@@ -1,0 +1,19 @@
+{
+  "magic": "MRPG",
+  "package_length": 76877,
+  "file_start_field": 6085,
+  "directory_start": 240,
+  "directory_end": 6093,
+  "filename": "res.mrp",
+  "display_name": "蜀山ol",
+  "authorization": "48cd24923",
+  "appid": 403084,
+  "version": 14,
+  "flags": 7,
+  "builder_version": 10002,
+  "stored_crc32": "a90532dc",
+  "vendor": "博荣无限",
+  "description": "蜀山剑侠Online",
+  "extra_header_ascii": "",
+  "sha256": "b0bdd61c9b7ef41ed8c1c076eb1764711d13d86de231fda59d5fd6255bc8b491"
+}

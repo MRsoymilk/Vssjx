@@ -1,0 +1,11 @@
+*.gd text eol=lf
+*.gd.uid text eol=lf
+*.tscn text eol=lf
+*.godot text eol=lf
+*.py text eol=lf
+*.md text eol=lf
+.gitattributes text eol=lf
+.gitignore text eol=lf
+LICENSE text eol=lf
+# Preserve bytes in the original decoded and unpacked reference materials.
+analysis/** -text

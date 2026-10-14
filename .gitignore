@@ -1,0 +1,7 @@
+.godot/
+*.import
+*.tmp
+work/
+__pycache__/
+*.py[cod]
+*.zip

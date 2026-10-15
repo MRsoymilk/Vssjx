@@ -6,6 +6,7 @@ __pycache__/
 *.py[cod]
 *.zip
 /server/target/
+/tests/load_driver/target/
 .env
 .env.*
 !.env.sample.txt

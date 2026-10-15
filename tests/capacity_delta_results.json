@@ -1,0 +1,834 @@
+{
+  "environment": {
+    "profile": {
+      "profile": "shared-map-capacity-v1",
+      "players": 1000,
+      "admission_seconds": 60,
+      "warmup_seconds": 5,
+      "stages": [
+        {
+          "name": "move60-50",
+          "players": 50,
+          "moving_percent": 60,
+          "seconds": 30
+        },
+        {
+          "name": "move60-200",
+          "players": 200,
+          "moving_percent": 60,
+          "seconds": 30
+        },
+        {
+          "name": "move60-500",
+          "players": 500,
+          "moving_percent": 60,
+          "seconds": 30
+        },
+        {
+          "name": "idle-1000",
+          "players": 1000,
+          "moving_percent": 0,
+          "seconds": 30
+        },
+        {
+          "name": "move60-1000",
+          "players": 1000,
+          "moving_percent": 60,
+          "seconds": 60
+        },
+        {
+          "name": "move100-1000",
+          "players": 1000,
+          "moving_percent": 100,
+          "seconds": 30
+        }
+      ]
+    },
+    "date_utc": "2026-10-15T07:53:43Z",
+    "host": "Linux-7.1.3-gentoo-dist-bin-x86_64-Intel-R-_Core-TM-_i5-8300H_CPU_@_2.30GHz-with-glibc2.43",
+    "cpu_model": "Intel(R) Core(TM) i5-8300H CPU @ 2.30GHz",
+    "logical_cpus": 8,
+    "affinity": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "memory_available_before_mib": 5803.4765625,
+    "nofile_limit": [
+      4096,
+      4096
+    ],
+    "source_sha256": "150f76329ec127a47bcfea7ad1d17ccc12c05a3181022ea08803d90dd5c4d4bc",
+    "git_head": "fff31f2d9ea7bddbd9b809c535bd75f124df71d5",
+    "dirty": true,
+    "rustc": "rustc 1.97.1 (8bab26f4f 2026-07-14)",
+    "server_binary_sha256": "6a623dcb9a9bad097ce101cbd51c3da0144b1a818b1bc5c2316e33a56cc38fba",
+    "driver_binary_sha256": "d66b93d51dc9bed30cc9a2b5637df04e812093f28df632189949333232251c84",
+    "transport": "loopback WS/HTTP, no TLS/proxy/compression; server, driver and DB on same host",
+    "database_storage": "disposable PostgreSQL 17 Docker tmpfs; not production durable disk",
+    "scope": "one shared map, all players visible; 2s fixed-rate destination changes, 3s heartbeat, 1 global chat message/s; NO PVE/inventory workload",
+    "nonsecret_overrides": {
+      "SSJX_ENV_FILE": "",
+      "SSJX_BIND_ADDR": "127.0.0.1:0",
+      "RUST_LOG": "info",
+      "SSJX_AUTH_RATE_GLOBAL": "100000",
+      "SSJX_AUTH_RATE_IP": "10000",
+      "SSJX_AUTH_RATE_ACCOUNT": "1000",
+      "SSJX_AUTH_ACCESS_SECONDS": "3600"
+    },
+    "driver_exit_code": 0,
+    "aborted": null,
+    "database": "{\"version\" : \"PostgreSQL 17.11 (Debian 17.11-1.pgdg12+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 12.2.0-14+deb12u1) 12.2.0, 64-bit\", \"fsync\" : \"on\", \"synchronous_commit\" : \"on\", \"shared_buffers\" : \"128MB\", \"max_connections\" : \"100\"}",
+    "database_statistics": "{\"numbackends\":11,\"xact_commit\":293627,\"xact_rollback\":0,\"deadlocks\":0,\"temp_bytes\":0}"
+  },
+  "setup": {
+    "players": 1000,
+    "register_login_create": {
+      "count": 1000,
+      "max_ms": 90.01293100000001,
+      "mean_ms": 53.944731829000084,
+      "p50_ms": 52,
+      "p95_ms": 66,
+      "p99_ms": 76
+    },
+    "seconds": 27.134178758
+  },
+  "preliminary_gate_definition": "short loopback current-feature probe only: all clients online and verify population; zero errors; >=98% fixed offered movement; movement/ping p95<=500ms; complete reconstructed-world frontiers>=8Hz (v1 full snapshots; v2 baseline plus contiguous deltas). V2 additionally requires complete population before timing and every client>=8Hz; >=0.9 chat/s offered and chat p95<=1000ms. NOT full-game or 60min production acceptance.",
+  "overall_resources": {
+    "server": {
+      "rss_peak_mib": 278.1015625,
+      "fds_peak": 1020,
+      "threads_peak": 11,
+      "cpu_mean_percent_one_core_100": 76.37677905674101,
+      "cpu_peak_percent_one_core_100": 188.90951556759475
+    },
+    "driver": {
+      "rss_peak_mib": 323.453125,
+      "fds_peak": 1006,
+      "threads_peak": 9,
+      "cpu_mean_percent_one_core_100": 100.61923542002992,
+      "cpu_peak_percent_one_core_100": 330.5315944960828
+    },
+    "database": {
+      "sample_count": 27,
+      "cpu_mean_percent_one_core_100": 18.732592592592592,
+      "cpu_peak_percent_one_core_100": 38.29,
+      "memory_peak_mib": 127.0
+    }
+  },
+  "results": [
+    {
+      "active_at_end": 50,
+      "active_at_start": 50,
+      "authenticated_total": 50,
+      "chat_accepted": 30,
+      "chat_deliveries": 1500,
+      "chat_delivery": {
+        "count": 1500,
+        "max_ms": 149.871536,
+        "mean_ms": 52.43993559066668,
+        "p50_ms": 51,
+        "p95_ms": 57,
+        "p99_ms": 97
+      },
+      "chat_sends": 30,
+      "clients_ever_saw_entire_population": 50,
+      "entity_records_delivered": 328500,
+      "errors": {},
+      "full_population_snapshots": 15000,
+      "full_population_state_updates": 15000,
+      "full_visibility_at_start": 50,
+      "initial_snapshot_installs": 50,
+      "live_clients_saw_entire_population": 50,
+      "measure_end_unix": 1792050887.501925,
+      "measure_start_unix": 1792050857.5008013,
+      "measured_seconds": 30.0010935,
+      "minimum_client_state_updates": 300,
+      "missed_scheduled_actions": 0,
+      "movement_snapshot_observation": {
+        "count": 450,
+        "max_ms": 122.85195,
+        "mean_ms": 60.63666966222227,
+        "p50_ms": 51,
+        "p95_ms": 100,
+        "p99_ms": 119
+      },
+      "moves_planned": 450,
+      "moves_sent": 450,
+      "moves_unobserved_at_end": 0,
+      "packets": 17060,
+      "payload_bytes": 10094650,
+      "payload_mib_per_second": 0.32088858488142613,
+      "peak_active": 50,
+      "ping_roundtrip": {
+        "count": 500,
+        "max_ms": 46.090454,
+        "mean_ms": 1.480831564,
+        "p50_ms": 2,
+        "p95_ms": 3,
+        "p99_ms": 5
+      },
+      "pings_sent": 500,
+      "pings_unanswered_at_end": 0,
+      "ramp_seconds": 0.404113995,
+      "replication_contract": "initial snapshot plus ordered VWD2 deltas; legacy snapshot counters count reconstructed state observations, not repeated full snapshots",
+      "snapshot_interval": {
+        "count": 14950,
+        "max_ms": 143.34521,
+        "mean_ms": 99.99912030722349,
+        "p50_ms": 101,
+        "p95_ms": 102,
+        "p99_ms": 102
+      },
+      "snapshots": 15000,
+      "stage": {
+        "moving_percent": 60,
+        "name": "move60-50",
+        "players": 50,
+        "seconds": 30
+      },
+      "state_updates": 15000,
+      "ticket_to_auth_ready": {
+        "count": 50,
+        "max_ms": 102.40796900000001,
+        "mean_ms": 89.51980442,
+        "p50_ms": 101,
+        "p95_ms": 103,
+        "p99_ms": 103
+      },
+      "ticket_to_first_valid_snapshot": {
+        "count": 50,
+        "max_ms": 148.073873,
+        "mean_ms": 131.97106053999997,
+        "p50_ms": 143,
+        "p95_ms": 148,
+        "p99_ms": 149
+      },
+      "world_sync_version": 2,
+      "expected_fixed_rate_moves": 451,
+      "fixed_population_measurement": true,
+      "full_population_snapshots_per_client_second": 9.999635513285542,
+      "full_population_state_updates_per_client_second": 9.999635513285542,
+      "minimum_client_state_updates_per_second": 9.999635513285542,
+      "preliminary_gate": "PASS",
+      "preliminary_failure_reasons": [],
+      "resources": {
+        "server": {
+          "rss_peak_mib": 91.4765625,
+          "fds_peak": 70,
+          "threads_peak": 11,
+          "cpu_mean_percent_one_core_100": 7.765112948012352,
+          "cpu_peak_percent_one_core_100": 10.968407314118837
+        },
+        "driver": {
+          "rss_peak_mib": 11.25390625,
+          "fds_peak": 56,
+          "threads_peak": 9,
+          "cpu_mean_percent_one_core_100": 6.825925619245679,
+          "cpu_peak_percent_one_core_100": 11.970273407028282
+        },
+        "database": {
+          "sample_count": 2,
+          "cpu_mean_percent_one_core_100": 2.5,
+          "cpu_peak_percent_one_core_100": 2.69,
+          "memory_peak_mib": 105.0
+        }
+      }
+    },
+    {
+      "active_at_end": 200,
+      "active_at_start": 200,
+      "authenticated_total": 200,
+      "chat_accepted": 30,
+      "chat_deliveries": 6000,
+      "chat_delivery": {
+        "count": 6000,
+        "max_ms": 206.741405,
+        "mean_ms": 72.7946605881668,
+        "p50_ms": 78,
+        "p95_ms": 138,
+        "p99_ms": 147
+      },
+      "chat_sends": 30,
+      "clients_ever_saw_entire_population": 200,
+      "entity_records_delivered": 5136000,
+      "errors": {},
+      "full_population_snapshots": 60000,
+      "full_population_state_updates": 60000,
+      "full_visibility_at_start": 200,
+      "initial_snapshot_installs": 200,
+      "live_clients_saw_entire_population": 200,
+      "measure_end_unix": 1792050925.8377213,
+      "measure_start_unix": 1792050895.8367517,
+      "measured_seconds": 30.000911865,
+      "minimum_client_state_updates": 300,
+      "missed_scheduled_actions": 0,
+      "movement_snapshot_observation": {
+        "count": 1793,
+        "max_ms": 146.67158,
+        "mean_ms": 62.80986174790846,
+        "p50_ms": 60,
+        "p95_ms": 103,
+        "p99_ms": 120
+      },
+      "moves_planned": 1799,
+      "moves_sent": 1798,
+      "moves_unobserved_at_end": 6,
+      "packets": 68060,
+      "payload_bytes": 139734100,
+      "payload_mib_per_second": 4.441892396331086,
+      "peak_active": 200,
+      "ping_roundtrip": {
+        "count": 2000,
+        "max_ms": 47.751332,
+        "mean_ms": 2.4748222430000006,
+        "p50_ms": 2,
+        "p95_ms": 9,
+        "p99_ms": 41
+      },
+      "pings_sent": 2000,
+      "pings_unanswered_at_end": 0,
+      "ramp_seconds": 1.31752036,
+      "replication_contract": "initial snapshot plus ordered VWD2 deltas; legacy snapshot counters count reconstructed state observations, not repeated full snapshots",
+      "snapshot_interval": {
+        "count": 59799,
+        "max_ms": 154.53804,
+        "mean_ms": 99.99921113167396,
+        "p50_ms": 101,
+        "p95_ms": 107,
+        "p99_ms": 112
+      },
+      "snapshots": 60000,
+      "stage": {
+        "moving_percent": 60,
+        "name": "move60-200",
+        "players": 200,
+        "seconds": 30
+      },
+      "state_updates": 60000,
+      "ticket_to_auth_ready": {
+        "count": 200,
+        "max_ms": 117.23959500000001,
+        "mean_ms": 95.64562355999996,
+        "p50_ms": 101,
+        "p95_ms": 109,
+        "p99_ms": 113
+      },
+      "ticket_to_first_valid_snapshot": {
+        "count": 200,
+        "max_ms": 151.285593,
+        "mean_ms": 132.80039496500004,
+        "p50_ms": 140,
+        "p95_ms": 150,
+        "p99_ms": 151
+      },
+      "world_sync_version": 2,
+      "expected_fixed_rate_moves": 1800,
+      "fixed_population_measurement": true,
+      "full_population_snapshots_per_client_second": 9.999696054238584,
+      "full_population_state_updates_per_client_second": 9.999696054238584,
+      "minimum_client_state_updates_per_second": 9.999696054238584,
+      "preliminary_gate": "PASS",
+      "preliminary_failure_reasons": [],
+      "resources": {
+        "server": {
+          "rss_peak_mib": 114.1015625,
+          "fds_peak": 220,
+          "threads_peak": 9,
+          "cpu_mean_percent_one_core_100": 30.86072646429675,
+          "cpu_peak_percent_one_core_100": 37.75147397532331
+        },
+        "driver": {
+          "rss_peak_mib": 34.328125,
+          "fds_peak": 206,
+          "threads_peak": 9,
+          "cpu_mean_percent_one_core_100": 31.74965263507275,
+          "cpu_peak_percent_one_core_100": 42.51252994179232
+        },
+        "database": {
+          "sample_count": 3,
+          "cpu_mean_percent_one_core_100": 11.893333333333333,
+          "cpu_peak_percent_one_core_100": 17.11,
+          "memory_peak_mib": 108.0
+        }
+      }
+    },
+    {
+      "active_at_end": 500,
+      "active_at_start": 500,
+      "authenticated_total": 500,
+      "chat_accepted": 30,
+      "chat_deliveries": 15000,
+      "chat_delivery": {
+        "count": 15000,
+        "max_ms": 121.041309,
+        "mean_ms": 65.17030430340012,
+        "p50_ms": 65,
+        "p95_ms": 87,
+        "p99_ms": 97
+      },
+      "chat_sends": 30,
+      "clients_ever_saw_entire_population": 500,
+      "entity_records_delivered": 31854500,
+      "errors": {},
+      "full_population_snapshots": 150000,
+      "full_population_state_updates": 150000,
+      "full_visibility_at_start": 500,
+      "initial_snapshot_installs": 500,
+      "live_clients_saw_entire_population": 500,
+      "measure_end_unix": 1792050966.1127887,
+      "measure_start_unix": 1792050936.1118672,
+      "measured_seconds": 30.000841937,
+      "minimum_client_state_updates": 300,
+      "missed_scheduled_actions": 0,
+      "movement_snapshot_observation": {
+        "count": 4489,
+        "max_ms": 151.930949,
+        "mean_ms": 70.67910676208524,
+        "p50_ms": 74,
+        "p95_ms": 112,
+        "p99_ms": 126
+      },
+      "moves_planned": 4496,
+      "moves_sent": 4496,
+      "moves_unobserved_at_end": 7,
+      "packets": 170060,
+      "payload_bytes": 843700100,
+      "payload_mib_per_second": 26.819751185951016,
+      "peak_active": 500,
+      "ping_roundtrip": {
+        "count": 5000,
+        "max_ms": 69.302976,
+        "mean_ms": 5.385971068999999,
+        "p50_ms": 2,
+        "p95_ms": 25,
+        "p99_ms": 45
+      },
+      "pings_sent": 5000,
+      "pings_unanswered_at_end": 0,
+      "ramp_seconds": 3.246818347,
+      "replication_contract": "initial snapshot plus ordered VWD2 deltas; legacy snapshot counters count reconstructed state observations, not repeated full snapshots",
+      "snapshot_interval": {
+        "count": 149500,
+        "max_ms": 174.911907,
+        "mean_ms": 100.05165884034658,
+        "p50_ms": 101,
+        "p95_ms": 122,
+        "p99_ms": 131
+      },
+      "snapshots": 150000,
+      "stage": {
+        "moving_percent": 60,
+        "name": "move60-500",
+        "players": 500,
+        "seconds": 30
+      },
+      "state_updates": 150000,
+      "ticket_to_auth_ready": {
+        "count": 500,
+        "max_ms": 120.940491,
+        "mean_ms": 97.87349576599993,
+        "p50_ms": 99,
+        "p95_ms": 114,
+        "p99_ms": 116
+      },
+      "ticket_to_first_valid_snapshot": {
+        "count": 500,
+        "max_ms": 155.488695,
+        "mean_ms": 124.47146296,
+        "p50_ms": 131,
+        "p95_ms": 146,
+        "p99_ms": 148
+      },
+      "world_sync_version": 2,
+      "expected_fixed_rate_moves": 4500,
+      "fixed_population_measurement": true,
+      "full_population_snapshots_per_client_second": 9.99971936220931,
+      "full_population_state_updates_per_client_second": 9.99971936220931,
+      "minimum_client_state_updates_per_second": 9.99971936220931,
+      "preliminary_gate": "PASS",
+      "preliminary_failure_reasons": [],
+      "resources": {
+        "server": {
+          "rss_peak_mib": 163.3515625,
+          "fds_peak": 520,
+          "threads_peak": 9,
+          "cpu_mean_percent_one_core_100": 64.7445899285502,
+          "cpu_peak_percent_one_core_100": 84.03018694128365
+        },
+        "driver": {
+          "rss_peak_mib": 100.22265625,
+          "fds_peak": 506,
+          "threads_peak": 9,
+          "cpu_mean_percent_one_core_100": 105.20752756147796,
+          "cpu_peak_percent_one_core_100": 152.6266777944652
+        },
+        "database": {
+          "sample_count": 2,
+          "cpu_mean_percent_one_core_100": 22.79,
+          "cpu_peak_percent_one_core_100": 24.61,
+          "memory_peak_mib": 108.4
+        }
+      }
+    },
+    {
+      "active_at_end": 1000,
+      "active_at_start": 1000,
+      "authenticated_total": 1000,
+      "chat_accepted": 30,
+      "chat_deliveries": 30000,
+      "chat_delivery": {
+        "count": 30000,
+        "max_ms": 171.88631600000002,
+        "mean_ms": 78.64121977683382,
+        "p50_ms": 74,
+        "p95_ms": 115,
+        "p99_ms": 136
+      },
+      "chat_sends": 30,
+      "clients_ever_saw_entire_population": 1000,
+      "entity_records_delivered": 0,
+      "errors": {},
+      "full_population_snapshots": 300001,
+      "full_population_state_updates": 300001,
+      "full_visibility_at_start": 1000,
+      "initial_snapshot_installs": 1000,
+      "live_clients_saw_entire_population": 1000,
+      "measure_end_unix": 1792051010.2919397,
+      "measure_start_unix": 1792050980.2904763,
+      "measured_seconds": 30.001426612,
+      "minimum_client_state_updates": 300,
+      "missed_scheduled_actions": 0,
+      "movement_snapshot_observation": {
+        "count": 0,
+        "max_ms": 0.0,
+        "mean_ms": 0.0,
+        "p50_ms": null,
+        "p95_ms": null,
+        "p99_ms": null
+      },
+      "moves_planned": 0,
+      "moves_sent": 0,
+      "moves_unobserved_at_end": 0,
+      "packets": 340064,
+      "payload_bytes": 30949215,
+      "payload_mib_per_second": 0.9838022651439325,
+      "peak_active": 1000,
+      "ping_roundtrip": {
+        "count": 9999,
+        "max_ms": 92.109158,
+        "mean_ms": 4.616473400540052,
+        "p50_ms": 1,
+        "p95_ms": 21,
+        "p99_ms": 42
+      },
+      "pings_sent": 10000,
+      "pings_unanswered_at_end": 0,
+      "ramp_seconds": 7.149494954,
+      "replication_contract": "initial snapshot plus ordered VWD2 deltas; legacy snapshot counters count reconstructed state observations, not repeated full snapshots",
+      "snapshot_interval": {
+        "count": 299000,
+        "max_ms": 183.93222,
+        "mean_ms": 99.9784249897854,
+        "p50_ms": 100,
+        "p95_ms": 114,
+        "p99_ms": 121
+      },
+      "snapshots": 300001,
+      "stage": {
+        "moving_percent": 0,
+        "name": "idle-1000",
+        "players": 1000,
+        "seconds": 30
+      },
+      "state_updates": 300001,
+      "ticket_to_auth_ready": {
+        "count": 1000,
+        "max_ms": 265.493861,
+        "mean_ms": 107.19791285600003,
+        "p50_ms": 101,
+        "p95_ms": 185,
+        "p99_ms": 221
+      },
+      "ticket_to_first_valid_snapshot": {
+        "count": 1000,
+        "max_ms": 300.50327799999997,
+        "mean_ms": 128.70172804799986,
+        "p50_ms": 131,
+        "p95_ms": 207,
+        "p99_ms": 256
+      },
+      "world_sync_version": 2,
+      "expected_fixed_rate_moves": 0,
+      "fixed_population_measurement": true,
+      "full_population_snapshots_per_client_second": 9.999557817027451,
+      "full_population_state_updates_per_client_second": 9.999557817027451,
+      "minimum_client_state_updates_per_second": 9.999524485279167,
+      "preliminary_gate": "PASS",
+      "preliminary_failure_reasons": [],
+      "resources": {
+        "server": {
+          "rss_peak_mib": 249.3515625,
+          "fds_peak": 1020,
+          "threads_peak": 9,
+          "cpu_mean_percent_one_core_100": 89.08170573911102,
+          "cpu_peak_percent_one_core_100": 127.74273589126476
+        },
+        "driver": {
+          "rss_peak_mib": 230.5546875,
+          "fds_peak": 1006,
+          "threads_peak": 9,
+          "cpu_mean_percent_one_core_100": 55.064765157379355,
+          "cpu_peak_percent_one_core_100": 85.47871167240052
+        },
+        "database": {
+          "sample_count": 2,
+          "cpu_mean_percent_one_core_100": 20.299999999999997,
+          "cpu_peak_percent_one_core_100": 20.61,
+          "memory_peak_mib": 108.9
+        }
+      }
+    },
+    {
+      "active_at_end": 1000,
+      "active_at_start": 1000,
+      "authenticated_total": 1000,
+      "chat_accepted": 60,
+      "chat_deliveries": 60000,
+      "chat_delivery": {
+        "count": 60000,
+        "max_ms": 200.056087,
+        "mean_ms": 93.36678080355028,
+        "p50_ms": 90,
+        "p95_ms": 135,
+        "p99_ms": 148
+      },
+      "chat_sends": 60,
+      "clients_ever_saw_entire_population": 1000,
+      "entity_records_delivered": 249013140,
+      "errors": {},
+      "full_population_snapshots": 599988,
+      "full_population_state_updates": 599988,
+      "full_visibility_at_start": 1000,
+      "initial_snapshot_installs": 1000,
+      "live_clients_saw_entire_population": 1000,
+      "measure_end_unix": 1792051083.5991814,
+      "measure_start_unix": 1792051023.5982463,
+      "measured_seconds": 60.000895641,
+      "minimum_client_state_updates": 599,
+      "missed_scheduled_actions": 0,
+      "movement_snapshot_observation": {
+        "count": 17979,
+        "max_ms": 229.080033,
+        "mean_ms": 85.41508336448132,
+        "p50_ms": 88,
+        "p95_ms": 136,
+        "p99_ms": 165
+      },
+      "moves_planned": 17994,
+      "moves_sent": 17994,
+      "moves_unobserved_at_end": 15,
+      "packets": 680096,
+      "payload_bytes": 6536386820,
+      "payload_mib_per_second": 103.89151971376191,
+      "peak_active": 1000,
+      "ping_roundtrip": {
+        "count": 19988,
+        "max_ms": 133.65060200000002,
+        "mean_ms": 9.480137279067451,
+        "p50_ms": 3,
+        "p95_ms": 43,
+        "p99_ms": 66
+      },
+      "pings_sent": 20001,
+      "pings_unanswered_at_end": 4,
+      "ramp_seconds": 6.279602401,
+      "replication_contract": "initial snapshot plus ordered VWD2 deltas; legacy snapshot counters count reconstructed state observations, not repeated full snapshots",
+      "snapshot_interval": {
+        "count": 598988,
+        "max_ms": 245.488898,
+        "mean_ms": 100.00737722853435,
+        "p50_ms": 100,
+        "p95_ms": 138,
+        "p99_ms": 165
+      },
+      "snapshots": 599988,
+      "stage": {
+        "moving_percent": 60,
+        "name": "move60-1000",
+        "players": 1000,
+        "seconds": 60
+      },
+      "state_updates": 599988,
+      "ticket_to_auth_ready": {
+        "count": 1000,
+        "max_ms": 124.16837,
+        "mean_ms": 97.28593437400004,
+        "p50_ms": 99,
+        "p95_ms": 109,
+        "p99_ms": 115
+      },
+      "ticket_to_first_valid_snapshot": {
+        "count": 1000,
+        "max_ms": 158.371331,
+        "mean_ms": 114.73308713100009,
+        "p50_ms": 108,
+        "p95_ms": 143,
+        "p99_ms": 148
+      },
+      "world_sync_version": 2,
+      "expected_fixed_rate_moves": 18000,
+      "fixed_population_measurement": true,
+      "full_population_snapshots_per_client_second": 9.99965073171365,
+      "full_population_state_updates_per_client_second": 9.99965073171365,
+      "minimum_client_state_updates_per_second": 9.983184310847012,
+      "preliminary_gate": "PASS",
+      "preliminary_failure_reasons": [],
+      "resources": {
+        "server": {
+          "rss_peak_mib": 270.4765625,
+          "fds_peak": 1020,
+          "threads_peak": 9,
+          "cpu_mean_percent_one_core_100": 82.93551379294321,
+          "cpu_peak_percent_one_core_100": 104.1989349400326
+        },
+        "driver": {
+          "rss_peak_mib": 260.265625,
+          "fds_peak": 1006,
+          "threads_peak": 9,
+          "cpu_mean_percent_one_core_100": 196.34631184474918,
+          "cpu_peak_percent_one_core_100": 263.13092301684185
+        },
+        "database": {
+          "sample_count": 5,
+          "cpu_mean_percent_one_core_100": 27.39,
+          "cpu_peak_percent_one_core_100": 33.02,
+          "memory_peak_mib": 127.0
+        }
+      }
+    },
+    {
+      "active_at_end": 1000,
+      "active_at_start": 1000,
+      "authenticated_total": 1000,
+      "chat_accepted": 30,
+      "chat_deliveries": 30000,
+      "chat_delivery": {
+        "count": 30000,
+        "max_ms": 222.32706,
+        "mean_ms": 123.49738989786718,
+        "p50_ms": 124,
+        "p95_ms": 161,
+        "p99_ms": 196
+      },
+      "chat_sends": 30,
+      "clients_ever_saw_entire_population": 1000,
+      "entity_records_delivered": 212432224,
+      "errors": {},
+      "full_population_snapshots": 300024,
+      "full_population_state_updates": 300024,
+      "full_visibility_at_start": 1000,
+      "initial_snapshot_installs": 1000,
+      "live_clients_saw_entire_population": 1000,
+      "measure_end_unix": 1792051127.5640466,
+      "measure_start_unix": 1792051097.5613496,
+      "measured_seconds": 30.002639968,
+      "minimum_client_state_updates": 300,
+      "missed_scheduled_actions": 0,
+      "movement_snapshot_observation": {
+        "count": 14933,
+        "max_ms": 254.49767099999997,
+        "mean_ms": 94.58888099116012,
+        "p50_ms": 93,
+        "p95_ms": 156,
+        "p99_ms": 191
+      },
+      "moves_planned": 14988,
+      "moves_sent": 14988,
+      "moves_unobserved_at_end": 55,
+      "packets": 340084,
+      "payload_bytes": 5554287604,
+      "payload_mib_per_second": 176.55051153891873,
+      "peak_active": 1000,
+      "ping_roundtrip": {
+        "count": 10000,
+        "max_ms": 155.128254,
+        "mean_ms": 12.337217336699993,
+        "p50_ms": 4,
+        "p95_ms": 52,
+        "p99_ms": 87
+      },
+      "pings_sent": 10001,
+      "pings_unanswered_at_end": 0,
+      "ramp_seconds": 6.9314474310000005,
+      "replication_contract": "initial snapshot plus ordered VWD2 deltas; legacy snapshot counters count reconstructed state observations, not repeated full snapshots",
+      "snapshot_interval": {
+        "count": 298347,
+        "max_ms": 276.953667,
+        "mean_ms": 100.07869880480062,
+        "p50_ms": 100,
+        "p95_ms": 157,
+        "p99_ms": 191
+      },
+      "snapshots": 300024,
+      "stage": {
+        "moving_percent": 100,
+        "name": "move100-1000",
+        "players": 1000,
+        "seconds": 30
+      },
+      "state_updates": 300024,
+      "ticket_to_auth_ready": {
+        "count": 1000,
+        "max_ms": 225.517826,
+        "mean_ms": 104.48221508699993,
+        "p50_ms": 100,
+        "p95_ms": 162,
+        "p99_ms": 196
+      },
+      "ticket_to_first_valid_snapshot": {
+        "count": 1000,
+        "max_ms": 249.389117,
+        "mean_ms": 125.25979528899987,
+        "p50_ms": 128,
+        "p95_ms": 178,
+        "p99_ms": 208
+      },
+      "world_sync_version": 2,
+      "expected_fixed_rate_moves": 15001,
+      "fixed_population_measurement": true,
+      "full_population_snapshots_per_client_second": 9.999920017705023,
+      "full_population_state_updates_per_client_second": 9.999920017705023,
+      "minimum_client_state_updates_per_second": 9.999120088097975,
+      "preliminary_gate": "PASS",
+      "preliminary_failure_reasons": [],
+      "resources": {
+        "server": {
+          "rss_peak_mib": 278.1015625,
+          "fds_peak": 1020,
+          "threads_peak": 9,
+          "cpu_mean_percent_one_core_100": 93.44355266274674,
+          "cpu_peak_percent_one_core_100": 101.4825418996055
+        },
+        "driver": {
+          "rss_peak_mib": 323.453125,
+          "fds_peak": 1006,
+          "threads_peak": 9,
+          "cpu_mean_percent_one_core_100": 297.04353022729936,
+          "cpu_peak_percent_one_core_100": 330.5315944960828
+        },
+        "database": {
+          "sample_count": 3,
+          "cpu_mean_percent_one_core_100": 26.296666666666667,
+          "cpu_peak_percent_one_core_100": 29.52,
+          "memory_peak_mib": 127.0
+        }
+      }
+    }
+  ]
+}

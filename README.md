@@ -2,7 +2,7 @@
 
 基于 `analysis/` 中原始《蜀山剑侠Online》320×480 客户端素材，用 **Godot 4.7** 编写的离线可玩原型。
 
-工程已划分为`client/`（Godot客户端）和`server/`（Rust服务端）。已开放独立的线上账号/角色、青云山道多人同图移动和公共聊天；共享增量同步v2已接入；任务/PVE、容量和公网长稳验收仍属于后续阶段。联机进展见[design/README.md](design/README.md)。
+工程已划分为`client/`（Godot客户端）和`server/`（Rust服务端）。已开放独立的线上账号/角色、青云山道多人同图移动和公共聊天；当前功能千人短测已通过，任务/PVE、完整混合负载与公网长稳仍未验收，详见[容量记录](tests/capacity_delta.md)。联机进展见[design/README.md](design/README.md)。
 
 ## 启动
 

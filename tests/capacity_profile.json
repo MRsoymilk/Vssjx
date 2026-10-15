@@ -1,0 +1,14 @@
+{
+  "profile": "shared-map-capacity-v1",
+  "players": 1000,
+  "admission_seconds": 60,
+  "warmup_seconds": 5,
+  "stages": [
+    {"name": "move60-50", "players": 50, "moving_percent": 60, "seconds": 30},
+    {"name": "move60-200", "players": 200, "moving_percent": 60, "seconds": 30},
+    {"name": "move60-500", "players": 500, "moving_percent": 60, "seconds": 30},
+    {"name": "idle-1000", "players": 1000, "moving_percent": 0, "seconds": 30},
+    {"name": "move60-1000", "players": 1000, "moving_percent": 60, "seconds": 60},
+    {"name": "move100-1000", "players": 1000, "moving_percent": 100, "seconds": 30}
+  ]
+}

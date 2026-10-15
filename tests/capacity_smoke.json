@@ -1,0 +1,10 @@
+{
+  "profile": "capacity-tool-smoke-v1",
+  "players": 10,
+  "admission_seconds": 15,
+  "warmup_seconds": 1,
+  "stages": [
+    {"name": "smoke-idle", "players": 10, "moving_percent": 0, "seconds": 3},
+    {"name": "smoke-move", "players": 10, "moving_percent": 60, "seconds": 5}
+  ]
+}

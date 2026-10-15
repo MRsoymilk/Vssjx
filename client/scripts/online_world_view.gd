@@ -23,7 +23,8 @@ var _was_keyboard := false
 @onready var chat_button: Button = $Screen/Chrome/Toolbar/Social
 @onready var emote_button: Button = $Screen/Chat/ChatEmotes
 @onready var emote_picker: ChatEmotePicker = $Screen/Chat/EmotePicker
-@onready var menu: Control = $Menu
+@onready var menu: OriginalGameMenu = $GameMenu
+@onready var details: Control = $Menu
 var _character: Dictionary = {}
 var _system_text := "正在连接共享地图……"
 var _rendered_chat := ""
@@ -39,9 +40,10 @@ func _ready() -> void:
 	screen.action_requested.connect(_scene_action)
 	screen.hud.get_node("MapName").text = "青云山道"
 	screen.hud.get_node("Minimap").set_shared_world(map_data, {}, character_id)
-	$Menu/Panel/Continue.pressed.connect(func() -> void: menu.hide())
+	menu.chosen.connect(_scene_action)
+	$Menu/Panel/Continue.pressed.connect(func() -> void: details.hide())
 	$Menu/Panel/Leave.pressed.connect(_leave_world)
-	$Menu/Panel/Chat.pressed.connect(func() -> void: menu.hide(); _focus_chat())
+	$Menu/Panel/Chat.pressed.connect(_focus_chat)
 	chat_send.pressed.connect(_send_chat)
 	emote_button.pressed.connect(_toggle_emotes)
 	emote_picker.chosen.connect(_insert_emote)
@@ -70,26 +72,33 @@ func _leave_world() -> void:
 	close_requested.emit()
 
 func _scene_action(action: String) -> void:
+	if action == "menu":
+		details.hide()
+		emote_picker.hide()
+		chat_input.release_focus()
+		if network.world_ready: network.stop_moving()
+		_was_keyboard = false
+		if menu.visible: menu.dismiss()
+		else: menu.open()
+		return
+	menu.hide()
 	if action == "social":
 		_toggle_chat()
-		return
-	if action == "menu" and menu.visible:
-		menu.hide()
 		return
 	if network.world_ready: network.stop_moving()
 	emote_picker.hide()
 	chat_input.release_focus()
 	_was_keyboard = false
-	var titles := {"menu": "菜单", "properties": "人物属性", "quest": "任务", "bag": "背包", "map": "地图", "mail": "邮件", "reward": "奖励"}
+	var titles := {"system": "系统", "properties": "人物属性", "quest": "任务", "bag": "背包", "map": "地图", "mail": "邮件", "reward": "奖励", "shop": "商城", "craft": "炼制", "team": "队伍", "guild": "帮会", "trade": "交易"}
 	$Menu/Panel/Title.text = titles.get(action, "提示")
 	var body := "同图%d人 · 点击地图移动 / WASD\n公共消息在底部直接发送。\n线上进度由服务器保存。" % actors.size()
 	if action == "properties":
 		body = "%s\n等级%d · %s · %s派\n气血%d · 灵力%d · 铜币%d" % [String(_character.get("display_name", "")), int(_character.get("level", 1)), ["力士", "侠客", "隐者"][int(_character.get("job", 0))], ["峨眉", "花涧", "昆仑"][int(_character.get("school", 0))], int(_character.get("hp", 0)), int(_character.get("mp", 0)), int(_character.get("gold", 0))]
 	elif action == "map": body = "青云山道 · 同图%d人\n当前位置：%s\n小地图中的蓝点代表其他玩家。" % [actors.size(), screen.hud.get_node("MapCoordinates").text]
-	elif action in ["quest", "bag", "reward"]: body = "线上%s尚未开放。\n可在当前地图移动，与同图玩家聊天。" % titles[action]
+	elif action in ["quest", "bag", "reward", "shop", "craft", "team", "guild", "trade"]: body = "线上%s尚未开放。\n可在当前地图移动，与同图玩家聊天。" % titles[action]
 	elif action == "mail": body = "暂无邮件。"
 	$Menu/Panel/Body.text = body
-	menu.show()
+	details.show()
 
 func _status_changed(text_value: String) -> void:
 	status.text = text_value
@@ -152,18 +161,22 @@ func _snapshot(values: Dictionary) -> void:
 	_chat_changed()
 
 func _toggle_chat() -> void:
+	menu.hide()
+	details.hide()
 	emote_picker.hide()
 	if chat_input.has_focus(): chat_input.release_focus()
 	else: _focus_chat()
 
 func _focus_chat() -> void:
 	menu.hide()
+	details.hide()
 	emote_picker.hide()
 	chat_input.grab_focus()
 
 func _toggle_emotes() -> void:
 	if not _can_insert_emote(): return
 	menu.hide()
+	details.hide()
 	chat_input.grab_focus()
 	if network.world_ready: network.stop_moving()
 	_was_keyboard = false
@@ -233,7 +246,7 @@ func _process(delta: float) -> void:
 			actor.sprite.set_frame_and_progress(int(phase) % actor.sprite.sprite_frames.get_frame_count("walk"), fposmod(phase, 1.0))
 		elif actor.sprite.animation != "idle" or not actor.sprite.is_playing(): actor.sprite.play("idle")
 	if actors.has(character_id): camera.position = actors[character_id].root.position
-	if chat_input.has_focus() or menu.visible or emote_picker.visible:
+	if chat_input.has_focus() or menu.visible or details.visible or emote_picker.visible:
 		_was_keyboard = false
 		return
 	_key_timer -= delta
@@ -250,7 +263,7 @@ func _process(delta: float) -> void:
 		_was_keyboard = false
 
 func _map_input(event: InputEvent) -> void:
-	if not network.world_ready or menu.visible: return
+	if not network.world_ready or menu.visible or details.visible: return
 	var point := Vector2.ZERO
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed: point = event.position
 	elif event is InputEventScreenTouch and event.pressed: point = event.position
@@ -266,6 +279,8 @@ func _unhandled_key_input(event: InputEvent) -> void:
 	if not event is InputEventKey or not event.pressed: return
 	if event.keycode == KEY_ESCAPE:
 		if emote_picker.visible: emote_picker.hide()
+		elif menu.visible: menu.dismiss()
+		elif details.visible: details.hide()
 		elif chat_input.has_focus(): chat_input.release_focus()
 		else: _scene_action("menu")
 	elif event.keycode == KEY_ENTER: _focus_chat()

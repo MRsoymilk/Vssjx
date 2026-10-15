@@ -388,6 +388,10 @@ func _scene_action(action: String) -> void:
 		"map": _message("地图", ("青云山道" if int(Game.player.zone) == 0 else "古剑遗迹") + "\n\n当前位置：%d，%d\n" % [world.cell.x, world.cell.y] + Game.quest_text())
 		"mail": _message("邮件", "暂无邮件。")
 		"social": _message("社交", "尚未结交好友。")
+		"system": _system_menu()
+		"shop", "craft", "team", "guild", "trade":
+			var titles := {"shop": "商城", "craft": "炼制", "team": "队伍", "guild": "帮会", "trade": "交易"}
+			_message(titles[action], titles[action] + "暂未开放。")
 		"reward":
 			var panel := _modal_panel("奖励", 246, "reward")
 			_label(panel, Game.quest_text() + "\n\n完成山林试炼后，向清微道人领取奖励。", Rect2(18, 54, 248, 128), 12)
@@ -508,7 +512,7 @@ func _message(title: String, value: String) -> void:
 func _save_feedback() -> void:
 	world.stop_moving()
 	if Game.save_game():
-		_message("修行已保存", "下次从标题界面选择「继续修行」即可。\n\n存档会记录角色、任务、背包及所在位置。")
+		_message("修行已保存", "下次将服务地址设为local，进入游戏即可继续。\n\n存档会记录角色、任务、背包及所在位置。")
 	else:
 		_message("保存失败", Game.last_save_error)
 
@@ -542,15 +546,36 @@ func _quest() -> void:
 	_message("蜀山初行", Game.quest_text() + "\n\n路线：道人领受试炼 → 三只山狼 →\n道人领取奖励 → 东侧灵门 → 遗迹妖王\n\n点击目标可自动寻路。战斗失败会回山门，\n保留任务进度、铜钱和装备。")
 
 func _menu() -> void:
-	var panel := _modal_panel("菜单", 376)
-	_label(panel, "键盘：WASD / 方向键移动，E 交互。\nC 查看人物属性。点击地图可行走。\n每10秒自动存档，任务与战斗结算也会保存。", Rect2(18, 54, 248, 80), 11, TEAL)
-	_button(panel, "继续修行", Rect2(18, 140, 248, 31), _close_modal, true)
-	_button(panel, "人物属性", Rect2(18, 182, 117, 31), _attributes)
-	_button(panel, "门派", Rect2(145, 182, 121, 31), _school)
-	_button(panel, "调息", Rect2(18, 224, 248, 31), _rest)
-	_button(panel, "玩法与重建说明", Rect2(18, 266, 248, 31), _about)
-	_button(panel, "保存并返回标题", Rect2(18, 308, 248, 31), func() -> void:
-		if Game.save_game(): _home()
+	if modal is OriginalGameMenu:
+		_close_modal()
+		return
+	_close_modal()
+	if is_instance_valid(world):
+		world.stop_moving()
+		world.enabled = false
+	var popup: OriginalGameMenu = load("res://scenes/ui/game_menu.tscn").instantiate()
+	modal = popup
+	ui.add_child(popup)
+	popup.dismissed.connect(_close_modal)
+	popup.chosen.connect(func(action: String) -> void:
+		_close_modal()
+		_scene_action(action)
+	)
+	popup.open()
+
+func _system_menu() -> void:
+	_close_modal()
+	if is_instance_valid(world):
+		world.stop_moving()
+		world.enabled = false
+	modal = load("res://scenes/ui/system_menu.tscn").instantiate()
+	ui.add_child(modal)
+	modal.get_node("Panel/Continue").pressed.connect(_close_modal)
+	modal.get_node("Panel/Save").pressed.connect(_save_feedback)
+	modal.get_node("Panel/School").pressed.connect(_school)
+	modal.get_node("Panel/Rest").pressed.connect(_rest)
+	modal.get_node("Panel/Leave").pressed.connect(func() -> void:
+		if Game.save_game(): _return_to_server_login()
 		else: _message("保存失败", Game.last_save_error)
 	)
 

@@ -112,8 +112,8 @@ func _run() -> void:
 	await capture("01_online_chat")
 	view.screen.chrome.toolbar.get_node("Menu").pressed.emit()
 	check(view.menu.visible and not view.chat_input.has_focus(), "Original game menu opens without invoking offline menu actions")
-	view.get_node("Menu/Panel/Continue").pressed.emit()
-	check(not view.menu.visible, "Continue closes the in-world menu")
+	view.menu.get_node("Dismiss").pressed.emit()
+	check(not view.menu.visible, "Outside click closes the in-world menu")
 	var click := InputEventMouseButton.new()
 	click.button_index = MOUSE_BUTTON_LEFT
 	click.pressed = true

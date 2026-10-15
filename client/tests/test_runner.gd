@@ -413,7 +413,7 @@ func _run() -> void:
 	await get_tree().process_frame
 	check(app.mode == "world" and int(Game.player.quest) == 4, "Continue reloads completed character")
 	app._menu()
-	press("人物属性")
+	press("人物")
 	check(app.mode == "attributes" and not app.world.enabled and not app.world_view.visible, "Properties screen pauses the world")
 	check(app.attributes.snapshot.name == Game.player.name and app.attributes.preview.sprite_frames == OriginalArt.cached[Game.actor_key()], "Properties show saved name and current avatar")
 	check(app.attributes.bars.hp.value == int(Game.player.hp) and app.attributes.bars.mp.max_value == int(Game.stats().mp), "Properties bind current and maximum combat stats")
@@ -470,6 +470,7 @@ func _run() -> void:
 	app._close_modal()
 	for school in 3:
 		app._menu()
+		press("系统")
 		press("门派")
 		press(Game.SCHOOLS[school] + "派")
 		check(Game.load_game() and int(Game.player.school) == school and app.mode == "world", "Menu school choice persists identity and returns to world")

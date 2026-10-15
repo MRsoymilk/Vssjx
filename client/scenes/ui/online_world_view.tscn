@@ -3,6 +3,7 @@
 [ext_resource type="Script" path="res://scripts/network/online_world_client.gd" id="Network"]
 [ext_resource type="PackedScene" path="res://scenes/ui/game_world_screen.tscn" id="Screen"]
 [ext_resource type="PackedScene" path="res://scenes/ui/online_menu.tscn" id="Menu"]
+[ext_resource type="PackedScene" path="res://scenes/ui/game_menu.tscn" id="GameMenu"]
 
 [node name="OnlineWorldView" type="Control"]
 offset_right = 320.0
@@ -27,5 +28,6 @@ offset_bottom = 403.0
 [node name="Screen" parent="." instance=ExtResource("Screen")]
 online_mode = true
 [node name="Menu" parent="." instance=ExtResource("Menu")]
+[node name="GameMenu" parent="." instance=ExtResource("GameMenu")]
 [node name="Network" type="Node" parent="."]
 script = ExtResource("Network")

@@ -83,7 +83,7 @@ func _run() -> void:
 	sender_view.emote_button.pressed.emit()
 	sender_view.screen.chrome.toolbar.get_node("Menu").pressed.emit()
 	check(not sender_view.emote_picker.visible and sender_view.menu.visible, "Opening the game menu closes the picker")
-	sender_view.get_node("Menu/Panel/Continue").pressed.emit()
+	sender_view.menu.get_node("Dismiss").pressed.emit()
 	sender_view.emote_button.pressed.emit()
 	var click := InputEventMouseButton.new()
 	click.button_index = MOUSE_BUTTON_LEFT

@@ -33,6 +33,8 @@ func _run() -> void:
 		"battle_encounter_transition": ["Warning", "Caption", "Detail"],
 		"game_world_screen": ["Chrome", "Hud/Minimap", "Chat/ChatInput", "Chat/ChatLog", "Chat/ChatEmotes", "Chat/EmotePicker"],
 		"chat_emote_picker": ["Content/Header/Close", "Content/Grid/Smile", "Content/Grid/Cheer"],
+		"game_menu": ["Dismiss", "Panel/Rows/Shop", "Panel/Rows/Properties", "Panel/Rows/System"],
+		"system_menu": ["Panel/Save", "Panel/School", "Panel/Leave"],
 		"online_world_view": ["Viewport/Scene/Camera", "Screen/Chat/ChatInput", "Network"],
 		"modal_overlay": ["Shade"],
 		"dialog_frame": ["Title"],

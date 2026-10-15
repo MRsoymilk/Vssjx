@@ -1,0 +1,118 @@
+[gd_scene format=3]
+[ext_resource type="Script" path="res://scripts/game_menu.gd" id="Script"]
+[sub_resource type="SystemFont" id="Font"]
+font_names = PackedStringArray("SimHei", "Microsoft YaHei", "Noto Sans CJK SC", "sans-serif")
+antialiasing = 0
+[sub_resource type="StyleBoxFlat" id="Paper"]
+bg_color = Color(1, 0.956863, 0.756863, 1)
+border_color = Color(0.458824, 0.286275, 0.129412, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+content_margin_left = 2.0
+content_margin_top = 2.0
+content_margin_right = 2.0
+content_margin_bottom = 2.0
+shadow_color = Color(0.1, 0.15, 0.1, 0.5)
+shadow_size = 2
+[sub_resource type="StyleBoxEmpty" id="Empty"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+[sub_resource type="StyleBoxFlat" id="Selected"]
+bg_color = Color(1, 0.760784, 0.254902, 1)
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+[sub_resource type="Theme" id="Theme"]
+default_font = SubResource("Font")
+default_font_size = 18
+Button/colors/font_color = Color(0.396078, 0.270588, 0.094118, 1)
+Button/colors/font_hover_color = Color(0.396078, 0.270588, 0.094118, 1)
+Button/colors/font_pressed_color = Color(0.396078, 0.270588, 0.094118, 1)
+Button/styles/normal = SubResource("Empty")
+Button/styles/hover = SubResource("Selected")
+Button/styles/pressed = SubResource("Selected")
+Button/styles/focus = SubResource("Empty")
+
+[node name="GameMenu" type="Control"]
+visible = false
+offset_right = 320.0
+offset_bottom = 480.0
+theme = SubResource("Theme")
+script = ExtResource("Script")
+[node name="Dismiss" type="Button" parent="."]
+offset_right = 320.0
+offset_bottom = 480.0
+focus_mode = 0
+theme_override_styles/normal = SubResource("Empty")
+theme_override_styles/hover = SubResource("Empty")
+theme_override_styles/pressed = SubResource("Empty")
+theme_override_styles/focus = SubResource("Empty")
+[node name="Panel" type="PanelContainer" parent="."]
+offset_left = 2.0
+offset_top = 184.0
+offset_right = 66.0
+offset_bottom = 458.0
+mouse_filter = 0
+theme_override_styles/panel = SubResource("Paper")
+[node name="Rows" type="VBoxContainer" parent="Panel"]
+layout_mode = 2
+theme_override_constants/separation = 0
+[node name="Shop" type="Button" parent="Panel/Rows"]
+custom_minimum_size = Vector2(60, 30)
+layout_mode = 2
+focus_mode = 0
+toggle_mode = true
+text = "商城"
+[node name="Properties" type="Button" parent="Panel/Rows"]
+custom_minimum_size = Vector2(60, 30)
+layout_mode = 2
+focus_mode = 0
+toggle_mode = true
+text = "人物"
+[node name="Craft" type="Button" parent="Panel/Rows"]
+custom_minimum_size = Vector2(60, 30)
+layout_mode = 2
+focus_mode = 0
+toggle_mode = true
+text = "炼制"
+[node name="Social" type="Button" parent="Panel/Rows"]
+custom_minimum_size = Vector2(60, 30)
+layout_mode = 2
+focus_mode = 0
+toggle_mode = true
+text = "社交"
+[node name="Quest" type="Button" parent="Panel/Rows"]
+custom_minimum_size = Vector2(60, 30)
+layout_mode = 2
+focus_mode = 0
+toggle_mode = true
+text = "任务"
+[node name="Team" type="Button" parent="Panel/Rows"]
+custom_minimum_size = Vector2(60, 30)
+layout_mode = 2
+focus_mode = 0
+toggle_mode = true
+text = "队伍"
+[node name="Guild" type="Button" parent="Panel/Rows"]
+custom_minimum_size = Vector2(60, 30)
+layout_mode = 2
+focus_mode = 0
+toggle_mode = true
+text = "帮会"
+[node name="Trade" type="Button" parent="Panel/Rows"]
+custom_minimum_size = Vector2(60, 30)
+layout_mode = 2
+focus_mode = 0
+toggle_mode = true
+text = "交易"
+[node name="System" type="Button" parent="Panel/Rows"]
+custom_minimum_size = Vector2(60, 30)
+layout_mode = 2
+focus_mode = 0
+toggle_mode = true
+text = "系统"

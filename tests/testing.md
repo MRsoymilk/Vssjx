@@ -18,6 +18,8 @@ PostgreSQL账号、密码、会话、注销与账号界面验证见[account_auth
 
 底部内置表情面板、标记传输与双方贴图显示验证见[chat_emotes.md](chat_emotes.md)。
 
+游戏竖排菜单、充值及编号移除、功能跳转和系统存档入口验证见[game_menu.md](game_menu.md)。
+
 除非特别说明，命令均在`Vssjx/`仓库根目录执行，Godot工程路径为`client/`。
 
 - `tests/`：Python回归、离屏辅助脚本、测试说明和容量验收方案。

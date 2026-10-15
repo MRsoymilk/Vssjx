@@ -1,0 +1,103 @@
+[gd_scene format=3]
+[ext_resource type="Script" path="res://scripts/game_world_screen.gd" id="Script"]
+[ext_resource type="PackedScene" path="res://scenes/ui/scene_chrome.tscn" id="Chrome"]
+[ext_resource type="PackedScene" path="res://scenes/ui/world_hud.tscn" id="Hud"]
+
+[sub_resource type="SystemFont" id="Font"]
+font_names = PackedStringArray("SimHei", "Microsoft YaHei", "sans-serif")
+antialiasing = 0
+[sub_resource type="Theme" id="Theme"]
+default_font = SubResource("Font")
+default_font_size = 11
+[sub_resource type="StyleBoxFlat" id="Blue"]
+bg_color = Color(0.298039, 0.501961, 0.72549, 1)
+border_color = Color(0.937255, 0.905882, 0.639216, 1)
+border_width_left = 1
+border_width_right = 1
+border_width_top = 1
+border_width_bottom = 1
+[sub_resource type="StyleBoxFlat" id="Input"]
+content_margin_left = 3.0
+content_margin_right = 3.0
+content_margin_top = 1.0
+content_margin_bottom = 1.0
+bg_color = Color(0.160784, 0.301961, 0.454902, 1)
+border_color = Color(0.501961, 0.65098, 0.819608, 1)
+border_width_left = 1
+border_width_right = 1
+border_width_top = 1
+border_width_bottom = 1
+[sub_resource type="StyleBoxEmpty" id="Empty"]
+content_margin_left = 0.0
+content_margin_right = 0.0
+content_margin_top = 0.0
+content_margin_bottom = 0.0
+
+[node name="GameWorldScreen" type="Control"]
+offset_right = 320.0
+offset_bottom = 480.0
+mouse_filter = 2
+theme = SubResource("Theme")
+script = ExtResource("Script")
+
+[node name="Chrome" parent="." instance=ExtResource("Chrome")]
+[node name="Hud" parent="." instance=ExtResource("Hud")]
+
+[node name="CountLabel" type="Label" parent="."]
+offset_left = 228.0
+offset_top = 348.0
+offset_right = 316.0
+offset_bottom = 365.0
+mouse_filter = 2
+theme_override_font_sizes/font_size = 9
+theme_override_colors/font_color = Color(0.937255, 0.898039, 0.494118, 1)
+theme_override_colors/font_outline_color = Color(0.372549, 0.380392, 0.211765, 1)
+theme_override_constants/outline_size = 1
+text = "同图0人"
+horizontal_alignment = 2
+
+[node name="Chat" type="Panel" parent="."]
+visible = false
+offset_top = 403.0
+offset_right = 320.0
+offset_bottom = 458.0
+mouse_filter = 0
+theme_override_styles/panel = SubResource("Blue")
+
+[node name="ChatLog" type="RichTextLabel" parent="Chat"]
+offset_left = 5.0
+offset_top = 2.0
+offset_right = 315.0
+offset_bottom = 30.0
+theme_override_font_sizes/normal_font_size = 10
+theme_override_colors/default_color = Color(1, 0.960784, 0.862745, 1)
+bbcode_enabled = false
+scroll_following = true
+selection_enabled = true
+
+[node name="ChatInput" type="LineEdit" parent="Chat"]
+offset_left = 5.0
+offset_top = 33.0
+offset_right = 263.0
+offset_bottom = 52.0
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_color = Color(1, 0.972549, 0.772549, 1)
+theme_override_colors/caret_color = Color(1, 0.972549, 0.772549, 1)
+theme_override_styles/normal = SubResource("Input")
+theme_override_styles/focus = SubResource("Input")
+placeholder_text = "公共频道：输入消息…"
+max_length = 120
+
+[node name="ChatSend" type="Button" parent="Chat"]
+offset_left = 269.0
+offset_top = 33.0
+offset_right = 315.0
+offset_bottom = 52.0
+focus_mode = 0
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_color = Color(0.945098, 0.894118, 0.172549, 1)
+theme_override_styles/normal = SubResource("Empty")
+theme_override_styles/hover = SubResource("Empty")
+theme_override_styles/pressed = SubResource("Empty")
+theme_override_styles/focus = SubResource("Empty")
+text = "发送"

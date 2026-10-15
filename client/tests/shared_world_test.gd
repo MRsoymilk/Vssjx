@@ -64,6 +64,8 @@ func _run() -> void:
 	check(await wait_until(func() -> bool: return view.network.world_ready and view.actors.size() == 2), "Both independent clients share the map")
 	if not view.network.world_ready: get_tree().quit(1); return
 	check(app.mode == "online_world" and app.world == null, "Online entry never runs the offline world simulation")
+	check(view.screen.scene_file_path == "res://scenes/ui/game_world_screen.tscn" and view.viewport.size == Vector2i(320, 375), "Multiplayer uses the original game HUD and viewport")
+	check(view.chat_panel.visible and view.chat_panel.position.y == 403, "Public chat stays in the original bottom message area")
 	check(view.network.entities.has(other_id), "Peer appears with server identity")
 	var own_id := OnlineAccount.characters[0].id as String
 	var game := view.network.game_session
@@ -74,7 +76,7 @@ func _run() -> void:
 	check(await wait_until(func() -> bool: return view.network.chat.connected and view.network.chat.enabled), "Authenticated public channel starts independently of map snapshots")
 	view.chat_button.pressed.emit()
 	await get_tree().create_timer(0.15).timeout
-	check(view.chat_panel.visible and view.chat_input.has_focus(), "Public chat panel accepts keyboard focus")
+	check(view.chat_panel.visible and view.chat_input.has_focus(), "Inline public chat composer accepts keyboard focus")
 	var literal := "[b]%s WASD[/b] 大家好" % role
 	view.chat_input.text = literal
 	view.chat_input.text_submitted.emit(literal)

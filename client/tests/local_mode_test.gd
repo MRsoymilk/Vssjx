@@ -26,6 +26,7 @@ func _run() -> void:
 	var old_connection := OS.get_environment("SSJX_CONNECTION_PATH")
 	var old_player := Game.player.duplicate(true)
 	var account_before := OnlineAccount.account.duplicate(true)
+	var was_processing := OnlineAccount.is_processing()
 	var phase := OS.get_environment("SSJX_LOCAL_TEST_PHASE")
 	var path := OS.get_environment("SSJX_LOCAL_TEST_PATH")
 	if path.is_empty(): path = "user://local_mode_test_%d.json" % OS.get_process_id()
@@ -72,6 +73,15 @@ func _run() -> void:
 		enter_local()
 		check(app.mode == "home" and app.modal != null and FileAccess.get_file_as_string(path) == "{invalid-save", "A corrupt local save is reported and never replaced with a new character")
 	check(OnlineAccount.account == account_before and OnlineAccount._request == null, "Local mode neither authenticates nor changes the online account")
+	check(not OnlineAccount.is_processing(), "Local play suspends automatic online account refreshes")
+	if phase != "write":
+		app._home()
+		app.original_cover.rows[0].pressed.emit()
+		var remote: ServerLogin = app.modal.get_node("ServerLogin")
+		remote.address_input.text = "https://game.example.com"
+		remote.address_input.text_changed.emit(remote.address_input.text)
+		remote.auth_button.pressed.emit()
+		check(OnlineAccount.is_processing() and remote.status.text.contains("请输入") and OnlineAccount._request == null, "Returning to a remote service restores account processing without sending empty credentials")
 	app.queue_free()
 	await get_tree().process_frame
 	if phase != "write":
@@ -80,5 +90,6 @@ func _run() -> void:
 	Game.player = old_player
 	Game.save_path = old_path
 	OS.set_environment("SSJX_CONNECTION_PATH", old_connection)
+	OnlineAccount.set_process(was_processing)
 	print("LOCAL MODE %s: %d checks, %d failures" % [phase, checks, failures])
 	get_tree().quit(0 if failures == 0 else 1)

@@ -14,6 +14,8 @@ PostgreSQL账号、密码、会话、注销与账号界面验证见[account_auth
 
 服务端结构化日志、只读Web监控、真实浏览器与数据库故障验证见[observability.md](observability.md)。
 
+同一游戏界面的多人角色、内嵌聊天与本地入口验证见[shared_interface.md](shared_interface.md)及[local_mode.md](local_mode.md)。
+
 除非特别说明，命令均在`Vssjx/`仓库根目录执行，Godot工程路径为`client/`。
 
 - `tests/`：Python回归、离屏辅助脚本、测试说明和容量验收方案。

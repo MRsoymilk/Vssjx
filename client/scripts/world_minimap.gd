@@ -4,6 +4,15 @@ extends Control
 signal toggle_requested
 var world: ShushanWorld
 var expanded := true
+var shared_map: Dictionary = {}
+var shared_entities: Dictionary = {}
+var shared_character_id := ""
+
+func set_shared_world(data: Dictionary, entities: Dictionary, character_id: String) -> void:
+	shared_map = data
+	shared_entities = entities
+	shared_character_id = character_id
+	queue_redraw()
 
 func _ready() -> void:
 	size = Vector2(80, 82)
@@ -20,7 +29,8 @@ func _process(_delta: float) -> void:
 	queue_redraw()
 
 func _draw() -> void:
-	if world == null or not is_instance_valid(world): return
+	var local := world != null and is_instance_valid(world)
+	if not local and shared_map.is_empty(): return
 	if not expanded:
 		draw_rect(Rect2(0, 0, 26, 17), Color("152424"))
 		draw_rect(Rect2(0, 0, 26, 17), Color("e6efc8"), false)
@@ -35,14 +45,25 @@ func _draw() -> void:
 		for x in 32:
 			var point := Vector2i(x, y)
 			var fill := Color("626653")
-			if world.zone == 0:
+			if not local:
+				var index := y * 32 + x
+				var tile := int(shared_map.tiles[index])
+				fill = Color("426969") if tile == 123 else (Color("919279") if tile == 138 or tile in [18, 20, 21, 22, 30, 32, 40, 41, 42] else Color("666e58"))
+				if shared_map.blocked[index]: fill = fill.darkened(0.35)
+			elif world.zone == 0:
 				match world.ground_at(point):
 					ShushanWorld.Ground.GRASS: fill = Color("666e58")
 					ShushanWorld.Ground.DIRT, ShushanWorld.Ground.BRIDGE: fill = Color("919279")
 					ShushanWorld.Ground.WATER: fill = Color("426969")
 			else: fill = Color("666374")
-			if world.astar.is_point_solid(point): fill = fill.darkened(0.35)
+			if local and world.astar.is_point_solid(point): fill = fill.darkened(0.35)
 			draw_rect(Rect2(origin + Vector2(point) * scale_value, Vector2.ONE * scale_value), fill)
+	if not local:
+		for id in shared_entities:
+			var entry: Dictionary = shared_entities[id]
+			var own: bool = id == shared_character_id
+			draw_rect(Rect2(origin + Vector2(entry.cell[0], entry.cell[1]) * scale_value, Vector2(3, 3) if own else Vector2(2, 2)), Color("f7ed21") if own else Color("8de8f5"))
+		return
 	for enemy in world.available_enemies():
 		var cell := Vector2(enemy.cell[0], enemy.cell[1])
 		draw_rect(Rect2(origin + cell * scale_value, Vector2(2, 2)), Color("d27950"))

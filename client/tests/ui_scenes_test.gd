@@ -31,7 +31,8 @@ func _run() -> void:
 		"battle_hud": ["BattleHeroHp", "ActionMenu/BattleButtons0", "HeroHit"],
 		"battle_move_callout": ["Caption"],
 		"battle_encounter_transition": ["Warning", "Caption", "Detail"],
-		"online_world_view": ["Viewport/Scene/Camera", "ChatPanel/ChatInput", "Network"],
+		"game_world_screen": ["Chrome", "Hud/Minimap", "Chat/ChatInput", "Chat/ChatLog"],
+		"online_world_view": ["Viewport/Scene/Camera", "Screen/Chat/ChatInput", "Network"],
 		"modal_overlay": ["Shade"],
 		"dialog_frame": ["Title"],
 		"battle_inspect": ["NameValue", "Hp", "Secondary", "Tertiary"]

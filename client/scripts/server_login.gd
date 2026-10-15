@@ -55,7 +55,12 @@ func _login() -> void:
 		password_input.clear()
 		local_requested.emit()
 		return
+	OnlineAccount.set_process(true)
 	if OnlineAccount.is_logged_in():
+		if not save_draft(): return
+		if ServerConnectionSettings.normalize(address_input.text).address != OnlineAccount.server_address:
+			status.text = "请先退出原服务器账号，再登陆其他服务器。"
+			return
 		characters_requested.emit()
 		return
 	register_mode = false
@@ -63,6 +68,7 @@ func _login() -> void:
 
 func _register() -> void:
 	if switch_button.disabled: return
+	OnlineAccount.set_process(true)
 	register_mode = true
 	_submit_account()
 

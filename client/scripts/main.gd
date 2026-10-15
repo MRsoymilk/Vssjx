@@ -246,6 +246,7 @@ func _server_login() -> void:
 	login.local_requested.connect(_enter_local_game)
 
 func _enter_local_game() -> void:
+	OnlineAccount.suspend_network()
 	if FileAccess.file_exists(Game.save_path): _continue()
 	else: _create()
 
@@ -357,14 +358,14 @@ func _world_ui() -> void:
 	_clear_ui()
 	world_view.show()
 	world.enabled = true
-	chrome = load("res://scenes/ui/scene_chrome.tscn").instantiate()
-	ui.add_child(chrome)
-	chrome.action_requested.connect(_scene_action)
+	var screen: GameWorldScreen = preload("res://scenes/ui/game_world_screen.tscn").instantiate()
+	ui.add_child(screen)
+	chrome = screen.chrome
+	screen.action_requested.connect(_scene_action)
 	ui.theme = chrome.theme
-	var hud: Control = preload("res://scenes/ui/world_hud.tscn").instantiate()
+	var hud: Control = screen.hud
 	minimap = hud.get_node("Minimap")
 	minimap.world = world
-	ui.add_child(hud)
 	map_name = hud.get_node("MapName")
 	map_name.text = "青云山道" if int(Game.player.zone) == 0 else "古剑遗迹"
 	map_coordinates = hud.get_node("MapCoordinates")

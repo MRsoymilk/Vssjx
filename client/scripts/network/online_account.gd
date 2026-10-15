@@ -26,6 +26,20 @@ static func secure_credentials_target(address: String) -> bool:
 func is_logged_in() -> bool:
 	return not account.is_empty() and Time.get_unix_time_from_system() < _refresh_expires_at
 
+func suspend_network() -> void:
+	# Keep the memory-only account separate, but do no background network work
+	# while the player has explicitly selected the local service.
+	_generation += 1
+	if _request != null and is_instance_valid(_request):
+		_request.cancel_request()
+		_request.queue_free()
+	_request = null
+	busy = false
+	_action = ""
+	_target = ""
+	_after_refresh = {}
+	set_process(false)
+
 func clear() -> void:
 	_generation += 1
 	account = {}

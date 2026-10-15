@@ -1,6 +1,6 @@
 class_name OnlineWorldView
 extends Control
-## Public online scene: no Game.player, local quest/monster or local save calls.
+## Shared game interface backed by online state; never installs Game.player.
 signal close_requested
 var character_id := ""
 @onready var network: OnlineWorldClient = $Network
@@ -8,38 +8,87 @@ var character_id := ""
 @onready var scene: Node2D = $Viewport/Scene
 @onready var camera: Camera2D = $Viewport/Scene/Camera
 @onready var image: TextureRect = $Image
-@onready var status: Label = $Status
-@onready var count_label: Label = $CountLabel
+@onready var screen: GameWorldScreen = $Screen
+@onready var status: Label = $Screen/Chrome/MessagePanel/LogLabel
+@onready var count_label: Label = $Screen/CountLabel
 var actors: Dictionary = {}
 var map_data: Dictionary
 var _key_timer := 0.0
 var _was_keyboard := false
-@onready var chat_panel: Panel = $ChatPanel
-@onready var chat_log: RichTextLabel = $ChatPanel/ChatLog
-@onready var chat_input: LineEdit = $ChatPanel/ChatInput
-@onready var chat_send: Button = $ChatPanel/ChatSend
-@onready var chat_status: Label = $ChatPanel/ChatStatus
-@onready var chat_button: Button = $ChatButton
+@onready var chat_panel: Panel = $Screen/Chat
+@onready var chat_log: RichTextLabel = $Screen/Chat/ChatLog
+@onready var chat_input: LineEdit = $Screen/Chat/ChatInput
+@onready var chat_send: Button = $Screen/Chat/ChatSend
+@onready var chat_status: Label = $Screen/Chrome/Hint
+@onready var chat_button: Button = $Screen/Chrome/Toolbar/Social
+@onready var menu: Control = $Menu
+var _character: Dictionary = {}
+var _system_text := "正在连接共享地图……"
 
 func _ready() -> void:
 	map_data = JSON.parse_string(FileAccess.get_file_as_string(OnlineWorldClient.MAP_PATH))
 	_build_map()
 	image.texture = viewport.get_texture()
 	image.gui_input.connect(_map_input)
-	$Back.pressed.connect(func() -> void:
-		network.leave()
-		close_requested.emit()
-	)
-	chat_button.pressed.connect(_toggle_chat)
-	$ChatPanel/Collapse.pressed.connect(_toggle_chat)
+	for character in OnlineAccount.characters:
+		if character.id == character_id: _character = character.duplicate(true)
+	if not _character.is_empty(): screen.chrome.display_character(_character)
+	screen.action_requested.connect(_scene_action)
+	screen.hud.get_node("MapName").text = "青云山道"
+	screen.hud.get_node("Minimap").set_shared_world(map_data, {}, character_id)
+	$Menu/Panel/Continue.pressed.connect(func() -> void: menu.hide())
+	$Menu/Panel/Leave.pressed.connect(_leave_world)
+	$Menu/Panel/Chat.pressed.connect(func() -> void: menu.hide(); _focus_chat())
 	chat_send.pressed.connect(_send_chat)
 	chat_input.text_submitted.connect(func(_text: String) -> void: _send_chat())
+	chat_input.focus_entered.connect(func() -> void:
+		if network.world_ready: network.stop_moving()
+		_was_keyboard = false
+	)
+	chat_input.gui_input.connect(func(event: InputEvent) -> void:
+		if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
+			chat_input.release_focus()
+			chat_input.accept_event()
+	)
 	network.changed.connect(_snapshot)
-	network.status_changed.connect(func(text_value: String) -> void: status.text = text_value)
+	network.status_changed.connect(_status_changed)
 	network.chat.changed.connect(_chat_changed)
 	network.chat.status_changed.connect(func(text_value: String) -> void: chat_status.text = text_value)
 	network.chat.confirmed.connect(func() -> void: chat_input.clear())
+	chat_status.text = "公共频道 · 最多120字"
 	network.start(character_id)
+
+func _leave_world() -> void:
+	network.leave()
+	close_requested.emit()
+
+func _scene_action(action: String) -> void:
+	if action == "social":
+		_toggle_chat()
+		return
+	if action == "menu" and menu.visible:
+		menu.hide()
+		return
+	if network.world_ready: network.stop_moving()
+	chat_input.release_focus()
+	_was_keyboard = false
+	var titles := {"menu": "菜单", "properties": "人物属性", "quest": "任务", "bag": "背包", "map": "地图", "mail": "邮件", "reward": "奖励"}
+	$Menu/Panel/Title.text = titles.get(action, "提示")
+	var body := "同图%d人 · 点击地图移动 / WASD\n公共消息在底部直接发送。\n线上进度由服务器保存。" % actors.size()
+	if action == "properties":
+		body = "%s\n等级%d · %s · %s派\n气血%d · 灵力%d · 铜币%d" % [String(_character.get("display_name", "")), int(_character.get("level", 1)), ["力士", "侠客", "隐者"][int(_character.get("job", 0))], ["峨眉", "花涧", "昆仑"][int(_character.get("school", 0))], int(_character.get("hp", 0)), int(_character.get("mp", 0)), int(_character.get("gold", 0))]
+	elif action == "map": body = "青云山道 · 同图%d人\n当前位置：%s\n小地图中的蓝点代表其他玩家。" % [actors.size(), screen.hud.get_node("MapCoordinates").text]
+	elif action in ["quest", "bag", "reward"]: body = "线上%s尚未开放。\n可在当前地图移动，与同图玩家聊天。" % titles[action]
+	elif action == "mail": body = "暂无邮件。"
+	$Menu/Panel/Body.text = body
+	menu.show()
+
+func _status_changed(text_value: String) -> void:
+	status.text = text_value
+	_system_text = text_value
+	if not network.world_ready:
+		for actor in actors.values(): actor.sprite.play("idle")
+	_chat_changed()
 
 func _build_map() -> void:
 	var terrain := TileMapLayer.new()
@@ -84,24 +133,33 @@ func _snapshot(values: Dictionary) -> void:
 			label.add_theme_color_override("font_outline_color", Color("1e343b"))
 			actors[id] = {"root": root, "sprite": sprite, "target": point, "distance": 0.0}
 		actors[id].target = point
-	count_label.text = "青云山道 · 同图%d人" % actors.size()
-	status.text = "共享地图 · 点击移动 / WASD\n公共聊天已开放\n线上任务与战斗后续接入。"
+	count_label.text = "同图%d人" % actors.size()
+	screen.hud.get_node("Minimap").set_shared_world(map_data, values, character_id)
+	if values.has(character_id):
+		var own: Dictionary = values[character_id]
+		screen.hud.get_node("MapCoordinates").text = "%d  %d" % [int(own.cell[0]), int(own.cell[1])]
+		screen.hud.get_node("WorldIdentity").text = "等级 %d\n%s派" % [int(_character.get("level", 1)), ["峨眉", "花涧", "昆仑"][int(_character.get("school", 0))]]
+	_system_text = "同图%d人 · 点击移动 / WASD" % actors.size()
+	status.text = _system_text
+	_chat_changed()
 
 func _toggle_chat() -> void:
-	chat_panel.visible = not chat_panel.visible
-	if chat_panel.visible:
-		network.stop_moving()
-		chat_input.grab_focus()
-	else: chat_input.release_focus()
+	if chat_input.has_focus(): chat_input.release_focus()
+	else: _focus_chat()
+
+func _focus_chat() -> void:
+	menu.hide()
+	chat_input.grab_focus()
 
 func _send_chat() -> void:
 	network.chat.submit(chat_input.text)
 
 func _chat_changed() -> void:
 	var lines := PackedStringArray()
-	for message in network.chat.messages: lines.append("%s：%s" % [message.display_name, message.text])
+	if network.chat.messages.is_empty() or not network.world_ready: lines.append("[系统] " + _system_text)
+	for message in network.chat.messages: lines.append("[公共] %s：%s" % [message.display_name, message.text])
 	chat_log.text = "\n".join(lines)
-	chat_button.text = "聊天%d" % network.chat.messages.size() if not network.chat.messages.is_empty() else "聊天"
+	chat_button.tooltip_text = "公共聊天 · %d条消息" % network.chat.messages.size()
 
 func _process(delta: float) -> void:
 	if network != null:
@@ -122,7 +180,7 @@ func _process(delta: float) -> void:
 			actor.sprite.set_frame_and_progress(int(phase) % actor.sprite.sprite_frames.get_frame_count("walk"), fposmod(phase, 1.0))
 		elif actor.sprite.animation != "idle" or not actor.sprite.is_playing(): actor.sprite.play("idle")
 	if actors.has(character_id): camera.position = actors[character_id].root.position
-	if chat_panel.visible:
+	if chat_input.has_focus() or menu.visible:
 		_was_keyboard = false
 		return
 	_key_timer -= delta
@@ -139,10 +197,20 @@ func _process(delta: float) -> void:
 		_was_keyboard = false
 
 func _map_input(event: InputEvent) -> void:
-	if not network.world_ready or chat_panel.visible: return
+	if not network.world_ready or menu.visible: return
 	var point := Vector2.ZERO
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed: point = event.position
 	elif event is InputEventScreenTouch and event.pressed: point = event.position
 	else: return
+	chat_input.release_focus()
 	var world_point := camera.get_screen_center_position() + point - Vector2(viewport.size) / 2.0
 	network.move_to(Vector2i(floori(world_point.x / 16.0), floori(world_point.y / 16.0)))
+
+func _unhandled_key_input(event: InputEvent) -> void:
+	if not event is InputEventKey or not event.pressed: return
+	if event.keycode == KEY_ESCAPE:
+		if chat_input.has_focus(): chat_input.release_focus()
+		else: _scene_action("menu")
+	elif event.keycode == KEY_ENTER: _focus_chat()
+	else: return
+	get_viewport().set_input_as_handled()

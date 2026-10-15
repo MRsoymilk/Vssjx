@@ -4,6 +4,7 @@ extends Control
 
 signal action_requested(action: String)
 @export var in_battle := false
+@export var use_local_player := true
 @onready var log_label: Label = $MessagePanel/LogLabel
 @onready var round_label: Label = $RoundLabel
 @onready var clock_label: Label = $ClockLabel
@@ -20,14 +21,18 @@ var palette: Dictionary
 
 func _ready() -> void:
 	palette = OriginalUITheme.palette("scene")
-	identity.text = "LV.%d" % int(Game.player.level)
 	$Properties.pressed.connect(func() -> void: action_requested.emit("properties"))
 	if not in_battle:
 		$Reward.pressed.connect(func() -> void: action_requested.emit("reward"))
 		var entries := {"Menu": "menu", "Quest": "quest", "Map": "map", "Actions": "menu", "Mail": "mail", "Social": "social", "Bag": "bag"}
 		for node_name in entries:
 			toolbar.get_node(node_name).pressed.connect(_request_action.bind(entries[node_name]))
-	update_header(int(Game.player.hp), int(Game.player.mp), 0)
+	if use_local_player:
+		identity.text = "LV.%d" % int(Game.player.level)
+		update_header(int(Game.player.hp), int(Game.player.mp), 0)
+	else:
+		identity.text = "LV.—"
+		update_clock()
 
 func _request_action(action: String) -> void:
 	action_requested.emit(action)
@@ -40,13 +45,29 @@ func update_header(hp: int, mp: int, round_number: int) -> void:
 	mp_bar.value = mp
 	xp_bar.max_value = int(Game.player.level) * 40
 	xp_bar.value = int(Game.player.xp)
+	update_clock()
+	round_label.text = "回合：%d/%d" % [round_number, ShushanBattle.MAX_ROUNDS] if in_battle else "常规模式"
+
+func display_character(character: Dictionary) -> void:
+	# Online data is an independent server snapshot, never Game.player.
+	identity.text = "LV.%d" % int(character.get("level", 1))
+	for key in ["hp", "mp"]:
+		var bar: ProgressBar = hp_bar if key == "hp" else mp_bar
+		bar.max_value = maxi(1, int(character.get("max_" + key, character.get(key, 1))))
+		bar.value = int(character.get(key, 0))
+		bar.tooltip_text = ("气血：" if key == "hp" else "灵力：") + str(int(character.get(key, 0)))
+	xp_bar.max_value = maxi(1, int(character.get("next_xp", character.get("xp", 1))))
+	xp_bar.value = int(character.get("xp", 0))
+	round_label.text = "常规模式"
+	update_clock()
+
+func update_clock() -> void:
 	var time := Time.get_time_dict_from_system()
 	clock_label.text = "%02d:%02d" % [int(time.hour), int(time.minute)]
 	clock_hour.value = "%02d" % int(time.hour)
 	clock_minute.value = "%02d" % int(time.minute)
 	clock_hour.queue_redraw()
 	clock_minute.queue_redraw()
-	round_label.text = "回合：%d/%d" % [round_number, ShushanBattle.MAX_ROUNDS] if in_battle else "常规模式"
 
 static func panel(parent: Node, rect: Rect2, fill: Color, border: Color) -> Panel:
 	var node: Panel = preload("res://scenes/ui/dynamic_panel.tscn").instantiate()

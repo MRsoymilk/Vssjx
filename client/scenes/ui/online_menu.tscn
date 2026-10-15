@@ -1,0 +1,60 @@
+[gd_scene format=3]
+[ext_resource type="Theme" path="res://scenes/ui/login_theme.tres" id="Theme"]
+[sub_resource type="StyleBoxFlat" id="Paper"]
+bg_color = Color(1, 0.968627, 0.721569, 1)
+border_color = Color(0.298039, 0.501961, 0.72549, 1)
+border_width_left = 2
+border_width_right = 2
+border_width_top = 2
+border_width_bottom = 2
+
+[node name="OnlineMenu" type="Control"]
+visible = false
+offset_right = 320.0
+offset_bottom = 480.0
+theme = ExtResource("Theme")
+[node name="Shade" type="ColorRect" parent="."]
+offset_right = 320.0
+offset_bottom = 480.0
+color = Color(0.03, 0.05, 0.04, 0.3)
+[node name="Panel" type="Panel" parent="."]
+offset_left = 18.0
+offset_top = 125.0
+offset_right = 302.0
+offset_bottom = 355.0
+theme_override_styles/panel = SubResource("Paper")
+[node name="Title" type="Label" parent="Panel"]
+offset_left = 18.0
+offset_top = 10.0
+offset_right = 266.0
+offset_bottom = 36.0
+theme_override_font_sizes/font_size = 18
+text = "菜单"
+[node name="Body" type="Label" parent="Panel"]
+offset_left = 18.0
+offset_top = 44.0
+offset_right = 266.0
+offset_bottom = 146.0
+theme_override_font_sizes/font_size = 12
+autowrap_mode = 3
+[node name="Continue" type="Button" parent="Panel"]
+offset_left = 18.0
+offset_top = 156.0
+offset_right = 138.0
+offset_bottom = 184.0
+theme_override_font_sizes/font_size = 12
+text = "返回游戏"
+[node name="Leave" type="Button" parent="Panel"]
+offset_left = 146.0
+offset_top = 156.0
+offset_right = 266.0
+offset_bottom = 184.0
+theme_override_font_sizes/font_size = 12
+text = "返回登陆"
+[node name="Chat" type="Button" parent="Panel"]
+offset_left = 18.0
+offset_top = 192.0
+offset_right = 266.0
+offset_bottom = 220.0
+theme_override_font_sizes/font_size = 12
+text = "公共聊天"

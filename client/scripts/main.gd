@@ -242,7 +242,7 @@ func _server_login() -> void:
 	login.name = "ServerLogin"
 	modal.add_child(login)
 	login.close_requested.connect(_close_modal)
-	login.characters_requested.connect(_online_characters)
+	login.characters_requested.connect(_online_characters, CONNECT_DEFERRED)
 	login.local_requested.connect(_enter_local_game)
 
 func _enter_local_game() -> void:
@@ -251,17 +251,20 @@ func _enter_local_game() -> void:
 	else: _create()
 
 func _online_characters() -> void:
-	_close_modal()
-	var panel := _modal_panel("线上角色", 428)
-	var lobby: OnlineCharacters = load("res://scenes/ui/online_characters.tscn").instantiate()
-	lobby.name = "OnlineCharacters"
-	lobby.enter_requested.connect(_enter_online_world)
-	lobby.position = Vector2(0, 54)
-	panel.add_child(lobby)
-	lobby.close_requested.connect(func() -> void:
-		_close_modal()
-		_server_login()
-	)
+	mode = "online_create"
+	_clear_ui()
+	_dispose_world()
+	creation = load("res://scenes/ui/character_creation.tscn").instantiate()
+	creation.online_mode = true
+	var flow: OnlineCreationFlow = creation.get_node("Online")
+	flow.enter_requested.connect(_enter_online_world, CONNECT_DEFERRED)
+	flow.close_requested.connect(_return_to_server_login, CONNECT_DEFERRED)
+	ui.add_child(creation)
+	ui.theme = creation.theme
+
+func _return_to_server_login() -> void:
+	_home()
+	_server_login()
 
 func _cover_exit() -> void:
 	var panel := _modal_panel("退出游戏")
@@ -277,10 +280,7 @@ func _enter_online_world(character_id: String) -> void:
 	view.name = "OnlineWorld"
 	view.character_id = character_id
 	ui.add_child(view)
-	view.close_requested.connect(func() -> void:
-		_home()
-		_server_login()
-	)
+	view.close_requested.connect(_return_to_server_login)
 
 func _create() -> void:
 	mode = "create"

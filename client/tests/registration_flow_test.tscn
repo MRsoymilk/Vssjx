@@ -1,0 +1,4 @@
+[gd_scene format=3]
+[ext_resource type="Script" path="res://tests/registration_flow_test.gd" id="Test"]
+[node name="RegistrationFlowTest" type="Node"]
+script = ExtResource("Test")

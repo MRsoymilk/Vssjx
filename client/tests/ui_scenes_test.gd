@@ -17,7 +17,7 @@ func _run() -> void:
 		"original_cover": ["Original320x480Artwork", "Rows0", "Rows1"],
 		"server_login": ["ServerAddress", "Username", "Password", "Discovery"],
 		"online_characters": ["OnlineNickname", "Job", "Gender", "School"],
-		"character_creation": ["Nickname", "Slots0/PortraitButtons0", "Create"],
+		"character_creation": ["Nickname", "Slots0/PortraitButtons0", "Create", "Online", "OnlineControls/School", "OnlineControls/Status", "OnlineControls/Back"],
 		"character_attributes": ["Pages", "Signature", "Back"],
 		"attributes_regular": ["NameValue", "BarsHp", "NumbersLevel"],
 		"attributes_extended": ["StatValue5", "StatValue11"],

@@ -1,6 +1,7 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://scripts/character_creation.gd" id="1_73mgl"]
+[ext_resource type="Script" path="res://scripts/online_creation_flow.gd" id="OnlineFlow"]
 [ext_resource type="Texture2D" path="res://assets/ui/create_header_end.png" id="2_h2dpn"]
 [ext_resource type="Texture2D" path="res://assets/ui/create_scroll.png" id="3_tq5jt"]
 [ext_resource type="Texture2D" path="res://assets/ui/create_scroll_marks.png" id="4_bja34"]
@@ -849,3 +850,63 @@ offset_right = 34.0
 offset_bottom = 19.0
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_lgsfj")
+
+[node name="Online" type="Node" parent="."]
+script = ExtResource("OnlineFlow")
+
+[node name="OnlineControls" type="Control" parent="."]
+visible = false
+offset_right = 320.0
+offset_bottom = 480.0
+mouse_filter = 2
+
+[node name="Account" type="Label" parent="OnlineControls"]
+offset_left = 21.0
+offset_top = 27.0
+offset_right = 211.0
+offset_bottom = 44.0
+mouse_filter = 2
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_color = Color(0.396078, 0.270588, 0.094118, 1)
+text = "账号："
+text_overrun_behavior = 3
+
+[node name="School" type="OptionButton" parent="OnlineControls"]
+offset_left = 216.0
+offset_top = 27.0
+offset_right = 299.0
+offset_bottom = 44.0
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_color = Color(0.396078, 0.270588, 0.094118, 1)
+theme_override_styles/normal = SubResource("StyleBoxEmpty_qumqv")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_qumqv")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_qumqv")
+item_count = 3
+selected = 0
+popup/item_0/text = "峨眉派"
+popup/item_0/id = 0
+popup/item_1/text = "花涧派"
+popup/item_1/id = 1
+popup/item_2/text = "昆仑派"
+popup/item_2/id = 2
+
+[node name="Status" type="Label" parent="OnlineControls"]
+offset_left = 20.0
+offset_top = 426.0
+offset_right = 300.0
+offset_bottom = 454.0
+mouse_filter = 2
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_color = Color(0.396078, 0.270588, 0.094118, 1)
+autowrap_mode = 3
+
+[node name="Back" type="Button" parent="OnlineControls"]
+offset_left = 211.0
+offset_top = 457.0
+offset_right = 247.0
+offset_bottom = 478.0
+focus_mode = 0
+theme_override_colors/font_color = Color(1, 0.984314, 0.823529, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_oudsr")
+theme_override_styles/hover = SubResource("StyleBoxFlat_sej5o")
+text = "返回"

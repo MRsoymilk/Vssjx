@@ -1,4 +1,4 @@
-"""Real PostgreSQL character transactions + Godot lobby; never uses private .env."""
+"""Real PostgreSQL character transactions + original Godot creation UI; no private .env."""
 import argparse
 import hashlib
 from concurrent.futures import ThreadPoolExecutor

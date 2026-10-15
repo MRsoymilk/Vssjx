@@ -16,6 +16,8 @@ var register_mode := false
 @onready var switch_button: Button = $SwitchButton
 var _probing := false
 var _editing_address := false
+var _registration_secret := ""
+var _registered_login := false
 
 func _ready() -> void:
 	address_input.text = settings.load_address()
@@ -139,7 +141,9 @@ func _submit_account() -> void:
 	status.text = "正在注册账号……" if register_mode else "正在登录……"
 	var secret := password_input.text
 	password_input.clear()
-	if register_mode: OnlineAccount.register_account(address_input.text, username_input.text, secret)
+	if register_mode:
+		_registration_secret = secret
+		OnlineAccount.register_account(address_input.text, username_input.text, secret)
 	else: OnlineAccount.login(address_input.text, username_input.text, secret)
 	_update_controls()
 
@@ -155,6 +159,7 @@ func _account_result(action: String, result: Dictionary) -> void:
 	password_input.clear()
 	_update_controls()
 	if not result.ok:
+		_registration_secret = ""
 		var errors := {
 			"INVALID_USERNAME": "账号须为3～32位英数字或下划线。", "WEAK_PASSWORD": "密码须为12～128个字符，不能全为空白。",
 			"ACCOUNT_EXISTS": "账号已存在，请改用其他账号或登录。", "UNAUTHORIZED": "账号或密码错误，或会话已失效。",
@@ -164,15 +169,28 @@ func _account_result(action: String, result: Dictionary) -> void:
 			"LOGOUT_REQUIRED": "请先退出原服务器账号，再登录其他账号。", "NETWORK_ERROR": "网络请求未确认；注册可尝试登录，刷新失败请重新登录。",
 		}
 		status.text = String(errors.get(result.get("code", ""), "账号请求失败，请检查服务器与客户端版本。"))
+		if _registered_login: status.text = "注册成功，请使用刚才的账号密码登陆。\n" + status.text
+		_registered_login = false
 		if action == "logout": status.text = "本地已退出，服务器注销未确认。"
 		return
 	if action == "register":
 		register_mode = false
 		username_input.text = String(result.account.username)
-		status.text = "注册成功，请重新输入密码登录。"
+		if _registration_secret.is_empty():
+			status.text = "注册成功，请使用此账号登陆。"
+			return
+		status.text = "注册成功，正在登陆并读取角色……"
+		var secret := _registration_secret
+		_registration_secret = ""
+		_registered_login = true
+		OnlineAccount.login(address_input.text, username_input.text, secret)
 		_update_controls()
 	elif action == "logout": status.text = "账号已退出，服务器地址仍会保留。"
-	else: _show_account()
+	else:
+		_show_account()
+		if action == "login":
+			_registered_login = false
+			characters_requested.emit()
 
 func _return() -> void:
 	if ServerConnectionSettings.normalize(address_input.text).ok and not save_draft(): return
@@ -180,6 +198,8 @@ func _return() -> void:
 	close_requested.emit()
 
 func _exit_tree() -> void:
+	_registration_secret = ""
+	if OnlineAccount.completed.is_connected(_account_result): OnlineAccount.completed.disconnect(_account_result)
 	# Escape/window close also remembers a valid draft, without touching saves.
 	if address_input != null and is_instance_valid(address_input): save_draft(false)
 	if discovery != null and is_instance_valid(discovery): discovery.cancel()

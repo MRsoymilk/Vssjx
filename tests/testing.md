@@ -8,7 +8,7 @@ PostgreSQL账号、密码、会话、注销与账号界面验证见[account_auth
 
 `.env`读取、参数边界、环境优先级与Git忽略验证见[env_config.md](env_config.md)。
 
-线上角色、昵称唯一性、账号创建回执、事务故障与独立大厅验证见[characters.md](characters.md)。
+线上角色、昵称唯一性、账号创建回执与事务故障验证见[characters.md](characters.md)。注册进入原角色创建场景、后续登陆复用该账号角色的验证见[registration_flow.md](registration_flow.md)。
 
 角色元数据分片、按需加载、无损重建与读取微基准见[actor_catalog.md](actor_catalog.md)。
 

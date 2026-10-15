@@ -13,7 +13,10 @@ func check(condition: bool, message: String) -> void:
 
 func form(app: Control) -> ServerLogin:
 	app._server_login()
-	return app.modal.find_child("ServerLogin", true, false) as ServerLogin
+	var page := app.modal.find_child("ServerLogin", true, false) as ServerLogin
+	# Isolate auth/session checks here; registration_flow_test covers navigation.
+	page.characters_requested.disconnect(Callable(app, "_online_characters"))
+	return page
 
 func capture(name_value: String) -> void:
 	var output := OS.get_environment("SSJX_AUTH_CAPTURE_PATH")
@@ -50,7 +53,10 @@ func _run() -> void:
 	login.switch_button.pressed.emit()
 	check(login.password_input.text.is_empty() and login.auth_button.disabled, "Password cleared and duplicate submit locked")
 	await OnlineAccount.completed
-	check(login.status.text.contains("注册成功") and not login.register_mode, "Registration returns to login without faking authentication")
+	while OnlineAccount.busy: await get_tree().process_frame
+	check(OnlineAccount.is_logged_in() and not login.register_mode and login._registration_secret.is_empty(), "Registration performs a real login and forgets its temporary password")
+	login.switch_button.pressed.emit()
+	await OnlineAccount.completed
 	login.password_input.text = "incorrect-password"
 	login.auth_button.pressed.emit()
 	await OnlineAccount.completed

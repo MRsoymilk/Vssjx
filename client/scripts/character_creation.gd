@@ -4,6 +4,7 @@ extends Control
 
 signal selection_changed(job: int, gender: int)
 signal create_requested
+@export var online_mode := false
 
 const BODY_COLOR := Color("dedb49")
 const TEXT_COLOR := Color("654518")
@@ -69,7 +70,7 @@ func random_name() -> void:
 	nickname.caret_column = nickname.text.length()
 
 func _request_create() -> void:
-	if active: create_requested.emit()
+	if active or online_mode: create_requested.emit()
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	if not active or nickname.has_focus() or not event is InputEventKey or not event.pressed: return

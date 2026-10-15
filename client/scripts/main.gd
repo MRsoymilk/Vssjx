@@ -47,6 +47,8 @@ var battle_selected_enemy := false
 var battle_field: OriginalBattleField
 var field_kind := "courtyard"
 var battle_move_callout: BattleMoveCallout
+var battle_transition: BattleEncounterTransition
+var battle_transition_epoch := 0
 var clock_timer := 0.0
 var effects_layer: Control
 var world_identity: Label
@@ -93,6 +95,9 @@ func _process(delta: float) -> void:
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	if not event is InputEventKey or not event.pressed or event.echo: return
+	if mode == "battle_loading":
+		get_viewport().set_input_as_handled()
+		return
 	if event.keycode == KEY_ESCAPE:
 		if mode == "battle" and battle.phase == "finished":
 			_enter_world()
@@ -188,6 +193,8 @@ func _button(parent: Node, text_value: String, rect: Rect2, callback: Callable, 
 	return button
 
 func _clear_ui() -> void:
+	battle_transition_epoch += 1
+	battle_transition = null
 	modal = null
 	original_cover = null
 	creation = null
@@ -366,6 +373,7 @@ func _world_ui() -> void:
 	_refresh_hud()
 
 func _scene_action(action: String) -> void:
+	if mode == "battle_loading": return
 	match action:
 		"menu": _menu()
 		"properties":
@@ -393,12 +401,13 @@ func _refresh_hud() -> void:
 	chrome.update_header(int(Game.player.hp), int(Game.player.mp), 0)
 
 func _world_interaction(kind: String, data: Dictionary) -> void:
+	if mode == "battle_loading": return
 	match kind:
 		"npc": _npc()
 		"enemy":
 			if int(Game.player.quest) == 0:
 				_message("尚未领受试炼", "先找清微道人领受试炼，再挑战山中的妖物。")
-			else: _start_battle(data)
+			else: _encounter_battle(data)
 		"portal":
 			if int(Game.player.zone) == 0 and int(Game.player.quest) < 3:
 				_message("灵门未开", "完成山狼试炼，并向清微道人复命后，方可前往古剑遗迹。")
@@ -583,6 +592,88 @@ func _about() -> void:
 	var panel := _modal_panel("关于本次重建", 344)
 	_label(panel, "原包：《蜀山剑侠Online》320×480版\n原始开发者：博荣无限\n\n美术来自 analysis 中解包恢复的原始图像。\n图块、人物部件、动画组合由静态解析转换。\n\n本版采用 Godot 4.7，支持完全离线游玩。\n地图布局、任务、数值、战斗与存档重新编写。\n原服务端、账号和地图逻辑未恢复。\n\n战斗：1攻击 / 2技能 / 3待机 / 4道具\n5查看 / 6逃跑 / 0自动战斗。", Rect2(18, 54, 248, 236), 11)
 	_button(panel, "返回", Rect2(18, 296, 248, 31), _close_modal, true)
+
+func _encounter_current(epoch: int, world_id: int) -> bool:
+	return epoch == battle_transition_epoch and mode == "battle_loading" and is_instance_valid(world) and world.get_instance_id() == world_id and is_instance_valid(battle_transition)
+
+func _encounter_failed() -> void:
+	battle_transition_epoch += 1
+	if is_instance_valid(battle_transition):
+		ui.remove_child(battle_transition)
+		battle_transition.queue_free()
+	battle_transition = null
+	mode = "world"
+	chrome.hint.show()
+	_message("无法进入战斗", "本地战斗资源未能准备完成，请检查游戏文件后重试。\n当前角色资源没有扣除。")
+
+func _encounter_battle(enemy: Dictionary) -> void:
+	if mode != "world" or modal != null or not is_instance_valid(world): return
+	world.stop_moving()
+	world.enabled = false
+	mode = "battle_loading"
+	chrome.hint.hide()
+	battle_transition_epoch += 1
+	var epoch := battle_transition_epoch
+	var world_id := world.get_instance_id()
+	world.camera.force_update_scroll()
+	var point: Vector2 = world.hero.get_global_transform_with_canvas().origin + world_view.position
+	battle_transition = BattleEncounterTransition.new()
+	ui.add_child(battle_transition)
+	battle_transition.configure(String(enemy.get("name", "妖物")), point)
+	# A short readable warning, followed by actual texture/cache work.
+	await get_tree().create_timer(0.20).timeout
+	if not _encounter_current(epoch, world_id): return
+	var keys: Array[String] = [Game.actor_key(), String(enemy.get("art", "")), "effect/flash", ["effect/t71", "effect/t36", "effect/t47"][int(Game.player.job)]]
+	var paths: Array[String] = ["res://assets/tiles/original_tiles.png"]
+	for key in keys:
+		if not OriginalArt.catalog.has(key):
+			_encounter_failed()
+			return
+		var path := String(OriginalArt.catalog[key].texture)
+		if not paths.has(path): paths.append(path)
+	var resources: Dictionary = {}
+	for path in paths:
+		if not ResourceLoader.exists(path, "Texture2D"):
+			_encounter_failed()
+			return
+		if ResourceLoader.has_cached(path): resources[path] = load(path)
+		else:
+			var status := ResourceLoader.load_threaded_get_status(path)
+			if status not in [ResourceLoader.THREAD_LOAD_IN_PROGRESS, ResourceLoader.THREAD_LOAD_LOADED] and ResourceLoader.load_threaded_request(path, "Texture2D") != OK:
+				_encounter_failed()
+				return
+	var deadline := Time.get_ticks_msec() + 15000
+	while resources.size() < paths.size():
+		var done := float(resources.size())
+		for path in paths:
+			if resources.has(path): continue
+			var amount: Array = []
+			var status := ResourceLoader.load_threaded_get_status(path, amount)
+			if status == ResourceLoader.THREAD_LOAD_LOADED:
+				var resource := ResourceLoader.load_threaded_get(path)
+				if not resource is Texture2D:
+					_encounter_failed()
+					return
+				resources[path] = resource
+				done += 1.0
+			elif status in [ResourceLoader.THREAD_LOAD_FAILED, ResourceLoader.THREAD_LOAD_INVALID_RESOURCE] or Time.get_ticks_msec() >= deadline:
+				_encounter_failed()
+				return
+			elif not amount.is_empty(): done += clampf(float(amount[0]), 0.0, 1.0)
+		battle_transition.set_progress(0.75 * done / paths.size(), "准备战斗图像与场景")
+		await get_tree().process_frame
+		if not _encounter_current(epoch, world_id): return
+	for index in keys.size():
+		# SpriteFrames preparation is bounded to these four battle actors/effects.
+		var prepared := OriginalArt.actor(keys[index])
+		prepared.free()
+		battle_transition.set_progress(0.75 + 0.20 * float(index + 1) / keys.size(), "准备角色动作与招式")
+		await get_tree().process_frame
+		if not _encounter_current(epoch, world_id): return
+	battle_transition.set_progress(1.0, "准备就绪")
+	await get_tree().create_timer(0.16).timeout
+	if not _encounter_current(epoch, world_id): return
+	_start_battle(enemy)
 
 func _start_battle(enemy: Dictionary) -> void:
 	world.stop_moving()

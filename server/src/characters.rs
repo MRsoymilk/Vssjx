@@ -60,27 +60,27 @@ fn operation_id<'de, D: Deserializer<'de>>(deserializer: D) -> Result<Uuid, D::E
     Ok(id)
 }
 
-#[derive(Serialize, FromRow)]
-struct Character {
-    id: Uuid,
-    display_name: String,
-    name_rules_version: String,
-    rules_version: String,
-    job: i16,
-    gender: i16,
-    school: i16,
-    level: i32,
-    xp: i32,
-    gold: i32,
-    hp: i32,
-    mp: i32,
-    quest_stage: i32,
-    map_id: String,
-    cell_x: i32,
-    cell_y: i32,
-    state_revision: String,
+#[derive(Clone, Serialize, FromRow)]
+pub(crate) struct Character {
+    pub(crate) id: Uuid,
+    pub(crate) display_name: String,
+    pub(crate) name_rules_version: String,
+    pub(crate) rules_version: String,
+    pub(crate) job: i16,
+    pub(crate) gender: i16,
+    pub(crate) school: i16,
+    pub(crate) level: i32,
+    pub(crate) xp: i32,
+    pub(crate) gold: i32,
+    pub(crate) hp: i32,
+    pub(crate) mp: i32,
+    pub(crate) quest_stage: i32,
+    pub(crate) map_id: String,
+    pub(crate) cell_x: i32,
+    pub(crate) cell_y: i32,
+    pub(crate) state_revision: String,
 }
-const CHARACTER_COLUMNS: &str = "id, display_name, name_rules_version, rules_version, job, gender, school, level, xp, gold, hp, mp, quest_stage, map_id, cell_x, cell_y, state_revision::text";
+pub(crate) const CHARACTER_COLUMNS: &str = "id, display_name, name_rules_version, rules_version, job, gender, school, level, xp, gold, hp, mp, quest_stage, map_id, cell_x, cell_y, state_revision::text";
 
 fn database_error(error: sqlx::Error) -> AuthError {
     crate::observability::database_error(&error, "characters");

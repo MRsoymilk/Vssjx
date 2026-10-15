@@ -7,6 +7,8 @@ pub mod logging;
 mod monitor;
 pub mod observability;
 pub mod population;
+pub mod pve_rules;
+pub mod pve;
 pub mod world;
 pub mod world_map;
 pub mod world_replication;

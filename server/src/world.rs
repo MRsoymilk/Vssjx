@@ -65,6 +65,8 @@ pub struct Entity {
     pub world_epoch: String,
 }
 struct CharacterActor {
+    business: Arc<AsyncMutex<()>>,
+    in_battle: bool,
     net_id: u32,
     id: Uuid,
     session: Uuid,
@@ -116,6 +118,7 @@ pub struct WorldHub {
 }
 #[derive(Clone)]
 struct Ownership {
+    business: Arc<AsyncMutex<()>>,
     id: Uuid,
     session: Uuid,
     game: Uuid,
@@ -166,7 +169,7 @@ impl WorldHub {
                     let mut state = hub.data.lock().expect("world state");
                     let mut changed = false;
                     for actor in state.actors.values_mut() {
-                        if actor.connected {
+                        if actor.connected && !actor.in_battle {
                             changed |= actor.motion.advance(dt);
                         }
                     }
@@ -250,6 +253,8 @@ impl WorldHub {
         session: Uuid,
     ) -> Result<Ownership, AuthError> {
         let _gate = self.admissions.lock().await;
+        let business = self.data.lock().expect("world state").actors.get(&id).map(|a| a.business.clone()).unwrap_or_else(|| Arc::new(AsyncMutex::new(())));
+        let _business = business.lock().await;
         // Persist retired ownership before permitting a new login session to load it.
         let retired: Vec<SavedPosition> = {
             let state = self.data.lock().expect("world state");
@@ -284,6 +289,7 @@ impl WorldHub {
                 actor.last_input = 0;
                 actor.motion.stop();
                 let owner = Ownership {
+                    business: business.clone(),
                     id,
                     session,
                     game: actor.game,
@@ -299,7 +305,7 @@ impl WorldHub {
                 return Err(error(503, "WORLD_FULL"));
             }
         }
-        let row=sqlx::query("UPDATE characters c SET owner_epoch=owner_epoch+1,position_revision=0 WHERE c.id=$1 AND map_id='qingyun_trail' AND owner_epoch<9223372036854775807 AND EXISTS(SELECT 1 FROM sessions s JOIN accounts a ON a.id=s.account_id WHERE s.id=$2 AND s.account_id=c.account_id AND NOT a.disabled AND s.revoked_at IS NULL AND s.access_expires_at>clock_timestamp() AND s.refresh_expires_at>clock_timestamp()) RETURNING display_name,job,gender,cell_x,cell_y,owner_epoch")
+        let row=sqlx::query("UPDATE characters c SET owner_epoch=owner_epoch+1,position_revision=0 WHERE c.id=$1 AND map_id='qingyun_trail' AND owner_epoch<9223372036854775807 AND EXISTS(SELECT 1 FROM sessions s JOIN accounts a ON a.id=s.account_id WHERE s.id=$2 AND s.account_id=c.account_id AND NOT a.disabled AND s.revoked_at IS NULL AND s.access_expires_at>clock_timestamp() AND s.refresh_expires_at>clock_timestamp()) RETURNING display_name,job,gender,cell_x,cell_y,owner_epoch,active_battle_id")
             .bind(id).bind(session).fetch_optional(auth.pool()).await.map_err(db_error)?.ok_or(error(403,"WORLD_UNAVAILABLE"))?;
         let cell = [row.get("cell_x"), row.get("cell_y")];
         if !self.map.walkable(cell) {
@@ -307,6 +313,7 @@ impl WorldHub {
         }
         let mut state = self.data.lock().expect("world state");
         let owner = Ownership {
+            business: business.clone(),
             id,
             session,
             game: Uuid::new_v4(),
@@ -320,6 +327,8 @@ impl WorldHub {
             .checked_add(1)
             .ok_or(error(503, "WORLD_ID_EXHAUSTED"))?;
         let actor = CharacterActor {
+            business: business.clone(),
+            in_battle: row.get::<Option<Uuid>,_>("active_battle_id").is_some(),
             net_id,
             id,
             session,
@@ -393,6 +402,7 @@ impl WorldHub {
         if actor.last_command.elapsed() < Duration::from_millis(80) {
             return Err(error(429, "RATE_LIMITED"));
         }
+        if actor.in_battle { return Err(error(409,"BATTLE_ACTIVE")); }
         actor.last_command = Instant::now();
         actor.last_input = sequence;
         if let Some(goal) = target {
@@ -424,8 +434,23 @@ impl WorldHub {
             .chat
             .submit((owner.id, &name), id, channel, text, muted, Instant::now()))
     }
+    fn pve_context(&self, owner: &Ownership, target: Option<&str>) -> Result<crate::pve::Context,AuthError> {
+        let state = self.data.lock().expect("world state");
+        let actor = state.actors.get(&owner.id).filter(|a|Self::owned(a,owner)).ok_or(error(401,"SESSION_REPLACED"))?;
+        Ok(crate::pve::Context { character: owner.id,session:owner.session,owner:owner.owner,cell:actor.motion.cell,
+            moving: actor.motion.next.is_some() || !actor.motion.route.is_empty(),
+            target_cell:target.and_then(|id|state.population.get(id)).map(|r|r.motion.cell) })
+    }
+    fn pve_applied(&self, owner: &Ownership, result: &Value) {
+        let mut state = self.data.lock().expect("world state");
+        if let Some(actor)=state.actors.get_mut(&owner.id).filter(|a|Self::owned(a,owner)) {
+            actor.in_battle = result["state"]["battle"]["outcome"] == "active";
+            if actor.in_battle { actor.motion.stop(); }
+        }
+    }
     async fn disconnect(&self, auth: &AuthService, owner: &Ownership, leave: bool) {
         let _gate = self.admissions.lock().await;
+        let _business = owner.business.lock().await;
         let position = {
             let mut state = self.data.lock().expect("world state");
             let Some(actor) = state.actors.get_mut(&owner.id) else {
@@ -513,7 +538,7 @@ pub(crate) async fn ticket(
         .bind(auth::token_digest(&raw)?).bind(session).bind(request.character_id).execute(&mut *tx).await.map_err(db_error)?;
     tx.commit().await.map_err(db_error)?;
     Ok(Json(
-        json!({"ticket":raw,"expires_in":20,"character_id":request.character_id,"config_hash":config_hash(),"announcement_version":1,"population_version":1}),
+        json!({"ticket":raw,"expires_in":20,"character_id":request.character_id,"config_hash":config_hash(),"announcement_version":1,"population_version":1,"pve_version":1}),
     ))
 }
 #[derive(Deserialize)]
@@ -530,6 +555,8 @@ pub enum ClientMessage {
         announcement_version: u32,
         #[serde(default)]
         population_version: u32,
+        #[serde(default)]
+        pve_version: u32,
     },
     #[serde(rename = "world.move_to")]
     MoveTo {
@@ -546,6 +573,8 @@ pub enum ClientMessage {
         world_epoch: String,
         input_seq: String,
     },
+    #[serde(rename = "pve.command")]
+    Pve { command: crate::pve_rules::Command },
     #[serde(rename = "ping")]
     Ping {},
     #[serde(rename = "world.leave")]
@@ -671,6 +700,7 @@ async fn connection(socket: WebSocket, auth: AuthService, hub: Arc<WorldHub>, an
         world_sync_version,
         announcement_version,
         population_version,
+        pve_version,
     }) = serde_json::from_str::<ClientMessage>(&text)
     else {
         fail(&mut socket, "INVALID_HANDSHAKE").await;
@@ -754,6 +784,19 @@ async fn connection(socket: WebSocket, auth: AuthService, hub: Arc<WorldHub>, an
         hub.disconnect(&auth, &owner, false).await;
         return;
     }
+    if pve_version == 1 {
+        let result = {
+            let _business = owner.business.lock().await;
+            match hub.pve_context(&owner,None) {
+                Ok(context) => crate::pve::snapshot(&auth,&context).await.inspect(|value|hub.pve_applied(&owner,value)),
+                Err(e) => Err(e),
+            }
+        };
+        match result {
+            Ok(value) => { if send(&mut socket,value).await.is_err(){ hub.disconnect(&auth,&owner,false).await;return; } },
+            Err(e) => { fail(&mut socket,e.1).await;hub.disconnect(&auth,&owner,false).await;return; }
+        }
+    }
     let mut chat_pending: Option<Uuid> = None;
     let mut announcement_revision = None;
     let mut population_revision = None;
@@ -782,6 +825,26 @@ async fn connection(socket: WebSocket, auth: AuthService, hub: Arc<WorldHub>, an
                 if matches!(input,ClientMessage::Leave {}){leave=true;break;}
                 match auth.live_session(owner.session).await {Ok(true)=>{},Ok(false)=>{fail(&mut socket,"SESSION_REVOKED").await;leave=true;break},Err(_)=>{fail(&mut socket,"DATABASE_UNAVAILABLE").await;break}}
                 if matches!(input,ClientMessage::Ping {}){if send(&mut socket,json!({"type":"pong"})).await.is_err(){break;}}
+                else if let ClientMessage::Pve{command}=&input {
+                    if pve_version != 1 { fail(&mut socket,"PVE_UNSUPPORTED").await;break; }
+                    let result = {
+                        let _business = owner.business.lock().await;
+                        match hub.pve_context(&owner,command.target.as_deref()) {
+                            Ok(context) => match crate::pve::execute(&auth,&context,command).await {
+                                Ok(value) => match crate::pve::snapshot(&auth,&context).await {
+                                    Ok(current) => {hub.pve_applied(&owner,&current);Ok(value)},
+                                    Err(e) => Err(e),
+                                },
+                                Err(e) => Err(e),
+                            },
+                            Err(e) => Err(e),
+                        }
+                    };
+                    match result {
+                        Ok(value)=>{if send(&mut socket,value).await.is_err(){break;}},
+                        Err(e)=>{fail(&mut socket,e.1).await;break;}
+                    }
+                }
                 else if let ClientMessage::ChatSend{client_message_id,channel,text}=&input {
                     let muted=match auth.chat_muted(owner.session).await{Ok(value)=>value,Err(e)=>{fail(&mut socket,e.1).await;break;}};
                     match hub.chat(&owner,*client_message_id,channel,text,muted) {

@@ -338,7 +338,7 @@ func _advance_walk(distance: float) -> void:
 
 func _idle_hero() -> void:
 	walk_distance = 0.0
-	if hero.animation != "idle": hero.play("idle")
+	if hero.animation != "idle" or not hero.is_playing(): hero.play("idle")
 
 func _face_actor(sprite: AnimatedSprite2D, left: bool) -> void:
 	sprite.scale.x = 1.0 if left else -1.0

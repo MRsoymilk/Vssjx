@@ -1,5 +1,7 @@
 # 角色元数据分片与按需加载
 
+后续待机修复：六个 `hero/` 与六个 `creation/` 记录的 `playback.idle` 已从单张静态帧恢复为两张原生站姿，创建页男性力士的单帧特例也已移除。每帧权重4，使用Godot现有6 FPS待机速度。原始ANI序列、图集PNG、行走/攻击/施法映射保持原样；历史无损拆分夹具仍保存旧值，回归只允许上述12个待机映射发生变化，并验证重建结果与当前资源一致。下文无损摘要及微基准是拆分时的历史记录。
+
 ```sh
 python tools/import_assets.py --metadata-only
 python -m unittest discover -s tests -p 'test_*.py'

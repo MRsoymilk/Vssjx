@@ -25,9 +25,14 @@ class ActorCatalogTests(unittest.TestCase):
         cls.importer = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(cls.importer)
 
-    def test_every_runtime_record_is_semantically_identical(self):
+    def test_runtime_records_only_change_the_restored_character_idle_loops(self):
         self.assertEqual(len(self.actors), self.expected['runtime_records'])
-        self.assertEqual(canonical(self.actors), self.expected['runtime_canonical_sha256'])
+        path = ROOT.parent / 'tests/fixtures/actors_v1.json.zlib.b64'
+        expected = json.loads(zlib.decompress(base64.b64decode(path.read_text())))
+        for key, info in expected.items():
+            if key.startswith(('hero/', 'creation/')):
+                info['playback']['idle'] = [[info['count'] - 14, 4], [info['count'] - 13, 4]]
+        self.assertEqual(canonical(self.actors), canonical(expected))
 
     def test_benchmark_fixture_is_the_exact_legacy_catalog_size_and_content(self):
         path = ROOT.parent / 'tests/fixtures/actors_v1.json.zlib.b64'
@@ -71,7 +76,7 @@ class ActorCatalogTests(unittest.TestCase):
         parsed, errors = self.importer.read_animations()
         self.assertEqual(errors, [])
         rebuilt = self.importer.build_actor_catalog(parsed, write_textures=False)
-        self.assertEqual(canonical(rebuilt), self.expected['runtime_canonical_sha256'])
+        self.assertEqual(canonical(rebuilt), canonical(self.actors))
 
     def test_export_is_deterministic_and_does_not_delete_unrelated_files(self):
         with tempfile.TemporaryDirectory(prefix='vssjx-actor-data-') as folder:

@@ -120,7 +120,7 @@ func _process(delta: float) -> void:
 			actor.sprite.pause()
 			var phase: float = actor.distance / 32.0 * actor.sprite.sprite_frames.get_frame_count("walk")
 			actor.sprite.set_frame_and_progress(int(phase) % actor.sprite.sprite_frames.get_frame_count("walk"), fposmod(phase, 1.0))
-		elif actor.sprite.animation != "idle": actor.sprite.play("idle")
+		elif actor.sprite.animation != "idle" or not actor.sprite.is_playing(): actor.sprite.play("idle")
 	if actors.has(character_id): camera.position = actors[character_id].root.position
 	if chat_panel.visible:
 		_was_keyboard = false

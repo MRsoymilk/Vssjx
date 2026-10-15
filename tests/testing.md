@@ -69,6 +69,16 @@ godot --headless --path client res://tests/click_motion_regression.tscn
 
 2026-10-15（Godot 4.7.1，Windows）：旧实现的初始32项复现用例有4项失败，出现反向移动及非相邻格衔接；修复后扩展的776项连续点击检查全部通过，原有6018项行走、379项整流程、129项遭遇过渡和6项目录检查也全部通过。
 
+角色待机动画回归：
+
+```sh
+godot --headless --path client res://tests/idle_regression.tscn
+```
+
+覆盖六角色与六种创建页预览：使用真实 `AnimatedSprite2D` 时钟确认待机确实切换两张原生站姿，而非仅检查动画名；验证循环播放、重复更新不重置帧、暂停后恢复，以及走完后原地待机。待机每帧持续约2/3秒，整轮约4/3秒；不使用攻击帧、移动帧或脚本位移模拟呼吸。
+
+2026-10-15（Godot 4.7.1，Windows）：待机逻辑66项、实际OpenGL渲染68项检查全部通过，并逐张检查六角色的两张待机姿态截图。设置 `SSJX_IDLE_CAPTURE_PATH` 为已存在目录、以真实渲染器运行，可保存这两张对比图。
+
 ## 4. Linux真实渲染离屏
 
 ```sh

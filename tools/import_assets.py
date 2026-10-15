@@ -126,7 +126,9 @@ def bake(key, animation, output_key=None, write_texture=True):
                     if index < native_walk[0]
                     and any(layer['source'] == animation['sources'][0] and layer['frame'] == 0 and layer['transform'] == 0 for layer in layers)
                     and not any(layer['source'].endswith('x') or layer['source'].startswith('tx') for layer in layers)]
-        playback = {'idle': [[standing[-1], 1]],
+        # The last two native standing composites form a breathing pair.
+        # A single still frame gives the state an idle name but no animation.
+        playback = {'idle': [[index, 4] for index in standing[-2:]],
                     'walk': [[index, 1] for index in native_walk], 'attack': sequences[-1]}
         if key in ('hero/mfs', 'hero/wfs') and not (output_key or '').startswith('creation/'):
             # The last sequence faces right. Battle heroes stand on the right
@@ -165,7 +167,6 @@ def build_actor_catalog(parsed, write_textures=True):
                 for layer in layers:
                     if layer['source'] == 'ezs1': layer['source'] = 'ezs2'
         baked[preview_key] = bake(key, preview, preview_key, write_texture=write_textures)
-        if stem == 'mzs': baked[preview_key]['playback']['idle'] = [[65, 1]]
     return baked
 
 

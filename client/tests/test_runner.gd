@@ -278,7 +278,7 @@ func _run() -> void:
 	for key in ["hero/mzs", "hero/mck", "hero/mfs"]:
 		var actor := OriginalArt.actor(key)
 		app.ui.add_child(actor)
-		check(actor.sprite_frames.get_frame_count("idle") == 1 and actor.sprite_frames.get_frame_count("walk") > 1, "Distinct stand and walk for " + key)
+		check(actor.sprite_frames.get_frame_count("idle") == 2 and actor.sprite_frames.get_animation_loop("idle") and actor.sprite_frames.get_frame_count("walk") == 6, "Distinct animated idle and walk for " + key)
 		actor.play("attack")
 		actors_to_check.append(actor)
 	await get_tree().create_timer(0.8).timeout

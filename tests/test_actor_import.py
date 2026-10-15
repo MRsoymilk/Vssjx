@@ -59,6 +59,25 @@ class ActorImportTests(unittest.TestCase):
                 self.assertEqual(head['transform'], 0, (key, index))
                 self.assertTrue(any(layer['source'].endswith('x') for layer in layers), (key, index))
 
+    def test_all_characters_and_previews_have_a_real_native_idle_loop(self):
+        for group in ('hero', 'creation'):
+            for name in ('mck', 'wck', 'mzs', 'wzs', 'mfs', 'wfs'):
+                key = group + '/' + name
+                info = self.actors[key]
+                source = self.source['hero/' + name]
+                steps = info['playback']['idle']
+                self.assertEqual(steps, [[info['count'] - 14, 4], [info['count'] - 13, 4]], key)
+                atlas = Image.open(ROOT / info['texture'].removeprefix('res://')).convert('RGBA')
+                pixels = []
+                for index, _ in steps:
+                    layers = source['frames'][index]
+                    head = next(layer for layer in layers if layer['source'] == source['sources'][0] and layer['frame'] == 0)
+                    self.assertEqual(head['transform'], 0, (key, index))
+                    self.assertFalse(any(layer['source'].endswith('x') or layer['source'].startswith('tx') for layer in layers), (key, index))
+                    x, y = index % info['columns'] * info['width'], index // info['columns'] * info['height']
+                    pixels.append(atlas.crop((x, y, x + info['width'], y + info['height'])).tobytes())
+                self.assertNotEqual(pixels[0], pixels[1], key)
+
     def test_knight_blades_remain_attached_to_the_character(self):
         info = self.actors['hero/mck']
         atlas = Image.open(ROOT / info['texture'].replace('res://', '')).convert('RGBA')

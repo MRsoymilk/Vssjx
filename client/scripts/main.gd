@@ -467,7 +467,7 @@ func _modal_panel(title: String, height: int = 246, page: String = "scene") -> P
 	if original_cover != null: original_cover.active = false
 	if creation != null: creation.active = false
 	if world != null and is_instance_valid(world):
-		world.stop_moving()
+		world.pause_moving()
 		world.enabled = false
 	modal = preload("res://scenes/ui/modal_overlay.tscn").instantiate()
 	ui.add_child(modal)
@@ -510,7 +510,7 @@ func _message(title: String, value: String) -> void:
 	_button(panel, "知道了", Rect2(18, 192, 248, 32), _close_modal, true)
 
 func _save_feedback() -> void:
-	world.stop_moving()
+	world.pause_moving()
 	if Game.save_game():
 		_message("修行已保存", "下次将服务地址设为local，进入游戏即可继续。\n\n存档会记录角色、任务、背包及所在位置。")
 	else:
@@ -531,7 +531,7 @@ func _rest() -> void:
 
 func _bag() -> void:
 	_close_modal()
-	world.stop_moving()
+	world.pause_moving()
 	world.enabled = false
 	modal = preload("res://scenes/ui/modal_overlay.tscn").instantiate()
 	ui.add_child(modal)
@@ -551,7 +551,7 @@ func _menu() -> void:
 		return
 	_close_modal()
 	if is_instance_valid(world):
-		world.stop_moving()
+		world.pause_moving()
 		world.enabled = false
 	var popup: OriginalGameMenu = load("res://scenes/ui/game_menu.tscn").instantiate()
 	modal = popup
@@ -566,7 +566,7 @@ func _menu() -> void:
 func _system_menu() -> void:
 	_close_modal()
 	if is_instance_valid(world):
-		world.stop_moving()
+		world.pause_moving()
 		world.enabled = false
 	modal = load("res://scenes/ui/system_menu.tscn").instantiate()
 	ui.add_child(modal)
@@ -601,7 +601,7 @@ func _school() -> void:
 	_button(panel, "返回", Rect2(18, 172, 248, 30), _close_modal)
 
 func _attributes() -> void:
-	world.stop_moving()
+	world.pause_moving()
 	mode = "attributes"
 	_clear_ui()
 	attributes = load("res://scenes/ui/character_attributes.tscn").instantiate()
@@ -635,7 +635,7 @@ func _encounter_failed() -> void:
 
 func _encounter_battle(enemy: Dictionary) -> void:
 	if mode != "world" or modal != null or not is_instance_valid(world): return
-	world.stop_moving()
+	world.pause_moving()
 	world.enabled = false
 	mode = "battle_loading"
 	chrome.hint.hide()
@@ -704,7 +704,7 @@ func _encounter_battle(enemy: Dictionary) -> void:
 	_start_battle(enemy)
 
 func _start_battle(enemy: Dictionary) -> void:
-	world.stop_moving()
+	world.pause_moving()
 	mode = "battle"
 	_clear_ui()
 	battle = ShushanBattle.new(enemy)

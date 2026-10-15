@@ -13,6 +13,7 @@ var character_id := ""
 @onready var count_label: Label = $Screen/CountLabel
 var actors: Dictionary = {}
 var map_data: Dictionary
+var _motion_grid := AStarGrid2D.new()
 var _key_timer := 0.0
 var _was_keyboard := false
 @onready var chat_panel: Panel = $Screen/Chat
@@ -108,6 +109,12 @@ func _status_changed(text_value: String) -> void:
 	_chat_changed()
 
 func _build_map() -> void:
+	_motion_grid.region = Rect2i(0, 0, 32, 32)
+	_motion_grid.diagonal_mode = AStarGrid2D.DIAGONAL_MODE_NEVER
+	_motion_grid.default_compute_heuristic = AStarGrid2D.HEURISTIC_MANHATTAN
+	_motion_grid.default_estimate_heuristic = AStarGrid2D.HEURISTIC_MANHATTAN
+	_motion_grid.update()
+	for index in map_data.blocked.size(): _motion_grid.set_point_solid(Vector2i(index % 32, index / 32), map_data.blocked[index])
 	var terrain := TileMapLayer.new()
 	var tiles := TileSet.new()
 	tiles.tile_size = Vector2i(16, 16)
@@ -148,8 +155,10 @@ func _snapshot(values: Dictionary) -> void:
 			label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 			label.add_theme_constant_override("outline_size", 1)
 			label.add_theme_color_override("font_outline_color", Color("1e343b"))
-			actors[id] = {"root": root, "sprite": sprite, "target": point, "distance": 0.0}
+			actors[id] = {"root": root, "sprite": sprite, "target": point, "distance": 0.0, "motion": OnlineActorMotion.new()}
 		actors[id].target = point
+		actors[id].motion.receive(entity, _motion_grid)
+		actors[id].root.position = actors[id].motion.position
 	count_label.text = "同图%d人" % actors.size()
 	screen.hud.get_node("Minimap").set_shared_world(map_data, values, character_id)
 	if values.has(character_id):
@@ -235,8 +244,10 @@ func _process(delta: float) -> void:
 	for id in actors:
 		var actor: Dictionary = actors[id]
 		var old: Vector2 = actor.root.position
-		actor.root.position = old.move_toward(actor.target, 100.0 * delta)
-		var distance: float = old.distance_to(actor.root.position)
+		var motion: OnlineActorMotion = actor.motion
+		motion.advance(delta)
+		actor.root.position = motion.position
+		var distance := motion.travelled
 		if distance > 0.001:
 			actor.distance += distance
 			if absf(actor.root.position.x - old.x) > 0.001: actor.sprite.scale.x = 1.0 if actor.root.position.x < old.x else -1.0
@@ -244,7 +255,12 @@ func _process(delta: float) -> void:
 			actor.sprite.pause()
 			var phase: float = actor.distance / 32.0 * actor.sprite.sprite_frames.get_frame_count("walk")
 			actor.sprite.set_frame_and_progress(int(phase) % actor.sprite.sprite_frames.get_frame_count("walk"), fposmod(phase, 1.0))
-		elif actor.sprite.animation != "idle" or not actor.sprite.is_playing(): actor.sprite.play("idle")
+		elif motion.has_motion():
+			actor.sprite.animation = "walk"
+			actor.sprite.pause()
+		elif actor.sprite.animation != "idle" or not actor.sprite.is_playing():
+			actor.distance = 0.0
+			actor.sprite.play("idle")
 	if actors.has(character_id): camera.position = actors[character_id].root.position
 	if chat_input.has_focus() or menu.visible or details.visible or emote_picker.visible:
 		_was_keyboard = false
@@ -256,9 +272,11 @@ func _process(delta: float) -> void:
 		_key_timer = 0.15
 		var own: Dictionary = network.entities[character_id]
 		var cell: Array = own.next_cell if own.next_cell != null else own.cell
-		network.move_to(Vector2i(cell[0], cell[1]) + direction)
+		var destination := Vector2i(cell[0], cell[1]) + direction
+		if _motion_grid.region.has_point(destination) and not _motion_grid.is_point_solid(destination): network.move_to(destination)
+		else: network.stop_moving()
 		_was_keyboard = true
-	elif direction == Vector2i.ZERO and _was_keyboard and _key_timer <= 0:
+	elif direction == Vector2i.ZERO and _was_keyboard:
 		network.stop_moving()
 		_was_keyboard = false
 
@@ -272,8 +290,13 @@ func _map_input(event: InputEvent) -> void:
 		emote_picker.hide()
 		return
 	chat_input.release_focus()
+	_was_keyboard = false
 	var world_point := camera.get_screen_center_position() + point - Vector2(viewport.size) / 2.0
-	network.move_to(Vector2i(floori(world_point.x / 16.0), floori(world_point.y / 16.0)))
+	var destination := Vector2i(floori(world_point.x / 16.0), floori(world_point.y / 16.0))
+	if _motion_grid.region.has_point(destination) and not _motion_grid.is_point_solid(destination): network.move_to(destination)
+	else:
+		network.stop_moving()
+		chat_status.text = "目标不可达，已停止原路线。"
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	if not event is InputEventKey or not event.pressed: return

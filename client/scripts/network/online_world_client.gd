@@ -29,6 +29,7 @@ var _attempts := 0
 var _input_seq := 0
 var _seq := 0
 var _last_input_at := 0.0
+var _pending_motion: Dictionary = {}
 var _snapshot: Dictionary = {}
 var _records: Dictionary = {}
 var _digest: HashingContext
@@ -53,6 +54,7 @@ func start(id: String) -> void:
 	status_changed.emit("正在申请入场票据……")
 
 func leave() -> void:
+	_pending_motion.clear()
 	if socket != null:
 		if socket.get_ready_state() == WebSocketPeer.STATE_OPEN: socket.send_text(JSON.stringify({"type": "world.leave"}))
 		socket.close()
@@ -70,6 +72,7 @@ func _exit_tree() -> void:
 	leave()
 
 func _failed(code: String, retry: bool = false) -> void:
+	_pending_motion.clear()
 	chat.disconnect_channel()
 	world_ready = false
 	_ticket = ""
@@ -159,6 +162,7 @@ func _process(_delta: float) -> void:
 	if socket != null and now - _last_received > 12.0: _failed("HEARTBEAT_TIMEOUT", true)
 	chat.enabled = world_ready
 	chat.tick()
+	_flush_motion()
 
 static func _decimal(value: Variant) -> bool:
 	if not value is String: return false
@@ -329,10 +333,17 @@ func stop_moving() -> void:
 	_send_motion("world.stop")
 
 func _send_motion(kind: String, target: Array = []) -> void:
+	if not world_ready: return
+	_pending_motion = {"type": kind, "target": target.duplicate()}
+	_flush_motion()
+
+func _flush_motion() -> void:
 	var now := Time.get_unix_time_from_system()
-	if not world_ready or socket == null or now - _last_input_at < 0.1: return
+	if not world_ready or socket == null or socket.get_ready_state() != WebSocketPeer.STATE_OPEN or _pending_motion.is_empty() or now - _last_input_at < 0.1: return
+	var intent := _pending_motion
+	_pending_motion = {}
 	_last_input_at = now
 	_input_seq += 1
-	var message := {"type": kind, "game_session_id": game_session, "connection_epoch": connection_epoch, "world_epoch": world_epoch, "input_seq": str(_input_seq)}
-	if kind == "world.move_to": message.target = target
+	var message := {"type": intent.type, "game_session_id": game_session, "connection_epoch": connection_epoch, "world_epoch": world_epoch, "input_seq": str(_input_seq)}
+	if intent.type == "world.move_to": message.target = intent.target
 	if socket.send_text(JSON.stringify(message)) != OK: _failed("SEND_FAILED", true)

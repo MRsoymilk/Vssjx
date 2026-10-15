@@ -59,6 +59,8 @@ Windows PowerShell示例：
 
 ## 3. 行走专项逻辑回归
 
+路线频繁转向、键盘接管、暂停回拉、多人拐点/停走抖动和移动限频丢指令的后续修正见[movement_control.md](movement_control.md)。
+
 ```sh
 godot --headless --path client res://tests/motion_regression.tscn
 ```

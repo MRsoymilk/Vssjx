@@ -105,6 +105,8 @@ func _build_map() -> void:
 	astar.region = Rect2i(0, 0, MAP_SIZE, MAP_SIZE)
 	astar.cell_size = Vector2(CELL, CELL)
 	astar.diagonal_mode = AStarGrid2D.DIAGONAL_MODE_NEVER
+	astar.default_compute_heuristic = AStarGrid2D.HEURISTIC_MANHATTAN
+	astar.default_estimate_heuristic = AStarGrid2D.HEURISTIC_MANHATTAN
 	astar.update()
 	var random := RandomNumberGenerator.new()
 	random.seed = 403084 + zone
@@ -276,6 +278,9 @@ func _interact_pending() -> void:
 
 func _process(delta: float) -> void:
 	if not enabled or hero == null: return
+	if _keyboard_direction() != Vector2i.ZERO:
+		path.clear()
+		pending = {}
 	_update_patrols(delta)
 	var remaining := WALK_SPEED * delta
 	while remaining > 0.0:
@@ -311,11 +316,13 @@ func _keyboard_direction() -> Vector2i:
 	return Vector2i.ZERO
 
 func _begin_step() -> bool:
-	if path.is_empty():
-		var direction := _keyboard_direction()
+	var direction := _keyboard_direction()
+	if direction != Vector2i.ZERO:
+		# A held direction takes over a click route at the next cell boundary.
+		path.clear()
+		pending = {}
 		var destination := cell + direction
-		if direction != Vector2i.ZERO and astar.region.has_point(destination) and not astar.is_point_solid(destination):
-			pending = {}
+		if astar.region.has_point(destination) and not astar.is_point_solid(destination):
 			path.append(destination)
 	while not path.is_empty():
 		var destination: Vector2i = path.pop_front()
@@ -398,9 +405,14 @@ func _save_position() -> void:
 	moved.emit()
 
 func stop_moving() -> void:
-	path.clear()
-	pending = {}
+	pause_moving()
 	next_cell = Vector2i(-1, -1)
 	hero.position = cell_center(cell)
+
+func pause_moving() -> void:
+	# UI pauses keep the rendered position and unfinished segment. Resuming may
+	# finish that one segment, but must not restore an old click/interaction path.
+	path.clear()
+	pending = {}
 	_idle_hero()
 	_save_position()

@@ -193,10 +193,17 @@ func click(local: Vector2) -> void:
 	if found.is_empty(): found = target_at(target)
 	if found.is_empty():
 		pending = {}
-		path = astar.get_id_path(cell, target)
+		path = _route_to(target)
 	else:
 		_walk_to(found)
-	if not path.is_empty() and path[0] == cell: path.pop_front()
+
+func _route_to(target: Vector2i) -> Array[Vector2i]:
+	# Finish the active segment before following a replacement route. Planning
+	# from the previous cell can send us back or skip diagonally across cells.
+	var origin := next_cell if next_cell.x >= 0 else cell
+	var route: Array[Vector2i] = astar.get_id_path(origin, target)
+	if not route.is_empty() and route[0] == origin: route.pop_front()
+	return route
 
 func target_at_pixel(point: Vector2) -> Dictionary:
 	if zone == 0:
@@ -229,11 +236,15 @@ func _walk_to(target: Dictionary) -> void:
 	if cell.distance_to(target.cell) <= 2.0 and next_cell.x < 0:
 		_interact_pending()
 		return
+	var origin := next_cell if next_cell.x >= 0 else cell
 	var best: Array[Vector2i] = []
 	for offset in [Vector2i(0, 1), Vector2i(0, -1), Vector2i(1, 0), Vector2i(-1, 0)]:
 		var spot: Vector2i = target.cell + offset
 		if astar.is_point_solid(spot): continue
-		var candidate: Array[Vector2i] = astar.get_id_path(cell, spot)
+		var candidate := _route_to(spot)
+		if spot == origin:
+			best = candidate
+			break
 		if not candidate.is_empty() and (best.is_empty() or candidate.size() < best.size()):
 			best = candidate
 	path = best

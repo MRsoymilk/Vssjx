@@ -78,6 +78,45 @@ class ActorImportTests(unittest.TestCase):
                     pixels.append(atlas.crop((x, y, x + info['width'], y + info['height'])).tobytes())
                 self.assertNotEqual(pixels[0], pixels[1], key)
 
+    def test_forward_walk_preserves_each_costumes_contact_and_swing_order(self):
+        # Leg image IDs are not uniformly ordered across costumes. These phases
+        # follow the visible planted-foot travel and the return swing, including
+        # the less regular female knight/warrior and male mage sources.
+        expected = {'mck': [0, 1, 2, 3, 4, 5], 'mzs': [0, 1, 2, 3, 4, 5],
+                    'wck': [4, 0, 3, 1, 2, 5], 'wzs': [3, 0, 2, 4, 1, 5],
+                    'mfs': [0, 1, 2, 5, 4, 3], 'wfs': [0, 1, 2, 3, 4, 5]}
+        for group in ('hero', 'creation'):
+            for name, phases in expected.items():
+                key = group + '/' + name
+                frames = self.source['hero/' + name]['frames']
+                actual = [next(layer['frame'] for layer in frames[index]
+                               if layer['source'].endswith('x'))
+                          for index, _ in self.actors[key]['playback']['walk']]
+                self.assertEqual(actual, phases, key)
+
+    def test_native_left_walk_planted_boot_moves_right_across_loop_boundary(self):
+        # The user's marked male-warrior boot: track its red contact pixels in
+        # the baked atlas, not an animation name or numeric frame-order rule.
+        info = self.actors['hero/mzs']
+        atlas = Image.open(ROOT / info['texture'].removeprefix('res://')).convert('RGBA')
+        walk = info['playback']['walk']
+        centers = []
+        for index, _ in (walk[-2], walk[-1], walk[0]):
+            x = index % info['columns'] * info['width'] - info['origin'][0]
+            y = index // info['columns'] * info['height'] - info['origin'][1]
+            points = []
+            for dy in range(-8, 1):
+                for dx in range(-15, 15):
+                    red, green, blue, alpha = atlas.getpixel((x + dx, y + dy))
+                    if alpha and red > 135 and green < red * .6 and blue < red * .8:
+                        points.append((dx, dy))
+            self.assertTrue(points, index)
+            bottom = max(y for x, y in points)
+            sole = [x for x, y in points if y >= bottom - 2]
+            centers.append(sum(sole) / len(sole))
+        self.assertLess(centers[0], centers[1], centers)
+        self.assertLess(centers[1], centers[2], centers)
+
     def test_knight_blades_remain_attached_to_the_character(self):
         info = self.actors['hero/mck']
         atlas = Image.open(ROOT / info['texture'].replace('res://', '')).convert('RGBA')

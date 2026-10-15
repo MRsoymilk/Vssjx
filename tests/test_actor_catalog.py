@@ -25,13 +25,14 @@ class ActorCatalogTests(unittest.TestCase):
         cls.importer = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(cls.importer)
 
-    def test_runtime_records_only_change_the_restored_character_idle_loops(self):
+    def test_runtime_records_only_change_restored_idle_and_forward_walk(self):
         self.assertEqual(len(self.actors), self.expected['runtime_records'])
         path = ROOT.parent / 'tests/fixtures/actors_v1.json.zlib.b64'
         expected = json.loads(zlib.decompress(base64.b64decode(path.read_text())))
         for key, info in expected.items():
             if key.startswith(('hero/', 'creation/')):
                 info['playback']['idle'] = [[info['count'] - 14, 4], [info['count'] - 13, 4]]
+                info['playback']['walk'].reverse()
         self.assertEqual(canonical(self.actors), canonical(expected))
 
     def test_benchmark_fixture_is_the_exact_legacy_catalog_size_and_content(self):

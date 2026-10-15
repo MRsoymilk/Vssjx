@@ -128,8 +128,13 @@ def bake(key, animation, output_key=None, write_texture=True):
                     and not any(layer['source'].endswith('x') or layer['source'].startswith('tx') for layer in layers)]
         # The last two native standing composites form a breathing pair.
         # A single still frame gives the state an idle name but no animation.
+        # Composite IDs run opposite to the forward contact/swing cycle.
+        # In native left-facing art the planted foot must travel right relative
+        # to the body. Ascending IDs instead drag the planted foot left, making
+        # the actor backpedal. Reverse whole composites, keeping body bob, feet
+        # and weapons together; mirroring then also gives a forward right gait.
         playback = {'idle': [[index, 4] for index in standing[-2:]],
-                    'walk': [[index, 1] for index in native_walk], 'attack': sequences[-1]}
+                    'walk': [[index, 1] for index in reversed(native_walk)], 'attack': sequences[-1]}
         if key in ('hero/mfs', 'hero/wfs') and not (output_key or '').startswith('creation/'):
             # The last sequence faces right. Battle heroes stand on the right
             # and must keep the native left-facing staff motion instead.

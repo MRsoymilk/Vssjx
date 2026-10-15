@@ -21,7 +21,8 @@ func _capture() -> void:
 		get_tree().quit(1)
 		return
 	Game.save_path = "user://motion_test_save.json"
-	Game.new_player("行走验证", 1, 0)
+	var variant := clampi(int(OS.get_environment("SSJX_MOTION_VARIANT")), 0, 5) if OS.has_environment("SSJX_MOTION_VARIANT") else 2
+	Game.new_player("行走验证", variant / 2, 0, variant % 2)
 	Game.player.cell = [14, 17]
 	Game.save_game()
 	app = load("res://scenes/main.tscn").instantiate()

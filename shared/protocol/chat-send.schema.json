@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "chat-v1 authenticated native WebSocket command",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["type", "client_message_id", "channel", "text"],
+  "properties": {
+    "type": {"const": "chat.send"},
+    "client_message_id": {"type": "string", "format": "uuid", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"},
+    "channel": {"const": "public"},
+    "text": {
+      "type": "string", "minLength": 1, "maxLength": 120,
+      "description": "At most 480 UTF-8 bytes before normalization; reject Unicode controls, U+200B..200F, U+2028..202E, U+2060..206F, U+FEFF. Trim only outer U+0020; reject empty or all Unicode whitespace. Never interpret markup."
+    }
+  },
+  "$comment": "Server derives sender identity/name/time. Dedup key (character_id, client_message_id), normalized channel/text must match. Ephemeral accepted receipts survive reconnect/leave for advertised dedup window within one channel_epoch, not process restart."
+}

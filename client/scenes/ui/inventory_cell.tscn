@@ -1,0 +1,72 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/original_number.gd" id="1_m1t2f"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ugnx3"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0, 0.49411765, 0.40784314, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.84705883, 0.9019608, 0.1882353, 1)
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_y4pkb"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_mxwjy"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_6bym7"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_exigx"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_jpuy1"]
+
+[node name="InventoryCell" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+
+[node name="Panel" type="Panel" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_right = 34.0
+offset_bottom = 35.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_ugnx3")
+
+[node name="Icon" type="TextureRect" parent="Panel"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 2.0
+offset_top = 1.0
+offset_right = 32.0
+offset_bottom = 32.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Count" type="Control" parent="Panel"]
+unique_name_in_owner = true
+anchors_preset = 0
+offset_left = 14.0
+offset_top = 25.0
+offset_right = 33.0
+offset_bottom = 34.0
+script = ExtResource("1_m1t2f")
+
+[node name="Button" type="Button" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_right = 34.0
+offset_bottom = 35.0
+focus_mode = 0
+theme_override_colors/font_color = Color(1, 0.972549, 0.77254903, 1)
+theme_override_colors/font_disabled_color = Color(0.7176471, 0.6392157, 0.39607844, 1)
+theme_override_font_sizes/font_size = 12
+theme_override_styles/normal = SubResource("StyleBoxEmpty_y4pkb")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_mxwjy")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_6bym7")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_exigx")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_jpuy1")

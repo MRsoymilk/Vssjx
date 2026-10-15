@@ -3,37 +3,23 @@ extends Control
 ## Lobby only: never installs an online snapshot in Game.player.
 signal close_requested
 signal enter_requested(character_id: String)
-var nickname: LineEdit
-var job: OptionButton
-var gender: OptionButton
-var school: OptionButton
-var status: Label
-var create_button: Button
-var refresh_button: Button
-var enter_button: Button
+@onready var nickname: LineEdit = $OnlineNickname
+@onready var job: OptionButton = $Job
+@onready var gender: OptionButton = $Gender
+@onready var school: OptionButton = $School
+@onready var status: Label = $Status
+@onready var create_button: Button = $CreateButton
+@onready var refresh_button: Button = $RefreshButton
+@onready var enter_button: Button = $EnterButton
 var _loaded := false
 
 func _ready() -> void:
-	size = Vector2(284, 368)
-	_label("线上角色 · 每账号限一个", Rect2(18, 0, 248, 22))
-	_label("2～12位汉字、英数字或下划线\n全服唯一；英文大小写不区分", Rect2(18, 26, 248, 40))
-	nickname = LineEdit.new()
-	nickname.name = "OnlineNickname"
-	nickname.position = Vector2(18, 70)
-	nickname.size = Vector2(248, 28)
-	nickname.max_length = 32
-	nickname.placeholder_text = "请输入线上昵称"
-	add_child(nickname)
-	job = _choice("Job", ["力士", "侠客", "隐者"], Vector2(18, 108), 92)
-	gender = _choice("Gender", ["男", "女"], Vector2(116, 108), 62)
-	school = _choice("School", ["峨眉", "花涧", "昆仑"], Vector2(184, 108), 82)
-	status = _label("正在读取线上角色……", Rect2(18, 148, 248, 118))
-	create_button = _button("创建角色", Rect2(18, 274, 156, 30), _create)
-	refresh_button = _button("刷新", Rect2(182, 274, 84, 30), _refresh)
-	enter_button = _button("进入共享地图", Rect2(18, 308, 248, 28), func() -> void:
+	create_button.pressed.connect(_create)
+	refresh_button.pressed.connect(_refresh)
+	enter_button.pressed.connect(func() -> void:
 		if not enter_button.disabled: enter_requested.emit(OnlineAccount.characters[0].id)
 	)
-	_button("返回账号", Rect2(18, 340, 248, 28), func() -> void: close_requested.emit())
+	$Back.pressed.connect(func() -> void: close_requested.emit())
 	OnlineAccount.completed.connect(_result)
 	_restore_pending()
 	_update_controls()
@@ -41,34 +27,6 @@ func _ready() -> void:
 
 func _process(_delta: float) -> void:
 	_update_controls()
-
-func _label(text_value: String, rect: Rect2) -> Label:
-	var label := Label.new()
-	label.text = text_value
-	label.position = rect.position
-	label.size = rect.size
-	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	label.add_theme_font_size_override("font_size", 12)
-	add_child(label)
-	return label
-
-func _button(text_value: String, rect: Rect2, callback: Callable) -> Button:
-	var button := Button.new()
-	button.text = text_value
-	button.position = rect.position
-	button.size = rect.size
-	button.pressed.connect(callback)
-	add_child(button)
-	return button
-
-func _choice(node_name: String, choices: Array, position_value: Vector2, width: float) -> OptionButton:
-	var choice := OptionButton.new()
-	choice.name = node_name
-	choice.position = position_value
-	choice.size = Vector2(width, 28)
-	for text_value in choices: choice.add_item(text_value)
-	add_child(choice)
-	return choice
 
 func _restore_pending() -> void:
 	var pending: Dictionary = OnlineAccount.pending_creation

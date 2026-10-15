@@ -1,0 +1,251 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/server_login.gd" id="1_b65o1"]
+[ext_resource type="Script" path="res://scripts/network/server_discovery.gd" id="2_rgqu0"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lhdy1"]
+bg_color = Color(0.11764706, 0.23529412, 0.25490198, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.7137255, 0.57254905, 0.32156864, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_78uy0"]
+bg_color = Color(0.19215687, 0.34509805, 0.34509805, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.7137255, 0.57254905, 0.32156864, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_b17ce"]
+bg_color = Color(0.19215687, 0.34509805, 0.34509805, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.7137255, 0.57254905, 0.32156864, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fy58y"]
+bg_color = Color(0.11764706, 0.23529412, 0.25490198, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.7137255, 0.57254905, 0.32156864, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_40ml8"]
+bg_color = Color(0.19215687, 0.34509805, 0.34509805, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.7137255, 0.57254905, 0.32156864, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_34121"]
+bg_color = Color(0.19215687, 0.34509805, 0.34509805, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.7137255, 0.57254905, 0.32156864, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ef215"]
+bg_color = Color(0.11764706, 0.23529412, 0.25490198, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.7137255, 0.57254905, 0.32156864, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_d3ek8"]
+bg_color = Color(0.19215687, 0.34509805, 0.34509805, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.7137255, 0.57254905, 0.32156864, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mwhxo"]
+bg_color = Color(0.19215687, 0.34509805, 0.34509805, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.7137255, 0.57254905, 0.32156864, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_cfgaa"]
+bg_color = Color(0.11764706, 0.23529412, 0.25490198, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.7137255, 0.57254905, 0.32156864, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_sfqyv"]
+bg_color = Color(0.19215687, 0.34509805, 0.34509805, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.7137255, 0.57254905, 0.32156864, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_42ngi"]
+bg_color = Color(0.19215687, 0.34509805, 0.34509805, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.7137255, 0.57254905, 0.32156864, 1)
+
+[node name="ServerLogin" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 284.0
+offset_bottom = 368.0
+script = ExtResource("1_b65o1")
+
+[node name="Label0" type="Label" parent="."]
+layout_mode = 0
+offset_left = 18.0
+offset_right = 266.0
+offset_bottom = 23.0
+theme_override_font_sizes/font_size = 12
+text = "目标服务器地址"
+autowrap_mode = 3
+
+[node name="ServerAddress" type="LineEdit" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 18.0
+offset_top = 20.0
+offset_right = 266.0
+offset_bottom = 51.0
+placeholder_text = "IP:端口 / 域名"
+max_length = 1024
+
+[node name="Label2" type="Label" parent="."]
+layout_mode = 0
+offset_left = 18.0
+offset_top = 52.0
+offset_right = 291.0
+offset_bottom = 78.0
+theme_override_font_sizes/font_size = 12
+text = "地址自动保存；公网账号须用HTTPS。"
+autowrap_mode = 3
+
+[node name="Label3" type="Label" parent="."]
+layout_mode = 0
+offset_left = 18.0
+offset_top = 82.0
+offset_right = 276.0
+offset_bottom = 105.0
+theme_override_font_sizes/font_size = 12
+text = "登录账号（3～32位英数字/下划线）"
+autowrap_mode = 3
+
+[node name="Username" type="LineEdit" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 18.0
+offset_top = 100.0
+offset_right = 266.0
+offset_bottom = 131.0
+max_length = 32
+
+[node name="Label5" type="Label" parent="."]
+layout_mode = 0
+offset_left = 18.0
+offset_top = 132.0
+offset_right = 266.0
+offset_bottom = 155.0
+theme_override_font_sizes/font_size = 12
+text = "密码（12～128个字符，不保存）"
+autowrap_mode = 3
+
+[node name="Password" type="LineEdit" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 18.0
+offset_top = 150.0
+offset_right = 266.0
+offset_bottom = 181.0
+max_length = 128
+secret = true
+
+[node name="Status" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 18.0
+offset_top = 184.0
+offset_right = 266.0
+offset_bottom = 252.0
+theme_override_font_sizes/font_size = 12
+text = "服务器地址下次登录自动显示。"
+autowrap_mode = 3
+
+[node name="AuthButton" type="Button" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 18.0
+offset_top = 260.0
+offset_right = 134.0
+offset_bottom = 290.0
+theme_override_font_sizes/font_size = 12
+theme_override_styles/normal = SubResource("StyleBoxFlat_lhdy1")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_78uy0")
+theme_override_styles/hover = SubResource("StyleBoxFlat_b17ce")
+text = "登录账号"
+
+[node name="SwitchButton" type="Button" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 150.0
+offset_top = 260.0
+offset_right = 266.0
+offset_bottom = 290.0
+theme_override_font_sizes/font_size = 12
+theme_override_styles/normal = SubResource("StyleBoxFlat_fy58y")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_40ml8")
+theme_override_styles/hover = SubResource("StyleBoxFlat_34121")
+text = "注册账号"
+
+[node name="ConnectButton" type="Button" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 18.0
+offset_top = 298.0
+offset_right = 168.0
+offset_bottom = 329.0
+theme_override_font_sizes/font_size = 12
+theme_override_styles/normal = SubResource("StyleBoxFlat_ef215")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_d3ek8")
+theme_override_styles/hover = SubResource("StyleBoxFlat_mwhxo")
+text = "保存并连接"
+
+[node name="Back" type="Button" parent="."]
+layout_mode = 0
+offset_left = 178.0
+offset_top = 298.0
+offset_right = 266.0
+offset_bottom = 329.0
+theme_override_font_sizes/font_size = 12
+theme_override_styles/normal = SubResource("StyleBoxFlat_cfgaa")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_sfqyv")
+theme_override_styles/hover = SubResource("StyleBoxFlat_42ngi")
+text = "返回"
+
+[node name="Label12" type="Label" parent="."]
+layout_mode = 0
+offset_left = 18.0
+offset_top = 334.0
+offset_right = 274.0
+offset_bottom = 357.0
+theme_override_font_sizes/font_size = 12
+text = "账号与离线角色隔离；不记住密码。"
+autowrap_mode = 3
+
+[node name="Discovery" type="Node" parent="."]
+unique_name_in_owner = true
+script = ExtResource("2_rgqu0")

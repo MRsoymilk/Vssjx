@@ -117,7 +117,7 @@ func _run() -> void:
 	app._close_modal()
 	check(app.world.enabled and int(Game.player.gold) == 30 and int(Game.player.potions) == 6, "Closing preparation error restores play without deductions")
 	# Progress itself clamps malformed/backwards values without timer-driven fake percentages.
-	var progress := BattleEncounterTransition.new()
+	var progress: BattleEncounterTransition = load("res://scenes/ui/battle_encounter_transition.tscn").instantiate()
 	app.ui.add_child(progress)
 	progress.configure("测试", Vector2(-100, -100))
 	progress.set_progress(0.7, "准备动作")

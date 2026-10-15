@@ -1,0 +1,4 @@
+[gd_scene format=3]
+[node name="ProgressBar" type="ProgressBar"]
+mouse_filter = 2
+show_percentage = false

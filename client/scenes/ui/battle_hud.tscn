@@ -1,0 +1,407 @@
+[gd_scene format=3]
+
+[sub_resource type="SystemFont" id="SystemFont_7xx1w"]
+font_names = PackedStringArray("SimHei", "Microsoft YaHei", "sans-serif")
+antialiasing = 0
+
+[sub_resource type="Theme" id="Theme_dy3po"]
+default_font = SubResource("SystemFont_7xx1w")
+default_font_size = 11
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ytn0o"]
+bg_color = Color(0.27058825, 0.41960785, 0.5647059, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.4509804, 0.62352943, 0.8235294, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_p6blr"]
+bg_color = Color(0.8, 0.9254902, 0.1254902, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.4509804, 0.62352943, 0.8235294, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6uyy6"]
+bg_color = Color(0.27058825, 0.41960785, 0.5647059, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.4509804, 0.62352943, 0.8235294, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_nj5vo"]
+bg_color = Color(0.1882353, 0.8627451, 0.9098039, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.4509804, 0.62352943, 0.8235294, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_t6qmb"]
+bg_color = Color(0.27058825, 0.41960785, 0.5647059, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.4509804, 0.62352943, 0.8235294, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5jm4p"]
+bg_color = Color(0.8, 0.9254902, 0.1254902, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.4509804, 0.62352943, 0.8235294, 1)
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_w8gj3"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_o02nu"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_1dj1o"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_k1xb2"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_3qocc"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_618ne"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_248it"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_q8pi4"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_ojtv6"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_7dks2"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_f6mwp"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_51618"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mc3ph"]
+bg_color = Color(1, 0.9529412, 0.6784314, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.42352942, 0.32941177, 0.16470589, 1)
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_d6s8f"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3fpy6"]
+bg_color = Color(1, 0.7372549, 0.32156864, 1)
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_tx8x5"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_x4sra"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_52yeh"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_sf21p"]
+bg_color = Color(1, 0.7372549, 0.32156864, 1)
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_maqta"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_tmmnl"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_nap7k"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1foyf"]
+bg_color = Color(1, 0.7372549, 0.32156864, 1)
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_udbmj"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_brmdb"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_udvrx"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vctoe"]
+bg_color = Color(1, 0.7372549, 0.32156864, 1)
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_pfou3"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_70jwr"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_oyvxe"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_di3k7"]
+bg_color = Color(1, 0.7372549, 0.32156864, 1)
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_d1tc3"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_jcrbd"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_xwvo0"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fwnli"]
+bg_color = Color(1, 0.7372549, 0.32156864, 1)
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_g3a83"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_op3vm"]
+
+[node name="BattleHud" type="Control"]
+anchors_preset = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+theme = SubResource("Theme_dy3po")
+
+[node name="BattleHeroHp" type="ProgressBar" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 239.0
+offset_top = 211.0
+offset_right = 274.0
+offset_bottom = 215.0
+mouse_filter = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_ytn0o")
+theme_override_styles/fill = SubResource("StyleBoxFlat_p6blr")
+max_value = 120.0
+value = 120.0
+show_percentage = false
+
+[node name="BattleHeroMp" type="ProgressBar" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 239.0
+offset_top = 215.0
+offset_right = 274.0
+offset_bottom = 219.0
+mouse_filter = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_6uyy6")
+theme_override_styles/fill = SubResource("StyleBoxFlat_nj5vo")
+max_value = 35.0
+value = 35.0
+show_percentage = false
+
+[node name="BattleEnemyHp" type="ProgressBar" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 40.0
+offset_top = 199.0
+offset_right = 76.0
+offset_bottom = 204.0
+mouse_filter = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_t6qmb")
+theme_override_styles/fill = SubResource("StyleBoxFlat_5jm4p")
+max_value = 62.0
+value = 62.0
+show_percentage = false
+
+[node name="Level" type="Label" parent="."]
+layout_mode = 0
+offset_left = 226.0
+offset_top = 207.0
+offset_right = 238.0
+offset_bottom = 230.0
+theme_override_colors/font_color = Color(1, 0.9843137, 0.84313726, 1)
+theme_override_colors/font_outline_color = Color(0.16078432, 0.16470589, 0.09019608, 1)
+theme_override_constants/outline_size = 1
+theme_override_font_sizes/font_size = 8
+text = "1"
+autowrap_mode = 3
+
+[node name="BattleEnemyStatus" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 12.0
+offset_top = 225.0
+offset_right = 60.0
+offset_bottom = 248.0
+theme_override_colors/font_color = Color(0.15294118, 0.78431374, 0.93333334, 1)
+theme_override_colors/font_outline_color = Color(0.02745098, 0.32941177, 0.4509804, 1)
+theme_override_constants/outline_size = 1
+theme_override_font_sizes/font_size = 14
+text = "就绪"
+autowrap_mode = 3
+
+[node name="BattleHeroStatus" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 278.0
+offset_top = 233.0
+offset_right = 320.0
+offset_bottom = 256.0
+theme_override_colors/font_color = Color(0.15294118, 0.78431374, 0.93333334, 1)
+theme_override_colors/font_outline_color = Color(0.02745098, 0.32941177, 0.4509804, 1)
+theme_override_constants/outline_size = 1
+theme_override_font_sizes/font_size = 14
+text = "就绪"
+autowrap_mode = 3
+
+[node name="HeroHit" type="Button" parent="."]
+layout_mode = 0
+offset_left = 222.0
+offset_top = 214.0
+offset_right = 302.0
+offset_bottom = 296.0
+focus_mode = 0
+theme_override_colors/font_color = Color(1, 0.972549, 0.77254903, 1)
+theme_override_font_sizes/font_size = 1
+theme_override_styles/normal = SubResource("StyleBoxEmpty_w8gj3")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_o02nu")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_1dj1o")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_k1xb2")
+
+[node name="EnemyHit" type="Button" parent="."]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 193.0
+offset_right = 93.0
+offset_bottom = 300.0
+focus_mode = 0
+theme_override_colors/font_color = Color(1, 0.972549, 0.77254903, 1)
+theme_override_font_sizes/font_size = 1
+theme_override_styles/normal = SubResource("StyleBoxEmpty_3qocc")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_618ne")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_248it")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q8pi4")
+
+[node name="AutoButton" type="Button" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 85.0
+offset_top = 389.0
+offset_right = 236.0
+offset_bottom = 406.0
+focus_mode = 0
+theme_override_colors/font_color = Color(0.5019608, 0.84313726, 0.39607844, 1)
+theme_override_colors/font_outline_color = Color(0.20784314, 0.37254903, 0.21960784, 1)
+theme_override_constants/outline_size = 1
+theme_override_font_sizes/font_size = 10
+theme_override_styles/normal = SubResource("StyleBoxEmpty_ojtv6")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_7dks2")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_f6mwp")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_51618")
+text = "0键自动战斗"
+
+[node name="EffectsLayer" type="Control" parent="."]
+unique_name_in_owner = true
+clip_contents = true
+anchors_preset = 0
+offset_top = 28.0
+offset_right = 320.0
+offset_bottom = 424.0
+mouse_filter = 2
+
+[node name="ActionMenu" type="Panel" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+offset_left = 113.0
+offset_top = 128.0
+offset_right = 207.0
+offset_bottom = 285.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_mc3ph")
+
+[node name="BattleButtons0" type="Button" parent="ActionMenu"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 3.0
+offset_top = 3.0
+offset_right = 91.0
+offset_bottom = 27.0
+focus_mode = 0
+theme_override_colors/font_color = Color(0.4, 0.31764707, 0.10980392, 1)
+theme_override_colors/font_disabled_color = Color(0.7176471, 0.6392157, 0.39607844, 1)
+theme_override_font_sizes/font_size = 13
+theme_override_styles/normal = SubResource("StyleBoxEmpty_d6s8f")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_3fpy6")
+theme_override_styles/hover = SubResource("StyleBoxFlat_3fpy6")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_tx8x5")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_x4sra")
+text = "1 攻击"
+
+[node name="BattleButtons1" type="Button" parent="ActionMenu"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 3.0
+offset_top = 28.0
+offset_right = 91.0
+offset_bottom = 52.0
+focus_mode = 0
+theme_override_colors/font_color = Color(0.4, 0.31764707, 0.10980392, 1)
+theme_override_colors/font_disabled_color = Color(0.7176471, 0.6392157, 0.39607844, 1)
+theme_override_font_sizes/font_size = 13
+theme_override_styles/normal = SubResource("StyleBoxEmpty_52yeh")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_sf21p")
+theme_override_styles/hover = SubResource("StyleBoxFlat_sf21p")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_maqta")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_tmmnl")
+text = "2 技能"
+
+[node name="BattleButtons2" type="Button" parent="ActionMenu"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 3.0
+offset_top = 53.0
+offset_right = 91.0
+offset_bottom = 77.0
+focus_mode = 0
+theme_override_colors/font_color = Color(0.4, 0.31764707, 0.10980392, 1)
+theme_override_colors/font_disabled_color = Color(0.7176471, 0.6392157, 0.39607844, 1)
+theme_override_font_sizes/font_size = 13
+theme_override_styles/normal = SubResource("StyleBoxEmpty_nap7k")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_1foyf")
+theme_override_styles/hover = SubResource("StyleBoxFlat_1foyf")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_udbmj")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_brmdb")
+text = "3 待机"
+
+[node name="BattleButtons3" type="Button" parent="ActionMenu"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 3.0
+offset_top = 78.0
+offset_right = 91.0
+offset_bottom = 102.0
+focus_mode = 0
+theme_override_colors/font_color = Color(0.4, 0.31764707, 0.10980392, 1)
+theme_override_colors/font_disabled_color = Color(0.7176471, 0.6392157, 0.39607844, 1)
+theme_override_font_sizes/font_size = 13
+theme_override_styles/normal = SubResource("StyleBoxEmpty_udvrx")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_vctoe")
+theme_override_styles/hover = SubResource("StyleBoxFlat_vctoe")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_pfou3")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_70jwr")
+disabled = true
+text = "4 道具"
+
+[node name="BattleButtons4" type="Button" parent="ActionMenu"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 3.0
+offset_top = 103.0
+offset_right = 91.0
+offset_bottom = 127.0
+focus_mode = 0
+theme_override_colors/font_color = Color(0.4, 0.31764707, 0.10980392, 1)
+theme_override_colors/font_disabled_color = Color(0.7176471, 0.6392157, 0.39607844, 1)
+theme_override_font_sizes/font_size = 13
+theme_override_styles/normal = SubResource("StyleBoxEmpty_oyvxe")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_di3k7")
+theme_override_styles/hover = SubResource("StyleBoxFlat_di3k7")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_d1tc3")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_jcrbd")
+text = "5 查看"
+
+[node name="BattleButtons5" type="Button" parent="ActionMenu"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 3.0
+offset_top = 128.0
+offset_right = 91.0
+offset_bottom = 152.0
+focus_mode = 0
+theme_override_colors/font_color = Color(0.4, 0.31764707, 0.10980392, 1)
+theme_override_colors/font_disabled_color = Color(0.7176471, 0.6392157, 0.39607844, 1)
+theme_override_font_sizes/font_size = 13
+theme_override_styles/normal = SubResource("StyleBoxEmpty_xwvo0")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_fwnli")
+theme_override_styles/hover = SubResource("StyleBoxFlat_fwnli")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_g3a83")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_op3vm")
+text = "6 逃跑"

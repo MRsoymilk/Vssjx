@@ -70,7 +70,7 @@ func _run() -> void:
 		await get_tree().process_frame
 	# Other jobs use the same authoritative move names, not the reference's unimplemented skill.
 	for job in 3: check(ShushanBattle.action_name("skill", job) == ShushanBattle.SKILL_NAMES[job], "Skill callouts share names with battle resolution")
-	var bubble := BattleMoveCallout.new()
+	var bubble: BattleMoveCallout = load("res://scenes/ui/battle_move_callout.tscn").instantiate()
 	app.ui.add_child(bubble)
 	bubble.present("摄灵诀", Vector2(3, 100), 1.0)
 	check(bubble.position.x >= 0 and bubble.position.x + bubble.size.x <= 320, "Edge-anchored bubble is clamped inside the viewport")

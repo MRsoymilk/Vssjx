@@ -1,0 +1,5 @@
+[gd_scene format=3]
+[node name="WorldViewport" type="SubViewport"]
+handle_input_locally = false
+size = Vector2i(320, 375)
+render_target_update_mode = 4

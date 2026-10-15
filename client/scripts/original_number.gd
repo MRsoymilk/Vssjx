@@ -2,9 +2,9 @@ class_name OriginalNumber
 extends Control
 ## Original bitmap glyph order: slash, zero, one ... nine.
 
-var value := ""
-var color_set := "white"
-var align_right := true
+@export var value := ""
+@export var color_set := "white"
+@export var align_right := true
 var glyphs: Array[Texture2D] = []
 
 func _ready() -> void:

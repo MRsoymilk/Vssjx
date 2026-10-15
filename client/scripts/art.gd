@@ -7,6 +7,7 @@ static var _index: Dictionary = {}
 static var _index_loaded := false
 static var _metadata_reads := 0
 static var _metadata_bytes := 0
+const ACTOR_SCENE := preload("res://scenes/actors/original_actor.tscn")
 const INDEX_PATH := "res://assets/data/actors.json"
 
 static func _read_metadata(path: String) -> Dictionary:
@@ -66,8 +67,7 @@ static func _valid_info(info: Dictionary) -> bool:
 	return true
 
 static func actor(key: String) -> AnimatedSprite2D:
-	var sprite := AnimatedSprite2D.new()
-	sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	var sprite: AnimatedSprite2D = ACTOR_SCENE.instantiate()
 	var info := actor_info(key)
 	if info.is_empty():
 		push_error("Missing original actor: " + key)
@@ -105,7 +105,6 @@ static func actor(key: String) -> AnimatedSprite2D:
 				frames.add_frame(mode, regions[int(step[0])], maxf(1.0, float(step[1])))
 		cached[key] = frames
 	sprite.sprite_frames = cached[key]
-	sprite.centered = false
 	sprite.offset = Vector2(info.origin[0] - info.get("anchor_x", 0), info.origin[1])
 	sprite.animation_finished.connect(func() -> void:
 		if sprite.animation in ["attack", "cast"]: sprite.play("idle")

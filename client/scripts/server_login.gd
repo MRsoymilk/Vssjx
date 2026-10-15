@@ -4,43 +4,24 @@ extends Control
 signal close_requested
 signal characters_requested
 var settings := ServerConnectionSettings.new()
-var address_input: LineEdit
-var status: Label
-var connect_button: Button
-var discovery: ServerDiscovery
+@onready var address_input: LineEdit = $ServerAddress
+@onready var status: Label = $Status
+@onready var connect_button: Button = $ConnectButton
+@onready var discovery: ServerDiscovery = $Discovery
 var register_mode := false
-var username_input: LineEdit
-var password_input: LineEdit
-var auth_button: Button
-var switch_button: Button
+@onready var username_input: LineEdit = $Username
+@onready var password_input: LineEdit = $Password
+@onready var auth_button: Button = $AuthButton
+@onready var switch_button: Button = $SwitchButton
 var _probing := false
 
 func _ready() -> void:
-	size = Vector2(284, 368)
-	_label("目标服务器地址", Rect2(18, 0, 248, 20))
-	address_input = LineEdit.new()
-	address_input.name = "ServerAddress"
-	address_input.position = Vector2(18, 20)
-	address_input.size = Vector2(248, 28)
-	address_input.max_length = 1024
-	address_input.placeholder_text = "IP:端口 / 域名"
 	address_input.text = settings.load_address()
-	add_child(address_input)
-	_label("地址自动保存；公网账号须用HTTPS。", Rect2(18, 52, 248, 26))
-	_label("登录账号（3～32位英数字/下划线）", Rect2(18, 82, 248, 18))
-	username_input = _make_input("Username", Rect2(18, 100, 248, 28), 32)
-	_label("密码（12～128个字符，不保存）", Rect2(18, 132, 248, 18))
-	password_input = _make_input("Password", Rect2(18, 150, 248, 28), 128)
-	password_input.secret = true
-	status = _label("服务器地址下次登录自动显示。", Rect2(18, 184, 248, 68))
 	if not settings.last_error.is_empty(): status.text = settings.last_error
-	auth_button = _button("", Rect2(18, 260, 116, 30), _submit_account)
-	switch_button = _button("", Rect2(150, 260, 116, 30), _switch_mode)
-	connect_button = _button("保存并连接", Rect2(18, 298, 150, 30), connect_server)
-	_button("返回", Rect2(178, 298, 88, 30), _return)
-	_label("账号与离线角色隔离；不记住密码。", Rect2(18, 334, 248, 22))
-	discovery = ServerDiscovery.new()
-	add_child(discovery)
+	auth_button.pressed.connect(_submit_account)
+	switch_button.pressed.connect(_switch_mode)
+	connect_button.pressed.connect(connect_server)
+	$Back.pressed.connect(_return)
 	discovery.completed.connect(_connection_result)
 	OnlineAccount.completed.connect(_account_result)
 	address_input.text_changed.connect(func(_value: String) -> void:
@@ -52,42 +33,6 @@ func _ready() -> void:
 	_update_controls()
 	if OnlineAccount.is_logged_in(): _show_account()
 	address_input.grab_focus()
-
-func _make_input(node_name: String, rect: Rect2, limit: int) -> LineEdit:
-	var input := LineEdit.new()
-	input.name = node_name
-	input.position = rect.position
-	input.size = rect.size
-	input.max_length = limit
-	add_child(input)
-	return input
-
-func _label(value: String, rect: Rect2) -> Label:
-	var label := Label.new()
-	label.text = value
-	label.position = rect.position
-	label.size = rect.size
-	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	label.add_theme_font_size_override("font_size", 12)
-	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(label)
-	return label
-
-func _button(value: String, rect: Rect2, action: Callable) -> Button:
-	var button := Button.new()
-	button.text = value
-	button.position = rect.position
-	button.size = rect.size
-	for state in ["normal", "hover", "pressed"]:
-		var skin := StyleBoxFlat.new()
-		skin.bg_color = Color("1e3c41") if state == "normal" else Color("315858")
-		skin.border_color = Color("b69252")
-		skin.set_border_width_all(1)
-		button.add_theme_stylebox_override(state, skin)
-	button.add_theme_font_size_override("font_size", 12)
-	button.pressed.connect(action)
-	add_child(button)
-	return button
 
 func save_draft(show_error: bool = true) -> bool:
 	if not settings.save_address(address_input.text):

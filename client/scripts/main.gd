@@ -6,7 +6,7 @@ const PAPER := Color("eee6cc")
 const GOLD := Color("e9c67c")
 const TEAL := Color("7cc7bd")
 var mode := "home"
-var ui: Control
+@onready var ui: Control = $UI
 var world_view: TextureRect
 var viewport: SubViewport
 var world: ShushanWorld
@@ -59,16 +59,6 @@ var map_coordinates: Label
 
 func _ready() -> void:
 	get_tree().auto_accept_quit = false
-	var font := SystemFont.new()
-	font.font_names = PackedStringArray(["Microsoft YaHei", "Noto Sans CJK SC", "sans-serif"])
-	var shared := Theme.new()
-	shared.default_font = font
-	shared.default_font_size = 12
-	theme = shared
-	ui = Control.new()
-	ui.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	ui.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(ui)
 	_home()
 
 func _process(delta: float) -> void:
@@ -125,20 +115,23 @@ func _unhandled_key_input(event: InputEvent) -> void:
 			KEY_ENTER: _battle_menu()
 
 func _box(parent: Node, rect: Rect2, color: Color = INK, border: Color = Color("3e6060")) -> Panel:
-	var panel := Panel.new()
+	var panel: Panel = preload("res://scenes/ui/dynamic_panel.tscn").instantiate()
 	panel.position = rect.position
 	panel.size = rect.size
+	_style_panel(panel, color, border)
+	parent.add_child(panel)
+	return panel
+
+func _style_panel(panel: Panel, color: Color, border: Color) -> void:
 	var style := StyleBoxFlat.new()
 	style.bg_color = Color("fff7b8") if mode in ["world", "battle"] and color == INK else color
 	style.border_color = OriginalUITheme.palette("scene").main if mode in ["world", "battle"] else border
 	style.set_border_width_all(1)
 	style.set_corner_radius_all(0 if mode in ["world", "battle"] else 4)
 	panel.add_theme_stylebox_override("panel", style)
-	parent.add_child(panel)
-	return panel
 
 func _label(parent: Node, text_value: String, rect: Rect2, size_value: int = 12, color: Color = PAPER, centered: bool = false) -> Label:
-	var label := Label.new()
+	var label: Label = preload("res://scenes/ui/dynamic_label.tscn").instantiate()
 	label.text = text_value
 	label.position = rect.position
 	label.size = rect.size
@@ -151,7 +144,7 @@ func _label(parent: Node, text_value: String, rect: Rect2, size_value: int = 12,
 	return label
 
 func _button(parent: Node, text_value: String, rect: Rect2, callback: Callable, primary: bool = false) -> Button:
-	var button := Button.new()
+	var button: Button = preload("res://scenes/ui/dynamic_button.tscn").instantiate()
 	button.text = text_value
 	button.position = rect.position
 	button.size = rect.size
@@ -230,7 +223,7 @@ func _home() -> void:
 	mode = "home"
 	_clear_ui()
 	_dispose_world()
-	original_cover = OriginalCover.new()
+	original_cover = load("res://scenes/ui/original_cover.tscn").instantiate()
 	ui.add_child(original_cover)
 	original_cover.chosen.connect(_cover_choice)
 	original_cover.exit_requested.connect(_cover_exit)
@@ -251,7 +244,7 @@ func _cover_choice(option: String) -> void:
 
 func _server_login(register_mode: bool = false) -> void:
 	var panel := _modal_panel("账号服务", 428)
-	var login := ServerLogin.new()
+	var login: ServerLogin = load("res://scenes/ui/server_login.tscn").instantiate()
 	login.name = "ServerLogin"
 	login.register_mode = register_mode
 	login.position = Vector2(0, 54)
@@ -262,7 +255,7 @@ func _server_login(register_mode: bool = false) -> void:
 func _online_characters() -> void:
 	_close_modal()
 	var panel := _modal_panel("线上角色", 428)
-	var lobby := OnlineCharacters.new()
+	var lobby: OnlineCharacters = load("res://scenes/ui/online_characters.tscn").instantiate()
 	lobby.name = "OnlineCharacters"
 	lobby.enter_requested.connect(_enter_online_world)
 	lobby.position = Vector2(0, 54)
@@ -282,7 +275,7 @@ func _enter_online_world(character_id: String) -> void:
 	mode = "online_world"
 	_clear_ui()
 	_dispose_world()
-	var view := OnlineWorldView.new()
+	var view: OnlineWorldView = load("res://scenes/ui/online_world_view.tscn").instantiate()
 	view.name = "OnlineWorld"
 	view.character_id = character_id
 	ui.add_child(view)
@@ -294,7 +287,7 @@ func _enter_online_world(character_id: String) -> void:
 func _create() -> void:
 	mode = "create"
 	_clear_ui()
-	creation = OriginalCharacterCreation.new()
+	creation = load("res://scenes/ui/character_creation.tscn").instantiate()
 	creation.selected_variant = selected_job * 2 + selected_gender
 	creation.selection_changed.connect(_creation_selection)
 	creation.create_requested.connect(_start_new)
@@ -343,18 +336,13 @@ func _enter_world() -> void:
 	mode = "world"
 	_clear_ui()
 	_dispose_world()
-	viewport = SubViewport.new()
-	viewport.size = Vector2i(320, 375)
-	viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS
-	viewport.handle_input_locally = false
+	viewport = preload("res://scenes/ui/world_viewport.tscn").instantiate()
 	add_child(viewport)
 	world = ShushanWorld.new()
 	viewport.add_child(world)
 	world.interaction.connect(_world_interaction)
 	world.moved.connect(_refresh_hud)
-	world_view = TextureRect.new()
-	world_view.position = Vector2(0, 28)
-	world_view.size = Vector2(320, 375)
+	world_view = preload("res://scenes/ui/world_image.tscn").instantiate()
 	world_view.texture = viewport.get_texture()
 	world_view.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	world_view.gui_input.connect(func(event: InputEvent) -> void:
@@ -372,29 +360,19 @@ func _world_ui() -> void:
 	_clear_ui()
 	world_view.show()
 	world.enabled = true
-	chrome = OriginalSceneChrome.new()
+	chrome = load("res://scenes/ui/scene_chrome.tscn").instantiate()
 	ui.add_child(chrome)
 	chrome.action_requested.connect(_scene_action)
 	ui.theme = chrome.theme
-	minimap = OriginalWorldMinimap.new()
+	var hud: Control = preload("res://scenes/ui/world_hud.tscn").instantiate()
+	minimap = hud.get_node("Minimap")
 	minimap.world = world
-	minimap.position = Vector2(1, 29)
-	ui.add_child(minimap)
-	map_name = _label(ui, "青云山道" if int(Game.player.zone) == 0 else "古剑遗迹", Rect2(4, 111, 78, 15), 10, Color("d98b54"))
-	map_name.add_theme_color_override("font_outline_color", Color("675334"))
-	map_name.add_theme_constant_override("outline_size", 1)
-	map_coordinates = _label(ui, "", Rect2(4, 126, 75, 15), 9, Color("fff5ca"))
-	hud_name = _label(ui, "", Rect2(7, 29, 250, 18), 10, Color("fff6b7"))
-	hud_name.add_theme_constant_override("outline_size", 1)
-	hud_name.add_theme_color_override("font_outline_color", Color("514b2c"))
-	hud_name.autowrap_mode = TextServer.AUTOWRAP_OFF
-	hud_name.clip_text = true
-	hud_name.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-	hud_name.hide()
-	world_identity = _label(ui, "", Rect2(230, 367, 86, 32), 10, Color("efe57e"))
-	world_identity.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	world_identity.add_theme_constant_override("outline_size", 1)
-	world_identity.add_theme_color_override("font_outline_color", Color("5f6136"))
+	ui.add_child(hud)
+	map_name = hud.get_node("MapName")
+	map_name.text = "青云山道" if int(Game.player.zone) == 0 else "古剑遗迹"
+	map_coordinates = hud.get_node("MapCoordinates")
+	hud_name = hud.get_node("HudName")
+	world_identity = hud.get_node("WorldIdentity")
 	hud_stats = chrome.hint
 	quest_label = chrome.log_label
 	_refresh_hud()
@@ -489,15 +467,15 @@ func _modal_panel(title: String, height: int = 246, page: String = "scene") -> P
 	if world != null and is_instance_valid(world):
 		world.stop_moving()
 		world.enabled = false
-	modal = Control.new()
-	modal.size = Vector2(320, 480)
-	modal.mouse_filter = Control.MOUSE_FILTER_STOP
+	modal = preload("res://scenes/ui/modal_overlay.tscn").instantiate()
 	ui.add_child(modal)
-	var shade := ColorRect.new()
+	var shade: ColorRect = modal.get_node("Shade")
 	shade.color = Color(0.92, 0.88, 0.71, 0.28) if mode in ["world", "battle"] else Color(0.01, 0.02, 0.03, 0.75)
-	shade.size = Vector2(320, 480)
-	modal.add_child(shade)
-	var panel := _box(modal, Rect2(18, (480 - height) / 2, 284, height), INK, GOLD)
+	var panel: Panel = preload("res://scenes/ui/dialog_frame.tscn").instantiate()
+	panel.position.y = (480 - height) / 2.0
+	panel.size.y = height
+	_style_panel(panel, INK, GOLD)
+	modal.add_child(panel)
 	if page == "reward":
 		var colors := OriginalUITheme.palette(page)
 		var skin: StyleBoxFlat = panel.get_theme_stylebox("panel")
@@ -508,7 +486,10 @@ func _modal_panel(title: String, height: int = 246, page: String = "scene") -> P
 		skin.bg_color = Color("fff8b8")
 		skin.border_color = Color("81501b")
 		skin.set_corner_radius_all(0)
-	_label(panel, title, Rect2(18, 16, 248, 28), 18, Color("fff8c5") if page == "reward" else GOLD)
+	var title_label: Label = panel.get_node("Title")
+	title_label.text = title
+	title_label.add_theme_color_override("font_color", Color("fff8c5") if page == "reward" else (Color("654518") if mode in ["create", "world", "battle"] else GOLD))
+	panel.move_child(title_label, panel.get_child_count() - 1)
 	return panel
 
 func _close_modal() -> void:
@@ -550,15 +531,11 @@ func _bag() -> void:
 	_close_modal()
 	world.stop_moving()
 	world.enabled = false
-	modal = Control.new()
-	modal.size = Vector2(320, 480)
-	modal.mouse_filter = Control.MOUSE_FILTER_STOP
+	modal = preload("res://scenes/ui/modal_overlay.tscn").instantiate()
 	ui.add_child(modal)
-	var shade := ColorRect.new()
-	shade.size = Vector2(320, 480)
+	var shade: ColorRect = modal.get_node("Shade")
 	shade.color = Color(0.03, 0.04, 0.02, 0.42)
-	modal.add_child(shade)
-	backpack = OriginalInventory.new()
+	backpack = load("res://scenes/ui/inventory.tscn").instantiate()
 	modal.add_child(backpack)
 	backpack.back_requested.connect(_close_modal)
 	backpack.changed.connect(_refresh_hud)
@@ -604,7 +581,7 @@ func _attributes() -> void:
 	world.stop_moving()
 	mode = "attributes"
 	_clear_ui()
-	attributes = OriginalCharacterAttributes.new()
+	attributes = load("res://scenes/ui/character_attributes.tscn").instantiate()
 	ui.add_child(attributes)
 	attributes.back_requested.connect(_return_from_attributes)
 
@@ -644,7 +621,7 @@ func _encounter_battle(enemy: Dictionary) -> void:
 	var world_id := world.get_instance_id()
 	world.camera.force_update_scroll()
 	var point: Vector2 = world.hero.get_global_transform_with_canvas().origin + world_view.position
-	battle_transition = BattleEncounterTransition.new()
+	battle_transition = load("res://scenes/ui/battle_encounter_transition.tscn").instantiate()
 	ui.add_child(battle_transition)
 	battle_transition.configure(String(enemy.get("name", "妖物")), point)
 	# A short readable warning, followed by actual texture/cache work.
@@ -732,8 +709,7 @@ func _start_battle(enemy: Dictionary) -> void:
 	battle_hero.position = Vector2(256, 282)
 	battle_hero.scale = Vector2(1.2, 1.2)
 	ui.add_child(battle_hero)
-	chrome = OriginalSceneChrome.new()
-	chrome.in_battle = true
+	chrome = load("res://scenes/ui/battle_chrome.tscn").instantiate()
 	ui.add_child(chrome)
 	chrome.action_requested.connect(_scene_action)
 	ui.theme = chrome.theme
@@ -741,34 +717,27 @@ func _start_battle(enemy: Dictionary) -> void:
 	battle_round = chrome.round_label
 	battle_status = chrome.hint
 	battle_log.text = "[系统] %s进入战斗。\n[系统] 点击人物展开战斗指令。" % enemy.name
-	battle_hero_hp = OriginalSceneChrome.progress(ui, Rect2(239, 211, 35, 4), Color("ccec20"))
-	battle_hero_mp = OriginalSceneChrome.progress(ui, Rect2(239, 215, 35, 4), Color("30dce8"))
-	battle_enemy_hp = OriginalSceneChrome.progress(ui, Rect2(40, 199, 36, 5), Color("ccec20"))
-	var level_label := _label(ui, str(int(Game.player.level)), Rect2(226, 207, 12, 13), 8, Color("fffbd7"))
-	level_label.add_theme_constant_override("outline_size", 1)
-	level_label.add_theme_color_override("font_outline_color", Color("292a17"))
-	battle_enemy_status = _label(ui, "就绪", Rect2(12, 225, 48, 22), 14, Color("27c8ee"))
-	battle_enemy_status.add_theme_constant_override("outline_size", 1)
-	battle_enemy_status.add_theme_color_override("font_outline_color", Color("075473"))
-	battle_hero_status = _label(ui, "就绪", Rect2(278, 233, 42, 22), 14, Color("27c8ee"))
-	battle_hero_status.add_theme_constant_override("outline_size", 1)
-	battle_hero_status.add_theme_color_override("font_outline_color", Color("075473"))
-	var hero_hit := OriginalSceneChrome.button(ui, "", Rect2(222, 214, 80, 82), 1)
-	hero_hit.pressed.connect(func() -> void: battle_selected_enemy = false; _battle_menu())
-	var enemy_hit := OriginalSceneChrome.button(ui, "", Rect2(8, 193, 85, 107), 1)
-	enemy_hit.pressed.connect(func() -> void: battle_selected_enemy = true; _battle_menu())
-	auto_button = OriginalSceneChrome.button(ui, "", Rect2(85, 389, 151, 17), 10)
-	auto_button.add_theme_color_override("font_color", Color("80d765"))
-	auto_button.add_theme_color_override("font_outline_color", Color("355f38"))
-	auto_button.add_theme_constant_override("outline_size", 1)
+	var hud: Control = preload("res://scenes/ui/battle_hud.tscn").instantiate()
+	ui.add_child(hud)
+	battle_hero_hp = hud.get_node("BattleHeroHp")
+	battle_hero_mp = hud.get_node("BattleHeroMp")
+	battle_enemy_hp = hud.get_node("BattleEnemyHp")
+	battle_enemy_status = hud.get_node("BattleEnemyStatus")
+	battle_hero_status = hud.get_node("BattleHeroStatus")
+	hud.get_node("Level").text = str(int(Game.player.level))
+	hud.get_node("HeroHit").pressed.connect(func() -> void: battle_selected_enemy = false; _battle_menu())
+	hud.get_node("EnemyHit").pressed.connect(func() -> void: battle_selected_enemy = true; _battle_menu())
+	auto_button = hud.get_node("AutoButton")
 	auto_button.pressed.connect(_toggle_auto)
-	effects_layer = Control.new()
-	effects_layer.position = Vector2(0, 28)
-	effects_layer.size = Vector2(320, 396)
-	effects_layer.clip_contents = true
-	effects_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	ui.add_child(effects_layer)
-	battle_move_callout = BattleMoveCallout.new()
+	effects_layer = hud.get_node("EffectsLayer")
+	action_menu = hud.get_node("ActionMenu")
+	var commands := ["attack", "skill", "guard", "potion", "inspect", "flee"]
+	for i in commands.size():
+		var button: Button = action_menu.get_node("BattleButtons%d" % i)
+		if commands[i] == "inspect": button.pressed.connect(_battle_inspect)
+		else: button.pressed.connect(_battle_turn.bind(commands[i]))
+		battle_buttons.append(button)
+	battle_move_callout = load("res://scenes/ui/battle_move_callout.tscn").instantiate()
 	ui.add_child(battle_move_callout)
 	_battle_menu()
 	action_menu.hide()
@@ -784,53 +753,28 @@ func _battle_menu() -> void:
 	if battle.phase != "select" or modal != null: return
 	if action_menu != null and is_instance_valid(action_menu):
 		action_menu.visible = not action_menu.visible
-		return
-	action_menu = OriginalSceneChrome.panel(ui, Rect2(113, 128, 94, 157), Color("fff3ad"), Color("6c542a"))
-	action_menu.mouse_filter = Control.MOUSE_FILTER_STOP
-	var names := ["1 攻击", "2 技能", "3 待机", "4 道具", "5 查看", "6 逃跑"]
-	var commands := ["attack", "skill", "guard", "potion", "inspect", "flee"]
-	for i in 6:
-		var button := OriginalSceneChrome.button(action_menu, names[i], Rect2(3, 3 + i * 25, 88, 24), 13)
-		button.add_theme_color_override("font_color", Color("66511c"))
-		var selected := StyleBoxFlat.new()
-		selected.bg_color = Color("ffbc52")
-		button.add_theme_stylebox_override("hover", selected)
-		button.add_theme_stylebox_override("pressed", selected)
-		button.add_theme_stylebox_override("disabled", StyleBoxEmpty.new())
-		button.add_theme_color_override("font_disabled_color", Color("b7a365"))
-		if commands[i] == "inspect": button.pressed.connect(_battle_inspect)
-		else: button.pressed.connect(_battle_turn.bind(commands[i]))
-		battle_buttons.append(button)
-	_refresh_battle()
+		_refresh_battle()
 
 func _battle_inspect() -> void:
 	if battle.phase != "select": return
 	if action_menu != null: action_menu.hide()
 	_close_modal()
-	modal = Control.new()
-	modal.size = Vector2(320, 480)
-	modal.mouse_filter = Control.MOUSE_FILTER_STOP
+	modal = preload("res://scenes/ui/modal_overlay.tscn").instantiate()
 	modal.gui_input.connect(func(event: InputEvent) -> void:
 		if event is InputEventMouseButton and event.pressed: _close_modal()
 	)
 	ui.add_child(modal)
-	var panel := OriginalSceneChrome.panel(modal, Rect2(78, 173, 164, 113), Color("fff6b4"), Color("65552a"))
+	modal.get_node("Shade").hide()
+	var panel: Panel = preload("res://scenes/ui/battle_inspect.tscn").instantiate()
+	modal.add_child(panel)
 	var enemy := battle_selected_enemy
-	var name_value := String(battle.enemy.name) if enemy else String(Game.player.name)
-	var name_label := _label(panel, name_value, Rect2(7, 7, 150, 22), 15, Color("798317"), true)
-	name_label.clip_text = true
-	name_label.add_theme_constant_override("outline_size", 1)
-	name_label.add_theme_color_override("font_outline_color", Color("514512"))
+	panel.get_node("NameValue").text = String(battle.enemy.name) if enemy else String(Game.player.name)
 	var values := Game.stats()
 	var hp := battle.enemy_hp if enemy else battle.hp
 	var max_hp := int(battle.enemy.hp) if enemy else int(values.hp)
-	_label(panel, "气血：%d/%d" % [hp, max_hp], Rect2(10, 34, 146, 21), 12, Color("66511c"))
-	if enemy:
-		_label(panel, "攻击：%d" % int(battle.enemy.attack), Rect2(10, 57, 146, 21), 12, Color("66511c"))
-		_label(panel, "防御：%d" % int(battle.enemy.defense), Rect2(10, 80, 146, 21), 12, Color("66511c"))
-	else:
-		_label(panel, "灵力：%d/%d" % [battle.mp, int(values.mp)], Rect2(10, 57, 146, 21), 12, Color("66511c"))
-		_label(panel, "门派：" + Game.SCHOOLS[int(Game.player.school)] + "派", Rect2(10, 80, 146, 21), 12, Color("66511c"))
+	panel.get_node("Hp").text = "气血：%d/%d" % [hp, max_hp]
+	panel.get_node("Secondary").text = "攻击：%d" % int(battle.enemy.attack) if enemy else "灵力：%d/%d" % [battle.mp, int(values.mp)]
+	panel.get_node("Tertiary").text = "防御：%d" % int(battle.enemy.defense) if enemy else "门派：" + Game.SCHOOLS[int(Game.player.school)] + "派"
 
 func _battle_turn(command: String) -> void:
 	if mode != "battle" or battle.phase != "select" or modal != null: return

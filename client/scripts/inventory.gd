@@ -4,122 +4,50 @@ extends Control
 
 signal back_requested
 signal changed
+const CELL_SCENE := preload("res://scenes/ui/inventory_cell.tscn")
 const EQUIPMENT := ["武器", "腰佩", "衣服", "手腕", "腰带", "裤子", "鞋子", "戒指", "项链", "帽子"]
 const WINDOW := Rect2(36, 63, 248, 353)
 var palette: Dictionary
-var header: Label
+@onready var header: Label = $Header
 var preview: AnimatedSprite2D
-var grid: Control
+@onready var grid: Control = $Grid
 var cells: Array[Button] = []
-var scrollbar: VScrollBar
+@onready var scrollbar: VScrollBar = $Scrollbar
 var offset := 0
 var selected_index := 0
 var selected_equipment := false
 var items: Array[Dictionary] = []
-var description: Label
-var tooltip: Panel
-var tooltip_label: Label
-var cursor: TextureRect
+@onready var description: Label = $Description
+@onready var tooltip: Panel = $Tooltip
+@onready var tooltip_label: Label = $Tooltip/TooltipLabel
+@onready var cursor: TextureRect = $Cursor
 var item_menu: Panel
-var equipment_icon: TextureRect
-var equipment_level: OriginalNumber
-var money: OriginalNumber
-var hp_bar: ProgressBar
-var mp_bar: ProgressBar
+@onready var equipment_icon: TextureRect = $EquipmentIcon
+@onready var equipment_level: OriginalNumber = $EquipmentLevel
+@onready var money: OriginalNumber = $Money
+@onready var hp_bar: ProgressBar = $HpBar
+@onready var mp_bar: ProgressBar = $MpBar
 
 func _ready() -> void:
-	size = Vector2(320, 480)
-	mouse_filter = Control.MOUSE_FILTER_STOP
-	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	palette = OriginalUITheme.palette("bag")
-	var font := SystemFont.new()
-	font.font_names = PackedStringArray(["SimHei", "Microsoft YaHei", "sans-serif"])
-	font.antialiasing = TextServer.FONT_ANTIALIASING_NONE
-	var skin := Theme.new()
-	skin.default_font = font
-	skin.default_font_size = 11
-	theme = skin
-	_box(WINDOW, palette.body, Color("77521a"), 2)
-	_box(Rect2(38, 65, 244, 349), palette.body, Color("f5d963"), 1)
-	_box(Rect2(40, 68, 240, 28), palette.main, Color("e7e8b7"), 1)
-	_picture("create_header_end", Rect2(41, 69, 11, 26))
-	_picture("create_header_end", Rect2(268, 69, 11, 26), true)
-	header = _text("", Rect2(69, 73, 183, 19), 14, Color("f8e12f"), true)
-	for corner in [Vector2(35, 62), Vector2(277, 62), Vector2(35, 409), Vector2(277, 409)]:
-		var picture := _picture("bag_corner", Rect2(corner, Vector2(8, 8)), corner.x > 100)
-		picture.flip_v = corner.y > 100
-	_box(Rect2(43, 103, 72, 101), Color("c3e440"), palette.deep, 1)
-	var level := _text("LV.%d" % int(Game.player.level), Rect2(46, 106, 64, 14), 9, Color("fffbe1"))
-	level.add_theme_color_override("font_outline_color", Color("27322c"))
-	level.add_theme_constant_override("outline_size", 1)
+	$Level.text = "LV.%d" % int(Game.player.level)
 	preview = OriginalArt.actor(Game.actor_key())
 	preview.position = Vector2(80, 185)
 	preview.scale = Vector2(1.3, 1.3)
 	add_child(preview)
-	hp_bar = OriginalSceneChrome.progress(self, Rect2(46, 190, 65, 5), Color("cced18"))
-	mp_bar = OriginalSceneChrome.progress(self, Rect2(46, 196, 65, 5), Color("38d8ee"))
-	for i in 10:
-		var x := 118 + i % 5 * 32
-		var y := 103 + (i / 5) * 51
-		_box(Rect2(x, y, 32, 49), palette.body, palette.main, 1)
-		_box(Rect2(x, y, 32, 15), palette.main, palette.main, 0)
-		_text(EQUIPMENT[i], Rect2(x, y, 32, 16), 11, palette.bright, true)
-		if i == 0:
-			equipment_icon = _picture("bag_sword", Rect2(x + 3, y + 17, 26, 29))
-			equipment_level = OriginalNumber.new()
-			equipment_level.color_set = "green"
-			equipment_level.value = "1"
-			equipment_level.position = Vector2(x + 1, y + 16)
-			equipment_level.size = Vector2(10, 9)
-			add_child(equipment_level)
-		var slot := _button("", Rect2(x, y + 16, 32, 33), false)
-		slot.pressed.connect(_select_equipment.bind(i))
-	_box(Rect2(42, 209, 238, 151), palette.body, palette.main, 1)
-	grid = Control.new()
-	grid.position = Vector2(44, 211)
-	grid.size = Vector2(221, 148)
-	grid.mouse_filter = Control.MOUSE_FILTER_PASS
-	grid.gui_input.connect(func(event: InputEvent) -> void:
-		if event is InputEventMouseButton and event.pressed and event.button_index in [MOUSE_BUTTON_WHEEL_UP, MOUSE_BUTTON_WHEEL_DOWN]:
-			scrollbar.value += 6 if event.button_index == MOUSE_BUTTON_WHEEL_DOWN else -6
-			grid.accept_event()
-	)
-	add_child(grid)
-	scrollbar = VScrollBar.new()
-	scrollbar.min_value = 0
-	scrollbar.max_value = 60
-	scrollbar.page = 24
-	scrollbar.step = 6
-	scrollbar.focus_mode = Control.FOCUS_NONE
-	var rail := _style(Color("716529"), palette.main, 1)
-	var thumb := _style(Color("e9ef28"), Color("c8d925"), 0)
-	scrollbar.add_theme_stylebox_override("scroll", rail)
-	for state in ["grabber", "grabber_highlight", "grabber_pressed"]: scrollbar.add_theme_stylebox_override(state, thumb)
+	move_child(preview, hp_bar.get_index())
+	for i in 10: get_node("Equipment%d" % i).pressed.connect(_select_equipment.bind(i))
+	grid.gui_input.connect(_grid_input)
 	scrollbar.value_changed.connect(func(value: float) -> void: offset = roundi(value / 6.0) * 6; _render_grid())
-	add_child(scrollbar)
-	scrollbar.position = Vector2(269, 211)
-	scrollbar.size = Vector2(8, 148)
-	_box(Rect2(43, 364, 193, 24), Color("dfef50"), palette.edge, 1)
-	description = _text("", Rect2(46, 367, 187, 19), 11, Color("71601c"))
-	description.clip_text = true
-	var sort := _button("整理", Rect2(239, 364, 40, 24), true)
-	sort.add_theme_color_override("font_color", Color("654518"))
-	sort.pressed.connect(sort_items)
-	var menu := _button("菜单", Rect2(41, 391, 34, 21), true)
-	menu.pressed.connect(open_menu)
-	_picture("attribute_coin", Rect2(102, 395, 9, 11))
-	_box(Rect2(118, 392, 110, 19), palette.main, palette.main, 0)
-	money = OriginalNumber.new()
-	money.position = Vector2(121, 395)
-	money.size = Vector2(103, 12)
-	add_child(money)
-	var back := _button("返回", Rect2(245, 391, 34, 21), true)
-	back.pressed.connect(func() -> void: back_requested.emit())
-	cursor = _picture("create_cursor", Rect2(70, 235, 14, 14))
-	tooltip = _box(Rect2(46, 249, 141, 41), Color("ffdb6d"), Color("765322"), 1)
-	tooltip_label = _text("", Rect2(5, 4, 132, 35), 12, Color("ad621f"), false, tooltip)
-	tooltip.hide()
+	$Sort.pressed.connect(sort_items)
+	$Menu.pressed.connect(open_menu)
+	$Back.pressed.connect(func() -> void: back_requested.emit())
 	refresh()
+
+func _grid_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.pressed and event.button_index in [MOUSE_BUTTON_WHEEL_UP, MOUSE_BUTTON_WHEEL_DOWN]:
+		scrollbar.value += 6 if event.button_index == MOUSE_BUTTON_WHEEL_DOWN else -6
+		grid.accept_event()
 
 func refresh() -> void:
 	items = Game.bag_items()
@@ -144,26 +72,22 @@ func _render_grid() -> void:
 	cells.clear()
 	for i in 24:
 		var index := offset + i
-		var rect := Rect2(i % 6 * 37, (i / 6) * 37, 34, 35)
-		var fill: Color = palette.slot
+		var cell: Control = CELL_SCENE.instantiate()
+		cell.position = Vector2(i % 6 * 37, (i / 6) * 37)
+		grid.add_child(cell)
+		var panel: Panel = cell.get_node("Panel")
 		var chosen := index == selected_index and not selected_equipment and index < items.size()
-		var panel := _box(rect, fill, Color("d8e630") if chosen else palette.main, 2 if chosen else 1, grid)
+		panel.add_theme_stylebox_override("panel", _style(palette.slot, Color("d8e630") if chosen else palette.main, 2 if chosen else 1))
+		var icon: TextureRect = cell.get_node("Panel/Icon")
+		var count: OriginalNumber = cell.get_node("Panel/Count")
+		icon.visible = index < items.size()
+		count.visible = index < items.size()
 		if index < items.size():
 			var item: Dictionary = items[index]
-			var icon := TextureRect.new()
 			icon.texture = load(String(item.icon))
-			icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-			icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-			icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
-			panel.add_child(icon)
-			icon.position = Vector2(2, 1)
-			icon.size = Vector2(30, 31)
-			var count := OriginalNumber.new()
 			count.value = str(int(item.count))
-			count.position = Vector2(14, 25)
-			count.size = Vector2(19, 9)
-			panel.add_child(count)
-		var button := _button("", rect, false, grid)
+			count.queue_redraw()
+		var button: Button = cell.get_node("Button")
 		button.pressed.connect(func() -> void: close_menu(); select_item(index); open_menu())
 		button.mouse_entered.connect(func() -> void: select_item(index, true))
 		button.mouse_exited.connect(func() -> void: tooltip.hide())
@@ -180,7 +104,7 @@ func select_item(index: int, hover: bool = false) -> void:
 	# Updating only the styles avoids replacing a button while its mouse
 	# enter/exit signals are being dispatched.
 	for i in cells.size():
-		var slot: Panel = grid.get_child(i * 2)
+		var slot: Panel = grid.get_child(i).get_node("Panel")
 		var chosen := offset + i == selected_index and selected_index < items.size()
 		slot.add_theme_stylebox_override("panel", _style(palette.slot, Color("d8e630") if chosen else palette.main, 2 if chosen else 1))
 	var local := selected_index - offset
@@ -332,7 +256,7 @@ func _style(fill: Color, border: Color, width: int) -> StyleBoxFlat:
 	return style
 
 func _box(rect: Rect2, fill: Color, border: Color, width: int, parent: Node = null) -> Panel:
-	var node := Panel.new()
+	var node: Panel = preload("res://scenes/ui/dynamic_panel.tscn").instantiate()
 	node.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	node.add_theme_stylebox_override("panel", _style(fill, border, width))
 	(parent if parent != null else self).add_child(node)
@@ -353,16 +277,4 @@ func _button(value: String, rect: Rect2, wood: bool, parent: Node = null) -> But
 		for state in ["normal", "hover", "pressed"]: node.add_theme_stylebox_override(state, _style(Color("c59132"), Color("7f4019"), 2))
 		var inner := _box(Rect2(3, 3, rect.size.x - 6, rect.size.y - 6), Color.TRANSPARENT, Color("f5dea0"), 1, node)
 		inner.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	return node
-
-func _picture(key: String, rect: Rect2, mirrored: bool = false) -> TextureRect:
-	var node := TextureRect.new()
-	node.texture = load("res://assets/ui/%s.png" % key)
-	node.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	node.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	node.flip_h = mirrored
-	node.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(node)
-	node.position = rect.position
-	node.size = rect.size
 	return node

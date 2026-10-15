@@ -1,22 +1,9 @@
 class_name BattleMoveCallout
 extends Control
 ## Pixel-edged move announcement; visual only, never drives battle resolution.
-var caption: Label
+@onready var caption: Label = $Caption
 var remaining := 0.0
 var tail_x := 0.0
-
-func _ready() -> void:
-	mouse_filter = Control.MOUSE_FILTER_IGNORE
-	z_index = 12
-	caption = Label.new()
-	caption.position = Vector2(5, 2)
-	caption.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	caption.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	caption.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	caption.add_theme_font_size_override("font_size", 12)
-	caption.add_theme_color_override("font_color", Color("59350e"))
-	add_child(caption)
-	hide()
 
 func present(text_value: String, anchor: Vector2, seconds: float) -> void:
 	caption.text = text_value

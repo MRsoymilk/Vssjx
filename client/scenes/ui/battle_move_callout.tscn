@@ -1,0 +1,23 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/battle_move_callout.gd" id="1_e7oxv"]
+
+[node name="BattleMoveCallout" type="Control"]
+visible = false
+z_index = 12
+layout_mode = 3
+anchors_preset = 0
+mouse_filter = 2
+script = ExtResource("1_e7oxv")
+
+[node name="Caption" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 5.0
+offset_top = 2.0
+offset_right = 5.0
+offset_bottom = 2.0
+theme_override_colors/font_color = Color(0.34901962, 0.20784314, 0.05490196, 1)
+theme_override_font_sizes/font_size = 12
+horizontal_alignment = 1
+vertical_alignment = 1

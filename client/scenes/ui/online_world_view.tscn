@@ -1,0 +1,251 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/online_world_view.gd" id="1_ifur8"]
+[ext_resource type="Script" path="res://scripts/network/online_world_client.gd" id="2_6n4g6"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_iq0jh"]
+bg_color = Color(0.3137255, 0.49803922, 0.7137255, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.9098039, 0.8784314, 0.6666667, 1)
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_1qrtb"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_g4wq4"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_xporj"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_hm3ew"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_v6tj2"]
+bg_color = Color(0.3137255, 0.49803922, 0.7137255, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.9098039, 0.8784314, 0.6666667, 1)
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_avs82"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_4lmnw"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_ubbk4"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_spla7"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2mqmb"]
+bg_color = Color(0.21176471, 0.35686275, 0.5137255, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.9098039, 0.8784314, 0.6666667, 1)
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_oosw3"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_0lj8o"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_ktxhw"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_fkijf"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_vhnhv"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_qnfsi"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_5nevp"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_dim2n"]
+
+[node name="OnlineWorldView" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 320.0
+offset_bottom = 480.0
+script = ExtResource("1_ifur8")
+
+[node name="Viewport" type="SubViewport" parent="."]
+unique_name_in_owner = true
+size = Vector2i(320, 390)
+render_target_update_mode = 4
+
+[node name="Scene" type="Node2D" parent="Viewport"]
+unique_name_in_owner = true
+
+[node name="Camera" type="Camera2D" parent="Viewport/Scene"]
+unique_name_in_owner = true
+position = Vector2(168, 264)
+limit_left = 0
+limit_top = 0
+limit_right = 512
+limit_bottom = 512
+
+[node name="Image" type="TextureRect" parent="."]
+unique_name_in_owner = true
+texture_filter = 1
+layout_mode = 0
+offset_top = 28.0
+offset_right = 320.0
+offset_bottom = 418.0
+
+[node name="Panel2" type="Panel" parent="."]
+layout_mode = 0
+offset_right = 320.0
+offset_bottom = 28.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_iq0jh")
+
+[node name="CountLabel" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 5.0
+offset_top = 4.0
+offset_right = 250.0
+offset_bottom = 24.0
+theme_override_colors/font_color = Color(1, 0.9607843, 0.8627451, 1)
+theme_override_font_sizes/font_size = 12
+text = "青云山道 · 共享地图"
+
+[node name="Back" type="Button" parent="."]
+layout_mode = 0
+offset_left = 266.0
+offset_top = 1.0
+offset_right = 318.0
+offset_bottom = 27.0
+focus_mode = 0
+theme_override_colors/font_color = Color(1, 0.972549, 0.77254903, 1)
+theme_override_font_sizes/font_size = 12
+theme_override_styles/normal = SubResource("StyleBoxEmpty_1qrtb")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_g4wq4")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_xporj")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_hm3ew")
+text = "返回"
+
+[node name="Panel5" type="Panel" parent="."]
+layout_mode = 0
+offset_top = 418.0
+offset_right = 320.0
+offset_bottom = 480.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_v6tj2")
+
+[node name="Status" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 6.0
+offset_top = 424.0
+offset_right = 256.0
+offset_bottom = 472.0
+theme_override_colors/font_color = Color(1, 0.9607843, 0.8627451, 1)
+theme_override_font_sizes/font_size = 11
+text = "正在申请入场票据……"
+autowrap_mode = 3
+
+[node name="ChatButton" type="Button" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 263.0
+offset_top = 432.0
+offset_right = 315.0
+offset_bottom = 462.0
+focus_mode = 0
+theme_override_colors/font_color = Color(1, 0.972549, 0.77254903, 1)
+theme_override_font_sizes/font_size = 12
+theme_override_styles/normal = SubResource("StyleBoxEmpty_avs82")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_4lmnw")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_ubbk4")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_spla7")
+text = "聊天"
+
+[node name="ChatPanel" type="Panel" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+offset_left = 6.0
+offset_top = 244.0
+offset_right = 314.0
+offset_bottom = 412.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_2mqmb")
+
+[node name="Label0" type="Label" parent="ChatPanel"]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 6.0
+offset_right = 248.0
+offset_bottom = 26.0
+theme_override_colors/font_color = Color(1, 0.9607843, 0.8627451, 1)
+theme_override_font_sizes/font_size = 12
+text = "公共频道 · 最近记录"
+
+[node name="Collapse" type="Button" parent="ChatPanel"]
+layout_mode = 0
+offset_left = 254.0
+offset_top = 4.0
+offset_right = 302.0
+offset_bottom = 28.0
+focus_mode = 0
+theme_override_colors/font_color = Color(1, 0.972549, 0.77254903, 1)
+theme_override_font_sizes/font_size = 11
+theme_override_styles/normal = SubResource("StyleBoxEmpty_oosw3")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_0lj8o")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_ktxhw")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_fkijf")
+text = "收起"
+
+[node name="ChatLog" type="RichTextLabel" parent="ChatPanel"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 8.0
+offset_top = 32.0
+offset_right = 300.0
+offset_bottom = 106.0
+focus_mode = 2
+theme_override_colors/default_color = Color(1, 0.9607843, 0.8627451, 1)
+theme_override_font_sizes/normal_font_size = 11
+scroll_following = true
+selection_enabled = true
+
+[node name="ChatStatus" type="Label" parent="ChatPanel"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 8.0
+offset_top = 106.0
+offset_right = 300.0
+offset_bottom = 128.0
+theme_override_colors/font_color = Color(1, 0.9411765, 0.64705884, 1)
+theme_override_font_sizes/font_size = 10
+text = "纯文本 · 最多120字"
+autowrap_mode = 3
+
+[node name="ChatInput" type="LineEdit" parent="ChatPanel"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 8.0
+offset_top = 132.0
+offset_right = 242.0
+offset_bottom = 163.0
+theme_override_font_sizes/font_size = 11
+placeholder_text = "向大家说句话……"
+max_length = 120
+
+[node name="ChatSend" type="Button" parent="ChatPanel"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 246.0
+offset_top = 132.0
+offset_right = 300.0
+offset_bottom = 160.0
+focus_mode = 0
+theme_override_colors/font_color = Color(1, 0.972549, 0.77254903, 1)
+theme_override_font_sizes/font_size = 12
+theme_override_styles/normal = SubResource("StyleBoxEmpty_vhnhv")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_qnfsi")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_5nevp")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_dim2n")
+text = "发送"
+
+[node name="Network" type="Node" parent="."]
+unique_name_in_owner = true
+script = ExtResource("2_6n4g6")

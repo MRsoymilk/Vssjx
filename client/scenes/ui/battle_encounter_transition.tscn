@@ -1,0 +1,47 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/battle_encounter_transition.gd" id="1_ujq5x"]
+
+[node name="BattleEncounterTransition" type="Control"]
+z_index = 30
+layout_mode = 3
+anchors_preset = 0
+offset_right = 320.0
+offset_bottom = 480.0
+script = ExtResource("1_ujq5x")
+
+[node name="Warning" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_right = 20.0
+offset_bottom = 39.0
+theme_override_colors/font_color = Color(0.8901961, 0.1764706, 0.08235294, 1)
+theme_override_colors/font_outline_color = Color(0.34901962, 0.1764706, 0.101960786, 1)
+theme_override_constants/outline_size = 2
+theme_override_font_sizes/font_size = 28
+text = "!"
+
+[node name="Caption" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 24.0
+offset_top = 337.0
+offset_right = 296.0
+offset_bottom = 361.0
+theme_override_colors/font_color = Color(1, 0.9764706, 0.8235294, 1)
+theme_override_colors/font_outline_color = Color(0.1882353, 0.2784314, 0.3137255, 1)
+theme_override_constants/outline_size = 2
+theme_override_font_sizes/font_size = 13
+
+[node name="Detail" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 24.0
+offset_top = 390.0
+offset_right = 296.0
+offset_bottom = 403.0
+theme_override_colors/font_color = Color(1, 0.9764706, 0.8235294, 1)
+theme_override_colors/font_outline_color = Color(0.1882353, 0.2784314, 0.3137255, 1)
+theme_override_constants/outline_size = 2
+theme_override_font_sizes/font_size = 9
+text = "正在准备本地战斗资源"

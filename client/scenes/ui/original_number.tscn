@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/original_number.gd" id="1"]
+[node name="OriginalNumber" type="Control"]
+offset_right = 40.0
+offset_bottom = 14.0
+mouse_filter = 2
+script = ExtResource("1")
+value = "0"

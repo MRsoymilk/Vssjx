@@ -4,25 +4,9 @@ extends Control
 const BAR_RECT := Rect2(48, 370, 224, 20)
 var progress := 0.0
 var warning_anchor := Vector2(134, 160)
-var warning: Label
-var caption: Label
-var detail: Label
-
-func _ready() -> void:
-	size = Vector2(320, 480)
-	mouse_filter = Control.MOUSE_FILTER_STOP
-	z_index = 30
-	warning = _label("!", Rect2(0, 0, 20, 36), 28, Color("e32d15"))
-	warning.add_theme_constant_override("outline_size", 2)
-	warning.add_theme_color_override("font_outline_color", Color("592d1a"))
-	caption = _label("", Rect2(24, 337, 272, 24), 13, Color("fff9d2"))
-	detail = _label("正在准备本地战斗资源", Rect2(24, 390, 272, 13), 9, Color("fff9d2"))
-	for label in [caption, detail]:
-		label.add_theme_constant_override("outline_size", 2)
-		label.add_theme_color_override("font_outline_color", Color("304750"))
-
-func _label(text_value: String, rect: Rect2, font_size: int, color: Color) -> Label:
-	return OriginalSceneChrome.label(self, text_value, rect, font_size, color)
+@onready var warning: Label = $Warning
+@onready var caption: Label = $Caption
+@onready var detail: Label = $Detail
 
 func configure(enemy_name: String, hero_point: Vector2) -> void:
 	warning_anchor = Vector2(clampf(roundf(hero_point.x - 25), 25, 295), clampf(roundf(hero_point.y - 45), 60, 310))

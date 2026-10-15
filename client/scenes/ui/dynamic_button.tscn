@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3]
+[sub_resource type="StyleBoxEmpty" id="Empty"]
+[node name="Button" type="Button"]
+focus_mode = 0
+theme_override_styles/normal = SubResource("Empty")
+theme_override_styles/hover = SubResource("Empty")
+theme_override_styles/pressed = SubResource("Empty")
+theme_override_styles/focus = SubResource("Empty")

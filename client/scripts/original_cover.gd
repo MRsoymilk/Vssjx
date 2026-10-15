@@ -13,68 +13,21 @@ var selected_index := 0
 var first_visible := 0
 var original_text: Dictionary
 var rows: Array[Button] = []
-var left_arrow: TextureRect
-var right_arrow: TextureRect
-var up_arrow: TextureRect
-var down_arrow: TextureRect
+@onready var left_arrow: TextureRect = $LeftArrow
+@onready var right_arrow: TextureRect = $RightArrow
+@onready var up_arrow: TextureRect = $UpArrow
+@onready var down_arrow: TextureRect = $DownArrow
 
 func _ready() -> void:
-	size = Vector2(320, 480)
-	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	original_text = JSON.parse_string(FileAccess.get_file_as_string("res://assets/data/cover.json"))
-	var font := SystemFont.new()
-	font.font_names = PackedStringArray(["SimSun", "Noto Serif CJK SC", "serif"])
-	font.antialiasing = TextServer.FONT_ANTIALIASING_NONE
-	var cover_theme := Theme.new()
-	cover_theme.default_font = font
-	cover_theme.default_font_size = 16
-	theme = cover_theme
-	var artwork := TextureRect.new()
-	artwork.name = "Original320x480Artwork"
-	artwork.texture = load("res://assets/ui/original_cover.png")
-	artwork.size = Vector2(320, 480)
-	artwork.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(artwork)
 	for index in PAGE_SIZE:
-		var row := _text_button("", Rect2(MENU_RECT.position + Vector2(0, index * 18), MENU_RECT.size))
+		var row: Button = get_node("Rows%d" % index)
 		row.pressed.connect(_activate_row.bind(index))
 		row.mouse_entered.connect(_hover_row.bind(index))
 		rows.append(row)
-	left_arrow = _arrow(3)
-	right_arrow = _arrow(2)
-	up_arrow = _arrow(0)
-	down_arrow = _arrow(1)
-	up_arrow.position = Vector2(307, 395)
-	down_arrow.position = Vector2(307, 459)
-	var confirm := _text_button("确定", Rect2(4, 463, 52, 17))
-	confirm.pressed.connect(_activate)
-	var exit_button := _text_button("退出", Rect2(264, 463, 52, 17))
-	exit_button.pressed.connect(func() -> void: exit_requested.emit())
+	$Confirm.pressed.connect(_activate)
+	$Exit.pressed.connect(func() -> void: exit_requested.emit())
 	_refresh()
-
-func _text_button(value: String, rect: Rect2) -> Button:
-	var button := Button.new()
-	button.text = value
-	button.position = rect.position
-	button.size = rect.size
-	button.focus_mode = Control.FOCUS_NONE
-	button.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-	for state in ["normal", "hover", "pressed", "focus", "disabled"]:
-		button.add_theme_stylebox_override(state, StyleBoxEmpty.new())
-	button.add_theme_constant_override("outline_size", 1)
-	button.add_theme_color_override("font_outline_color", Color("713500"))
-	button.add_theme_color_override("font_color", Color("ffff00"))
-	button.add_theme_color_override("font_hover_color", Color("ffff00"))
-	button.add_theme_color_override("font_pressed_color", Color.WHITE)
-	add_child(button)
-	return button
-
-func _arrow(index: int) -> TextureRect:
-	var result := TextureRect.new()
-	result.texture = load("res://assets/ui/select_%d.png" % index)
-	result.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(result)
-	return result
 
 func _refresh() -> void:
 	for i in PAGE_SIZE:

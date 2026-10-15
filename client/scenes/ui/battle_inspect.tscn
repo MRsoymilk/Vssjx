@@ -1,0 +1,60 @@
+[gd_scene load_steps=2 format=3]
+[sub_resource type="StyleBoxFlat" id="Panel"]
+bg_color = Color(1, 0.9647059, 0.7058824, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.3960784, 0.3333333, 0.1647059, 1)
+
+[node name="BattleInspect" type="Panel"]
+offset_left = 78.0
+offset_top = 173.0
+offset_right = 242.0
+offset_bottom = 286.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("Panel")
+
+[node name="NameValue" type="Label" parent="."]
+offset_left = 7.0
+offset_top = 7.0
+offset_right = 157.0
+offset_bottom = 29.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.4745098, 0.5137255, 0.09019608, 1)
+theme_override_colors/font_outline_color = Color(0.3176471, 0.2705882, 0.07058824, 1)
+theme_override_constants/outline_size = 1
+theme_override_font_sizes/font_size = 15
+horizontal_alignment = 1
+autowrap_mode = 3
+clip_text = true
+
+[node name="Hp" type="Label" parent="."]
+offset_left = 10.0
+offset_top = 34.0
+offset_right = 156.0
+offset_bottom = 55.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.4, 0.3176471, 0.1098039, 1)
+theme_override_font_sizes/font_size = 12
+autowrap_mode = 3
+
+[node name="Secondary" type="Label" parent="."]
+offset_left = 10.0
+offset_top = 57.0
+offset_right = 156.0
+offset_bottom = 78.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.4, 0.3176471, 0.1098039, 1)
+theme_override_font_sizes/font_size = 12
+autowrap_mode = 3
+
+[node name="Tertiary" type="Label" parent="."]
+offset_left = 10.0
+offset_top = 80.0
+offset_right = 156.0
+offset_bottom = 101.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.4, 0.3176471, 0.1098039, 1)
+theme_override_font_sizes/font_size = 12
+autowrap_mode = 3

@@ -1,0 +1,16 @@
+[gd_scene format=3]
+[node name="DialogFrame" type="Panel"]
+offset_left = 18.0
+offset_top = 117.0
+offset_right = 302.0
+offset_bottom = 363.0
+
+[node name="Title" type="Label" parent="."]
+layout_mode = 0
+offset_left = 18.0
+offset_top = 16.0
+offset_right = 266.0
+offset_bottom = 44.0
+mouse_filter = 2
+theme_override_font_sizes/font_size = 18
+autowrap_mode = 3

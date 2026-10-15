@@ -1,0 +1,531 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/original_number.gd" id="1_uhaia"]
+[ext_resource type="Texture2D" path="res://assets/ui/attribute_coin.png" id="2_agydf"]
+[ext_resource type="Texture2D" path="res://assets/ui/attribute_ingot.png" id="3_6oisy"]
+[ext_resource type="Texture2D" path="res://assets/ui/attribute_guild.png" id="4_n8nr0"]
+[ext_resource type="Texture2D" path="res://assets/ui/attribute_essence.png" id="5_taqkd"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_31udv"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(1, 0.89411765, 0.60784316, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 0.9529412, 0.7294118, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_m36d4"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(1, 0.89411765, 0.60784316, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 0.9529412, 0.7294118, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xurw7"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.96862745, 0.3764706, 0.27450982, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.7764706, 0.3137255, 0.16862746, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3840t"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(1, 0.89411765, 0.60784316, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 0.9529412, 0.7294118, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7x3g7"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.6392157, 0.49019608, 0.27058825, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.39607844, 0.27058825, 0.09411765, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2tlc0"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.79607844, 0.91764706, 0.06666667, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.39607844, 0.27058825, 0.09411765, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rbseo"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.6392157, 0.49019608, 0.27058825, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.39607844, 0.27058825, 0.09411765, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ahq75"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.31764707, 0.84313726, 0.85882354, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.39607844, 0.27058825, 0.09411765, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_yk23b"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.6392157, 0.49019608, 0.27058825, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.39607844, 0.27058825, 0.09411765, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jawpb"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.7411765, 0.5411765, 0.3254902, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.39607844, 0.27058825, 0.09411765, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ggjll"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(1, 0.89411765, 0.60784316, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 0.9529412, 0.7294118, 1)
+
+[node name="AttributesRegular" type="Control"]
+unique_name_in_owner = true
+anchors_preset = 0
+
+[node name="Panel0" type="Panel" parent="."]
+layout_mode = 0
+offset_left = 14.0
+offset_top = 88.0
+offset_right = 130.0
+offset_bottom = 212.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_31udv")
+
+[node name="Panel1" type="Panel" parent="."]
+layout_mode = 0
+offset_left = 136.0
+offset_top = 88.0
+offset_right = 308.0
+offset_bottom = 212.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_m36d4")
+
+[node name="Label2" type="Label" parent="."]
+layout_mode = 0
+offset_left = 149.0
+offset_top = 94.0
+offset_right = 192.0
+offset_bottom = 117.0
+theme_override_colors/font_color = Color(0.39607844, 0.27058825, 0.09411765, 1)
+theme_override_font_sizes/font_size = 16
+text = "名称"
+
+[node name="NameValue" type="Label" parent="."]
+layout_mode = 0
+offset_left = 202.0
+offset_top = 94.0
+offset_right = 305.0
+offset_bottom = 117.0
+theme_override_colors/font_color = Color(0.39607844, 0.27058825, 0.09411765, 1)
+theme_override_font_sizes/font_size = 16
+text = "青衫客"
+clip_text = true
+text_overrun_behavior = 3
+
+[node name="Label4" type="Label" parent="."]
+layout_mode = 0
+offset_left = 149.0
+offset_top = 116.0
+offset_right = 192.0
+offset_bottom = 139.0
+theme_override_colors/font_color = Color(0.39607844, 0.27058825, 0.09411765, 1)
+theme_override_font_sizes/font_size = 16
+text = "等级"
+
+[node name="NumbersLevel" type="Control" parent="."]
+unique_name_in_owner = true
+anchors_preset = 0
+offset_left = 202.0
+offset_top = 118.0
+offset_right = 228.0
+offset_bottom = 134.0
+mouse_filter = 2
+script = ExtResource("1_uhaia")
+value = "1"
+color_set = "green"
+align_right = false
+
+[node name="Label6" type="Label" parent="."]
+layout_mode = 0
+offset_left = 149.0
+offset_top = 138.0
+offset_right = 192.0
+offset_bottom = 161.0
+theme_override_colors/font_color = Color(0.39607844, 0.27058825, 0.09411765, 1)
+theme_override_font_sizes/font_size = 16
+text = "职业"
+
+[node name="JobValue" type="Label" parent="."]
+layout_mode = 0
+offset_left = 202.0
+offset_top = 138.0
+offset_right = 305.0
+offset_bottom = 161.0
+theme_override_colors/font_color = Color(0.39607844, 0.27058825, 0.09411765, 1)
+theme_override_font_sizes/font_size = 16
+text = "力士"
+clip_text = true
+text_overrun_behavior = 3
+
+[node name="Label8" type="Label" parent="."]
+layout_mode = 0
+offset_left = 149.0
+offset_top = 160.0
+offset_right = 192.0
+offset_bottom = 183.0
+theme_override_colors/font_color = Color(0.39607844, 0.27058825, 0.09411765, 1)
+theme_override_font_sizes/font_size = 16
+text = "门派"
+
+[node name="SchoolValue" type="Label" parent="."]
+layout_mode = 0
+offset_left = 202.0
+offset_top = 160.0
+offset_right = 305.0
+offset_bottom = 183.0
+theme_override_colors/font_color = Color(0.39607844, 0.27058825, 0.09411765, 1)
+theme_override_font_sizes/font_size = 16
+text = "峨眉派"
+clip_text = true
+text_overrun_behavior = 3
+
+[node name="Panel10" type="Panel" parent="."]
+layout_mode = 0
+offset_left = 145.0
+offset_top = 182.0
+offset_right = 185.0
+offset_bottom = 203.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_xurw7")
+
+[node name="Label11" type="Label" parent="."]
+layout_mode = 0
+offset_left = 149.0
+offset_top = 182.0
+offset_right = 192.0
+offset_bottom = 205.0
+theme_override_colors/font_color = Color(0.39607844, 0.27058825, 0.09411765, 1)
+theme_override_font_sizes/font_size = 16
+text = "称号"
+
+[node name="TitleValue" type="Label" parent="."]
+layout_mode = 0
+offset_left = 202.0
+offset_top = 182.0
+offset_right = 305.0
+offset_bottom = 205.0
+theme_override_colors/font_color = Color(0.39607844, 0.27058825, 0.09411765, 1)
+theme_override_font_sizes/font_size = 16
+text = "无"
+clip_text = true
+text_overrun_behavior = 3
+
+[node name="Panel13" type="Panel" parent="."]
+layout_mode = 0
+offset_left = 14.0
+offset_top = 216.0
+offset_right = 308.0
+offset_bottom = 323.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_3840t")
+
+[node name="Label14" type="Label" parent="."]
+layout_mode = 0
+offset_left = 21.0
+offset_top = 227.0
+offset_right = 75.0
+offset_bottom = 253.0
+theme_override_colors/font_color = Color(0.39607844, 0.27058825, 0.09411765, 1)
+theme_override_font_sizes/font_size = 17
+text = "气血"
+
+[node name="NumbersHp" type="Control" parent="."]
+unique_name_in_owner = true
+anchors_preset = 0
+offset_left = 103.0
+offset_top = 224.0
+offset_right = 290.0
+offset_bottom = 238.0
+mouse_filter = 2
+script = ExtResource("1_uhaia")
+value = "120/120"
+
+[node name="BarsHp" type="ProgressBar" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 67.0
+offset_top = 239.0
+offset_right = 292.0
+offset_bottom = 249.0
+mouse_filter = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_7x3g7")
+theme_override_styles/fill = SubResource("StyleBoxFlat_2tlc0")
+max_value = 120.0
+value = 120.0
+show_percentage = false
+
+[node name="Label17" type="Label" parent="."]
+layout_mode = 0
+offset_left = 21.0
+offset_top = 258.0
+offset_right = 75.0
+offset_bottom = 284.0
+theme_override_colors/font_color = Color(0.39607844, 0.27058825, 0.09411765, 1)
+theme_override_font_sizes/font_size = 17
+text = "灵力"
+
+[node name="NumbersMp" type="Control" parent="."]
+unique_name_in_owner = true
+anchors_preset = 0
+offset_left = 103.0
+offset_top = 255.0
+offset_right = 290.0
+offset_bottom = 269.0
+mouse_filter = 2
+script = ExtResource("1_uhaia")
+value = "35/35"
+
+[node name="BarsMp" type="ProgressBar" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 67.0
+offset_top = 270.0
+offset_right = 292.0
+offset_bottom = 280.0
+mouse_filter = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_rbseo")
+theme_override_styles/fill = SubResource("StyleBoxFlat_ahq75")
+max_value = 35.0
+value = 35.0
+show_percentage = false
+
+[node name="Label20" type="Label" parent="."]
+layout_mode = 0
+offset_left = 21.0
+offset_top = 289.0
+offset_right = 75.0
+offset_bottom = 315.0
+theme_override_colors/font_color = Color(0.39607844, 0.27058825, 0.09411765, 1)
+theme_override_font_sizes/font_size = 17
+text = "经验"
+
+[node name="NumbersXp" type="Control" parent="."]
+unique_name_in_owner = true
+anchors_preset = 0
+offset_left = 103.0
+offset_top = 286.0
+offset_right = 290.0
+offset_bottom = 300.0
+mouse_filter = 2
+script = ExtResource("1_uhaia")
+value = "0/40"
+
+[node name="BarsXp" type="ProgressBar" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 67.0
+offset_top = 301.0
+offset_right = 292.0
+offset_bottom = 311.0
+mouse_filter = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_yk23b")
+theme_override_styles/fill = SubResource("StyleBoxFlat_jawpb")
+max_value = 40.0
+show_percentage = false
+
+[node name="Panel23" type="Panel" parent="."]
+layout_mode = 0
+offset_left = 14.0
+offset_top = 327.0
+offset_right = 308.0
+offset_bottom = 431.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_ggjll")
+
+[node name="Label24" type="Label" parent="."]
+layout_mode = 0
+offset_left = 21.0
+offset_top = 333.0
+offset_right = 75.0
+offset_bottom = 356.0
+theme_override_colors/font_color = Color(0.39607844, 0.27058825, 0.09411765, 1)
+theme_override_font_sizes/font_size = 16
+text = "铜币"
+
+[node name="AttributeCoin25" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 80.0
+offset_top = 334.0
+offset_right = 91.7
+offset_bottom = 347.0
+mouse_filter = 2
+texture = ExtResource("2_agydf")
+expand_mode = 1
+
+[node name="NumbersGold" type="Control" parent="."]
+unique_name_in_owner = true
+anchors_preset = 0
+offset_left = 118.0
+offset_top = 337.0
+offset_right = 297.0
+offset_bottom = 353.0
+mouse_filter = 2
+script = ExtResource("1_uhaia")
+value = "30"
+align_right = false
+
+[node name="Label27" type="Label" parent="."]
+layout_mode = 0
+offset_left = 21.0
+offset_top = 357.0
+offset_right = 75.0
+offset_bottom = 380.0
+theme_override_colors/font_color = Color(0.39607844, 0.27058825, 0.09411765, 1)
+theme_override_font_sizes/font_size = 16
+text = "金锭"
+
+[node name="AttributeIngot28" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 80.0
+offset_top = 358.0
+offset_right = 98.2
+offset_bottom = 372.3
+mouse_filter = 2
+texture = ExtResource("3_6oisy")
+expand_mode = 1
+
+[node name="NumbersIngots" type="Control" parent="."]
+unique_name_in_owner = true
+anchors_preset = 0
+offset_left = 118.0
+offset_top = 361.0
+offset_right = 297.0
+offset_bottom = 377.0
+mouse_filter = 2
+script = ExtResource("1_uhaia")
+value = "0"
+align_right = false
+
+[node name="Label30" type="Label" parent="."]
+layout_mode = 0
+offset_left = 21.0
+offset_top = 381.0
+offset_right = 75.0
+offset_bottom = 404.0
+theme_override_colors/font_color = Color(0.39607844, 0.27058825, 0.09411765, 1)
+theme_override_font_sizes/font_size = 16
+text = "帮贡"
+
+[node name="AttributeGuild31" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 80.0
+offset_top = 382.0
+offset_right = 91.7
+offset_bottom = 398.9
+mouse_filter = 2
+texture = ExtResource("4_n8nr0")
+expand_mode = 1
+
+[node name="NumbersGuildContribution" type="Control" parent="."]
+unique_name_in_owner = true
+anchors_preset = 0
+offset_left = 118.0
+offset_top = 385.0
+offset_right = 297.0
+offset_bottom = 401.0
+mouse_filter = 2
+script = ExtResource("1_uhaia")
+value = "0"
+align_right = false
+
+[node name="Label33" type="Label" parent="."]
+layout_mode = 0
+offset_left = 21.0
+offset_top = 405.0
+offset_right = 75.0
+offset_bottom = 428.0
+theme_override_colors/font_color = Color(0.39607844, 0.27058825, 0.09411765, 1)
+theme_override_font_sizes/font_size = 16
+text = "精元"
+
+[node name="AttributeEssence34" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 80.0
+offset_top = 406.0
+offset_right = 98.2
+offset_bottom = 425.5
+mouse_filter = 2
+texture = ExtResource("5_taqkd")
+expand_mode = 1
+
+[node name="NumbersEssence" type="Control" parent="."]
+unique_name_in_owner = true
+anchors_preset = 0
+offset_left = 118.0
+offset_top = 409.0
+offset_right = 297.0
+offset_bottom = 425.0
+mouse_filter = 2
+script = ExtResource("1_uhaia")
+value = "0"
+align_right = false

@@ -1,0 +1,85 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/world_minimap.gd" id="1_3ies8"]
+
+[sub_resource type="SystemFont" id="SystemFont_dcm0e"]
+font_names = PackedStringArray("SimHei", "Microsoft YaHei", "sans-serif")
+antialiasing = 0
+
+[sub_resource type="Theme" id="Theme_p5407"]
+default_font = SubResource("SystemFont_dcm0e")
+default_font_size = 11
+
+[node name="WorldHud" type="Control"]
+anchors_preset = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+theme = SubResource("Theme_p5407")
+
+[node name="Minimap" type="Control" parent="."]
+unique_name_in_owner = true
+anchors_preset = 0
+offset_left = 1.0
+offset_top = 29.0
+offset_right = 81.0
+offset_bottom = 111.0
+script = ExtResource("1_3ies8")
+
+[node name="MapName" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 4.0
+offset_top = 111.0
+offset_right = 82.0
+offset_bottom = 134.0
+theme_override_colors/font_color = Color(0.8509804, 0.54509807, 0.32941177, 1)
+theme_override_colors/font_outline_color = Color(0.40392157, 0.3254902, 0.20392157, 1)
+theme_override_constants/outline_size = 1
+theme_override_font_sizes/font_size = 10
+text = "青云山道"
+autowrap_mode = 3
+
+[node name="MapCoordinates" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 4.0
+offset_top = 126.0
+offset_right = 79.0
+offset_bottom = 149.0
+theme_override_colors/font_color = Color(1, 0.9607843, 0.7921569, 1)
+theme_override_font_sizes/font_size = 9
+text = "10  16"
+autowrap_mode = 3
+
+[node name="HudName" type="Label" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+offset_left = 7.0
+offset_top = 29.0
+offset_right = 257.0
+offset_bottom = 52.0
+theme_override_colors/font_color = Color(1, 0.9647059, 0.7176471, 1)
+theme_override_colors/font_outline_color = Color(0.31764707, 0.29411766, 0.17254902, 1)
+theme_override_constants/outline_size = 1
+theme_override_font_sizes/font_size = 10
+text = "青衫客  Lv.1  ·  峨眉力士"
+clip_text = true
+text_overrun_behavior = 3
+
+[node name="WorldIdentity" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 230.0
+offset_top = 367.0
+offset_right = 316.0
+offset_bottom = 399.0
+theme_override_colors/font_color = Color(0.9372549, 0.8980392, 0.49411765, 1)
+theme_override_colors/font_outline_color = Color(0.37254903, 0.38039216, 0.21176471, 1)
+theme_override_constants/outline_size = 1
+theme_override_font_sizes/font_size = 10
+text = "等级 1
+峨眉派"
+horizontal_alignment = 2
+autowrap_mode = 3

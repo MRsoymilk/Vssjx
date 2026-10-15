@@ -25,7 +25,7 @@ class ProjectLayoutTests(unittest.TestCase):
     def test_literal_resource_paths_resolve_with_new_project_root(self):
         sources = [CLIENT / 'project.godot']
         sources += list((CLIENT / 'scripts').rglob('*.gd'))
-        sources += list((CLIENT / 'scenes').glob('*.tscn'))
+        sources += list((CLIENT / 'scenes').rglob('*.tscn'))
         sources += list((CLIENT / 'tests').glob('*.gd'))
         sources += list((CLIENT / 'tests').glob('*.tscn'))
         checked = 0

@@ -1,0 +1,851 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/character_creation.gd" id="1_73mgl"]
+[ext_resource type="Texture2D" path="res://assets/ui/create_header_end.png" id="2_h2dpn"]
+[ext_resource type="Texture2D" path="res://assets/ui/create_scroll.png" id="3_tq5jt"]
+[ext_resource type="Texture2D" path="res://assets/ui/create_scroll_marks.png" id="4_bja34"]
+[ext_resource type="Texture2D" path="res://assets/ui/create_career_0.png" id="5_tm3oj"]
+[ext_resource type="Texture2D" path="res://assets/ui/create_slot_male.png" id="6_7uka2"]
+[ext_resource type="Texture2D" path="res://assets/ui/create_portrait_0.png" id="7_f3iaw"]
+[ext_resource type="Texture2D" path="res://assets/ui/create_slot_female.png" id="8_kp535"]
+[ext_resource type="Texture2D" path="res://assets/ui/create_portrait_1.png" id="9_8e32k"]
+[ext_resource type="Texture2D" path="res://assets/ui/create_portrait_2.png" id="10_dc4n6"]
+[ext_resource type="Texture2D" path="res://assets/ui/create_portrait_3.png" id="11_u36e8"]
+[ext_resource type="Texture2D" path="res://assets/ui/create_portrait_4.png" id="12_xqntw"]
+[ext_resource type="Texture2D" path="res://assets/ui/create_portrait_5.png" id="13_n5wy8"]
+[ext_resource type="Texture2D" path="res://assets/ui/create_cursor.png" id="14_t30qf"]
+[ext_resource type="Texture2D" path="res://assets/ui/create_arrow.png" id="15_042yp"]
+[ext_resource type="Texture2D" path="res://assets/ui/create_edit.png" id="16_vwj6a"]
+
+[sub_resource type="SystemFont" id="SystemFont_0wafy"]
+font_names = PackedStringArray("SimHei", "Microsoft YaHei", "Noto Sans CJK SC", "sans-serif")
+antialiasing = 0
+
+[sub_resource type="Theme" id="Theme_spb6d"]
+default_font = SubResource("SystemFont_0wafy")
+default_font_size = 12
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_qumqv"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_kvl4m"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_8ibny"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_ogcos"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_s70ud"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_jd8cr"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_kbqnd"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_jpalk"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_a134g"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_tyrcd"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_fxj83"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_h2rpd"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_jvgp1"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_wcjmn"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_v1h4n"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_vgkh3"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_imw7y"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_hrxnp"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_3t62j"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_y3tj8"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_rslci"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_nt62f"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_5402v"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_adu7s"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_kp2cb"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_73s7r"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_qjjgh"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_jl18l"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_bc4x8"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_m5k8f"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_altk2"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_15h8x"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ocp5d"]
+content_margin_left = 3.0
+content_margin_top = 0.0
+content_margin_right = 23.0
+content_margin_bottom = 0.0
+bg_color = Color(1, 0.9764706, 0.70980394, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.7254902, 0.7137255, 0.34117648, 1)
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_gi2ph"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_xvphx"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_xlmtw"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_q3kq1"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_oudsr"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.7176471, 0.4745098, 0.15294118, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.45882353, 0.25490198, 0.05490196, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_sej5o"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.8156863, 0.58431375, 0.24705882, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.45882353, 0.25490198, 0.05490196, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_csgw7"]
+draw_center = false
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(1, 0.8901961, 0.6313726, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_h6kwu"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.7176471, 0.4745098, 0.15294118, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.45882353, 0.25490198, 0.05490196, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_flkkn"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.8156863, 0.58431375, 0.24705882, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.45882353, 0.25490198, 0.05490196, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_r8dy6"]
+draw_center = false
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(1, 0.8901961, 0.6313726, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_a3pyc"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.7176471, 0.4745098, 0.15294118, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.45882353, 0.25490198, 0.05490196, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_wsji2"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.8156863, 0.58431375, 0.24705882, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.45882353, 0.25490198, 0.05490196, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lgsfj"]
+draw_center = false
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(1, 0.8901961, 0.6313726, 1)
+
+[node name="CharacterCreation" type="Control"]
+texture_filter = 1
+layout_mode = 3
+anchors_preset = 0
+offset_right = 320.0
+offset_bottom = 480.0
+theme = SubResource("Theme_spb6d")
+script = ExtResource("1_73mgl")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 0
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 320.0
+offset_bottom = 480.0
+mouse_filter = 2
+color = Color(0.8705882352941177, 0.8588235294117647, 0.28627450980392155, 1)
+
+[node name="Header" type="ColorRect" parent="."]
+layout_mode = 0
+offset_left = 11.0
+offset_top = 1.0
+offset_right = 309.0
+offset_bottom = 24.0
+mouse_filter = 2
+color = Color(0.6549019607843137, 0.8431372549019608, 0.0, 1)
+
+[node name="HeaderTop" type="ColorRect" parent="."]
+layout_mode = 0
+offset_left = 11.0
+offset_top = 1.0
+offset_right = 309.0
+offset_bottom = 2.0
+mouse_filter = 2
+color = Color(1.0, 0.9529411764705882, 0.5686274509803921, 1)
+
+[node name="HeaderBottom" type="ColorRect" parent="."]
+layout_mode = 0
+offset_left = 11.0
+offset_top = 24.0
+offset_right = 309.0
+offset_bottom = 25.0
+mouse_filter = 2
+color = Color(0.4549019607843137, 0.3764705882352941, 0.08627450980392157, 1)
+
+[node name="ScrollBackground" type="ColorRect" parent="."]
+layout_mode = 0
+offset_left = 34.0
+offset_top = 50.0
+offset_right = 286.0
+offset_bottom = 185.0
+mouse_filter = 2
+color = Color(1.0, 0.7098039215686275, 0.0, 1)
+
+[node name="ScrollTop" type="ColorRect" parent="."]
+layout_mode = 0
+offset_left = 34.0
+offset_top = 50.0
+offset_right = 286.0
+offset_bottom = 51.0
+mouse_filter = 2
+color = Color(0.4588235294117647, 0.2784313725490196, 0.07450980392156863, 1)
+
+[node name="ScrollBottom" type="ColorRect" parent="."]
+layout_mode = 0
+offset_left = 34.0
+offset_top = 184.0
+offset_right = 286.0
+offset_bottom = 185.0
+mouse_filter = 2
+color = Color(0.44313725490196076, 0.30196078431372547, 0.08627450980392157, 1)
+
+[node name="PortraitStrip" type="ColorRect" parent="."]
+layout_mode = 0
+offset_left = 0.0
+offset_top = 226.0
+offset_right = 320.0
+offset_bottom = 246.0
+mouse_filter = 2
+color = Color(0.7137254901960784, 0.6823529411764706, 0.14901960784313725, 1)
+
+[node name="NicknameBackground" type="ColorRect" parent="."]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 265.0
+offset_right = 86.0
+offset_bottom = 289.0
+mouse_filter = 2
+color = Color(0.7176470588235294, 0.6980392156862745, 0.12549019607843137, 1)
+
+[node name="DescriptionBorder" type="ColorRect" parent="."]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 305.0
+offset_right = 300.0
+offset_bottom = 424.0
+mouse_filter = 2
+color = Color(0.7372549019607844, 0.7176470588235294, 0.4117647058823529, 1)
+
+[node name="DescriptionBackground" type="ColorRect" parent="."]
+layout_mode = 0
+offset_left = 21.0
+offset_top = 306.0
+offset_right = 299.0
+offset_bottom = 423.0
+mouse_filter = 2
+color = Color(1.0, 0.9725490196078431, 0.7215686274509804, 1)
+
+[node name="QuoteBubble" type="Polygon2D" parent="."]
+color = Color(1, 0.89411765, 0.50980395, 1)
+polygon = PackedVector2Array(116, 72, 246, 72, 246, 94, 166, 94, 181, 104, 151, 94, 116, 94)
+
+[node name="QuoteOutline" type="Line2D" parent="."]
+points = PackedVector2Array(116, 72, 246, 72, 246, 94, 166, 94, 181, 104, 151, 94, 116, 94, 116, 72)
+width = 1.0
+default_color = Color(0.505882, 0.3137255, 0.1058824, 1)
+
+[node name="CreateHeaderEnd0" type="TextureRect" parent="."]
+layout_mode = 0
+offset_right = 13.0
+offset_bottom = 25.0
+mouse_filter = 2
+texture = ExtResource("2_h2dpn")
+expand_mode = 1
+
+[node name="CreateHeaderEnd1" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 307.0
+offset_right = 320.0
+offset_bottom = 25.0
+mouse_filter = 2
+texture = ExtResource("2_h2dpn")
+expand_mode = 1
+flip_h = true
+
+[node name="Label2" type="Label" parent="."]
+layout_mode = 0
+offset_left = 80.0
+offset_top = 5.0
+offset_right = 240.0
+offset_bottom = 23.0
+theme_override_colors/font_color = Color(0.9098039, 0.88235295, 0.28235295, 1)
+theme_override_colors/font_outline_color = Color(0.45882353, 0.3764706, 0.07450981, 1)
+theme_override_constants/outline_size = 1
+theme_override_font_sizes/font_size = 12
+text = "创建角色"
+horizontal_alignment = 1
+
+[node name="CreateScroll3" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 22.0
+offset_top = 44.0
+offset_right = 42.0
+offset_bottom = 197.0
+mouse_filter = 2
+texture = ExtResource("3_tq5jt")
+expand_mode = 1
+
+[node name="CreateScroll4" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 278.0
+offset_top = 44.0
+offset_right = 298.0
+offset_bottom = 197.0
+mouse_filter = 2
+texture = ExtResource("3_tq5jt")
+expand_mode = 1
+flip_h = true
+
+[node name="CreateScrollMarks5" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 50.0
+offset_top = 64.0
+offset_right = 70.0
+offset_bottom = 181.0
+mouse_filter = 2
+texture = ExtResource("4_bja34")
+expand_mode = 1
+
+[node name="CreateScrollMarks6" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 258.0
+offset_top = 64.0
+offset_right = 278.0
+offset_bottom = 181.0
+mouse_filter = 2
+texture = ExtResource("4_bja34")
+expand_mode = 1
+flip_h = true
+
+[node name="Stamp" type="TextureRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 61.0
+offset_top = 87.0
+offset_right = 100.0
+offset_bottom = 160.0
+mouse_filter = 2
+texture = ExtResource("5_tm3oj")
+expand_mode = 1
+
+[node name="Quote" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 120.0
+offset_top = 76.0
+offset_right = 243.0
+offset_bottom = 91.0
+theme_override_colors/font_color = Color(0.39607844, 0.27058825, 0.09411765, 1)
+theme_override_font_sizes/font_size = 11
+text = "临兵斗者皆阵列在前！"
+
+[node name="Slots0" type="Control" parent="."]
+unique_name_in_owner = true
+anchors_preset = 0
+offset_left = 42.0
+offset_top = 215.0
+offset_right = 74.0
+offset_bottom = 247.0
+
+[node name="NinePatchRect0" type="NinePatchRect" parent="Slots0"]
+layout_mode = 0
+offset_right = 32.0
+offset_bottom = 32.0
+texture = ExtResource("6_7uka2")
+patch_margin_left = 3
+patch_margin_top = 3
+patch_margin_right = 3
+patch_margin_bottom = 3
+
+[node name="CreatePortrait01" type="TextureRect" parent="Slots0"]
+layout_mode = 0
+offset_left = 2.0
+offset_top = 2.0
+offset_right = 30.0
+offset_bottom = 30.0
+mouse_filter = 2
+texture = ExtResource("7_f3iaw")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="PortraitButtons0" type="Button" parent="Slots0"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_right = 32.0
+offset_bottom = 32.0
+focus_mode = 0
+theme_override_styles/normal = SubResource("StyleBoxEmpty_qumqv")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_kvl4m")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_8ibny")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_ogcos")
+
+[node name="Slots1" type="Control" parent="."]
+unique_name_in_owner = true
+anchors_preset = 0
+offset_left = 82.0
+offset_top = 218.0
+offset_right = 114.0
+offset_bottom = 250.0
+
+[node name="NinePatchRect0" type="NinePatchRect" parent="Slots1"]
+layout_mode = 0
+offset_right = 32.0
+offset_bottom = 32.0
+texture = ExtResource("8_kp535")
+patch_margin_left = 3
+patch_margin_top = 3
+patch_margin_right = 3
+patch_margin_bottom = 3
+
+[node name="CreatePortrait11" type="TextureRect" parent="Slots1"]
+layout_mode = 0
+offset_left = 2.0
+offset_top = 2.0
+offset_right = 30.0
+offset_bottom = 30.0
+mouse_filter = 2
+texture = ExtResource("9_8e32k")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="PortraitButtons1" type="Button" parent="Slots1"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_right = 32.0
+offset_bottom = 32.0
+focus_mode = 0
+theme_override_styles/normal = SubResource("StyleBoxEmpty_s70ud")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_jd8cr")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_kbqnd")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_jpalk")
+
+[node name="Slots2" type="Control" parent="."]
+unique_name_in_owner = true
+anchors_preset = 0
+offset_left = 122.0
+offset_top = 218.0
+offset_right = 154.0
+offset_bottom = 250.0
+
+[node name="NinePatchRect0" type="NinePatchRect" parent="Slots2"]
+layout_mode = 0
+offset_right = 32.0
+offset_bottom = 32.0
+texture = ExtResource("6_7uka2")
+patch_margin_left = 3
+patch_margin_top = 3
+patch_margin_right = 3
+patch_margin_bottom = 3
+
+[node name="CreatePortrait21" type="TextureRect" parent="Slots2"]
+layout_mode = 0
+offset_left = 2.0
+offset_top = 2.0
+offset_right = 30.0
+offset_bottom = 30.0
+mouse_filter = 2
+texture = ExtResource("10_dc4n6")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="PortraitButtons2" type="Button" parent="Slots2"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_right = 32.0
+offset_bottom = 32.0
+focus_mode = 0
+theme_override_styles/normal = SubResource("StyleBoxEmpty_a134g")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_tyrcd")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_fxj83")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_h2rpd")
+
+[node name="Slots3" type="Control" parent="."]
+unique_name_in_owner = true
+anchors_preset = 0
+offset_left = 162.0
+offset_top = 218.0
+offset_right = 194.0
+offset_bottom = 250.0
+
+[node name="NinePatchRect0" type="NinePatchRect" parent="Slots3"]
+layout_mode = 0
+offset_right = 32.0
+offset_bottom = 32.0
+texture = ExtResource("8_kp535")
+patch_margin_left = 3
+patch_margin_top = 3
+patch_margin_right = 3
+patch_margin_bottom = 3
+
+[node name="CreatePortrait31" type="TextureRect" parent="Slots3"]
+layout_mode = 0
+offset_left = 2.0
+offset_top = 2.0
+offset_right = 30.0
+offset_bottom = 30.0
+mouse_filter = 2
+texture = ExtResource("11_u36e8")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="PortraitButtons3" type="Button" parent="Slots3"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_right = 32.0
+offset_bottom = 32.0
+focus_mode = 0
+theme_override_styles/normal = SubResource("StyleBoxEmpty_jvgp1")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_wcjmn")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_v1h4n")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_vgkh3")
+
+[node name="Slots4" type="Control" parent="."]
+unique_name_in_owner = true
+anchors_preset = 0
+offset_left = 202.0
+offset_top = 218.0
+offset_right = 234.0
+offset_bottom = 250.0
+
+[node name="NinePatchRect0" type="NinePatchRect" parent="Slots4"]
+layout_mode = 0
+offset_right = 32.0
+offset_bottom = 32.0
+texture = ExtResource("6_7uka2")
+patch_margin_left = 3
+patch_margin_top = 3
+patch_margin_right = 3
+patch_margin_bottom = 3
+
+[node name="CreatePortrait41" type="TextureRect" parent="Slots4"]
+layout_mode = 0
+offset_left = 2.0
+offset_top = 2.0
+offset_right = 30.0
+offset_bottom = 30.0
+mouse_filter = 2
+texture = ExtResource("12_xqntw")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="PortraitButtons4" type="Button" parent="Slots4"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_right = 32.0
+offset_bottom = 32.0
+focus_mode = 0
+theme_override_styles/normal = SubResource("StyleBoxEmpty_imw7y")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_hrxnp")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_3t62j")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_y3tj8")
+
+[node name="Slots5" type="Control" parent="."]
+unique_name_in_owner = true
+anchors_preset = 0
+offset_left = 242.0
+offset_top = 218.0
+offset_right = 274.0
+offset_bottom = 250.0
+
+[node name="NinePatchRect0" type="NinePatchRect" parent="Slots5"]
+layout_mode = 0
+offset_right = 32.0
+offset_bottom = 32.0
+texture = ExtResource("8_kp535")
+patch_margin_left = 3
+patch_margin_top = 3
+patch_margin_right = 3
+patch_margin_bottom = 3
+
+[node name="CreatePortrait51" type="TextureRect" parent="Slots5"]
+layout_mode = 0
+offset_left = 2.0
+offset_top = 2.0
+offset_right = 30.0
+offset_bottom = 30.0
+mouse_filter = 2
+texture = ExtResource("13_n5wy8")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="PortraitButtons5" type="Button" parent="Slots5"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_right = 32.0
+offset_bottom = 32.0
+focus_mode = 0
+theme_override_styles/normal = SubResource("StyleBoxEmpty_rslci")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_nt62f")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_5402v")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_adu7s")
+
+[node name="Cursor" type="TextureRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 68.0
+offset_top = 240.0
+offset_right = 82.0
+offset_bottom = 254.0
+mouse_filter = 2
+texture = ExtResource("14_t30qf")
+expand_mode = 1
+
+[node name="CreateArrow16" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 12.0
+offset_top = 220.0
+offset_right = 34.0
+offset_bottom = 249.0
+mouse_filter = 2
+texture = ExtResource("15_042yp")
+expand_mode = 1
+
+[node name="Previous" type="Button" parent="."]
+layout_mode = 0
+offset_left = 12.0
+offset_top = 220.0
+offset_right = 34.0
+offset_bottom = 249.0
+focus_mode = 0
+theme_override_font_sizes/font_size = 1
+theme_override_styles/normal = SubResource("StyleBoxEmpty_kp2cb")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_73s7r")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_qjjgh")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_jl18l")
+
+[node name="CreateArrow18" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 286.0
+offset_top = 220.0
+offset_right = 308.0
+offset_bottom = 249.0
+mouse_filter = 2
+texture = ExtResource("15_042yp")
+expand_mode = 1
+flip_h = true
+
+[node name="Next" type="Button" parent="."]
+layout_mode = 0
+offset_left = 286.0
+offset_top = 220.0
+offset_right = 308.0
+offset_bottom = 249.0
+focus_mode = 0
+theme_override_font_sizes/font_size = 1
+theme_override_styles/normal = SubResource("StyleBoxEmpty_bc4x8")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_m5k8f")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_altk2")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_15h8x")
+
+[node name="Label20" type="Label" parent="."]
+layout_mode = 0
+offset_left = 23.0
+offset_top = 270.0
+offset_right = 87.0
+offset_bottom = 288.0
+theme_override_colors/font_color = Color(0.39607844, 0.27058825, 0.09411765, 1)
+theme_override_font_sizes/font_size = 12
+text = "请输入昵称"
+
+[node name="Nickname" type="LineEdit" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 86.0
+offset_top = 265.0
+offset_right = 300.0
+offset_bottom = 289.0
+theme_override_colors/font_color = Color(0.39607844, 0.27058825, 0.09411765, 1)
+theme_override_colors/caret_color = Color(0.39607844, 0.27058825, 0.09411765, 1)
+theme_override_font_sizes/font_size = 11
+theme_override_styles/normal = SubResource("StyleBoxFlat_ocp5d")
+theme_override_styles/focus = SubResource("StyleBoxFlat_ocp5d")
+max_length = 24
+
+[node name="CreateEdit22" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 283.0
+offset_top = 270.0
+offset_right = 296.0
+offset_bottom = 283.0
+mouse_filter = 2
+texture = ExtResource("16_vwj6a")
+expand_mode = 1
+
+[node name="Edit" type="Button" parent="."]
+layout_mode = 0
+offset_left = 283.0
+offset_top = 270.0
+offset_right = 296.0
+offset_bottom = 283.0
+focus_mode = 0
+theme_override_font_sizes/font_size = 1
+theme_override_styles/normal = SubResource("StyleBoxEmpty_gi2ph")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_xvphx")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_xlmtw")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_q3kq1")
+
+[node name="Description" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 30.0
+offset_top = 320.0
+offset_right = 290.0
+offset_bottom = 417.0
+theme_override_colors/font_color = Color(0.39607844, 0.27058825, 0.09411765, 1)
+theme_override_font_sizes/font_size = 12
+text = "特点：霸气 血牛 伤害反弹 流血
+介绍：力士是蜀山世界最为霸道的职业，凭借着强健的体魄无惧敌人的攻击，反而将伤害反弹给敌方，让人无可奈何。"
+autowrap_mode = 3
+
+[node name="Create" type="Button" parent="."]
+layout_mode = 0
+offset_left = 2.0
+offset_top = 457.0
+offset_right = 38.0
+offset_bottom = 478.0
+focus_mode = 0
+theme_override_colors/font_color = Color(1, 0.9843137, 0.8235294, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0.47058824, 0.26666668, 0.105882354, 1)
+theme_override_constants/outline_size = 1
+theme_override_styles/normal = SubResource("StyleBoxFlat_oudsr")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_oudsr")
+theme_override_styles/hover = SubResource("StyleBoxFlat_sej5o")
+text = "创建"
+
+[node name="Panel0" type="Panel" parent="Create"]
+layout_mode = 0
+offset_left = 2.0
+offset_top = 2.0
+offset_right = 34.0
+offset_bottom = 19.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_csgw7")
+
+[node name="Rename" type="Button" parent="."]
+layout_mode = 0
+offset_left = 141.0
+offset_top = 457.0
+offset_right = 177.0
+offset_bottom = 478.0
+focus_mode = 0
+theme_override_colors/font_color = Color(1, 0.9843137, 0.8235294, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0.47058824, 0.26666668, 0.105882354, 1)
+theme_override_constants/outline_size = 1
+theme_override_styles/normal = SubResource("StyleBoxFlat_h6kwu")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_h6kwu")
+theme_override_styles/hover = SubResource("StyleBoxFlat_flkkn")
+text = "改名"
+
+[node name="Panel0" type="Panel" parent="Rename"]
+layout_mode = 0
+offset_left = 2.0
+offset_top = 2.0
+offset_right = 34.0
+offset_bottom = 19.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_r8dy6")
+
+[node name="Random" type="Button" parent="."]
+layout_mode = 0
+offset_left = 283.0
+offset_top = 457.0
+offset_right = 319.0
+offset_bottom = 478.0
+focus_mode = 0
+theme_override_colors/font_color = Color(1, 0.9843137, 0.8235294, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0.47058824, 0.26666668, 0.105882354, 1)
+theme_override_constants/outline_size = 1
+theme_override_styles/normal = SubResource("StyleBoxFlat_a3pyc")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_a3pyc")
+theme_override_styles/hover = SubResource("StyleBoxFlat_wsji2")
+text = "随机"
+
+[node name="Panel0" type="Panel" parent="Random"]
+layout_mode = 0
+offset_left = 2.0
+offset_top = 2.0
+offset_right = 34.0
+offset_bottom = 19.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_lgsfj")

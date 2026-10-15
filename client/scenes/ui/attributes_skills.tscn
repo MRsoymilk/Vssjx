@@ -1,0 +1,46 @@
+[gd_scene format=3]
+
+[node name="AttributesSkills" type="Control"]
+unique_name_in_owner = true
+anchors_preset = 0
+
+[node name="SkillName" type="Label" parent="."]
+layout_mode = 0
+offset_left = 22.0
+offset_top = 99.0
+offset_right = 282.0
+offset_bottom = 124.0
+theme_override_colors/font_color = Color(0.39607844, 0.27058825, 0.09411765, 1)
+theme_override_font_sizes/font_size = 17
+text = "破山诀"
+
+[node name="Label1" type="Label" parent="."]
+layout_mode = 0
+offset_left = 22.0
+offset_top = 132.0
+offset_right = 282.0
+offset_bottom = 157.0
+theme_override_colors/font_color = Color(0.39607844, 0.27058825, 0.09411765, 1)
+theme_override_font_sizes/font_size = 15
+text = "（消耗灵力9）"
+
+[node name="Description" type="Label" parent="."]
+layout_mode = 0
+offset_left = 22.0
+offset_top = 171.0
+offset_right = 295.0
+offset_bottom = 223.0
+theme_override_colors/font_color = Color(0.39607844, 0.27058825, 0.09411765, 1)
+theme_override_font_sizes/font_size = 14
+text = "重击敌人，并造成额外伤害。"
+autowrap_mode = 3
+
+[node name="Label3" type="Label" parent="."]
+layout_mode = 0
+offset_left = 22.0
+offset_top = 371.0
+offset_right = 292.0
+offset_bottom = 396.0
+theme_override_colors/font_color = Color(0.39607844, 0.27058825, 0.09411765, 1)
+theme_override_font_sizes/font_size = 15
+text = "技能点  0"

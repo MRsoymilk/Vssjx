@@ -6,3 +6,6 @@ __pycache__/
 *.py[cod]
 *.zip
 /server/target/
+.env
+.env.*
+!.env.sample.txt

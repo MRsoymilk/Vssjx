@@ -46,6 +46,30 @@ async fn unimplemented_login_is_not_a_success_response() {
     assert_eq!(value["code"], "NOT_FOUND");
 }
 
+#[tokio::test]
+async fn authentication_is_explicitly_unavailable_without_database() {
+    let config = Config::parse("127.0.0.1:0", "服务器").unwrap();
+    let response = app(config)
+        .oneshot(
+            Request::builder()
+                .method("POST")
+                .uri("/api/v1/auth/login")
+                .header("content-type", "application/json")
+                .body(Body::from(
+                    r#"{"username":"player_one","password":"password-1234"}"#,
+                ))
+                .unwrap(),
+        )
+        .await
+        .unwrap();
+    assert_eq!(response.status(), StatusCode::SERVICE_UNAVAILABLE);
+    let bytes = response.into_body().collect().await.unwrap().to_bytes();
+    assert_eq!(
+        serde_json::from_slice::<Value>(&bytes).unwrap()["code"],
+        "AUTH_UNAVAILABLE"
+    );
+}
+
 #[test]
 fn configuration_validates_bind_address_and_display_name() {
     assert!(Config::parse("127.0.0.1:8080", "服务器").is_ok());

@@ -58,8 +58,9 @@ def main():
     args = parser.parse_args()
     subprocess.run(['cargo', 'build', '--locked', '--manifest-path', str(ROOT / 'server/Cargo.toml')], check=True)
     binary = ROOT / 'server/target/debug' / ('vssjx-server.exe' if os.name == 'nt' else 'vssjx-server')
-    env = dict(os.environ, SSJX_BIND_ADDR='127.0.0.1:0', RUST_LOG='info')
+    env = dict(os.environ, SSJX_BIND_ADDR='127.0.0.1:0', RUST_LOG='info', SSJX_ENV_FILE='')
     env.pop('SSJX_TEST_PERSISTENCE_PHASE', None)
+    env.pop('SSJX_DATABASE_URL', None)  # Never touch a developer's account database.
     service = subprocess.Popen([str(binary)], env=env, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     fixture = None
     try:

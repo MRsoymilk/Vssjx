@@ -3,6 +3,8 @@ extends Node
 var failures := 0
 var checks := 0
 var app: Control
+var previous_connection_path := ""
+var connection_test_path := ""
 
 func _ready() -> void:
 	call_deferred("_run")
@@ -28,6 +30,9 @@ func press(text_value: String) -> void:
 		button.pressed.emit()
 
 func _run() -> void:
+	previous_connection_path = OS.get_environment("SSJX_CONNECTION_PATH")
+	connection_test_path = "user://runner_connection_%d.cfg" % OS.get_process_id()
+	OS.set_environment("SSJX_CONNECTION_PATH", connection_test_path)
 	Game.save_path = "user://test_save.json"
 	Game.new_player("验证侠客", 1, 0)
 	check(Game.save_game(), "Initial save succeeds")
@@ -498,5 +503,7 @@ func _run() -> void:
 	app.queue_free()
 	await get_tree().process_frame
 	DirAccess.remove_absolute(Game.save_path)
+	if FileAccess.file_exists(connection_test_path): DirAccess.remove_absolute(connection_test_path)
+	OS.set_environment("SSJX_CONNECTION_PATH", previous_connection_path)
 	print("TEST RESULT: %d checks, %d failures" % [checks, failures])
 	get_tree().quit(0 if failures == 0 else 1)

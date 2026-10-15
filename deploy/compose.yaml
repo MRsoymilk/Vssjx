@@ -1,0 +1,19 @@
+name: vssjx
+services:
+  postgres:
+    image: ${SSJX_POSTGRES_IMAGE:-postgres:17-bookworm}
+    environment:
+      POSTGRES_USER: ${SSJX_POSTGRES_USER:-vssjx}
+      POSTGRES_DB: ${SSJX_POSTGRES_DB:-vssjx}
+      POSTGRES_PASSWORD: ${SSJX_POSTGRES_PASSWORD:?Set SSJX_POSTGRES_PASSWORD before starting PostgreSQL}
+    ports:
+      - "${SSJX_POSTGRES_BIND_ADDR:-127.0.0.1}:${SSJX_POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\""]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+volumes:
+  postgres-data:

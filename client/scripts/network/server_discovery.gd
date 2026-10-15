@@ -54,4 +54,6 @@ func _on_response(result: int, code: int, _headers: PackedStringArray, body: Pac
 	if not name_value is String or name_value.is_empty() or name_value.length() > 64:
 		completed.emit({"ok": false, "error": "服务器名称字段无效。"})
 		return
-	completed.emit({"ok": true, "server_name": name_value, "stage": info.get("stage", "unknown")})
+	var capabilities: Variant = info.get("capabilities", [])
+	if not capabilities is Array: capabilities = []
+	completed.emit({"ok": true, "server_name": name_value, "stage": info.get("stage", "unknown"), "capabilities": capabilities})

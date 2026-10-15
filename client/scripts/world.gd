@@ -21,6 +21,7 @@ var zone := 0
 var enabled := true:
 	set(value):
 		enabled = value
+		if not value and move_target != null: move_target.clear()
 		for sprite in enemy_nodes.values():
 			if not value: sprite.pause()
 			else: sprite.play()
@@ -38,11 +39,14 @@ var patrols: Dictionary = {}
 var facing_left := true # Native stand and walk composites face left.
 var walk_distance := 0.0
 var portal_marker: Node2D
+var move_target: WorldMoveTarget
 
 func _ready() -> void:
 	zone = int(Game.player.zone)
 	cell = Vector2i(Game.player.cell[0], Game.player.cell[1])
 	_build_map()
+	move_target = preload("res://scenes/world_move_target.tscn").instantiate()
+	add_child(move_target)
 	actors = Node2D.new()
 	actors.y_sort_enabled = true
 	add_child(actors)
@@ -196,6 +200,9 @@ func click(local: Vector2) -> void:
 	if found.is_empty():
 		pending = {}
 		path = _route_to(target)
+		if not path.is_empty() or target == next_cell:
+			move_target.set_destination(target)
+		else: move_target.clear()
 	else:
 		_walk_to(found)
 
@@ -250,6 +257,8 @@ func _walk_to(target: Dictionary) -> void:
 		if not candidate.is_empty() and (best.is_empty() or candidate.size() < best.size()):
 			best = candidate
 	path = best
+	if not path.is_empty(): move_target.set_destination(path[-1])
+	else: move_target.clear()
 
 func interact_nearest() -> void:
 	if not enabled: return
@@ -271,6 +280,7 @@ func interact_nearest() -> void:
 		interaction.emit("hint", {"text": "靠近人物、怪物或灵门，再按交互。"})
 
 func _interact_pending() -> void:
+	move_target.clear()
 	var target := pending
 	pending = {}
 	path.clear()
@@ -279,6 +289,7 @@ func _interact_pending() -> void:
 func _process(delta: float) -> void:
 	if not enabled or hero == null: return
 	if _keyboard_direction() != Vector2i.ZERO:
+		move_target.clear()
 		path.clear()
 		pending = {}
 	_update_patrols(delta)
@@ -344,6 +355,7 @@ func _advance_walk(distance: float) -> void:
 	hero.set_frame_and_progress(int(phase), fposmod(phase, 1.0))
 
 func _idle_hero() -> void:
+	move_target.clear()
 	walk_distance = 0.0
 	if hero.animation != "idle" or not hero.is_playing(): hero.play("idle")
 
@@ -413,6 +425,7 @@ func pause_moving() -> void:
 	# UI pauses keep the rendered position and unfinished segment. Resuming may
 	# finish that one segment, but must not restore an old click/interaction path.
 	path.clear()
+	move_target.clear()
 	pending = {}
 	_idle_hero()
 	_save_position()

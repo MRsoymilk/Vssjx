@@ -11,3 +11,7 @@ client/assets/data/actors/** text eol=lf
 LICENSE text eol=lf
 # Preserve bytes in the original decoded and unpacked reference materials.
 analysis/** -text
+# Generated catalogs/evidence use stable line endings; original source bytes stay untouched.
+analysis/catalogs/** text eol=lf
+analysis/recovery/** text eol=lf
+client/assets/data/original_world.json text eol=lf

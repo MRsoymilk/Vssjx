@@ -1,0 +1,42 @@
+{
+  "format_version": 1,
+  "native_sha256": "e08f93bebe133b700f2305bfbedd994b05cc8d04a5a854262af9ced956afbc03",
+  "source_package": {
+    "path": "analysis/source/ssjx.mrp",
+    "filename": "ssjx.mpr",
+    "appid": 403084,
+    "version": 48,
+    "description": "蜀山剑侠Online",
+    "sha256": "15c0e9fad4b3c6af974c863bf1405f9fd649b457ea99b2f5a6780d56e330aefc"
+  },
+  "world_overview": {
+    "visible_locations": 79,
+    "route_segments": 78
+  },
+  "scene_schema_status": "原生代码静态推导；待真实.map样本核验",
+  "scans": [
+    {
+      "source_root": "F:\\project\\Vssjx\\analysis\\unpacked",
+      "files_examined": 1928,
+      "bytes_examined": 2290117,
+      "mrpg_headers": 0,
+      "online_package_headers": 0,
+      "scene_candidates": []
+    },
+    {
+      "source_root": "C:\\Users\\milk\\Downloads\\mythroad",
+      "files_examined": 3921,
+      "bytes_examined": 29447346,
+      "mrpg_headers": 111,
+      "online_package_headers": 0,
+      "scene_candidates": []
+    }
+  ],
+  "scene_candidate_count": 0,
+  "notes": [
+    "候选需身份审核，不自动导入地形。被用户拒绝的两个同名游戏不参与扫描。",
+    "仅发现格式匹配不足以证明文件来自Online，需进一步核对包/缓存来源。",
+    "检查散落缓存与已有解包成员，统计其他MRPG包头但不解包导入其他游戏。",
+    "格式为静态推导且无真实样本；未知封装或格式变体可能无法匹配。4字节前缀不等于校验值已验证。"
+  ]
+}

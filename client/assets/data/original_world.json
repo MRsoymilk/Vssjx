@@ -1,0 +1,6244 @@
+{
+  "format_version": 1,
+  "source_package": {
+    "path": "analysis/source/ssjx.mrp",
+    "filename": "ssjx.mpr",
+    "appid": 403084,
+    "version": 48,
+    "description": "蜀山剑侠Online",
+    "sha256": "15c0e9fad4b3c6af974c863bf1405f9fd649b457ea99b2f5a6780d56e330aefc"
+  },
+  "maps": {
+    "source_member": "worldmap.data",
+    "source_bytes": 3592,
+    "source_sha256": "736cda5fa70d38c92c5aabed43f88939fd41b7219eff8f23630247c658b91714",
+    "header_raw": [
+      25,
+      22,
+      214
+    ],
+    "name_table_end_offset": 1995,
+    "record_count": 214,
+    "distinct_name_count": 157,
+    "records": [
+      {
+        "name_index": 0,
+        "directory_number": 1,
+        "name": "灵空台",
+        "name_offset": 3,
+        "name_length_bytes": 6,
+        "raw_record_offset": 1995,
+        "raw_record_hex": "01 15 06 00 01 05",
+        "original_map_id": 1,
+        "world_row": 21,
+        "world_column": 6,
+        "world_position": [
+          6,
+          21
+        ],
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 1,
+        "level_max": 5
+      },
+      {
+        "name_index": 1,
+        "directory_number": 2,
+        "name": "百花谷",
+        "name_offset": 11,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2001,
+        "raw_record_hex": "02 15 07 00 05 08",
+        "original_map_id": 2,
+        "world_row": 21,
+        "world_column": 7,
+        "world_position": [
+          7,
+          21
+        ],
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 5,
+        "level_max": 8
+      },
+      {
+        "name_index": 2,
+        "directory_number": 3,
+        "name": "黑刀峡",
+        "name_offset": 19,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2007,
+        "raw_record_hex": "03 ff ff 00 05 0a",
+        "original_map_id": 3,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 5,
+        "level_max": 10
+      },
+      {
+        "name_index": 3,
+        "directory_number": 4,
+        "name": "峨眉派",
+        "name_offset": 27,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2013,
+        "raw_record_hex": "04 09 04 02 0a 0f",
+        "original_map_id": 4,
+        "world_row": 9,
+        "world_column": 4,
+        "world_position": [
+          4,
+          9
+        ],
+        "location_kind": 2,
+        "location_type": "门派",
+        "level_min": 10,
+        "level_max": 15
+      },
+      {
+        "name_index": 4,
+        "directory_number": 5,
+        "name": "凝碧崖",
+        "name_offset": 35,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2019,
+        "raw_record_hex": "05 09 03 00 0a 0b",
+        "original_map_id": 5,
+        "world_row": 9,
+        "world_column": 3,
+        "world_position": [
+          3,
+          9
+        ],
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 10,
+        "level_max": 11
+      },
+      {
+        "name_index": 5,
+        "directory_number": 6,
+        "name": "峨眉山",
+        "name_offset": 43,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2025,
+        "raw_record_hex": "06 0a 04 00 0b 0c",
+        "original_map_id": 6,
+        "world_row": 10,
+        "world_column": 4,
+        "world_position": [
+          4,
+          10
+        ],
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 11,
+        "level_max": 12
+      },
+      {
+        "name_index": 6,
+        "directory_number": 7,
+        "name": "天化村",
+        "name_offset": 51,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2031,
+        "raw_record_hex": "07 0a 05 00 0a 0f",
+        "original_map_id": 7,
+        "world_row": 10,
+        "world_column": 5,
+        "world_position": [
+          5,
+          10
+        ],
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 10,
+        "level_max": 15
+      },
+      {
+        "name_index": 7,
+        "directory_number": 8,
+        "name": "乱坟岗",
+        "name_offset": 59,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2037,
+        "raw_record_hex": "08 0b 05 00 0d 0f",
+        "original_map_id": 8,
+        "world_row": 11,
+        "world_column": 5,
+        "world_position": [
+          5,
+          11
+        ],
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 13,
+        "level_max": 15
+      },
+      {
+        "name_index": 8,
+        "directory_number": 9,
+        "name": "野猪岭",
+        "name_offset": 67,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2043,
+        "raw_record_hex": "09 0c 05 00 0d 10",
+        "original_map_id": 9,
+        "world_row": 12,
+        "world_column": 5,
+        "world_position": [
+          5,
+          12
+        ],
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 13,
+        "level_max": 16
+      },
+      {
+        "name_index": 9,
+        "directory_number": 10,
+        "name": "瘟疫猪巢",
+        "name_offset": 75,
+        "name_length_bytes": 8,
+        "raw_record_offset": 2049,
+        "raw_record_hex": "0a 0c 04 00 0f 10",
+        "original_map_id": 10,
+        "world_row": 12,
+        "world_column": 4,
+        "world_position": [
+          4,
+          12
+        ],
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 15,
+        "level_max": 16
+      },
+      {
+        "name_index": 10,
+        "directory_number": 11,
+        "name": "平雁谷",
+        "name_offset": 85,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2055,
+        "raw_record_hex": "0b 0e 04 00 11 14",
+        "original_map_id": 11,
+        "world_row": 14,
+        "world_column": 4,
+        "world_position": [
+          4,
+          14
+        ],
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 17,
+        "level_max": 20
+      },
+      {
+        "name_index": 11,
+        "directory_number": 12,
+        "name": "失落沼泽",
+        "name_offset": 93,
+        "name_length_bytes": 8,
+        "raw_record_offset": 2061,
+        "raw_record_hex": "0c 0e 05 00 11 13",
+        "original_map_id": 12,
+        "world_row": 14,
+        "world_column": 5,
+        "world_position": [
+          5,
+          14
+        ],
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 17,
+        "level_max": 19
+      },
+      {
+        "name_index": 12,
+        "directory_number": 13,
+        "name": "卧云镇",
+        "name_offset": 103,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2067,
+        "raw_record_hex": "0d 0e 07 01 14 19",
+        "original_map_id": 13,
+        "world_row": 14,
+        "world_column": 7,
+        "world_position": [
+          7,
+          14
+        ],
+        "location_kind": 1,
+        "location_type": "城市",
+        "level_min": 20,
+        "level_max": 25
+      },
+      {
+        "name_index": 13,
+        "directory_number": 14,
+        "name": "卧云镇北",
+        "name_offset": 111,
+        "name_length_bytes": 8,
+        "raw_record_offset": 2073,
+        "raw_record_hex": "0e 0d 07 00 14 19",
+        "original_map_id": 14,
+        "world_row": 13,
+        "world_column": 7,
+        "world_position": [
+          7,
+          13
+        ],
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 20,
+        "level_max": 25
+      },
+      {
+        "name_index": 14,
+        "directory_number": 15,
+        "name": "跃阳湖",
+        "name_offset": 121,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2079,
+        "raw_record_hex": "0f 0c 07 00 14 15",
+        "original_map_id": 15,
+        "world_row": 12,
+        "world_column": 7,
+        "world_position": [
+          7,
+          12
+        ],
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 20,
+        "level_max": 21
+      },
+      {
+        "name_index": 15,
+        "directory_number": 16,
+        "name": "莽苍山",
+        "name_offset": 129,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2085,
+        "raw_record_hex": "10 0f 07 00 17 1a",
+        "original_map_id": 16,
+        "world_row": 15,
+        "world_column": 7,
+        "world_position": [
+          7,
+          15
+        ],
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 23,
+        "level_max": 26
+      },
+      {
+        "name_index": 16,
+        "directory_number": 17,
+        "name": "金石峡",
+        "name_offset": 137,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2091,
+        "raw_record_hex": "11 0f 06 00 19 1c",
+        "original_map_id": 17,
+        "world_row": 15,
+        "world_column": 6,
+        "world_position": [
+          6,
+          15
+        ],
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 25,
+        "level_max": 28
+      },
+      {
+        "name_index": 17,
+        "directory_number": 18,
+        "name": "金水潭",
+        "name_offset": 145,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2097,
+        "raw_record_hex": "12 10 06 00 1b 1e",
+        "original_map_id": 18,
+        "world_row": 16,
+        "world_column": 6,
+        "world_position": [
+          6,
+          16
+        ],
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 27,
+        "level_max": 30
+      },
+      {
+        "name_index": 18,
+        "directory_number": 19,
+        "name": "天外神山",
+        "name_offset": 153,
+        "name_length_bytes": 8,
+        "raw_record_offset": 2103,
+        "raw_record_hex": "13 10 08 00 1c 1e",
+        "original_map_id": 19,
+        "world_row": 16,
+        "world_column": 8,
+        "world_position": [
+          8,
+          16
+        ],
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 28,
+        "level_max": 30
+      },
+      {
+        "name_index": 19,
+        "directory_number": 20,
+        "name": "封印祠",
+        "name_offset": 163,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2109,
+        "raw_record_hex": "14 11 08 00 1c 1e",
+        "original_map_id": 20,
+        "world_row": 17,
+        "world_column": 8,
+        "world_position": [
+          8,
+          17
+        ],
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 28,
+        "level_max": 30
+      },
+      {
+        "name_index": 20,
+        "directory_number": 21,
+        "name": "花涧派",
+        "name_offset": 171,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2115,
+        "raw_record_hex": "15 13 04 02 0a 0f",
+        "original_map_id": 21,
+        "world_row": 19,
+        "world_column": 4,
+        "world_position": [
+          4,
+          19
+        ],
+        "location_kind": 2,
+        "location_type": "门派",
+        "level_min": 10,
+        "level_max": 15
+      },
+      {
+        "name_index": 21,
+        "directory_number": 22,
+        "name": "秋兰竹亭",
+        "name_offset": 179,
+        "name_length_bytes": 8,
+        "raw_record_offset": 2121,
+        "raw_record_hex": "16 13 03 00 0a 0b",
+        "original_map_id": 22,
+        "world_row": 19,
+        "world_column": 3,
+        "world_position": [
+          3,
+          19
+        ],
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 10,
+        "level_max": 11
+      },
+      {
+        "name_index": 22,
+        "directory_number": 23,
+        "name": "幻波池",
+        "name_offset": 189,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2127,
+        "raw_record_hex": "17 13 05 00 0b 0c",
+        "original_map_id": 23,
+        "world_row": 19,
+        "world_column": 5,
+        "world_position": [
+          5,
+          19
+        ],
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 11,
+        "level_max": 12
+      },
+      {
+        "name_index": 23,
+        "directory_number": 24,
+        "name": "蛊苗村",
+        "name_offset": 197,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2133,
+        "raw_record_hex": "18 12 05 00 0a 0f",
+        "original_map_id": 24,
+        "world_row": 18,
+        "world_column": 5,
+        "world_position": [
+          5,
+          18
+        ],
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 10,
+        "level_max": 15
+      },
+      {
+        "name_index": 24,
+        "directory_number": 25,
+        "name": "牵牛潭",
+        "name_offset": 205,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2139,
+        "raw_record_hex": "19 12 04 00 0d 0f",
+        "original_map_id": 25,
+        "world_row": 18,
+        "world_column": 4,
+        "world_position": [
+          4,
+          18
+        ],
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 13,
+        "level_max": 15
+      },
+      {
+        "name_index": 25,
+        "directory_number": 26,
+        "name": "云灵山",
+        "name_offset": 213,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2145,
+        "raw_record_hex": "1a 11 04 00 0d 10",
+        "original_map_id": 26,
+        "world_row": 17,
+        "world_column": 4,
+        "world_position": [
+          4,
+          17
+        ],
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 13,
+        "level_max": 16
+      },
+      {
+        "name_index": 26,
+        "directory_number": 27,
+        "name": "云灵山顶",
+        "name_offset": 221,
+        "name_length_bytes": 8,
+        "raw_record_offset": 2151,
+        "raw_record_hex": "1b 10 04 00 0f 10",
+        "original_map_id": 27,
+        "world_row": 16,
+        "world_column": 4,
+        "world_position": [
+          4,
+          16
+        ],
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 15,
+        "level_max": 16
+      },
+      {
+        "name_index": 27,
+        "directory_number": 28,
+        "name": "慈云寺北",
+        "name_offset": 231,
+        "name_length_bytes": 8,
+        "raw_record_offset": 2157,
+        "raw_record_hex": "1c 11 0a 00 1e 21",
+        "original_map_id": 28,
+        "world_row": 17,
+        "world_column": 10,
+        "world_position": [
+          10,
+          17
+        ],
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 30,
+        "level_max": 33
+      },
+      {
+        "name_index": 28,
+        "directory_number": 29,
+        "name": "慈云寺",
+        "name_offset": 241,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2163,
+        "raw_record_hex": "1d 12 0a 01 1f 22",
+        "original_map_id": 29,
+        "world_row": 18,
+        "world_column": 10,
+        "world_position": [
+          10,
+          18
+        ],
+        "location_kind": 1,
+        "location_type": "城市",
+        "level_min": 31,
+        "level_max": 34
+      },
+      {
+        "name_index": 29,
+        "directory_number": 30,
+        "name": "慈云寺外围",
+        "name_offset": 249,
+        "name_length_bytes": 10,
+        "raw_record_offset": 2169,
+        "raw_record_hex": "1e 12 09 00 1e 1f",
+        "original_map_id": 30,
+        "world_row": 18,
+        "world_column": 9,
+        "world_position": [
+          9,
+          18
+        ],
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 30,
+        "level_max": 31
+      },
+      {
+        "name_index": 30,
+        "directory_number": 31,
+        "name": "慈云寺密道",
+        "name_offset": 261,
+        "name_length_bytes": 10,
+        "raw_record_offset": 2175,
+        "raw_record_hex": "1f 13 0a 00 21 23",
+        "original_map_id": 31,
+        "world_row": 19,
+        "world_column": 10,
+        "world_position": [
+          10,
+          19
+        ],
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 33,
+        "level_max": 35
+      },
+      {
+        "name_index": 31,
+        "directory_number": 32,
+        "name": "昆仑派",
+        "name_offset": 273,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2181,
+        "raw_record_hex": "20 13 12 02 0a 0f",
+        "original_map_id": 32,
+        "world_row": 19,
+        "world_column": 18,
+        "world_position": [
+          18,
+          19
+        ],
+        "location_kind": 2,
+        "location_type": "门派",
+        "level_min": 10,
+        "level_max": 15
+      },
+      {
+        "name_index": 32,
+        "directory_number": 33,
+        "name": "玄冰谷",
+        "name_offset": 281,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2187,
+        "raw_record_hex": "21 13 13 00 0a 0b",
+        "original_map_id": 33,
+        "world_row": 19,
+        "world_column": 19,
+        "world_position": [
+          19,
+          19
+        ],
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 10,
+        "level_max": 11
+      },
+      {
+        "name_index": 33,
+        "directory_number": 34,
+        "name": "玉泉关",
+        "name_offset": 289,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2193,
+        "raw_record_hex": "22 14 12 00 0b 0c",
+        "original_map_id": 34,
+        "world_row": 20,
+        "world_column": 18,
+        "world_position": [
+          18,
+          20
+        ],
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 11,
+        "level_max": 12
+      },
+      {
+        "name_index": 34,
+        "directory_number": 35,
+        "name": "辟邪村",
+        "name_offset": 297,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2199,
+        "raw_record_hex": "23 14 10 00 0a 0f",
+        "original_map_id": 35,
+        "world_row": 20,
+        "world_column": 16,
+        "world_position": [
+          16,
+          20
+        ],
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 10,
+        "level_max": 15
+      },
+      {
+        "name_index": 35,
+        "directory_number": 36,
+        "name": "梯田",
+        "name_offset": 305,
+        "name_length_bytes": 4,
+        "raw_record_offset": 2205,
+        "raw_record_hex": "24 14 0f 00 0d 0f",
+        "original_map_id": 36,
+        "world_row": 20,
+        "world_column": 15,
+        "world_position": [
+          15,
+          20
+        ],
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 13,
+        "level_max": 15
+      },
+      {
+        "name_index": 36,
+        "directory_number": 37,
+        "name": "风云宫",
+        "name_offset": 311,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2211,
+        "raw_record_hex": "25 13 10 00 0d 10",
+        "original_map_id": 37,
+        "world_row": 19,
+        "world_column": 16,
+        "world_position": [
+          16,
+          19
+        ],
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 13,
+        "level_max": 16
+      },
+      {
+        "name_index": 37,
+        "directory_number": 38,
+        "name": "凌雪池",
+        "name_offset": 319,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2217,
+        "raw_record_hex": "26 12 10 00 0f 10",
+        "original_map_id": 38,
+        "world_row": 18,
+        "world_column": 16,
+        "world_position": [
+          16,
+          18
+        ],
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 15,
+        "level_max": 16
+      },
+      {
+        "name_index": 38,
+        "directory_number": 39,
+        "name": "幽林",
+        "name_offset": 327,
+        "name_length_bytes": 4,
+        "raw_record_offset": 2223,
+        "raw_record_hex": "27 12 11 00 11 14",
+        "original_map_id": 39,
+        "world_row": 18,
+        "world_column": 17,
+        "world_position": [
+          17,
+          18
+        ],
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 17,
+        "level_max": 20
+      },
+      {
+        "name_index": 39,
+        "directory_number": 40,
+        "name": "卧龙潭",
+        "name_offset": 333,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2229,
+        "raw_record_hex": "28 11 11 00 11 13",
+        "original_map_id": 40,
+        "world_row": 17,
+        "world_column": 17,
+        "world_position": [
+          17,
+          17
+        ],
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 17,
+        "level_max": 19
+      },
+      {
+        "name_index": 40,
+        "directory_number": 41,
+        "name": "八旗镇",
+        "name_offset": 341,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2235,
+        "raw_record_hex": "29 10 11 01 14 19",
+        "original_map_id": 41,
+        "world_row": 16,
+        "world_column": 17,
+        "world_position": [
+          17,
+          16
+        ],
+        "location_kind": 1,
+        "location_type": "城市",
+        "level_min": 20,
+        "level_max": 25
+      },
+      {
+        "name_index": 41,
+        "directory_number": 42,
+        "name": "八旗镇西",
+        "name_offset": 349,
+        "name_length_bytes": 8,
+        "raw_record_offset": 2241,
+        "raw_record_hex": "2a 10 10 00 14 19",
+        "original_map_id": 42,
+        "world_row": 16,
+        "world_column": 16,
+        "world_position": [
+          16,
+          16
+        ],
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 20,
+        "level_max": 25
+      },
+      {
+        "name_index": 42,
+        "directory_number": 43,
+        "name": "沙丘",
+        "name_offset": 359,
+        "name_length_bytes": 4,
+        "raw_record_offset": 2247,
+        "raw_record_hex": "2b 10 12 00 13 15",
+        "original_map_id": 43,
+        "world_row": 16,
+        "world_column": 18,
+        "world_position": [
+          18,
+          16
+        ],
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 19,
+        "level_max": 21
+      },
+      {
+        "name_index": 43,
+        "directory_number": 44,
+        "name": "金山绿水",
+        "name_offset": 365,
+        "name_length_bytes": 8,
+        "raw_record_offset": 2253,
+        "raw_record_hex": "2c 10 0f 00 17 1a",
+        "original_map_id": 44,
+        "world_row": 16,
+        "world_column": 15,
+        "world_position": [
+          15,
+          16
+        ],
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 23,
+        "level_max": 26
+      },
+      {
+        "name_index": 44,
+        "directory_number": 45,
+        "name": "沙漠荒野",
+        "name_offset": 375,
+        "name_length_bytes": 8,
+        "raw_record_offset": 2259,
+        "raw_record_hex": "2d 10 0e 00 19 1c",
+        "original_map_id": 45,
+        "world_row": 16,
+        "world_column": 14,
+        "world_position": [
+          14,
+          16
+        ],
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 25,
+        "level_max": 28
+      },
+      {
+        "name_index": 45,
+        "directory_number": 46,
+        "name": "流沙平原",
+        "name_offset": 385,
+        "name_length_bytes": 8,
+        "raw_record_offset": 2265,
+        "raw_record_hex": "2e 10 0d 00 1b 1e",
+        "original_map_id": 46,
+        "world_row": 16,
+        "world_column": 13,
+        "world_position": [
+          13,
+          16
+        ],
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 27,
+        "level_max": 30
+      },
+      {
+        "name_index": 46,
+        "directory_number": 47,
+        "name": "火云窟",
+        "name_offset": 395,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2271,
+        "raw_record_hex": "2f 11 0d 00 1c 1e",
+        "original_map_id": 47,
+        "world_row": 17,
+        "world_column": 13,
+        "world_position": [
+          13,
+          17
+        ],
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 28,
+        "level_max": 30
+      },
+      {
+        "name_index": 47,
+        "directory_number": 48,
+        "name": "铸剑池",
+        "name_offset": 403,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2277,
+        "raw_record_hex": "30 11 0c 00 1c 1e",
+        "original_map_id": 48,
+        "world_row": 17,
+        "world_column": 12,
+        "world_position": [
+          12,
+          17
+        ],
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 28,
+        "level_max": 30
+      },
+      {
+        "name_index": 48,
+        "directory_number": 49,
+        "name": "神剑峰",
+        "name_offset": 411,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2283,
+        "raw_record_hex": "31 0f 0a 00 1e 20",
+        "original_map_id": 49,
+        "world_row": 15,
+        "world_column": 10,
+        "world_position": [
+          10,
+          15
+        ],
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 30,
+        "level_max": 32
+      },
+      {
+        "name_index": 49,
+        "directory_number": 50,
+        "name": "神剑湖",
+        "name_offset": 419,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2289,
+        "raw_record_hex": "32 0e 0a 00 1e 21",
+        "original_map_id": 50,
+        "world_row": 14,
+        "world_column": 10,
+        "world_position": [
+          10,
+          14
+        ],
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 30,
+        "level_max": 33
+      },
+      {
+        "name_index": 50,
+        "directory_number": 51,
+        "name": "雷崖",
+        "name_offset": 427,
+        "name_length_bytes": 4,
+        "raw_record_offset": 2295,
+        "raw_record_hex": "33 0e 0b 00 20 21",
+        "original_map_id": 51,
+        "world_row": 14,
+        "world_column": 11,
+        "world_position": [
+          11,
+          14
+        ],
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 32,
+        "level_max": 33
+      },
+      {
+        "name_index": 51,
+        "directory_number": 52,
+        "name": "古道",
+        "name_offset": 433,
+        "name_length_bytes": 4,
+        "raw_record_offset": 2301,
+        "raw_record_hex": "34 0d 0b 00 20 23",
+        "original_map_id": 52,
+        "world_row": 13,
+        "world_column": 11,
+        "world_position": [
+          11,
+          13
+        ],
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 32,
+        "level_max": 35
+      },
+      {
+        "name_index": 52,
+        "directory_number": 53,
+        "name": "仪凤窟",
+        "name_offset": 439,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2307,
+        "raw_record_hex": "35 0c 0b 00 21 24",
+        "original_map_id": 53,
+        "world_row": 12,
+        "world_column": 11,
+        "world_position": [
+          11,
+          12
+        ],
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 33,
+        "level_max": 36
+      },
+      {
+        "name_index": 53,
+        "directory_number": 54,
+        "name": "青螺峪",
+        "name_offset": 447,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2313,
+        "raw_record_hex": "36 0a 0b 00 23 25",
+        "original_map_id": 54,
+        "world_row": 10,
+        "world_column": 11,
+        "world_position": [
+          11,
+          10
+        ],
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 35,
+        "level_max": 37
+      },
+      {
+        "name_index": 54,
+        "directory_number": 55,
+        "name": "陷空岛",
+        "name_offset": 455,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2319,
+        "raw_record_hex": "37 0a 0a 00 25 28",
+        "original_map_id": 55,
+        "world_row": 10,
+        "world_column": 10,
+        "world_position": [
+          10,
+          10
+        ],
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 37,
+        "level_max": 40
+      },
+      {
+        "name_index": 55,
+        "directory_number": 56,
+        "name": "白骨之谷",
+        "name_offset": 463,
+        "name_length_bytes": 8,
+        "raw_record_offset": 2325,
+        "raw_record_hex": "38 0a 0c 00 25 27",
+        "original_map_id": 56,
+        "world_row": 10,
+        "world_column": 12,
+        "world_position": [
+          12,
+          10
+        ],
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 37,
+        "level_max": 39
+      },
+      {
+        "name_index": 56,
+        "directory_number": 57,
+        "name": "紫云宫",
+        "name_offset": 473,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2331,
+        "raw_record_hex": "39 09 0b 00 25 28",
+        "original_map_id": 57,
+        "world_row": 9,
+        "world_column": 11,
+        "world_position": [
+          11,
+          9
+        ],
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 37,
+        "level_max": 40
+      },
+      {
+        "name_index": 57,
+        "directory_number": 58,
+        "name": "神碑禅经",
+        "name_offset": 481,
+        "name_length_bytes": 8,
+        "raw_record_offset": 2337,
+        "raw_record_hex": "3a 09 0c 00 25 27",
+        "original_map_id": 58,
+        "world_row": 9,
+        "world_column": 12,
+        "world_position": [
+          12,
+          9
+        ],
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 37,
+        "level_max": 39
+      },
+      {
+        "name_index": 58,
+        "directory_number": 59,
+        "name": "戴家场",
+        "name_offset": 491,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2343,
+        "raw_record_hex": "3b 07 0c 01 28 32",
+        "original_map_id": 59,
+        "world_row": 7,
+        "world_column": 12,
+        "world_position": [
+          12,
+          7
+        ],
+        "location_kind": 1,
+        "location_type": "城市",
+        "level_min": 40,
+        "level_max": 50
+      },
+      {
+        "name_index": 59,
+        "directory_number": 60,
+        "name": "化血池",
+        "name_offset": 499,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2349,
+        "raw_record_hex": "3c 07 0b 00 2b 2d",
+        "original_map_id": 60,
+        "world_row": 7,
+        "world_column": 11,
+        "world_position": [
+          11,
+          7
+        ],
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 43,
+        "level_max": 45
+      },
+      {
+        "name_index": 60,
+        "directory_number": 61,
+        "name": "屠龙谷",
+        "name_offset": 507,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2355,
+        "raw_record_hex": "3d 07 0a 00 2d 32",
+        "original_map_id": 61,
+        "world_row": 7,
+        "world_column": 10,
+        "world_position": [
+          10,
+          7
+        ],
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 45,
+        "level_max": 50
+      },
+      {
+        "name_index": 61,
+        "directory_number": 62,
+        "name": "群雄大殿",
+        "name_offset": 515,
+        "name_length_bytes": 8,
+        "raw_record_offset": 2361,
+        "raw_record_hex": "3e 07 0d 00 28 32",
+        "original_map_id": 62,
+        "world_row": 7,
+        "world_column": 13,
+        "world_position": [
+          13,
+          7
+        ],
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 40,
+        "level_max": 50
+      },
+      {
+        "name_index": 62,
+        "directory_number": 63,
+        "name": "西方太乙",
+        "name_offset": 525,
+        "name_length_bytes": 8,
+        "raw_record_offset": 2367,
+        "raw_record_hex": "3f 06 0e 00 2e 33",
+        "original_map_id": 63,
+        "world_row": 6,
+        "world_column": 14,
+        "world_position": [
+          14,
+          6
+        ],
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 46,
+        "level_max": 51
+      },
+      {
+        "name_index": 63,
+        "directory_number": 64,
+        "name": "金钟岛",
+        "name_offset": 535,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2373,
+        "raw_record_hex": "40 06 0d 00 2f 31",
+        "original_map_id": 64,
+        "world_row": 6,
+        "world_column": 13,
+        "world_position": [
+          13,
+          6
+        ],
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 47,
+        "level_max": 49
+      },
+      {
+        "name_index": 64,
+        "directory_number": 65,
+        "name": "修罗关",
+        "name_offset": 543,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2379,
+        "raw_record_hex": "41 05 0c 00 31 34",
+        "original_map_id": 65,
+        "world_row": 5,
+        "world_column": 12,
+        "world_position": [
+          12,
+          5
+        ],
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 49,
+        "level_max": 52
+      },
+      {
+        "name_index": 65,
+        "directory_number": 66,
+        "name": "妖尸谷",
+        "name_offset": 551,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2385,
+        "raw_record_hex": "42 04 0c 00 32 37",
+        "original_map_id": 66,
+        "world_row": 4,
+        "world_column": 12,
+        "world_position": [
+          12,
+          4
+        ],
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 50,
+        "level_max": 55
+      },
+      {
+        "name_index": 66,
+        "directory_number": 67,
+        "name": "乌金障",
+        "name_offset": 559,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2391,
+        "raw_record_hex": "43 04 0d 00 34 35",
+        "original_map_id": 67,
+        "world_row": 4,
+        "world_column": 13,
+        "world_position": [
+          13,
+          4
+        ],
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 52,
+        "level_max": 53
+      },
+      {
+        "name_index": 67,
+        "directory_number": 68,
+        "name": "行刑场",
+        "name_offset": 567,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2397,
+        "raw_record_hex": "44 04 0e 00 36 37",
+        "original_map_id": 68,
+        "world_row": 4,
+        "world_column": 14,
+        "world_position": [
+          14,
+          4
+        ],
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 54,
+        "level_max": 55
+      },
+      {
+        "name_index": 68,
+        "directory_number": 69,
+        "name": "碎心崖",
+        "name_offset": 575,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2403,
+        "raw_record_hex": "45 03 0c 00 37 38",
+        "original_map_id": 69,
+        "world_row": 3,
+        "world_column": 12,
+        "world_position": [
+          12,
+          3
+        ],
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 55,
+        "level_max": 56
+      },
+      {
+        "name_index": 69,
+        "directory_number": 70,
+        "name": "如意山",
+        "name_offset": 583,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2409,
+        "raw_record_hex": "46 03 0a 00 32 37",
+        "original_map_id": 70,
+        "world_row": 3,
+        "world_column": 10,
+        "world_position": [
+          10,
+          3
+        ],
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 50,
+        "level_max": 55
+      },
+      {
+        "name_index": 70,
+        "directory_number": 71,
+        "name": "玉京潭",
+        "name_offset": 591,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2415,
+        "raw_record_hex": "47 04 0a 00 37 38",
+        "original_map_id": 71,
+        "world_row": 4,
+        "world_column": 10,
+        "world_position": [
+          10,
+          4
+        ],
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 55,
+        "level_max": 56
+      },
+      {
+        "name_index": 71,
+        "directory_number": 72,
+        "name": "大河山川",
+        "name_offset": 599,
+        "name_length_bytes": 8,
+        "raw_record_offset": 2421,
+        "raw_record_hex": "48 05 0a 00 38 39",
+        "original_map_id": 72,
+        "world_row": 5,
+        "world_column": 10,
+        "world_position": [
+          10,
+          5
+        ],
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 56,
+        "level_max": 57
+      },
+      {
+        "name_index": 72,
+        "directory_number": 73,
+        "name": "迁流峭壁",
+        "name_offset": 609,
+        "name_length_bytes": 8,
+        "raw_record_offset": 2427,
+        "raw_record_hex": "49 05 07 00 3a 3b",
+        "original_map_id": 73,
+        "world_row": 5,
+        "world_column": 7,
+        "world_position": [
+          7,
+          5
+        ],
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 58,
+        "level_max": 59
+      },
+      {
+        "name_index": 73,
+        "directory_number": 74,
+        "name": "山顶洞",
+        "name_offset": 619,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2433,
+        "raw_record_hex": "4a 04 08 00 39 3a",
+        "original_map_id": 74,
+        "world_row": 4,
+        "world_column": 8,
+        "world_position": [
+          8,
+          4
+        ],
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 57,
+        "level_max": 58
+      },
+      {
+        "name_index": 74,
+        "directory_number": 75,
+        "name": "万马阵",
+        "name_offset": 627,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2439,
+        "raw_record_hex": "4b 04 07 00 3a 3b",
+        "original_map_id": 75,
+        "world_row": 4,
+        "world_column": 7,
+        "world_position": [
+          7,
+          4
+        ],
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 58,
+        "level_max": 59
+      },
+      {
+        "name_index": 75,
+        "directory_number": 76,
+        "name": "九宫阁",
+        "name_offset": 635,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2445,
+        "raw_record_hex": "4c 05 08 00 37 3c",
+        "original_map_id": 76,
+        "world_row": 5,
+        "world_column": 8,
+        "world_position": [
+          8,
+          5
+        ],
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 55,
+        "level_max": 60
+      },
+      {
+        "name_index": 76,
+        "directory_number": 77,
+        "name": "正派营地",
+        "name_offset": 643,
+        "name_length_bytes": 8,
+        "raw_record_offset": 2451,
+        "raw_record_hex": "4d 02 07 00 3a 3c",
+        "original_map_id": 77,
+        "world_row": 2,
+        "world_column": 7,
+        "world_position": [
+          7,
+          2
+        ],
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 58,
+        "level_max": 60
+      },
+      {
+        "name_index": 77,
+        "directory_number": 78,
+        "name": "天下武场",
+        "name_offset": 653,
+        "name_length_bytes": 8,
+        "raw_record_offset": 2457,
+        "raw_record_hex": "4e 02 06 00 3b 3c",
+        "original_map_id": 78,
+        "world_row": 2,
+        "world_column": 6,
+        "world_position": [
+          6,
+          2
+        ],
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 59,
+        "level_max": 60
+      },
+      {
+        "name_index": 78,
+        "directory_number": 79,
+        "name": "火礁祭坛",
+        "name_offset": 663,
+        "name_length_bytes": 8,
+        "raw_record_offset": 2463,
+        "raw_record_hex": "4f 14 07 00 08 0a",
+        "original_map_id": 79,
+        "world_row": 20,
+        "world_column": 7,
+        "world_position": [
+          7,
+          20
+        ],
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 8,
+        "level_max": 10
+      },
+      {
+        "name_index": 79,
+        "directory_number": 80,
+        "name": "地狱",
+        "name_offset": 673,
+        "name_length_bytes": 4,
+        "raw_record_offset": 2469,
+        "raw_record_hex": "50 ff ff 00 01 3c",
+        "original_map_id": 80,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 1,
+        "level_max": 60
+      },
+      {
+        "name_index": 80,
+        "directory_number": 81,
+        "name": "擂台",
+        "name_offset": 679,
+        "name_length_bytes": 4,
+        "raw_record_offset": 2475,
+        "raw_record_hex": "51 ff ff 00 0a 3c",
+        "original_map_id": 81,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 10,
+        "level_max": 60
+      },
+      {
+        "name_index": 81,
+        "directory_number": 82,
+        "name": "流放之地",
+        "name_offset": 685,
+        "name_length_bytes": 8,
+        "raw_record_offset": 2481,
+        "raw_record_hex": "52 ff ff 00 01 3c",
+        "original_map_id": 82,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 1,
+        "level_max": 60
+      },
+      {
+        "name_index": 82,
+        "directory_number": 83,
+        "name": "莫言山",
+        "name_offset": 695,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2487,
+        "raw_record_hex": "53 ff ff 00 0f 19",
+        "original_map_id": 83,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 15,
+        "level_max": 25
+      },
+      {
+        "name_index": 83,
+        "directory_number": 84,
+        "name": "赤岩峡",
+        "name_offset": 703,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2493,
+        "raw_record_hex": "54 ff ff 00 0f 19",
+        "original_map_id": 84,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 15,
+        "level_max": 25
+      },
+      {
+        "name_index": 84,
+        "directory_number": 85,
+        "name": "潭溪山",
+        "name_offset": 711,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2499,
+        "raw_record_hex": "55 ff ff 00 0f 19",
+        "original_map_id": 85,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 15,
+        "level_max": 25
+      },
+      {
+        "name_index": 85,
+        "directory_number": 86,
+        "name": "莫言谷",
+        "name_offset": 719,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2505,
+        "raw_record_hex": "56 ff ff 00 0f 19",
+        "original_map_id": 86,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 15,
+        "level_max": 25
+      },
+      {
+        "name_index": 86,
+        "directory_number": 87,
+        "name": "地宫大殿",
+        "name_offset": 727,
+        "name_length_bytes": 8,
+        "raw_record_offset": 2511,
+        "raw_record_hex": "57 ff ff 00 1e 28",
+        "original_map_id": 87,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 30,
+        "level_max": 40
+      },
+      {
+        "name_index": 87,
+        "directory_number": 88,
+        "name": "枉死路",
+        "name_offset": 737,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2517,
+        "raw_record_hex": "58 ff ff 00 1e 28",
+        "original_map_id": 88,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 30,
+        "level_max": 40
+      },
+      {
+        "name_index": 88,
+        "directory_number": 89,
+        "name": "墓道法阵",
+        "name_offset": 745,
+        "name_length_bytes": 8,
+        "raw_record_offset": 2523,
+        "raw_record_hex": "59 ff ff 00 1e 28",
+        "original_map_id": 89,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 30,
+        "level_max": 40
+      },
+      {
+        "name_index": 89,
+        "directory_number": 90,
+        "name": "将军冢",
+        "name_offset": 755,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2529,
+        "raw_record_hex": "5a ff ff 00 1e 28",
+        "original_map_id": 90,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 30,
+        "level_max": 40
+      },
+      {
+        "name_index": 90,
+        "directory_number": 91,
+        "name": "落雪池",
+        "name_offset": 763,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2535,
+        "raw_record_hex": "5b ff ff 00 3c 3c",
+        "original_map_id": 91,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 60,
+        "level_max": 60
+      },
+      {
+        "name_index": 91,
+        "directory_number": 92,
+        "name": "隐龙窟",
+        "name_offset": 771,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2541,
+        "raw_record_hex": "5c ff ff 00 3c 3c",
+        "original_map_id": 92,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 60,
+        "level_max": 60
+      },
+      {
+        "name_index": 92,
+        "directory_number": 93,
+        "name": "浴血崖",
+        "name_offset": 779,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2547,
+        "raw_record_hex": "5d ff ff 00 3c 3c",
+        "original_map_id": 93,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 60,
+        "level_max": 60
+      },
+      {
+        "name_index": 93,
+        "directory_number": 94,
+        "name": "阴阳道",
+        "name_offset": 787,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2553,
+        "raw_record_hex": "5e ff ff 00 3c 3c",
+        "original_map_id": 94,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 60,
+        "level_max": 60
+      },
+      {
+        "name_index": 94,
+        "directory_number": 95,
+        "name": "映波谷",
+        "name_offset": 795,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2559,
+        "raw_record_hex": "5f ff ff 00 3c 3c",
+        "original_map_id": 95,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 60,
+        "level_max": 60
+      },
+      {
+        "name_index": 95,
+        "directory_number": 96,
+        "name": "祈星台",
+        "name_offset": 803,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2565,
+        "raw_record_hex": "60 ff ff 00 3c 3c",
+        "original_map_id": 96,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 60,
+        "level_max": 60
+      },
+      {
+        "name_index": 96,
+        "directory_number": 97,
+        "name": "莫言山",
+        "name_offset": 811,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2571,
+        "raw_record_hex": "61 ff ff 00 19 23",
+        "original_map_id": 97,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 25,
+        "level_max": 35
+      },
+      {
+        "name_index": 97,
+        "directory_number": 98,
+        "name": "赤岩峡",
+        "name_offset": 819,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2577,
+        "raw_record_hex": "62 ff ff 00 19 23",
+        "original_map_id": 98,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 25,
+        "level_max": 35
+      },
+      {
+        "name_index": 98,
+        "directory_number": 99,
+        "name": "潭溪山",
+        "name_offset": 827,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2583,
+        "raw_record_hex": "63 ff ff 00 19 23",
+        "original_map_id": 99,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 25,
+        "level_max": 35
+      },
+      {
+        "name_index": 99,
+        "directory_number": 100,
+        "name": "莫言谷",
+        "name_offset": 835,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2589,
+        "raw_record_hex": "64 ff ff 00 19 23",
+        "original_map_id": 100,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 25,
+        "level_max": 35
+      },
+      {
+        "name_index": 100,
+        "directory_number": 101,
+        "name": "地宫大殿",
+        "name_offset": 843,
+        "name_length_bytes": 8,
+        "raw_record_offset": 2595,
+        "raw_record_hex": "65 ff ff 00 28 32",
+        "original_map_id": 101,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 40,
+        "level_max": 50
+      },
+      {
+        "name_index": 101,
+        "directory_number": 102,
+        "name": "枉死路",
+        "name_offset": 853,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2601,
+        "raw_record_hex": "66 ff ff 00 28 32",
+        "original_map_id": 102,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 40,
+        "level_max": 50
+      },
+      {
+        "name_index": 102,
+        "directory_number": 103,
+        "name": "墓道法阵",
+        "name_offset": 861,
+        "name_length_bytes": 8,
+        "raw_record_offset": 2607,
+        "raw_record_hex": "67 ff ff 00 28 32",
+        "original_map_id": 103,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 40,
+        "level_max": 50
+      },
+      {
+        "name_index": 103,
+        "directory_number": 104,
+        "name": "将军冢",
+        "name_offset": 871,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2613,
+        "raw_record_hex": "68 ff ff 00 28 32",
+        "original_map_id": 104,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 40,
+        "level_max": 50
+      },
+      {
+        "name_index": 104,
+        "directory_number": 105,
+        "name": "莫言山",
+        "name_offset": 879,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2619,
+        "raw_record_hex": "69 ff ff 00 23 2d",
+        "original_map_id": 105,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 35,
+        "level_max": 45
+      },
+      {
+        "name_index": 105,
+        "directory_number": 106,
+        "name": "赤岩峡",
+        "name_offset": 887,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2625,
+        "raw_record_hex": "6a ff ff 00 23 2d",
+        "original_map_id": 106,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 35,
+        "level_max": 45
+      },
+      {
+        "name_index": 106,
+        "directory_number": 107,
+        "name": "潭溪山",
+        "name_offset": 895,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2631,
+        "raw_record_hex": "6b ff ff 00 23 2d",
+        "original_map_id": 107,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 35,
+        "level_max": 45
+      },
+      {
+        "name_index": 107,
+        "directory_number": 108,
+        "name": "莫言谷",
+        "name_offset": 903,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2637,
+        "raw_record_hex": "6c ff ff 00 23 2d",
+        "original_map_id": 108,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 35,
+        "level_max": 45
+      },
+      {
+        "name_index": 108,
+        "directory_number": 109,
+        "name": "地宫大殿",
+        "name_offset": 911,
+        "name_length_bytes": 8,
+        "raw_record_offset": 2643,
+        "raw_record_hex": "6d ff ff 00 32 3c",
+        "original_map_id": 109,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 50,
+        "level_max": 60
+      },
+      {
+        "name_index": 109,
+        "directory_number": 110,
+        "name": "枉死路",
+        "name_offset": 921,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2649,
+        "raw_record_hex": "6e ff ff 00 32 3c",
+        "original_map_id": 110,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 50,
+        "level_max": 60
+      },
+      {
+        "name_index": 110,
+        "directory_number": 111,
+        "name": "墓道法阵",
+        "name_offset": 929,
+        "name_length_bytes": 8,
+        "raw_record_offset": 2655,
+        "raw_record_hex": "6f ff ff 00 32 3c",
+        "original_map_id": 111,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 50,
+        "level_max": 60
+      },
+      {
+        "name_index": 111,
+        "directory_number": 112,
+        "name": "将军冢",
+        "name_offset": 939,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2661,
+        "raw_record_hex": "70 ff ff 00 32 3c",
+        "original_map_id": 112,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 50,
+        "level_max": 60
+      },
+      {
+        "name_index": 112,
+        "directory_number": 113,
+        "name": "莫言山",
+        "name_offset": 947,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2667,
+        "raw_record_hex": "71 ff ff 00 2d 37",
+        "original_map_id": 113,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 45,
+        "level_max": 55
+      },
+      {
+        "name_index": 113,
+        "directory_number": 114,
+        "name": "赤岩峡",
+        "name_offset": 955,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2673,
+        "raw_record_hex": "72 ff ff 00 2d 37",
+        "original_map_id": 114,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 45,
+        "level_max": 55
+      },
+      {
+        "name_index": 114,
+        "directory_number": 115,
+        "name": "潭溪山",
+        "name_offset": 963,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2679,
+        "raw_record_hex": "73 ff ff 00 2d 37",
+        "original_map_id": 115,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 45,
+        "level_max": 55
+      },
+      {
+        "name_index": 115,
+        "directory_number": 116,
+        "name": "莫言谷",
+        "name_offset": 971,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2685,
+        "raw_record_hex": "74 ff ff 00 2d 37",
+        "original_map_id": 116,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 45,
+        "level_max": 55
+      },
+      {
+        "name_index": 116,
+        "directory_number": 117,
+        "name": "落雪池",
+        "name_offset": 979,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2691,
+        "raw_record_hex": "75 ff ff 00 2d 37",
+        "original_map_id": 117,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 45,
+        "level_max": 55
+      },
+      {
+        "name_index": 117,
+        "directory_number": 118,
+        "name": "隐龙窟",
+        "name_offset": 987,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2697,
+        "raw_record_hex": "76 ff ff 00 2d 37",
+        "original_map_id": 118,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 45,
+        "level_max": 55
+      },
+      {
+        "name_index": 118,
+        "directory_number": 119,
+        "name": "浴血崖",
+        "name_offset": 995,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2703,
+        "raw_record_hex": "77 ff ff 00 2d 37",
+        "original_map_id": 119,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 45,
+        "level_max": 55
+      },
+      {
+        "name_index": 119,
+        "directory_number": 120,
+        "name": "阴阳道",
+        "name_offset": 1003,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2709,
+        "raw_record_hex": "78 ff ff 00 2d 37",
+        "original_map_id": 120,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 45,
+        "level_max": 55
+      },
+      {
+        "name_index": 120,
+        "directory_number": 121,
+        "name": "映波谷",
+        "name_offset": 1011,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2715,
+        "raw_record_hex": "79 ff ff 00 2d 37",
+        "original_map_id": 121,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 45,
+        "level_max": 55
+      },
+      {
+        "name_index": 121,
+        "directory_number": 122,
+        "name": "祈星台",
+        "name_offset": 1019,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2721,
+        "raw_record_hex": "7a ff ff 00 2d 37",
+        "original_map_id": 122,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 45,
+        "level_max": 55
+      },
+      {
+        "name_index": 122,
+        "directory_number": 123,
+        "name": "落雪池",
+        "name_offset": 1027,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2727,
+        "raw_record_hex": "7b ff ff 00 32 3c",
+        "original_map_id": 123,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 50,
+        "level_max": 60
+      },
+      {
+        "name_index": 123,
+        "directory_number": 124,
+        "name": "隐龙窟",
+        "name_offset": 1035,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2733,
+        "raw_record_hex": "7c ff ff 00 32 3c",
+        "original_map_id": 124,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 50,
+        "level_max": 60
+      },
+      {
+        "name_index": 124,
+        "directory_number": 125,
+        "name": "浴血崖",
+        "name_offset": 1043,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2739,
+        "raw_record_hex": "7d ff ff 00 32 3c",
+        "original_map_id": 125,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 50,
+        "level_max": 60
+      },
+      {
+        "name_index": 125,
+        "directory_number": 126,
+        "name": "阴阳道",
+        "name_offset": 1051,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2745,
+        "raw_record_hex": "7e ff ff 00 32 3c",
+        "original_map_id": 126,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 50,
+        "level_max": 60
+      },
+      {
+        "name_index": 126,
+        "directory_number": 127,
+        "name": "映波谷",
+        "name_offset": 1059,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2751,
+        "raw_record_hex": "7f ff ff 00 32 3c",
+        "original_map_id": 127,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 50,
+        "level_max": 60
+      },
+      {
+        "name_index": 127,
+        "directory_number": 128,
+        "name": "祈星台",
+        "name_offset": 1067,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2757,
+        "raw_record_hex": "80 ff ff 00 32 3c",
+        "original_map_id": 128,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 50,
+        "level_max": 60
+      },
+      {
+        "name_index": 128,
+        "directory_number": 129,
+        "name": "百花谷",
+        "name_offset": 1075,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2763,
+        "raw_record_hex": "81 ff ff 00 32 3c",
+        "original_map_id": 129,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 50,
+        "level_max": 60
+      },
+      {
+        "name_index": 129,
+        "directory_number": 130,
+        "name": "魔界一层上",
+        "name_offset": 1083,
+        "name_length_bytes": 10,
+        "raw_record_offset": 2769,
+        "raw_record_hex": "82 ff ff 00 14 1e",
+        "original_map_id": 130,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 20,
+        "level_max": 30
+      },
+      {
+        "name_index": 130,
+        "directory_number": 131,
+        "name": "魔界一层中",
+        "name_offset": 1095,
+        "name_length_bytes": 10,
+        "raw_record_offset": 2775,
+        "raw_record_hex": "83 ff ff 00 14 1e",
+        "original_map_id": 131,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 20,
+        "level_max": 30
+      },
+      {
+        "name_index": 131,
+        "directory_number": 132,
+        "name": "魔界一层下",
+        "name_offset": 1107,
+        "name_length_bytes": 10,
+        "raw_record_offset": 2781,
+        "raw_record_hex": "84 ff ff 00 14 1e",
+        "original_map_id": 132,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 20,
+        "level_max": 30
+      },
+      {
+        "name_index": 132,
+        "directory_number": 133,
+        "name": "魔界二层上",
+        "name_offset": 1119,
+        "name_length_bytes": 10,
+        "raw_record_offset": 2787,
+        "raw_record_hex": "85 ff ff 00 1f 28",
+        "original_map_id": 133,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 31,
+        "level_max": 40
+      },
+      {
+        "name_index": 133,
+        "directory_number": 134,
+        "name": "魔界二层中",
+        "name_offset": 1131,
+        "name_length_bytes": 10,
+        "raw_record_offset": 2793,
+        "raw_record_hex": "86 ff ff 00 1f 28",
+        "original_map_id": 134,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 31,
+        "level_max": 40
+      },
+      {
+        "name_index": 134,
+        "directory_number": 135,
+        "name": "魔界二层下",
+        "name_offset": 1143,
+        "name_length_bytes": 10,
+        "raw_record_offset": 2799,
+        "raw_record_hex": "87 ff ff 00 1f 28",
+        "original_map_id": 135,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 31,
+        "level_max": 40
+      },
+      {
+        "name_index": 135,
+        "directory_number": 136,
+        "name": "魔界三层上",
+        "name_offset": 1155,
+        "name_length_bytes": 10,
+        "raw_record_offset": 2805,
+        "raw_record_hex": "88 ff ff 00 29 32",
+        "original_map_id": 136,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 41,
+        "level_max": 50
+      },
+      {
+        "name_index": 136,
+        "directory_number": 137,
+        "name": "魔界三层中",
+        "name_offset": 1167,
+        "name_length_bytes": 10,
+        "raw_record_offset": 2811,
+        "raw_record_hex": "89 ff ff 00 29 32",
+        "original_map_id": 137,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 41,
+        "level_max": 50
+      },
+      {
+        "name_index": 137,
+        "directory_number": 138,
+        "name": "魔界三层下",
+        "name_offset": 1179,
+        "name_length_bytes": 10,
+        "raw_record_offset": 2817,
+        "raw_record_hex": "8a ff ff 00 29 32",
+        "original_map_id": 138,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 41,
+        "level_max": 50
+      },
+      {
+        "name_index": 138,
+        "directory_number": 139,
+        "name": "魔界四层上",
+        "name_offset": 1191,
+        "name_length_bytes": 10,
+        "raw_record_offset": 2823,
+        "raw_record_hex": "8b ff ff 00 33 3c",
+        "original_map_id": 139,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 51,
+        "level_max": 60
+      },
+      {
+        "name_index": 139,
+        "directory_number": 140,
+        "name": "魔界四层中",
+        "name_offset": 1203,
+        "name_length_bytes": 10,
+        "raw_record_offset": 2829,
+        "raw_record_hex": "8c ff ff 00 33 3c",
+        "original_map_id": 140,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 51,
+        "level_max": 60
+      },
+      {
+        "name_index": 140,
+        "directory_number": 141,
+        "name": "魔界四层下",
+        "name_offset": 1215,
+        "name_length_bytes": 10,
+        "raw_record_offset": 2835,
+        "raw_record_hex": "8d ff ff 00 33 3c",
+        "original_map_id": 141,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 51,
+        "level_max": 60
+      },
+      {
+        "name_index": 141,
+        "directory_number": 142,
+        "name": "旧卧云镇",
+        "name_offset": 1227,
+        "name_length_bytes": 8,
+        "raw_record_offset": 2841,
+        "raw_record_hex": "8e ff ff 00 1c 1c",
+        "original_map_id": 142,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 28,
+        "level_max": 28
+      },
+      {
+        "name_index": 142,
+        "directory_number": 143,
+        "name": "旧卧云镇北",
+        "name_offset": 1237,
+        "name_length_bytes": 10,
+        "raw_record_offset": 2847,
+        "raw_record_hex": "8f ff ff 00 21 21",
+        "original_map_id": 143,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 33,
+        "level_max": 33
+      },
+      {
+        "name_index": 143,
+        "directory_number": 144,
+        "name": "旧八旗镇",
+        "name_offset": 1249,
+        "name_length_bytes": 8,
+        "raw_record_offset": 2853,
+        "raw_record_hex": "90 ff ff 00 25 25",
+        "original_map_id": 144,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 37,
+        "level_max": 37
+      },
+      {
+        "name_index": 144,
+        "directory_number": 145,
+        "name": "旧八旗镇西",
+        "name_offset": 1259,
+        "name_length_bytes": 10,
+        "raw_record_offset": 2859,
+        "raw_record_hex": "91 ff ff 00 2a 2a",
+        "original_map_id": 145,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 42,
+        "level_max": 42
+      },
+      {
+        "name_index": 145,
+        "directory_number": 146,
+        "name": "旧慈云寺北",
+        "name_offset": 1271,
+        "name_length_bytes": 10,
+        "raw_record_offset": 2865,
+        "raw_record_hex": "92 ff ff 00 2e 2e",
+        "original_map_id": 146,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 46,
+        "level_max": 46
+      },
+      {
+        "name_index": 146,
+        "directory_number": 147,
+        "name": "旧慈云寺",
+        "name_offset": 1283,
+        "name_length_bytes": 8,
+        "raw_record_offset": 2871,
+        "raw_record_hex": "93 ff ff 00 33 33",
+        "original_map_id": 147,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 51,
+        "level_max": 51
+      },
+      {
+        "name_index": 147,
+        "directory_number": 148,
+        "name": "旧戴家场",
+        "name_offset": 1293,
+        "name_length_bytes": 8,
+        "raw_record_offset": 2877,
+        "raw_record_hex": "94 ff ff 00 37 37",
+        "original_map_id": 148,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 55,
+        "level_max": 55
+      },
+      {
+        "name_index": 148,
+        "directory_number": 149,
+        "name": "旧群雄大殿",
+        "name_offset": 1303,
+        "name_length_bytes": 10,
+        "raw_record_offset": 2883,
+        "raw_record_hex": "95 ff ff 00 3c 3c",
+        "original_map_id": 149,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 60,
+        "level_max": 60
+      },
+      {
+        "name_index": 149,
+        "directory_number": 150,
+        "name": "群英会主会场",
+        "name_offset": 1315,
+        "name_length_bytes": 12,
+        "raw_record_offset": 2889,
+        "raw_record_hex": "96 ff ff 00 14 3c",
+        "original_map_id": 150,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 20,
+        "level_max": 60
+      },
+      {
+        "name_index": 150,
+        "directory_number": 151,
+        "name": "群英会分会场",
+        "name_offset": 1329,
+        "name_length_bytes": 12,
+        "raw_record_offset": 2895,
+        "raw_record_hex": "97 ff ff 00 14 3c",
+        "original_map_id": 151,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 20,
+        "level_max": 60
+      },
+      {
+        "name_index": 151,
+        "directory_number": 152,
+        "name": "无尽之路",
+        "name_offset": 1343,
+        "name_length_bytes": 8,
+        "raw_record_offset": 2901,
+        "raw_record_hex": "98 ff ff 00 14 3c",
+        "original_map_id": 152,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 20,
+        "level_max": 60
+      },
+      {
+        "name_index": 152,
+        "directory_number": 153,
+        "name": "流云山顶",
+        "name_offset": 1353,
+        "name_length_bytes": 8,
+        "raw_record_offset": 2907,
+        "raw_record_hex": "99 ff ff 00 32 3c",
+        "original_map_id": 153,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 50,
+        "level_max": 60
+      },
+      {
+        "name_index": 153,
+        "directory_number": 154,
+        "name": "乾坤道",
+        "name_offset": 1363,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2913,
+        "raw_record_hex": "9a ff ff 00 32 3c",
+        "original_map_id": 154,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 50,
+        "level_max": 60
+      },
+      {
+        "name_index": 154,
+        "directory_number": 155,
+        "name": "迷流河",
+        "name_offset": 1371,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2919,
+        "raw_record_hex": "9b ff ff 00 32 3c",
+        "original_map_id": 155,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 50,
+        "level_max": 60
+      },
+      {
+        "name_index": 155,
+        "directory_number": 156,
+        "name": "帮会擂台",
+        "name_offset": 1379,
+        "name_length_bytes": 8,
+        "raw_record_offset": 2925,
+        "raw_record_hex": "9c ff ff 00 0f 3c",
+        "original_map_id": 156,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 15,
+        "level_max": 60
+      },
+      {
+        "name_index": 156,
+        "directory_number": 157,
+        "name": "红岭村",
+        "name_offset": 1389,
+        "name_length_bytes": 6,
+        "raw_record_offset": 2931,
+        "raw_record_hex": "9d ff ff 00 0a 3c",
+        "original_map_id": 157,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 10,
+        "level_max": 60
+      },
+      {
+        "name_index": 157,
+        "directory_number": 158,
+        "name": "神秘仙境",
+        "name_offset": 1397,
+        "name_length_bytes": 8,
+        "raw_record_offset": 2937,
+        "raw_record_hex": "9e 0e 0f 00 01 3c",
+        "original_map_id": 158,
+        "world_row": 14,
+        "world_column": 15,
+        "world_position": [
+          15,
+          14
+        ],
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 1,
+        "level_max": 60
+      },
+      {
+        "name_index": 158,
+        "directory_number": 159,
+        "name": "帮会战斗一",
+        "name_offset": 1407,
+        "name_length_bytes": 10,
+        "raw_record_offset": 2943,
+        "raw_record_hex": "9f ff ff 00 0f 3c",
+        "original_map_id": 159,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 15,
+        "level_max": 60
+      },
+      {
+        "name_index": 159,
+        "directory_number": 160,
+        "name": "帮会战斗二",
+        "name_offset": 1419,
+        "name_length_bytes": 10,
+        "raw_record_offset": 2949,
+        "raw_record_hex": "a0 ff ff 00 0f 3c",
+        "original_map_id": 160,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 15,
+        "level_max": 60
+      },
+      {
+        "name_index": 160,
+        "directory_number": 161,
+        "name": "帮会战斗三",
+        "name_offset": 1431,
+        "name_length_bytes": 10,
+        "raw_record_offset": 2955,
+        "raw_record_hex": "a1 ff ff 00 0f 3c",
+        "original_map_id": 161,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 15,
+        "level_max": 60
+      },
+      {
+        "name_index": 161,
+        "directory_number": 162,
+        "name": "帮会领奖一",
+        "name_offset": 1443,
+        "name_length_bytes": 10,
+        "raw_record_offset": 2961,
+        "raw_record_hex": "a2 ff ff 00 0f 3c",
+        "original_map_id": 162,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 15,
+        "level_max": 60
+      },
+      {
+        "name_index": 162,
+        "directory_number": 163,
+        "name": "帮会领奖二",
+        "name_offset": 1455,
+        "name_length_bytes": 10,
+        "raw_record_offset": 2967,
+        "raw_record_hex": "a3 ff ff 00 0f 3c",
+        "original_map_id": 163,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 15,
+        "level_max": 60
+      },
+      {
+        "name_index": 163,
+        "directory_number": 164,
+        "name": "帮会领奖三",
+        "name_offset": 1467,
+        "name_length_bytes": 10,
+        "raw_record_offset": 2973,
+        "raw_record_hex": "a4 ff ff 00 0f 3c",
+        "original_map_id": 164,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 15,
+        "level_max": 60
+      },
+      {
+        "name_index": 164,
+        "directory_number": 165,
+        "name": "帮会战斗一",
+        "name_offset": 1479,
+        "name_length_bytes": 10,
+        "raw_record_offset": 2979,
+        "raw_record_hex": "a5 ff ff 00 0f 3c",
+        "original_map_id": 165,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 15,
+        "level_max": 60
+      },
+      {
+        "name_index": 165,
+        "directory_number": 166,
+        "name": "帮会领奖一",
+        "name_offset": 1491,
+        "name_length_bytes": 10,
+        "raw_record_offset": 2985,
+        "raw_record_hex": "a6 ff ff 00 0f 3c",
+        "original_map_id": 166,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 15,
+        "level_max": 60
+      },
+      {
+        "name_index": 166,
+        "directory_number": 167,
+        "name": "帮会战斗二",
+        "name_offset": 1503,
+        "name_length_bytes": 10,
+        "raw_record_offset": 2991,
+        "raw_record_hex": "a7 ff ff 00 0f 3c",
+        "original_map_id": 167,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 15,
+        "level_max": 60
+      },
+      {
+        "name_index": 167,
+        "directory_number": 168,
+        "name": "帮会领奖二",
+        "name_offset": 1515,
+        "name_length_bytes": 10,
+        "raw_record_offset": 2997,
+        "raw_record_hex": "a8 ff ff 00 0f 3c",
+        "original_map_id": 168,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 15,
+        "level_max": 60
+      },
+      {
+        "name_index": 168,
+        "directory_number": 169,
+        "name": "帮会战斗三",
+        "name_offset": 1527,
+        "name_length_bytes": 10,
+        "raw_record_offset": 3003,
+        "raw_record_hex": "a9 ff ff 00 0f 3c",
+        "original_map_id": 169,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 15,
+        "level_max": 60
+      },
+      {
+        "name_index": 169,
+        "directory_number": 170,
+        "name": "帮会领奖三",
+        "name_offset": 1539,
+        "name_length_bytes": 10,
+        "raw_record_offset": 3009,
+        "raw_record_hex": "aa ff ff 00 0f 3c",
+        "original_map_id": 170,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 15,
+        "level_max": 60
+      },
+      {
+        "name_index": 170,
+        "directory_number": 171,
+        "name": "帮会战斗一",
+        "name_offset": 1551,
+        "name_length_bytes": 10,
+        "raw_record_offset": 3015,
+        "raw_record_hex": "ab ff ff 00 0f 3c",
+        "original_map_id": 171,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 15,
+        "level_max": 60
+      },
+      {
+        "name_index": 171,
+        "directory_number": 172,
+        "name": "帮会领奖一",
+        "name_offset": 1563,
+        "name_length_bytes": 10,
+        "raw_record_offset": 3021,
+        "raw_record_hex": "ac ff ff 00 0f 3c",
+        "original_map_id": 172,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 15,
+        "level_max": 60
+      },
+      {
+        "name_index": 172,
+        "directory_number": 173,
+        "name": "帮会战斗二",
+        "name_offset": 1575,
+        "name_length_bytes": 10,
+        "raw_record_offset": 3027,
+        "raw_record_hex": "ad ff ff 00 0f 3c",
+        "original_map_id": 173,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 15,
+        "level_max": 60
+      },
+      {
+        "name_index": 173,
+        "directory_number": 174,
+        "name": "帮会领奖二",
+        "name_offset": 1587,
+        "name_length_bytes": 10,
+        "raw_record_offset": 3033,
+        "raw_record_hex": "ae ff ff 00 0f 3c",
+        "original_map_id": 174,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 15,
+        "level_max": 60
+      },
+      {
+        "name_index": 174,
+        "directory_number": 175,
+        "name": "帮会战斗三",
+        "name_offset": 1599,
+        "name_length_bytes": 10,
+        "raw_record_offset": 3039,
+        "raw_record_hex": "af ff ff 00 0f 3c",
+        "original_map_id": 175,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 15,
+        "level_max": 60
+      },
+      {
+        "name_index": 175,
+        "directory_number": 176,
+        "name": "帮会领奖三",
+        "name_offset": 1611,
+        "name_length_bytes": 10,
+        "raw_record_offset": 3045,
+        "raw_record_hex": "b0 ff ff 00 0f 3c",
+        "original_map_id": 176,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 15,
+        "level_max": 60
+      },
+      {
+        "name_index": 176,
+        "directory_number": 177,
+        "name": "备战区",
+        "name_offset": 1623,
+        "name_length_bytes": 6,
+        "raw_record_offset": 3051,
+        "raw_record_hex": "b1 ff ff 00 14 3c",
+        "original_map_id": 177,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 20,
+        "level_max": 60
+      },
+      {
+        "name_index": 177,
+        "directory_number": 178,
+        "name": "仙派营地",
+        "name_offset": 1631,
+        "name_length_bytes": 8,
+        "raw_record_offset": 3057,
+        "raw_record_hex": "b2 ff ff 00 14 3c",
+        "original_map_id": 178,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 20,
+        "level_max": 60
+      },
+      {
+        "name_index": 178,
+        "directory_number": 179,
+        "name": "侠派营地",
+        "name_offset": 1641,
+        "name_length_bytes": 8,
+        "raw_record_offset": 3063,
+        "raw_record_hex": "b3 ff ff 00 14 3c",
+        "original_map_id": 179,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 20,
+        "level_max": 60
+      },
+      {
+        "name_index": 179,
+        "directory_number": 180,
+        "name": "资源战场",
+        "name_offset": 1651,
+        "name_length_bytes": 8,
+        "raw_record_offset": 3069,
+        "raw_record_hex": "b4 ff ff 00 14 3c",
+        "original_map_id": 180,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 20,
+        "level_max": 60
+      },
+      {
+        "name_index": 180,
+        "directory_number": 181,
+        "name": "备战区",
+        "name_offset": 1661,
+        "name_length_bytes": 6,
+        "raw_record_offset": 3075,
+        "raw_record_hex": "b5 ff ff 00 14 3c",
+        "original_map_id": 181,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 20,
+        "level_max": 60
+      },
+      {
+        "name_index": 181,
+        "directory_number": 182,
+        "name": "仙派营地",
+        "name_offset": 1669,
+        "name_length_bytes": 8,
+        "raw_record_offset": 3081,
+        "raw_record_hex": "b6 ff ff 00 14 3c",
+        "original_map_id": 182,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 20,
+        "level_max": 60
+      },
+      {
+        "name_index": 182,
+        "directory_number": 183,
+        "name": "侠派营地",
+        "name_offset": 1679,
+        "name_length_bytes": 8,
+        "raw_record_offset": 3087,
+        "raw_record_hex": "b7 ff ff 00 14 3c",
+        "original_map_id": 183,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 20,
+        "level_max": 60
+      },
+      {
+        "name_index": 183,
+        "directory_number": 184,
+        "name": "资源战场",
+        "name_offset": 1689,
+        "name_length_bytes": 8,
+        "raw_record_offset": 3093,
+        "raw_record_hex": "b8 ff ff 00 14 3c",
+        "original_map_id": 184,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 20,
+        "level_max": 60
+      },
+      {
+        "name_index": 184,
+        "directory_number": 185,
+        "name": "备战区",
+        "name_offset": 1699,
+        "name_length_bytes": 6,
+        "raw_record_offset": 3099,
+        "raw_record_hex": "b9 ff ff 00 14 3c",
+        "original_map_id": 185,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 20,
+        "level_max": 60
+      },
+      {
+        "name_index": 185,
+        "directory_number": 186,
+        "name": "仙派营地",
+        "name_offset": 1707,
+        "name_length_bytes": 8,
+        "raw_record_offset": 3105,
+        "raw_record_hex": "ba ff ff 00 14 3c",
+        "original_map_id": 186,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 20,
+        "level_max": 60
+      },
+      {
+        "name_index": 186,
+        "directory_number": 187,
+        "name": "侠派营地",
+        "name_offset": 1717,
+        "name_length_bytes": 8,
+        "raw_record_offset": 3111,
+        "raw_record_hex": "bb ff ff 00 14 3c",
+        "original_map_id": 187,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 20,
+        "level_max": 60
+      },
+      {
+        "name_index": 187,
+        "directory_number": 188,
+        "name": "资源战场",
+        "name_offset": 1727,
+        "name_length_bytes": 8,
+        "raw_record_offset": 3117,
+        "raw_record_hex": "bc ff ff 00 14 3c",
+        "original_map_id": 188,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 20,
+        "level_max": 60
+      },
+      {
+        "name_index": 188,
+        "directory_number": 189,
+        "name": "备战区",
+        "name_offset": 1737,
+        "name_length_bytes": 6,
+        "raw_record_offset": 3123,
+        "raw_record_hex": "bd ff ff 00 14 3c",
+        "original_map_id": 189,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 20,
+        "level_max": 60
+      },
+      {
+        "name_index": 189,
+        "directory_number": 190,
+        "name": "仙派营地",
+        "name_offset": 1745,
+        "name_length_bytes": 8,
+        "raw_record_offset": 3129,
+        "raw_record_hex": "be ff ff 00 14 3c",
+        "original_map_id": 190,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 20,
+        "level_max": 60
+      },
+      {
+        "name_index": 190,
+        "directory_number": 191,
+        "name": "侠派营地",
+        "name_offset": 1755,
+        "name_length_bytes": 8,
+        "raw_record_offset": 3135,
+        "raw_record_hex": "bf ff ff 00 14 3c",
+        "original_map_id": 191,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 20,
+        "level_max": 60
+      },
+      {
+        "name_index": 191,
+        "directory_number": 192,
+        "name": "资源战场",
+        "name_offset": 1765,
+        "name_length_bytes": 8,
+        "raw_record_offset": 3141,
+        "raw_record_hex": "c0 ff ff 00 14 3c",
+        "original_map_id": 192,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 20,
+        "level_max": 60
+      },
+      {
+        "name_index": 192,
+        "directory_number": 193,
+        "name": "普通礼堂",
+        "name_offset": 1775,
+        "name_length_bytes": 8,
+        "raw_record_offset": 3147,
+        "raw_record_hex": "c1 ff ff 00 01 3c",
+        "original_map_id": 193,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 1,
+        "level_max": 60
+      },
+      {
+        "name_index": 193,
+        "directory_number": 194,
+        "name": "漂亮礼堂",
+        "name_offset": 1785,
+        "name_length_bytes": 8,
+        "raw_record_offset": 3153,
+        "raw_record_hex": "c2 ff ff 00 01 3c",
+        "original_map_id": 194,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 1,
+        "level_max": 60
+      },
+      {
+        "name_index": 194,
+        "directory_number": 195,
+        "name": "华丽礼堂",
+        "name_offset": 1795,
+        "name_length_bytes": 8,
+        "raw_record_offset": 3159,
+        "raw_record_hex": "c3 ff ff 00 01 3c",
+        "original_map_id": 195,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 1,
+        "level_max": 60
+      },
+      {
+        "name_index": 195,
+        "directory_number": 196,
+        "name": "奢侈礼堂",
+        "name_offset": 1805,
+        "name_length_bytes": 8,
+        "raw_record_offset": 3165,
+        "raw_record_hex": "c4 ff ff 00 01 3c",
+        "original_map_id": 196,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 1,
+        "level_max": 60
+      },
+      {
+        "name_index": 196,
+        "directory_number": 197,
+        "name": "攻方基地",
+        "name_offset": 1815,
+        "name_length_bytes": 8,
+        "raw_record_offset": 3171,
+        "raw_record_hex": "c5 ff ff 00 0f 3c",
+        "original_map_id": 197,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 15,
+        "level_max": 60
+      },
+      {
+        "name_index": 197,
+        "directory_number": 198,
+        "name": "进攻区日",
+        "name_offset": 1825,
+        "name_length_bytes": 8,
+        "raw_record_offset": 3177,
+        "raw_record_hex": "c6 ff ff 00 0f 3c",
+        "original_map_id": 198,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 15,
+        "level_max": 60
+      },
+      {
+        "name_index": 198,
+        "directory_number": 199,
+        "name": "进攻区月",
+        "name_offset": 1835,
+        "name_length_bytes": 8,
+        "raw_record_offset": 3183,
+        "raw_record_hex": "c7 ff ff 00 0f 3c",
+        "original_map_id": 199,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 15,
+        "level_max": 60
+      },
+      {
+        "name_index": 199,
+        "directory_number": 200,
+        "name": "进攻区星",
+        "name_offset": 1845,
+        "name_length_bytes": 8,
+        "raw_record_offset": 3189,
+        "raw_record_hex": "c8 ff ff 00 0f 3c",
+        "original_map_id": 200,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 15,
+        "level_max": 60
+      },
+      {
+        "name_index": 200,
+        "directory_number": 201,
+        "name": "进攻区天",
+        "name_offset": 1855,
+        "name_length_bytes": 8,
+        "raw_record_offset": 3195,
+        "raw_record_hex": "c9 ff ff 00 0f 3c",
+        "original_map_id": 201,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 15,
+        "level_max": 60
+      },
+      {
+        "name_index": 201,
+        "directory_number": 202,
+        "name": "进攻区地",
+        "name_offset": 1865,
+        "name_length_bytes": 8,
+        "raw_record_offset": 3201,
+        "raw_record_hex": "ca ff ff 00 0f 3c",
+        "original_map_id": 202,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 15,
+        "level_max": 60
+      },
+      {
+        "name_index": 202,
+        "directory_number": 203,
+        "name": "精华源日",
+        "name_offset": 1875,
+        "name_length_bytes": 8,
+        "raw_record_offset": 3207,
+        "raw_record_hex": "cb ff ff 00 0f 3c",
+        "original_map_id": 203,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 15,
+        "level_max": 60
+      },
+      {
+        "name_index": 203,
+        "directory_number": 204,
+        "name": "精华源月",
+        "name_offset": 1885,
+        "name_length_bytes": 8,
+        "raw_record_offset": 3213,
+        "raw_record_hex": "cc ff ff 00 0f 3c",
+        "original_map_id": 204,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 15,
+        "level_max": 60
+      },
+      {
+        "name_index": 204,
+        "directory_number": 205,
+        "name": "精华源星",
+        "name_offset": 1895,
+        "name_length_bytes": 8,
+        "raw_record_offset": 3219,
+        "raw_record_hex": "cd ff ff 00 0f 3c",
+        "original_map_id": 205,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 15,
+        "level_max": 60
+      },
+      {
+        "name_index": 205,
+        "directory_number": 206,
+        "name": "精华源天",
+        "name_offset": 1905,
+        "name_length_bytes": 8,
+        "raw_record_offset": 3225,
+        "raw_record_hex": "ce ff ff 00 0f 3c",
+        "original_map_id": 206,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 15,
+        "level_max": 60
+      },
+      {
+        "name_index": 206,
+        "directory_number": 207,
+        "name": "精华源地",
+        "name_offset": 1915,
+        "name_length_bytes": 8,
+        "raw_record_offset": 3231,
+        "raw_record_hex": "cf ff ff 00 0f 3c",
+        "original_map_id": 207,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 15,
+        "level_max": 60
+      },
+      {
+        "name_index": 207,
+        "directory_number": 208,
+        "name": "防守区日",
+        "name_offset": 1925,
+        "name_length_bytes": 8,
+        "raw_record_offset": 3237,
+        "raw_record_hex": "d0 ff ff 00 0f 3c",
+        "original_map_id": 208,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 15,
+        "level_max": 60
+      },
+      {
+        "name_index": 208,
+        "directory_number": 209,
+        "name": "防守区月",
+        "name_offset": 1935,
+        "name_length_bytes": 8,
+        "raw_record_offset": 3243,
+        "raw_record_hex": "d1 ff ff 00 0f 3c",
+        "original_map_id": 209,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 15,
+        "level_max": 60
+      },
+      {
+        "name_index": 209,
+        "directory_number": 210,
+        "name": "防守区星",
+        "name_offset": 1945,
+        "name_length_bytes": 8,
+        "raw_record_offset": 3249,
+        "raw_record_hex": "d2 ff ff 00 0f 3c",
+        "original_map_id": 210,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 15,
+        "level_max": 60
+      },
+      {
+        "name_index": 210,
+        "directory_number": 211,
+        "name": "防守区天",
+        "name_offset": 1955,
+        "name_length_bytes": 8,
+        "raw_record_offset": 3255,
+        "raw_record_hex": "d3 ff ff 00 0f 3c",
+        "original_map_id": 211,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 15,
+        "level_max": 60
+      },
+      {
+        "name_index": 211,
+        "directory_number": 212,
+        "name": "防守区地",
+        "name_offset": 1965,
+        "name_length_bytes": 8,
+        "raw_record_offset": 3261,
+        "raw_record_hex": "d4 ff ff 00 0f 3c",
+        "original_map_id": 212,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 15,
+        "level_max": 60
+      },
+      {
+        "name_index": 212,
+        "directory_number": 213,
+        "name": "守方基地",
+        "name_offset": 1975,
+        "name_length_bytes": 8,
+        "raw_record_offset": 3267,
+        "raw_record_hex": "d5 ff ff 00 0f 3c",
+        "original_map_id": 213,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 15,
+        "level_max": 60
+      },
+      {
+        "name_index": 213,
+        "directory_number": 214,
+        "name": "仙灵幻界",
+        "name_offset": 1985,
+        "name_length_bytes": 8,
+        "raw_record_offset": 3273,
+        "raw_record_hex": "d6 ff ff 00 3c 3c",
+        "original_map_id": 214,
+        "world_row": null,
+        "world_column": null,
+        "world_position": null,
+        "location_kind": 0,
+        "location_type": "野外",
+        "level_min": 60,
+        "level_max": 60
+      }
+    ],
+    "uninterpreted_trailer_offset": 3279,
+    "uninterpreted_trailer_hex": "4e 0a 04 0a 05 0a 05 0b 05 0b 05 0c 05 0c 05 0c 04 0e 05 0e 07 0e 07 0d 07 0d 07 0c 07 0e 07 0f 07 0f 07 0f 06 0f 06 10 06 10 06 10 08 10 08 11 08 11 08 11 0a 11 0a 12 0a 12 0a 12 09 12 0a 13 0a 11 0a 11 0c 11 0c 11 0d 11 0d 10 0d 10 0d 10 0e 10 0e 10 0f 10 0f 10 10 10 10 10 11 11 11 12 11 12 11 12 10 12 10 13 10 13 10 14 10 11 0a 0f 0a 0f 0a 0e 0a 0e 0a 0e 0b 0e 0b 0d 0b 0d 0b 0c 0b 0c 0b 0a 0b 0a 0a 0a 0b 0a 0b 0a 0c 0a 0b 09 0b 09 0b 09 0c 09 0c 07 0c 07 0b 07 0c 07 0c 07 0d 07 0b 07 0a 07 0d 06 0d 07 0c 05 0c 06 0d 06 0e 05 0c 04 0c 04 0c 04 0d 04 0d 04 0e 04 0c 03 0c 03 0c 03 0a 03 0a 04 0a 04 0a 05 0a 04 07 05 07 04 07 02 07 02 07 02 06 05 0a 05 08 05 08 05 07 05 08 04 08 14 10 14 0f 13 12 13 13 13 12 14 12 14 12 14 10 0a 04 09 04 09 04 09 03 10 11 11 11 10 11 10 12 13 04 13 03 13 04 13 05 13 05 12 05 12 05 12 04 12 04 11 04 11 04 10 04 10 04 0e 04 0c 04 0e 04 0e 04 0e 05 0c 16 08 16 15 06 15 07 15 07 14 07 0c 0f 0c 0f",
+    "notes": "保留同名目录记录与原始字节。经v48原生代码核验后可补充地图编号、世界总图位置、类型与等级；单张场景布局仍需对应.map文件。",
+    "world_overview": {
+      "grid_width": 22,
+      "grid_height": 25,
+      "nodes": [
+        {
+          "original_map_id": 1,
+          "name": "灵空台",
+          "world_position": [
+            6,
+            21
+          ],
+          "location_kind": 0,
+          "location_type": "野外",
+          "level_min": 1,
+          "level_max": 5
+        },
+        {
+          "original_map_id": 2,
+          "name": "百花谷",
+          "world_position": [
+            7,
+            21
+          ],
+          "location_kind": 0,
+          "location_type": "野外",
+          "level_min": 5,
+          "level_max": 8
+        },
+        {
+          "original_map_id": 4,
+          "name": "峨眉派",
+          "world_position": [
+            4,
+            9
+          ],
+          "location_kind": 2,
+          "location_type": "门派",
+          "level_min": 10,
+          "level_max": 15
+        },
+        {
+          "original_map_id": 5,
+          "name": "凝碧崖",
+          "world_position": [
+            3,
+            9
+          ],
+          "location_kind": 0,
+          "location_type": "野外",
+          "level_min": 10,
+          "level_max": 11
+        },
+        {
+          "original_map_id": 6,
+          "name": "峨眉山",
+          "world_position": [
+            4,
+            10
+          ],
+          "location_kind": 0,
+          "location_type": "野外",
+          "level_min": 11,
+          "level_max": 12
+        },
+        {
+          "original_map_id": 7,
+          "name": "天化村",
+          "world_position": [
+            5,
+            10
+          ],
+          "location_kind": 0,
+          "location_type": "野外",
+          "level_min": 10,
+          "level_max": 15
+        },
+        {
+          "original_map_id": 8,
+          "name": "乱坟岗",
+          "world_position": [
+            5,
+            11
+          ],
+          "location_kind": 0,
+          "location_type": "野外",
+          "level_min": 13,
+          "level_max": 15
+        },
+        {
+          "original_map_id": 9,
+          "name": "野猪岭",
+          "world_position": [
+            5,
+            12
+          ],
+          "location_kind": 0,
+          "location_type": "野外",
+          "level_min": 13,
+          "level_max": 16
+        },
+        {
+          "original_map_id": 10,
+          "name": "瘟疫猪巢",
+          "world_position": [
+            4,
+            12
+          ],
+          "location_kind": 0,
+          "location_type": "野外",
+          "level_min": 15,
+          "level_max": 16
+        },
+        {
+          "original_map_id": 11,
+          "name": "平雁谷",
+          "world_position": [
+            4,
+            14
+          ],
+          "location_kind": 0,
+          "location_type": "野外",
+          "level_min": 17,
+          "level_max": 20
+        },
+        {
+          "original_map_id": 12,
+          "name": "失落沼泽",
+          "world_position": [
+            5,
+            14
+          ],
+          "location_kind": 0,
+          "location_type": "野外",
+          "level_min": 17,
+          "level_max": 19
+        },
+        {
+          "original_map_id": 13,
+          "name": "卧云镇",
+          "world_position": [
+            7,
+            14
+          ],
+          "location_kind": 1,
+          "location_type": "城市",
+          "level_min": 20,
+          "level_max": 25
+        },
+        {
+          "original_map_id": 14,
+          "name": "卧云镇北",
+          "world_position": [
+            7,
+            13
+          ],
+          "location_kind": 0,
+          "location_type": "野外",
+          "level_min": 20,
+          "level_max": 25
+        },
+        {
+          "original_map_id": 15,
+          "name": "跃阳湖",
+          "world_position": [
+            7,
+            12
+          ],
+          "location_kind": 0,
+          "location_type": "野外",
+          "level_min": 20,
+          "level_max": 21
+        },
+        {
+          "original_map_id": 16,
+          "name": "莽苍山",
+          "world_position": [
+            7,
+            15
+          ],
+          "location_kind": 0,
+          "location_type": "野外",
+          "level_min": 23,
+          "level_max": 26
+        },
+        {
+          "original_map_id": 17,
+          "name": "金石峡",
+          "world_position": [
+            6,
+            15
+          ],
+          "location_kind": 0,
+          "location_type": "野外",
+          "level_min": 25,
+          "level_max": 28
+        },
+        {
+          "original_map_id": 18,
+          "name": "金水潭",
+          "world_position": [
+            6,
+            16
+          ],
+          "location_kind": 0,
+          "location_type": "野外",
+          "level_min": 27,
+          "level_max": 30
+        },
+        {
+          "original_map_id": 19,
+          "name": "天外神山",
+          "world_position": [
+            8,
+            16
+          ],
+          "location_kind": 0,
+          "location_type": "野外",
+          "level_min": 28,
+          "level_max": 30
+        },
+        {
+          "original_map_id": 20,
+          "name": "封印祠",
+          "world_position": [
+            8,
+            17
+          ],
+          "location_kind": 0,
+          "location_type": "野外",
+          "level_min": 28,
+          "level_max": 30
+        },
+        {
+          "original_map_id": 21,
+          "name": "花涧派",
+          "world_position": [
+            4,
+            19
+          ],
+          "location_kind": 2,
+          "location_type": "门派",
+          "level_min": 10,
+          "level_max": 15
+        },
+        {
+          "original_map_id": 22,
+          "name": "秋兰竹亭",
+          "world_position": [
+            3,
+            19
+          ],
+          "location_kind": 0,
+          "location_type": "野外",
+          "level_min": 10,
+          "level_max": 11
+        },
+        {
+          "original_map_id": 23,
+          "name": "幻波池",
+          "world_position": [
+            5,
+            19
+          ],
+          "location_kind": 0,
+          "location_type": "野外",
+          "level_min": 11,
+          "level_max": 12
+        },
+        {
+          "original_map_id": 24,
+          "name": "蛊苗村",
+          "world_position": [
+            5,
+            18
+          ],
+          "location_kind": 0,
+          "location_type": "野外",
+          "level_min": 10,
+          "level_max": 15
+        },
+        {
+          "original_map_id": 25,
+          "name": "牵牛潭",
+          "world_position": [
+            4,
+            18
+          ],
+          "location_kind": 0,
+          "location_type": "野外",
+          "level_min": 13,
+          "level_max": 15
+        },
+        {
+          "original_map_id": 26,
+          "name": "云灵山",
+          "world_position": [
+            4,
+            17
+          ],
+          "location_kind": 0,
+          "location_type": "野外",
+          "level_min": 13,
+          "level_max": 16
+        },
+        {
+          "original_map_id": 27,
+          "name": "云灵山顶",
+          "world_position": [
+            4,
+            16
+          ],
+          "location_kind": 0,
+          "location_type": "野外",
+          "level_min": 15,
+          "level_max": 16
+        },
+        {
+          "original_map_id": 28,
+          "name": "慈云寺北",
+          "world_position": [
+            10,
+            17
+          ],
+          "location_kind": 0,
+          "location_type": "野外",
+          "level_min": 30,
+          "level_max": 33
+        },
+        {
+          "original_map_id": 29,
+          "name": "慈云寺",
+          "world_position": [
+            10,
+            18
+          ],
+          "location_kind": 1,
+          "location_type": "城市",
+          "level_min": 31,
+          "level_max": 34
+        },
+        {
+          "original_map_id": 30,
+          "name": "慈云寺外围",
+          "world_position": [
+            9,
+            18
+          ],
+          "location_kind": 0,
+          "location_type": "野外",
+          "level_min": 30,
+          "level_max": 31
+        },
+        {
+          "original_map_id": 31,
+          "name": "慈云寺密道",
+          "world_position": [
+            10,
+            19
+          ],
+          "location_kind": 0,
+          "location_type": "野外",
+          "level_min": 33,
+          "level_max": 35
+        },
+        {
+          "original_map_id": 32,
+          "name": "昆仑派",
+          "world_position": [
+            18,
+            19
+          ],
+          "location_kind": 2,
+          "location_type": "门派",
+          "level_min": 10,
+          "level_max": 15
+        },
+        {
+          "original_map_id": 33,
+          "name": "玄冰谷",
+          "world_position": [
+            19,
+            19
+          ],
+          "location_kind": 0,
+          "location_type": "野外",
+          "level_min": 10,
+          "level_max": 11
+        },
+        {
+          "original_map_id": 34,
+          "name": "玉泉关",
+          "world_position": [
+            18,
+            20
+          ],
+          "location_kind": 0,
+          "location_type": "野外",
+          "level_min": 11,
+          "level_max": 12
+        },
+        {
+          "original_map_id": 35,
+          "name": "辟邪村",
+          "world_position": [
+            16,
+            20
+          ],
+          "location_kind": 0,
+          "location_type": "野外",
+          "level_min": 10,
+          "level_max": 15
+        },
+        {
+          "original_map_id": 36,
+          "name": "梯田",
+          "world_position": [
+            15,
+            20
+          ],
+          "location_kind": 0,
+          "location_type": "野外",
+          "level_min": 13,
+          "level_max": 15
+        },
+        {
+          "original_map_id": 37,
+          "name": "风云宫",
+          "world_position": [
+            16,
+            19
+          ],
+          "location_kind": 0,
+          "location_type": "野外",
+          "level_min": 13,
+          "level_max": 16
+        },
+        {
+          "original_map_id": 38,
+          "name": "凌雪池",
+          "world_position": [
+            16,
+            18
+          ],
+          "location_kind": 0,
+          "location_type": "野外",
+          "level_min": 15,
+          "level_max": 16
+        },
+        {
+          "original_map_id": 39,
+          "name": "幽林",
+          "world_position": [
+            17,
+            18
+          ],
+          "location_kind": 0,
+          "location_type": "野外",
+          "level_min": 17,
+          "level_max": 20
+        },
+        {
+          "original_map_id": 40,
+          "name": "卧龙潭",
+          "world_position": [
+            17,
+            17
+          ],
+          "location_kind": 0,
+          "location_type": "野外",
+          "level_min": 17,
+          "level_max": 19
+        },
+        {
+          "original_map_id": 41,
+          "name": "八旗镇",
+          "world_position": [
+            17,
+            16
+          ],
+          "location_kind": 1,
+          "location_type": "城市",
+          "level_min": 20,
+          "level_max": 25
+        },
+        {
+          "original_map_id": 42,
+          "name": "八旗镇西",
+          "world_position": [
+            16,
+            16
+          ],
+          "location_kind": 0,
+          "location_type": "野外",
+          "level_min": 20,
+          "level_max": 25
+        },
+        {
+          "original_map_id": 43,
+          "name": "沙丘",
+          "world_position": [
+            18,
+            16
+          ],
+          "location_kind": 0,
+          "location_type": "野外",
+          "level_min": 19,
+          "level_max": 21
+        },
+        {
+          "original_map_id": 44,
+          "name": "金山绿水",
+          "world_position": [
+            15,
+            16
+          ],
+          "location_kind": 0,
+          "location_type": "野外",
+          "level_min": 23,
+          "level_max": 26
+        },
+        {
+          "original_map_id": 45,
+          "name": "沙漠荒野",
+          "world_position": [
+            14,
+            16
+          ],
+          "location_kind": 0,
+          "location_type": "野外",
+          "level_min": 25,
+          "level_max": 28
+        },
+        {
+          "original_map_id": 46,
+          "name": "流沙平原",
+          "world_position": [
+            13,
+            16
+          ],
+          "location_kind": 0,
+          "location_type": "野外",
+          "level_min": 27,
+          "level_max": 30
+        },
+        {
+          "original_map_id": 47,
+          "name": "火云窟",
+          "world_position": [
+            13,
+            17
+          ],
+          "location_kind": 0,
+          "location_type": "野外",
+          "level_min": 28,
+          "level_max": 30
+        },
+        {
+          "original_map_id": 48,
+          "name": "铸剑池",
+          "world_position": [
+            12,
+            17
+          ],
+          "location_kind": 0,
+          "location_type": "野外",
+          "level_min": 28,
+          "level_max": 30
+        },
+        {
+          "original_map_id": 49,
+          "name": "神剑峰",
+          "world_position": [
+            10,
+            15
+          ],
+          "location_kind": 0,
+          "location_type": "野外",
+          "level_min": 30,
+          "level_max": 32
+        },
+        {
+          "original_map_id": 50,
+          "name": "神剑湖",
+          "world_position": [
+            10,
+            14
+          ],
+          "location_kind": 0,
+          "location_type": "野外",
+          "level_min": 30,
+          "level_max": 33
+        },
+        {
+          "original_map_id": 51,
+          "name": "雷崖",
+          "world_position": [
+            11,
+            14
+          ],
+          "location_kind": 0,
+          "location_type": "野外",
+          "level_min": 32,
+          "level_max": 33
+        },
+        {
+          "original_map_id": 52,
+          "name": "古道",
+          "world_position": [
+            11,
+            13
+          ],
+          "location_kind": 0,
+          "location_type": "野外",
+          "level_min": 32,
+          "level_max": 35
+        },
+        {
+          "original_map_id": 53,
+          "name": "仪凤窟",
+          "world_position": [
+            11,
+            12
+          ],
+          "location_kind": 0,
+          "location_type": "野外",
+          "level_min": 33,
+          "level_max": 36
+        },
+        {
+          "original_map_id": 54,
+          "name": "青螺峪",
+          "world_position": [
+            11,
+            10
+          ],
+          "location_kind": 0,
+          "location_type": "野外",
+          "level_min": 35,
+          "level_max": 37
+        },
+        {
+          "original_map_id": 55,
+          "name": "陷空岛",
+          "world_position": [
+            10,
+            10
+          ],
+          "location_kind": 0,
+          "location_type": "野外",
+          "level_min": 37,
+          "level_max": 40
+        },
+        {
+          "original_map_id": 56,
+          "name": "白骨之谷",
+          "world_position": [
+            12,
+            10
+          ],
+          "location_kind": 0,
+          "location_type": "野外",
+          "level_min": 37,
+          "level_max": 39
+        },
+        {
+          "original_map_id": 57,
+          "name": "紫云宫",
+          "world_position": [
+            11,
+            9
+          ],
+          "location_kind": 0,
+          "location_type": "野外",
+          "level_min": 37,
+          "level_max": 40
+        },
+        {
+          "original_map_id": 58,
+          "name": "神碑禅经",
+          "world_position": [
+            12,
+            9
+          ],
+          "location_kind": 0,
+          "location_type": "野外",
+          "level_min": 37,
+          "level_max": 39
+        },
+        {
+          "original_map_id": 59,
+          "name": "戴家场",
+          "world_position": [
+            12,
+            7
+          ],
+          "location_kind": 1,
+          "location_type": "城市",
+          "level_min": 40,
+          "level_max": 50
+        },
+        {
+          "original_map_id": 60,
+          "name": "化血池",
+          "world_position": [
+            11,
+            7
+          ],
+          "location_kind": 0,
+          "location_type": "野外",
+          "level_min": 43,
+          "level_max": 45
+        },
+        {
+          "original_map_id": 61,
+          "name": "屠龙谷",
+          "world_position": [
+            10,
+            7
+          ],
+          "location_kind": 0,
+          "location_type": "野外",
+          "level_min": 45,
+          "level_max": 50
+        },
+        {
+          "original_map_id": 62,
+          "name": "群雄大殿",
+          "world_position": [
+            13,
+            7
+          ],
+          "location_kind": 0,
+          "location_type": "野外",
+          "level_min": 40,
+          "level_max": 50
+        },
+        {
+          "original_map_id": 63,
+          "name": "西方太乙",
+          "world_position": [
+            14,
+            6
+          ],
+          "location_kind": 0,
+          "location_type": "野外",
+          "level_min": 46,
+          "level_max": 51
+        },
+        {
+          "original_map_id": 64,
+          "name": "金钟岛",
+          "world_position": [
+            13,
+            6
+          ],
+          "location_kind": 0,
+          "location_type": "野外",
+          "level_min": 47,
+          "level_max": 49
+        },
+        {
+          "original_map_id": 65,
+          "name": "修罗关",
+          "world_position": [
+            12,
+            5
+          ],
+          "location_kind": 0,
+          "location_type": "野外",
+          "level_min": 49,
+          "level_max": 52
+        },
+        {
+          "original_map_id": 66,
+          "name": "妖尸谷",
+          "world_position": [
+            12,
+            4
+          ],
+          "location_kind": 0,
+          "location_type": "野外",
+          "level_min": 50,
+          "level_max": 55
+        },
+        {
+          "original_map_id": 67,
+          "name": "乌金障",
+          "world_position": [
+            13,
+            4
+          ],
+          "location_kind": 0,
+          "location_type": "野外",
+          "level_min": 52,
+          "level_max": 53
+        },
+        {
+          "original_map_id": 68,
+          "name": "行刑场",
+          "world_position": [
+            14,
+            4
+          ],
+          "location_kind": 0,
+          "location_type": "野外",
+          "level_min": 54,
+          "level_max": 55
+        },
+        {
+          "original_map_id": 69,
+          "name": "碎心崖",
+          "world_position": [
+            12,
+            3
+          ],
+          "location_kind": 0,
+          "location_type": "野外",
+          "level_min": 55,
+          "level_max": 56
+        },
+        {
+          "original_map_id": 70,
+          "name": "如意山",
+          "world_position": [
+            10,
+            3
+          ],
+          "location_kind": 0,
+          "location_type": "野外",
+          "level_min": 50,
+          "level_max": 55
+        },
+        {
+          "original_map_id": 71,
+          "name": "玉京潭",
+          "world_position": [
+            10,
+            4
+          ],
+          "location_kind": 0,
+          "location_type": "野外",
+          "level_min": 55,
+          "level_max": 56
+        },
+        {
+          "original_map_id": 72,
+          "name": "大河山川",
+          "world_position": [
+            10,
+            5
+          ],
+          "location_kind": 0,
+          "location_type": "野外",
+          "level_min": 56,
+          "level_max": 57
+        },
+        {
+          "original_map_id": 73,
+          "name": "迁流峭壁",
+          "world_position": [
+            7,
+            5
+          ],
+          "location_kind": 0,
+          "location_type": "野外",
+          "level_min": 58,
+          "level_max": 59
+        },
+        {
+          "original_map_id": 74,
+          "name": "山顶洞",
+          "world_position": [
+            8,
+            4
+          ],
+          "location_kind": 0,
+          "location_type": "野外",
+          "level_min": 57,
+          "level_max": 58
+        },
+        {
+          "original_map_id": 75,
+          "name": "万马阵",
+          "world_position": [
+            7,
+            4
+          ],
+          "location_kind": 0,
+          "location_type": "野外",
+          "level_min": 58,
+          "level_max": 59
+        },
+        {
+          "original_map_id": 76,
+          "name": "九宫阁",
+          "world_position": [
+            8,
+            5
+          ],
+          "location_kind": 0,
+          "location_type": "野外",
+          "level_min": 55,
+          "level_max": 60
+        },
+        {
+          "original_map_id": 77,
+          "name": "正派营地",
+          "world_position": [
+            7,
+            2
+          ],
+          "location_kind": 0,
+          "location_type": "野外",
+          "level_min": 58,
+          "level_max": 60
+        },
+        {
+          "original_map_id": 78,
+          "name": "天下武场",
+          "world_position": [
+            6,
+            2
+          ],
+          "location_kind": 0,
+          "location_type": "野外",
+          "level_min": 59,
+          "level_max": 60
+        },
+        {
+          "original_map_id": 79,
+          "name": "火礁祭坛",
+          "world_position": [
+            7,
+            20
+          ],
+          "location_kind": 0,
+          "location_type": "野外",
+          "level_min": 8,
+          "level_max": 10
+        },
+        {
+          "original_map_id": 158,
+          "name": "神秘仙境",
+          "world_position": [
+            15,
+            14
+          ],
+          "location_kind": 0,
+          "location_type": "野外",
+          "level_min": 1,
+          "level_max": 60
+        }
+      ],
+      "routes": [
+        {
+          "index": 0,
+          "source_offset": 3280,
+          "raw_hex": "0a 04 0a 05",
+          "from": [
+            4,
+            10
+          ],
+          "to": [
+            5,
+            10
+          ],
+          "from_map_id": 6,
+          "to_map_id": 7
+        },
+        {
+          "index": 1,
+          "source_offset": 3284,
+          "raw_hex": "0a 05 0b 05",
+          "from": [
+            5,
+            10
+          ],
+          "to": [
+            5,
+            11
+          ],
+          "from_map_id": 7,
+          "to_map_id": 8
+        },
+        {
+          "index": 2,
+          "source_offset": 3288,
+          "raw_hex": "0b 05 0c 05",
+          "from": [
+            5,
+            11
+          ],
+          "to": [
+            5,
+            12
+          ],
+          "from_map_id": 8,
+          "to_map_id": 9
+        },
+        {
+          "index": 3,
+          "source_offset": 3292,
+          "raw_hex": "0c 05 0c 04",
+          "from": [
+            5,
+            12
+          ],
+          "to": [
+            4,
+            12
+          ],
+          "from_map_id": 9,
+          "to_map_id": 10
+        },
+        {
+          "index": 4,
+          "source_offset": 3296,
+          "raw_hex": "0e 05 0e 07",
+          "from": [
+            5,
+            14
+          ],
+          "to": [
+            7,
+            14
+          ],
+          "from_map_id": 12,
+          "to_map_id": 13
+        },
+        {
+          "index": 5,
+          "source_offset": 3300,
+          "raw_hex": "0e 07 0d 07",
+          "from": [
+            7,
+            14
+          ],
+          "to": [
+            7,
+            13
+          ],
+          "from_map_id": 13,
+          "to_map_id": 14
+        },
+        {
+          "index": 6,
+          "source_offset": 3304,
+          "raw_hex": "0d 07 0c 07",
+          "from": [
+            7,
+            13
+          ],
+          "to": [
+            7,
+            12
+          ],
+          "from_map_id": 14,
+          "to_map_id": 15
+        },
+        {
+          "index": 7,
+          "source_offset": 3308,
+          "raw_hex": "0e 07 0f 07",
+          "from": [
+            7,
+            14
+          ],
+          "to": [
+            7,
+            15
+          ],
+          "from_map_id": 13,
+          "to_map_id": 16
+        },
+        {
+          "index": 8,
+          "source_offset": 3312,
+          "raw_hex": "0f 07 0f 06",
+          "from": [
+            7,
+            15
+          ],
+          "to": [
+            6,
+            15
+          ],
+          "from_map_id": 16,
+          "to_map_id": 17
+        },
+        {
+          "index": 9,
+          "source_offset": 3316,
+          "raw_hex": "0f 06 10 06",
+          "from": [
+            6,
+            15
+          ],
+          "to": [
+            6,
+            16
+          ],
+          "from_map_id": 17,
+          "to_map_id": 18
+        },
+        {
+          "index": 10,
+          "source_offset": 3320,
+          "raw_hex": "10 06 10 08",
+          "from": [
+            6,
+            16
+          ],
+          "to": [
+            8,
+            16
+          ],
+          "from_map_id": 18,
+          "to_map_id": 19
+        },
+        {
+          "index": 11,
+          "source_offset": 3324,
+          "raw_hex": "10 08 11 08",
+          "from": [
+            8,
+            16
+          ],
+          "to": [
+            8,
+            17
+          ],
+          "from_map_id": 19,
+          "to_map_id": 20
+        },
+        {
+          "index": 12,
+          "source_offset": 3328,
+          "raw_hex": "11 08 11 0a",
+          "from": [
+            8,
+            17
+          ],
+          "to": [
+            10,
+            17
+          ],
+          "from_map_id": 20,
+          "to_map_id": 28
+        },
+        {
+          "index": 13,
+          "source_offset": 3332,
+          "raw_hex": "11 0a 12 0a",
+          "from": [
+            10,
+            17
+          ],
+          "to": [
+            10,
+            18
+          ],
+          "from_map_id": 28,
+          "to_map_id": 29
+        },
+        {
+          "index": 14,
+          "source_offset": 3336,
+          "raw_hex": "12 0a 12 09",
+          "from": [
+            10,
+            18
+          ],
+          "to": [
+            9,
+            18
+          ],
+          "from_map_id": 29,
+          "to_map_id": 30
+        },
+        {
+          "index": 15,
+          "source_offset": 3340,
+          "raw_hex": "12 0a 13 0a",
+          "from": [
+            10,
+            18
+          ],
+          "to": [
+            10,
+            19
+          ],
+          "from_map_id": 29,
+          "to_map_id": 31
+        },
+        {
+          "index": 16,
+          "source_offset": 3344,
+          "raw_hex": "11 0a 11 0c",
+          "from": [
+            10,
+            17
+          ],
+          "to": [
+            12,
+            17
+          ],
+          "from_map_id": 28,
+          "to_map_id": 48
+        },
+        {
+          "index": 17,
+          "source_offset": 3348,
+          "raw_hex": "11 0c 11 0d",
+          "from": [
+            12,
+            17
+          ],
+          "to": [
+            13,
+            17
+          ],
+          "from_map_id": 48,
+          "to_map_id": 47
+        },
+        {
+          "index": 18,
+          "source_offset": 3352,
+          "raw_hex": "11 0d 10 0d",
+          "from": [
+            13,
+            17
+          ],
+          "to": [
+            13,
+            16
+          ],
+          "from_map_id": 47,
+          "to_map_id": 46
+        },
+        {
+          "index": 19,
+          "source_offset": 3356,
+          "raw_hex": "10 0d 10 0e",
+          "from": [
+            13,
+            16
+          ],
+          "to": [
+            14,
+            16
+          ],
+          "from_map_id": 46,
+          "to_map_id": 45
+        },
+        {
+          "index": 20,
+          "source_offset": 3360,
+          "raw_hex": "10 0e 10 0f",
+          "from": [
+            14,
+            16
+          ],
+          "to": [
+            15,
+            16
+          ],
+          "from_map_id": 45,
+          "to_map_id": 44
+        },
+        {
+          "index": 21,
+          "source_offset": 3364,
+          "raw_hex": "10 0f 10 10",
+          "from": [
+            15,
+            16
+          ],
+          "to": [
+            16,
+            16
+          ],
+          "from_map_id": 44,
+          "to_map_id": 42
+        },
+        {
+          "index": 22,
+          "source_offset": 3368,
+          "raw_hex": "10 10 10 11",
+          "from": [
+            16,
+            16
+          ],
+          "to": [
+            17,
+            16
+          ],
+          "from_map_id": 42,
+          "to_map_id": 41
+        },
+        {
+          "index": 23,
+          "source_offset": 3372,
+          "raw_hex": "11 11 12 11",
+          "from": [
+            17,
+            17
+          ],
+          "to": [
+            17,
+            18
+          ],
+          "from_map_id": 40,
+          "to_map_id": 39
+        },
+        {
+          "index": 24,
+          "source_offset": 3376,
+          "raw_hex": "12 11 12 10",
+          "from": [
+            17,
+            18
+          ],
+          "to": [
+            16,
+            18
+          ],
+          "from_map_id": 39,
+          "to_map_id": 38
+        },
+        {
+          "index": 25,
+          "source_offset": 3380,
+          "raw_hex": "12 10 13 10",
+          "from": [
+            16,
+            18
+          ],
+          "to": [
+            16,
+            19
+          ],
+          "from_map_id": 38,
+          "to_map_id": 37
+        },
+        {
+          "index": 26,
+          "source_offset": 3384,
+          "raw_hex": "13 10 14 10",
+          "from": [
+            16,
+            19
+          ],
+          "to": [
+            16,
+            20
+          ],
+          "from_map_id": 37,
+          "to_map_id": 35
+        },
+        {
+          "index": 27,
+          "source_offset": 3388,
+          "raw_hex": "11 0a 0f 0a",
+          "from": [
+            10,
+            17
+          ],
+          "to": [
+            10,
+            15
+          ],
+          "from_map_id": 28,
+          "to_map_id": 49
+        },
+        {
+          "index": 28,
+          "source_offset": 3392,
+          "raw_hex": "0f 0a 0e 0a",
+          "from": [
+            10,
+            15
+          ],
+          "to": [
+            10,
+            14
+          ],
+          "from_map_id": 49,
+          "to_map_id": 50
+        },
+        {
+          "index": 29,
+          "source_offset": 3396,
+          "raw_hex": "0e 0a 0e 0b",
+          "from": [
+            10,
+            14
+          ],
+          "to": [
+            11,
+            14
+          ],
+          "from_map_id": 50,
+          "to_map_id": 51
+        },
+        {
+          "index": 30,
+          "source_offset": 3400,
+          "raw_hex": "0e 0b 0d 0b",
+          "from": [
+            11,
+            14
+          ],
+          "to": [
+            11,
+            13
+          ],
+          "from_map_id": 51,
+          "to_map_id": 52
+        },
+        {
+          "index": 31,
+          "source_offset": 3404,
+          "raw_hex": "0d 0b 0c 0b",
+          "from": [
+            11,
+            13
+          ],
+          "to": [
+            11,
+            12
+          ],
+          "from_map_id": 52,
+          "to_map_id": 53
+        },
+        {
+          "index": 32,
+          "source_offset": 3408,
+          "raw_hex": "0c 0b 0a 0b",
+          "from": [
+            11,
+            12
+          ],
+          "to": [
+            11,
+            10
+          ],
+          "from_map_id": 53,
+          "to_map_id": 54
+        },
+        {
+          "index": 33,
+          "source_offset": 3412,
+          "raw_hex": "0a 0a 0a 0b",
+          "from": [
+            10,
+            10
+          ],
+          "to": [
+            11,
+            10
+          ],
+          "from_map_id": 55,
+          "to_map_id": 54
+        },
+        {
+          "index": 34,
+          "source_offset": 3416,
+          "raw_hex": "0a 0b 0a 0c",
+          "from": [
+            11,
+            10
+          ],
+          "to": [
+            12,
+            10
+          ],
+          "from_map_id": 54,
+          "to_map_id": 56
+        },
+        {
+          "index": 35,
+          "source_offset": 3420,
+          "raw_hex": "0a 0b 09 0b",
+          "from": [
+            11,
+            10
+          ],
+          "to": [
+            11,
+            9
+          ],
+          "from_map_id": 54,
+          "to_map_id": 57
+        },
+        {
+          "index": 36,
+          "source_offset": 3424,
+          "raw_hex": "09 0b 09 0c",
+          "from": [
+            11,
+            9
+          ],
+          "to": [
+            12,
+            9
+          ],
+          "from_map_id": 57,
+          "to_map_id": 58
+        },
+        {
+          "index": 37,
+          "source_offset": 3428,
+          "raw_hex": "09 0c 07 0c",
+          "from": [
+            12,
+            9
+          ],
+          "to": [
+            12,
+            7
+          ],
+          "from_map_id": 58,
+          "to_map_id": 59
+        },
+        {
+          "index": 38,
+          "source_offset": 3432,
+          "raw_hex": "07 0b 07 0c",
+          "from": [
+            11,
+            7
+          ],
+          "to": [
+            12,
+            7
+          ],
+          "from_map_id": 60,
+          "to_map_id": 59
+        },
+        {
+          "index": 39,
+          "source_offset": 3436,
+          "raw_hex": "07 0c 07 0d",
+          "from": [
+            12,
+            7
+          ],
+          "to": [
+            13,
+            7
+          ],
+          "from_map_id": 59,
+          "to_map_id": 62
+        },
+        {
+          "index": 40,
+          "source_offset": 3440,
+          "raw_hex": "07 0b 07 0a",
+          "from": [
+            11,
+            7
+          ],
+          "to": [
+            10,
+            7
+          ],
+          "from_map_id": 60,
+          "to_map_id": 61
+        },
+        {
+          "index": 41,
+          "source_offset": 3444,
+          "raw_hex": "07 0d 06 0d",
+          "from": [
+            13,
+            7
+          ],
+          "to": [
+            13,
+            6
+          ],
+          "from_map_id": 62,
+          "to_map_id": 64
+        },
+        {
+          "index": 42,
+          "source_offset": 3448,
+          "raw_hex": "07 0c 05 0c",
+          "from": [
+            12,
+            7
+          ],
+          "to": [
+            12,
+            5
+          ],
+          "from_map_id": 59,
+          "to_map_id": 65
+        },
+        {
+          "index": 43,
+          "source_offset": 3452,
+          "raw_hex": "06 0d 06 0e",
+          "from": [
+            13,
+            6
+          ],
+          "to": [
+            14,
+            6
+          ],
+          "from_map_id": 64,
+          "to_map_id": 63
+        },
+        {
+          "index": 44,
+          "source_offset": 3456,
+          "raw_hex": "05 0c 04 0c",
+          "from": [
+            12,
+            5
+          ],
+          "to": [
+            12,
+            4
+          ],
+          "from_map_id": 65,
+          "to_map_id": 66
+        },
+        {
+          "index": 45,
+          "source_offset": 3460,
+          "raw_hex": "04 0c 04 0d",
+          "from": [
+            12,
+            4
+          ],
+          "to": [
+            13,
+            4
+          ],
+          "from_map_id": 66,
+          "to_map_id": 67
+        },
+        {
+          "index": 46,
+          "source_offset": 3464,
+          "raw_hex": "04 0d 04 0e",
+          "from": [
+            13,
+            4
+          ],
+          "to": [
+            14,
+            4
+          ],
+          "from_map_id": 67,
+          "to_map_id": 68
+        },
+        {
+          "index": 47,
+          "source_offset": 3468,
+          "raw_hex": "04 0c 03 0c",
+          "from": [
+            12,
+            4
+          ],
+          "to": [
+            12,
+            3
+          ],
+          "from_map_id": 66,
+          "to_map_id": 69
+        },
+        {
+          "index": 48,
+          "source_offset": 3472,
+          "raw_hex": "03 0c 03 0a",
+          "from": [
+            12,
+            3
+          ],
+          "to": [
+            10,
+            3
+          ],
+          "from_map_id": 69,
+          "to_map_id": 70
+        },
+        {
+          "index": 49,
+          "source_offset": 3476,
+          "raw_hex": "03 0a 04 0a",
+          "from": [
+            10,
+            3
+          ],
+          "to": [
+            10,
+            4
+          ],
+          "from_map_id": 70,
+          "to_map_id": 71
+        },
+        {
+          "index": 50,
+          "source_offset": 3480,
+          "raw_hex": "04 0a 05 0a",
+          "from": [
+            10,
+            4
+          ],
+          "to": [
+            10,
+            5
+          ],
+          "from_map_id": 71,
+          "to_map_id": 72
+        },
+        {
+          "index": 51,
+          "source_offset": 3484,
+          "raw_hex": "04 07 05 07",
+          "from": [
+            7,
+            4
+          ],
+          "to": [
+            7,
+            5
+          ],
+          "from_map_id": 75,
+          "to_map_id": 73
+        },
+        {
+          "index": 52,
+          "source_offset": 3488,
+          "raw_hex": "04 07 02 07",
+          "from": [
+            7,
+            4
+          ],
+          "to": [
+            7,
+            2
+          ],
+          "from_map_id": 75,
+          "to_map_id": 77
+        },
+        {
+          "index": 53,
+          "source_offset": 3492,
+          "raw_hex": "02 07 02 06",
+          "from": [
+            7,
+            2
+          ],
+          "to": [
+            6,
+            2
+          ],
+          "from_map_id": 77,
+          "to_map_id": 78
+        },
+        {
+          "index": 54,
+          "source_offset": 3496,
+          "raw_hex": "05 0a 05 08",
+          "from": [
+            10,
+            5
+          ],
+          "to": [
+            8,
+            5
+          ],
+          "from_map_id": 72,
+          "to_map_id": 76
+        },
+        {
+          "index": 55,
+          "source_offset": 3500,
+          "raw_hex": "05 08 05 07",
+          "from": [
+            8,
+            5
+          ],
+          "to": [
+            7,
+            5
+          ],
+          "from_map_id": 76,
+          "to_map_id": 73
+        },
+        {
+          "index": 56,
+          "source_offset": 3504,
+          "raw_hex": "05 08 04 08",
+          "from": [
+            8,
+            5
+          ],
+          "to": [
+            8,
+            4
+          ],
+          "from_map_id": 76,
+          "to_map_id": 74
+        },
+        {
+          "index": 57,
+          "source_offset": 3508,
+          "raw_hex": "14 10 14 0f",
+          "from": [
+            16,
+            20
+          ],
+          "to": [
+            15,
+            20
+          ],
+          "from_map_id": 35,
+          "to_map_id": 36
+        },
+        {
+          "index": 58,
+          "source_offset": 3512,
+          "raw_hex": "13 12 13 13",
+          "from": [
+            18,
+            19
+          ],
+          "to": [
+            19,
+            19
+          ],
+          "from_map_id": 32,
+          "to_map_id": 33
+        },
+        {
+          "index": 59,
+          "source_offset": 3516,
+          "raw_hex": "13 12 14 12",
+          "from": [
+            18,
+            19
+          ],
+          "to": [
+            18,
+            20
+          ],
+          "from_map_id": 32,
+          "to_map_id": 34
+        },
+        {
+          "index": 60,
+          "source_offset": 3520,
+          "raw_hex": "14 12 14 10",
+          "from": [
+            18,
+            20
+          ],
+          "to": [
+            16,
+            20
+          ],
+          "from_map_id": 34,
+          "to_map_id": 35
+        },
+        {
+          "index": 61,
+          "source_offset": 3524,
+          "raw_hex": "0a 04 09 04",
+          "from": [
+            4,
+            10
+          ],
+          "to": [
+            4,
+            9
+          ],
+          "from_map_id": 6,
+          "to_map_id": 4
+        },
+        {
+          "index": 62,
+          "source_offset": 3528,
+          "raw_hex": "09 04 09 03",
+          "from": [
+            4,
+            9
+          ],
+          "to": [
+            3,
+            9
+          ],
+          "from_map_id": 4,
+          "to_map_id": 5
+        },
+        {
+          "index": 63,
+          "source_offset": 3532,
+          "raw_hex": "10 11 11 11",
+          "from": [
+            17,
+            16
+          ],
+          "to": [
+            17,
+            17
+          ],
+          "from_map_id": 41,
+          "to_map_id": 40
+        },
+        {
+          "index": 64,
+          "source_offset": 3536,
+          "raw_hex": "10 11 10 12",
+          "from": [
+            17,
+            16
+          ],
+          "to": [
+            18,
+            16
+          ],
+          "from_map_id": 41,
+          "to_map_id": 43
+        },
+        {
+          "index": 65,
+          "source_offset": 3540,
+          "raw_hex": "13 04 13 03",
+          "from": [
+            4,
+            19
+          ],
+          "to": [
+            3,
+            19
+          ],
+          "from_map_id": 21,
+          "to_map_id": 22
+        },
+        {
+          "index": 66,
+          "source_offset": 3544,
+          "raw_hex": "13 04 13 05",
+          "from": [
+            4,
+            19
+          ],
+          "to": [
+            5,
+            19
+          ],
+          "from_map_id": 21,
+          "to_map_id": 23
+        },
+        {
+          "index": 67,
+          "source_offset": 3548,
+          "raw_hex": "13 05 12 05",
+          "from": [
+            5,
+            19
+          ],
+          "to": [
+            5,
+            18
+          ],
+          "from_map_id": 23,
+          "to_map_id": 24
+        },
+        {
+          "index": 68,
+          "source_offset": 3552,
+          "raw_hex": "12 05 12 04",
+          "from": [
+            5,
+            18
+          ],
+          "to": [
+            4,
+            18
+          ],
+          "from_map_id": 24,
+          "to_map_id": 25
+        },
+        {
+          "index": 69,
+          "source_offset": 3556,
+          "raw_hex": "12 04 11 04",
+          "from": [
+            4,
+            18
+          ],
+          "to": [
+            4,
+            17
+          ],
+          "from_map_id": 25,
+          "to_map_id": 26
+        },
+        {
+          "index": 70,
+          "source_offset": 3560,
+          "raw_hex": "11 04 10 04",
+          "from": [
+            4,
+            17
+          ],
+          "to": [
+            4,
+            16
+          ],
+          "from_map_id": 26,
+          "to_map_id": 27
+        },
+        {
+          "index": 71,
+          "source_offset": 3564,
+          "raw_hex": "10 04 0e 04",
+          "from": [
+            4,
+            16
+          ],
+          "to": [
+            4,
+            14
+          ],
+          "from_map_id": 27,
+          "to_map_id": 11
+        },
+        {
+          "index": 72,
+          "source_offset": 3568,
+          "raw_hex": "0c 04 0e 04",
+          "from": [
+            4,
+            12
+          ],
+          "to": [
+            4,
+            14
+          ],
+          "from_map_id": 10,
+          "to_map_id": 11
+        },
+        {
+          "index": 73,
+          "source_offset": 3572,
+          "raw_hex": "0e 04 0e 05",
+          "from": [
+            4,
+            14
+          ],
+          "to": [
+            5,
+            14
+          ],
+          "from_map_id": 11,
+          "to_map_id": 12
+        },
+        {
+          "index": 74,
+          "source_offset": 3576,
+          "raw_hex": "0c 16 08 16",
+          "from": [
+            22,
+            12
+          ],
+          "to": [
+            22,
+            8
+          ],
+          "from_map_id": null,
+          "to_map_id": null
+        },
+        {
+          "index": 75,
+          "source_offset": 3580,
+          "raw_hex": "15 06 15 07",
+          "from": [
+            6,
+            21
+          ],
+          "to": [
+            7,
+            21
+          ],
+          "from_map_id": 1,
+          "to_map_id": 2
+        },
+        {
+          "index": 76,
+          "source_offset": 3584,
+          "raw_hex": "15 07 14 07",
+          "from": [
+            7,
+            21
+          ],
+          "to": [
+            7,
+            20
+          ],
+          "from_map_id": 2,
+          "to_map_id": 79
+        },
+        {
+          "index": 77,
+          "source_offset": 3588,
+          "raw_hex": "0c 0f 0c 0f",
+          "from": [
+            15,
+            12
+          ],
+          "to": [
+            15,
+            12
+          ],
+          "from_map_id": null,
+          "to_map_id": null
+        }
+      ],
+      "visible_location_count": 79,
+      "route_count": 78,
+      "native_sha256": "e08f93bebe133b700f2305bfbedd994b05cc8d04a5a854262af9ced956afbc03",
+      "evidence": {
+        "reader": "gameonline.ext@0x2b25c",
+        "route_draw": "gameonline.ext@0x21090",
+        "node_draw": "gameonline.ext@0x21244",
+        "level_label": "gameonline.ext@0x2193c",
+        "map_id_lookup": "gameonline.ext@0x221e8"
+      },
+      "notes": [
+        "这是世界总图，非单张场景地形。记录坐标顺序为行、列，显示位置已转换为x、y。",
+        "按原样保留未命名端点与零长度线段；总图连线不等同于完整通行或传送配置。"
+      ]
+    }
+  },
+  "quests": {
+    "original_complete_quest_count": null,
+    "evidence": [
+      {
+        "source_member": "mission.str",
+        "kind": "ui",
+        "title": "任务界面文案 · mission.str",
+        "source_bytes": 115,
+        "source_sha256": "5fc516a96b8e882cb70da7aa8ae666cf03390e4a65081729e2c6a2c550f02b41",
+        "complete_quest_definition": false,
+        "text_groups": [
+          [
+            "任务信息",
+            "已接",
+            "-",
+            "查看",
+            "放弃",
+            "接受",
+            "寻路",
+            "传送(免费)",
+            "完成",
+            "任务等级",
+            "级以上",
+            "任务目标",
+            "任务描述",
+            "接受并寻路"
+          ]
+        ]
+      },
+      {
+        "source_member": "teach.str",
+        "kind": "guide",
+        "title": "游戏引导文案 · teach.str",
+        "source_bytes": 165,
+        "source_sha256": "16f9eea8d03c74c344f92fb1ebd0e23172f3a9b3cd05b2a3909ede3def23d01a",
+        "complete_quest_definition": false,
+        "text_groups": [
+          [
+            "请按照提示点击相应区域或按键。如果您想退出本次教学，请点击确定。",
+            "欢迎您再次进入蜀山的世界，是否还要开启游戏引导呢？",
+            "峨眉派",
+            "花涧派",
+            "昆仑派",
+            "邀请函",
+            "xsrw05"
+          ]
+        ]
+      },
+      {
+        "source_member": "teach1",
+        "kind": "guide",
+        "title": "游戏引导线索 · teach1",
+        "source_bytes": 111,
+        "source_sha256": "7dc6acd22a574d5d3b5ae034a2d7b559aa97358e15b04a766aff9a8e1d05a0f7",
+        "complete_quest_definition": false,
+        "text_fragments": [
+          {
+            "byte_offset": 1,
+            "byte_length": 96,
+            "text": "角色头顶的@16777114 黄色感叹号@，代表有任务需要你来接受，完成后获得经验可让角色成长。"
+          }
+        ],
+        "raw_hex": "02 07 00 60 89 d2 82 72 59 34 98 76 76 84 00 40 00 31 00 36 00 37 00 37 00 37 00 31 00 31 00 34 00 20 9e c4 82 72 61 1f 53 f9 53 f7 00 40 ff 0c 4e e3 88 68 67 09 4e fb 52 a1 97 00 89 81 4f 60 67 65 63 a5 53 d7 ff 0c 5b 8c 62 10 54 0e 83 b7 5f 97 7e cf 9a 8c 53 ef 8b a9 89 d2 82 72 62 10 95 7f 30 02 04 00 08 87 00 5c 71 4e d9 70 75"
+      },
+      {
+        "source_member": "teach2",
+        "kind": "guide",
+        "title": "游戏引导线索 · teach2",
+        "source_bytes": 81,
+        "source_sha256": "c3ca452d5b593ae175efe0833cc0ae7ff8c93b1bf31ec8e1f18bab49ae4d15ad",
+        "complete_quest_definition": false,
+        "text_fragments": [
+          {
+            "byte_offset": 1,
+            "byte_length": 66,
+            "text": "现在您可以选择心仪的门派加入，一旦选择之后，将不能加入其他的门派。"
+          }
+        ],
+        "raw_hex": "02 07 00 42 73 b0 57 28 60 a8 53 ef 4e e5 90 09 62 e9 5f c3 4e ea 76 84 95 e8 6d 3e 52 a0 51 65 ff 0c 4e 00 65 e6 90 09 62 e9 4e 4b 54 0e ff 0c 5c 06 4e 0d 80 fd 52 a0 51 65 51 76 4e d6 76 84 95 e8 6d 3e 30 02 04 00 08 59 99 4e 00 77 1f 4e ba"
+      },
+      {
+        "source_member": "teach3",
+        "kind": "guide",
+        "title": "游戏引导线索 · teach3",
+        "source_bytes": 81,
+        "source_sha256": "d89bf5926e179ea56055407fd997f8591fd3aafa9c650ec1056140064e001349",
+        "complete_quest_definition": false,
+        "text_fragments": [
+          {
+            "byte_offset": 1,
+            "byte_length": 66,
+            "text": "现在您可以选择心仪的门派加入，一旦选择之后，将不能加入其他的门派。"
+          }
+        ],
+        "raw_hex": "02 07 00 42 73 b0 57 28 60 a8 53 ef 4e e5 90 09 62 e9 5f c3 4e ea 76 84 95 e8 6d 3e 52 a0 51 65 ff 0c 4e 00 65 e6 90 09 62 e9 4e 4b 54 0e ff 0c 5c 06 4e 0d 80 fd 52 a0 51 65 51 76 4e d6 76 84 95 e8 6d 3e 30 02 04 00 08 54 c8 54 c8 80 01 79 56"
+      },
+      {
+        "source_member": "teach4",
+        "kind": "guide",
+        "title": "游戏引导线索 · teach4",
+        "source_bytes": 81,
+        "source_sha256": "9d455632a0dd8c087bdf7ab558b758f1395e7a89af6a73b57505fb87cd2e52d6",
+        "complete_quest_definition": false,
+        "text_fragments": [
+          {
+            "byte_offset": 1,
+            "byte_length": 66,
+            "text": "现在您可以选择心仪的门派加入，一旦选择之后，将不能加入其他的门派。"
+          }
+        ],
+        "raw_hex": "02 07 00 42 73 b0 57 28 60 a8 53 ef 4e e5 90 09 62 e9 5f c3 4e ea 76 84 95 e8 6d 3e 52 a0 51 65 ff 0c 4e 00 65 e6 90 09 62 e9 4e 4b 54 0e ff 0c 5c 06 4e 0d 80 fd 52 a0 51 65 51 76 4e d6 76 84 95 e8 6d 3e 30 02 04 00 08 4e 00 51 43 79 56 5e 08"
+      },
+      {
+        "source_member": "teach5",
+        "kind": "guide",
+        "title": "游戏引导线索 · teach5",
+        "source_bytes": 100,
+        "source_sha256": "272a61abeb1545c5e6d47769c187fdc9dfe444323c45a375ee0d63083d9c6489",
+        "complete_quest_definition": false,
+        "text_fragments": [
+          {
+            "byte_offset": 1,
+            "byte_length": 96,
+            "text": "每次升级会获得@16727619 5个属性点@，分配点数后，可以提升玩家属性，让你的战斗更强力。"
+          }
+        ],
+        "raw_hex": "01 07 00 60 6b cf 6b 21 53 47 7e a7 4f 1a 83 b7 5f 97 00 40 00 31 00 36 00 37 00 32 00 37 00 36 00 31 00 39 00 20 00 35 4e 2a 5c 5e 60 27 70 b9 00 40 ff 0c 52 06 91 4d 70 b9 65 70 54 0e ff 0c 53 ef 4e e5 63 d0 53 47 73 a9 5b b6 5c 5e 60 27 ff 0c 8b a9 4f 60 76 84 62 18 65 97 66 f4 5f 3a 52 9b 30 02"
+      },
+      {
+        "source_member": "teach6",
+        "kind": "guide",
+        "title": "游戏引导线索 · teach6",
+        "source_bytes": 236,
+        "source_sha256": "c1e2acd28a3c7c1fdf4bc54df0f7195eed1dc7370a0a0a790822aa557640a334",
+        "complete_quest_definition": false,
+        "text_fragments": [
+          {
+            "byte_offset": 1,
+            "byte_length": 232,
+            "text": "技能分为@03654547 武功@和@03654547 心法@，武功为攻击性技能，可以在战斗中选择；心法为辅助性技能，可以提升人物属性。每次升级会获得@16727619 2个技能点@，分配点数后，可以提升玩家属性，让你的战斗更强力。"
+          }
+        ],
+        "raw_hex": "01 07 00 e8 62 80 80 fd 52 06 4e 3a 00 40 00 30 00 33 00 36 00 35 00 34 00 35 00 34 00 37 00 20 6b 66 52 9f 00 40 54 8c 00 40 00 30 00 33 00 36 00 35 00 34 00 35 00 34 00 37 00 20 5f c3 6c d5 00 40 ff 0c 6b 66 52 9f 4e 3a 65 3b 51 fb 60 27 62 80 80 fd ff 0c 53 ef 4e e5 57 28 62 18 65 97 4e 2d 90 09 62 e9 ff 1b 5f c3 6c d5 4e 3a 8f 85 52 a9 60 27 62 80 80 fd ff 0c 53 ef 4e e5 63 d0 53 47 4e ba 72 69 5c 5e 60 27 30 02 6b cf 6b 21 53 47 7e a7 4f 1a 83 b7 5f 97 00 40 00 31 00 36 00 37 00 32 00 37 00 36 00 31 00 39 00 20 00 32 4e 2a 62 80 80 fd 70 b9 00 40 ff 0c 52 06 91 4d 70 b9 65 70 54 0e ff 0c 53 ef 4e e5 63 d0 53 47 73 a9 5b b6 5c 5e 60 27 ff 0c 8b a9 4f 60 76 84 62 18 65 97 66 f4 5f 3a 52 9b 30 02"
+      },
+      {
+        "source_member": "teach7",
+        "kind": "guide",
+        "title": "游戏引导线索 · teach7",
+        "source_bytes": 108,
+        "source_sha256": "f5e98b362b3b94cd1bf10b86194635a8c31be91f62195de41e6d2050edc44be6",
+        "complete_quest_definition": false,
+        "text_fragments": [
+          {
+            "byte_offset": 1,
+            "byte_length": 104,
+            "text": "界面出现@16727619 红色闪烁@，代表您的气血偏低，请及时使用药品@03654547 补充气血@！"
+          }
+        ],
+        "raw_hex": "01 07 00 68 75 4c 97 62 51 fa 73 b0 00 40 00 31 00 36 00 37 00 32 00 37 00 36 00 31 00 39 00 20 7e a2 82 72 95 ea 70 c1 00 40 ff 0c 4e e3 88 68 60 a8 76 84 6c 14 88 40 50 4f 4f 4e ff 0c 8b f7 53 ca 65 f6 4f 7f 75 28 83 6f 54 c1 00 40 00 30 00 33 00 36 00 35 00 34 00 35 00 34 00 37 00 20 88 65 51 45 6c 14 88 40 00 40 ff 01"
+      },
+      {
+        "source_member": "teach8",
+        "kind": "guide",
+        "title": "游戏引导线索 · teach8",
+        "source_bytes": 207,
+        "source_sha256": "0b1b289ea98a7415cd2112f2fe860b7fada6c823ddc452ae84bd3832e36981ad",
+        "complete_quest_definition": false,
+        "text_fragments": [
+          {
+            "byte_offset": 19,
+            "byte_length": 114,
+            "text": "战斗界面需要您每回合@16727619 选择指令@，每回合操作超过30秒，系统会为您托管。请选择攻击，战胜怪物吧！"
+          },
+          {
+            "byte_offset": 144,
+            "byte_length": 60,
+            "text": "将战斗界面的全部怪物@16727619 击败@，战斗即胜利！"
+          }
+        ],
+        "raw_hex": "06 03 00 00 00 03 04 00 0a 00 35 7e a7 70 6b 70 75 5b 50 07 00 72 62 18 65 97 75 4c 97 62 97 00 89 81 60 a8 6b cf 56 de 54 08 00 40 00 31 00 36 00 37 00 32 00 37 00 36 00 31 00 39 00 20 90 09 62 e9 63 07 4e e4 00 40 ff 0c 6b cf 56 de 54 08 64 cd 4f 5c 8d 85 8f c7 00 33 00 30 79 d2 ff 0c 7c fb 7e df 4f 1a 4e 3a 60 a8 62 58 7b a1 30 02 8b f7 90 09 62 e9 65 3b 51 fb ff 0c 62 18 80 dc 60 2a 72 69 54 27 ff 01 00 00 00 00 00 06 00 00 07 00 3c 5c 06 62 18 65 97 75 4c 97 62 76 84 51 68 90 e8 60 2a 72 69 00 40 00 31 00 36 00 37 00 32 00 37 00 36 00 31 00 39 00 20 51 fb 8d 25 00 40 ff 0c 62 18 65 97 53 73 80 dc 52 29 ff 01"
+      },
+      {
+        "source_member": "teach9",
+        "kind": "guide",
+        "title": "游戏引导线索 · teach9",
+        "source_bytes": 115,
+        "source_sha256": "02d7896824402fab8ff0811aa9cd57524303767d2fe8ad1dcd3ab5d238d8f27d",
+        "complete_quest_definition": false,
+        "text_fragments": [
+          {
+            "byte_offset": 1,
+            "byte_length": 98,
+            "text": "战斗中，在@02404324 攻击@或@02404324 技能@上使用0键，可切换为自动战斗模式！"
+          }
+        ],
+        "raw_hex": "02 07 00 62 62 18 65 97 4e 2d ff 0c 57 28 00 40 00 30 00 32 00 34 00 30 00 34 00 33 00 32 00 34 00 20 65 3b 51 fb 00 40 62 16 00 40 00 30 00 32 00 34 00 30 00 34 00 33 00 32 00 34 00 20 62 80 80 fd 00 40 4e 0a 4f 7f 75 28 00 30 95 2e ff 0c 53 ef 52 07 63 62 4e 3a 81 ea 52 a8 62 18 65 97 6a 21 5f 0f ff 01 02 00 00 00 00 00 00 00 00 00 00 00 01"
+      }
+    ],
+    "notes": "文案与引导线索不计为任务定义；原版任务总数尚未恢复。"
+  }
+}

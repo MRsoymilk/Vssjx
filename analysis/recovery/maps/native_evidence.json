@@ -1,0 +1,93 @@
+{
+  "source": "analysis/unpacked/ssjx/gameonline.ext",
+  "native_sha256": "e08f93bebe133b700f2305bfbedd994b05cc8d04a5a854262af9ced956afbc03",
+  "mode": "ARM Thumb, static disassembly",
+  "address_unit": "original file offset",
+  "functions": [
+    {
+      "name": "scene_read",
+      "start": "0x137c8",
+      "end_exclusive": "0x138b4",
+      "byte_sha256": "fe90ed5e653b217a3df943df2945edd7b38497a60787dd292d2512985c49ae46",
+      "interpretation": "编号字符串、名称、行列数、两层字节、图块表、两个字节、交互记录"
+    },
+    {
+      "name": "terrain_draw",
+      "start": "0x14670",
+      "end_exclusive": "0x146c6",
+      "byte_sha256": "63ef1b81bb3920c63e880c65b690596e3cd389a772b5e7969c9e1b20d9f2ad6e",
+      "interpretation": "单元0不绘制，正索引指向图块表；16像素网格"
+    },
+    {
+      "name": "tile_load",
+      "start": "0x15618",
+      "end_exclusive": "0x1569c",
+      "byte_sha256": "9c7ffdf49e7a305bee920a082ea9b26c1e31e3a3852da5a6cbecbd5a0554b76f",
+      "interpretation": "图块表编号减1后生成tile%d资源名"
+    },
+    {
+      "name": "world_routes_draw",
+      "start": "0x21090",
+      "end_exclusive": "0x210d8",
+      "byte_sha256": "c4d5bbcd148ba92b92988991ac32c64c06193263ae0daef31b89c382929eb86f",
+      "interpretation": "原始行列顺序转换为x/y后绘制线段"
+    },
+    {
+      "name": "world_nodes_draw",
+      "start": "0x21244",
+      "end_exclusive": "0x212e8",
+      "byte_sha256": "e4754800b016e4dc2d21fd36d9b76e9f941d01ab5acc96f65d4ba2db669d1e6f",
+      "interpretation": "记录+2为x、+1为y、+3为节点图标类别"
+    },
+    {
+      "name": "world_levels",
+      "start": "0x2193c",
+      "end_exclusive": "0x2196e",
+      "byte_sha256": "2db823cbcb9e9379d4cebbaa7c841e3afdb643e690c2314969cc56b79d65df8f",
+      "interpretation": "记录+4与+5显示为等级区间"
+    },
+    {
+      "name": "map_id_lookup",
+      "start": "0x221e8",
+      "end_exclusive": "0x22210",
+      "byte_sha256": "82ceb1aab0db0152eefb0cb19aed7c9b991f59141ed8c68b5114cc20caab34c9",
+      "interpretation": "以记录首字节匹配原包地图编号"
+    },
+    {
+      "name": "cache_write",
+      "start": "0x25430",
+      "end_exclusive": "0x25470",
+      "byte_sha256": "4b03b3e4826bc78cef1375691eb92eba82bab219dfc9feb8b0010d2e08ebda28",
+      "interpretation": "写入缓存；有校验值时先写4字节再写原始流"
+    },
+    {
+      "name": "cache_read",
+      "start": "0x27274",
+      "end_exclusive": "0x27300",
+      "byte_sha256": "652a7efa507251baad3615de2836cf91d5ac728529cf87a30ff4ed483fcb99e6",
+      "interpretation": "缓存校验匹配后跳过4字节头"
+    },
+    {
+      "name": "stream_readers",
+      "start": "0x277a4",
+      "end_exclusive": "0x27980",
+      "byte_sha256": "0cb456c8653faf65eeaa930929296a08fe98253764b8a25e6cfb470a599109ca",
+      "interpretation": "字节、大端短整数、UTF16字符串及数字字符串读取"
+    },
+    {
+      "name": "world_read",
+      "start": "0x2b25c",
+      "end_exclusive": "0x2b2bc",
+      "byte_sha256": "4a371c2010dc7308e65c50fbee1508f4179b40344de419e54e769c0cf0ccea6a",
+      "interpretation": "三字节头、名称数组、六字节记录、四字节路线记录"
+    },
+    {
+      "name": "tile_palette_read",
+      "start": "0x2fb50",
+      "end_exclusive": "0x2fb6e",
+      "byte_sha256": "c824d874ad514f9df5da7800f2c1319d620782ebe1715584121bd9a0477c8206",
+      "interpretation": "字节数量，随后读取大端短整数数组"
+    }
+  ],
+  "scene_schema_status": "静态推导，尚无真实.map样本；合成测试只验证解析器自洽性"
+}

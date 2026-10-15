@@ -195,3 +195,15 @@ fn idle_time_cannot_turn_into_unbounded_channel_burst() {
     chat.drain(now + Duration::from_millis(600500));
     assert_eq!(chat.batch(0).len(), 3);
 }
+
+#[test]
+fn client_chat_cannot_supply_sender_or_inject_extra_fields() {
+    use vssjx_server::world::ClientMessage;
+    let id = Uuid::new_v4();
+    let valid = format!(
+        r#"{{"type":"chat.send","client_message_id":"{id}","channel":"public","text":"hello"}}"#
+    );
+    assert!(serde_json::from_str::<ClientMessage>(&valid).is_ok());
+    let spoof = valid.replace("\"text\":", "\"display_name\":\"管理员\",\"text\":");
+    assert!(serde_json::from_str::<ClientMessage>(&spoof).is_err());
+}

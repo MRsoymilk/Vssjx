@@ -1,6 +1,7 @@
 extends Node
 ## Online identity stays separate from Game.player and offline saves.
 signal completed(action: String, result: Dictionary)
+signal world_ticket_received(result: Dictionary)
 var account: Dictionary = {}
 var server_address := ""
 var login_session_id := ""
@@ -40,6 +41,9 @@ func clear() -> void:
 
 func list_characters() -> void:
 	_send("characters", server_address, {}, true)
+
+func request_world_ticket(character_id: String, config_hash: String) -> void:
+	_send("world_ticket", server_address, {"character_id": character_id, "protocol_version": 1, "config_hash": config_hash}, true)
 
 func create_character(display_name: String, job: int, gender: int, school: int) -> void:
 	if busy: return
@@ -112,6 +116,7 @@ func _send(action: String, address: String, payload: Dictionary, bearer: bool = 
 	var body := "" if payload.is_empty() else JSON.stringify(payload)
 	var route := "/api/v1/auth/" + action
 	if action in ["characters", "character_create"]: route = "/api/v1/characters"
+	if action == "world_ticket": route = "/api/v1/world/ticket"
 	var error := _request.request(_target + route, headers, method, body)
 	if error != OK: _finish({"ok": false, "code": "NETWORK_ERROR"})
 
@@ -130,6 +135,12 @@ func _on_response(result: int, code: int, _headers: PackedStringArray, body: Pac
 		_finish({"ok": false, "code": "INVALID_RESPONSE"})
 		return
 	var data: Dictionary = parser.data
+	if _action == "world_ticket" and code == 200:
+		if not data.get("ticket") is String or RegEx.create_from_string("^[0-9a-f]{64}\\z").search(data.ticket) == null:
+			_finish({"ok": false, "code": "INVALID_RESPONSE"})
+		else:
+			_finish({"ok": true, "ticket": data.ticket})
+		return
 	if code not in [200, 201]:
 		if _action == "character_create" and code in [409, 422] and data.get("operation_id") == pending_creation.get("operation_id"): pending_creation = {}
 		if code == 401 and _action in ["refresh", "me", "characters", "character_create"]: clear()
@@ -195,9 +206,11 @@ func _finish(result: Dictionary) -> void:
 		_request.queue_free()
 		_request = null
 	# Do not expose tokens to page callbacks, logs or local preference files.
-	completed.emit(action, result)
+	if action == "world_ticket": world_ticket_received.emit(result)
+	else: completed.emit(action, result)
 	if not next.is_empty():
 		if result.ok: _send(next.action, server_address, next.payload, true)
+		elif next.action == "world_ticket": world_ticket_received.emit(result)
 		else: completed.emit(next.action, result)
 
 static func valid_nickname(raw: String) -> bool:

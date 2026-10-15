@@ -1,10 +1,10 @@
 # 联机协议草案
 
-设计修订：2026-10-15。账号与角色HTTPS接口已分阶段实现，当前契约见[auth.md](auth.md)和[characters.md](characters.md)，角色请求/昵称样例位于`shared/protocol/`。下述WSS、世界及战斗消息仍是后续实施契约，不是已经存在的接口；产品规则按[设计入口](README.md)D01～D08确认，事务所有权按[architecture.md](architecture.md)执行。
+设计修订：2026-10-15。账号与角色HTTPS、单次连接票据、共享地图移动及公共聊天已分阶段实现，当前落地契约分别见[auth.md](auth.md)、[characters.md](characters.md)、[shared_world.md](shared_world.md)和[chat.md](chat.md)，对应schema/样例位于`shared/protocol/`。本文件仍包含尚未落地的战斗、增量订阅等目标设计；当前实现以对应专题文档为准。产品规则按[设计入口](README.md)D01～D08确认，事务所有权按[architecture.md](architecture.md)执行。
 
 ## 1. 传输、认证与连接接管
 
-HTTPS处理注册、登录、刷新/撤销登录会话、角色列表/创建和连接票据；WSS处理角色进入世界后的移动、聊天及业务操作。初期UTF-8 JSON，不同时维护多套线上传输。路由前缀使用`/api/v1`，具体HTTP字段/状态码在M1契约中冻结。
+HTTPS处理注册、登录、刷新/撤销登录会话、角色列表/创建和连接票据；WSS处理角色进入世界后的移动、聊天及业务操作。账号、控制及初始快照使用UTF-8 JSON；当前世界增量v2使用同一WSS连接的紧凑二进制发布，见[shared_world.md](shared_world.md)与`shared/protocol/world-sync-v2.json`，旧世界版本明确拒绝。路由前缀使用`/api/v1`。
 
 客户端经已认证HTTPS接口取得短时、单次、绑定登录会话和角色的票据，在WSS首条`auth.exchange`消息中交换。票据不可放URL查询参数，消费必须原子；认证失败的票据是否已消费以服务器结果为准，客户端直接申请新票据而非盲目复用。认证超时关闭，未认证连接不得加载世界、订阅聊天或执行昂贵业务。
 
@@ -208,6 +208,8 @@ battle快照包含battle_id、rules_version、revision、回合、双方公开�
 已确认D04：断线冻结60秒并停止自动下指令，超时或在线连续5分钟无有效指令按主动逃跑结束，保留已提交消耗且不发胜利奖励，不套用战败回城处罚。相应deadline写入战斗的版本化状态，客户端不得自行延长。timeout由服务端稳定操作ID提交，与玩家命令争用同一角色串行与战斗修订：谁先有效提交谁生效，另一方看到已结束/旧版本，不重复结算。无效指令、查看、心跳、换连接不能无限延长deadline。维护/服务器恢复中的计时按架构规则区分处理。
 
 ## 8. 公共聊天
+
+当前 `chat-v1` 已实现，使用 `chat.ready` / `chat.batch` / `chat.result` 和独立channel_epoch/seq；批次每次最多16条。下述 `chat.message` 字段对应批内消息记录，具体格式、短期回执/重启边界见 [chat.md](chat.md)。
 
 chat.send只提交client_message_id、channel=`public`和纯文本。身份、名称、消息ID和时间来自服务器，未认证连接不能订阅或读历史。
 

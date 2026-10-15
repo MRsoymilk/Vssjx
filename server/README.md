@@ -1,6 +1,6 @@
 # Vssjx 服务端
 
-Rust/Tokio/Axum服务已支持服务器发现、基于PostgreSQL的账号注册/登录/刷新/注销，以及账号归属下的角色创建、查询和幂等回执。WSS、共享地图与公共聊天尚未实现。
+Rust/Tokio/Axum服务已支持服务器发现、PostgreSQL账号认证、角色创建/查询/幂等回执、单次连接票据、共享地图权威移动与公共聊天。线上任务/PVE尚未接入，当前仅支持一个世界服务进程，不能将多进程直连同库作为世界集群运行。
 
 - `src/`：启动入口、环境配置与HTTP服务。
 - `migrations/`：SQLx启动时执行的PostgreSQL版本化迁移。
@@ -36,6 +36,8 @@ Rust自动读取当前工作目录的`.env`；当前目录没有时，开发构�
 | `SSJX_AUTH_MAX_SESSIONS`、`SSJX_AUTH_HASH_WORKERS` | 认证会话与并行密码任务上限 |
 | `SSJX_AUTH_RATE_*` | 限流窗口、全局/IP/账号额度及键数量上限 |
 | `SSJX_DB_*` | 数据库连接池、查询、等待、空闲事务及就绪检查超时 |
+| `SSJX_WORLD_*` | 世界准入人数、位置保存间隔及重连所有权窗口；人数上限不是容量实测结论 |
+| `SSJX_CHAT_*` | 公共聊天有限历史、去重窗口、有界队列与个人/全局额度 |
 
 客户端不会读取或打包服务端`.env`，避免泄露数据库密码；客户端服务器地址仍由用户输入并保存到独立的`user://connection.cfg`。
 
@@ -84,13 +86,17 @@ SSJX_SERVER_NAME="蜀山剑侠服务器"
 | `GET /api/v1/characters` | 当前账号的角色基本行，至多一个，不读取离线存档 |
 | `POST /api/v1/characters` | 账号级幂等创建，昵称全服唯一，初始资产同事务提交 |
 | `GET /api/v1/character-operations/{operation_id}` | 读取当前账号的原创建回执，成功与明确拒绝均持久化 |
+| `POST /api/v1/world/ticket` | 账号角色归属校验后签发短时单次票据 |
+| `GET /api/v1/world/ws` | WebSocket升级后交换票据、进入世界、移动与公共聊天 |
 
-未配置数据库时`stage=connection_only`且能力列表为空；配置后为`stage=account_auth`、`capabilities=["account_auth","character_creation"]`。仍不发布WSS或游戏世界能力。账号及角色契约分别见[auth.md](../design/auth.md)、[characters.md](../design/characters.md)。
+未配置数据库时`stage=connection_only`且能力列表为空；配置后为`stage=account_auth`、`capabilities=["account_auth","character_creation","shared_world","public_chat"]`。详细契约见[账号](../design/auth.md)、[角色](../design/characters.md)、[共享地图](../design/shared_world.md)与[聊天](../design/chat.md)。公开能力不代表1000人容量或公网TLS代理已经验收。
 
 ## 域名与路径前缀
 
 公网使用带有效证书的HTTPS反向代理，Rust服务放在受控内网。客户端支持`https://game.example.com`和`https://game.example.com/ssjx`；使用前缀时代理应将`/ssjx/api/v1/server-info`转发到后端`/api/v1/server-info`。
 
 域名无需修改客户端或重新编译服务端；把客户端地址改为域名即可。客户端不关闭证书校验，也不自动跟随重定向。完整地址与保存规则见[连接入口设计](../design/connection.md)。
+
+共享地图还需代理支持WebSocket升级，并保留相同路径前缀；客户端将HTTPS地址转换为WSS。Rust本体不终止TLS；仅原生客户端接入，本阶段拒绝浏览器Origin。
 
 客户端发送密码或令牌要求HTTPS，仅`localhost`、`127.*`、`[::1]`允许本机HTTP。局域网HTTP地址仍可用于连接检查，账号操作需要HTTPS；Rust本身当前不终止TLS，公网部署必须由受控反向代理提供TLS且限制后端直连。应用不信任任意`X-Forwarded-For`来放宽限流。

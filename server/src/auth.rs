@@ -157,12 +157,12 @@ pub fn validate_password(password: &str) -> Result<(), AuthError> {
     Ok(())
 }
 
-fn token() -> String {
+pub(crate) fn token() -> String {
     let mut bytes = [0_u8; 32];
     OsRng.fill_bytes(&mut bytes);
     bytes.iter().map(|byte| format!("{byte:02x}")).collect()
 }
-fn token_digest(raw: &str) -> Result<Vec<u8>, AuthError> {
+pub(crate) fn token_digest(raw: &str) -> Result<Vec<u8>, AuthError> {
     if raw.len() != 64 || !raw.bytes().all(|c| c.is_ascii_hexdigit()) {
         return Err(unauthorized());
     }
@@ -392,6 +392,16 @@ impl AuthService {
 
     pub(crate) fn pool(&self) -> &PgPool {
         &self.pool
+    }
+
+    pub(crate) async fn live_session(&self, id: Uuid) -> Result<bool, AuthError> {
+        sqlx::query_scalar("SELECT EXISTS(SELECT 1 FROM sessions s JOIN accounts a ON a.id=s.account_id WHERE s.id=$1 AND s.revoked_at IS NULL AND s.access_expires_at>clock_timestamp() AND s.refresh_expires_at>clock_timestamp() AND NOT a.disabled)")
+            .bind(id).fetch_one(&self.pool).await.map_err(|_| unavailable())
+    }
+
+    pub(crate) async fn chat_muted(&self, id: Uuid) -> Result<bool, AuthError> {
+        sqlx::query_scalar("SELECT COALESCE(a.chat_muted_until>clock_timestamp(),FALSE) FROM sessions s JOIN accounts a ON a.id=s.account_id WHERE s.id=$1 AND s.revoked_at IS NULL AND s.access_expires_at>clock_timestamp() AND s.refresh_expires_at>clock_timestamp() AND NOT a.disabled")
+            .bind(id).fetch_optional(&self.pool).await.map_err(|_|unavailable())?.ok_or(AuthError(StatusCode::UNAUTHORIZED,"SESSION_REVOKED"))
     }
 
     pub(crate) async fn authorize_in(

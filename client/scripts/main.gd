@@ -264,6 +264,7 @@ func _online_characters() -> void:
 	var panel := _modal_panel("线上角色", 428)
 	var lobby := OnlineCharacters.new()
 	lobby.name = "OnlineCharacters"
+	lobby.enter_requested.connect(_enter_online_world)
 	lobby.position = Vector2(0, 54)
 	panel.add_child(lobby)
 	lobby.close_requested.connect(func() -> void:
@@ -276,6 +277,19 @@ func _cover_exit() -> void:
 	_label(panel, String(original_cover.original_text.quit), Rect2(18, 56, 248, 90), 14)
 	_button(panel, "确定", Rect2(18, 186, 148, 32), func() -> void: get_tree().quit(), true)
 	_button(panel, "取消", Rect2(176, 186, 88, 32), _close_modal)
+
+func _enter_online_world(character_id: String) -> void:
+	mode = "online_world"
+	_clear_ui()
+	_dispose_world()
+	var view := OnlineWorldView.new()
+	view.name = "OnlineWorld"
+	view.character_id = character_id
+	ui.add_child(view)
+	view.close_requested.connect(func() -> void:
+		_home()
+		_server_login()
+	)
 
 func _create() -> void:
 	mode = "create"
@@ -936,7 +950,7 @@ func _battle_result() -> void:
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_CLOSE_REQUEST:
-		if not Game.player.is_empty():
+		if mode != "online_world" and not Game.player.is_empty():
 			if mode == "battle" and battle != null:
 				if battle.finished and battle.phase == "settlement":
 					battle.finish_round()

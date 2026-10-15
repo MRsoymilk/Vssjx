@@ -2,6 +2,7 @@ class_name OnlineCharacters
 extends Control
 ## Lobby only: never installs an online snapshot in Game.player.
 signal close_requested
+signal enter_requested(character_id: String)
 var nickname: LineEdit
 var job: OptionButton
 var gender: OptionButton
@@ -9,6 +10,7 @@ var school: OptionButton
 var status: Label
 var create_button: Button
 var refresh_button: Button
+var enter_button: Button
 var _loaded := false
 
 func _ready() -> void:
@@ -28,7 +30,10 @@ func _ready() -> void:
 	status = _label("正在读取线上角色……", Rect2(18, 148, 248, 118))
 	create_button = _button("创建角色", Rect2(18, 274, 156, 30), _create)
 	refresh_button = _button("刷新", Rect2(182, 274, 84, 30), _refresh)
-	_button("返回账号", Rect2(18, 326, 248, 30), func() -> void: close_requested.emit())
+	enter_button = _button("进入共享地图", Rect2(18, 308, 248, 28), func() -> void:
+		if not enter_button.disabled: enter_requested.emit(OnlineAccount.characters[0].id)
+	)
+	_button("返回账号", Rect2(18, 340, 248, 28), func() -> void: close_requested.emit())
 	OnlineAccount.completed.connect(_result)
 	_restore_pending()
 	_update_controls()
@@ -82,6 +87,7 @@ func _update_controls() -> void:
 	create_button.disabled = locked or exists or not _loaded
 	create_button.text = "重试原创建请求" if pending else "创建角色"
 	refresh_button.disabled = locked
+	enter_button.disabled = locked or not exists or not _loaded
 
 func _refresh() -> void:
 	if OnlineAccount.busy: return
@@ -119,5 +125,5 @@ func _result(action: String, result: Dictionary) -> void:
 			job.select(int(character.job))
 			gender.select(int(character.gender))
 			school.select(int(character.school))
-			status.text = "线上角色：%s\n等级%d · 金币%d\n角色已存入服务器，可重新登录查看。\n共享地图尚未开放；不会进入离线世界。" % [character.display_name, character.level, character.gold]
+			status.text = "线上角色：%s\n等级%d · 金币%d\n可进入青云山道同图移动、公共聊天。\n线上任务与战斗尚未开放。" % [character.display_name, character.level, character.gold]
 	_update_controls()

@@ -1,0 +1,23 @@
+# 公共聊天验收
+
+```sh
+python tests/run_shared_world.py --render --output /tmp/opencode/vssjx-public-chat
+godot --headless --path client res://tests/public_chat_test.tscn
+cargo test --locked --manifest-path server/Cargo.toml
+cargo clippy --locked --manifest-path server/Cargo.toml --all-targets -- -D warnings
+```
+
+渲染依赖与本机Xvfb环境见 [共享地图测试](shared_world.md)。集成脚本创建临时PostgreSQL、Rust服务和两个独立Godot进程，不读私有.env，不保留账号凭据。`chat_checks.py`是协议/数据库断言，`client/tests/public_chat_test.gd`是客户端协议边界测试。
+
+## 2026-10-15验证
+
+- 双客户端真实OpenGL离屏：Alice 25项、Bob 28项，零失败。共8张640×960截图（入场、聊天、移动、重连），聊天面板标记按字面显示。
+- 聊天双向发送；发送确认后清空；输入WASD不移动；聊天保持打开时远端继续移动；在线/离线存档哨兵隔离。
+- 故障注入：Bob暂停网络接收，Alice先看见消息后Bob主动断线，重连原ID查询；两端只显示一次原消息，客户端无待确认残留。
+- 真实服务器：身份由服务端决定、未认证聊天拒绝、去重/改内容冲突、控制符/超长/频道拒绝、账号禁言/到期恢复、个人限流；换连接仍能查询原消息；服务重启更换频道代次且历史为空。
+- 客户端协议42项：严格字段、顺序/代次、无半批安装、重复消息拒绝、缓存上限、历史缺口恢复、未知消息原ID重试、重启/去重窗口过期不自动发送。
+- Rust聊天测试覆盖FIFO公平队列、频道总预算、停顿不无限突发、历史上限、未过期回执不被逐出、回执过期回收及禁言后的原结果重放。
+- Rust共22项测试通过，Clippy所有target以`-D warnings`通过。
+- 账号UI回归18项、角色UI回归47项及对应PostgreSQL集成通过。
+
+截图和进程日志：`/tmp/opencode/vssjx-public-chat/`。测试不承诺永久聊天历史、运营审计、管理UI、跨进程去重或1000人聊天容量。

@@ -13,6 +13,7 @@ pub struct Config {
     pub database_url: Option<String>,
     pub log_filter: String,
     pub auth: AuthConfig,
+    pub world: crate::world::WorldConfig,
 }
 
 impl Config {
@@ -78,6 +79,26 @@ impl Config {
             return Err("Invalid RUST_LOG filter".into());
         }
         config.auth = AuthConfig::from_values(values)?;
+        config.world = crate::world::WorldConfig {
+            max_players: number(values, "SSJX_WORLD_MAX_PLAYERS", 1000, 2, 1000)? as usize,
+            save_seconds: u64::from(number(values, "SSJX_WORLD_SAVE_SECONDS", 10, 1, 30)?),
+            grace_seconds: u64::from(number(values, "SSJX_WORLD_RECONNECT_SECONDS", 15, 1, 60)?),
+            chat: crate::chat::ChatConfig {
+                history: number(values, "SSJX_CHAT_HISTORY", 50, 1, 100)? as usize,
+                dedup_seconds: u64::from(number(values, "SSJX_CHAT_DEDUP_SECONDS", 300, 30, 3600)?),
+                max_receipts: number(values, "SSJX_CHAT_MAX_RECEIPTS", 4096, 16, 65536)? as usize,
+                max_pending: number(values, "SSJX_CHAT_MAX_PENDING", 256, 1, 1000)? as usize,
+                personal_burst: number(values, "SSJX_CHAT_PERSONAL_BURST", 3, 1, 10)?,
+                personal_seconds: u64::from(number(
+                    values,
+                    "SSJX_CHAT_PERSONAL_SECONDS",
+                    5,
+                    1,
+                    60,
+                )?),
+                global_per_second: number(values, "SSJX_CHAT_GLOBAL_PER_SECOND", 20, 1, 100)?,
+            },
+        };
         Ok(config)
     }
 
@@ -98,6 +119,7 @@ impl Config {
             database_url: None,
             log_filter: "info".into(),
             auth: AuthConfig::default(),
+            world: crate::world::WorldConfig::default(),
         })
     }
 }

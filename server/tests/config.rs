@@ -44,6 +44,8 @@ fn sample_is_complete_and_safe_without_a_database_password() {
     let config = Config::from_values(&values).unwrap();
     assert!(config.database_url.is_none());
     assert_eq!(config.auth, AuthConfig::default());
+    assert_eq!(config.world.chat.history, 50);
+    assert_eq!(config.world.chat.global_per_second, 20);
 }
 
 #[test]
@@ -85,6 +87,10 @@ fn invalid_limits_and_syntax_fail_without_exposing_values() {
         ("SSJX_AUTH_HASH_WORKERS", "0"),
         ("SSJX_DB_MAX_CONNECTIONS", "101"),
         ("SSJX_AUTH_ACCESS_SECONDS", "not-a-number"),
+        ("SSJX_CHAT_HISTORY", "101"),
+        ("SSJX_CHAT_GLOBAL_PER_SECOND", "0"),
+        ("SSJX_CHAT_DEDUP_SECONDS", "29"),
+        ("SSJX_CHAT_MAX_RECEIPTS", "1000000"),
     ] {
         assert!(Config::from_values(&HashMap::from([(key.into(), value.into())])).is_err());
     }

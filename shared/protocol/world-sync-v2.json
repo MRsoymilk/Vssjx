@@ -1,0 +1,26 @@
+{
+  "world_sync_version": 2,
+  "transport": "one WebSocket binary message per authoritative 100ms publication",
+  "endian": "big",
+  "magic_ascii": "VWD2",
+  "header_bytes": 36,
+  "header": [
+    ["magic", "bytes4"], ["world_stream_id", "uuid_bytes16"], ["seq", "u64"],
+    ["enter_json_bytes", "u32"], ["leave_count", "u16"], ["motion_count", "u16"]
+  ],
+  "body": [
+    ["enter", "UTF-8 JSON array of complete public Entity records, length from header"],
+    ["leave", "leave_count consecutive u32 net_id values"],
+    ["motion", "motion_count consecutive 26-byte records"],
+    ["sha256", "bytes32 over every preceding byte of the message"]
+  ],
+  "motion": [
+    ["net_id", "u32"], ["cell", "u16: y*32+x"], ["next_cell", "u16: y*32+x, 65535=null"],
+    ["segment_progress", "u16: 0..1000"], ["entity_revision", "u64: 0..i64::MAX"], ["last_input_seq", "u64: 0..i64::MAX"]
+  ],
+  "limits": {"players": 1000, "message_bytes": 1048576, "retained_publications": 32},
+  "baseline": "JSON snapshot.begin.base_world_seq and auth.ready.world_stream_id. No delta interleaves initial snapshot chunks. All subsequent publications must have seq=previous+1, including empty ticks.",
+  "golden_epoch": "20000000-0000-4000-8000-000000000001",
+  "golden_quiet_seq7_hex": "5657443220000000000040008000000000000001000000000000000700000002000000005b5d77bc32acdd344127228f15f6646a31ba31513ac351e0e4fbf4b2374aca8d79ba",
+  "golden_motion_seq8_hex": "5657443220000000000040008000000000000001000000000000000800000002000000015b5d00000001020a020b01c20000000000000001000000000000000775a11373d5642be204b34864e72fe62733f067a0bbbf475237cf37da6c3e0edc"
+}

@@ -1,4 +1,7 @@
-use vssjx_server::world_map::{Motion, WorldMap};
+use vssjx_server::{
+    world::{ClientMessage, decimal},
+    world_map::{Motion, WorldMap},
+};
 #[test]
 fn map_export_includes_river_bridge_and_tree_blockers() {
     let map = WorldMap::default();
@@ -41,4 +44,19 @@ fn movement_budget_and_retargeting_cannot_teleport_or_accelerate() {
     assert!(moving.move_to(&map, [20, 16]));
     moving.advance(100.0);
     assert!((moving.progress - 0.45).abs() < 1e-6); // Long server stall grants at most one 100ms step.
+}
+#[test]
+fn world_messages_reject_authoritative_positions_duplicates_and_bad_sequences() {
+    assert_eq!(decimal("9223372036854775807").unwrap(), i64::MAX as u64);
+    for raw in ["01", "+1", "-1", "1.0", "9223372036854775808", "1\n", ""] {
+        assert!(decimal(raw).is_err());
+    }
+    assert!(
+        serde_json::from_str::<ClientMessage>(r#"{"type":"world.move_to","position":[900,900]}"#)
+            .is_err()
+    );
+    assert!(
+        serde_json::from_str::<ClientMessage>(r#"{"type":"ping","type":"world.leave"}"#).is_err()
+    );
+    assert!(serde_json::from_str::<ClientMessage>(r#"{"type":"ping","gold":900}"#).is_err());
 }

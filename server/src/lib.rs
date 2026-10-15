@@ -2,7 +2,9 @@ pub mod auth;
 pub mod characters;
 pub mod chat;
 pub mod config;
+pub mod world;
 pub mod world_map;
+pub mod world_replication;
 
 use axum::response::IntoResponse;
 use axum::{
@@ -44,6 +46,7 @@ struct ApiError {
 pub(crate) struct AppState {
     config: config::Config,
     auth: Option<auth::AuthService>,
+    world: Option<Arc<world::WorldHub>>,
 }
 
 pub fn app(config: config::Config) -> Router {
@@ -55,6 +58,7 @@ pub fn app_with_auth(config: config::Config, auth: auth::AuthService) -> Router 
 }
 
 fn build_app(config: config::Config, auth: Option<auth::AuthService>) -> Router {
+    let world = auth.as_ref().map(|_| world::WorldHub::new(config.world));
     Router::new()
         .route("/healthz", get(health))
         .route("/readyz", get(ready))
@@ -64,6 +68,8 @@ fn build_app(config: config::Config, auth: Option<auth::AuthService>) -> Router 
         .route("/api/v1/auth/refresh", post(auth::refresh))
         .route("/api/v1/auth/me", get(auth::me))
         .route("/api/v1/auth/logout", post(auth::logout))
+        .route("/api/v1/world/ticket", post(world::ticket))
+        .route("/api/v1/world/ws", get(world::upgrade))
         .route(
             "/api/v1/characters",
             get(characters::list).post(characters::create),
@@ -75,7 +81,11 @@ fn build_app(config: config::Config, auth: Option<auth::AuthService>) -> Router 
         .fallback(|| async { (StatusCode::NOT_FOUND, Json(ApiError { code: "NOT_FOUND" })) })
         .layer(DefaultBodyLimit::max(4096))
         .layer(middleware::map_response(no_store))
-        .with_state(Arc::new(AppState { config, auth }))
+        .with_state(Arc::new(AppState {
+            config,
+            auth,
+            world,
+        }))
 }
 
 async fn no_store(mut response: Response) -> Response {
@@ -127,7 +137,12 @@ async fn server_info(State(state): State<Arc<AppState>>) -> impl axum::response:
                 "connection_only"
             },
             capabilities: if state.auth.is_some() {
-                vec!["account_auth", "character_creation"]
+                vec![
+                    "account_auth",
+                    "character_creation",
+                    "shared_world",
+                    "public_chat",
+                ]
             } else {
                 vec![]
             },

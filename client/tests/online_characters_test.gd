@@ -82,7 +82,7 @@ func _run() -> void:
 	var overflowing := character.duplicate(true)
 	overflowing.state_revision = "9223372036854775808"
 	check(not OnlineAccount._valid_character(overflowing), "Revision overflow rejected without float conversion")
-	check(lobby.create_button.disabled and lobby.status.text.contains("共享地图尚未开放"), "Existing character is read-only, no fake world entry")
+	check(lobby.create_button.disabled and not lobby.enter_button.disabled and lobby.status.text.contains("同图移动"), "Existing character offers explicit shared-world entry")
 	check(original.operation_id.length() == 36, "Creation uses random UUID operation identity")
 	await capture("03_character_created")
 	check(Game.player == before and FileAccess.get_file_as_string(Game.save_path) == "offline-save-sentinel", "Online creation never changes offline player or save")

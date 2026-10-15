@@ -33,6 +33,13 @@ func _run() -> void:
 	check(view.attributes.visible and view.attributes.snapshot.name == view.network.pve.state.character.display_name, "Real online header opens original attributes with server identity")
 	check(view.attributes.numbers.hp.value == "%d/%d" % [int(view.network.pve.state.character.hp), int(view.network.pve.state.stats.hp)], "Real attributes use authoritative health maximum")
 	view.attributes.get_node("Back").pressed.emit()
+	var click := InputEventMouseButton.new()
+	click.button_index = MOUSE_BUTTON_LEFT
+	click.pressed = true
+	click.position = Vector2(14 * 16 + 8, 16 * 16 + 8) - view.camera.get_screen_center_position() + Vector2(view.viewport.size) / 2.0
+	view._map_input(click)
+	check(view.move_target.visible and view.move_target.destination == Vector2i(14,16), "Real online map click displays original destination marker")
+	check(await wait_until(func() -> bool: return int(view.network.entities[own_id].cell[0]) == 14 and int(view.network.entities[own_id].cell[1]) == 16 and not view.move_target.visible), "Real movement clears marker only after character arrives")
 	view.resident_selected.emit("qingwei")
 	view.encounter.get_node("Panel/Primary").pressed.emit()
 	check(await wait_until(func() -> bool: return int(view.network.pve.state.character.quest_stage) == 1), "NPC UI automatically approaches and accepts quest on server")

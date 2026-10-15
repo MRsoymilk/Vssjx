@@ -3,6 +3,7 @@ extends Node
 ## Full initial baseline + bounded, authenticated world deltas. No Game dependency.
 signal changed(entities: Dictionary)
 signal status_changed(text: String)
+signal movement_cancelled
 const MAP_PATH := "res://assets/data/qingyun-v1.json"
 var world_ready := false
 var character_id := ""
@@ -367,6 +368,7 @@ func move_to(cell: Vector2i) -> void:
 	_send_motion("world.move_to", [cell.x, cell.y])
 
 func stop_moving() -> void:
+	movement_cancelled.emit()
 	_send_motion("world.stop")
 
 func _send_motion(kind: String, target: Array = []) -> void:

@@ -31,6 +31,9 @@ var _was_keyboard := false
 @onready var menu: OriginalGameMenu = $GameMenu
 @onready var details: Control = $Menu
 @onready var attributes: OriginalCharacterAttributes = $Attributes
+@onready var move_target: WorldMoveTarget = $Viewport/Scene/MoveTarget
+var _target_wait := 0.0
+var _target_seen_motion := false
 var _character: Dictionary = {}
 var _system_text := "正在连接共享地图……"
 var _rendered_chat := ""
@@ -104,6 +107,7 @@ func _ready() -> void:
 	network.changed.connect(_snapshot)
 	network.population.changed.connect(_population)
 	network.status_changed.connect(_status_changed)
+	network.movement_cancelled.connect(move_target.clear)
 	network.chat.changed.connect(_chat_changed)
 	network.chat.status_changed.connect(func(text_value: String) -> void:
 		chat_status.text = text_value
@@ -158,6 +162,7 @@ func _status_changed(text_value: String) -> void:
 	_system_text = text_value
 	expanded_chat.add_system(text_value)
 	if not network.world_ready:
+		move_target.clear()
 		for actor in actors.values(): actor.sprite.play("idle")
 	_chat_changed()
 
@@ -337,6 +342,7 @@ func _process(delta: float) -> void:
 			actor.distance = 0.0
 			actor.sprite.play("idle")
 	if actors.has(character_id): camera.position = actors[character_id].root.position
+	_update_move_target(delta)
 	_advance_approach()
 	if chat_input.has_focus() or menu.visible or details.visible or emote_picker.visible or encounter.visible or battle_view.visible or expanded_chat.visible or attributes.visible or network.pve.pending():
 		_was_keyboard = false
@@ -344,6 +350,7 @@ func _process(delta: float) -> void:
 	_key_timer -= delta
 	var direction := Vector2i(int(Input.is_physical_key_pressed(KEY_D) or Input.is_physical_key_pressed(KEY_RIGHT)) - int(Input.is_physical_key_pressed(KEY_A) or Input.is_physical_key_pressed(KEY_LEFT)), int(Input.is_physical_key_pressed(KEY_S) or Input.is_physical_key_pressed(KEY_DOWN)) - int(Input.is_physical_key_pressed(KEY_W) or Input.is_physical_key_pressed(KEY_UP)))
 	if direction.x != 0: direction.y = 0
+	if direction != Vector2i.ZERO: move_target.clear()
 	if direction != Vector2i.ZERO and _key_timer <= 0 and network.entities.has(character_id):
 		_key_timer = 0.15
 		var own: Dictionary = network.entities[character_id]
@@ -374,7 +381,9 @@ func _map_input(event: InputEvent) -> void:
 			return
 	_cancel_approach()
 	var destination := Vector2i(floori(world_point.x / 16.0), floori(world_point.y / 16.0))
-	if _motion_grid.region.has_point(destination) and not _motion_grid.is_point_solid(destination): network.move_to(destination)
+	if _motion_grid.region.has_point(destination) and not _motion_grid.is_point_solid(destination):
+		network.move_to(destination)
+		_mark_destination(destination)
 	else:
 		network.stop_moving()
 		chat_status.text = "目标不可达，已停止原路线。"
@@ -408,6 +417,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 
 func _pve_changed() -> void:
 	var model := network.pve
+	if not model.ready or model.active(): move_target.clear()
 	if not model.ready:
 		_cancel_approach()
 	if not model.state.is_empty():
@@ -496,6 +506,35 @@ func _advance_approach() -> void:
 	else:
 		_approach.stopped = false
 		network.move_to(best)
+		_mark_destination(best)
+
+func _mark_destination(cell: Vector2i) -> void:
+	move_target.clear()
+	if not network.world_ready or network.pve.active() or network.pve.pending() or not network.entities.has(character_id): return
+	var own: Dictionary = network.entities[character_id]
+	var origin: Array = own.cell if own.next_cell == null else own.next_cell
+	var start := Vector2i(origin[0], origin[1])
+	if not _motion_grid.region.has_point(cell) or _motion_grid.is_point_solid(cell): return
+	if (cell == start and own.next_cell == null) or _motion_grid.get_id_path(start, cell).is_empty(): return
+	move_target.set_destination(cell)
+	_target_wait = 0.0
+	_target_seen_motion = false
+
+func _update_move_target(delta: float) -> void:
+	if not move_target.visible: return
+	if not network.world_ready or network.pve.active() or not actors.has(character_id):
+		move_target.clear()
+		return
+	var own: Dictionary = network.entities[character_id]
+	# Old idle snapshots must not erase a click awaiting send or acknowledgement.
+	if not network._pending_motion.is_empty() or int(own.last_input_seq) < network._input_seq: return
+	_target_wait += delta
+	var motion: OnlineActorMotion = actors[character_id].motion
+	if motion.has_motion():
+		_target_seen_motion = true
+		return
+	if motion.position.distance_to(move_target.position) < 0.5 or _target_seen_motion or _target_wait > 1.0:
+		move_target.clear()
 
 func _set_battle_layout(active: bool) -> void:
 	screen.chrome.toolbar.visible = not active

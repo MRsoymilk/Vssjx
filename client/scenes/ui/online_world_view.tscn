@@ -9,6 +9,7 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/online_battle_view.tscn" id="Battle"]
 
 [ext_resource type="PackedScene" path="res://scenes/ui/character_attributes.tscn" id="Attributes"]
+[ext_resource type="PackedScene" path="res://scenes/world_move_target.tscn" id="MoveTarget"]
 
 [node name="OnlineWorldView" type="Control"]
 offset_right = 320.0
@@ -23,6 +24,7 @@ render_target_update_mode = 4
 z_index = -1
 [node name="Actors" type="Node2D" parent="Viewport/Scene"]
 y_sort_enabled = true
+[node name="MoveTarget" parent="Viewport/Scene" instance=ExtResource("MoveTarget")]
 [node name="Camera" type="Camera2D" parent="Viewport/Scene"]
 position = Vector2(168, 264)
 limit_left = 0

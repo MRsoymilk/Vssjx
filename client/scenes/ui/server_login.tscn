@@ -1,251 +1,244 @@
 [gd_scene format=3]
 
-[ext_resource type="Script" path="res://scripts/server_login.gd" id="1_b65o1"]
-[ext_resource type="Script" path="res://scripts/network/server_discovery.gd" id="2_rgqu0"]
+[ext_resource type="Script" path="res://scripts/server_login.gd" id="Script"]
+[ext_resource type="Script" path="res://scripts/network/server_discovery.gd" id="Discovery"]
+[ext_resource type="Theme" path="res://scenes/ui/login_theme.tres" id="Theme"]
+[ext_resource type="Texture2D" path="res://assets/ui/create_header_end.png" id="HeaderEnd"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lhdy1"]
-bg_color = Color(0.11764706, 0.23529412, 0.25490198, 1)
+[sub_resource type="StyleBoxFlat" id="Frame"]
+content_margin_left = 0.0
+content_margin_top = 3.0
+content_margin_right = 0.0
+content_margin_bottom = 3.0
+bg_color = Color(0.886275, 0.811765, 0.533333, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.462745, 0.313725, 0.12549, 1)
+
+[sub_resource type="StyleBoxFlat" id="Paper"]
+content_margin_left = 0.0
+content_margin_top = 3.0
+content_margin_right = 0.0
+content_margin_bottom = 3.0
+bg_color = Color(1.0, 0.94902, 0.741176, 1)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
-border_color = Color(0.7137255, 0.57254905, 0.32156864, 1)
+border_color = Color(1.0, 0.964706, 0.823529, 1)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_78uy0"]
-bg_color = Color(0.19215687, 0.34509805, 0.34509805, 1)
+[sub_resource type="StyleBoxFlat" id="Title"]
+content_margin_left = 0.0
+content_margin_top = 3.0
+content_margin_right = 0.0
+content_margin_bottom = 3.0
+bg_color = Color(0.658824, 0.235294, 0.14902, 1)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
-border_color = Color(0.7137255, 0.57254905, 0.32156864, 1)
+border_color = Color(0.937255, 0.811765, 0.478431, 1)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_b17ce"]
-bg_color = Color(0.19215687, 0.34509805, 0.34509805, 1)
+[sub_resource type="StyleBoxFlat" id="Service"]
+content_margin_left = 0.0
+content_margin_top = 3.0
+content_margin_right = 0.0
+content_margin_bottom = 3.0
+bg_color = Color(0.956863, 0.901961, 0.639216, 1)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
-border_color = Color(0.7137255, 0.57254905, 0.32156864, 1)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fy58y"]
-bg_color = Color(0.11764706, 0.23529412, 0.25490198, 1)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0.7137255, 0.57254905, 0.32156864, 1)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_40ml8"]
-bg_color = Color(0.19215687, 0.34509805, 0.34509805, 1)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0.7137255, 0.57254905, 0.32156864, 1)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_34121"]
-bg_color = Color(0.19215687, 0.34509805, 0.34509805, 1)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0.7137255, 0.57254905, 0.32156864, 1)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ef215"]
-bg_color = Color(0.11764706, 0.23529412, 0.25490198, 1)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0.7137255, 0.57254905, 0.32156864, 1)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_d3ek8"]
-bg_color = Color(0.19215687, 0.34509805, 0.34509805, 1)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0.7137255, 0.57254905, 0.32156864, 1)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mwhxo"]
-bg_color = Color(0.19215687, 0.34509805, 0.34509805, 1)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0.7137255, 0.57254905, 0.32156864, 1)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_cfgaa"]
-bg_color = Color(0.11764706, 0.23529412, 0.25490198, 1)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0.7137255, 0.57254905, 0.32156864, 1)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_sfqyv"]
-bg_color = Color(0.19215687, 0.34509805, 0.34509805, 1)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0.7137255, 0.57254905, 0.32156864, 1)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_42ngi"]
-bg_color = Color(0.19215687, 0.34509805, 0.34509805, 1)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0.7137255, 0.57254905, 0.32156864, 1)
+border_color = Color(0.8, 0.721569, 0.419608, 1)
 
 [node name="ServerLogin" type="Control"]
+texture_filter = 1
 layout_mode = 3
-anchors_preset = 0
-offset_right = 284.0
-offset_bottom = 368.0
-script = ExtResource("1_b65o1")
+offset_right = 320.0
+offset_bottom = 480.0
+theme = ExtResource("Theme")
+script = ExtResource("Script")
 
-[node name="Label0" type="Label" parent="."]
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 0
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 320.0
+offset_bottom = 480.0
+mouse_filter = 2
+color = Color(0.160784, 0.301961, 0.286275, 1)
+
+[node name="OuterFrame" type="Panel" parent="."]
+layout_mode = 0
+offset_left = 12.0
+offset_top = 38.0
+offset_right = 308.0
+offset_bottom = 440.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("Frame")
+
+[node name="Paper" type="Panel" parent="."]
 layout_mode = 0
 offset_left = 18.0
-offset_right = 266.0
-offset_bottom = 23.0
+offset_top = 44.0
+offset_right = 302.0
+offset_bottom = 434.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("Paper")
+
+[node name="TitleBar" type="Panel" parent="."]
+layout_mode = 0
+offset_left = 18.0
+offset_top = 44.0
+offset_right = 302.0
+offset_bottom = 86.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("Title")
+
+[node name="HeaderLeft" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 19.0
+offset_top = 45.0
+offset_right = 35.0
+offset_bottom = 85.0
+mouse_filter = 2
+texture = ExtResource("HeaderEnd")
+expand_mode = 1
+
+[node name="HeaderRight" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 285.0
+offset_top = 45.0
+offset_right = 301.0
+offset_bottom = 85.0
+mouse_filter = 2
+texture = ExtResource("HeaderEnd")
+expand_mode = 1
+flip_h = true
+
+[node name="Title" type="Label" parent="."]
+layout_mode = 0
+offset_left = 72.0
+offset_top = 52.0
+offset_right = 248.0
+offset_bottom = 80.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(1.0, 0.945098, 0.631373, 1)
+theme_override_font_sizes/font_size = 18
+text = "登陆游戏"
+horizontal_alignment = 1
+
+[node name="ServiceFrame" type="Panel" parent="."]
+layout_mode = 0
+offset_left = 26.0
+offset_top = 105.0
+offset_right = 294.0
+offset_bottom = 147.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("Service")
+
+[node name="ServiceLabel" type="Label" parent="."]
+layout_mode = 0
+offset_left = 32.0
+offset_top = 112.0
+offset_right = 96.0
+offset_bottom = 140.0
+mouse_filter = 2
 theme_override_font_sizes/font_size = 12
-text = "目标服务器地址"
-autowrap_mode = 3
+text = "服务地址："
 
 [node name="ServerAddress" type="LineEdit" parent="."]
-unique_name_in_owner = true
 layout_mode = 0
-offset_left = 18.0
-offset_top = 20.0
-offset_right = 266.0
-offset_bottom = 51.0
-placeholder_text = "IP:端口 / 域名"
+offset_left = 96.0
+offset_top = 112.0
+offset_right = 241.0
+offset_bottom = 140.0
+theme_override_font_sizes/font_size = 10
+placeholder_text = "请设置服务地址"
 max_length = 1024
+editable = false
 
-[node name="Label2" type="Label" parent="."]
+[node name="ConnectButton" type="Button" parent="."]
 layout_mode = 0
-offset_left = 18.0
-offset_top = 52.0
-offset_right = 291.0
-offset_bottom = 78.0
+offset_left = 247.0
+offset_top = 112.0
+offset_right = 287.0
+offset_bottom = 140.0
 theme_override_font_sizes/font_size = 12
-text = "地址自动保存；公网账号须用HTTPS。"
-autowrap_mode = 3
+text = "修改"
 
-[node name="Label3" type="Label" parent="."]
+[node name="UsernameLabel" type="Label" parent="."]
 layout_mode = 0
-offset_left = 18.0
-offset_top = 82.0
-offset_right = 276.0
-offset_bottom = 105.0
-theme_override_font_sizes/font_size = 12
-text = "登录账号（3～32位英数字/下划线）"
-autowrap_mode = 3
+offset_left = 32.0
+offset_top = 169.0
+offset_right = 96.0
+offset_bottom = 197.0
+mouse_filter = 2
+text = "用户名："
 
 [node name="Username" type="LineEdit" parent="."]
-unique_name_in_owner = true
 layout_mode = 0
-offset_left = 18.0
-offset_top = 100.0
-offset_right = 266.0
-offset_bottom = 131.0
+offset_left = 96.0
+offset_top = 168.0
+offset_right = 286.0
+offset_bottom = 198.0
 max_length = 32
 
-[node name="Label5" type="Label" parent="."]
+[node name="PasswordLabel" type="Label" parent="."]
 layout_mode = 0
-offset_left = 18.0
-offset_top = 132.0
-offset_right = 266.0
-offset_bottom = 155.0
-theme_override_font_sizes/font_size = 12
-text = "密码（12～128个字符，不保存）"
-autowrap_mode = 3
+offset_left = 32.0
+offset_top = 216.0
+offset_right = 96.0
+offset_bottom = 244.0
+mouse_filter = 2
+text = "密码："
 
 [node name="Password" type="LineEdit" parent="."]
-unique_name_in_owner = true
 layout_mode = 0
-offset_left = 18.0
-offset_top = 150.0
-offset_right = 266.0
-offset_bottom = 181.0
+offset_left = 96.0
+offset_top = 215.0
+offset_right = 286.0
+offset_bottom = 245.0
 max_length = 128
 secret = true
 
-[node name="Status" type="Label" parent="."]
-unique_name_in_owner = true
-layout_mode = 0
-offset_left = 18.0
-offset_top = 184.0
-offset_right = 266.0
-offset_bottom = 252.0
-theme_override_font_sizes/font_size = 12
-text = "服务器地址下次登录自动显示。"
-autowrap_mode = 3
-
 [node name="AuthButton" type="Button" parent="."]
-unique_name_in_owner = true
 layout_mode = 0
-offset_left = 18.0
-offset_top = 260.0
-offset_right = 134.0
-offset_bottom = 290.0
-theme_override_font_sizes/font_size = 12
-theme_override_styles/normal = SubResource("StyleBoxFlat_lhdy1")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_78uy0")
-theme_override_styles/hover = SubResource("StyleBoxFlat_b17ce")
-text = "登录账号"
+offset_left = 104.0
+offset_top = 277.0
+offset_right = 216.0
+offset_bottom = 311.0
+text = "登陆"
 
 [node name="SwitchButton" type="Button" parent="."]
-unique_name_in_owner = true
 layout_mode = 0
-offset_left = 150.0
-offset_top = 260.0
-offset_right = 266.0
-offset_bottom = 290.0
-theme_override_font_sizes/font_size = 12
-theme_override_styles/normal = SubResource("StyleBoxFlat_fy58y")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_40ml8")
-theme_override_styles/hover = SubResource("StyleBoxFlat_34121")
-text = "注册账号"
+offset_left = 104.0
+offset_top = 322.0
+offset_right = 216.0
+offset_bottom = 356.0
+text = "注册"
 
-[node name="ConnectButton" type="Button" parent="."]
-unique_name_in_owner = true
+[node name="Status" type="Label" parent="."]
 layout_mode = 0
-offset_left = 18.0
-offset_top = 298.0
-offset_right = 168.0
-offset_bottom = 329.0
-theme_override_font_sizes/font_size = 12
-theme_override_styles/normal = SubResource("StyleBoxFlat_ef215")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_d3ek8")
-theme_override_styles/hover = SubResource("StyleBoxFlat_mwhxo")
-text = "保存并连接"
+offset_left = 32.0
+offset_top = 370.0
+offset_right = 288.0
+offset_bottom = 418.0
+mouse_filter = 2
+theme_override_font_sizes/font_size = 11
+autowrap_mode = 3
+horizontal_alignment = 1
 
 [node name="Back" type="Button" parent="."]
 layout_mode = 0
-offset_left = 178.0
-offset_top = 298.0
-offset_right = 266.0
-offset_bottom = 329.0
-theme_override_font_sizes/font_size = 12
-theme_override_styles/normal = SubResource("StyleBoxFlat_cfgaa")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_sfqyv")
-theme_override_styles/hover = SubResource("StyleBoxFlat_42ngi")
+offset_left = 22.0
+offset_top = 448.0
+offset_right = 80.0
+offset_bottom = 474.0
+theme_override_font_sizes/font_size = 14
 text = "返回"
 
-[node name="Label12" type="Label" parent="."]
-layout_mode = 0
-offset_left = 18.0
-offset_top = 334.0
-offset_right = 274.0
-offset_bottom = 357.0
-theme_override_font_sizes/font_size = 12
-text = "账号与离线角色隔离；不记住密码。"
-autowrap_mode = 3
-
 [node name="Discovery" type="Node" parent="."]
-unique_name_in_owner = true
-script = ExtResource("2_rgqu0")
+script = ExtResource("Discovery")

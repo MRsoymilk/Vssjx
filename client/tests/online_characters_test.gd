@@ -46,8 +46,8 @@ func _run() -> void:
 	get_tree().root.add_child(app)
 	app._server_login()
 	var login := app.modal.find_child("ServerLogin", true, false) as ServerLogin
-	check(login.switch_button.text == "线上角色", "Authenticated account exposes online lobby")
-	login._switch_mode()
+	check(login.auth_button.text == "进入游戏", "Authenticated account exposes online lobby")
+	login.auth_button.pressed.emit()
 	var lobby := app.modal.find_child("OnlineCharacters", true, false) as OnlineCharacters
 	await OnlineAccount.completed
 	check(lobby != null and not lobby.create_button.disabled and OnlineAccount.characters.is_empty(), "Empty online account can create")

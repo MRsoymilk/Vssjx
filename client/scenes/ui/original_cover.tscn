@@ -1,257 +1,85 @@
 [gd_scene format=3]
 
-[ext_resource type="Script" path="res://scripts/original_cover.gd" id="1_vtd5l"]
-[ext_resource type="Texture2D" path="res://assets/ui/original_cover.png" id="2_m6yn0"]
-[ext_resource type="Texture2D" path="res://assets/ui/select_3.png" id="3_yomvb"]
-[ext_resource type="Texture2D" path="res://assets/ui/select_2.png" id="4_k3wer"]
-[ext_resource type="Texture2D" path="res://assets/ui/select_0.png" id="5_c7c1f"]
-[ext_resource type="Texture2D" path="res://assets/ui/select_1.png" id="6_o2jd1"]
+[ext_resource type="Script" path="res://scripts/original_cover.gd" id="Script"]
+[ext_resource type="Texture2D" path="res://assets/ui/original_cover.png" id="Artwork"]
+[ext_resource type="Texture2D" path="res://assets/ui/select_3.png" id="Left"]
+[ext_resource type="Texture2D" path="res://assets/ui/select_2.png" id="Right"]
 
-[sub_resource type="SystemFont" id="SystemFont_6wun6"]
+[sub_resource type="SystemFont" id="Font"]
 font_names = PackedStringArray("SimSun", "Noto Serif CJK SC", "serif")
 antialiasing = 0
 
-[sub_resource type="Theme" id="Theme_4g3e0"]
-default_font = SubResource("SystemFont_6wun6")
+[sub_resource type="StyleBoxEmpty" id="Empty"]
+content_margin_left = 0.0
+content_margin_top = 0.0
+content_margin_right = 0.0
+content_margin_bottom = 0.0
+
+[sub_resource type="Theme" id="Theme"]
+default_font = SubResource("Font")
 default_font_size = 16
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_ymdtq"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_watvj"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_vxj74"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_7il6m"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_o548s"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_qclw6"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_rtphl"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_j4fbc"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_m3l53"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_nspuw"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_3fnsx"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_fg0ea"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_55jvw"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_wccns"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_3cuj4"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_thcyd"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_l0y3b"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_1n6ca"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_vrqtm"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_o118y"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_s4s1x"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_kchd7"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_7m7db"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_gln50"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_06yb5"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_qdc3b"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_mn4iv"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_dkoa2"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_5fqhh"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_o7yxn"]
+Button/colors/font_color = Color(1, 1, 0, 1)
+Button/colors/font_pressed_color = Color(1, 1, 1, 1)
+Button/colors/font_hover_color = Color(1, 1, 0, 1)
+Button/colors/font_outline_color = Color(0.443137, 0.207843, 0, 1)
+Button/constants/outline_size = 1
+Button/styles/normal = SubResource("Empty")
+Button/styles/pressed = SubResource("Empty")
+Button/styles/hover = SubResource("Empty")
+Button/styles/focus = SubResource("Empty")
+Button/styles/disabled = SubResource("Empty")
 
 [node name="OriginalCover" type="Control"]
 texture_filter = 1
 layout_mode = 3
-anchors_preset = 0
 offset_right = 320.0
 offset_bottom = 480.0
-theme = SubResource("Theme_4g3e0")
-script = ExtResource("1_vtd5l")
+theme = SubResource("Theme")
+script = ExtResource("Script")
 
 [node name="Original320x480Artwork" type="TextureRect" parent="."]
 layout_mode = 0
+offset_left = 0.0
+offset_top = 0.0
 offset_right = 320.0
 offset_bottom = 480.0
 mouse_filter = 2
-texture = ExtResource("2_m6yn0")
+texture = ExtResource("Artwork")
 
 [node name="Rows0" type="Button" parent="."]
-unique_name_in_owner = true
 layout_mode = 0
 offset_left = 164.0
-offset_top = 396.0
+offset_top = 400.0
 offset_right = 306.0
-offset_bottom = 414.0
+offset_bottom = 430.0
 focus_mode = 0
 mouse_default_cursor_shape = 2
-theme_override_colors/font_color = Color(1, 1, 0, 1)
-theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
-theme_override_colors/font_hover_color = Color(1, 1, 0, 1)
-theme_override_colors/font_outline_color = Color(0.44313726, 0.20784314, 0, 1)
-theme_override_constants/outline_size = 1
-theme_override_styles/normal = SubResource("StyleBoxEmpty_ymdtq")
-theme_override_styles/pressed = SubResource("StyleBoxEmpty_watvj")
-theme_override_styles/hover = SubResource("StyleBoxEmpty_vxj74")
-theme_override_styles/disabled = SubResource("StyleBoxEmpty_7il6m")
-theme_override_styles/focus = SubResource("StyleBoxEmpty_o548s")
-text = "游戏试玩"
+text = "登陆游戏"
 
 [node name="Rows1" type="Button" parent="."]
-unique_name_in_owner = true
 layout_mode = 0
 offset_left = 164.0
-offset_top = 414.0
-offset_right = 306.0
-offset_bottom = 432.0
-focus_mode = 0
-mouse_default_cursor_shape = 2
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
-theme_override_colors/font_hover_color = Color(1, 1, 0, 1)
-theme_override_colors/font_outline_color = Color(0.44313726, 0.20784314, 0, 1)
-theme_override_constants/outline_size = 1
-theme_override_styles/normal = SubResource("StyleBoxEmpty_qclw6")
-theme_override_styles/pressed = SubResource("StyleBoxEmpty_rtphl")
-theme_override_styles/hover = SubResource("StyleBoxEmpty_j4fbc")
-theme_override_styles/disabled = SubResource("StyleBoxEmpty_m3l53")
-theme_override_styles/focus = SubResource("StyleBoxEmpty_nspuw")
-text = "快速登录"
-
-[node name="Rows2" type="Button" parent="."]
-unique_name_in_owner = true
-layout_mode = 0
-offset_left = 164.0
-offset_top = 432.0
-offset_right = 306.0
-offset_bottom = 450.0
-focus_mode = 0
-mouse_default_cursor_shape = 2
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
-theme_override_colors/font_hover_color = Color(1, 1, 0, 1)
-theme_override_colors/font_outline_color = Color(0.44313726, 0.20784314, 0, 1)
-theme_override_constants/outline_size = 1
-theme_override_styles/normal = SubResource("StyleBoxEmpty_3fnsx")
-theme_override_styles/pressed = SubResource("StyleBoxEmpty_fg0ea")
-theme_override_styles/hover = SubResource("StyleBoxEmpty_55jvw")
-theme_override_styles/disabled = SubResource("StyleBoxEmpty_wccns")
-theme_override_styles/focus = SubResource("StyleBoxEmpty_3cuj4")
-text = "登录游戏"
-
-[node name="Rows3" type="Button" parent="."]
-unique_name_in_owner = true
-layout_mode = 0
-offset_left = 164.0
-offset_top = 450.0
+offset_top = 438.0
 offset_right = 306.0
 offset_bottom = 468.0
 focus_mode = 0
 mouse_default_cursor_shape = 2
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
-theme_override_colors/font_hover_color = Color(1, 1, 0, 1)
-theme_override_colors/font_outline_color = Color(0.44313726, 0.20784314, 0, 1)
-theme_override_constants/outline_size = 1
-theme_override_styles/normal = SubResource("StyleBoxEmpty_thcyd")
-theme_override_styles/pressed = SubResource("StyleBoxEmpty_l0y3b")
-theme_override_styles/hover = SubResource("StyleBoxEmpty_1n6ca")
-theme_override_styles/disabled = SubResource("StyleBoxEmpty_vrqtm")
-theme_override_styles/focus = SubResource("StyleBoxEmpty_o118y")
-text = "注册账号"
+text = "退出游戏"
 
 [node name="LeftArrow" type="TextureRect" parent="."]
-unique_name_in_owner = true
 layout_mode = 0
 offset_left = 169.0
-offset_top = 402.0
+offset_top = 411.0
 offset_right = 176.0
-offset_bottom = 410.0
+offset_bottom = 419.0
 mouse_filter = 2
-texture = ExtResource("3_yomvb")
+texture = ExtResource("Left")
 
 [node name="RightArrow" type="TextureRect" parent="."]
-unique_name_in_owner = true
 layout_mode = 0
 offset_left = 296.0
-offset_top = 402.0
+offset_top = 411.0
 offset_right = 303.0
-offset_bottom = 410.0
+offset_bottom = 419.0
 mouse_filter = 2
-texture = ExtResource("4_k3wer")
-
-[node name="UpArrow" type="TextureRect" parent="."]
-unique_name_in_owner = true
-visible = false
-layout_mode = 0
-offset_left = 307.0
-offset_top = 395.0
-offset_right = 319.0
-offset_bottom = 399.0
-mouse_filter = 2
-texture = ExtResource("5_c7c1f")
-
-[node name="DownArrow" type="TextureRect" parent="."]
-unique_name_in_owner = true
-layout_mode = 0
-offset_left = 307.0
-offset_top = 459.0
-offset_right = 319.0
-offset_bottom = 463.0
-mouse_filter = 2
-texture = ExtResource("6_o2jd1")
-
-[node name="Confirm" type="Button" parent="."]
-layout_mode = 0
-offset_left = 4.0
-offset_top = 463.0
-offset_right = 56.0
-offset_bottom = 494.0
-focus_mode = 0
-mouse_default_cursor_shape = 2
-theme_override_colors/font_color = Color(1, 1, 0, 1)
-theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
-theme_override_colors/font_hover_color = Color(1, 1, 0, 1)
-theme_override_colors/font_outline_color = Color(0.44313726, 0.20784314, 0, 1)
-theme_override_constants/outline_size = 1
-theme_override_styles/normal = SubResource("StyleBoxEmpty_s4s1x")
-theme_override_styles/pressed = SubResource("StyleBoxEmpty_kchd7")
-theme_override_styles/hover = SubResource("StyleBoxEmpty_7m7db")
-theme_override_styles/disabled = SubResource("StyleBoxEmpty_gln50")
-theme_override_styles/focus = SubResource("StyleBoxEmpty_06yb5")
-text = "确定"
-
-[node name="Exit" type="Button" parent="."]
-layout_mode = 0
-offset_left = 264.0
-offset_top = 463.0
-offset_right = 316.0
-offset_bottom = 494.0
-focus_mode = 0
-mouse_default_cursor_shape = 2
-theme_override_colors/font_color = Color(1, 1, 0, 1)
-theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
-theme_override_colors/font_hover_color = Color(1, 1, 0, 1)
-theme_override_colors/font_outline_color = Color(0.44313726, 0.20784314, 0, 1)
-theme_override_constants/outline_size = 1
-theme_override_styles/normal = SubResource("StyleBoxEmpty_qdc3b")
-theme_override_styles/pressed = SubResource("StyleBoxEmpty_mn4iv")
-theme_override_styles/hover = SubResource("StyleBoxEmpty_dkoa2")
-theme_override_styles/disabled = SubResource("StyleBoxEmpty_5fqhh")
-theme_override_styles/focus = SubResource("StyleBoxEmpty_o7yxn")
-text = "退出"
+texture = ExtResource("Right")

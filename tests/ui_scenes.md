@@ -4,6 +4,8 @@
 
 页面从对应的 `PackedScene` 实例化，脚本通过节点引用连接信号、更新角色数据与显示状态。不要对这些页面脚本直接调用 `.new()`，否则不会得到场景中的子节点。动态弹窗内容使用 `dynamic_*.tscn` 基础组件；按状态变化的文本、颜色和尺寸仍由脚本配置。
 
+标题页公开入口只有“登陆游戏”和“退出游戏”，已移除四行菜单滚动与底部“确定/退出”。登录页由 `server_login.tscn` 和 `login_theme.tres` 保存游戏风格布局：服务地址行带“修改”按钮，用户名与密码左右对齐，登陆/注册纵向排列，返回位于左下方。地址默认只读，“修改”后变为“保存”；登陆与注册分别提交各自请求。已登录时按钮显示“进入游戏/退出账号”。
+
 角色、怪物与特效使用 `scenes/actors/original_actor.tscn` 中的 `AnimatedSprite2D`。`OriginalArt.actor()` 按角色元数据配置 `SpriteFrames`，保留共享缓存、图集偏移、待机/行走循环和攻击/施法单次播放。地图格子、网络实体和临时特效依旧按实际数据生成。
 
 ## 验证入口
@@ -13,6 +15,7 @@
 ```sh
 godot --headless --path client --editor --import
 godot --headless --path client res://tests/ui_scenes_test.tscn
+godot --headless --path client res://tests/login_ui_test.tscn
 godot --headless --path client res://tests/test_runner.tscn
 godot --headless --path client res://tests/server_connection_test.tscn
 godot --headless --path client res://tests/battle_casting_test.tscn
@@ -25,3 +28,5 @@ python -m unittest discover -s tests -p 'test_project_layout.py'
 `ui_scenes_test` 在节点进入场景树、执行 `_ready()` 之前检查静态控件，验证布局确实来自场景文件；另检查选项列表、位图数字配置、战斗模式和 `AnimatedSprite2D` 类型。既有流程测试覆盖切页、角色选择、背包操作、弹窗及战斗交互。
 
 真实渲染使用既有 `visual_smoke.tscn` 和 `SSJX_CAPTURE_PATH`，生成 37 张截图；`--headless` 不用于替代截图检查。线上账号/共享地图的真实网络联调仍按各自测试文档运行。
+
+标题/登陆布局专项可设置 `SSJX_LOGIN_UI_CAPTURE_PATH`，以真实渲染器运行 `login_ui_test.tscn` 保存两张截图。2026-10-15（Windows，Godot 4.7.1）：布局与动作检查31项通过，实际渲染33项通过，场景资源81项和整流程377项通过；`tests/run_server_connection.py` 的真实Rust发现及Godot界面58项、跨进程地址读写各1项通过。此次未运行需要独立PostgreSQL的完整账号/角色联调；测试入口已改为实际点击独立的登陆/注册按钮。

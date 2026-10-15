@@ -15,7 +15,7 @@ func check(condition: bool, description: String) -> void:
 		push_error("FAIL: " + description)
 
 func login_form() -> ServerLogin:
-	app._cover_choice("登录游戏")
+	app._cover_choice("登陆游戏")
 	return app.modal.find_child("ServerLogin", true, false) as ServerLogin
 
 func capture(name_value: String) -> void:
@@ -99,7 +99,7 @@ func _run() -> void:
 		form.connect_server()
 		await form.discovery.completed
 		check(form.status.text.begins_with("已连接："), "Godot reaches actual Rust server")
-		check(form.status.text.contains("尚未开放") and app.mode == "home", "Discovery never pretends player authentication succeeded")
+		check(not OnlineAccount.is_logged_in() and app.mode == "home", "Discovery never pretends player authentication succeeded")
 		check(settings.load_address() == backend, "Submitted address is saved independently of gameplay")
 		await capture("02_connected_server")
 		app._close_modal()

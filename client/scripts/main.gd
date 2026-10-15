@@ -230,25 +230,17 @@ func _home() -> void:
 
 func _cover_choice(option: String) -> void:
 	match option:
-		"游戏试玩": _create()
-		"快速登录":
-			if FileAccess.file_exists(Game.save_path): _continue()
-			else: _create()
-		"登录游戏": _server_login()
-		"注册账号": _server_login(true)
-		"游戏帮助":
-			_message("游戏帮助", "【触屏】\n人物移动：点击屏幕目的地控制角色行走。\n功能选择：点击图标或者文字即可选择。\n\n【按键】\n方向键移动，E键交互。")
-		"关于": _message("关于", String(original_cover.original_text.about))
+		"登陆游戏", "登录游戏": _server_login()
 		"退出游戏": _cover_exit()
-		_: _message(option, "该服务暂未连接。")
 
-func _server_login(register_mode: bool = false) -> void:
-	var panel := _modal_panel("账号服务", 428)
+func _server_login() -> void:
+	_close_modal()
+	if original_cover != null: original_cover.active = false
+	modal = preload("res://scenes/ui/modal_overlay.tscn").instantiate()
+	ui.add_child(modal)
 	var login: ServerLogin = load("res://scenes/ui/server_login.tscn").instantiate()
 	login.name = "ServerLogin"
-	login.register_mode = register_mode
-	login.position = Vector2(0, 54)
-	panel.add_child(login)
+	modal.add_child(login)
 	login.close_requested.connect(_close_modal)
 	login.characters_requested.connect(_online_characters)
 

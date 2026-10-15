@@ -14,25 +14,49 @@ var register_mode := false
 @onready var auth_button: Button = $AuthButton
 @onready var switch_button: Button = $SwitchButton
 var _probing := false
+var _editing_address := false
 
 func _ready() -> void:
 	address_input.text = settings.load_address()
 	if not settings.last_error.is_empty(): status.text = settings.last_error
-	auth_button.pressed.connect(_submit_account)
-	switch_button.pressed.connect(_switch_mode)
-	connect_button.pressed.connect(connect_server)
+	auth_button.pressed.connect(_login)
+	switch_button.pressed.connect(_register)
+	connect_button.pressed.connect(_edit_address)
 	$Back.pressed.connect(_return)
 	discovery.completed.connect(_connection_result)
 	OnlineAccount.completed.connect(_account_result)
 	address_input.text_changed.connect(func(_value: String) -> void:
-		status.text = "地址已修改，保存并连接后查看服务状态。"
+		status.text = "地址已修改，点击保存后生效。"
 	)
 	address_input.text_submitted.connect(func(_value: String) -> void: connect_server())
 	address_input.focus_exited.connect(func() -> void: save_draft(false))
-	password_input.text_submitted.connect(func(_value: String) -> void: _submit_account())
+	password_input.text_submitted.connect(func(_value: String) -> void: _login())
 	_update_controls()
 	if OnlineAccount.is_logged_in(): _show_account()
+	username_input.grab_focus()
+
+func _edit_address() -> void:
+	if connect_button.disabled: return
+	if _editing_address:
+		connect_server()
+		return
+	_editing_address = true
+	_update_controls()
 	address_input.grab_focus()
+	address_input.select_all()
+
+func _login() -> void:
+	if auth_button.disabled: return
+	if OnlineAccount.is_logged_in():
+		characters_requested.emit()
+		return
+	register_mode = false
+	_submit_account()
+
+func _register() -> void:
+	if switch_button.disabled: return
+	register_mode = true
+	_submit_account()
 
 func save_draft(show_error: bool = true) -> bool:
 	if not settings.save_address(address_input.text):
@@ -46,13 +70,12 @@ func connect_server() -> void:
 	address_input.text = ServerConnectionSettings.normalize(address_input.text).address
 	status.text = "地址已保存，正在连接服务器……"
 	_probing = true
-	address_input.editable = false
+	_editing_address = false
 	_update_controls()
 	discovery.check_server(address_input.text)
 
 func _connection_result(result: Dictionary) -> void:
 	_probing = false
-	address_input.editable = true
 	_update_controls()
 	if not result.ok:
 		status.text = result.error + "\n已保存的有效地址不会被清除。"
@@ -60,9 +83,9 @@ func _connection_result(result: Dictionary) -> void:
 	var display_name := String(result.server_name).left(24)
 	if String(result.server_name).length() > 24: display_name += "…"
 	if "account_auth" in result.get("capabilities", []):
-		status.text = "已连接：%s\n账号服务可用，请注册或登录。\n共享地图尚未开放。" % display_name
+		status.text = "已连接：%s\n请登陆或注册账号。" % display_name
 	else:
-		status.text = "已连接：%s\n当前仅开放服务连接检查。\n账号登录和多人世界尚未开放。" % display_name
+		status.text = "已连接：%s\n账号服务尚未开放。" % display_name
 
 func _update_controls() -> void:
 	var locked := OnlineAccount.busy or _probing
@@ -71,18 +94,10 @@ func _update_controls() -> void:
 	switch_button.disabled = locked
 	username_input.editable = not locked and not OnlineAccount.is_logged_in()
 	password_input.editable = not locked and not OnlineAccount.is_logged_in()
-	address_input.editable = not locked
-	auth_button.text = "退出账号" if OnlineAccount.is_logged_in() else ("注册账号" if register_mode else "登录账号")
-	switch_button.text = "线上角色" if OnlineAccount.is_logged_in() else ("已有账号" if register_mode else "注册账号")
-
-func _switch_mode() -> void:
-	if OnlineAccount.is_logged_in():
-		characters_requested.emit()
-		return
-	register_mode = not register_mode
-	password_input.clear()
-	status.text = "注册登录账号，不占用角色昵称。" if register_mode else "请输入账号和密码。"
-	_update_controls()
+	address_input.editable = not locked and _editing_address
+	connect_button.text = "保存" if _editing_address else "修改"
+	auth_button.text = "进入游戏" if OnlineAccount.is_logged_in() else "登陆"
+	switch_button.text = "退出账号" if OnlineAccount.is_logged_in() else "注册"
 
 func _submit_account() -> void:
 	if auth_button.disabled: return
@@ -96,6 +111,7 @@ func _submit_account() -> void:
 	if username_input.text.strip_edges().is_empty() or password_input.text.is_empty():
 		status.text = "请输入账号和密码。"
 		return
+	_editing_address = false
 	status.text = "正在注册账号……" if register_mode else "正在登录……"
 	var secret := password_input.text
 	password_input.clear()
@@ -105,7 +121,7 @@ func _submit_account() -> void:
 
 func _show_account() -> void:
 	username_input.text = String(OnlineAccount.account.get("username", ""))
-	status.text = "已登录：%s\n可点击“线上角色”创建或查看角色。\n共享地图尚未开放。" % username_input.text
+	status.text = "已登录：%s\n点击进入游戏，查看线上角色。" % username_input.text
 	if address_input.text != OnlineAccount.server_address:
 		status.text = "已登录其他服务器：%s\n请先退出原账号，再更换服务器登录。" % username_input.text
 	_update_controls()

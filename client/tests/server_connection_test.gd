@@ -45,6 +45,8 @@ func _run() -> void:
 	var isolated := "user://server_connection_test_%d_%d.cfg" % [OS.get_process_id(), Time.get_ticks_usec()]
 	OS.set_environment("SSJX_CONNECTION_PATH", isolated)
 	var valid := {
+		" local ": "local",
+		"LOCAL": "local",
 		"127.0.0.1:8080": "http://127.0.0.1:8080",
 		"192.168.1.10:9000/ssjx/": "http://192.168.1.10:9000/ssjx",
 		"localhost:8080": "http://localhost:8080",

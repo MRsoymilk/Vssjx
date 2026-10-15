@@ -12,6 +12,7 @@ func _init(path: String = "") -> void:
 
 static func normalize(raw: String) -> Dictionary:
 	var value := raw.strip_edges()
+	if value.to_lower() == "local": return {"ok": true, "address": "local", "error": ""}
 	if value.is_empty(): return _invalid("请输入服务器地址。")
 	if value.length() > 1024: return _invalid("服务器地址过长。")
 	var whitespace := RegEx.create_from_string("[\\s\\x00-\\x1f\\x7f\\\\]")
@@ -50,6 +51,9 @@ static func normalize(raw: String) -> Dictionary:
 		if segment in [".", ".."]: return _invalid("路径前缀不能包含相对目录。")
 	while prefix.ends_with("/"): prefix = prefix.trim_suffix("/")
 	return {"ok": true, "address": scheme + "://" + host + port + prefix, "error": ""}
+
+static func is_local(raw: String) -> bool:
+	return raw.strip_edges().to_lower() == "local"
 
 static func _invalid(message: String) -> Dictionary:
 	return {"ok": false, "address": "", "error": message}

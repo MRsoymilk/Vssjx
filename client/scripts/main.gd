@@ -243,6 +243,11 @@ func _server_login() -> void:
 	modal.add_child(login)
 	login.close_requested.connect(_close_modal)
 	login.characters_requested.connect(_online_characters)
+	login.local_requested.connect(_enter_local_game)
+
+func _enter_local_game() -> void:
+	if FileAccess.file_exists(Game.save_path): _continue()
+	else: _create()
 
 func _online_characters() -> void:
 	_close_modal()

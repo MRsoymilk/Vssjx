@@ -3,6 +3,7 @@ extends Control
 
 signal close_requested
 signal characters_requested
+signal local_requested
 var settings := ServerConnectionSettings.new()
 @onready var address_input: LineEdit = $ServerAddress
 @onready var status: Label = $Status
@@ -27,12 +28,14 @@ func _ready() -> void:
 	OnlineAccount.completed.connect(_account_result)
 	address_input.text_changed.connect(func(_value: String) -> void:
 		status.text = "地址已修改，点击保存后生效。"
+		_update_controls()
 	)
 	address_input.text_submitted.connect(func(_value: String) -> void: connect_server())
 	address_input.focus_exited.connect(func() -> void: save_draft(false))
 	password_input.text_submitted.connect(func(_value: String) -> void: _login())
 	_update_controls()
-	if OnlineAccount.is_logged_in(): _show_account()
+	if ServerConnectionSettings.is_local(address_input.text): status.text = "本地单人模式，进度保存在此设备。"
+	elif OnlineAccount.is_logged_in(): _show_account()
 	username_input.grab_focus()
 
 func _edit_address() -> void:
@@ -47,6 +50,11 @@ func _edit_address() -> void:
 
 func _login() -> void:
 	if auth_button.disabled: return
+	if ServerConnectionSettings.is_local(address_input.text):
+		if not save_draft(): return
+		password_input.clear()
+		local_requested.emit()
+		return
 	if OnlineAccount.is_logged_in():
 		characters_requested.emit()
 		return
@@ -68,6 +76,14 @@ func connect_server() -> void:
 	if connect_button.disabled: return
 	if not save_draft(): return
 	address_input.text = ServerConnectionSettings.normalize(address_input.text).address
+	if ServerConnectionSettings.is_local(address_input.text):
+		discovery.cancel()
+		_probing = false
+		_editing_address = false
+		password_input.clear()
+		status.text = "本地单人模式，进度保存在此设备。"
+		_update_controls()
+		return
 	status.text = "地址已保存，正在连接服务器……"
 	_probing = true
 	_editing_address = false
@@ -88,16 +104,18 @@ func _connection_result(result: Dictionary) -> void:
 		status.text = "已连接：%s\n账号服务尚未开放。" % display_name
 
 func _update_controls() -> void:
-	var locked := OnlineAccount.busy or _probing
+	var local := ServerConnectionSettings.is_local(address_input.text)
+	var locked := _probing or (OnlineAccount.busy and not local)
 	connect_button.disabled = locked
 	auth_button.disabled = locked
-	switch_button.disabled = locked
-	username_input.editable = not locked and not OnlineAccount.is_logged_in()
-	password_input.editable = not locked and not OnlineAccount.is_logged_in()
+	switch_button.disabled = locked or local
+	username_input.editable = not locked and not local and not OnlineAccount.is_logged_in()
+	password_input.editable = not locked and not local and not OnlineAccount.is_logged_in()
+	username_input.placeholder_text = "本地模式，无需账号" if local else ""
 	address_input.editable = not locked and _editing_address
 	connect_button.text = "保存" if _editing_address else "修改"
-	auth_button.text = "进入游戏" if OnlineAccount.is_logged_in() else "登陆"
-	switch_button.text = "退出账号" if OnlineAccount.is_logged_in() else "注册"
+	auth_button.text = "进入游戏" if local or OnlineAccount.is_logged_in() else "登陆"
+	switch_button.text = "退出账号" if not local and OnlineAccount.is_logged_in() else "注册"
 
 func _submit_account() -> void:
 	if auth_button.disabled: return
@@ -127,6 +145,7 @@ func _show_account() -> void:
 	_update_controls()
 
 func _account_result(action: String, result: Dictionary) -> void:
+	if ServerConnectionSettings.is_local(address_input.text): return
 	password_input.clear()
 	_update_controls()
 	if not result.ok:

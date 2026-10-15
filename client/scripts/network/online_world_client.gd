@@ -21,6 +21,8 @@ var socket: WebSocketPeer
 var chat := OnlinePublicChat.new()
 var announcements := OnlineAnnouncements.new()
 var population := OnlinePopulation.new()
+var pve := OnlinePve.new()
+var _pve_version := 0
 var _ticket := ""
 var _announcement_version := 0
 var _population_version := 0
@@ -43,6 +45,10 @@ var _snapshot_bytes := 0
 func _ready() -> void:
 	config_hash = FileAccess.get_sha256(MAP_PATH)
 	OnlineAccount.world_ticket_received.connect(_on_ticket)
+	pve.send_requested.connect(func(packet: Dictionary) -> void:
+		if socket != null and world_ready:
+			if socket.send_text(JSON.stringify(packet)) != OK: _failed("SEND_FAILED", true)
+	)
 	chat.send_requested.connect(func(message: Dictionary) -> void:
 		if socket != null and world_ready:
 			if socket.send_text(JSON.stringify(message)) != OK: _failed("SEND_FAILED", true)
@@ -52,6 +58,7 @@ func start(id: String) -> void:
 	character_id = id
 	server = OnlineAccount.server_address
 	login_session = OnlineAccount.login_session_id
+	pve.bind_character(id, server)
 	_attempts = 0
 	_state = "request"
 	_retry_at = 0.0
@@ -73,6 +80,7 @@ func leave() -> void:
 	chat.clear()
 	announcements.clear()
 	population.clear()
+	pve.disconnect_channel()
 
 func _exit_tree() -> void:
 	leave()
@@ -82,6 +90,7 @@ func _failed(code: String, retry: bool = false) -> void:
 	chat.disconnect_channel()
 	announcements.clear()
 	population.clear()
+	pve.disconnect_channel()
 	world_ready = false
 	_ticket = ""
 	_snapshot = {}
@@ -104,6 +113,7 @@ func _on_ticket(result: Dictionary) -> void:
 		return
 	_ticket = result.ticket
 	_announcement_version = 1 if result.get("announcement_version") == 1 else 0
+	_pve_version = 1 if result.get("pve_version") == 1 else 0
 	_population_version = 1 if result.get("population_version") == 1 else 0
 	socket = WebSocketPeer.new()
 	socket.inbound_buffer_size = 2097152
@@ -172,12 +182,14 @@ func _process(_delta: float) -> void:
 	if socket != null and now - _last_received > 12.0: _failed("HEARTBEAT_TIMEOUT", true)
 	chat.enabled = world_ready
 	chat.tick()
+	if pve.ready and pve.pending() and now - pve.sent_at > 8.0: _failed("TIMEOUT", true)
 	_flush_motion()
 
 func _exchange_packet() -> Dictionary:
 	var packet := {"type": "auth.exchange", "ticket": _ticket, "protocol_version": 1, "config_hash": config_hash, "world_sync_version": 2}
 	if _announcement_version == 1: packet.announcement_version = 1
 	if _population_version == 1: packet.population_version = 1
+	if _pve_version == 1: packet.pve_version = 1
 	return packet
 
 static func _decimal(value: Variant) -> bool:
@@ -210,11 +222,14 @@ func _receive(data: Dictionary, raw: PackedByteArray) -> void:
 	var kind: Variant = data.get("type")
 	if kind == "error":
 		var code := String(data.get("code", "SERVER_ERROR"))
-		if code in ["INVALID_TARGET", "STALE_INPUT", "RATE_LIMITED"]:
-			status_changed.emit("目标不可达或操作过快，请重试。")
+		if code in ["INVALID_TARGET", "STALE_INPUT", "RATE_LIMITED", "BATTLE_ACTIVE"]:
+			status_changed.emit("战斗中暂不能移动。" if code == "BATTLE_ACTIVE" else "目标不可达或操作过快，请重试。")
 		else: _failed(code, code in ["DATABASE_UNAVAILABLE", "SERVER_BUSY", "WORLD_STREAM_LAGGED"])
 		return
 	if kind == "pong": return
+	if kind in ["pve.state", "pve.result"]:
+		if not world_ready or _pve_version != 1 or not pve.receive(data): _failed("INVALID_PVE")
+		return
 	if kind == "population.state":
 		if stream.is_empty() or not population.receive(data): _failed("INVALID_POPULATION")
 		return
@@ -355,7 +370,7 @@ func stop_moving() -> void:
 	_send_motion("world.stop")
 
 func _send_motion(kind: String, target: Array = []) -> void:
-	if not world_ready: return
+	if not world_ready or pve.active() or pve.pending(): return
 	_pending_motion = {"type": kind, "target": target.duplicate()}
 	_flush_motion()
 

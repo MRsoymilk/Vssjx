@@ -5,6 +5,9 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/online_menu.tscn" id="Menu"]
 [ext_resource type="PackedScene" path="res://scenes/ui/game_menu.tscn" id="GameMenu"]
 
+[ext_resource type="PackedScene" path="res://scenes/ui/online_encounter.tscn" id="Encounter"]
+[ext_resource type="PackedScene" path="res://scenes/ui/online_battle_view.tscn" id="Battle"]
+
 [node name="OnlineWorldView" type="Control"]
 offset_right = 320.0
 offset_bottom = 480.0
@@ -30,6 +33,11 @@ offset_bottom = 403.0
 [node name="Screen" parent="." instance=ExtResource("Screen")]
 online_mode = true
 [node name="Menu" parent="." instance=ExtResource("Menu")]
+z_index = 10
 [node name="GameMenu" parent="." instance=ExtResource("GameMenu")]
+z_index = 11
 [node name="Network" type="Node" parent="."]
 script = ExtResource("Network")
+
+[node name="Encounter" parent="." instance=ExtResource("Encounter")]
+[node name="Battle" parent="." instance=ExtResource("Battle")]

@@ -2,7 +2,7 @@ class_name OriginalBattleField
 extends Node2D
 ## Original tile vocabulary, with hand-authored layouts matching the references.
 
-var kind := "courtyard"
+@export var kind := "courtyard"
 var terrain: TileMapLayer
 
 func _ready() -> void:
@@ -25,12 +25,15 @@ func _ready() -> void:
 					var lawn := (x < 4 or x > 15) and (y < 7 or y > 17)
 					tile = (14 if (x + y) % 4 else 13) if lawn else [157, 158, 159, 167, 168, 169][x % 3 + (y % 2) * 3]
 					if lawn and (x * 13 + y * 7) % 23 == 0: tile = 3
+				"arena": tile = 325 if (x * 13 + y * 7) % 89 else 329
 				"wilderness":
 					tile = 325 if (x * 13 + y * 7) % 37 else 329
 				"snow": tile = 474 if (x * 5 + y * 3) % 29 else 456
 				"ruins": tile = _ruins_tile(Vector2i(x, y))
 			_put(Vector2i(x, y), tile)
-	if kind == "courtyard":
+	if kind == "arena":
+		terrain.modulate = Color(0.90, 0.815, 1.03)
+	elif kind == "courtyard":
 		_house(Vector2i(0, 4))
 		_house(Vector2i(15, 19))
 	elif kind == "wilderness":
@@ -43,7 +46,7 @@ func _ready() -> void:
 		_prop("map/m9", Vector2(34, 99))
 		_prop("map/m10", Vector2(302, 353))
 	var wash := ColorRect.new()
-	wash.color = Color(0.9, 0.88, 0.72, 0.22)
+	wash.color = Color(0.9, 0.75, 0.66, 0.18) if kind == "arena" else Color(0.9, 0.88, 0.72, 0.22)
 	wash.size = Vector2(320, 400)
 	wash.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(wash)

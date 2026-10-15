@@ -1,0 +1,263 @@
+[gd_scene format=3]
+[ext_resource type="Script" path="res://scripts/online_battle_view.gd" id="Script"]
+[ext_resource type="Script" path="res://scripts/battle_field.gd" id="Field"]
+[ext_resource type="Script" path="res://scripts/original_number.gd" id="Number"]
+[ext_resource type="PackedScene" path="res://scenes/ui/battle_hud.tscn" id="Hud"]
+[ext_resource type="PackedScene" path="res://scenes/ui/battle_inspect.tscn" id="Inspect"]
+[ext_resource type="Theme" path="res://scenes/ui/online_pve_theme.tres" id="Theme"]
+[ext_resource type="Texture2D" path="res://assets/ui/battle_ring.svg" id="Ring"]
+[ext_resource type="Texture2D" path="res://assets/ui/create_cursor.png" id="Cursor"]
+[sub_resource type="StyleBoxFlat" id="Paper"]
+bg_color = Color(1, 0.953, 0.678, 1)
+border_color = Color(0.424, 0.329, 0.165, 1)
+border_width_left = 1
+border_width_right = 1
+border_width_top = 1
+border_width_bottom = 1
+[sub_resource type="StyleBoxFlat" id="BarBg"]
+bg_color = Color(0.15, 0.16, 0.10, 1)
+border_color = Color(0.15, 0.16, 0.10, 1)
+border_width_left = 1
+border_width_right = 1
+border_width_top = 1
+border_width_bottom = 1
+[sub_resource type="StyleBoxEmpty" id="Empty"]
+[sub_resource type="StyleBoxFlat" id="Highlight"]
+bg_color = Color(1, 0.737, 0.322, 1)
+[node name="OnlineBattle" type="Control"]
+visible = false
+offset_top = 28.0
+offset_right = 320.0
+offset_bottom = 424.0
+clip_contents = true
+theme = ExtResource("Theme")
+script = ExtResource("Script")
+[node name="Field" type="Node2D" parent="."]
+script = ExtResource("Field")
+kind = "arena"
+[node name="Ring" type="Sprite2D" parent="."]
+position = Vector2(265, 252)
+texture = ExtResource("Ring")
+[node name="Hero" type="Node2D" parent="."]
+position = Vector2(265, 252)
+scale = Vector2(1.2, 1.2)
+[node name="Enemy" type="Node2D" parent="."]
+position = Vector2(59, 246)
+scale = Vector2(1.1, 1.1)
+[node name="Hud" parent="." instance=ExtResource("Hud")]
+anchor_right = 0.0
+anchor_bottom = 0.0
+offset_top = -28.0
+offset_right = 320.0
+offset_bottom = 368.0
+[node name="BattleHeroHp" parent="Hud" index="0"]
+theme_override_styles/background = SubResource("BarBg")
+offset_left = 250.0
+offset_right = 285.0
+[node name="BattleHeroMp" parent="Hud" index="1"]
+theme_override_styles/background = SubResource("BarBg")
+offset_left = 250.0
+offset_right = 285.0
+[node name="BattleEnemyHp" parent="Hud" index="2"]
+theme_override_styles/background = SubResource("BarBg")
+[node name="Level" parent="Hud" index="3"]
+offset_bottom = 220.0
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 0
+clip_text = false
+theme_override_styles/normal = SubResource("BarBg")
+offset_left = 237.0
+offset_right = 249.0
+[node name="BattleEnemyStatus" parent="Hud" index="4"]
+visible = false
+[node name="BattleHeroStatus" parent="Hud" index="5"]
+visible = false
+[node name="AutoButton" parent="Hud" index="8"]
+offset_top = 407.0
+offset_bottom = 423.0
+[node name="ActionMenu" parent="Hud" index="10"]
+visible = true
+offset_left = 117.0
+offset_top = 149.0
+offset_right = 203.0
+offset_bottom = 341.0
+[node name="BattleButtons0" parent="Hud/ActionMenu" index="0"]
+offset_left = 3.0
+offset_top = 3.0
+offset_right = 83.0
+offset_bottom = 33.0
+theme_override_font_sizes/font_size = 14
+[node name="BattleButtons1" parent="Hud/ActionMenu" index="1"]
+offset_left = 3.0
+offset_top = 34.0
+offset_right = 83.0
+offset_bottom = 64.0
+theme_override_font_sizes/font_size = 14
+[node name="BattleButtons2" parent="Hud/ActionMenu" index="2"]
+offset_left = 3.0
+offset_top = 65.0
+offset_right = 83.0
+offset_bottom = 95.0
+theme_override_font_sizes/font_size = 14
+[node name="BattleButtons3" parent="Hud/ActionMenu" index="3"]
+offset_left = 3.0
+offset_top = 96.0
+offset_right = 83.0
+offset_bottom = 126.0
+theme_override_font_sizes/font_size = 14
+[node name="BattleButtons4" parent="Hud/ActionMenu" index="4"]
+offset_left = 3.0
+offset_top = 127.0
+offset_right = 83.0
+offset_bottom = 157.0
+theme_override_font_sizes/font_size = 14
+[node name="BattleButtons5" parent="Hud/ActionMenu" index="5"]
+offset_left = 3.0
+offset_top = 158.0
+offset_right = 83.0
+offset_bottom = 188.0
+theme_override_font_sizes/font_size = 14
+[node name="Separator1" type="ColorRect" parent="Hud/ActionMenu"]
+offset_left = 3.0
+offset_top = 33.0
+offset_right = 83.0
+offset_bottom = 34.0
+mouse_filter = 2
+color = Color(1, 0.985, 0.85, 0.9)
+[node name="Separator2" type="ColorRect" parent="Hud/ActionMenu"]
+offset_left = 3.0
+offset_top = 64.0
+offset_right = 83.0
+offset_bottom = 65.0
+mouse_filter = 2
+color = Color(1, 0.985, 0.85, 0.9)
+[node name="Separator3" type="ColorRect" parent="Hud/ActionMenu"]
+offset_left = 3.0
+offset_top = 95.0
+offset_right = 83.0
+offset_bottom = 96.0
+mouse_filter = 2
+color = Color(1, 0.985, 0.85, 0.9)
+[node name="Separator4" type="ColorRect" parent="Hud/ActionMenu"]
+offset_left = 3.0
+offset_top = 126.0
+offset_right = 83.0
+offset_bottom = 127.0
+mouse_filter = 2
+color = Color(1, 0.985, 0.85, 0.9)
+[node name="Separator5" type="ColorRect" parent="Hud/ActionMenu"]
+offset_left = 3.0
+offset_top = 157.0
+offset_right = 83.0
+offset_bottom = 158.0
+mouse_filter = 2
+color = Color(1, 0.985, 0.85, 0.9)
+[node name="Cursor" type="TextureRect" parent="Hud/ActionMenu"]
+offset_left = 78.0
+offset_top = 13.0
+offset_right = 91.0
+offset_bottom = 27.0
+mouse_filter = 2
+texture = ExtResource("Cursor")
+expand_mode = 1
+[node name="Countdown" type="Control" parent="."]
+offset_left = 147.0
+offset_top = 13.0
+offset_right = 172.0
+offset_bottom = 35.0
+script = ExtResource("Number")
+value = "30"
+color_set = "green"
+align_right = false
+[node name="EnemyLevel" type="Label" parent="."]
+offset_left = 29.0
+offset_top = 169.0
+offset_right = 40.0
+offset_bottom = 179.0
+horizontal_alignment = 1
+clip_text = true
+theme_override_styles/normal = SubResource("BarBg")
+theme_override_font_sizes/font_size = 8
+theme_override_colors/font_color = Color(1, 0.98, 0.85, 1)
+theme_override_colors/font_outline_color = Color(0.16, 0.16, 0.09, 1)
+theme_override_constants/outline_size = 1
+[node name="Hint" type="Label" parent="."]
+offset_left = 50.0
+offset_top = 48.0
+offset_right = 270.0
+offset_bottom = 65.0
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_color = Color(0.27, 0.26, 0.16, 1)
+[node name="Choice" type="Panel" parent="."]
+visible = false
+offset_left = 91.0
+offset_top = 149.0
+offset_right = 229.0
+offset_bottom = 218.0
+theme_override_styles/panel = SubResource("Paper")
+[node name="Use" type="Button" parent="Choice"]
+offset_left = 3.0
+offset_top = 3.0
+offset_right = 135.0
+offset_bottom = 35.0
+focus_mode = 0
+theme_override_colors/font_color = Color(0.40, 0.32, 0.11, 1)
+theme_override_styles/normal = SubResource("Empty")
+theme_override_styles/hover = SubResource("Highlight")
+[node name="Cancel" type="Button" parent="Choice"]
+offset_left = 3.0
+offset_top = 36.0
+offset_right = 135.0
+offset_bottom = 66.0
+focus_mode = 0
+theme_override_colors/font_color = Color(0.40, 0.32, 0.11, 1)
+theme_override_styles/normal = SubResource("Empty")
+theme_override_styles/hover = SubResource("Highlight")
+text = "返回"
+[node name="Inspect" parent="." instance=ExtResource("Inspect")]
+visible = false
+offset_top = 145.0
+offset_bottom = 258.0
+[node name="Close" type="Button" parent="Inspect"]
+offset_top = 114.0
+offset_right = 164.0
+offset_bottom = 141.0
+focus_mode = 0
+text = "返回"
+[node name="Result" type="Panel" parent="."]
+visible = false
+offset_left = 66.0
+offset_top = 149.0
+offset_right = 254.0
+offset_bottom = 249.0
+theme_override_styles/panel = SubResource("Paper")
+[node name="Title" type="Label" parent="Result"]
+offset_left = 6.0
+offset_top = 8.0
+offset_right = 182.0
+offset_bottom = 33.0
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 17
+theme_override_colors/font_color = Color(0.40, 0.32, 0.11, 1)
+[node name="Body" type="Label" parent="Result"]
+offset_left = 6.0
+offset_top = 36.0
+offset_right = 182.0
+offset_bottom = 61.0
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 11
+theme_override_colors/font_color = Color(0.40, 0.32, 0.11, 1)
+[node name="Return" type="Button" parent="Result"]
+offset_left = 6.0
+offset_top = 66.0
+offset_right = 182.0
+offset_bottom = 94.0
+focus_mode = 0
+theme_override_colors/font_color = Color(0.40, 0.32, 0.11, 1)
+theme_override_styles/normal = SubResource("Empty")
+theme_override_styles/hover = SubResource("Highlight")
+text = "返回山道"
+
+[editable path="Hud"]

@@ -1,0 +1,192 @@
+class_name OnlineBattleView
+extends Control
+## Reference battle HUD; all outcomes and inventory come from OnlinePve.
+signal action_requested(action: String)
+signal dismissed
+signal settings_requested
+var model: OnlinePve
+var hero: AnimatedSprite2D
+var enemy: AnimatedSprite2D
+var battle_id := ""
+var revision := ""
+var animation_time := 0.0
+var countdown := 30.0
+var automatic := false
+var auto_time := 0.0
+var selected_enemy := false
+var choice_action := ""
+var buttons: Array[Button] = []
+const ACTIONS := ["attack", "skill", "guard", "potion", "inspect", "flee"]
+
+func _ready() -> void:
+	for index in 6:
+		var button: Button = get_node("Hud/ActionMenu/BattleButtons%d" % index)
+		buttons.append(button)
+		button.pressed.connect(choose.bind(ACTIONS[index]))
+		button.mouse_entered.connect(_highlight.bind(index))
+	$Hud/HeroHit.pressed.connect(func() -> void: selected_enemy = false; _open_menu())
+	$Hud/EnemyHit.pressed.connect(func() -> void: selected_enemy = true; _open_menu())
+	$Hud/AutoButton.pressed.connect(toggle_auto)
+	$Choice/Use.pressed.connect(func() -> void: _send(choice_action))
+	$Choice/Cancel.pressed.connect(_open_menu)
+	$Inspect/Close.pressed.connect(_open_menu)
+	$Result/Return.pressed.connect(return_to_map)
+	_highlight(0)
+
+func _highlight(index: int) -> void:
+	$Hud/ActionMenu/Cursor.position.y = 13.0 + index * 31.0
+	for i in buttons.size():
+		buttons[i].add_theme_stylebox_override("normal", buttons[i].get_theme_stylebox("hover") if i == index else StyleBoxEmpty.new())
+
+func present(pve: OnlinePve) -> void:
+	model = pve
+	if not model.state.get("battle") is Dictionary: return
+	var b: Dictionary = model.state.battle
+	var c: Dictionary = model.state.character
+	if battle_id != b.id:
+		battle_id = b.id
+		revision = ""
+		automatic = false
+		countdown = 30.0
+		$Choice.hide()
+		$Inspect.hide()
+		$Result.hide()
+		$Hud/ActionMenu.show()
+		if hero != null: hero.queue_free()
+		if enemy != null: enemy.queue_free()
+		var key: String = (["mzs", "mck", "mfs"] if int(c.gender) == 0 else ["wzs", "wck", "wfs"])[int(c.job)]
+		hero = OriginalArt.actor("hero/" + key)
+		$Hero.add_child(hero)
+		enemy = OriginalArt.actor(b.enemy.art)
+		enemy.scale.x = -1
+		$Enemy.add_child(enemy)
+		_highlight(0)
+	if revision != b.revision:
+		countdown = 30.0
+		auto_time = 0.0
+		if not revision.is_empty() and model.last_code.is_empty():
+			if model.last_action in ["attack", "skill"]:
+				hero.play("cast" if model.last_action == "skill" and hero.sprite_frames.has_animation("cast") else "attack")
+			if b.outcome == "active": enemy.play("attack")
+			animation_time = 0.8
+			$Hud/ActionMenu.hide()
+	revision = b.revision
+	if model.ready and not model.pending() and not model.last_code.is_empty() and model.active(): _open_menu()
+	$Hud/Level.text = str(int(c.level))
+	$EnemyLevel.text = str(int(b.enemy.level))
+	$Hud/BattleHeroHp.max_value = model.state.stats.hp
+	$Hud/BattleHeroHp.value = c.hp
+	$Hud/BattleHeroMp.max_value = model.state.stats.mp
+	$Hud/BattleHeroMp.value = c.mp
+	$Hud/BattleEnemyHp.max_value = b.enemy.hp
+	$Hud/BattleEnemyHp.value = b.enemy_hp
+	$Hud/BattleHeroHp.tooltip_text = "%s  气血 %d/%d" % [c.display_name, int(c.hp), int(model.state.stats.hp)]
+	$Hud/BattleEnemyHp.tooltip_text = "%s  气血 %d/%d" % [b.enemy.name, int(b.enemy_hp), int(b.enemy.hp)]
+	show()
+	refresh()
+
+func refresh() -> void:
+	if model == null or not model.state.get("battle") is Dictionary: return
+	var locked := not model.ready or model.pending() or animation_time > 0
+	for button in buttons: button.disabled = locked or not model.active()
+	if not locked and model.active():
+		buttons[1].disabled = int(model.state.battle.mp) < 9
+		buttons[3].disabled = int(model.state.potions) == 0 or int(model.state.battle.hp) >= int(model.state.stats.hp)
+	$Choice/Use.disabled = locked
+	$Hud/AutoButton.disabled = not model.ready or not model.active()
+	$Hud/AutoButton.text = "0键手动战斗" if automatic else "0键自动战斗"
+	$Result/Return.disabled = model.active() or model.pending() or not model.ready
+	if not model.ready:
+		automatic = false
+		$Hint.text = "连接中断，正在恢复战斗……"
+	elif model.pending(): $Hint.text = "等待回合结果……"
+	elif not model.active():
+		automatic = false
+		$Hint.text = ""
+		$Hud/ActionMenu.hide()
+		$Choice.hide()
+		$Inspect.hide()
+		$Result.show()
+		var outcome: String = model.state.battle.outcome
+		$Result/Title.text = {"victory":"战 斗 胜 利", "defeat":"重整旗鼓", "fled":"撤离山林"}.get(outcome,"战斗结束")
+		$Result/Body.text = "奖励已入账" if outcome == "victory" else ("元气已经恢复" if outcome == "defeat" else "试炼进度保留")
+	else: $Hint.text = ""
+	$Countdown.visible = model.active()
+	$Countdown.value = str(maxi(0, ceili(countdown)))
+	$Countdown.queue_redraw()
+
+func choose(action: String) -> void:
+	if model == null or not model.ready or not model.active() or model.pending() or animation_time > 0: return
+	if action in ["skill", "potion"]:
+		choice_action = action
+		$Hud/ActionMenu.hide()
+		$Inspect.hide()
+		$Choice/Use.text = (["破山诀", "御剑诀", "摄灵诀"][int(model.state.character.job)] + "  9灵力") if action == "skill" else "回春散 ×%d" % int(model.state.potions)
+		$Choice.show()
+	elif action == "inspect":
+		$Hud/ActionMenu.hide()
+		$Choice.hide()
+		var b: Dictionary = model.state.battle
+		var c: Dictionary = model.state.character
+		$Inspect/NameValue.text = b.enemy.name if selected_enemy else c.display_name
+		$Inspect/Hp.text = "气血：%d/%d" % [int(b.enemy_hp), int(b.enemy.hp)] if selected_enemy else "气血：%d/%d" % [int(c.hp), int(model.state.stats.hp)]
+		$Inspect/Secondary.text = "攻击：%d" % int(b.enemy.attack) if selected_enemy else "灵力：%d/%d" % [int(c.mp), int(model.state.stats.mp)]
+		$Inspect/Tertiary.text = "防御：%d" % int(b.enemy.defense) if selected_enemy else "回春散：%d" % int(model.state.potions)
+		$Inspect.show()
+	else: _send(action)
+
+func _send(action: String) -> void:
+	if model == null or not model.ready or not model.active() or model.pending() or animation_time > 0: return
+	$Choice.hide()
+	$Inspect.hide()
+	$Hud/ActionMenu.hide()
+	action_requested.emit(action)
+	refresh()
+
+func _open_menu() -> void:
+	if model == null or not model.active(): return
+	$Choice.hide()
+	$Inspect.hide()
+	$Hud/ActionMenu.show()
+
+func toggle_auto() -> void:
+	if model == null or not model.active() or not model.ready: return
+	automatic = not automatic
+	auto_time = 0.0
+	$Hud/ActionMenu.visible = not automatic
+	$Choice.hide()
+	$Inspect.hide()
+	refresh()
+
+func return_to_map() -> void:
+	if model == null or model.active() or model.pending() or not model.ready: return
+	hide()
+	dismissed.emit()
+
+func _process(delta: float) -> void:
+	var was_animating := animation_time > 0
+	animation_time = maxf(0.0, animation_time - delta)
+	if not visible or model == null: return
+	if was_animating and animation_time == 0 and model.active() and not automatic: _open_menu()
+	if model.ready and model.active() and not model.pending() and animation_time == 0:
+		countdown = maxf(0.0, countdown - delta)
+		auto_time += delta
+		if automatic and auto_time >= 1.4: _send("attack")
+		elif countdown == 0: _send("guard")
+	refresh()
+
+func _unhandled_key_input(event: InputEvent) -> void:
+	if not visible or not event is InputEventKey or not event.pressed or event.echo: return
+	if model == null: return
+	match event.keycode:
+		KEY_0, KEY_KP_0: toggle_auto()
+		KEY_1, KEY_2, KEY_3, KEY_4, KEY_5, KEY_6:
+			if $Choice.visible:
+				if event.keycode == KEY_1: _send(choice_action)
+			else: choose(ACTIONS[event.keycode - KEY_1])
+		KEY_ESCAPE:
+			if $Inspect.visible or $Choice.visible: _open_menu()
+			elif not model.active(): return_to_map()
+			else: settings_requested.emit()
+		_: return
+	get_viewport().set_input_as_handled()

@@ -86,6 +86,11 @@ def main():
             threading.Thread(target=lambda:list(p.stdout),daemon=True).start()
             return p,base
         process,base=start(); sockets=[]
+        def run_client():
+            godot_env=dict(os.environ,SSJX_PVE_BASE=base,SSJX_PVE_USER='pve_second',SSJX_PVE_PASSWORD='owned-pve-test-password')
+            result=subprocess.run([os.environ['GODOT_BIN'],'--headless','--path',str(ROOT/'client'),'res://tests/online_pve_live_test.tscn'],env=godot_env,capture_output=True,text=True,encoding='utf-8',timeout=70)
+            print(result.stdout);print(result.stderr)
+            assert result.returncode==0 and '0 failures' in result.stdout and 'SCRIPT ERROR' not in result.stderr
         try:
             def create(name):
                 password='owned-pve-test-password'
@@ -94,6 +99,9 @@ def main():
                 code,data=api(base,'/api/v1/characters',dict(operation_id=str(uuid4()),display_name=name,job=0,gender=0,school=0,rules_version='creation-v1'),session['access_token']);assert code==201,data
                 return session,data['character']['id']
             session,char=create('pve_first');other,other_id=create('pve_second')
+            if os.environ.get('SSJX_TEST_PVE_CLIENT_ONLY') == '1':
+                run_client()
+                return
             a=Player(base,session,char);sockets.append(a)
             b=Player(base,other,other_id);sockets.append(b)
             assert a.state['character']['quest_stage']==0 and a.state['potions']==6
@@ -163,10 +171,7 @@ def main():
                     try:p.close()
                     except OSError:pass
                 time.sleep(1.3)
-                godot_env=dict(os.environ,SSJX_PVE_BASE=base,SSJX_PVE_USER='pve_second',SSJX_PVE_PASSWORD='owned-pve-test-password')
-                result=subprocess.run([os.environ['GODOT_BIN'],'--headless','--path',str(ROOT/'client'),'res://tests/online_pve_live_test.tscn'],env=godot_env,capture_output=True,text=True,encoding='utf-8',timeout=70)
-                print(result.stdout);print(result.stderr)
-                assert result.returncode==0 and '0 failures' in result.stdout and 'SCRIPT ERROR' not in result.stderr
+                run_client()
             print('Online PVE integration: PASS (quests, battles, replay, rollback, restart, isolation, ownership)')
         finally:
             for p in sockets:

@@ -32,6 +32,11 @@ var _was_keyboard := false
 var _character: Dictionary = {}
 var _system_text := "正在连接共享地图……"
 var _rendered_chat := ""
+@onready var encounter: OnlineEncounter = $Encounter
+@onready var battle_view: OnlineBattleView = $Battle
+var _approach: Dictionary = {}
+var _pve_log := ""
+var _closed_battle := ""
 
 func _ready() -> void:
 	map_data = JSON.parse_string(FileAccess.get_file_as_string(OnlineWorldClient.MAP_PATH))
@@ -56,12 +61,32 @@ func _ready() -> void:
 	chat_input.focus_entered.connect(func() -> void:
 		if network.world_ready: network.stop_moving()
 		_was_keyboard = false
+		_cancel_approach()
 	)
 	chat_input.gui_input.connect(func(event: InputEvent) -> void:
 		if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
 			if emote_picker.visible: emote_picker.hide()
 			else: chat_input.release_focus()
 			chat_input.accept_event()
+	)
+	resident_selected.connect(_select_resident)
+	encounter.action_requested.connect(_resident_action)
+	encounter.dismissed.connect(_cancel_approach)
+	battle_view.settings_requested.connect(func() -> void: _scene_action("system"))
+	battle_view.action_requested.connect(func(action: String) -> void: network.pve.submit(action))
+	battle_view.dismissed.connect(func() -> void:
+		_closed_battle = battle_view.battle_id
+		screen.hud.show()
+		count_label.show()
+		screen.chrome.round_label.text = "常规模式"
+		_set_battle_layout(false)
+	)
+	network.pve.changed.connect(_pve_changed)
+	network.pve.message.connect(func(text: String) -> void:
+		_pve_log = text
+		_system_text = text
+		_chat_changed()
+		if network.pve.last_code.is_empty(): encounter.hide()
 	)
 	network.changed.connect(_snapshot)
 	network.population.changed.connect(_population)
@@ -77,6 +102,8 @@ func _leave_world() -> void:
 	close_requested.emit()
 
 func _scene_action(action: String) -> void:
+	_cancel_approach()
+	encounter.hide()
 	if action == "menu":
 		details.hide()
 		emote_picker.hide()
@@ -100,7 +127,9 @@ func _scene_action(action: String) -> void:
 	if action == "properties":
 		body = "%s\n等级%d · %s · %s派\n气血%d · 灵力%d · 铜币%d" % [String(_character.get("display_name", "")), int(_character.get("level", 1)), ["力士", "侠客", "隐者"][int(_character.get("job", 0))], ["峨眉", "花涧", "昆仑"][int(_character.get("school", 0))], int(_character.get("hp", 0)), int(_character.get("mp", 0)), int(_character.get("gold", 0))]
 	elif action == "map": body = "青云山道 · 同图%d人\n当前位置：%s\n小地图中的蓝点代表其他玩家。" % [actors.size(), screen.hud.get_node("MapCoordinates").text]
-	elif action in ["quest", "bag", "reward", "shop", "craft", "team", "guild", "trade"]: body = "线上%s尚未开放。\n可在当前地图移动，与同图玩家聊天。" % titles[action]
+	elif action == "quest": body = network.pve.quest_text()
+	elif action == "bag" and not network.pve.state.is_empty(): body = "回春散 ×%d\n战斗中可恢复45点生命。\n铜钱：%d" % [int(network.pve.state.potions), int(_character.get("gold", 0))]
+	elif action in ["bag", "reward", "shop", "craft", "team", "guild", "trade"]: body = "线上%s尚未开放。\n可在当前地图移动，与同图玩家聊天。" % titles[action]
 	elif action == "mail": body = "暂无邮件。"
 	$Menu/Panel/Body.text = body
 	details.show()
@@ -138,17 +167,19 @@ func _build_map() -> void:
 		scene.add_child(actor)
 
 func _population(values: Dictionary) -> void:
+	var visible_values := values.duplicate()
+	for id in network.pve.state.get("progress", {}).get("defeated", []): visible_values.erase(id)
 	for id in residents.keys():
-		if not values.has(id):
+		if not visible_values.has(id):
 			residents[id].queue_free()
 			residents.erase(id)
-	for id in values:
+	for id in visible_values:
 		if not residents.has(id):
 			var resident: OnlineResident = preload("res://scenes/actors/online_resident.tscn").instantiate()
 			actor_layer.add_child(resident)
 			residents[id] = resident
-		residents[id].receive(values[id], _motion_grid)
-	screen.hud.get_node("Minimap").set_shared_population(values)
+		residents[id].receive(visible_values[id], _motion_grid)
+	screen.hud.get_node("Minimap").set_shared_population(visible_values)
 
 func _snapshot(values: Dictionary) -> void:
 	for id in actors.keys():
@@ -182,7 +213,7 @@ func _snapshot(values: Dictionary) -> void:
 		var own: Dictionary = values[character_id]
 		screen.hud.get_node("MapCoordinates").text = "%d  %d" % [int(own.cell[0]), int(own.cell[1])]
 		screen.hud.get_node("WorldIdentity").text = "等级 %d\n%s派" % [int(_character.get("level", 1)), ["峨眉", "花涧", "昆仑"][int(_character.get("school", 0))]]
-	_system_text = "同图%d人 · 点击移动 / WASD" % actors.size()
+	if _pve_log.is_empty(): _system_text = "同图%d人 · 点击移动 / WASD" % actors.size()
 	status.text = _system_text
 	_chat_changed()
 
@@ -232,13 +263,13 @@ func _send_chat() -> void:
 
 func _chat_changed() -> void:
 	var lines := PackedStringArray()
-	if network.chat.messages.is_empty() or not network.world_ready: lines.append("[系统] " + _system_text)
+	if not _pve_log.is_empty() or network.chat.messages.is_empty() or not network.world_ready: lines.append("[系统] " + _system_text)
 	for message in network.chat.messages: lines.append("[公共] %s：%s" % [message.display_name, message.text])
 	var text_value := "\n".join(lines)
 	if text_value != _rendered_chat:
 		_rendered_chat = text_value
 		chat_log.clear()
-		if network.chat.messages.is_empty() or not network.world_ready:
+		if not _pve_log.is_empty() or network.chat.messages.is_empty() or not network.world_ready:
 			chat_log.add_text("[系统] " + _system_text)
 			if not network.chat.messages.is_empty(): chat_log.add_text("\n")
 		for index in network.chat.messages.size():
@@ -280,7 +311,8 @@ func _process(delta: float) -> void:
 			actor.distance = 0.0
 			actor.sprite.play("idle")
 	if actors.has(character_id): camera.position = actors[character_id].root.position
-	if chat_input.has_focus() or menu.visible or details.visible or emote_picker.visible:
+	_advance_approach()
+	if chat_input.has_focus() or menu.visible or details.visible or emote_picker.visible or encounter.visible or battle_view.visible or network.pve.pending():
 		_was_keyboard = false
 		return
 	_key_timer -= delta
@@ -299,7 +331,7 @@ func _process(delta: float) -> void:
 		_was_keyboard = false
 
 func _map_input(event: InputEvent) -> void:
-	if not network.world_ready or menu.visible or details.visible: return
+	if not network.world_ready or menu.visible or details.visible or encounter.visible or battle_view.visible or network.pve.pending(): return
 	var point := Vector2.ZERO
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed: point = event.position
 	elif event is InputEventScreenTouch and event.pressed: point = event.position
@@ -314,6 +346,7 @@ func _map_input(event: InputEvent) -> void:
 		if residents[id].hit(world_point):
 			resident_selected.emit(id)
 			return
+	_cancel_approach()
 	var destination := Vector2i(floori(world_point.x / 16.0), floori(world_point.y / 16.0))
 	if _motion_grid.region.has_point(destination) and not _motion_grid.is_point_solid(destination): network.move_to(destination)
 	else:
@@ -323,7 +356,11 @@ func _map_input(event: InputEvent) -> void:
 func _unhandled_key_input(event: InputEvent) -> void:
 	if not event is InputEventKey or not event.pressed: return
 	if event.keycode == KEY_ESCAPE:
-		if emote_picker.visible: emote_picker.hide()
+		if battle_view.visible: return
+		if encounter.visible:
+			encounter.hide()
+			_cancel_approach()
+		elif emote_picker.visible: emote_picker.hide()
 		elif menu.visible: menu.dismiss()
 		elif details.visible: details.hide()
 		elif chat_input.has_focus(): chat_input.release_focus()
@@ -331,3 +368,101 @@ func _unhandled_key_input(event: InputEvent) -> void:
 	elif event.keycode == KEY_ENTER: _focus_chat()
 	else: return
 	get_viewport().set_input_as_handled()
+
+func _pve_changed() -> void:
+	var model := network.pve
+	if not model.ready:
+		_cancel_approach()
+	if not model.state.is_empty():
+		_character = model.state.character.duplicate(true)
+		_character.max_hp = model.state.stats.hp
+		_character.max_mp = model.state.stats.mp
+		_character.next_xp = int(_character.level) * 40
+		screen.chrome.display_character(_character)
+		screen.hud.get_node("WorldIdentity").text = "等级 %d\n%s派" % [int(_character.level), ["峨眉", "花涧", "昆仑"][int(_character.school)]]
+		_population(network.population.entities)
+		if model.state.battle is Dictionary and (model.active() or model.state.battle.id != _closed_battle):
+			encounter.hide()
+			battle_view.present(model)
+			screen.chrome.round_label.text = "回合：%d/30" % int(model.state.battle.round)
+			_set_battle_layout(true)
+			screen.hud.hide()
+			count_label.hide()
+		elif battle_view.visible:
+			battle_view.hide()
+			_set_battle_layout(false)
+			screen.hud.show()
+			count_label.show()
+	encounter.refresh()
+	battle_view.refresh()
+
+func _select_resident(id: String) -> void:
+	if not residents.has(id) or network.pve.active() or network.pve.pending(): return
+	_cancel_approach()
+	if network.world_ready: network.stop_moving()
+	menu.hide()
+	details.hide()
+	emote_picker.hide()
+	encounter.present(id, network.population.entities[id], network.pve)
+
+func _cancel_approach() -> void:
+	if not _approach.is_empty() and network.world_ready: network.stop_moving()
+	_approach = {}
+	if encounter != null:
+		encounter.approaching = false
+		encounter.refresh()
+
+func _resident_action(action: String, target: String) -> void:
+	if not network.pve.ready or network.pve.pending(): return
+	_approach = {"action": action, "target": target, "deadline": Time.get_unix_time_from_system() + 30.0, "stopped": true}
+	encounter.approaching = true
+	encounter.refresh()
+	network.stop_moving()
+
+func _advance_approach() -> void:
+	if _approach.is_empty(): return
+	if not network.world_ready or not network.pve.ready or Time.get_unix_time_from_system() > float(_approach.deadline):
+		_cancel_approach()
+		chat_status.text = "未能抵达，请重新选择目标。"
+		return
+	if not network.population.entities.has(_approach.target) or not network.entities.has(character_id):
+		_cancel_approach()
+		return
+	var own: Dictionary = network.entities[character_id]
+	if own.next_cell != null or not network._pending_motion.is_empty() or int(own.last_input_seq) < network._input_seq: return
+	var cell := Vector2i(own.cell[0], own.cell[1])
+	var resident: Dictionary = network.population.entities[_approach.target]
+	var target := Vector2i(resident.cell[0], resident.cell[1])
+	if absi(cell.x - target.x) + absi(cell.y - target.y) <= 2:
+		if not _approach.stopped:
+			_approach.stopped = true
+			network.stop_moving()
+			return
+		var request := _approach
+		_approach = {}
+		encounter.approaching = false
+		network.pve.submit(request.action, request.target)
+		return
+	var best := Vector2i(-1, -1)
+	var shortest := 9999
+	for offset in [Vector2i.UP, Vector2i.DOWN, Vector2i.LEFT, Vector2i.RIGHT]:
+		var goal: Vector2i = target + offset
+		if not _motion_grid.region.has_point(goal) or _motion_grid.is_point_solid(goal): continue
+		var path := _motion_grid.get_id_path(cell, goal)
+		if not path.is_empty() and path.size() < shortest:
+			best = goal
+			shortest = path.size()
+	if best.x < 0:
+		_cancel_approach()
+		chat_status.text = "目标不可达，请更换路线。"
+	else:
+		_approach.stopped = false
+		network.move_to(best)
+
+func _set_battle_layout(active: bool) -> void:
+	screen.chrome.toolbar.visible = not active
+	for name_value in ["Reward", "SceneReward13", "Panel11"]: screen.chrome.get_node(name_value).visible = not active
+	screen.chrome.round_label.position.x = 205.0 if active else 210.0
+	screen.chrome.round_label.size.x = 114.0 if active else 77.0
+	screen.chrome.round_label.add_theme_color_override("font_color", Color("294d74") if active else Color("efe82e"))
+	chat_panel.position.y = 424.0 if active else 403.0

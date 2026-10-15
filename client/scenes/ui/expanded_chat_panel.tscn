@@ -1,0 +1,281 @@
+[gd_scene format=3]
+[ext_resource type="Script" path="res://scripts/expanded_chat_panel.gd" id="Script"]
+[ext_resource type="PackedScene" path="res://scenes/ui/chat_emote_picker.tscn" id="Emotes"]
+[ext_resource type="Texture2D" path="res://assets/ui/chat_scroll_up.svg" id="Up"]
+[ext_resource type="Texture2D" path="res://assets/ui/chat_scroll_down.svg" id="Down"]
+[ext_resource type="Texture2D" path="res://assets/ui/chat_frame_corner.svg" id="Corner"]
+[sub_resource type="SystemFont" id="Font"]
+font_names = PackedStringArray("SimHei", "Microsoft YaHei", "sans-serif")
+antialiasing = 0
+[sub_resource type="StyleBoxFlat" id="Frame"]
+bg_color = Color(0.75, 0.48, 0.12, 1)
+border_color = Color(1, 0.83, 0.39, 1)
+border_width_left = 2
+border_width_right = 2
+border_width_top = 2
+border_width_bottom = 2
+shadow_color = Color(0.10, 0.08, 0.03, 0.55)
+shadow_size = 3
+[sub_resource type="StyleBoxFlat" id="Paper"]
+bg_color = Color(1, 0.97, 0.73, 1)
+border_color = Color(0.47, 0.32, 0.12, 1)
+border_width_left = 1
+border_width_right = 1
+border_width_top = 1
+border_width_bottom = 1
+[sub_resource type="StyleBoxFlat" id="Tab"]
+bg_color = Color(0.65, 0.39, 0.11, 1)
+content_margin_left = 2.0
+content_margin_right = 2.0
+content_margin_top = 1.0
+content_margin_bottom = 1.0
+[sub_resource type="StyleBoxFlat" id="Hover"]
+bg_color = Color(0.91, 0.65, 0.21, 1)
+content_margin_left = 2.0
+content_margin_right = 2.0
+content_margin_top = 1.0
+content_margin_bottom = 1.0
+[sub_resource type="StyleBoxFlat" id="Selected"]
+bg_color = Color(0.25, 0.77, 0.67, 1)
+border_color = Color(1, 0.89, 0.54, 1)
+border_width_left = 1
+border_width_right = 1
+border_width_top = 1
+border_width_bottom = 1
+content_margin_left = 2.0
+content_margin_right = 2.0
+content_margin_top = 1.0
+content_margin_bottom = 1.0
+[sub_resource type="StyleBoxFlat" id="Wood"]
+bg_color = Color(0.65, 0.39, 0.11, 1)
+border_color = Color(1, 0.87, 0.51, 1)
+border_width_left = 1
+border_width_right = 1
+border_width_top = 1
+border_width_bottom = 1
+content_margin_left = 3.0
+content_margin_right = 3.0
+[sub_resource type="StyleBoxFlat" id="Track"]
+bg_color = Color(0.38, 0.28, 0.12, 1)
+content_margin_left = 3.0
+content_margin_right = 3.0
+[sub_resource type="StyleBoxFlat" id="Thumb"]
+bg_color = Color(0.77, 0.57, 0.19, 1)
+border_color = Color(1, 0.87, 0.51, 1)
+border_width_left = 1
+border_width_right = 1
+border_width_top = 1
+border_width_bottom = 1
+content_margin_left = 3.0
+content_margin_right = 3.0
+[sub_resource type="Theme" id="Theme"]
+default_font = SubResource("Font")
+default_font_size = 11
+Button/styles/normal = SubResource("Tab")
+Button/styles/hover = SubResource("Hover")
+Button/styles/pressed = SubResource("Selected")
+Button/styles/disabled = SubResource("Tab")
+Button/styles/focus = SubResource("Selected")
+Button/colors/font_color = Color(1, 0.88, 0.40, 1)
+Button/colors/font_hover_color = Color(0.35, 0.24, 0.07, 1)
+Button/colors/font_pressed_color = Color(0.23, 0.28, 0.13, 1)
+VScrollBar/styles/scroll = SubResource("Track")
+VScrollBar/styles/grabber = SubResource("Thumb")
+VScrollBar/styles/grabber_highlight = SubResource("Thumb")
+VScrollBar/styles/grabber_pressed = SubResource("Thumb")
+VScrollBar/icons/decrement = ExtResource("Up")
+VScrollBar/icons/increment = ExtResource("Down")
+VScrollBar/icons/decrement_highlight = ExtResource("Up")
+VScrollBar/icons/increment_highlight = ExtResource("Down")
+[sub_resource type="ButtonGroup" id="Channels"]
+[node name="ExpandedChat" type="Control"]
+visible = false
+z_index = 20
+offset_right = 320.0
+offset_bottom = 480.0
+mouse_filter = 2
+theme = SubResource("Theme")
+script = ExtResource("Script")
+[node name="Shade" type="ColorRect" parent="."]
+offset_right = 320.0
+offset_bottom = 403.0
+color = Color(0.06, 0.09, 0.06, 0.48)
+[node name="Panel" type="Panel" parent="."]
+offset_left = 22.0
+offset_top = 24.0
+offset_right = 298.0
+offset_bottom = 396.0
+theme_override_styles/panel = SubResource("Frame")
+[node name="Paper" type="Panel" parent="Panel"]
+offset_left = 8.0
+offset_top = 34.0
+offset_right = 268.0
+offset_bottom = 332.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("Paper")
+[node name="Tabs" type="HBoxContainer" parent="Panel"]
+offset_left = 8.0
+offset_top = 8.0
+offset_right = 268.0
+offset_bottom = 34.0
+theme_override_constants/separation = 1
+[node name="All" type="Button" parent="Panel/Tabs"]
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+toggle_mode = true
+button_group = SubResource("Channels")
+button_pressed = false
+disabled = false
+theme_override_colors/font_color = Color(1, 0.86, 0.34, 1)
+theme_override_colors/font_disabled_color = Color(1, 0.86, 0.34, 1)
+text = "全部"
+metadata/channel = "all"
+[node name="World" type="Button" parent="Panel/Tabs"]
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+toggle_mode = true
+button_group = SubResource("Channels")
+button_pressed = true
+disabled = false
+theme_override_colors/font_color = Color(0.52, 0.91, 0.81, 1)
+theme_override_colors/font_disabled_color = Color(0.52, 0.91, 0.81, 1)
+text = "世界"
+metadata/channel = "public"
+[node name="Area" type="Button" parent="Panel/Tabs"]
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+toggle_mode = true
+button_group = SubResource("Channels")
+button_pressed = false
+disabled = true
+theme_override_colors/font_color = Color(0.76, 0.57, 0.32, 1)
+theme_override_colors/font_disabled_color = Color(0.76, 0.57, 0.32, 1)
+text = "地区"
+metadata/channel = "area"
+tooltip_text = "地区频道暂未开放"
+[node name="Team" type="Button" parent="Panel/Tabs"]
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+toggle_mode = true
+button_group = SubResource("Channels")
+button_pressed = false
+disabled = true
+theme_override_colors/font_color = Color(0.45, 0.65, 0.75, 1)
+theme_override_colors/font_disabled_color = Color(0.45, 0.65, 0.75, 1)
+text = "队伍"
+metadata/channel = "team"
+tooltip_text = "队伍频道暂未开放"
+[node name="Guild" type="Button" parent="Panel/Tabs"]
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+toggle_mode = true
+button_group = SubResource("Channels")
+button_pressed = false
+disabled = true
+theme_override_colors/font_color = Color(0.54, 0.66, 0.32, 1)
+theme_override_colors/font_disabled_color = Color(0.54, 0.66, 0.32, 1)
+text = "帮会"
+metadata/channel = "guild"
+tooltip_text = "帮会频道暂未开放"
+[node name="Private" type="Button" parent="Panel/Tabs"]
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+toggle_mode = true
+button_group = SubResource("Channels")
+button_pressed = false
+disabled = true
+theme_override_colors/font_color = Color(0.75, 0.47, 0.56, 1)
+theme_override_colors/font_disabled_color = Color(0.75, 0.47, 0.56, 1)
+text = "私聊"
+metadata/channel = "private"
+tooltip_text = "私聊频道暂未开放"
+[node name="System" type="Button" parent="Panel/Tabs"]
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+toggle_mode = true
+button_group = SubResource("Channels")
+button_pressed = false
+disabled = false
+theme_override_colors/font_color = Color(0.98, 0.82, 0.88, 1)
+theme_override_colors/font_disabled_color = Color(0.98, 0.82, 0.88, 1)
+text = "系统"
+metadata/channel = "system"
+[node name="History" type="RichTextLabel" parent="Panel"]
+offset_left = 13.0
+offset_top = 40.0
+offset_right = 265.0
+offset_bottom = 327.0
+theme_override_colors/default_color = Color(0.27, 0.22, 0.10, 1)
+theme_override_font_sizes/normal_font_size = 11
+theme_override_constants/line_separation = 4
+bbcode_enabled = false
+scroll_following = false
+selection_enabled = true
+[node name="Empty" type="Label" parent="Panel"]
+offset_left = 20.0
+offset_top = 164.0
+offset_right = 256.0
+offset_bottom = 196.0
+mouse_filter = 2
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.55, 0.40, 0.18, 1)
+text = "暂时没有世界消息"
+[node name="Emotes" type="Button" parent="Panel"]
+offset_left = 8.0
+offset_top = 338.0
+offset_right = 51.0
+offset_bottom = 363.0
+focus_mode = 0
+theme_override_styles/normal = SubResource("Wood")
+text = "表情"
+[node name="Status" type="Label" parent="Panel"]
+offset_left = 55.0
+offset_top = 340.0
+offset_right = 215.0
+offset_bottom = 363.0
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 9
+theme_override_colors/font_color = Color(1, 0.89, 0.50, 1)
+text = "世界频道 · 最多120字"
+clip_text = true
+text_overrun_behavior = 3
+[node name="Return" type="Button" parent="Panel"]
+offset_left = 217.0
+offset_top = 338.0
+offset_right = 268.0
+offset_bottom = 363.0
+focus_mode = 0
+theme_override_styles/normal = SubResource("Wood")
+text = "返回"
+[node name="TopLeft" type="Sprite2D" parent="Panel"]
+position = Vector2(2, 2)
+rotation = 0
+texture = ExtResource("Corner")
+centered = false
+[node name="TopRight" type="Sprite2D" parent="Panel"]
+position = Vector2(274, 2)
+rotation = 1.5707963
+texture = ExtResource("Corner")
+centered = false
+[node name="BottomRight" type="Sprite2D" parent="Panel"]
+position = Vector2(274, 370)
+rotation = 3.1415927
+texture = ExtResource("Corner")
+centered = false
+[node name="BottomLeft" type="Sprite2D" parent="Panel"]
+position = Vector2(2, 370)
+rotation = -1.5707963
+texture = ExtResource("Corner")
+centered = false
+[node name="EmotePicker" parent="." instance=ExtResource("Emotes")]
+offset_left = 38.0
+offset_top = 264.0
+offset_right = 282.0
+offset_bottom = 356.0

@@ -5,6 +5,9 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/chat_emote_picker.tscn" id="Emotes"]
 [ext_resource type="Texture2D" path="res://assets/ui/chat_emotes/smile.svg" id="Smile"]
 
+[ext_resource type="Texture2D" path="res://assets/ui/chat_expand.svg" id="ExpandArrow"]
+[ext_resource type="PackedScene" path="res://scenes/ui/expanded_chat_panel.tscn" id="ExpandedChat"]
+
 [sub_resource type="SystemFont" id="Font"]
 font_names = PackedStringArray("SimHei", "Microsoft YaHei", "sans-serif")
 antialiasing = 0
@@ -25,6 +28,20 @@ content_margin_top = 1.0
 content_margin_bottom = 1.0
 bg_color = Color(0.160784, 0.301961, 0.454902, 1)
 border_color = Color(0.501961, 0.65098, 0.819608, 1)
+border_width_left = 1
+border_width_right = 1
+border_width_top = 1
+border_width_bottom = 1
+[sub_resource type="StyleBoxFlat" id="ExpandButton"]
+bg_color = Color(0.55, 0.35, 0.13, 1)
+border_color = Color(0.95, 0.82, 0.46, 1)
+border_width_left = 1
+border_width_right = 1
+border_width_top = 1
+border_width_bottom = 1
+[sub_resource type="StyleBoxFlat" id="ExpandHover"]
+bg_color = Color(0.73, 0.49, 0.17, 1)
+border_color = Color(1, 0.91, 0.62, 1)
 border_width_left = 1
 border_width_right = 1
 border_width_top = 1
@@ -69,7 +86,7 @@ theme_override_styles/panel = SubResource("Blue")
 [node name="ChatLog" type="RichTextLabel" parent="Chat"]
 offset_left = 5.0
 offset_top = 2.0
-offset_right = 315.0
+offset_right = 289.0
 offset_bottom = 30.0
 theme_override_font_sizes/normal_font_size = 10
 theme_override_colors/default_color = Color(1, 0.960784, 0.862745, 1)
@@ -122,3 +139,17 @@ text = "表情"
 icon = ExtResource("Smile")
 
 [node name="EmotePicker" parent="Chat" instance=ExtResource("Emotes")]
+
+[node name="Expand" type="Button" parent="Chat"]
+offset_left = 294.0
+offset_top = 3.0
+offset_right = 316.0
+offset_bottom = 25.0
+focus_mode = 0
+tooltip_text = "展开聊天"
+icon = ExtResource("ExpandArrow")
+theme_override_styles/normal = SubResource("ExpandButton")
+theme_override_styles/hover = SubResource("ExpandHover")
+theme_override_styles/pressed = SubResource("ExpandHover")
+theme_override_constants/h_separation = 0
+[node name="ExpandedChat" parent="." instance=ExtResource("ExpandedChat")]

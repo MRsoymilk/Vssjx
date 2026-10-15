@@ -27,6 +27,7 @@ var _was_keyboard := false
 @onready var chat_button: Button = $Screen/Chrome/Toolbar/Social
 @onready var emote_button: Button = $Screen/Chat/ChatEmotes
 @onready var emote_picker: ChatEmotePicker = $Screen/Chat/EmotePicker
+@onready var expanded_chat: ExpandedChatPanel = $Screen/ExpandedChat
 @onready var menu: OriginalGameMenu = $GameMenu
 @onready var details: Control = $Menu
 var _character: Dictionary = {}
@@ -53,6 +54,12 @@ func _ready() -> void:
 	$Menu/Panel/Continue.pressed.connect(func() -> void: details.hide())
 	$Menu/Panel/Leave.pressed.connect(_leave_world)
 	$Menu/Panel/Chat.pressed.connect(_focus_chat)
+	$Screen/Chat/Expand.pressed.connect(_open_expanded_chat)
+	expanded_chat.dismissed.connect(_expanded_chat_dismissed)
+	expanded_chat.emotes_requested.connect(_toggle_emotes)
+	expanded_chat.emote_chosen.connect(_insert_emote)
+	expanded_chat.focus_requested.connect(func() -> void: chat_input.grab_focus())
+	expanded_chat.add_system(_system_text)
 	chat_send.pressed.connect(_send_chat)
 	emote_button.pressed.connect(_toggle_emotes)
 	emote_picker.chosen.connect(_insert_emote)
@@ -65,7 +72,9 @@ func _ready() -> void:
 	)
 	chat_input.gui_input.connect(func(event: InputEvent) -> void:
 		if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
-			if emote_picker.visible: emote_picker.hide()
+			if expanded_chat.visible and expanded_chat.picker.visible: expanded_chat.close_emotes()
+			elif emote_picker.visible: emote_picker.hide()
+			elif expanded_chat.visible: expanded_chat.dismiss()
 			else: chat_input.release_focus()
 			chat_input.accept_event()
 	)
@@ -85,6 +94,7 @@ func _ready() -> void:
 	network.pve.message.connect(func(text: String) -> void:
 		_pve_log = text
 		_system_text = text
+		expanded_chat.add_system(text)
 		_chat_changed()
 		if network.pve.last_code.is_empty(): encounter.hide()
 	)
@@ -92,7 +102,10 @@ func _ready() -> void:
 	network.population.changed.connect(_population)
 	network.status_changed.connect(_status_changed)
 	network.chat.changed.connect(_chat_changed)
-	network.chat.status_changed.connect(func(text_value: String) -> void: chat_status.text = text_value)
+	network.chat.status_changed.connect(func(text_value: String) -> void:
+		chat_status.text = text_value
+		expanded_chat.set_status(text_value)
+	)
 	network.chat.confirmed.connect(func() -> void: chat_input.clear())
 	chat_status.text = "公共频道 · 最多120字"
 	network.start(character_id)
@@ -102,6 +115,7 @@ func _leave_world() -> void:
 	close_requested.emit()
 
 func _scene_action(action: String) -> void:
+	if expanded_chat.visible: expanded_chat.dismiss()
 	_cancel_approach()
 	encounter.hide()
 	if action == "menu":
@@ -137,6 +151,7 @@ func _scene_action(action: String) -> void:
 func _status_changed(text_value: String) -> void:
 	status.text = text_value
 	_system_text = text_value
+	expanded_chat.add_system(text_value)
 	if not network.world_ready:
 		for actor in actors.values(): actor.sprite.play("idle")
 	_chat_changed()
@@ -225,6 +240,7 @@ func _toggle_chat() -> void:
 	else: _focus_chat()
 
 func _focus_chat() -> void:
+	expanded_chat.close_emotes()
 	menu.hide()
 	details.hide()
 	emote_picker.hide()
@@ -237,7 +253,8 @@ func _toggle_emotes() -> void:
 	chat_input.grab_focus()
 	if network.world_ready: network.stop_moving()
 	_was_keyboard = false
-	emote_picker.visible = not emote_picker.visible
+	if expanded_chat.visible: expanded_chat.toggle_emotes()
+	else: emote_picker.visible = not emote_picker.visible
 
 func _insert_emote(token: String) -> void:
 	if not _can_insert_emote() or not chat_input.editable or ChatEmotePicker.CATALOG.texture_for(token) == null: return
@@ -246,8 +263,10 @@ func _insert_emote(token: String) -> void:
 	var draft := chat_input.text.left(start) + token + chat_input.text.substr(end)
 	if draft.length() > 120 or draft.to_utf8_buffer().size() > 480:
 		chat_status.text = "消息最多120字，请删减后再添加表情。"
+		expanded_chat.set_status(chat_status.text)
 		return
 	chat_input.text = draft
+	expanded_chat.close_emotes()
 	chat_input.deselect()
 	chat_input.caret_column = start + token.length()
 	emote_picker.hide()
@@ -258,10 +277,12 @@ func _can_insert_emote() -> bool:
 
 func _send_chat() -> void:
 	emote_picker.hide()
+	expanded_chat.close_emotes()
 	network.chat.submit(chat_input.text)
 	_update_chat_controls()
 
 func _chat_changed() -> void:
+	expanded_chat.sync_messages(network.chat.messages)
 	var lines := PackedStringArray()
 	if not _pve_log.is_empty() or network.chat.messages.is_empty() or not network.world_ready: lines.append("[系统] " + _system_text)
 	for message in network.chat.messages: lines.append("[公共] %s：%s" % [message.display_name, message.text])
@@ -284,6 +305,7 @@ func _update_chat_controls() -> void:
 		chat_send.disabled = not network.world_ready or not network.chat.connected or not network.chat.pending.is_empty()
 		chat_input.editable = network.chat.pending.is_empty()
 		emote_button.disabled = chat_send.disabled
+		expanded_chat.set_emotes_enabled(not emote_button.disabled)
 		if emote_button.disabled: emote_picker.hide()
 
 func _process(delta: float) -> void:
@@ -312,7 +334,7 @@ func _process(delta: float) -> void:
 			actor.sprite.play("idle")
 	if actors.has(character_id): camera.position = actors[character_id].root.position
 	_advance_approach()
-	if chat_input.has_focus() or menu.visible or details.visible or emote_picker.visible or encounter.visible or battle_view.visible or network.pve.pending():
+	if chat_input.has_focus() or menu.visible or details.visible or emote_picker.visible or encounter.visible or battle_view.visible or expanded_chat.visible or network.pve.pending():
 		_was_keyboard = false
 		return
 	_key_timer -= delta
@@ -331,7 +353,7 @@ func _process(delta: float) -> void:
 		_was_keyboard = false
 
 func _map_input(event: InputEvent) -> void:
-	if not network.world_ready or menu.visible or details.visible or encounter.visible or battle_view.visible or network.pve.pending(): return
+	if not network.world_ready or menu.visible or details.visible or encounter.visible or battle_view.visible or expanded_chat.visible or network.pve.pending(): return
 	var point := Vector2.ZERO
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed: point = event.position
 	elif event is InputEventScreenTouch and event.pressed: point = event.position
@@ -356,6 +378,11 @@ func _map_input(event: InputEvent) -> void:
 func _unhandled_key_input(event: InputEvent) -> void:
 	if not event is InputEventKey or not event.pressed: return
 	if event.keycode == KEY_ESCAPE:
+		if expanded_chat.visible:
+			if expanded_chat.picker.visible: expanded_chat.close_emotes()
+			else: expanded_chat.dismiss()
+			get_viewport().set_input_as_handled()
+			return
 		if battle_view.visible: return
 		if encounter.visible:
 			encounter.hide()
@@ -466,3 +493,20 @@ func _set_battle_layout(active: bool) -> void:
 	screen.chrome.round_label.size.x = 114.0 if active else 77.0
 	screen.chrome.round_label.add_theme_color_override("font_color", Color("294d74") if active else Color("efe82e"))
 	chat_panel.position.y = 424.0 if active else 403.0
+	expanded_chat.get_node("Shade").size.y = chat_panel.position.y
+
+func _open_expanded_chat() -> void:
+	_cancel_approach()
+	if network.world_ready: network.stop_moving()
+	_was_keyboard = false
+	menu.hide()
+	details.hide()
+	encounter.hide()
+	emote_picker.hide()
+	chat_input.release_focus()
+	battle_view.set_process_unhandled_key_input(false)
+	expanded_chat.open()
+
+func _expanded_chat_dismissed() -> void:
+	chat_input.release_focus()
+	battle_view.set_process_unhandled_key_input(true)

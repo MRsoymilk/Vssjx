@@ -2,13 +2,21 @@
 
 基于 `analysis/` 中原始《蜀山剑侠Online》320×480 客户端素材，用 **Godot 4.7** 编写的离线可玩原型。
 
-工程已划分为`client/`（Godot客户端）和`server/`（Rust服务端预留目录）。当前玩法仍为离线模式，服务器尚未实现；联机方案见[design/README.md](design/README.md)。
+工程已划分为`client/`（Godot客户端）和`server/`（Rust服务端）。当前Rust服务已支持连接检查，游戏玩法仍为离线模式，账号认证和多人世界尚未开放；联机方案见[design/README.md](design/README.md)。
 
 ## 启动
 
 - 使用 Godot 4.7 打开 `client/project.godot`，按 **F5** 运行项目。
+- 命令行在仓库根目录运行：`godot --path client`。
+- 服务端启动：`cargo run --locked --manifest-path server/Cargo.toml`，默认监听`127.0.0.1:8080`，详见[server/README.md](server/README.md)。
 
-已生成所需 Godot 素材，正常运行不依赖 Python，也不需要联网。启动脚本在首次运行时自动执行Godot导入。本项目采用 OpenGL Compatibility 渲染器。
+已生成所需 Godot 素材，离线试玩不依赖Python或联网；Godot首次打开客户端时导入素材。本项目采用OpenGL Compatibility渲染器。
+
+## 服务器地址
+
+封面选择“登录游戏”，输入目标服务器地址并“保存并连接”。支持`127.0.0.1:8080`、`game.example.com`或完整HTTP/HTTPS地址，也支持反向代理路径前缀。省略协议时IP/localhost使用HTTP，域名使用HTTPS。
+
+有效地址保存到独立的`user://connection.cfg`，下次打开登录界面或重启客户端自动回填，可随时更换。连接失败也保留地址，非法输入不覆盖旧值，不保存密码或修改角色存档。当前连接成功只显示服务信息，不进入线上角色或多人地图。
 
 ## 已实现
 
@@ -70,7 +78,7 @@
 | `client/scripts/art.gd` | 原始组合帧图集转SpriteFrames |
 | `client/scripts/portal.gd` | 灵门标记 |
 | `client/assets/` | 已转换的图块、角色图集、标题和动画数据 |
-| `server/` | Rust服务端预留目录，尚无运行服务 |
+| `server/` | Rust连接检查服务，账号和玩法服务待实现 |
 | `design/` | 联机架构、协议草案与实施规划 |
 | `tools/import_assets.py` | 可重复执行的静态资源转换程序 |
 | `analysis/` | 用户提供的原始静态解析材料，保留并排除Godot扫描 |

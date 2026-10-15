@@ -17,7 +17,7 @@ func check(condition: bool, description: String) -> void:
 
 func _find_button(parent: Node, text_value: String) -> Button:
 	for child in parent.get_children():
-		if child is Button and child.text == text_value: return child
+		if child is Button and child.is_visible_in_tree() and child.text == text_value: return child
 		var result := _find_button(child, text_value)
 		if result != null: return result
 	return null

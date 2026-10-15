@@ -29,6 +29,10 @@ func _run() -> void:
 	view = app.ui.get_node("OnlineWorld")
 	check(await wait_until(func() -> bool: return view.network.world_ready and view.network.pve.ready and view.residents.size() == 5), "Real server negotiates population and private quest state")
 	if not view.network.pve.ready: get_tree().quit(1); return
+	view.screen.chrome.get_node("Properties").pressed.emit()
+	check(view.attributes.visible and view.attributes.snapshot.name == view.network.pve.state.character.display_name, "Real online header opens original attributes with server identity")
+	check(view.attributes.numbers.hp.value == "%d/%d" % [int(view.network.pve.state.character.hp), int(view.network.pve.state.stats.hp)], "Real attributes use authoritative health maximum")
+	view.attributes.get_node("Back").pressed.emit()
 	view.resident_selected.emit("qingwei")
 	view.encounter.get_node("Panel/Primary").pressed.emit()
 	check(await wait_until(func() -> bool: return int(view.network.pve.state.character.quest_stage) == 1), "NPC UI automatically approaches and accepts quest on server")

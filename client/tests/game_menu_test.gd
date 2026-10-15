@@ -95,8 +95,8 @@ func _run() -> void:
 	view._process(0.2)
 	check(view._key_timer == timer, "Open menu blocks keyboard movement input")
 	view.menu.get_node("Panel/Rows/Properties").pressed.emit()
-	check(not view.menu.visible and view.details.visible and view.details.get_node("Panel/Body").text.contains("昆仑客"), "Online People entry uses the server character snapshot")
-	view.get_node("Menu/Panel/Continue").pressed.emit()
+	check(not view.menu.visible and view.attributes.visible and view.attributes.snapshot.name == "昆仑客", "Online People entry uses the original attributes scene with server data")
+	view.attributes.get_node("Back").pressed.emit()
 	view._scene_action("menu")
 	view.menu.get_node("Panel/Rows/Social").pressed.emit()
 	await get_tree().process_frame

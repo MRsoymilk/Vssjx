@@ -529,3 +529,39 @@ mouse_filter = 2
 script = ExtResource("1_uhaia")
 value = "0"
 align_right = false
+
+[node name="UnavailableIngots" type="Label" parent="."]
+visible = false
+offset_left = 118.0
+offset_top = 359.0
+offset_right = 297.0
+offset_bottom = 377.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.396078, 0.270588, 0.094118, 1)
+theme_override_font_sizes/font_size = 12
+text = "—"
+tooltip_text = "暂无服务器数据"
+
+[node name="UnavailableGuildContribution" type="Label" parent="."]
+visible = false
+offset_left = 118.0
+offset_top = 383.0
+offset_right = 297.0
+offset_bottom = 401.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.396078, 0.270588, 0.094118, 1)
+theme_override_font_sizes/font_size = 12
+text = "—"
+tooltip_text = "暂无服务器数据"
+
+[node name="UnavailableEssence" type="Label" parent="."]
+visible = false
+offset_left = 118.0
+offset_top = 407.0
+offset_right = 297.0
+offset_bottom = 425.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.396078, 0.270588, 0.094118, 1)
+theme_override_font_sizes/font_size = 12
+text = "—"
+tooltip_text = "暂无服务器数据"

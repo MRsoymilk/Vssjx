@@ -30,6 +30,7 @@ var _was_keyboard := false
 @onready var expanded_chat: ExpandedChatPanel = $Screen/ExpandedChat
 @onready var menu: OriginalGameMenu = $GameMenu
 @onready var details: Control = $Menu
+@onready var attributes: OriginalCharacterAttributes = $Attributes
 var _character: Dictionary = {}
 var _system_text := "正在连接共享地图……"
 var _rendered_chat := ""
@@ -51,6 +52,7 @@ func _ready() -> void:
 	screen.hud.get_node("MapName").text = "青云山道"
 	screen.hud.get_node("Minimap").set_shared_world(map_data, {}, character_id)
 	menu.chosen.connect(_scene_action)
+	attributes.back_requested.connect(_close_attributes)
 	$Menu/Panel/Continue.pressed.connect(func() -> void: details.hide())
 	$Menu/Panel/Leave.pressed.connect(_leave_world)
 	$Menu/Panel/Chat.pressed.connect(_focus_chat)
@@ -115,6 +117,7 @@ func _leave_world() -> void:
 	close_requested.emit()
 
 func _scene_action(action: String) -> void:
+	_close_attributes()
 	if expanded_chat.visible: expanded_chat.dismiss()
 	_cancel_approach()
 	encounter.hide()
@@ -135,12 +138,13 @@ func _scene_action(action: String) -> void:
 	emote_picker.hide()
 	chat_input.release_focus()
 	_was_keyboard = false
+	if action == "properties":
+		_open_attributes()
+		return
 	var titles := {"system": "系统", "properties": "人物属性", "quest": "任务", "bag": "背包", "map": "地图", "mail": "邮件", "reward": "奖励", "shop": "商城", "craft": "炼制", "team": "队伍", "guild": "帮会", "trade": "交易"}
 	$Menu/Panel/Title.text = titles.get(action, "提示")
 	var body := "同图%d人 · 点击地图移动 / WASD\n公共消息在底部直接发送。\n线上进度由服务器保存。" % actors.size()
-	if action == "properties":
-		body = "%s\n等级%d · %s · %s派\n气血%d · 灵力%d · 铜币%d" % [String(_character.get("display_name", "")), int(_character.get("level", 1)), ["力士", "侠客", "隐者"][int(_character.get("job", 0))], ["峨眉", "花涧", "昆仑"][int(_character.get("school", 0))], int(_character.get("hp", 0)), int(_character.get("mp", 0)), int(_character.get("gold", 0))]
-	elif action == "map": body = "青云山道 · 同图%d人\n当前位置：%s\n小地图中的蓝点代表其他玩家。" % [actors.size(), screen.hud.get_node("MapCoordinates").text]
+	if action == "map": body = "青云山道 · 同图%d人\n当前位置：%s\n小地图中的蓝点代表其他玩家。" % [actors.size(), screen.hud.get_node("MapCoordinates").text]
 	elif action == "quest": body = network.pve.quest_text()
 	elif action == "bag" and not network.pve.state.is_empty(): body = "回春散 ×%d\n战斗中可恢复45点生命。\n铜钱：%d" % [int(network.pve.state.potions), int(_character.get("gold", 0))]
 	elif action in ["bag", "reward", "shop", "craft", "team", "guild", "trade"]: body = "线上%s尚未开放。\n可在当前地图移动，与同图玩家聊天。" % titles[action]
@@ -332,7 +336,7 @@ func _process(delta: float) -> void:
 			actor.sprite.play("idle")
 	if actors.has(character_id): camera.position = actors[character_id].root.position
 	_advance_approach()
-	if chat_input.has_focus() or menu.visible or details.visible or emote_picker.visible or encounter.visible or battle_view.visible or expanded_chat.visible or network.pve.pending():
+	if chat_input.has_focus() or menu.visible or details.visible or emote_picker.visible or encounter.visible or battle_view.visible or expanded_chat.visible or attributes.visible or network.pve.pending():
 		_was_keyboard = false
 		return
 	_key_timer -= delta
@@ -351,7 +355,7 @@ func _process(delta: float) -> void:
 		_was_keyboard = false
 
 func _map_input(event: InputEvent) -> void:
-	if not network.world_ready or menu.visible or details.visible or encounter.visible or battle_view.visible or expanded_chat.visible or network.pve.pending(): return
+	if not network.world_ready or menu.visible or details.visible or encounter.visible or battle_view.visible or expanded_chat.visible or attributes.visible or network.pve.pending(): return
 	var point := Vector2.ZERO
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed: point = event.position
 	elif event is InputEventScreenTouch and event.pressed: point = event.position
@@ -375,6 +379,11 @@ func _map_input(event: InputEvent) -> void:
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	if not event is InputEventKey or not event.pressed: return
+	if attributes.visible:
+		if event.keycode == KEY_ESCAPE:
+			_close_attributes()
+			get_viewport().set_input_as_handled()
+		return
 	if event.keycode == KEY_ESCAPE:
 		if expanded_chat.visible:
 			if expanded_chat.picker.visible: expanded_chat.close_emotes()
@@ -390,6 +399,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		elif details.visible: details.hide()
 		elif chat_input.has_focus(): chat_input.release_focus()
 		else: _scene_action("menu")
+	elif event.keycode == KEY_C and not expanded_chat.visible and not battle_view.visible and not chat_input.has_focus(): _scene_action("properties")
 	elif event.keycode == KEY_ENTER: _focus_chat()
 	else: return
 	get_viewport().set_input_as_handled()
@@ -403,6 +413,7 @@ func _pve_changed() -> void:
 		_character.max_hp = model.state.stats.hp
 		_character.max_mp = model.state.stats.mp
 		_character.next_xp = int(_character.level) * 40
+		if attributes.visible: attributes.display_online(_character, model.state.stats)
 		screen.chrome.display_character(_character)
 		screen.hud.get_node("WorldIdentity").text = "等级 %d\n%s派" % [int(_character.level), ["峨眉", "花涧", "昆仑"][int(_character.school)]]
 		_population(network.population.entities)
@@ -494,6 +505,7 @@ func _set_battle_layout(active: bool) -> void:
 	expanded_chat.get_node("Shade").size.y = chat_panel.position.y
 
 func _open_expanded_chat() -> void:
+	_close_attributes()
 	_cancel_approach()
 	if network.world_ready: network.stop_moving()
 	_was_keyboard = false
@@ -507,4 +519,19 @@ func _open_expanded_chat() -> void:
 
 func _expanded_chat_dismissed() -> void:
 	chat_input.release_focus()
+	battle_view.set_process_unhandled_key_input(true)
+
+func _open_attributes() -> void:
+	details.hide()
+	if _character.is_empty():
+		chat_status.text = "角色数据正在同步，请稍候。"
+		return
+	attributes.display_online(_character, network.pve.state.get("stats", {}))
+	attributes.show()
+	battle_view.set_process_unhandled_key_input(false)
+
+func _close_attributes() -> void:
+	if not attributes.visible: return
+	attributes.signature.release_focus()
+	attributes.hide()
 	battle_view.set_process_unhandled_key_input(true)

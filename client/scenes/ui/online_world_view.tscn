@@ -8,6 +8,8 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/online_encounter.tscn" id="Encounter"]
 [ext_resource type="PackedScene" path="res://scenes/ui/online_battle_view.tscn" id="Battle"]
 
+[ext_resource type="PackedScene" path="res://scenes/ui/character_attributes.tscn" id="Attributes"]
+
 [node name="OnlineWorldView" type="Control"]
 offset_right = 320.0
 offset_bottom = 480.0
@@ -43,3 +45,8 @@ script = ExtResource("Network")
 
 [node name="Encounter" parent="." instance=ExtResource("Encounter")]
 [node name="Battle" parent="." instance=ExtResource("Battle")]
+
+[node name="Attributes" parent="." instance=ExtResource("Attributes")]
+visible = false
+z_index = 15
+online_mode = true

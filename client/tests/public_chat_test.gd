@@ -20,7 +20,7 @@ func batch(values: Array) -> Dictionary:
 	return {"type": "chat.batch", "channel_epoch": epoch, "messages": values}
 
 func _ready() -> void:
-	for raw in ["你好", " [b]literal[/b] ", "界".repeat(120), "😀".repeat(120)]: check(OnlinePublicChat.valid_text(raw), "Valid pure text accepted")
+	for raw in ["你好", " [b]literal[/b] ", "界".repeat(120), "😀".repeat(120), "[微笑][大笑][爱心][流泪][生气][惊讶][害羞][加油]"]: check(OnlinePublicChat.valid_text(raw), "Valid pure text and emote markers accepted")
 	for raw in ["", "   ", "\u3000", "\u00a0", "\u2001", "a\n", "a\t", "a\u0085", "a\u202e", "a\u200b", "a\ufeff", "界".repeat(121)]: check(not OnlinePublicChat.valid_text(raw), "Invalid text rejected")
 	var chat := OnlinePublicChat.new()
 	chat.send_requested.connect(func(message: Dictionary) -> void: sent.append(message.duplicate(true)))

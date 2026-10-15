@@ -21,9 +21,12 @@ var _was_keyboard := false
 @onready var chat_send: Button = $Screen/Chat/ChatSend
 @onready var chat_status: Label = $Screen/Chrome/Hint
 @onready var chat_button: Button = $Screen/Chrome/Toolbar/Social
+@onready var emote_button: Button = $Screen/Chat/ChatEmotes
+@onready var emote_picker: ChatEmotePicker = $Screen/Chat/EmotePicker
 @onready var menu: Control = $Menu
 var _character: Dictionary = {}
 var _system_text := "正在连接共享地图……"
+var _rendered_chat := ""
 
 func _ready() -> void:
 	map_data = JSON.parse_string(FileAccess.get_file_as_string(OnlineWorldClient.MAP_PATH))
@@ -40,6 +43,9 @@ func _ready() -> void:
 	$Menu/Panel/Leave.pressed.connect(_leave_world)
 	$Menu/Panel/Chat.pressed.connect(func() -> void: menu.hide(); _focus_chat())
 	chat_send.pressed.connect(_send_chat)
+	emote_button.pressed.connect(_toggle_emotes)
+	emote_picker.chosen.connect(_insert_emote)
+	emote_picker.dismissed.connect(func() -> void: chat_input.grab_focus())
 	chat_input.text_submitted.connect(func(_text: String) -> void: _send_chat())
 	chat_input.focus_entered.connect(func() -> void:
 		if network.world_ready: network.stop_moving()
@@ -47,7 +53,8 @@ func _ready() -> void:
 	)
 	chat_input.gui_input.connect(func(event: InputEvent) -> void:
 		if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
-			chat_input.release_focus()
+			if emote_picker.visible: emote_picker.hide()
+			else: chat_input.release_focus()
 			chat_input.accept_event()
 	)
 	network.changed.connect(_snapshot)
@@ -70,6 +77,7 @@ func _scene_action(action: String) -> void:
 		menu.hide()
 		return
 	if network.world_ready: network.stop_moving()
+	emote_picker.hide()
 	chat_input.release_focus()
 	_was_keyboard = false
 	var titles := {"menu": "菜单", "properties": "人物属性", "quest": "任务", "bag": "背包", "map": "地图", "mail": "邮件", "reward": "奖励"}
@@ -144,27 +152,72 @@ func _snapshot(values: Dictionary) -> void:
 	_chat_changed()
 
 func _toggle_chat() -> void:
+	emote_picker.hide()
 	if chat_input.has_focus(): chat_input.release_focus()
 	else: _focus_chat()
 
 func _focus_chat() -> void:
 	menu.hide()
+	emote_picker.hide()
 	chat_input.grab_focus()
 
+func _toggle_emotes() -> void:
+	if not _can_insert_emote(): return
+	menu.hide()
+	chat_input.grab_focus()
+	if network.world_ready: network.stop_moving()
+	_was_keyboard = false
+	emote_picker.visible = not emote_picker.visible
+
+func _insert_emote(token: String) -> void:
+	if not _can_insert_emote() or not chat_input.editable or ChatEmotePicker.CATALOG.texture_for(token) == null: return
+	var start := chat_input.get_selection_from_column() if chat_input.has_selection() else chat_input.caret_column
+	var end := chat_input.get_selection_to_column() if chat_input.has_selection() else start
+	var draft := chat_input.text.left(start) + token + chat_input.text.substr(end)
+	if draft.length() > 120 or draft.to_utf8_buffer().size() > 480:
+		chat_status.text = "消息最多120字，请删减后再添加表情。"
+		return
+	chat_input.text = draft
+	chat_input.deselect()
+	chat_input.caret_column = start + token.length()
+	emote_picker.hide()
+	chat_input.grab_focus()
+
+func _can_insert_emote() -> bool:
+	return network.world_ready and network.chat.connected and network.chat.pending.is_empty()
+
 func _send_chat() -> void:
+	emote_picker.hide()
 	network.chat.submit(chat_input.text)
+	_update_chat_controls()
 
 func _chat_changed() -> void:
 	var lines := PackedStringArray()
 	if network.chat.messages.is_empty() or not network.world_ready: lines.append("[系统] " + _system_text)
 	for message in network.chat.messages: lines.append("[公共] %s：%s" % [message.display_name, message.text])
-	chat_log.text = "\n".join(lines)
+	var text_value := "\n".join(lines)
+	if text_value != _rendered_chat:
+		_rendered_chat = text_value
+		chat_log.clear()
+		if network.chat.messages.is_empty() or not network.world_ready:
+			chat_log.add_text("[系统] " + _system_text)
+			if not network.chat.messages.is_empty(): chat_log.add_text("\n")
+		for index in network.chat.messages.size():
+			if index > 0: chat_log.add_text("\n")
+			var message: Dictionary = network.chat.messages[index]
+			chat_log.add_text("[公共] %s：" % message.display_name)
+			ChatEmotePicker.CATALOG.append_body(chat_log, message.text)
 	chat_button.tooltip_text = "公共聊天 · %d条消息" % network.chat.messages.size()
 
-func _process(delta: float) -> void:
+func _update_chat_controls() -> void:
 	if network != null:
 		chat_send.disabled = not network.world_ready or not network.chat.connected or not network.chat.pending.is_empty()
 		chat_input.editable = network.chat.pending.is_empty()
+		emote_button.disabled = chat_send.disabled
+		if emote_button.disabled: emote_picker.hide()
+
+func _process(delta: float) -> void:
+	_update_chat_controls()
 	if network == null or not network.world_ready: return
 	for id in actors:
 		var actor: Dictionary = actors[id]
@@ -180,7 +233,7 @@ func _process(delta: float) -> void:
 			actor.sprite.set_frame_and_progress(int(phase) % actor.sprite.sprite_frames.get_frame_count("walk"), fposmod(phase, 1.0))
 		elif actor.sprite.animation != "idle" or not actor.sprite.is_playing(): actor.sprite.play("idle")
 	if actors.has(character_id): camera.position = actors[character_id].root.position
-	if chat_input.has_focus() or menu.visible:
+	if chat_input.has_focus() or menu.visible or emote_picker.visible:
 		_was_keyboard = false
 		return
 	_key_timer -= delta
@@ -202,6 +255,9 @@ func _map_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed: point = event.position
 	elif event is InputEventScreenTouch and event.pressed: point = event.position
 	else: return
+	if emote_picker.visible:
+		emote_picker.hide()
+		return
 	chat_input.release_focus()
 	var world_point := camera.get_screen_center_position() + point - Vector2(viewport.size) / 2.0
 	network.move_to(Vector2i(floori(world_point.x / 16.0), floori(world_point.y / 16.0)))
@@ -209,7 +265,8 @@ func _map_input(event: InputEvent) -> void:
 func _unhandled_key_input(event: InputEvent) -> void:
 	if not event is InputEventKey or not event.pressed: return
 	if event.keycode == KEY_ESCAPE:
-		if chat_input.has_focus(): chat_input.release_focus()
+		if emote_picker.visible: emote_picker.hide()
+		elif chat_input.has_focus(): chat_input.release_focus()
 		else: _scene_action("menu")
 	elif event.keycode == KEY_ENTER: _focus_chat()
 	else: return

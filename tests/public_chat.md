@@ -1,5 +1,7 @@
 # 公共聊天验收
 
+内置表情及底部选择面板见[chat_emotes.md](chat_emotes.md)。当前客户端只将固定表情标记转换为贴图，其他标记保留原文；下方历史验证记录对应当时的客户端版本。
+
 ```sh
 python tests/run_shared_world.py --render --output /tmp/opencode/vssjx-public-chat
 godot --headless --path client res://tests/public_chat_test.tscn

@@ -56,10 +56,7 @@ func _run() -> void:
 	var app: Control = load("res://scenes/main.tscn").instantiate()
 	get_tree().root.add_child(app)
 	app._online_characters()
-	await OnlineAccount.completed
-	var lobby := app.modal.find_child("OnlineCharacters", true, false) as OnlineCharacters
-	check(not lobby.enter_button.disabled, "Lobby enables explicit online entry")
-	lobby.enter_button.pressed.emit()
+	check(await wait_until(func() -> bool: return app.mode == "online_world"), "Existing account character enters the shared world")
 	view = app.ui.get_node("OnlineWorld") as OnlineWorldView
 	check(await wait_until(func() -> bool: return view.network.world_ready and view.actors.size() == 2), "Both independent clients share the map")
 	if not view.network.world_ready: get_tree().quit(1); return
@@ -77,11 +74,12 @@ func _run() -> void:
 	view.chat_button.pressed.emit()
 	await get_tree().create_timer(0.15).timeout
 	check(view.chat_panel.visible and view.chat_input.has_focus(), "Inline public chat composer accepts keyboard focus")
-	var literal := "[b]%s WASD[/b] 大家好" % role
+	var literal := "[b]%s WASD[/b] 大家好[微笑]" % role
 	view.chat_input.text = literal
 	view.chat_input.text_submitted.emit(literal)
 	check(await wait_until(func() -> bool: return view.network.chat.messages.size() == 2 and view.network.chat.pending.is_empty()), "Both independent clients send and receive public chat")
 	check(not view.chat_log.bbcode_enabled and view.chat_log.get_parsed_text().contains("[b]") and view.chat_input.text.is_empty(), "Markup is literal plain text and confirmed input clears")
+	check(not view.chat_log.get_parsed_text().contains("[微笑]"), "Both independent clients display packaged emote images in received public messages")
 	var before_input := view.network._input_seq
 	var key := InputEventKey.new()
 	key.physical_keycode = KEY_W

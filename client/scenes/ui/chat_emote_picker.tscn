@@ -1,0 +1,144 @@
+[gd_scene format=3]
+[ext_resource type="Script" path="res://scripts/chat_emote_picker.gd" id="Script"]
+[ext_resource type="Texture2D" path="res://assets/ui/chat_emotes/smile.svg" id="Smile"]
+[ext_resource type="Texture2D" path="res://assets/ui/chat_emotes/laugh.svg" id="Laugh"]
+[ext_resource type="Texture2D" path="res://assets/ui/chat_emotes/heart.svg" id="Heart"]
+[ext_resource type="Texture2D" path="res://assets/ui/chat_emotes/cry.svg" id="Cry"]
+[ext_resource type="Texture2D" path="res://assets/ui/chat_emotes/angry.svg" id="Angry"]
+[ext_resource type="Texture2D" path="res://assets/ui/chat_emotes/surprise.svg" id="Surprise"]
+[ext_resource type="Texture2D" path="res://assets/ui/chat_emotes/shy.svg" id="Shy"]
+[ext_resource type="Texture2D" path="res://assets/ui/chat_emotes/cheer.svg" id="Cheer"]
+
+[sub_resource type="StyleBoxFlat" id="Panel"]
+bg_color = Color(0.956863, 0.901961, 0.639216, 1)
+border_color = Color(0.458824, 0.254902, 0.054902, 1)
+border_width_left = 2
+border_width_right = 2
+border_width_top = 2
+border_width_bottom = 2
+content_margin_left = 6.0
+content_margin_right = 6.0
+content_margin_top = 6.0
+content_margin_bottom = 6.0
+shadow_color = Color(0.1, 0.18, 0.15, 0.6)
+shadow_size = 2
+[sub_resource type="StyleBoxFlat" id="Button"]
+bg_color = Color(1, 0.956863, 0.756863, 1)
+border_color = Color(0.8, 0.678431, 0.337255, 1)
+border_width_left = 1
+border_width_right = 1
+border_width_top = 1
+border_width_bottom = 1
+content_margin_left = 2.0
+content_margin_right = 2.0
+content_margin_top = 2.0
+content_margin_bottom = 2.0
+[sub_resource type="StyleBoxFlat" id="Hover"]
+bg_color = Color(0.956863, 0.784314, 0.388235, 1)
+border_color = Color(0.458824, 0.254902, 0.054902, 1)
+border_width_left = 1
+border_width_right = 1
+border_width_top = 1
+border_width_bottom = 1
+content_margin_left = 2.0
+content_margin_right = 2.0
+content_margin_top = 2.0
+content_margin_bottom = 2.0
+[sub_resource type="Theme" id="Theme"]
+default_font_size = 10
+Button/colors/font_color = Color(0.396078, 0.270588, 0.094118, 1)
+Button/colors/font_hover_color = Color(0.396078, 0.270588, 0.094118, 1)
+Button/colors/font_pressed_color = Color(0.396078, 0.270588, 0.094118, 1)
+Button/constants/h_separation = 3
+Button/styles/normal = SubResource("Button")
+Button/styles/hover = SubResource("Hover")
+Button/styles/pressed = SubResource("Hover")
+Label/colors/font_color = Color(0.396078, 0.270588, 0.094118, 1)
+
+[node name="EmotePicker" type="PanelContainer"]
+visible = false
+texture_filter = 1
+offset_left = 71.0
+offset_top = -96.0
+offset_right = 315.0
+offset_bottom = -4.0
+mouse_filter = 0
+theme = SubResource("Theme")
+theme_override_styles/panel = SubResource("Panel")
+script = ExtResource("Script")
+
+[node name="Content" type="VBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 4
+[node name="Header" type="HBoxContainer" parent="Content"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 18)
+[node name="Title" type="Label" parent="Content/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "内置表情"
+[node name="Close" type="Button" parent="Content/Header"]
+layout_mode = 2
+focus_mode = 0
+text = "关闭"
+[node name="Grid" type="GridContainer" parent="Content"]
+layout_mode = 2
+columns = 4
+theme_override_constants/h_separation = 4
+theme_override_constants/v_separation = 4
+[node name="Smile" type="Button" parent="Content/Grid"]
+layout_mode = 2
+custom_minimum_size = Vector2(55, 26)
+focus_mode = 0
+tooltip_text = "[微笑]"
+text = "微笑"
+icon = ExtResource("Smile")
+[node name="Laugh" type="Button" parent="Content/Grid"]
+layout_mode = 2
+custom_minimum_size = Vector2(55, 26)
+focus_mode = 0
+tooltip_text = "[大笑]"
+text = "大笑"
+icon = ExtResource("Laugh")
+[node name="Heart" type="Button" parent="Content/Grid"]
+layout_mode = 2
+custom_minimum_size = Vector2(55, 26)
+focus_mode = 0
+tooltip_text = "[爱心]"
+text = "爱心"
+icon = ExtResource("Heart")
+[node name="Cry" type="Button" parent="Content/Grid"]
+layout_mode = 2
+custom_minimum_size = Vector2(55, 26)
+focus_mode = 0
+tooltip_text = "[流泪]"
+text = "流泪"
+icon = ExtResource("Cry")
+[node name="Angry" type="Button" parent="Content/Grid"]
+layout_mode = 2
+custom_minimum_size = Vector2(55, 26)
+focus_mode = 0
+tooltip_text = "[生气]"
+text = "生气"
+icon = ExtResource("Angry")
+[node name="Surprise" type="Button" parent="Content/Grid"]
+layout_mode = 2
+custom_minimum_size = Vector2(55, 26)
+focus_mode = 0
+tooltip_text = "[惊讶]"
+text = "惊讶"
+icon = ExtResource("Surprise")
+[node name="Shy" type="Button" parent="Content/Grid"]
+layout_mode = 2
+custom_minimum_size = Vector2(55, 26)
+focus_mode = 0
+tooltip_text = "[害羞]"
+text = "害羞"
+icon = ExtResource("Shy")
+[node name="Cheer" type="Button" parent="Content/Grid"]
+layout_mode = 2
+custom_minimum_size = Vector2(55, 26)
+focus_mode = 0
+tooltip_text = "[加油]"
+text = "加油"
+icon = ExtResource("Cheer")

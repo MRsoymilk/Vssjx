@@ -1,0 +1,4 @@
+[gd_scene format=3]
+[ext_resource type="Script" path="res://tests/chat_emotes_test.gd" id="Test"]
+[node name="ChatEmotesTest" type="Node"]
+script = ExtResource("Test")

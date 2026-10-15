@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ChatEmoteCatalog" load_steps=10 format=3]
+[ext_resource type="Script" path="res://scripts/chat_emote_catalog.gd" id="Script"]
+[ext_resource type="Texture2D" path="res://assets/ui/chat_emotes/smile.svg" id="Smile"]
+[ext_resource type="Texture2D" path="res://assets/ui/chat_emotes/laugh.svg" id="Laugh"]
+[ext_resource type="Texture2D" path="res://assets/ui/chat_emotes/heart.svg" id="Heart"]
+[ext_resource type="Texture2D" path="res://assets/ui/chat_emotes/cry.svg" id="Cry"]
+[ext_resource type="Texture2D" path="res://assets/ui/chat_emotes/angry.svg" id="Angry"]
+[ext_resource type="Texture2D" path="res://assets/ui/chat_emotes/surprise.svg" id="Surprise"]
+[ext_resource type="Texture2D" path="res://assets/ui/chat_emotes/shy.svg" id="Shy"]
+[ext_resource type="Texture2D" path="res://assets/ui/chat_emotes/cheer.svg" id="Cheer"]
+[resource]
+script = ExtResource("Script")
+tokens = PackedStringArray("[微笑]", "[大笑]", "[爱心]", "[流泪]", "[生气]", "[惊讶]", "[害羞]", "[加油]")
+textures = Array[Texture2D]([ExtResource("Smile"), ExtResource("Laugh"), ExtResource("Heart"), ExtResource("Cry"), ExtResource("Angry"), ExtResource("Surprise"), ExtResource("Shy"), ExtResource("Cheer")])

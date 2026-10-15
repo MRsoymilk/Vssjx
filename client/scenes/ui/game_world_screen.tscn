@@ -2,6 +2,8 @@
 [ext_resource type="Script" path="res://scripts/game_world_screen.gd" id="Script"]
 [ext_resource type="PackedScene" path="res://scenes/ui/scene_chrome.tscn" id="Chrome"]
 [ext_resource type="PackedScene" path="res://scenes/ui/world_hud.tscn" id="Hud"]
+[ext_resource type="PackedScene" path="res://scenes/ui/chat_emote_picker.tscn" id="Emotes"]
+[ext_resource type="Texture2D" path="res://assets/ui/chat_emotes/smile.svg" id="Smile"]
 
 [sub_resource type="SystemFont" id="Font"]
 font_names = PackedStringArray("SimHei", "Microsoft YaHei", "sans-serif")
@@ -78,7 +80,7 @@ selection_enabled = true
 [node name="ChatInput" type="LineEdit" parent="Chat"]
 offset_left = 5.0
 offset_top = 33.0
-offset_right = 263.0
+offset_right = 221.0
 offset_bottom = 52.0
 theme_override_font_sizes/font_size = 10
 theme_override_colors/font_color = Color(1, 0.972549, 0.772549, 1)
@@ -101,3 +103,22 @@ theme_override_styles/hover = SubResource("Empty")
 theme_override_styles/pressed = SubResource("Empty")
 theme_override_styles/focus = SubResource("Empty")
 text = "发送"
+
+[node name="ChatEmotes" type="Button" parent="Chat"]
+offset_left = 227.0
+offset_top = 33.0
+offset_right = 265.0
+offset_bottom = 52.0
+focus_mode = 0
+tooltip_text = "选择内置表情"
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_color = Color(0.945098, 0.894118, 0.172549, 1)
+theme_override_styles/normal = SubResource("Empty")
+theme_override_styles/hover = SubResource("Empty")
+theme_override_styles/pressed = SubResource("Empty")
+theme_override_styles/focus = SubResource("Empty")
+theme_override_constants/h_separation = 1
+text = "表情"
+icon = ExtResource("Smile")
+
+[node name="EmotePicker" parent="Chat" instance=ExtResource("Emotes")]

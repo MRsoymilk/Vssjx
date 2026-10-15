@@ -33,7 +33,7 @@ class ChatProbe:
 
 def exercise_chat(a, b, first_id, second_id, db):
     alice, bob = ChatProbe(a), ChatProbe(b)
-    literal = '[url=https://invalid.example]你好[/url] <b>world</b>'
+    literal = '[url=https://invalid.example]你好[/url] <b>world</b>[微笑][爱心]'
     original = alice.send(literal)
     result = alice.result(original, 'SENT')
     remote = bob.seen(result['message_id'])

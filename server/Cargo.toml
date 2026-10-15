@@ -10,8 +10,9 @@ argon2 = "0.5"
 dotenvy = "0.15"
 rand = "0.8"
 serde = { version = "1", features = ["derive"] }
+serde_json = "1"
 sha2 = "0.10"
-sqlx = { version = "0.8", default-features = false, features = ["runtime-tokio-rustls", "postgres", "uuid", "macros", "migrate"] }
+sqlx = { version = "0.8", default-features = false, features = ["runtime-tokio-rustls", "postgres", "uuid", "json", "macros", "migrate"] }
 tokio = { version = "1", features = ["macros", "net", "rt-multi-thread", "signal", "time"] }
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
@@ -19,5 +20,4 @@ uuid = { version = "1", features = ["v4", "serde"] }
 
 [dev-dependencies]
 http-body-util = "0.1"
-serde_json = "1"
 tower = { version = "0.5", features = ["util"] }

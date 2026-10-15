@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "character.create v1 (POST /api/v1/characters)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["operation_id", "display_name", "job", "gender", "school", "rules_version"],
+  "properties": {
+    "operation_id": {"type": "string", "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89aAbB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"},
+    "display_name": {"type": "string", "maxLength": 256, "description": "Business validation after receipt lookup: trim U+0020 only; 2..12 ASCII letters/digits/underscore or U+4E00..U+9FFF. ASCII lowercase forms name_key."},
+    "job": {"type": "integer", "minimum": 0, "maximum": 255, "description": "Business-valid range 0..2"},
+    "gender": {"type": "integer", "minimum": 0, "maximum": 255, "description": "Business-valid range 0..1"},
+    "school": {"type": "integer", "minimum": 0, "maximum": 255, "description": "Business-valid range 0..2"},
+    "rules_version": {"type": "string", "maxLength": 64, "description": "Currently creation-v1; version business check occurs after receipt lookup."}
+  }
+}

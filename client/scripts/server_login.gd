@@ -2,6 +2,7 @@ class_name ServerLogin
 extends Control
 
 signal close_requested
+signal characters_requested
 var settings := ServerConnectionSettings.new()
 var address_input: LineEdit
 var status: Label
@@ -114,7 +115,7 @@ func _connection_result(result: Dictionary) -> void:
 	var display_name := String(result.server_name).left(24)
 	if String(result.server_name).length() > 24: display_name += "…"
 	if "account_auth" in result.get("capabilities", []):
-		status.text = "已连接：%s\n账号服务可用，请注册或登录。\n角色与多人世界尚未开放。" % display_name
+		status.text = "已连接：%s\n账号服务可用，请注册或登录。\n共享地图尚未开放。" % display_name
 	else:
 		status.text = "已连接：%s\n当前仅开放服务连接检查。\n账号登录和多人世界尚未开放。" % display_name
 
@@ -122,14 +123,17 @@ func _update_controls() -> void:
 	var locked := OnlineAccount.busy or _probing
 	connect_button.disabled = locked
 	auth_button.disabled = locked
-	switch_button.disabled = locked or OnlineAccount.is_logged_in()
+	switch_button.disabled = locked
 	username_input.editable = not locked and not OnlineAccount.is_logged_in()
 	password_input.editable = not locked and not OnlineAccount.is_logged_in()
 	address_input.editable = not locked
 	auth_button.text = "退出账号" if OnlineAccount.is_logged_in() else ("注册账号" if register_mode else "登录账号")
-	switch_button.text = "已有账号" if register_mode else "注册账号"
+	switch_button.text = "线上角色" if OnlineAccount.is_logged_in() else ("已有账号" if register_mode else "注册账号")
 
 func _switch_mode() -> void:
+	if OnlineAccount.is_logged_in():
+		characters_requested.emit()
+		return
 	register_mode = not register_mode
 	password_input.clear()
 	status.text = "注册登录账号，不占用角色昵称。" if register_mode else "请输入账号和密码。"
@@ -156,7 +160,7 @@ func _submit_account() -> void:
 
 func _show_account() -> void:
 	username_input.text = String(OnlineAccount.account.get("username", ""))
-	status.text = "已登录：%s\n账号认证成功。\n线上角色与多人世界尚未开放。" % username_input.text
+	status.text = "已登录：%s\n可点击“线上角色”创建或查看角色。\n共享地图尚未开放。" % username_input.text
 	if address_input.text != OnlineAccount.server_address:
 		status.text = "已登录其他服务器：%s\n请先退出原账号，再更换服务器登录。" % username_input.text
 	_update_controls()

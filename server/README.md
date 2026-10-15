@@ -1,6 +1,6 @@
 # Vssjx 服务端
 
-Rust/Tokio/Axum服务已支持服务器发现，以及基于PostgreSQL的账号注册、登录、刷新和注销。线上角色、WSS、共享地图与公共聊天尚未实现。
+Rust/Tokio/Axum服务已支持服务器发现、基于PostgreSQL的账号注册/登录/刷新/注销，以及账号归属下的角色创建、查询和幂等回执。WSS、共享地图与公共聊天尚未实现。
 
 - `src/`：启动入口、环境配置与HTTP服务。
 - `migrations/`：SQLx启动时执行的PostgreSQL版本化迁移。
@@ -56,7 +56,7 @@ cargo run --locked --manifest-path server/Cargo.toml
 
 封面“注册账号”或“登录游戏”进入同一账号面板，服务器地址会自动回填。注册后重新输入密码登录；退出账号会撤销服务端会话。关闭面板不清除内存会话，重启客户端则重新输入密码。服务器地址是唯一写入本地偏好文件的字段。
 
-登录账号使用3～32位英文字母、数字或下划线，首尾空白清理后按小写比较。密码为12～128个Unicode字符、最多512个UTF-8字节，不能全为空白，不裁剪密码。账号名不是角色昵称，线上角色创建与全服昵称唯一性仍待实现。
+登录账号使用3～32位英文字母、数字或下划线，首尾空白清理后按小写比较。密码为12～128个Unicode字符、最多512个UTF-8字节，不能全为空白，不裁剪密码。账号名不是角色昵称；登录后可在“线上角色”创建或查看服务器角色，具体昵称与回执契约见[design/characters.md](../design/characters.md)。
 
 密码使用带随机盐的Argon2id保存。默认访问令牌15分钟、刷新总期限7天，可通过`.env`在有效范围内调整，刷新不延长已签发会话的总期限；刷新同时轮换两种令牌，数据库仅存令牌摘要。账号禁用、注销或令牌过期后，身份查询和刷新被拒绝。
 
@@ -81,8 +81,11 @@ SSJX_SERVER_NAME="蜀山剑侠服务器"
 | `POST /api/v1/auth/refresh` | 单次轮换刷新令牌与访问令牌 |
 | `GET /api/v1/auth/me` | Bearer令牌查询本人账号 |
 | `POST /api/v1/auth/logout` | 撤销该Bearer会话，重复注销可安全重试 |
+| `GET /api/v1/characters` | 当前账号的角色基本行，至多一个，不读取离线存档 |
+| `POST /api/v1/characters` | 账号级幂等创建，昵称全服唯一，初始资产同事务提交 |
+| `GET /api/v1/character-operations/{operation_id}` | 读取当前账号的原创建回执，成功与明确拒绝均持久化 |
 
-未配置数据库时`stage=connection_only`且能力列表为空；配置后为`stage=account_auth`、`capabilities=["account_auth"]`。不会发布未实现的角色或游戏能力。账号契约与限制见[auth.md](../design/auth.md)。
+未配置数据库时`stage=connection_only`且能力列表为空；配置后为`stage=account_auth`、`capabilities=["account_auth","character_creation"]`。仍不发布WSS或游戏世界能力。账号及角色契约分别见[auth.md](../design/auth.md)、[characters.md](../design/characters.md)。
 
 ## 域名与路径前缀
 

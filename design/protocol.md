@@ -1,6 +1,6 @@
 # 联机协议草案
 
-设计修订：2026-10-15。下述字段和消息是后续实施契约，不是已经存在的接口。实现前补齐`shared/protocol/`定义与正反样例并执行契约测试；产品规则按[设计入口](README.md)D01～D08确认，事务所有权按[architecture.md](architecture.md)执行。
+设计修订：2026-10-15。账号与角色HTTPS接口已分阶段实现，当前契约见[auth.md](auth.md)和[characters.md](characters.md)，角色请求/昵称样例位于`shared/protocol/`。下述WSS、世界及战斗消息仍是后续实施契约，不是已经存在的接口；产品规则按[设计入口](README.md)D01～D08确认，事务所有权按[architecture.md](architecture.md)执行。
 
 ## 1. 传输、认证与连接接管
 

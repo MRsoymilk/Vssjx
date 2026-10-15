@@ -1,0 +1,11 @@
+{
+  "version": "nickname-v1",
+  "valid": [
+    {"raw": "  青衫Ab_1  ", "display_name": "青衫Ab_1", "name_key": "青衫ab_1"},
+    {"raw": "AB", "display_name": "AB", "name_key": "ab"},
+    {"raw": "ab", "display_name": "ab", "name_key": "ab"},
+    {"raw": "一鿿", "display_name": "一鿿", "name_key": "一鿿"},
+    {"raw": "abcdefghijkl", "display_name": "abcdefghijkl", "name_key": "abcdefghijkl"}
+  ],
+  "invalid": ["", "a", "十三个字符abcdefghij", "青 衫", "青衫\n", "\t青衫", "ＡＢ", "éé", "éé", "😀😀", "青​衫", "青　衫", "𠀀𠀀", " 青衫 ", "青-衫"]
+}

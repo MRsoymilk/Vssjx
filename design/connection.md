@@ -50,4 +50,4 @@ Rust HTTP基础服务和Godot地址输入、独立持久化、服务发现已实
 
 客户端核对服务标识、协议版本及名称类型/长度，拒绝普通网页、错误服务或不兼容协议。此接口是公开元数据，不发令牌、不创建会话、不加载角色。
 
-未配置数据库时使用上述`connection_only`结果；启用数据库后返回`stage=account_auth`、`capabilities=["account_auth"]`。`/readyz`在账号模式查询真实数据库，故障返回503。连接检查仍不等于账号认证；WSS及世界协议继续按[protocol.md](protocol.md)推进。
+未配置数据库时使用上述`connection_only`结果；启用数据库后返回`stage=account_auth`、`capabilities=["account_auth","character_creation"]`，角色创建/读取契约见[characters.md](characters.md)。`/readyz`在账号模式查询真实数据库，故障返回503。连接检查仍不等于账号认证或进入世界；WSS及世界协议继续按[protocol.md](protocol.md)推进。

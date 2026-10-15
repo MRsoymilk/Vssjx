@@ -1,4 +1,5 @@
 pub mod auth;
+pub mod characters;
 pub mod config;
 
 use axum::response::IntoResponse;
@@ -61,6 +62,14 @@ fn build_app(config: config::Config, auth: Option<auth::AuthService>) -> Router 
         .route("/api/v1/auth/refresh", post(auth::refresh))
         .route("/api/v1/auth/me", get(auth::me))
         .route("/api/v1/auth/logout", post(auth::logout))
+        .route(
+            "/api/v1/characters",
+            get(characters::list).post(characters::create),
+        )
+        .route(
+            "/api/v1/character-operations/{operation_id}",
+            get(characters::receipt),
+        )
         .fallback(|| async { (StatusCode::NOT_FOUND, Json(ApiError { code: "NOT_FOUND" })) })
         .layer(DefaultBodyLimit::max(4096))
         .layer(middleware::map_response(no_store))
@@ -116,7 +125,7 @@ async fn server_info(State(state): State<Arc<AppState>>) -> impl axum::response:
                 "connection_only"
             },
             capabilities: if state.auth.is_some() {
-                vec!["account_auth"]
+                vec!["account_auth", "character_creation"]
             } else {
                 vec![]
             },

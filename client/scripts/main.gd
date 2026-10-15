@@ -257,6 +257,19 @@ func _server_login(register_mode: bool = false) -> void:
 	login.position = Vector2(0, 54)
 	panel.add_child(login)
 	login.close_requested.connect(_close_modal)
+	login.characters_requested.connect(_online_characters)
+
+func _online_characters() -> void:
+	_close_modal()
+	var panel := _modal_panel("线上角色", 428)
+	var lobby := OnlineCharacters.new()
+	lobby.name = "OnlineCharacters"
+	lobby.position = Vector2(0, 54)
+	panel.add_child(lobby)
+	lobby.close_requested.connect(func() -> void:
+		_close_modal()
+		_server_login()
+	)
 
 func _cover_exit() -> void:
 	var panel := _modal_panel("退出游戏")

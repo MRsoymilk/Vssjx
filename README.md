@@ -2,7 +2,7 @@
 
 基于 `analysis/` 中原始《蜀山剑侠Online》320×480 客户端素材，用 **Godot 4.7** 编写的离线可玩原型。
 
-工程已划分为`client/`（Godot客户端）和`server/`（Rust服务端）。Rust服务已支持连接检查与PostgreSQL账号认证，游戏玩法仍为离线模式，线上角色和多人世界尚未开放；联机方案见[design/README.md](design/README.md)。
+工程已划分为`client/`（Godot客户端）和`server/`（Rust服务端）。Rust服务已支持连接检查、PostgreSQL账号认证及线上角色创建/查询，游戏玩法仍为离线模式，多人世界尚未开放；联机方案见[design/README.md](design/README.md)。
 
 ## 启动
 
@@ -20,7 +20,7 @@
 
 有效地址保存到独立的`user://connection.cfg`，下次打开登录界面或重启客户端自动回填，可随时更换。连接失败也保留地址，非法输入不覆盖旧值，不保存密码或修改角色存档。
 
-配置服务端数据库后，可从“注册账号”创建账号，再输入密码登录；会话仅保存在内存，可退出账号。公网账号要求HTTPS，本机回环地址允许HTTP。账号认证与离线角色完全隔离，线上角色创建及多人地图仍待接入。数据库配置见[server/README.md](server/README.md)。
+配置服务端数据库后，可从“注册账号”创建账号，再输入密码登录；会话仅保存在内存，可退出账号。登录后点击“线上角色”创建或查看服务器角色，每账号一个、昵称全服唯一，不导入或覆盖离线存档；共享地图仍未开放。公网账号要求HTTPS，本机回环地址允许HTTP。数据库配置见[server/README.md](server/README.md)。
 
 ## 已实现
 
@@ -82,7 +82,8 @@
 | `client/scripts/art.gd` | 原始组合帧图集转SpriteFrames |
 | `client/scripts/portal.gd` | 灵门标记 |
 | `client/assets/` | 已转换的图块、角色图集、标题和动画数据 |
-| `server/` | Rust连接检查、PostgreSQL账号与会话服务，线上角色和玩法待实现 |
+| `server/` | Rust连接检查、PostgreSQL账号/会话、线上角色及创建回执，线上玩法待实现 |
+| `shared/protocol/` | 当前角色创建schema与固定昵称正反样例 |
 | `design/` | 联机架构、协议草案与实施规划 |
 | `tools/import_assets.py` | 可重复执行的静态资源转换程序 |
 | `analysis/` | 用户提供的原始静态解析材料，保留并排除Godot扫描 |

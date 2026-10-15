@@ -80,3 +80,35 @@ fn configuration_validates_bind_address_and_display_name() {
     assert!(Config::parse("127.0.0.1:8080", "服务器\n假日志").is_err());
     assert!(Config::parse("127.0.0.1:8080", &"甲".repeat(65)).is_err());
 }
+
+#[tokio::test]
+async fn character_routes_do_not_fake_storage_without_a_database() {
+    for (method, path) in [
+        ("GET", "/api/v1/characters"),
+        ("POST", "/api/v1/characters"),
+        (
+            "GET",
+            "/api/v1/character-operations/6b0fdf30-8399-4e58-90c2-cab9cf48d473",
+        ),
+    ] {
+        let config = Config::parse("127.0.0.1:0", "服务器").unwrap();
+        let response = app(config)
+            .oneshot(
+                Request::builder()
+                    .method(method)
+                    .uri(path)
+                    .header("content-type", "application/json")
+                    .body(Body::from("{}"))
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+        assert_eq!(response.status(), StatusCode::SERVICE_UNAVAILABLE);
+        assert_eq!(response.headers()["cache-control"], "no-store");
+        let bytes = response.into_body().collect().await.unwrap().to_bytes();
+        assert_eq!(
+            serde_json::from_slice::<Value>(&bytes).unwrap()["code"],
+            "AUTH_UNAVAILABLE"
+        );
+    }
+}

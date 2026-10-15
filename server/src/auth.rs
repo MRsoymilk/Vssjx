@@ -37,19 +37,23 @@ struct Limiter {
 
 impl Limiter {
     fn admit(&mut self, ip: IpAddr, username: Option<&str>) -> bool {
-        let now = Instant::now();
-        let window = Duration::from_secs(u64::from(self.settings.rate_window_seconds));
-        if now.duration_since(self.last_cleanup) > window {
-            self.entries
-                .retain(|_, (since, _)| now.duration_since(*since) < window);
-            self.last_cleanup = now;
-        }
         let mut keys = vec![
             ("global".to_string(), self.settings.rate_global),
             (format!("ip:{ip}"), self.settings.rate_ip),
         ];
         if let Some(name) = username {
             keys.push((format!("account:{name}"), self.settings.rate_account));
+        }
+        self.admit_keys(keys)
+    }
+
+    fn admit_keys(&mut self, keys: Vec<(String, u32)>) -> bool {
+        let now = Instant::now();
+        let window = Duration::from_secs(u64::from(self.settings.rate_window_seconds));
+        if now.duration_since(self.last_cleanup) > window {
+            self.entries
+                .retain(|_, (since, _)| now.duration_since(*since) < window);
+            self.last_cleanup = now;
         }
         for (key, limit) in &keys {
             if !self.entries.contains_key(key)
@@ -221,8 +225,18 @@ impl AuthService {
             Ok(Ok(_))
         )
     }
-    fn admit(&self, ip: IpAddr, username: Option<&str>) -> Result<(), AuthError> {
+    pub(crate) fn admit(&self, ip: IpAddr, username: Option<&str>) -> Result<(), AuthError> {
         if self.limiter.lock().map_err(|_| busy())?.admit(ip, username) {
+            Ok(())
+        } else {
+            Err(AuthError(StatusCode::TOO_MANY_REQUESTS, "RATE_LIMITED"))
+        }
+    }
+
+    pub(crate) fn admit_creation(&self, account_id: Uuid) -> Result<(), AuthError> {
+        let mut limiter = self.limiter.lock().map_err(|_| busy())?;
+        let limit = limiter.settings.rate_account;
+        if limiter.admit_keys(vec![(format!("character:{account_id}"), limit)]) {
             Ok(())
         } else {
             Err(AuthError(StatusCode::TOO_MANY_REQUESTS, "RATE_LIMITED"))
@@ -376,7 +390,24 @@ impl AuthService {
         Ok(response)
     }
 
-    async fn me(&self, bearer: &str) -> Result<Account, AuthError> {
+    pub(crate) fn pool(&self) -> &PgPool {
+        &self.pool
+    }
+
+    pub(crate) async fn authorize_in(
+        &self,
+        connection: &mut sqlx::PgConnection,
+        bearer: &str,
+    ) -> Result<Account, AuthError> {
+        let row = sqlx::query("SELECT a.id, a.username FROM sessions s JOIN accounts a ON a.id=s.account_id WHERE s.access_digest=$1 AND s.revoked_at IS NULL AND s.access_expires_at > clock_timestamp() AND s.refresh_expires_at > clock_timestamp() AND NOT a.disabled FOR SHARE OF s")
+            .bind(token_digest(bearer)?).fetch_optional(connection).await.map_err(|_| unavailable())?.ok_or_else(unauthorized)?;
+        Ok(Account {
+            id: row.get("id"),
+            username: row.get("username"),
+        })
+    }
+
+    pub(crate) async fn me(&self, bearer: &str) -> Result<Account, AuthError> {
         let row = sqlx::query("SELECT a.id, a.username FROM sessions s JOIN accounts a ON a.id=s.account_id WHERE s.access_digest=$1 AND s.revoked_at IS NULL AND s.access_expires_at > NOW() AND s.refresh_expires_at > NOW() AND NOT a.disabled")
             .bind(token_digest(bearer)?).fetch_optional(&self.pool).await.map_err(|_| unavailable())?.ok_or_else(unauthorized)?;
         Ok(Account {
@@ -396,14 +427,14 @@ impl AuthService {
     }
 }
 
-fn service(state: &AppState) -> Result<&AuthService, AuthError> {
+pub(crate) fn service(state: &AppState) -> Result<&AuthService, AuthError> {
     state.auth.as_ref().ok_or(AuthError(
         StatusCode::SERVICE_UNAVAILABLE,
         "AUTH_UNAVAILABLE",
     ))
 }
-type Peer = Option<Extension<ConnectInfo<std::net::SocketAddr>>>;
-fn peer_ip(peer: Peer) -> IpAddr {
+pub(crate) type Peer = Option<Extension<ConnectInfo<std::net::SocketAddr>>>;
+pub(crate) fn peer_ip(peer: Peer) -> IpAddr {
     peer.map(|Extension(ConnectInfo(address))| address.ip())
         .unwrap_or(IpAddr::from([127, 0, 0, 1]))
 }
@@ -414,7 +445,7 @@ fn credentials(
         .map(|Json(value)| value)
         .map_err(|_| AuthError(StatusCode::BAD_REQUEST, "INVALID_REQUEST"))
 }
-fn bearer(headers: &HeaderMap) -> Result<&str, AuthError> {
+pub(crate) fn bearer(headers: &HeaderMap) -> Result<&str, AuthError> {
     if headers.get_all("authorization").iter().count() != 1 {
         return Err(unauthorized());
     }

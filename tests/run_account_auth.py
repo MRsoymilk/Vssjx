@@ -68,7 +68,7 @@ def main():
         try:
             assert api('/readyz')[0] == 200
             info = api('/api/v1/server-info')[1]
-            assert info['stage'] == 'account_auth' and info['capabilities'] == ['account_auth']
+            assert info['stage'] == 'account_auth' and info['capabilities'] == ['account_auth', 'character_creation']
             assert auth('register', {'username': 'abc', 'password': 'short'})[0] == 422
             assert auth('register', {'username': 'a!', 'password': password})[0] == 422
             assert auth('register', raw=b'{broken')[0] == 400

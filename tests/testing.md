@@ -8,6 +8,8 @@ PostgreSQL账号、密码、会话、注销与账号界面验证见[account_auth
 
 `.env`读取、参数边界、环境优先级与Git忽略验证见[env_config.md](env_config.md)。
 
+线上角色、昵称唯一性、账号创建回执、事务故障与独立大厅验证见[characters.md](characters.md)。
+
 除非特别说明，命令均在`Vssjx/`仓库根目录执行，Godot工程路径为`client/`。
 
 - `tests/`：Python回归、离屏辅助脚本、测试说明和容量验收方案。

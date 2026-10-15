@@ -17,7 +17,7 @@ class ProjectLayoutTests(unittest.TestCase):
             self.assertTrue((CLIENT / folder).is_dir(), folder)
 
     def test_godot_test_scenes_remain_inside_project(self):
-        for stem in ('test_runner', 'motion_regression', 'motion_smoke', 'turn_smoke', 'visual_smoke', 'server_connection_test', 'account_auth_test'):
+        for stem in ('test_runner', 'motion_regression', 'motion_smoke', 'turn_smoke', 'visual_smoke', 'server_connection_test', 'account_auth_test', 'online_characters_test'):
             for suffix in ('.gd', '.gd.uid', '.tscn'):
                 self.assertTrue((CLIENT / 'tests' / (stem + suffix)).is_file())
                 self.assertFalse((ROOT / 'tests' / (stem + suffix)).exists())

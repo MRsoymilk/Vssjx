@@ -1,0 +1,261 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/admin/data_browser.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/admin/data_preview.gd" id="2"]
+
+[node name="DataBrowser" type="PanelContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1")
+
+[node name="Margin" type="MarginContainer" parent="."]
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 14
+
+[node name="Layout" type="VBoxContainer" parent="Margin"]
+theme_override_constants/separation = 16
+
+[node name="Header" type="HBoxContainer" parent="Margin/Layout"]
+theme_override_constants/separation = 18
+
+[node name="Brand" type="VBoxContainer" parent="Margin/Layout/Header"]
+size_flags_horizontal = 3
+
+[node name="Title" type="Label" parent="Margin/Layout/Header/Brand"]
+theme_override_colors/font_color = Color(0.92, 0.97, 1, 1)
+theme_override_font_sizes/font_size = 27
+text = "蜀山剑侠 / 项目数据管理"
+
+[node name="Total" type="Label" parent="Margin/Layout/Header/Brand"]
+unique_name_in_owner = true
+theme_override_colors/font_color = Color(0.51, 0.65, 0.73, 1)
+text = "正在读取项目定义…"
+
+[node name="Badge" type="Label" parent="Margin/Layout/Header"]
+theme_override_colors/font_color = Color(0.51, 0.87, 0.74, 1)
+text = "● 只读工作台"
+
+[node name="Refresh" type="Button" parent="Margin/Layout/Header"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(124, 42)
+size_flags_vertical = 4
+tooltip_text = "重新读取定义（F5）；脚本常量变更需重新运行场景"
+text = "刷新  F5"
+
+[node name="Body" type="HBoxContainer" parent="Margin/Layout"]
+size_flags_vertical = 3
+theme_override_constants/separation = 18
+
+[node name="NavPanel" type="PanelContainer" parent="Margin/Layout/Body"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(194, 0)
+
+[node name="Nav" type="VBoxContainer" parent="Margin/Layout/Body/NavPanel"]
+theme_override_constants/separation = 14
+
+[node name="Label" type="Label" parent="Margin/Layout/Body/NavPanel/Nav"]
+theme_override_colors/font_color = Color(0.51, 0.65, 0.73, 1)
+text = "数据目录"
+
+[node name="Categories" type="ItemList" parent="Margin/Layout/Body/NavPanel/Nav"]
+unique_name_in_owner = true
+size_flags_vertical = 3
+auto_height = false
+
+[node name="Hint" type="Label" parent="Margin/Layout/Body/NavPanel/Nav"]
+theme_override_colors/font_color = Color(0.51, 0.65, 0.73, 1)
+theme_override_font_sizes/font_size = 13
+text = "原包物品全部收录\n缺失名称 / 数值标为 —\n已接入数值属重建规则\n\nCtrl+F 搜索当前分类\nF5 刷新数据"
+
+[node name="Split" type="HSplitContainer" parent="Margin/Layout/Body"]
+size_flags_horizontal = 3
+split_offset = -60
+
+[node name="Listing" type="VBoxContainer" parent="Margin/Layout/Body/Split"]
+custom_minimum_size = Vector2(310, 0)
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+
+[node name="Heading" type="HBoxContainer" parent="Margin/Layout/Body/Split/Listing"]
+
+[node name="Section" type="Label" parent="Margin/Layout/Body/Split/Listing/Heading"]
+unique_name_in_owner = true
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 23
+text = "武器"
+
+[node name="Count" type="Label" parent="Margin/Layout/Body/Split/Listing/Heading"]
+unique_name_in_owner = true
+theme_override_colors/font_color = Color(0.51, 0.65, 0.73, 1)
+
+[node name="Context" type="Label" parent="Margin/Layout/Body/Split/Listing"]
+unique_name_in_owner = true
+visible = false
+theme_override_colors/font_color = Color(0.85, 0.74, 0.49, 1)
+theme_override_font_sizes/font_size = 14
+autowrap_mode = 3
+
+[node name="SearchBar" type="HBoxContainer" parent="Margin/Layout/Body/Split/Listing"]
+theme_override_constants/separation = 8
+
+[node name="Search" type="LineEdit" parent="Margin/Layout/Body/Split/Listing/SearchBar"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 42)
+size_flags_horizontal = 3
+placeholder_text = "搜索名称、ID、属性…"
+clear_button_enabled = true
+
+[node name="StatusFilter" type="OptionButton" parent="Margin/Layout/Body/Split/Listing/SearchBar"]
+unique_name_in_owner = true
+item_count = 9
+selected = 0
+popup/item_0/text = "全部"
+popup/item_0/id = 0
+popup/item_1/text = "已接入"
+popup/item_1/id = 1
+popup/item_2/text = "预留"
+popup/item_2/id = 2
+popup/item_3/text = "资源"
+popup/item_3/id = 3
+popup/item_4/text = "原包资源"
+popup/item_4/id = 4
+popup/item_5/text = "原包目录"
+popup/item_5/id = 5
+popup/item_6/text = "原包文案"
+popup/item_6/id = 6
+popup/item_7/text = "原包线索"
+popup/item_7/id = 7
+popup/item_8/text = "重建阶段"
+popup/item_8/id = 8
+
+[node name="Records" type="Tree" parent="Margin/Layout/Body/Split/Listing"]
+unique_name_in_owner = true
+size_flags_vertical = 3
+columns = 2
+column_titles_visible = true
+hide_root = true
+select_mode = 1
+hide_folding = true
+
+[node name="Empty" type="Label" parent="Margin/Layout/Body/Split/Listing"]
+unique_name_in_owner = true
+visible = false
+size_flags_vertical = 3
+text = "没有匹配的数据\n试试其他关键词或状态筛选"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Inspector" type="PanelContainer" parent="Margin/Layout/Body/Split"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(410, 0)
+size_flags_horizontal = 3
+
+[node name="Details" type="VBoxContainer" parent="Margin/Layout/Body/Split/Inspector"]
+theme_override_constants/separation = 10
+
+[node name="DetailTitle" type="Label" parent="Margin/Layout/Body/Split/Inspector/Details"]
+unique_name_in_owner = true
+theme_override_font_sizes/font_size = 22
+text = "未选择条目"
+text_overrun_behavior = 3
+
+[node name="Summary" type="Label" parent="Margin/Layout/Body/Split/Inspector/Details"]
+unique_name_in_owner = true
+theme_override_colors/font_color = Color(0.6, 0.74, 0.82, 1)
+autowrap_mode = 3
+
+[node name="Preview" type="Control" parent="Margin/Layout/Body/Split/Inspector/Details"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 240)
+mouse_filter = 2
+script = ExtResource("2")
+
+[node name="PreviewMessage" type="Label" parent="Margin/Layout/Body/Split/Inspector/Details/Preview"]
+unique_name_in_owner = true
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 12.0
+offset_top = 12.0
+offset_right = -12.0
+offset_bottom = -12.0
+grow_horizontal = 2
+grow_vertical = 2
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.68, 0.79, 0.86, 1)
+
+[node name="AnimationBar" type="HBoxContainer" parent="Margin/Layout/Body/Split/Inspector/Details"]
+unique_name_in_owner = true
+
+[node name="ExpandOverview" type="Button" parent="Margin/Layout/Body/Split/Inspector/Details"]
+unique_name_in_owner = true
+visible = false
+text = "展开世界总图 · 查看地点 / 等级 / 连线"
+tooltip_text = "世界总图恢复数据；单张场景地形仍缺少.map文件"
+
+[node name="Label" type="Label" parent="Margin/Layout/Body/Split/Inspector/Details/AnimationBar"]
+text = "动画"
+
+[node name="Animations" type="OptionButton" parent="Margin/Layout/Body/Split/Inspector/Details/AnimationBar"]
+unique_name_in_owner = true
+size_flags_horizontal = 3
+
+[node name="Replay" type="Button" parent="Margin/Layout/Body/Split/Inspector/Details/AnimationBar"]
+unique_name_in_owner = true
+text = "播放"
+
+[node name="Collision" type="CheckBox" parent="Margin/Layout/Body/Split/Inspector/Details"]
+unique_name_in_owner = true
+text = "叠加地形阻挡（红色） · 绿色圆点为出生点"
+theme_override_font_sizes/font_size = 13
+
+[node name="Tabs" type="TabContainer" parent="Margin/Layout/Body/Split/Inspector/Details"]
+size_flags_vertical = 3
+
+[node name="Fields" type="Tree" parent="Margin/Layout/Body/Split/Inspector/Details/Tabs"]
+unique_name_in_owner = true
+columns = 2
+column_titles_visible = true
+hide_root = true
+
+[node name="Raw" type="CodeEdit" parent="Margin/Layout/Body/Split/Inspector/Details/Tabs"]
+unique_name_in_owner = true
+editable = false
+gutters_draw_line_numbers = true
+theme_override_font_sizes/font_size = 14
+scroll_past_end_of_file = false
+
+[node name="Texts" type="RichTextLabel" parent="Margin/Layout/Body/Split/Inspector/Details/Tabs"]
+unique_name_in_owner = true
+selection_enabled = true
+bbcode_enabled = false
+
+[node name="SourceLabel" type="Label" parent="Margin/Layout/Body/Split/Inspector/Details"]
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.51, 0.65, 0.73, 1)
+text = "定义来源"
+
+[node name="Source" type="LineEdit" parent="Margin/Layout/Body/Split/Inspector/Details"]
+unique_name_in_owner = true
+editable = false
+theme_override_font_sizes/font_size = 13
+
+[node name="Copy" type="Button" parent="Margin/Layout/Body/Split/Inspector/Details"]
+unique_name_in_owner = true
+text = "复制当前条目数据"
+
+[node name="Footer" type="Label" parent="Margin/Layout"]
+unique_name_in_owner = true
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.51, 0.65, 0.73, 1)
+text = "只读浏览 · 本地项目定义"
+autowrap_mode = 3

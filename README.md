@@ -15,6 +15,26 @@
 
 已生成所需 Godot 素材，离线试玩不依赖Python或联网；Godot首次打开客户端时导入素材。本项目采用OpenGL Compatibility渲染器。
 
+## 项目数据管理
+
+使用 Godot 4.7 打开 `client/scenes/admin/data_browser.tscn`，按 **F6** 单独运行；或在仓库根目录运行：
+
+```sh
+godot --path client res://scenes/admin/data_browser.tscn
+```
+
+Windows 也可运行 `./tools/open-data-browser.ps1 -GodotBin "你的Godot可执行文件路径"`，支持 `GODOT_BIN` 环境变量或 PATH 中的 `godot` / `godot4`。
+
+管理页提供武器、人物装备、物品、人物、任务、地图、怪物、素材/动画八类目录，可搜索名称、ID 和属性，按状态筛选，查看字段、JSON 数据和定义来源；人物支持动画预览，地图支持地形与阻挡预览。**只读浏览项目定义与原包资源**，不连接数据库或读取玩家存档。按 F5 刷新 JSON 与列表，修改脚本常量后需重新运行场景。
+
+物品目录收录 `item.mrp` 已解码的全部 **208 张图标：56 张武器、81 张装备、71 张其他物品**，可选择“原包资源”单独浏览，列表支持图标缩略图。原始资源编号、来源成员、帧号、尺寸、校验值均可查看；尚未恢复的原版名称、物品ID映射、等级和数值显示“—”。青锋剑、回春散另列为当前已接入的本地规则，预留装备槽位另作标记。同一原包资源会同时出现在“物品”和对应的武器/装备分类中。
+
+重新导出物品索引与无损图标：`python tools/import_item_catalog.py`（使用 `analysis/image_manifest.json` 与已解码 PNG；修改原始解码结果后再运行）。
+
+地图页收录 Online 原包 `worldmap.data` 的 **214 条目录（157 个不同名称）**，并保留 3 条当前已接入的场景定义；可筛选“原包目录”或“已接入”。对照原生代码恢复了 **79 个世界总图位置、78条连线**，可展开查看、悬停查询名称与等级；目录还显示原包编号、位置、类型、原始记录与来源校验。单张场景地形仍缺少对应`.map`缓存，明确显示提示；[恢复记录与复现方式](analysis/recovery/maps/README.md)保留格式、扫描结果和证据。
+
+“任务 / 线索”页区分一条重建任务链的 5 个阶段与 11 组原包界面文案、引导资料；原版任务总数仍未知。原包文字可在“文本摘录”页查看，文案和引导线索不当作完整任务定义。重新导出：`python tools/import_original_world.py`；该命令核验 Online 应用 ID 与原包成员，并同步生成 `analysis/catalogs/online_world.json` 和客户端只读索引。
+
 ## 服务器地址
 
 封面选择“登录游戏”，输入目标服务器地址并“保存并连接”。支持`127.0.0.1:8080`、`game.example.com`或完整HTTP/HTTPS地址，也支持反向代理路径前缀。省略协议时IP/localhost使用HTTP，域名使用HTTPS。

@@ -1,0 +1,228 @@
+extends Control
+## Standalone project-data workbench. No editing, network calls or save loading.
+
+const CATALOG := preload("res://scripts/admin/data_catalog.gd")
+const OVERVIEW := preload("res://scenes/admin/world_overview.tscn")
+var catalog := CATALOG.new()
+var category := "weapons"
+var current: Dictionary = {}
+var configure_window := true
+var visible_entries: Array[Dictionary] = []
+
+func _ready() -> void:
+	if configure_window:
+		var window := get_window()
+		window.title = "蜀山剑侠 · 项目数据管理"
+		window.content_scale_mode = Window.CONTENT_SCALE_MODE_DISABLED
+		window.content_scale_size = Vector2i.ZERO
+		window.min_size = Vector2i(1060, 740)
+		window.size = Vector2i(1360, 900)
+		window.move_to_center()
+	_apply_theme()
+	%Fields.get_parent().set_tab_title(0, "字段详情")
+	%Raw.get_parent().set_tab_title(1, "原始数据")
+	%Texts.get_parent().set_tab_title(2, "文本摘录")
+	%Records.set_column_title(0, "名称 / 标识")
+	%Records.set_column_title(1, "状态")
+	%Records.set_column_expand(1, false)
+	%Records.set_column_custom_minimum_width(1, 76)
+	%Fields.set_column_title(0, "字段")
+	%Fields.set_column_title(1, "值")
+	%Fields.set_column_expand_ratio(0, 2)
+	%Fields.set_column_expand_ratio(1, 3)
+	%Fields.add_theme_constant_override("v_separation", 4)
+	%Categories.item_selected.connect(_category_selected)
+	%Search.text_changed.connect(func(_text: String) -> void: _fill_list())
+	%StatusFilter.item_selected.connect(func(_index: int) -> void: _fill_list())
+	%Records.item_selected.connect(_record_selected)
+	%Refresh.pressed.connect(reload_data)
+	%Copy.pressed.connect(func() -> void:
+		if not current.is_empty():
+			DisplayServer.clipboard_set(JSON.stringify(current.data, "  "))
+			%Footer.text = "已复制当前条目数据 · " + String(current.id)
+	)
+	%Animations.item_selected.connect(func(index: int) -> void: %Preview.play_animation(%Animations.get_item_text(index)))
+	%Replay.pressed.connect(func() -> void:
+		if %Animations.item_count > 0: %Preview.play_animation(%Animations.get_item_text(%Animations.selected))
+	)
+	%Collision.toggled.connect(func(value: bool) -> void: %Preview.show_blocked = value; %Preview.queue_redraw())
+	%ExpandOverview.pressed.connect(open_world_overview)
+	reload_data()
+
+func open_world_overview() -> Window:
+	if current.get("preview", {}).get("kind") != "world_overview": return null
+	var window: Window = OVERVIEW.instantiate()
+	window.theme = theme
+	add_child(window)
+	window.get_node("%WorldPreview").display(current)
+	window.get_node("%Selection").text = "当前：%s · 原包编号 %d%s" % [current.name, int(current.preview.selected_map_id), "（原包未提供总图位置）" if current.data["世界总图坐标（列x、行y）"] == null else ""]
+	window.close_requested.connect(window.queue_free)
+	window.popup_centered(Vector2i(820, 860))
+	return window
+
+func _apply_theme() -> void:
+	var design := Theme.new()
+	var font := SystemFont.new()
+	font.font_names = PackedStringArray(["Microsoft YaHei", "Noto Sans CJK SC", "sans-serif"])
+	design.default_font = font
+	design.default_font_size = 16
+	for type in ["Label", "Button", "LineEdit", "Tree", "ItemList", "CheckBox", "CodeEdit", "TabContainer"]:
+		design.set_color("font_color", type, Color("dbe7ef"))
+		design.set_color("font_selected_color", type, Color("ffffff"))
+	design.set_color("font_uneditable_color", "LineEdit", Color("9bb3c2"))
+	for type in ["LineEdit", "Tree", "ItemList", "CodeEdit"]:
+		design.set_stylebox("normal" if type == "LineEdit" else "panel", type, _box("101923", "293b4a", 8))
+		design.set_color("selection_color", type, Color("254c61"))
+		design.set_color("font_placeholder_color", type, Color("7e95a6"))
+	for type in ["Button", "OptionButton"]:
+		for state in ["normal", "hover", "pressed", "focus"]:
+			design.set_stylebox(state, type, _box("243948" if state in ["hover", "pressed"] else "1a2a37", "4cbda3" if state == "focus" else "344c5c", 7))
+	for state in ["tab_selected", "tab_hovered", "tab_unselected"]:
+		design.set_stylebox(state, "TabContainer", _box("243948" if state == "tab_selected" else "15222e", "293b4a", 5))
+	design.set_stylebox("panel", "TabContainer", _box("101923", "293b4a", 7))
+	design.set_stylebox("selected", "ItemList", _box("23483f", "4cbda3", 6))
+	design.set_stylebox("selected_focus", "ItemList", _box("23483f", "4cbda3", 6))
+	design.set_stylebox("selected", "Tree", _box("254c61", "375d72", 4))
+	design.set_stylebox("selected_focus", "Tree", _box("254c61", "4cbda3", 4))
+	design.set_constant("v_separation", "Tree", 12)
+	design.set_constant("v_separation", "ItemList", 17)
+	design.set_constant("h_separation", "ItemList", 12)
+	theme = design
+	add_theme_stylebox_override("panel", _box("15222e", "293b4a", 0))
+	%NavPanel.add_theme_stylebox_override("panel", _box("101923", "293b4a", 10))
+	%Inspector.add_theme_stylebox_override("panel", _box("1a2a37", "293b4a", 10))
+
+func _box(fill: String, border: String, radius: int) -> StyleBoxFlat:
+	var box := StyleBoxFlat.new()
+	box.bg_color = Color(fill)
+	box.border_color = Color(border)
+	box.set_border_width_all(1)
+	box.set_corner_radius_all(radius)
+	box.content_margin_left = 12
+	box.content_margin_right = 12
+	box.content_margin_top = 9
+	box.content_margin_bottom = 9
+	return box
+
+func reload_data() -> void:
+	var selected_id := String(current.get("id", ""))
+	catalog.reload()
+	%Categories.clear()
+	for item in CATALOG.CATEGORIES:
+		var count: int = catalog.find(item[0]).size()
+		%Categories.add_item("%s    %d" % [item[1], count])
+		%Categories.set_item_metadata(%Categories.item_count - 1, item[0])
+		if item[0] == category: %Categories.select(%Categories.item_count - 1)
+	%Total.text = "原包物品 %d 件 · 地图目录 %d 条 · %d 条索引" % [catalog.find("items", "", "原包资源").size(), catalog.original_map_names, catalog.entries.size()]
+	_fill_list(selected_id)
+
+func select_category(id: String) -> void:
+	for index in %Categories.item_count:
+		if %Categories.get_item_metadata(index) == id:
+			%Categories.select(index)
+			_category_selected(index)
+			return
+
+func _category_selected(index: int) -> void:
+	category = %Categories.get_item_metadata(index)
+	%Search.text = ""
+	%StatusFilter.select(0)
+	_fill_list()
+
+func _fill_list(preferred_id: String = "") -> void:
+	for item in CATALOG.CATEGORIES:
+		if item[0] == category: %Section.text = item[1]
+	%Context.visible = category in ["maps", "quests"]
+	if category == "maps":
+		%Context.text = "原包目录 %d 条（%d 个不同名称）；世界总图 %d 个位置 / %d 条连线已恢复。单张场景地形仍缺失。另有 %d 条重建场景定义。" % [catalog.original_map_names, catalog.original_distinct_map_names, int(catalog.original_overview.get("visible_location_count", 0)), int(catalog.original_overview.get("route_count", 0)), catalog.find("maps", "", "已接入").size()]
+	elif category == "quests":
+		var stages: int = catalog.find("quests", "", "重建阶段").size()
+		%Context.text = "重建：1 条任务链 / %d 个阶段；原包：%d 组文案与引导线索。原版任务总数未知。" % [stages, catalog.find("quests").size() - stages]
+	visible_entries = catalog.find(category, %Search.text, %StatusFilter.get_item_text(%StatusFilter.selected))
+	%Count.text = "%d / %d 条" % [visible_entries.size(), catalog.find(category).size()]
+	%Records.clear()
+	var root: TreeItem = %Records.create_item()
+	var selected: TreeItem
+	for entry in visible_entries:
+		var row: TreeItem = %Records.create_item(root)
+		row.set_text(0, entry.name + "\n" + entry.id)
+		row.set_text(1, entry.status)
+		if entry.preview.get("kind") == "icon":
+			row.set_icon(0, load(entry.preview.path))
+			row.set_icon_max_width(0, 36)
+		row.set_custom_color(1, Color("83dfbd") if entry.status == "已接入" else Color("dbbb78"))
+		row.set_tooltip_text(0, entry.summary)
+		row.set_metadata(0, entry)
+		if selected == null or entry.id == preferred_id: selected = row
+	%Empty.visible = visible_entries.is_empty()
+	%Records.visible = not visible_entries.is_empty()
+	if selected != null:
+		selected.select(0)
+		# select emits item_selected; call explicitly for non-interactive refresh too.
+		_show_entry(selected.get_metadata(0))
+	else:
+		_show_entry({})
+	%Footer.text = "只读浏览 · 本地项目定义 · 不连接数据库或读取玩家存档" if catalog.errors.is_empty() else "数据加载异常：" + "；".join(catalog.errors)
+
+func _record_selected() -> void:
+	var row: TreeItem = %Records.get_selected()
+	if row != null: _show_entry(row.get_metadata(0))
+
+func _show_entry(entry: Dictionary) -> void:
+	current = entry
+	%Fields.clear()
+	%Raw.text = ""
+	%Texts.text = ""
+	%Animations.clear()
+	%Preview.display(entry)
+	%Copy.disabled = entry.is_empty()
+	%DetailTitle.text = entry.get("name", "未选择条目")
+	%Summary.text = entry.get("summary", "当前分类没有匹配结果，请调整搜索或筛选条件。")
+	%Source.text = entry.get("source", "")
+	%AnimationBar.visible = entry.get("preview", {}).get("kind") == "actor"
+	%Collision.visible = entry.get("preview", {}).get("kind") == "map"
+	var preview_kind: String = entry.get("preview", {}).get("kind", "")
+	%ExpandOverview.visible = preview_kind == "world_overview"
+	%PreviewMessage.visible = preview_kind == "unavailable"
+	%PreviewMessage.text = entry.get("preview", {}).get("message", "")
+	%Preview.custom_minimum_size.y = 160 if preview_kind == "unavailable" else 240
+	var excerpts: Array = entry.get("data", {}).get("文本摘录", [])
+	var was_reading_text: bool = %Texts.get_parent().current_tab == 2
+	%Texts.get_parent().set_tab_hidden(2, excerpts.is_empty())
+	if not excerpts.is_empty():
+		%Texts.text = "\n\n".join(excerpts)
+		%Texts.get_parent().current_tab = 2
+	elif was_reading_text:
+		%Texts.get_parent().current_tab = 0
+	if entry.is_empty(): return
+	var root: TreeItem = %Fields.create_item()
+	_append_fields(root, entry.data)
+	%Raw.text = JSON.stringify(entry.data, "  ")
+	var names: PackedStringArray = %Preview.animations()
+	for name in names:
+		%Animations.add_item(name)
+		if name == "idle": %Animations.select(%Animations.item_count - 1)
+
+func _append_fields(parent: TreeItem, data: Dictionary) -> void:
+	for key in data:
+		var row: TreeItem = %Fields.create_item(parent)
+		row.set_text(0, String(key))
+		var value: Variant = data[key]
+		if value is Dictionary:
+			row.set_text(1, "%d 个字段" % value.size())
+			_append_fields(row, value)
+		elif value is Array and value.size() > 12:
+			row.set_text(1, "%d 项 · 完整内容见原始数据" % value.size())
+		else:
+			var text := JSON.stringify(value) if value is Array else ("—" if value == null else str(value))
+			row.set_text(1, text)
+			row.set_tooltip_text(1, text)
+
+func _unhandled_key_input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed:
+		if event.keycode == KEY_F5:
+			reload_data()
+			get_viewport().set_input_as_handled()
+		elif event.keycode == KEY_F and (event.ctrl_pressed or event.meta_pressed):
+			%Search.grab_focus()
+			get_viewport().set_input_as_handled()

@@ -33,6 +33,12 @@ func _run() -> void:
 	check(view.attributes.visible and view.attributes.snapshot.name == view.network.pve.state.character.display_name, "Real online header opens original attributes with server identity")
 	check(view.attributes.numbers.hp.value == "%d/%d" % [int(view.network.pve.state.character.hp), int(view.network.pve.state.stats.hp)], "Real attributes use authoritative health maximum")
 	view.attributes.get_node("Back").pressed.emit()
+	var map_revision: String = view.network.pve.state.character.state_revision
+	view.screen.chrome.toolbar.get_node("Map").pressed.emit()
+	check(view.world_map.visible and view.world_map.locations.size() == 79 and not view.details.visible, "Real online toolbar opens recovered world map scene")
+	view.world_map.get_node("MainCity").pressed.emit()
+	view.world_map.get_node("Footer/Back").pressed.emit()
+	check(not view.world_map.visible and view.network.world_ready and view.network.pve.state.character.state_revision == map_revision, "World map browsing returns to same authoritative session without teleporting")
 	var click := InputEventMouseButton.new()
 	click.button_index = MOUSE_BUTTON_LEFT
 	click.pressed = true

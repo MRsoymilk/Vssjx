@@ -10,6 +10,7 @@ func mouse_event(point: Vector2, pressed: bool) -> InputEventMouseButton:
 func _run() -> void:
 	var old := Game.player.duplicate(true)
 	var old_path := Game.save_path
+	var old_characters := OnlineAccount.characters.duplicate(true)
 	Game.save_path = "user://world_map_%d.json" % OS.get_process_id()
 	Game.new_player("地图修士",1,2)
 	var app: Control = load("res://scenes/main.tscn").instantiate()
@@ -80,7 +81,59 @@ func _run() -> void:
 	check(app.modal == null and app.world.enabled, "Map Escape closes without consuming input through a detached node")
 	app.queue_free()
 	await get_tree().process_frame
+	await online_map()
+	OnlineAccount.characters = old_characters
 	Game.player = old
 	Game.save_path = old_path
 	print("WORLD MAP: %d checks, %d failures" % [checks,failures])
 	get_tree().quit(0 if failures == 0 else 1)
+
+func online_map() -> void:
+	var offline := Game.player.duplicate(true)
+	OnlineAccount.characters = [{"id":SELF,"display_name":"联网修士","job":1,"gender":0,"school":2,"level":1,"hp":95,"mp":45,"gold":30}]
+	var app: Control = load("res://scenes/main.tscn").instantiate()
+	add_child(app)
+	app._enter_online_world(SELF)
+	var view: OnlineWorldView = app.ui.get_node("OnlineWorld")
+	view.network.set_process(false)
+	view.network.world_ready = true
+	view.network.entities = {SELF:entity(SELF,1,"联网修士",1,0,[10,16])}
+	view.network.changed.emit(view.network.entities)
+	var chat_id := view.chat_panel.get_instance_id()
+	view.chat_input.text = "未发送的聊天草稿"
+	view.move_target.set_destination(Vector2i(14,16))
+	view._scene_action("map")
+	var page := view.world_map
+	check(page.visible and page.scene_file_path == "res://scenes/ui/world_map.tscn" and not view.details.visible, "Online map entry opens shared reference scene instead of text dialog")
+	check(view.network._pending_motion.get("type") == "world.stop" and not view.move_target.visible, "Online map stops movement and clears destination marker")
+	check(page.locations.size() == 79 and page.graph.get_node("Routes").get_child_count() == 78, "Online map uses full recovered world graph")
+	var timer := view._key_timer
+	var pending := view.network._pending_motion.duplicate(true)
+	view._process(.2)
+	check(timer == view._key_timer, "World map blocks online keyboard walking")
+	view._map_input(mouse_event(Vector2(220,260),true))
+	check(view.network._pending_motion == pending, "Clicks browsing world map cannot move the character underneath")
+	await capture("online_world_map")
+	page.get_node("MainCity").pressed.emit()
+	page.get_node("Footer/Back").pressed.emit()
+	check(not page.visible and view.network.world_ready and view.chat_panel.get_instance_id() == chat_id and view.chat_input.text == "未发送的聊天草稿", "Return keeps current online session, shared chat and input draft")
+	check(view.network.entities[SELF].cell == [10,16] and Game.player == offline, "Map browsing neither teleports online character nor changes offline state")
+	var key := InputEventKey.new(); key.keycode = KEY_3; key.pressed = true
+	view._unhandled_key_input(key)
+	check(page.visible, "Online three key opens world map")
+	page._unhandled_key_input(key)
+	check(not page.visible, "Three key returns from online world map")
+	view._scene_action("map")
+	view._scene_action("properties")
+	check(not page.visible and view.attributes.visible, "Online properties dismiss world map before opening")
+	view.attributes.get_node("Back").pressed.emit()
+	view._scene_action("map")
+	view._open_expanded_chat()
+	check(not page.visible and view.expanded_chat.visible, "Expanded chat does not overlap world map")
+	view.expanded_chat.dismiss()
+	view.network.pve.state = {"battle":{"outcome":"active"}}
+	view._open_world_map()
+	check(not page.visible, "Active battle cannot open field world map")
+	view.network.pve.state = {}
+	app.queue_free()
+	await get_tree().process_frame

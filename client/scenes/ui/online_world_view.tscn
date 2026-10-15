@@ -10,6 +10,7 @@
 
 [ext_resource type="PackedScene" path="res://scenes/ui/character_attributes.tscn" id="Attributes"]
 [ext_resource type="PackedScene" path="res://scenes/world_move_target.tscn" id="MoveTarget"]
+[ext_resource type="PackedScene" path="res://scenes/ui/world_map.tscn" id="WorldMap"]
 
 [node name="OnlineWorldView" type="Control"]
 offset_right = 320.0
@@ -38,6 +39,9 @@ offset_right = 320.0
 offset_bottom = 403.0
 [node name="Screen" parent="." instance=ExtResource("Screen")]
 online_mode = true
+
+[node name="WorldMap" parent="." instance=ExtResource("WorldMap")]
+visible = false
 [node name="Menu" parent="." instance=ExtResource("Menu")]
 z_index = 10
 [node name="GameMenu" parent="." instance=ExtResource("GameMenu")]

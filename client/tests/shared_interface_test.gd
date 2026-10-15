@@ -77,7 +77,9 @@ func _run() -> void:
 	check(view.screen.chrome.toolbar.visible and view.screen.hud.get_node("Minimap").shared_entities.size() == 2, "Original toolbar and minimap include online peers")
 	check(view.chat_panel.visible and view.chat_panel.position.y == 403 and not view.has_node("ChatPanel"), "Chat is permanently embedded in the original bottom message area")
 	check(view.screen.hud.get_node("MapCoordinates").text == "10  16" and view.count_label.text == "同图2人", "Coordinates and online population are displayed in the game HUD")
-	check(view.network.chat.receive({"type": "chat.ready", "channel_epoch": EPOCH, "latest_seq": "0", "oldest_seq": "1", "history_limit": 1, "dedup_seconds": 300, "max_chars": 120, "max_bytes": 480}), "Chat channel handshake is accepted")
+	var system_log := view.chat_log.get_parsed_text()
+	check(view.network.chat.receive({"type": "chat.ready", "channel_epoch": EPOCH, "latest_seq": "40", "oldest_seq": "41", "history_limit": 1, "dedup_seconds": 300, "max_chars": 120, "max_bytes": 480}), "Chat channel handshake is accepted")
+	check(view.network.chat.messages.is_empty() and view.chat_log.get_parsed_text() == system_log, "Entering a populated channel adds no pre-online history to the system log")
 	view.network.chat.enabled = true
 	view.network.chat.send_requested.connect(func(message: Dictionary) -> void: sent.append(message))
 	view._process(0.01)
@@ -102,9 +104,9 @@ func _run() -> void:
 	var message_id := "30000000-0000-4000-8000-000000000001"
 	check(view.network.chat.receive({"type": "chat.result", "result": {"client_message_id": sent[0].client_message_id, "status": "SENT", "message_id": message_id}}), "Confirmed send receipt is accepted")
 	check(view.chat_input.text.is_empty(), "Composer clears only after confirmed delivery")
-	check(view.network.chat.receive({"type": "chat.batch", "channel_epoch": EPOCH, "messages": [{"seq": "1", "message_id": message_id, "sender_character_id": PEER, "display_name": "青衫客", "server_time_ms": "1792036800000", "channel": "public", "text": "[b]同屏聊天[/b]"}]}), "Peer public message is validated")
+	check(view.network.chat.receive({"type": "chat.batch", "channel_epoch": EPOCH, "messages": [{"seq": "41", "message_id": message_id, "sender_character_id": PEER, "display_name": "青衫客", "server_time_ms": "1792036800000", "channel": "public", "text": "[b]同屏聊天[/b]"}]}), "Peer public message is validated")
 	check(not view.chat_log.bbcode_enabled and view.chat_log.get_parsed_text().contains("[b]同屏聊天[/b]"), "Public messages render as literal text in the bottom area")
-	check(view.network.chat.receive({"type": "chat.batch", "channel_epoch": EPOCH, "messages": [{"seq": "2", "message_id": "30000000-0000-4000-8000-000000000002", "sender_character_id": PEER, "display_name": "青衫客", "server_time_ms": "1792036800001", "channel": "public", "text": "大家好，一起游历青云山道！"}]}), "Recent public messages replace expired history in the same inline log")
+	check(view.network.chat.receive({"type": "chat.batch", "channel_epoch": EPOCH, "messages": [{"seq": "42", "message_id": "30000000-0000-4000-8000-000000000002", "sender_character_id": PEER, "display_name": "青衫客", "server_time_ms": "1792036800001", "channel": "public", "text": "大家好，一起游历青云山道！"}]}), "Recent public messages replace expired history in the same inline log")
 	var peer_before: Vector2 = view.actors[PEER].root.position
 	check(view.network._receive_delta(delta(2, [], [], [[2, 524, 525, 500, 1, 1]])), "Peer movement is validated while chatting")
 	view._process(0.1)

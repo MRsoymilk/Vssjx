@@ -207,3 +207,82 @@ fn client_chat_cannot_supply_sender_or_inject_extra_fields() {
     let spoof = valid.replace("\"text\":", "\"display_name\":\"管理员\",\"text\":");
     assert!(serde_json::from_str::<ClientMessage>(&spoof).is_err());
 }
+
+#[test]
+fn admission_window_skips_old_chat_and_keeps_messages_during_sync() {
+    let mut chat = ChatHub::new(ChatConfig::default());
+    let now = Instant::now();
+    chat.submit(
+        (Uuid::new_v4(), "甲乙"),
+        Uuid::new_v4(),
+        "public",
+        "上线以前",
+        false,
+        now,
+    );
+    chat.drain(now + Duration::from_secs(1));
+    let admitted = chat.latest();
+    let (ready, cursor) = chat.ready_since(admitted);
+    assert_eq!(ready["oldest_seq"], "2");
+    assert_eq!(ready["latest_seq"], "1");
+    assert!(chat.batch(cursor).is_empty());
+
+    // Admission precedes the world baseline: do not skip messages while syncing.
+    chat.submit(
+        (Uuid::new_v4(), "丙丁"),
+        Uuid::new_v4(),
+        "public",
+        "上线以后[微笑]",
+        false,
+        now + Duration::from_secs(1),
+    );
+    chat.drain(now + Duration::from_secs(2));
+    let (ready, cursor) = chat.ready_since(admitted);
+    assert_eq!(ready["oldest_seq"], "2");
+    assert_eq!(ready["latest_seq"], "2");
+    assert_eq!(chat.batch(cursor).len(), 1);
+    assert_eq!(chat.batch(cursor)[0].text, "上线以后[微笑]");
+
+    // A retained game session reconnects using its original admission cursor.
+    assert_eq!(chat.batch(chat.ready_since(admitted).1)[0].seq, "2");
+    // A new admission starts afresh without deleting other players' history.
+    assert!(chat.batch(chat.ready_since(chat.latest()).1).is_empty());
+    assert_eq!(chat.batch(0).len(), 2);
+}
+
+#[test]
+fn admission_window_is_bounded_by_history_and_resets_with_channel() {
+    let mut chat = ChatHub::new(ChatConfig {
+        history: 2,
+        ..ChatConfig::default()
+    });
+    let now = Instant::now();
+    for index in 0..4 {
+        let at = now + Duration::from_secs(index);
+        chat.submit(
+            (Uuid::new_v4(), "甲乙"),
+            Uuid::new_v4(),
+            "public",
+            &format!("消息{index}"),
+            false,
+            at,
+        );
+        chat.drain(at + Duration::from_secs(1));
+    }
+    let (ready, cursor) = chat.ready_since(1);
+    assert_eq!(ready["oldest_seq"], "3");
+    assert_eq!(ready["latest_seq"], "4");
+    assert_eq!(cursor, 2);
+    assert_eq!(
+        chat.batch(cursor)
+            .iter()
+            .map(|message| message.seq.as_str())
+            .collect::<Vec<_>>(),
+        ["3", "4"]
+    );
+    let fresh = ChatHub::new(ChatConfig::default());
+    let (ready, cursor) = fresh.ready_since(4);
+    assert_eq!(cursor, 0);
+    assert_eq!(ready["oldest_seq"], "1");
+    assert_eq!(ready["latest_seq"], "0");
+}

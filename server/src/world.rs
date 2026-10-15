@@ -69,6 +69,7 @@ struct CharacterActor {
     id: Uuid,
     session: Uuid,
     game: Uuid,
+    chat_start_seq: u64,
     epoch: u64,
     owner: i64,
     display_name: String,
@@ -117,6 +118,7 @@ struct Ownership {
     id: Uuid,
     session: Uuid,
     game: Uuid,
+    chat_start_seq: u64,
     epoch: u64,
     owner: i64,
     joined_revision: u64,
@@ -282,6 +284,7 @@ impl WorldHub {
                     id,
                     session,
                     game: actor.game,
+                    chat_start_seq: actor.chat_start_seq,
                     epoch: actor.epoch,
                     owner: actor.owner,
                     joined_revision: state.revision + 1,
@@ -299,15 +302,16 @@ impl WorldHub {
         if !self.map.walkable(cell) {
             return Err(error(409, "INVALID_SAVED_POSITION"));
         }
+        let mut state = self.data.lock().expect("world state");
         let owner = Ownership {
             id,
             session,
             game: Uuid::new_v4(),
+            chat_start_seq: state.chat.latest(),
             epoch: 1,
             owner: row.get("owner_epoch"),
             joined_revision: 0,
         };
-        let mut state = self.data.lock().expect("world state");
         let net_id = state.next_net_id;
         state.next_net_id = net_id
             .checked_add(1)
@@ -317,6 +321,7 @@ impl WorldHub {
             id,
             session,
             game: owner.game,
+            chat_start_seq: owner.chat_start_seq,
             epoch: 1,
             owner: owner.owner,
             display_name: row.get("display_name"),
@@ -729,7 +734,7 @@ async fn connection(socket: WebSocket, auth: AuthService, hub: Arc<WorldHub>, id
     }
     let (chat_ready, mut chat_cursor) = {
         let state = hub.data.lock().expect("world state");
-        (state.chat.ready(), state.chat.oldest() - 1)
+        state.chat.ready_since(owner.chat_start_seq)
     };
     if send(&mut socket, chat_ready).await.is_err() {
         hub.disconnect(&auth, &owner, false).await;

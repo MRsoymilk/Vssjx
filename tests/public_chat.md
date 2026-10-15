@@ -2,6 +2,14 @@
 
 内置表情及底部选择面板见[chat_emotes.md](chat_emotes.md)。当前客户端只将固定表情标记转换为贴图，其他标记保留原文；下方历史验证记录对应当时的客户端版本。
 
+## 上线聊天范围修正
+
+新上线角色从进入世界时的频道序号之后开始接收消息，不再收到上线前保留的公共聊天。世界快照同步期间的新消息仍会收到。短暂断线重连保留本次上线起点，显式离开后重新上线则重置起点；频道历史仍受原数量上限约束。
+
+服务端聊天测试覆盖入场前历史隔离、同步期间消息、同会话重连、新会话重置与历史截断。客户端协议测试新增相同序号窗口的接受/拒绝检查；共享界面用已有40条消息的频道验证入场不添加旧聊天，后续新消息正常显示。`run_shared_world.py`补充后到角色与显式离开重新上线的真实连接断言。
+
+本次验证：Rust 36项、Clippy全部target、Godot聊天协议48项、共享界面28项；Python 31项通过、1项跳过。当前机器缺少Docker/PostgreSQL工具，新增数据库集成断言未运行。服务端修改需要更新并重启服务后生效。
+
 ```sh
 python tests/run_shared_world.py --render --output /tmp/opencode/vssjx-public-chat
 godot --headless --path client res://tests/public_chat_test.tscn

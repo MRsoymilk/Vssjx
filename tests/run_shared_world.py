@@ -115,6 +115,20 @@ def main():
             assert {first_id, second_id} == set(entities)
             assert all(not {'account_id', 'gold', 'hp', 'potions', 'session_id'} & entity.keys() for entity in entities.values())
             chat_id, chat_text, chat_message = exercise_chat(a, b, first_id, second_id, db)
+            # A newly admitted character cannot read messages from before entry.
+            late_session, late_id = user('world_late', '后到修士')
+            late, _ = connect(ticket(late_session, late_id))
+            late_chat = ChatProbe(late)
+            boundary = late_chat.until(lambda data: data['type'] == 'chat.ready')
+            assert int(boundary['latest_seq']) > 0
+            assert int(boundary['oldest_seq']) == int(boundary['latest_seq']) + 1
+            request = late_chat.send('上线后的消息[微笑]')
+            delivered = late_chat.result(request, 'SENT')['message_id']
+            assert late_chat.seen(delivered)['text'] == '上线后的消息[微笑]'
+            assert [message['message_id'] for message in late_chat.messages] == [delivered]
+            late.send({'type': 'world.leave'})
+            assert late_id not in b.snapshot(lambda values: late_id not in values)
+            late.close()
             a.send(motion(ready_a, 1, [13, 16]))
             moved = b.snapshot(lambda values: values[first_id]['cell'] == [13, 16] and values[first_id]['next_cell'] is None)
             assert moved[second_id]['cell'] == [10, 16]
@@ -136,8 +150,10 @@ def main():
             assert int(ready_new['connection_epoch']) == int(ready_a['connection_epoch']) + 1
             error(a, 'SESSION_REPLACED')
             a.close()
-            assert replacement.snapshot()[first_id]['cell'] == [13, 16]
             resumed_chat = ChatProbe(replacement)
+            resumed_ready = resumed_chat.until(lambda data: data['type'] == 'chat.ready')
+            assert resumed_ready['oldest_seq'] == initial_chat['oldest_seq']
+            assert replacement.snapshot()[first_id]['cell'] == [13, 16]
             resumed_chat.send(chat_text, chat_id)
             assert resumed_chat.result(chat_id, 'SENT')['message_id'] == chat_message
             replacement.send(motion(ready_a, 4, [20, 16]))
@@ -148,6 +164,8 @@ def main():
             assert db.query(f"SELECT cell_x || ',' || cell_y FROM characters WHERE id='{first_id}';") == '13,16'
             # A new login is allowed after explicit leave, loading the durable coordinate.
             a, ready_a = connect(ticket(another, first_id))
+            reentered_chat = ChatProbe(a).until(lambda data: data['type'] == 'chat.ready')
+            assert int(reentered_chat['oldest_seq']) == int(reentered_chat['latest_seq']) + 1
             assert a.snapshot()[first_id]['cell'] == [13, 16]
             assert ready_a['game_session_id'] != ready_new['game_session_id']
             _, refreshed = api('/api/v1/auth/refresh', {'refresh_token': another['refresh_token']})

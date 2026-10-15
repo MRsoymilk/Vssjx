@@ -115,7 +115,18 @@ impl ChatHub {
         }
     }
     pub fn ready(&self) -> serde_json::Value {
-        serde_json::json!({"type":"chat.ready","channel_epoch":self.epoch,"latest_seq":self.seq.to_string(),"oldest_seq":self.oldest().to_string(),"history_limit":self.config.history,"dedup_seconds":self.config.dedup_seconds,"max_chars":MAX_CHARS,"max_bytes":MAX_BYTES})
+        self.ready_since(self.oldest() - 1).0
+    }
+    pub fn latest(&self) -> u64 {
+        self.seq
+    }
+    /// The readable window begins at this character's admission, bounded by
+    /// retained history. Capture admission separately so messages published
+    /// during world synchronization are still delivered.
+    pub fn ready_since(&self, admitted_after: u64) -> (serde_json::Value, u64) {
+        let cursor = admitted_after.max(self.oldest() - 1).min(self.seq);
+        let ready = serde_json::json!({"type":"chat.ready","channel_epoch":self.epoch,"latest_seq":self.seq.to_string(),"oldest_seq":(cursor+1).to_string(),"history_limit":self.config.history,"dedup_seconds":self.config.dedup_seconds,"max_chars":MAX_CHARS,"max_bytes":MAX_BYTES});
+        (ready, cursor)
     }
     fn prune(&mut self, now: Instant) {
         let ttl = Duration::from_secs(self.config.dedup_seconds);

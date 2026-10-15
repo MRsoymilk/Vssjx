@@ -20,11 +20,11 @@
 
 ## 独立序列与历史
 
-`chat.ready`公开channel_epoch（每服务进程随机UUID）、latest_seq、oldest_seq、history_limit、dedup_seconds和字数/字节上限。只有通过票据认证后才发送。
+`chat.ready`公开channel_epoch（每服务进程随机UUID）、latest_seq、oldest_seq、history_limit、dedup_seconds和字数/字节上限。只有通过票据认证后才发送。latest_seq为频道最新序号；oldest_seq为当前角色可读取的起点，取上线起点与频道保留窗口起点的较大值；无可读消息时为latest_seq+1。
 
 `chat.batch`每批最多16条，包含channel_epoch和messages；消息含seq、message_id、sender_character_id、display_name、server_time_ms、channel、text。seq与时间为十进制字符串。聊天不使用世界快照stream_id/seq，不插入快照块中间。
 
-默认只保留最近50条。首次入场/重连从当前历史起点开始；客户端清空旧显示缓存后安装，批内先完整校验再追加。游标落后被历史窗口截断时先发`chat.gap`，再从新oldest_seq继续，不承诺完整补发。客户端同样最多保留握手指定的历史数量。慢连接受现有发送超时保护，不为每连接创建无限广播队列。
+默认只保留最近50条。角色首次进入世界时，在插入角色的同一把世界锁内记录频道最新序号，只接收此后发布的聊天；同步世界快照期间发布的消息也会收到。短暂断线、同一游戏会话重连沿用原上线起点；显式离开、保留角色过期或新游戏会话重新记录起点，不读取上线以前的历史。客户端清空旧显示缓存后安装，批内先完整校验再追加。游标落后被历史窗口截断时先发`chat.gap`，再从新oldest_seq继续，不承诺完整补发。客户端同样最多保留握手指定的历史数量。慢连接受现有发送超时保护，不为每连接创建无限广播队列。
 
 ## 禁言与界面
 

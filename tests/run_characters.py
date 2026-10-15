@@ -28,7 +28,7 @@ def main():
     subprocess.run(['cargo', 'build', '--locked', '--manifest-path', str(ROOT / 'server/Cargo.toml')], check=True)
     with PostgresFixture() as db:
         env = {k: v for k, v in os.environ.items() if not k.startswith('SSJX_')}
-        env.update(SSJX_ENV_FILE='', SSJX_DATABASE_URL=db.url, SSJX_BIND_ADDR='127.0.0.1:0', RUST_LOG='info',
+        env.update(SSJX_ENV_FILE='', SSJX_DATABASE_URL=db.url, SSJX_BIND_ADDR='127.0.0.1:0', RUST_LOG='info', SSJX_MONITOR_BIND_ADDR='', SSJX_LOG_DIR='',
                    SSJX_AUTH_RATE_IP='1000', SSJX_AUTH_RATE_GLOBAL='10000', SSJX_AUTH_RATE_ACCOUNT='100')
         logs = []
 

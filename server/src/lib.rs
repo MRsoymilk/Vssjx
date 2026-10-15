@@ -2,6 +2,9 @@ pub mod auth;
 pub mod characters;
 pub mod chat;
 pub mod config;
+pub mod logging;
+mod monitor;
+pub mod observability;
 pub mod world;
 pub mod world_map;
 pub mod world_replication;
@@ -47,6 +50,7 @@ pub(crate) struct AppState {
     config: config::Config,
     auth: Option<auth::AuthService>,
     world: Option<Arc<world::WorldHub>>,
+    metrics: Arc<observability::Observability>,
 }
 
 pub fn app(config: config::Config) -> Router {
@@ -58,8 +62,29 @@ pub fn app_with_auth(config: config::Config, auth: auth::AuthService) -> Router 
 }
 
 fn build_app(config: config::Config, auth: Option<auth::AuthService>) -> Router {
-    let world = auth.as_ref().map(|_| world::WorldHub::new(config.world));
-    Router::new()
+    apps(config, auth, logging::LogHealth::default()).0
+}
+
+/// Public game router and private monitoring router share the same process state.
+/// The caller must serve the second router on a dedicated loopback listener.
+pub fn apps(
+    config: config::Config,
+    auth: Option<auth::AuthService>,
+    log_health: logging::LogHealth,
+) -> (Router, Router) {
+    let metrics = Arc::new(observability::Observability::new(log_health));
+    tracing::info!(boot_id=%metrics.boot_id, "process diagnostics initialized");
+    let world = auth
+        .as_ref()
+        .map(|_| world::WorldHub::with_metrics(config.world, metrics.clone()));
+    let state = Arc::new(AppState {
+        config,
+        auth,
+        world,
+        metrics: metrics.clone(),
+    });
+    monitor::sample_database(&state);
+    let router = Router::new()
         .route("/healthz", get(health))
         .route("/readyz", get(ready))
         .route("/api/v1/server-info", get(server_info))
@@ -81,11 +106,12 @@ fn build_app(config: config::Config, auth: Option<auth::AuthService>) -> Router 
         .fallback(|| async { (StatusCode::NOT_FOUND, Json(ApiError { code: "NOT_FOUND" })) })
         .layer(DefaultBodyLimit::max(4096))
         .layer(middleware::map_response(no_store))
-        .with_state(Arc::new(AppState {
-            config,
-            auth,
-            world,
-        }))
+        .layer(middleware::from_fn_with_state(
+            metrics,
+            observability::request,
+        ))
+        .with_state(state.clone());
+    (router, monitor::router(state))
 }
 
 async fn no_store(mut response: Response) -> Response {
@@ -112,12 +138,7 @@ async fn ready(State(state): State<Arc<AppState>>) -> Response {
     if let Some(auth) = &state.auth
         && !auth.healthy().await
     {
-        return (
-            StatusCode::SERVICE_UNAVAILABLE,
-            Json(ApiError {
-                code: "DATABASE_UNAVAILABLE",
-            }),
-        )
+        return auth::AuthError(StatusCode::SERVICE_UNAVAILABLE, "DATABASE_UNAVAILABLE")
             .into_response();
     }
     health(State(state)).await.into_response()

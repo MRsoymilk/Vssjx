@@ -82,7 +82,8 @@ struct Character {
 }
 const CHARACTER_COLUMNS: &str = "id, display_name, name_rules_version, rules_version, job, gender, school, level, xp, gold, hp, mp, quest_stage, map_id, cell_x, cell_y, state_revision::text";
 
-fn database_error(_: sqlx::Error) -> AuthError {
+fn database_error(error: sqlx::Error) -> AuthError {
+    crate::observability::database_error(&error, "characters");
     AuthError(StatusCode::SERVICE_UNAVAILABLE, "DATABASE_UNAVAILABLE")
 }
 

@@ -98,6 +98,9 @@ pub struct ChatHub {
     last_drain: Instant,
 }
 impl ChatHub {
+    pub(crate) fn monitor_snapshot(&self) -> serde_json::Value {
+        serde_json::json!({"pending":self.pending.len(),"history":self.history.len(),"receipts":self.receipts.len()})
+    }
     pub fn new(config: ChatConfig) -> Self {
         Self {
             epoch: Uuid::new_v4(),

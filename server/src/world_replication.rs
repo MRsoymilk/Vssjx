@@ -63,7 +63,7 @@ impl Default for Publisher {
 }
 impl Publisher {
     /// Called by the sole world tick task, NOT by connection handlers.
-    pub fn publish(&self, source_revision: u64, entities: Vec<Entity>) {
+    pub fn publish(&self, source_revision: u64, entities: Vec<Entity>) -> usize {
         let previous = self.inner.lock().expect("publication").current.clone();
         let seq = previous
             .seq
@@ -71,6 +71,7 @@ impl Publisher {
             .filter(|v| *v <= i64::MAX as u64)
             .expect("world stream exhausted");
         let delta = encode_delta(previous.epoch, seq, &previous.entities, &entities);
+        let encoded_bytes = delta.len();
         let current = Arc::new(Publication {
             epoch: previous.epoch,
             seq,
@@ -82,6 +83,10 @@ impl Publisher {
         let mut published = self.inner.lock().expect("publication");
         published.current = current.clone();
         let _ = published.sender.send(current);
+        encoded_bytes
+    }
+    pub(crate) fn sequence(&self) -> u64 {
+        self.inner.lock().expect("publication").current.seq
     }
     /// Subscription and baseline capture have the same linearization point.
     pub fn subscribe(&self) -> (Arc<Publication>, broadcast::Receiver<Arc<Publication>>) {

@@ -34,7 +34,7 @@ def main():
     binary = ROOT / 'server/target/debug/vssjx-server'
     with PostgresFixture() as database:
         env = dict(os.environ, SSJX_DATABASE_URL=database.url, SSJX_BIND_ADDR='127.0.0.1:0', RUST_LOG='info', SSJX_ENV_FILE='',
-                   SSJX_AUTH_ACCESS_SECONDS='120', SSJX_AUTH_REFRESH_SECONDS='600')
+                   SSJX_AUTH_ACCESS_SECONDS='120', SSJX_AUTH_REFRESH_SECONDS='600', SSJX_MONITOR_BIND_ADDR='', SSJX_LOG_DIR='')
         logs = []
 
         def start():

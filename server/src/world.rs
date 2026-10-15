@@ -4,13 +4,14 @@ use crate::{
     AppState,
     auth::{self, AuthError, AuthService, Peer},
     chat::{ChatConfig, ChatHub, ChatResult},
+    observability::{Observability, RequestId},
     world_map::{Motion, WorldMap, config_hash},
     world_replication::{Publication, Publisher, SYNC_VERSION},
 };
 use axum::{
     Json,
     extract::{
-        State, WebSocketUpgrade,
+        Extension, State, WebSocketUpgrade,
         rejection::JsonRejection,
         ws::{Message, WebSocket},
     },
@@ -21,12 +22,14 @@ use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
 use sqlx::Row;
+use std::sync::atomic::Ordering;
 use std::{
     collections::HashMap,
     sync::{Arc, Mutex},
     time::{Duration, Instant},
 };
 use tokio::sync::{Mutex as AsyncMutex, Semaphore};
+use tracing::Instrument;
 use uuid::Uuid;
 
 #[derive(Clone, Copy)]
@@ -101,6 +104,7 @@ struct StateData {
     next_net_id: u32,
 }
 pub struct WorldHub {
+    metrics: Arc<Observability>,
     data: Mutex<StateData>,
     admissions: AsyncMutex<()>,
     map: WorldMap,
@@ -126,7 +130,11 @@ struct SavedPosition {
 }
 impl WorldHub {
     pub fn new(config: WorldConfig) -> Arc<Self> {
+        Self::with_metrics(config, Arc::new(Observability::default()))
+    }
+    pub fn with_metrics(config: WorldConfig, metrics: Arc<Observability>) -> Arc<Self> {
         let hub = Arc::new(Self {
+            metrics,
             data: Mutex::new(StateData {
                 actors: HashMap::new(),
                 revision: 0,
@@ -172,10 +180,34 @@ impl WorldHub {
                 };
                 // No world-state lock is held while sorting/encoding for network IO.
                 entities.sort_unstable_by_key(|e| e.net_id);
-                hub.publications.publish(revision, entities);
+                let bytes = hub.publications.publish(revision, entities);
+                hub.metrics.record_tick(
+                    (dt * 1_000_000.0) as u64,
+                    now.elapsed().as_micros() as u64,
+                    bytes,
+                );
             }
         });
         hub
+    }
+    pub(crate) fn monitor_snapshot(&self) -> Value {
+        let (connected, retained, moving, chat) = {
+            let state = self.data.lock().expect("world state");
+            (
+                state.actors.values().filter(|a| a.connected).count(),
+                state.actors.len(),
+                state
+                    .actors
+                    .values()
+                    .filter(|a| {
+                        a.connected && (a.motion.next.is_some() || !a.motion.route.is_empty())
+                    })
+                    .count(),
+                state.chat.monitor_snapshot(),
+            )
+        };
+        json!({"map_id":"qingyun_trail","max_players":self.config.max_players,"connected_players":connected,"retained_players":retained,"moving_players":moving,
+            "world_seq":self.publications.sequence().to_string(),"last_tick_age_ms":crate::observability::now_ms().saturating_sub(self.metrics.last_tick_ms.load(Ordering::Relaxed)),"chat":chat})
     }
     fn position(actor: &CharacterActor) -> SavedPosition {
         SavedPosition {
@@ -415,7 +447,8 @@ impl WorldHub {
 fn error(status: u16, code: &'static str) -> AuthError {
     AuthError(StatusCode::from_u16(status).expect("status"), code)
 }
-fn db_error(_: sqlx::Error) -> AuthError {
+fn db_error(cause: sqlx::Error) -> AuthError {
+    crate::observability::database_error(&cause, "world");
     error(503, "DATABASE_UNAVAILABLE")
 }
 pub fn decimal(raw: &str) -> Result<u64, AuthError> {
@@ -512,33 +545,65 @@ pub enum ClientMessage {
         text: String,
     },
 }
-async fn send(socket: &mut WebSocket, value: Value) -> Result<(), ()> {
+struct ObservedSocket {
+    inner: WebSocket,
+    metrics: Arc<Observability>,
+    id: Uuid,
+}
+impl ObservedSocket {
+    async fn recv(&mut self) -> Option<Result<Message, axum::Error>> {
+        let message = self.inner.recv().await;
+        if matches!(message, Some(Err(_))) {
+            self.metrics
+                .event("websocket", "WORLD_RECEIVE_FAILED", self.id);
+            // Tungstenite's raw error may contain peer-supplied protocol data.
+            tracing::warn!(code = "WORLD_RECEIVE_FAILED", "world socket receive failed");
+        }
+        message
+    }
+    async fn send(&mut self, message: Message) -> Result<(), ()> {
+        let bytes = match &message {
+            Message::Text(text) => text.len(),
+            Message::Binary(bytes) => bytes.len(),
+            _ => 0,
+        };
+        let result = tokio::time::timeout(Duration::from_secs(2), self.inner.send(message)).await;
+        if matches!(result, Ok(Ok(()))) {
+            self.metrics
+                .ws_sent_bytes
+                .fetch_add(bytes as u64, Ordering::Relaxed);
+            Ok(())
+        } else {
+            self.metrics
+                .ws_send_failures
+                .fetch_add(1, Ordering::Relaxed);
+            self.metrics
+                .event("websocket", "WORLD_SEND_FAILED", self.id);
+            tracing::warn!("world socket send failed or timed out");
+            Err(())
+        }
+    }
+}
+async fn send(socket: &mut ObservedSocket, value: Value) -> Result<(), ()> {
     send_raw(socket, value.to_string()).await
 }
-async fn send_raw(socket: &mut WebSocket, text: String) -> Result<(), ()> {
-    tokio::time::timeout(
-        Duration::from_secs(2),
-        socket.send(Message::Text(text.into())),
-    )
-    .await
-    .map_err(|_| ())?
-    .map_err(|_| ())
+async fn send_raw(socket: &mut ObservedSocket, text: String) -> Result<(), ()> {
+    socket.send(Message::Text(text.into())).await
 }
-async fn send_delta(socket: &mut WebSocket, publication: &Publication) -> Result<(), ()> {
-    tokio::time::timeout(
-        Duration::from_secs(2),
-        socket.send(Message::Binary(publication.delta.clone())),
-    )
-    .await
-    .map_err(|_| ())?
-    .map_err(|_| ())
+async fn send_delta(socket: &mut ObservedSocket, publication: &Publication) -> Result<(), ()> {
+    socket
+        .send(Message::Binary(publication.delta.clone()))
+        .await
 }
-async fn fail(socket: &mut WebSocket, code: &str) {
+async fn fail(socket: &mut ObservedSocket, code: &'static str) {
+    socket.metrics.event("websocket", code, socket.id);
+    tracing::warn!(code, "world operation rejected");
     let _ = send(socket, json!({"type":"error","code":code})).await;
 }
 pub(crate) async fn upgrade(
     State(state): State<Arc<AppState>>,
     peer: Peer,
+    Extension(request_id): Extension<RequestId>,
     headers: HeaderMap,
     ws: WebSocketUpgrade,
 ) -> Result<Response, AuthError> {
@@ -560,12 +625,30 @@ pub(crate) async fn upgrade(
         .max_frame_size(2048)
         .on_upgrade(move |socket| async move {
             let _permit = permit;
-            connection(socket, auth, hub).await;
+            let connection_id = Uuid::new_v4();
+            let span =
+                tracing::error_span!("world_socket", %connection_id, request_id=%request_id.0);
+            connection(socket, auth, hub, connection_id)
+                .instrument(span)
+                .await;
         }))
 }
-async fn connection(mut socket: WebSocket, auth: AuthService, hub: Arc<WorldHub>) {
+async fn connection(socket: WebSocket, auth: AuthService, hub: Arc<WorldHub>, id: Uuid) {
+    let _connection = hub.metrics.socket(id);
+    let mut socket = ObservedSocket {
+        inner: socket,
+        metrics: hub.metrics.clone(),
+        id,
+    };
     let handshake = tokio::time::timeout(Duration::from_secs(5), socket.recv()).await;
     let Ok(Some(Ok(Message::Text(text)))) = handshake else {
+        socket
+            .metrics
+            .event("websocket", "HANDSHAKE_TIMEOUT_OR_CLOSED", id);
+        tracing::warn!(
+            code = "HANDSHAKE_TIMEOUT_OR_CLOSED",
+            "world handshake not completed"
+        );
         return;
     };
     let Ok(ClientMessage::Exchange {
@@ -597,7 +680,8 @@ async fn connection(mut socket: WebSocket, auth: AuthService, hub: Arc<WorldHub>
             fail(&mut socket, "INVALID_TICKET").await;
             return;
         }
-        Err(_) => {
+        Err(error) => {
+            crate::observability::database_error(&error, "world_ticket_exchange");
             fail(&mut socket, "DATABASE_UNAVAILABLE").await;
             return;
         }
@@ -613,6 +697,10 @@ async fn connection(mut socket: WebSocket, auth: AuthService, hub: Arc<WorldHub>
         }
     };
     let stream = Uuid::new_v4();
+    tracing::info!(
+        connection_epoch = owner.epoch,
+        "world connection authenticated"
+    );
     let (mut baseline, mut updates) = hub.publications.subscribe();
     let synchronized = tokio::time::timeout(Duration::from_secs(5), async {
         while baseline.source_revision < owner.joined_revision
@@ -624,6 +712,13 @@ async fn connection(mut socket: WebSocket, auth: AuthService, hub: Arc<WorldHub>
     })
     .await;
     if !matches!(synchronized, Ok(Ok(()))) {
+        socket
+            .metrics
+            .event("websocket", "WORLD_BASELINE_TIMEOUT", id);
+        tracing::warn!(
+            code = "WORLD_BASELINE_TIMEOUT",
+            "world baseline unavailable"
+        );
         hub.disconnect(&auth, &owner, false).await;
         return;
     }
@@ -684,7 +779,7 @@ async fn connection(mut socket: WebSocket, auth: AuthService, hub: Arc<WorldHub>
             },
             _=pulse.tick()=>{
                 if !hub.current(&owner){fail(&mut socket,"SESSION_REPLACED").await;break;}
-                if heard.elapsed()>Duration::from_secs(15){break;}
+                if heard.elapsed()>Duration::from_secs(15){socket.metrics.event("websocket","HEARTBEAT_TIMEOUT",id);tracing::warn!(code="HEARTBEAT_TIMEOUT","world heartbeat expired");break;}
                 if checked.elapsed()>=Duration::from_secs(1){
                     match auth.live_session(owner.session).await{Ok(true)=>{},Ok(false)=>{fail(&mut socket,"SESSION_REVOKED").await;leave=true;break},Err(_)=>{fail(&mut socket,"DATABASE_UNAVAILABLE").await;break}}
                     checked=Instant::now();
@@ -713,11 +808,12 @@ async fn connection(mut socket: WebSocket, auth: AuthService, hub: Arc<WorldHub>
             }
         }
     }
+    tracing::info!(leave, "world session ending");
     hub.disconnect(&auth, &owner, leave).await;
     let _ = tokio::time::timeout(Duration::from_secs(1), socket.send(Message::Close(None))).await;
 }
 async fn send_snapshot(
-    socket: &mut WebSocket,
+    socket: &mut ObservedSocket,
     stream: Uuid,
     publication: &Publication,
 ) -> Result<(), ()> {

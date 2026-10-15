@@ -10,7 +10,10 @@ use axum::{
 use rand::{RngCore, rngs::OsRng};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
-use sqlx::{PgPool, Row, postgres::PgPoolOptions};
+use sqlx::{
+    ConnectOptions, PgPool, Row,
+    postgres::{PgConnectOptions, PgPoolOptions},
+};
 use std::{
     collections::HashMap,
     net::IpAddr,
@@ -80,12 +83,16 @@ impl Limiter {
 pub struct AuthError(pub StatusCode, pub &'static str);
 impl IntoResponse for AuthError {
     fn into_response(self) -> Response {
-        (
+        let mut response = (
             self.0,
             [("cache-control", "no-store")],
             Json(serde_json_error(self.1)),
         )
-            .into_response()
+            .into_response();
+        response
+            .extensions_mut()
+            .insert(crate::observability::ErrorCode(self.1));
+        response
     }
 }
 #[derive(Serialize)]
@@ -97,6 +104,10 @@ fn serde_json_error(code: &'static str) -> ErrorBody {
 }
 fn unavailable() -> AuthError {
     AuthError(StatusCode::SERVICE_UNAVAILABLE, "DATABASE_UNAVAILABLE")
+}
+fn database_unavailable(error: sqlx::Error) -> AuthError {
+    crate::observability::database_error(&error, "auth");
+    unavailable()
 }
 fn unauthorized() -> AuthError {
     AuthError(StatusCode::UNAUTHORIZED, "UNAUTHORIZED")
@@ -171,6 +182,10 @@ pub(crate) fn token_digest(raw: &str) -> Result<Vec<u8>, AuthError> {
 
 impl AuthService {
     pub async fn connect(url: &str, settings: AuthConfig) -> Result<Self, &'static str> {
+        let options = url
+            .parse::<PgConnectOptions>()
+            .map_err(|_| "invalid database configuration")?
+            .disable_statement_logging();
         let pool = PgPoolOptions::new()
             .max_connections(settings.db_max_connections)
             .acquire_timeout(Duration::from_secs(u64::from(settings.db_acquire_timeout_seconds)))
@@ -184,13 +199,19 @@ impl AuthService {
                     Ok(())
                 })
             })
-            .connect(url)
+            .connect_with(options)
             .await
-            .map_err(|_| "database connection failed")?;
+            .map_err(|error| {
+                crate::observability::database_error(&error, "connect");
+                "database connection failed"
+            })?;
         sqlx::migrate!("./migrations")
             .run(&pool)
             .await
-            .map_err(|_| "database migration failed")?;
+            .map_err(|_| {
+                tracing::error!(operation = "migrate", "database migration failed");
+                "database migration failed"
+            })?;
         let dummy_hash = tokio::task::spawn_blocking(|| {
             Argon2::default()
                 .hash_password(
@@ -216,14 +237,26 @@ impl AuthService {
     }
 
     pub async fn healthy(&self) -> bool {
-        matches!(
-            tokio::time::timeout(
-                Duration::from_secs(u64::from(self.settings.db_ready_timeout_seconds)),
-                sqlx::query("SELECT 1").execute(&self.pool)
-            )
-            .await,
-            Ok(Ok(_))
+        match tokio::time::timeout(
+            Duration::from_secs(u64::from(self.settings.db_ready_timeout_seconds)),
+            sqlx::query("SELECT 1").execute(&self.pool),
         )
+        .await
+        {
+            Ok(Ok(_)) => true,
+            Ok(Err(error)) => {
+                crate::observability::database_error(&error, "health_probe");
+                false
+            }
+            Err(_) => {
+                tracing::error!(
+                    operation = "health_probe",
+                    kind = "timeout",
+                    "database health probe timed out"
+                );
+                false
+            }
+        }
     }
     pub(crate) fn admit(&self, ip: IpAddr, username: Option<&str>) -> Result<(), AuthError> {
         if self.limiter.lock().map_err(|_| busy())?.admit(ip, username) {
@@ -282,7 +315,7 @@ impl AuthService {
         let hash = self.hash(credentials.password).await?;
         let id = Uuid::new_v4();
         let inserted = sqlx::query("INSERT INTO accounts (id, username, password_hash) VALUES ($1, $2, $3) ON CONFLICT (username) DO NOTHING")
-            .bind(id).bind(&username).bind(hash).execute(&self.pool).await.map_err(|_| unavailable())?;
+            .bind(id).bind(&username).bind(hash).execute(&self.pool).await.map_err(database_unavailable)?;
         if inserted.rows_affected() == 0 {
             return Err(AuthError(StatusCode::CONFLICT, "ACCOUNT_EXISTS"));
         }
@@ -299,7 +332,7 @@ impl AuthService {
                 .bind(&username)
                 .fetch_optional(&self.pool)
                 .await
-                .map_err(|_| unavailable())?;
+                .map_err(database_unavailable)?;
         let hash = account
             .as_ref()
             .map(|r| r.get::<String, _>("password_hash"))
@@ -312,22 +345,22 @@ impl AuthService {
             return Err(unauthorized());
         }
         let account_id: Uuid = row.get("id");
-        let mut transaction = self.pool.begin().await.map_err(|_| unavailable())?;
+        let mut transaction = self.pool.begin().await.map_err(database_unavailable)?;
         let enabled = sqlx::query("SELECT disabled FROM accounts WHERE id = $1 FOR UPDATE")
             .bind(account_id)
             .fetch_one(&mut *transaction)
             .await
-            .map_err(|_| unavailable())?;
+            .map_err(database_unavailable)?;
         if enabled.get::<bool, _>("disabled") {
             return Err(unauthorized());
         }
         sqlx::query("DELETE FROM sessions WHERE account_id = $1 AND (revoked_at IS NOT NULL OR refresh_expires_at <= NOW())")
-            .bind(account_id).execute(&mut *transaction).await.map_err(|_| unavailable())?;
+            .bind(account_id).execute(&mut *transaction).await.map_err(database_unavailable)?;
         let count: i64 = sqlx::query_scalar("SELECT COUNT(*) FROM sessions WHERE account_id = $1")
             .bind(account_id)
             .fetch_one(&mut *transaction)
             .await
-            .map_err(|_| unavailable())?;
+            .map_err(database_unavailable)?;
         if count >= i64::from(self.settings.max_sessions) {
             return Err(AuthError(
                 StatusCode::TOO_MANY_REQUESTS,
@@ -347,19 +380,19 @@ impl AuthService {
         };
         sqlx::query("INSERT INTO sessions (id, account_id, access_digest, refresh_digest, access_expires_at, refresh_expires_at) VALUES ($1, $2, $3, $4, NOW() + $5 * INTERVAL '1 second', NOW() + $6 * INTERVAL '1 second')")
             .bind(response.session_id).bind(account_id).bind(token_digest(&response.access_token)?).bind(token_digest(&response.refresh_token)?)
-            .bind(response.expires_in).bind(response.refresh_expires_in).execute(&mut *transaction).await.map_err(|_| unavailable())?;
+            .bind(response.expires_in).bind(response.refresh_expires_in).execute(&mut *transaction).await.map_err(database_unavailable)?;
         sqlx::query("INSERT INTO session_access_history (access_digest, session_id, expires_at) VALUES ($1, $2, NOW() + $3 * INTERVAL '1 second')")
             .bind(token_digest(&response.access_token)?).bind(response.session_id).bind(response.expires_in)
-            .execute(&mut *transaction).await.map_err(|_| unavailable())?;
-        transaction.commit().await.map_err(|_| unavailable())?;
+            .execute(&mut *transaction).await.map_err(database_unavailable)?;
+        transaction.commit().await.map_err(database_unavailable)?;
         Ok(response)
     }
 
     async fn refresh(&self, refresh_token: &str) -> Result<SessionResponse, AuthError> {
         let digest = token_digest(refresh_token)?;
-        let mut transaction = self.pool.begin().await.map_err(|_| unavailable())?;
+        let mut transaction = self.pool.begin().await.map_err(database_unavailable)?;
         let row = sqlx::query("SELECT s.id, s.account_id, a.username, FLOOR(EXTRACT(EPOCH FROM (s.refresh_expires_at - NOW())))::int AS remaining FROM sessions s JOIN accounts a ON a.id = s.account_id WHERE s.refresh_digest = $1 AND s.revoked_at IS NULL AND s.refresh_expires_at > NOW() AND NOT a.disabled FOR UPDATE OF s")
-            .bind(digest).fetch_optional(&mut *transaction).await.map_err(|_| unavailable())?.ok_or_else(unauthorized)?;
+            .bind(digest).fetch_optional(&mut *transaction).await.map_err(database_unavailable)?.ok_or_else(unauthorized)?;
         let remaining: i32 = row.get("remaining");
         if remaining <= 0 {
             return Err(unauthorized());
@@ -377,16 +410,16 @@ impl AuthService {
         };
         sqlx::query("UPDATE sessions SET access_digest=$1, refresh_digest=$2, access_expires_at=NOW() + $3 * INTERVAL '1 second' WHERE id=$4")
             .bind(token_digest(&response.access_token)?).bind(token_digest(&response.refresh_token)?).bind(response.expires_in).bind(response.session_id)
-            .execute(&mut *transaction).await.map_err(|_| unavailable())?;
+            .execute(&mut *transaction).await.map_err(database_unavailable)?;
         sqlx::query("DELETE FROM session_access_history WHERE session_id=$1 AND expires_at<=NOW()")
             .bind(response.session_id)
             .execute(&mut *transaction)
             .await
-            .map_err(|_| unavailable())?;
+            .map_err(database_unavailable)?;
         sqlx::query("INSERT INTO session_access_history (access_digest, session_id, expires_at) VALUES ($1, $2, NOW() + $3 * INTERVAL '1 second')")
             .bind(token_digest(&response.access_token)?).bind(response.session_id).bind(response.expires_in)
-            .execute(&mut *transaction).await.map_err(|_| unavailable())?;
-        transaction.commit().await.map_err(|_| unavailable())?;
+            .execute(&mut *transaction).await.map_err(database_unavailable)?;
+        transaction.commit().await.map_err(database_unavailable)?;
         Ok(response)
     }
 
@@ -396,12 +429,12 @@ impl AuthService {
 
     pub(crate) async fn live_session(&self, id: Uuid) -> Result<bool, AuthError> {
         sqlx::query_scalar("SELECT EXISTS(SELECT 1 FROM sessions s JOIN accounts a ON a.id=s.account_id WHERE s.id=$1 AND s.revoked_at IS NULL AND s.access_expires_at>clock_timestamp() AND s.refresh_expires_at>clock_timestamp() AND NOT a.disabled)")
-            .bind(id).fetch_one(&self.pool).await.map_err(|_| unavailable())
+            .bind(id).fetch_one(&self.pool).await.map_err(database_unavailable)
     }
 
     pub(crate) async fn chat_muted(&self, id: Uuid) -> Result<bool, AuthError> {
         sqlx::query_scalar("SELECT COALESCE(a.chat_muted_until>clock_timestamp(),FALSE) FROM sessions s JOIN accounts a ON a.id=s.account_id WHERE s.id=$1 AND s.revoked_at IS NULL AND s.access_expires_at>clock_timestamp() AND s.refresh_expires_at>clock_timestamp() AND NOT a.disabled")
-            .bind(id).fetch_optional(&self.pool).await.map_err(|_|unavailable())?.ok_or(AuthError(StatusCode::UNAUTHORIZED,"SESSION_REVOKED"))
+            .bind(id).fetch_optional(&self.pool).await.map_err(database_unavailable)?.ok_or(AuthError(StatusCode::UNAUTHORIZED,"SESSION_REVOKED"))
     }
 
     pub(crate) async fn authorize_in(
@@ -410,7 +443,7 @@ impl AuthService {
         bearer: &str,
     ) -> Result<Account, AuthError> {
         let row = sqlx::query("SELECT a.id, a.username FROM sessions s JOIN accounts a ON a.id=s.account_id WHERE s.access_digest=$1 AND s.revoked_at IS NULL AND s.access_expires_at > clock_timestamp() AND s.refresh_expires_at > clock_timestamp() AND NOT a.disabled FOR SHARE OF s")
-            .bind(token_digest(bearer)?).fetch_optional(connection).await.map_err(|_| unavailable())?.ok_or_else(unauthorized)?;
+            .bind(token_digest(bearer)?).fetch_optional(connection).await.map_err(database_unavailable)?.ok_or_else(unauthorized)?;
         Ok(Account {
             id: row.get("id"),
             username: row.get("username"),
@@ -419,7 +452,7 @@ impl AuthService {
 
     pub(crate) async fn me(&self, bearer: &str) -> Result<Account, AuthError> {
         let row = sqlx::query("SELECT a.id, a.username FROM sessions s JOIN accounts a ON a.id=s.account_id WHERE s.access_digest=$1 AND s.revoked_at IS NULL AND s.access_expires_at > NOW() AND s.refresh_expires_at > NOW() AND NOT a.disabled")
-            .bind(token_digest(bearer)?).fetch_optional(&self.pool).await.map_err(|_| unavailable())?.ok_or_else(unauthorized)?;
+            .bind(token_digest(bearer)?).fetch_optional(&self.pool).await.map_err(database_unavailable)?.ok_or_else(unauthorized)?;
         Ok(Account {
             id: row.get("id"),
             username: row.get("username"),
@@ -432,7 +465,7 @@ impl AuthService {
         .bind(token_digest(bearer)?)
         .execute(&self.pool)
         .await
-        .map_err(|_| unavailable())?;
+        .map_err(database_unavailable)?;
         Ok(())
     }
 }

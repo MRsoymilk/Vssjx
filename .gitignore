@@ -10,3 +10,5 @@ __pycache__/
 .env
 .env.*
 !.env.sample.txt
+/logs/
+/server/logs/

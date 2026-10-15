@@ -38,7 +38,7 @@ def main():
     with PostgresFixture() as db, tempfile.TemporaryDirectory(prefix='vssjx-world-', dir='/tmp/opencode') as scratch:
         env = {k: v for k, v in os.environ.items() if not k.startswith('SSJX_')}
         env.update(SSJX_ENV_FILE='', SSJX_DATABASE_URL=db.url, SSJX_BIND_ADDR='127.0.0.1:0', RUST_LOG='info',
-                   SSJX_AUTH_RATE_IP='1000', SSJX_AUTH_RATE_GLOBAL='10000', SSJX_AUTH_RATE_ACCOUNT='100', SSJX_WORLD_SAVE_SECONDS='1', SSJX_WORLD_RECONNECT_SECONDS='2')
+                   SSJX_AUTH_RATE_IP='1000', SSJX_AUTH_RATE_GLOBAL='10000', SSJX_AUTH_RATE_ACCOUNT='100', SSJX_WORLD_SAVE_SECONDS='1', SSJX_WORLD_RECONNECT_SECONDS='2', SSJX_MONITOR_BIND_ADDR='', SSJX_LOG_DIR='')
         def start():
             process = subprocess.Popen([str(ROOT / 'server/target/debug/vssjx-server')], env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
             try: return process, wait_for_server(process)

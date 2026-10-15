@@ -31,7 +31,7 @@ def mem_available():
 
 def fingerprint():
     digest = hashlib.sha256()
-    paths = sorted([*ROOT.glob('server/src/*.rs'), *ROOT.glob('server/migrations/*.sql'), ROOT / 'server/Cargo.lock', ROOT / 'shared/data/qingyun-v1.json'])
+    paths = sorted([*(p for p in ROOT.glob('server/src/**/*') if p.is_file()), *ROOT.glob('server/migrations/*.sql'), ROOT / 'server/Cargo.toml', ROOT / 'server/Cargo.lock', ROOT / 'shared/data/qingyun-v1.json'])
     for path in paths:
         digest.update(str(path.relative_to(ROOT)).encode() + b'\0' + path.read_bytes())
     return digest.hexdigest()
@@ -80,7 +80,7 @@ def main():
         # database and password-worker limits otherwise retain production defaults.
         overrides = {'SSJX_ENV_FILE': '', 'SSJX_BIND_ADDR': '127.0.0.1:0', 'RUST_LOG': 'info',
                      'SSJX_AUTH_RATE_GLOBAL': '100000', 'SSJX_AUTH_RATE_IP': '10000', 'SSJX_AUTH_RATE_ACCOUNT': '1000',
-                     'SSJX_AUTH_ACCESS_SECONDS': '3600'}
+                     'SSJX_AUTH_ACCESS_SECONDS': '3600', 'SSJX_MONITOR_BIND_ADDR': '', 'SSJX_LOG_DIR': ''}
         env.update(overrides, SSJX_DATABASE_URL=db.url)
         metadata['nonsecret_overrides'] = overrides
         try:

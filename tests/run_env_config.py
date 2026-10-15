@@ -16,6 +16,7 @@ def main():
     subprocess.run(['cargo', 'build', '--locked', '--manifest-path', str(ROOT / 'server/Cargo.toml')], check=True)
     binary = ROOT / 'server/target/debug/vssjx-server'
     clean = {k: v for k, v in os.environ.items() if not k.startswith('SSJX_') and k != 'RUST_LOG'}
+    clean.update(SSJX_MONITOR_BIND_ADDR='', SSJX_LOG_DIR='')
     scratch = '/tmp/opencode' if Path('/tmp/opencode').is_dir() else None
     with tempfile.TemporaryDirectory(prefix='vssjx-env-', dir=scratch) as directory:
         directory = Path(directory)

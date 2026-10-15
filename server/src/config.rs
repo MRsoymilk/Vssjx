@@ -12,6 +12,7 @@ pub struct Config {
     pub server_name: String,
     pub database_url: Option<String>,
     pub log_filter: String,
+    pub monitoring: MonitoringConfig,
     pub auth: AuthConfig,
     pub world: crate::world::WorldConfig,
 }
@@ -79,6 +80,7 @@ impl Config {
             return Err("Invalid RUST_LOG filter".into());
         }
         config.auth = AuthConfig::from_values(values)?;
+        config.monitoring = MonitoringConfig::from_values(values)?;
         config.world = crate::world::WorldConfig {
             max_players: number(values, "SSJX_WORLD_MAX_PLAYERS", 1000, 2, 1000)? as usize,
             save_seconds: u64::from(number(values, "SSJX_WORLD_SAVE_SECONDS", 10, 1, 30)?),
@@ -118,9 +120,56 @@ impl Config {
             server_name: server_name.into(),
             database_url: None,
             log_filter: "info".into(),
+            monitoring: MonitoringConfig::default(),
             auth: AuthConfig::default(),
             world: crate::world::WorldConfig::default(),
         })
+    }
+}
+
+// No credentials: the monitoring listener is deliberately loopback-only.
+#[derive(Clone)]
+pub struct MonitoringConfig {
+    pub bind_addr: Option<SocketAddr>,
+    pub log_dir: Option<PathBuf>,
+    pub log_file_bytes: u64,
+    pub log_files: u32,
+}
+impl Default for MonitoringConfig {
+    fn default() -> Self {
+        Self {
+            bind_addr: Some("127.0.0.1:9090".parse().expect("default monitor address")),
+            log_dir: Some(PathBuf::from("logs")),
+            log_file_bytes: 10 * 1024 * 1024,
+            log_files: 7,
+        }
+    }
+}
+impl MonitoringConfig {
+    fn from_values(values: &HashMap<String, String>) -> Result<Self, String> {
+        let mut config = Self::default();
+        if let Some(raw) = values.get("SSJX_MONITOR_BIND_ADDR") {
+            config.bind_addr = if raw.is_empty() {
+                None
+            } else {
+                let addr: SocketAddr = raw.parse().map_err(|_| "Invalid SSJX_MONITOR_BIND_ADDR")?;
+                if !addr.ip().is_loopback() {
+                    return Err("SSJX_MONITOR_BIND_ADDR must use a loopback IP; use SSH forwarding for remote access".into());
+                }
+                Some(addr)
+            };
+        }
+        if let Some(raw) = values.get("SSJX_LOG_DIR") {
+            config.log_dir = if raw.is_empty() {
+                None
+            } else {
+                Some(PathBuf::from(raw))
+            };
+        }
+        config.log_file_bytes =
+            u64::from(number(values, "SSJX_LOG_FILE_MIB", 10, 1, 1024)?) * 1024 * 1024;
+        config.log_files = number(values, "SSJX_LOG_FILES", 7, 1, 100)?;
+        Ok(config)
     }
 }
 

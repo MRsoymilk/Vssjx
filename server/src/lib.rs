@@ -1,4 +1,5 @@
 pub mod auth;
+pub mod attributes;
 pub mod announcements;
 pub mod characters;
 pub mod chat;

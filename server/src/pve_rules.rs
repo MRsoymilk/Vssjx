@@ -8,6 +8,7 @@ pub const RULES: &str = "qingyun-pve-v1";
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "snake_case")]
 pub enum Action {
+    Allocate,
     Accept,
     Claim,
     Restore,
@@ -26,6 +27,8 @@ pub struct Command {
     pub target: Option<String>,
     pub battle_id: Option<Uuid>,
     pub expected_revision: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub attributes: Option<[i32; 5]>,
 }
 #[derive(Clone, Copy, Debug, Serialize)]
 pub struct Stats {

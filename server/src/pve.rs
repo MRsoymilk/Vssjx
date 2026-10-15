@@ -27,6 +27,7 @@ struct Loaded {
     battle: Option<Battle>,
     potions: i32,
     equipped: bool,
+    allocated: [i32; 5],
 }
 fn database(error: sqlx::Error) -> AuthError {
     crate::observability::database_error(&error, "online_pve");
@@ -40,7 +41,7 @@ async fn load(tx: &mut Transaction<'_, Postgres>, context: &Context) -> Result<L
     let account: Option<Uuid> = sqlx::query_scalar("SELECT s.account_id FROM sessions s JOIN accounts a ON a.id=s.account_id WHERE s.id=$1 AND NOT a.disabled AND s.revoked_at IS NULL AND s.access_expires_at>clock_timestamp() AND s.refresh_expires_at>clock_timestamp() FOR SHARE OF s,a")
         .bind(context.session).fetch_optional(&mut **tx).await.map_err(database)?;
     let account = account.ok_or(AuthError(StatusCode::UNAUTHORIZED, "SESSION_REVOKED"))?;
-    let row=sqlx::query(&format!("SELECT {CHARACTER_COLUMNS},defeated_mask,active_battle_id,owner_epoch FROM characters WHERE id=$1 AND account_id=$2 FOR UPDATE"))
+    let row=sqlx::query(&format!("SELECT {CHARACTER_COLUMNS},defeated_mask,active_battle_id,owner_epoch,allocated_attributes FROM characters WHERE id=$1 AND account_id=$2 FOR UPDATE"))
         .bind(context.character).bind(account).fetch_optional(&mut **tx).await.map_err(database)?
         .ok_or(AuthError(StatusCode::FORBIDDEN,"FORBIDDEN"))?;
     if row.get::<i64, _>("owner_epoch") != context.owner {
@@ -69,9 +70,21 @@ async fn load(tx: &mut Transaction<'_, Postgres>, context: &Context) -> Result<L
         battle,
         potions,
         equipped,
+        allocated: row
+            .get::<Vec<i32>, _>("allocated_attributes")
+            .try_into()
+            .map_err(|_| unavailable())?,
     })
 }
 impl Loaded {
+    fn stats(&self) -> pve_rules::Stats {
+        crate::attributes::stats(
+            self.character.job,
+            self.character.level,
+            self.equipped,
+            self.allocated,
+        )
+    }
     fn state(&self) -> Value {
         let defeated: Vec<_> = population::definitions()
             .into_iter()
@@ -79,7 +92,8 @@ impl Loaded {
             .map(|d| d.id)
             .collect();
         json!({"rules_version":pve_rules::RULES,"character":self.character,"potions":self.potions,
-            "stats":pve_rules::stats(self.character.job,self.character.level,self.equipped),
+            "stats":self.stats(),
+            "attributes":crate::attributes::profile(self.character.job,self.character.level,self.equipped,self.allocated),
             "progress":{"kills":(self.defeated&7).count_ones(),"defeated":defeated},"battle":self.battle.as_ref().map(Battle::view)})
     }
     fn rewards(&mut self, gold: i32, xp: i32) -> Result<(), &'static str> {
@@ -101,13 +115,53 @@ impl Loaded {
         Ok(())
     }
     fn restore(&mut self) {
-        let stats = pve_rules::stats(self.character.job, self.character.level, self.equipped);
+        let stats = self.stats();
         self.character.hp = stats.hp;
         self.character.mp = stats.mp;
     }
     fn apply(&mut self, command: &Command, context: &Context) -> Result<Vec<String>, &'static str> {
         if context.moving {
             return Err("PLAYER_MOVING");
+        }
+        if command.action == Action::Allocate {
+            if self.battle.is_some() {
+                return Err("BATTLE_ACTIVE");
+            }
+            if command.target.is_some() || command.battle_id.is_some() {
+                return Err("INVALID_PVE_COMMAND");
+            }
+            if command.expected_revision.as_deref() != Some(&self.character.state_revision) {
+                return Err("STALE_ATTRIBUTES");
+            }
+            let points = command.attributes.ok_or("INVALID_ATTRIBUTES")?;
+            if points.iter().any(|v| !(0..=250).contains(v)) {
+                return Err("INVALID_ATTRIBUTES");
+            }
+            if points
+                .iter()
+                .zip(self.allocated)
+                .any(|(new, old)| *new < old)
+            {
+                return Err("ATTRIBUTE_RESPEC_FORBIDDEN");
+            }
+            if crate::attributes::available(self.character.level, points) < 0 {
+                return Err("ATTRIBUTE_POINTS_EXCEEDED");
+            }
+            if points == self.allocated {
+                return Err("NO_ATTRIBUTE_CHANGE");
+            }
+            let old = self.stats();
+            self.allocated = points;
+            let new = self.stats();
+            self.character.hp += new.hp - old.hp;
+            self.character.mp += new.mp - old.mp;
+            return Ok(vec![format!(
+                "属性已保存，剩余{}点。",
+                crate::attributes::available(self.character.level, self.allocated)
+            )]);
+        }
+        if command.attributes.is_some() {
+            return Err("INVALID_PVE_COMMAND");
         }
         match command.action {
             Action::Accept | Action::Claim | Action::Restore | Action::Challenge => {
@@ -178,8 +232,7 @@ impl Loaded {
                 if command.target.is_some() {
                     return Err("INVALID_PVE_COMMAND");
                 }
-                let stats =
-                    pve_rules::stats(self.character.job, self.character.level, self.equipped);
+                let stats = self.stats();
                 let battle = self.battle.as_mut().ok_or("NO_ACTIVE_BATTLE")?;
                 if command.battle_id != Some(battle.id)
                     || command
@@ -269,8 +322,8 @@ pub async fn execute(
         }
         let character_id = loaded.character.id;
         let c = &loaded.character;
-        let revision:i64=sqlx::query_scalar("UPDATE characters SET level=$2,xp=$3,gold=$4,hp=$5,mp=$6,quest_stage=$7,defeated_mask=$8,active_battle_id=$9,state_revision=state_revision+1 WHERE id=$1 RETURNING state_revision")
-            .bind(c.id).bind(c.level).bind(c.xp).bind(c.gold).bind(c.hp).bind(c.mp).bind(c.quest_stage).bind(loaded.defeated).bind(active)
+        let revision:i64=sqlx::query_scalar("UPDATE characters SET level=$2,xp=$3,gold=$4,hp=$5,mp=$6,quest_stage=$7,defeated_mask=$8,active_battle_id=$9,allocated_attributes=$10,state_revision=state_revision+1 WHERE id=$1 RETURNING state_revision")
+            .bind(c.id).bind(c.level).bind(c.xp).bind(c.gold).bind(c.hp).bind(c.mp).bind(c.quest_stage).bind(loaded.defeated).bind(active).bind(loaded.allocated.to_vec())
             .fetch_one(&mut *tx).await.map_err(database)?;
         loaded.character.state_revision = revision.to_string();
         if loaded.potions == 0 {

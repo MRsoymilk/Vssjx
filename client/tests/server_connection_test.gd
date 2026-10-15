@@ -33,7 +33,9 @@ func _run() -> void:
 		if phase == "write":
 			form.address_input.text = "  HTTPS://Game.Example.com/ssjx/  "
 			form._return()
-			check(ServerConnectionSettings.new().load_address() == DOMAIN, "Draft persisted before process exit")
+			var persisted := ServerConnectionSettings.new()
+			var restored := persisted.load_address()
+			check(restored == DOMAIN, "Draft persisted before process exit (save: %s; load: %s)" % [form.settings.last_error, persisted.last_error])
 		else:
 			check(form.address_input.text == DOMAIN, "Address restored after process restart")
 			app._close_modal()
@@ -69,6 +71,12 @@ func _run() -> void:
 	invalid_config.save(isolated)
 	check(settings.load_address().is_empty() and not settings.last_error.is_empty(), "Malformed preference value is handled")
 	settings.save_address(DOMAIN)
+	if OS.get_name() == "Windows":
+		var native_path := ProjectSettings.globalize_path(isolated + ".native").replace("/", "\\")
+		var native_settings := ServerConnectionSettings.new(native_path)
+		check(native_settings.save_address(DOMAIN), "Native Windows path saves preferences")
+		check(ServerConnectionSettings.new(native_path).load_address() == DOMAIN, "Native Windows path restores preferences")
+		DirAccess.remove_absolute(native_settings.settings_path)
 	var form := login_form()
 	check(form.address_input.text == DOMAIN, "Login page fills persisted domain")
 	check(not app.original_cover.active, "Login page pauses cover input")

@@ -35,7 +35,7 @@ def main():
     subprocess.run([os.environ.get('GODOT_BIN', 'godot'), '--headless', '--path', str(ROOT / 'client'), 'res://tests/public_chat_test.tscn'], check=True)
     subprocess.run([os.environ.get('GODOT_BIN', 'godot'), '--headless', '--path', str(ROOT / 'client'), 'res://tests/world_delta_test.tscn'], check=True)
     subprocess.run(['cargo', 'build', '--locked', '--manifest-path', str(ROOT / 'server/Cargo.toml')], check=True)
-    with PostgresFixture() as db, tempfile.TemporaryDirectory(prefix='vssjx-world-', dir='/tmp/opencode') as scratch:
+    with PostgresFixture() as db, tempfile.TemporaryDirectory(prefix='vssjx-world-') as scratch:
         env = {k: v for k, v in os.environ.items() if not k.startswith('SSJX_')}
         env.update(SSJX_ENV_FILE='', SSJX_DATABASE_URL=db.url, SSJX_BIND_ADDR='127.0.0.1:0', RUST_LOG='info',
                    SSJX_AUTH_RATE_IP='1000', SSJX_AUTH_RATE_GLOBAL='10000', SSJX_AUTH_RATE_ACCOUNT='100', SSJX_WORLD_SAVE_SECONDS='1', SSJX_WORLD_RECONNECT_SECONDS='2', SSJX_MONITOR_BIND_ADDR='', SSJX_LOG_DIR='')
@@ -184,10 +184,10 @@ def main():
 
             sessions = {}
             for role, display in [('alice', '同图青衫'), ('bob', '同图听雪')]: sessions[role] = user('world_ui_' + role, display)
-            sync = Path(scratch)
+            sync = Path(scratch).resolve()
             for role in ('alice', 'bob'):
                 other = 'bob' if role == 'alice' else 'alice'
-                child_env = dict(env, SSJX_TEST_SERVER_URL=base, SSJX_WORLD_ROLE=role, SSJX_WORLD_SYNC=str(sync), SSJX_WORLD_OTHER=sessions[other][1], SSJX_WORLD_RENDER='1' if args.render else '0')
+                child_env = dict(env, SSJX_TEST_SERVER_URL=base, SSJX_WORLD_ROLE=role, SSJX_WORLD_SYNC=sync.as_posix(), SSJX_WORLD_OTHER=sessions[other][1], SSJX_WORLD_RENDER='1' if args.render else '0')
                 command = [sys.executable, str(ROOT / 'tests/run_offscreen.py'), '--rendering-driver', 'opengl3_es'] if args.render else [os.environ.get('GODOT_BIN', 'godot'), '--headless']
                 command += ['--path', str(ROOT / 'client'), 'res://tests/shared_world_test.tscn']
                 logfile = (args.output / f'{role}.log').open('w')

@@ -5,8 +5,8 @@ import json
 import os
 from pathlib import Path
 import platform
-import resource
 import subprocess
+import sys
 import time
 
 from pg_fixture import PostgresFixture
@@ -51,6 +51,10 @@ def main():
     parser.add_argument('--profile', type=Path, default=ROOT / 'tests/capacity_profile.json')
     parser.add_argument('--output', type=Path, default=Path('/tmp/opencode/vssjx-capacity'))
     args = parser.parse_args()
+    if not sys.platform.startswith('linux'):
+        parser.error('Capacity probes require Linux /proc metrics; report summarization is available on all platforms.')
+    import resource
+
     args.output.mkdir(parents=True, exist_ok=True)
     profile = json.loads(args.profile.read_text())
     assert 1 <= profile['players'] <= 1000

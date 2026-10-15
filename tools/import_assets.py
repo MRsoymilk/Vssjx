@@ -190,18 +190,18 @@ def write_metadata(baked, parsed, data_dir=None, analysis_dir=None):
     for key in sorted(baked):
         path = data_dir / 'actors' / (key + '.json')
         path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(readable_json(baked[key]) + '\n', 'utf-8')
+        path.write_text(readable_json(baked[key]) + '\n', 'utf-8', newline='\n')
         index[key] = 'res://assets/data/actors/' + key + '.json'
     data_dir.mkdir(parents=True, exist_ok=True)
-    (data_dir / 'actors.json').write_text(json.dumps({'format_version': 2, 'actors': index}, ensure_ascii=False, indent=2) + '\n', 'utf-8')
+    (data_dir / 'actors.json').write_text(json.dumps({'format_version': 2, 'actors': index}, ensure_ascii=False, indent=2) + '\n', 'utf-8', newline='\n')
     original_index = {}
     for key in sorted(parsed):
         path = analysis_dir / (key + '.json')
         path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(readable_json(parsed[key]) + '\n', 'utf-8')
+        path.write_text(readable_json(parsed[key]) + '\n', 'utf-8', newline='\n')
         original_index[key] = key + '.json'
     analysis_dir.mkdir(parents=True, exist_ok=True)
-    (analysis_dir / 'index.json').write_text(json.dumps({'format_version': 1, 'animations': original_index}, ensure_ascii=False, indent=2) + '\n', 'utf-8')
+    (analysis_dir / 'index.json').write_text(json.dumps({'format_version': 1, 'animations': original_index}, ensure_ascii=False, indent=2) + '\n', 'utf-8', newline='\n')
 
 
 def main():

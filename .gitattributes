@@ -4,6 +4,8 @@
 *.godot text eol=lf
 *.py text eol=lf
 *.md text eol=lf
+client/assets/data/actors.json text eol=lf
+client/assets/data/actors/** text eol=lf
 .gitattributes text eol=lf
 .gitignore text eol=lf
 LICENSE text eol=lf

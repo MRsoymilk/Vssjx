@@ -8,7 +8,7 @@ import json
 import os
 from pathlib import Path
 import re
-import selectors
+import queue
 import subprocess
 import sys
 import tempfile
@@ -21,18 +21,29 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def wait_for_server(process):
-    with selectors.DefaultSelector() as selector:
-        selector.register(process.stdout, selectors.EVENT_READ)
-        deadline = time.monotonic() + 15
-        while time.monotonic() < deadline:
-            if selector.select(timeout=0.2):
-                line = process.stdout.readline()
+    # Windows select() accepts sockets but not subprocess stdout pipes.
+    # Stop at the listening line so callers can continue draining later logs.
+    addresses = queue.Queue(maxsize=1)
+
+    def read_startup():
+        try:
+            for line in process.stdout:
                 match = re.search(r'address=(127\.0\.0\.1:\d+)', line)
                 if match:
-                    return 'http://' + match[1]
-            if process.poll() is not None:
-                raise RuntimeError('Rust server exited before listening')
-    raise RuntimeError('Rust server did not announce a listening address')
+                    addresses.put('http://' + match[1])
+                    return
+        except (OSError, ValueError):
+            pass
+        addresses.put(None)
+
+    threading.Thread(target=read_startup, daemon=True).start()
+    try:
+        address = addresses.get(timeout=15)
+    except queue.Empty:
+        raise RuntimeError('Rust server did not announce a listening address') from None
+    if address is None:
+        raise RuntimeError('Rust server exited before listening')
+    return address
 
 
 def run_godot(env, render=False):
@@ -44,7 +55,7 @@ def run_godot(env, render=False):
     if render:
         command += ['--rendering-driver', 'opengl3_es']
     command += ['res://tests/server_connection_test.tscn']
-    result = subprocess.run(command, env=env, text=True, capture_output=True, timeout=60)
+    result = subprocess.run(command, env=env, text=True, encoding='utf-8', capture_output=True, timeout=60)
     print(result.stdout, end='')
     if result.stderr:
         print(result.stderr, end='', file=sys.stderr)
@@ -53,6 +64,8 @@ def run_godot(env, render=False):
 
 
 def main():
+    sys.stdout.reconfigure(encoding='utf-8')
+    sys.stderr.reconfigure(encoding='utf-8')
     parser = argparse.ArgumentParser()
     parser.add_argument('--render', action='store_true')
     args = parser.parse_args()
@@ -61,7 +74,7 @@ def main():
     env = dict(os.environ, SSJX_BIND_ADDR='127.0.0.1:0', RUST_LOG='info', SSJX_ENV_FILE='', SSJX_MONITOR_BIND_ADDR='', SSJX_LOG_DIR='')
     env.pop('SSJX_TEST_PERSISTENCE_PHASE', None)
     env.pop('SSJX_DATABASE_URL', None)  # Never touch a developer's account database.
-    service = subprocess.Popen([str(binary)], env=env, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    service = subprocess.Popen([str(binary)], env=env, text=True, encoding='utf-8', stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     fixture = None
     try:
         backend = wait_for_server(service)
@@ -102,14 +115,14 @@ def main():
                         self.send_header('Location', backend + '/api/v1/server-info')
                     self.end_headers()
                     self.wfile.write(body)
-                except (BrokenPipeError, ConnectionResetError):
+                except (BrokenPipeError, ConnectionResetError, ConnectionAbortedError):
                     pass  # Timeout and cancellation intentionally close sockets.
 
         fixture = ThreadingHTTPServer(('127.0.0.1', 0), Handler)
         threading.Thread(target=fixture.serve_forever, daemon=True).start()
         scratch = '/tmp/opencode' if Path('/tmp/opencode').is_dir() else None
         with tempfile.TemporaryDirectory(prefix='vssjx-connection-', dir=scratch) as directory:
-            env['SSJX_CONNECTION_PATH'] = str(Path(directory) / 'connection.cfg')
+            env['SSJX_CONNECTION_PATH'] = (Path(directory) / 'connection.cfg').resolve().as_posix()
             env['SSJX_TEST_SERVER_URL'] = backend
             env['SSJX_TEST_FIXTURE_URL'] = f'http://127.0.0.1:{fixture.server_port}'
             run_godot(env, args.render)

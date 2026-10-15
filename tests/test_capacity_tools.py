@@ -4,6 +4,7 @@ import os
 from pathlib import Path
 import tempfile
 import unittest
+import sys
 
 from run_capacity import proc_sample
 from summarize_capacity import database_resources, resources, summarize
@@ -25,6 +26,7 @@ class CapacityToolsTest(unittest.TestCase):
     def store(self, directory, result):
         (directory / 'results.json').write_text(json.dumps({'setup': {}, 'results': [result]}))
 
+    @unittest.skipUnless(sys.platform.startswith('linux'), 'Process sampling requires Linux /proc')
     def test_current_process_resource_reader(self):
         sample = proc_sample(os.getpid())
         self.assertGreater(sample['rss_mib'], 0)
@@ -41,7 +43,7 @@ class CapacityToolsTest(unittest.TestCase):
         self.assertEqual(values['cpu_mean_percent_one_core_100'], 125.5)
 
     def test_healthy_short_movement_fixture(self):
-        with tempfile.TemporaryDirectory(dir='/tmp/opencode') as scratch:
+        with tempfile.TemporaryDirectory() as scratch:
             directory = Path(scratch)
             self.fixture(directory)
             result = summarize(directory)['results'][0]
@@ -49,7 +51,7 @@ class CapacityToolsTest(unittest.TestCase):
             self.assertEqual(result['preliminary_gate'], 'PASS')
 
     def test_idle_connections_never_substitute_for_movement(self):
-        with tempfile.TemporaryDirectory(dir='/tmp/opencode') as scratch:
+        with tempfile.TemporaryDirectory() as scratch:
             directory = Path(scratch)
             idle = self.fixture(directory, moving=0)
             self.assertEqual(summarize(directory)['results'][0]['preliminary_gate'], 'PASS')
@@ -58,7 +60,7 @@ class CapacityToolsTest(unittest.TestCase):
             self.assertEqual(summarize(directory)['results'][0]['preliminary_gate'], 'FAIL')
 
     def test_missing_players_errors_and_slow_generator_are_not_success(self):
-        with tempfile.TemporaryDirectory(dir='/tmp/opencode') as scratch:
+        with tempfile.TemporaryDirectory() as scratch:
             directory = Path(scratch)
             good = self.fixture(directory)
             for field, value in [('active_at_end', 9), ('clients_ever_saw_entire_population', 9), ('moves_sent', 10), ('errors', {'DATABASE_UNAVAILABLE': 1}), ('full_population_snapshots', 50), ('chat_deliveries', 20)]:
@@ -68,7 +70,7 @@ class CapacityToolsTest(unittest.TestCase):
                 self.assertEqual(summarize(directory)['results'][0]['preliminary_gate'], 'FAIL', field)
 
     def test_delta_frontiers_require_complete_populations_and_each_client_stays_fresh(self):
-        with tempfile.TemporaryDirectory(dir='/tmp/opencode') as scratch:
+        with tempfile.TemporaryDirectory() as scratch:
             directory = Path(scratch)
             result = self.fixture(directory)
             result.update(world_sync_version=2, full_visibility_at_start=10, full_population_state_updates=1000, minimum_client_state_updates=100)

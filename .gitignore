@@ -12,3 +12,7 @@ __pycache__/
 !.env.sample.txt
 /logs/
 /server/logs/
+/.cargo/config.toml
+/deploy/proxy.local.env
+/deploy/docker-proxy.local.txt
+/tools/use-proxy.local.ps1

@@ -74,7 +74,7 @@ class ActorCatalogTests(unittest.TestCase):
         self.assertEqual(canonical(rebuilt), self.expected['runtime_canonical_sha256'])
 
     def test_export_is_deterministic_and_does_not_delete_unrelated_files(self):
-        with tempfile.TemporaryDirectory(prefix='vssjx-actor-data-', dir='/tmp/opencode') as folder:
+        with tempfile.TemporaryDirectory(prefix='vssjx-actor-data-') as folder:
             folder = Path(folder)
             data, source = folder / 'data', folder / 'analysis'
             self.importer.write_metadata(self.actors, self.source, data, source)
@@ -92,7 +92,7 @@ class ActorCatalogTests(unittest.TestCase):
                 self.assertEqual((source / (key + '.json')).read_bytes(), (ROOT.parent / 'analysis/animations' / (key + '.json')).read_bytes())
 
     def test_export_refuses_path_traversal_before_writing(self):
-        with tempfile.TemporaryDirectory(prefix='vssjx-actor-path-', dir='/tmp/opencode') as folder:
+        with tempfile.TemporaryDirectory(prefix='vssjx-actor-path-') as folder:
             with self.assertRaises(ValueError):
                 self.importer.write_metadata({'../escape': {}}, {}, Path(folder) / 'data', Path(folder) / 'analysis')
             self.assertEqual(list(Path(folder).iterdir()), [])

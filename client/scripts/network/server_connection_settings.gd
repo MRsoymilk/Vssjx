@@ -8,6 +8,7 @@ var last_error := ""
 func _init(path: String = "") -> void:
 	settings_path = path if not path.is_empty() else OS.get_environment("SSJX_CONNECTION_PATH")
 	if settings_path.is_empty(): settings_path = "user://connection.cfg"
+	if OS.get_name() == "Windows": settings_path = settings_path.replace("\\", "/")
 
 static func normalize(raw: String) -> Dictionary:
 	var value := raw.strip_edges()

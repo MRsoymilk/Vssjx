@@ -19,7 +19,9 @@ var _world_seq := 0
 var _net_ids: Dictionary = {}
 var socket: WebSocketPeer
 var chat := OnlinePublicChat.new()
+var announcements := OnlineAnnouncements.new()
 var _ticket := ""
+var _announcement_version := 0
 var _state := "idle"
 var _deadline := 0.0
 var _heartbeat := 0.0
@@ -67,6 +69,7 @@ func leave() -> void:
 	_snapshot = {}
 	_records = {}
 	chat.clear()
+	announcements.clear()
 
 func _exit_tree() -> void:
 	leave()
@@ -74,6 +77,7 @@ func _exit_tree() -> void:
 func _failed(code: String, retry: bool = false) -> void:
 	_pending_motion.clear()
 	chat.disconnect_channel()
+	announcements.clear()
 	world_ready = false
 	_ticket = ""
 	_snapshot = {}
@@ -95,6 +99,7 @@ func _on_ticket(result: Dictionary) -> void:
 		_failed(String(result.get("code", "TICKET_FAILED")), result.get("code") in ["NETWORK_ERROR", "SERVER_BUSY", "RATE_LIMITED", "DATABASE_UNAVAILABLE"])
 		return
 	_ticket = result.ticket
+	_announcement_version = 1 if result.get("announcement_version") == 1 else 0
 	socket = WebSocketPeer.new()
 	socket.inbound_buffer_size = 2097152
 	socket.outbound_buffer_size = 8192
@@ -136,7 +141,7 @@ func _process(_delta: float) -> void:
 		_world_seq = 0
 		_net_ids = {}
 		_deadline = now + 8.0
-		socket.send_text(JSON.stringify({"type": "auth.exchange", "ticket": _ticket, "protocol_version": 1, "config_hash": config_hash, "world_sync_version": 2}))
+		socket.send_text(JSON.stringify(_exchange_packet()))
 		_ticket = ""
 		_heartbeat = now
 		_last_received = now
@@ -163,6 +168,11 @@ func _process(_delta: float) -> void:
 	chat.enabled = world_ready
 	chat.tick()
 	_flush_motion()
+
+func _exchange_packet() -> Dictionary:
+	var packet := {"type": "auth.exchange", "ticket": _ticket, "protocol_version": 1, "config_hash": config_hash, "world_sync_version": 2}
+	if _announcement_version == 1: packet.announcement_version = 1
+	return packet
 
 static func _decimal(value: Variant) -> bool:
 	if not value is String: return false
@@ -199,6 +209,9 @@ func _receive(data: Dictionary, raw: PackedByteArray) -> void:
 		else: _failed(code, code in ["DATABASE_UNAVAILABLE", "SERVER_BUSY", "WORLD_STREAM_LAGGED"])
 		return
 	if kind == "pong": return
+	if kind == "announcement.state":
+		if stream.is_empty() or not announcements.receive(data): _failed("INVALID_ANNOUNCEMENT")
+		return
 	if kind is String and kind.begins_with("chat."):
 		if stream.is_empty() or not chat.receive(data): _failed("INVALID_CHAT")
 		return

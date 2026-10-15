@@ -1,6 +1,7 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://scripts/main.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/ui/announcement_banner.tscn" id="Announcements"]
 
 [sub_resource type="SystemFont" id="SystemFont_shared"]
 font_names = PackedStringArray("Microsoft YaHei", "Noto Sans CJK SC", "sans-serif")
@@ -27,3 +28,8 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
+
+[node name="Announcements" type="CanvasLayer" parent="."]
+layer = 20
+
+[node name="Banner" parent="Announcements" instance=ExtResource("Announcements")]

@@ -1,0 +1,50 @@
+// Run against the disposable service started by run_announcements.py.
+const assert = require("node:assert/strict");
+const fs = require("node:fs");
+const {chromium} = require(process.env.PLAYWRIGHT_MODULE_PATH || "playwright-core");
+const [base, output] = process.argv.slice(2);
+(async () => {
+    const browser = await chromium.launch({headless:true, executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE || undefined});
+    let checks = 0;
+    const check = value => { assert.ok(value); checks++; };
+    try {
+        const page = await browser.newPage({viewport:{width:1280,height:1100}});
+        const errors = [];
+        page.on("pageerror", error=>errors.push(error.message));
+        await page.goto(base);
+        await page.waitForFunction(()=>!document.getElementById("announcement-publish").disabled);
+        check((await page.locator("#announcement-current").innerText()).includes("暂无"));
+        const text = "全服通知：今晚22:00进行维护，请诸位道友提前保存进度。";
+        await page.locator("#announcement-text").fill(text);
+        await page.locator("#announcement-minutes").fill("10");
+        const sent = page.waitForResponse(response=>response.url().endsWith("/api/announcements") && response.request().method()==="POST");
+        await page.locator("#announcement-publish").click();
+        const response = await sent;
+        check(response.ok());
+        const packet = await response.json();
+        fs.writeFileSync(`${output}/announcement_packet.json`,JSON.stringify(packet));
+        await page.waitForFunction(()=>document.getElementById("announcement-result").textContent.includes("已发布"));
+        check((await page.locator("#announcement-current").innerText())===text);
+        check(!(await page.locator("#announcement-cancel").isDisabled()));
+        await page.screenshot({path:`${output}/announcement_web.png`,fullPage:true});
+        await page.setViewportSize({width:390,height:844});
+        check(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+        await page.screenshot({path:`${output}/announcement_web_mobile.png`,fullPage:true});
+        const literal = '<img src=x onerror="window.injected=true"> 通知按原文展示';
+        await page.locator("#announcement-text").fill(literal);
+        await page.locator("#announcement-publish").click();
+        await page.waitForFunction(value=>document.getElementById("announcement-current").textContent===value,literal);
+        check((await page.locator("#announcement-current img").count())===0);
+        check(await page.evaluate(()=>!window.injected));
+        await page.locator("#announcement-cancel").click();
+        await page.waitForFunction(()=>document.getElementById("announcement-result").textContent.includes("已撤下"));
+        check((await page.locator("#announcement-current").innerText()).includes("暂无"));
+        check(await page.locator("#announcement-cancel").isDisabled());
+        await page.reload();
+        await page.waitForFunction(()=>!document.getElementById("announcement-publish").disabled);
+        check((await page.locator("#announcement-current").innerText()).includes("暂无"));
+        check(errors.length===0);
+        fs.writeFileSync(`${output}/announcement_browser.json`,JSON.stringify({checks,failures:0,browser:browser.version()},null,2));
+        console.log(`ANNOUNCEMENT BROWSER: ${checks} checks, 0 failures; desktop/mobile rendered`);
+    } finally { await browser.close(); }
+})().catch(error=>{console.error(error);process.exit(1);});

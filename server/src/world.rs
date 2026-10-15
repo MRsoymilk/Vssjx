@@ -510,7 +510,7 @@ pub(crate) async fn ticket(
         .bind(auth::token_digest(&raw)?).bind(session).bind(request.character_id).execute(&mut *tx).await.map_err(db_error)?;
     tx.commit().await.map_err(db_error)?;
     Ok(Json(
-        json!({"ticket":raw,"expires_in":20,"character_id":request.character_id,"config_hash":config_hash()}),
+        json!({"ticket":raw,"expires_in":20,"character_id":request.character_id,"config_hash":config_hash(),"announcement_version":1}),
     ))
 }
 #[derive(Deserialize)]
@@ -523,6 +523,8 @@ pub enum ClientMessage {
         config_hash: String,
         #[serde(default)]
         world_sync_version: u32,
+        #[serde(default)]
+        announcement_version: u32,
     },
     #[serde(rename = "world.move_to")]
     MoveTo {
@@ -625,6 +627,7 @@ pub(crate) async fn upgrade(
         .try_acquire_owned()
         .map_err(|_| error(503, "SERVER_BUSY"))?;
     let auth = auth.clone();
+    let announcements = state.announcements.clone();
     Ok(ws
         .max_message_size(2048)
         .max_frame_size(2048)
@@ -633,12 +636,12 @@ pub(crate) async fn upgrade(
             let connection_id = Uuid::new_v4();
             let span =
                 tracing::error_span!("world_socket", %connection_id, request_id=%request_id.0);
-            connection(socket, auth, hub, connection_id)
+            connection(socket, auth, hub, announcements, connection_id)
                 .instrument(span)
                 .await;
         }))
 }
-async fn connection(socket: WebSocket, auth: AuthService, hub: Arc<WorldHub>, id: Uuid) {
+async fn connection(socket: WebSocket, auth: AuthService, hub: Arc<WorldHub>, announcements: Arc<crate::announcements::Announcements>, id: Uuid) {
     let _connection = hub.metrics.socket(id);
     let mut socket = ObservedSocket {
         inner: socket,
@@ -661,6 +664,7 @@ async fn connection(socket: WebSocket, auth: AuthService, hub: Arc<WorldHub>, id
         protocol_version,
         config_hash: hash,
         world_sync_version,
+        announcement_version,
     }) = serde_json::from_str::<ClientMessage>(&text)
     else {
         fail(&mut socket, "INVALID_HANDSHAKE").await;
@@ -745,6 +749,7 @@ async fn connection(socket: WebSocket, auth: AuthService, hub: Arc<WorldHub>, id
         return;
     }
     let mut chat_pending: Option<Uuid> = None;
+    let mut announcement_revision = None;
     let mut pulse = tokio::time::interval(Duration::from_millis(100));
     pulse.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Skip);
     let mut checked = Instant::now();
@@ -784,6 +789,10 @@ async fn connection(socket: WebSocket, auth: AuthService, hub: Arc<WorldHub>, id
             },
             _=pulse.tick()=>{
                 if !hub.current(&owner){fail(&mut socket,"SESSION_REPLACED").await;break;}
+                if announcement_version == 1 && let Some((revision,packet))=announcements.packet_since(announcement_revision, Instant::now()) {
+                    if send(&mut socket,packet).await.is_err(){break;}
+                    announcement_revision=Some(revision);
+                }
                 if heard.elapsed()>Duration::from_secs(15){socket.metrics.event("websocket","HEARTBEAT_TIMEOUT",id);tracing::warn!(code="HEARTBEAT_TIMEOUT","world heartbeat expired");break;}
                 if checked.elapsed()>=Duration::from_secs(1){
                     match auth.live_session(owner.session).await{Ok(true)=>{},Ok(false)=>{fail(&mut socket,"SESSION_REVOKED").await;leave=true;break},Err(_)=>{fail(&mut socket,"DATABASE_UNAVAILABLE").await;break}}

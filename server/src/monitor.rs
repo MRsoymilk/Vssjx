@@ -1,8 +1,8 @@
-//! A separate, strictly local, read-only operational listener.
+//! A separate, strictly local operational listener with guarded announcements.
 use crate::{AppState, observability::now_ms};
 use axum::{
     Json, Router,
-    extract::{ConnectInfo, Request, State},
+    extract::{ConnectInfo, DefaultBodyLimit, Request, State, rejection::JsonRejection},
     http::{StatusCode, header},
     middleware::{self, Next},
     response::{Html, IntoResponse, Response},
@@ -39,8 +39,24 @@ pub(crate) fn router(state: Arc<AppState>) -> Router {
             }),
         )
         .route("/api/status", get(status))
+        .route(
+            "/announcements.js",
+            get(|| async {
+                (
+                    [(header::CONTENT_TYPE, "text/javascript; charset=utf-8")],
+                    include_str!("monitor_assets/announcements.js"),
+                )
+            }),
+        )
+        .route(
+            "/api/announcements",
+            get(announcements)
+                .post(publish_announcement)
+                .delete(cancel_announcement),
+        )
         .fallback(|| async { StatusCode::NOT_FOUND })
         .layer(middleware::from_fn(local_only))
+        .layer(DefaultBodyLimit::max(4096))
         .with_state(state)
 }
 async fn local_only(request: Request, next: Next) -> Response {
@@ -62,15 +78,16 @@ async fn local_only(request: Request, next: Next) -> Response {
         .headers()
         .get("sec-fetch-site")
         .is_none_or(|v| v == "same-origin" || v == "none");
-    let mut response = if !peer.is_some_and(|p| p.0.ip().is_loopback())
-        || !host_ok
-        || !fetch_ok
-        || request.headers().contains_key(header::ORIGIN)
-    {
-        StatusCode::FORBIDDEN.into_response()
-    } else {
-        next.run(request).await
-    };
+    let origin_ok = request.headers().get(header::ORIGIN).is_none_or(|origin| {
+        host.as_ref()
+            .is_some_and(|host| origin.as_bytes() == format!("http://{host}").as_bytes())
+    });
+    let mut response =
+        if !peer.is_some_and(|p| p.0.ip().is_loopback()) || !host_ok || !fetch_ok || !origin_ok {
+            StatusCode::FORBIDDEN.into_response()
+        } else {
+            next.run(request).await
+        };
     for (key, value) in [
         ("cache-control", "no-store"),
         ("x-content-type-options", "nosniff"),
@@ -86,6 +103,63 @@ async fn local_only(request: Request, next: Next) -> Response {
         );
     }
     response
+}
+async fn announcements(State(state): State<Arc<AppState>>) -> Json<serde_json::Value> {
+    Json(
+        serde_json::json!({"csrf_token":state.announcements.csrf_token,
+        "state":state.announcements.packet_since(None, Instant::now()).expect("current announcement").1}),
+    )
+}
+fn announcement_error(code: &'static str, status: StatusCode) -> Response {
+    (status, Json(serde_json::json!({"code":code}))).into_response()
+}
+fn announcement_token(state: &AppState, headers: &axum::http::HeaderMap) -> bool {
+    headers.get("x-announcement-token").is_some_and(|value| {
+        value.as_bytes() == state.announcements.csrf_token.to_string().as_bytes()
+    })
+}
+async fn publish_announcement(
+    State(state): State<Arc<AppState>>,
+    headers: axum::http::HeaderMap,
+    draft: Result<Json<crate::announcements::AnnouncementDraft>, JsonRejection>,
+) -> Response {
+    if !announcement_token(&state, &headers) {
+        return announcement_error("INVALID_OPERATOR_TOKEN", StatusCode::FORBIDDEN);
+    }
+    let Ok(Json(draft)) = draft else {
+        return announcement_error("INVALID_ANNOUNCEMENT", StatusCode::BAD_REQUEST);
+    };
+    match state.announcements.publish(draft, Instant::now()) {
+        Ok(packet) => {
+            tracing::info!("global announcement published");
+            Json(packet).into_response()
+        }
+        Err(code) => announcement_error(code, StatusCode::BAD_REQUEST),
+    }
+}
+#[derive(serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+struct CancelAnnouncement {
+    id: uuid::Uuid,
+}
+async fn cancel_announcement(
+    State(state): State<Arc<AppState>>,
+    headers: axum::http::HeaderMap,
+    draft: Result<Json<CancelAnnouncement>, JsonRejection>,
+) -> Response {
+    if !announcement_token(&state, &headers) {
+        return announcement_error("INVALID_OPERATOR_TOKEN", StatusCode::FORBIDDEN);
+    }
+    let Ok(Json(draft)) = draft else {
+        return announcement_error("INVALID_ANNOUNCEMENT", StatusCode::BAD_REQUEST);
+    };
+    match state.announcements.cancel(draft.id, Instant::now()) {
+        Ok(packet) => {
+            tracing::info!("global announcement removed");
+            Json(packet).into_response()
+        }
+        Err(code) => announcement_error(code, StatusCode::CONFLICT),
+    }
 }
 async fn status(State(state): State<Arc<AppState>>) -> Json<serde_json::Value> {
     let mut value = state.metrics.snapshot();

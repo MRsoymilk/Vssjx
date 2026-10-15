@@ -1,4 +1,5 @@
 pub mod auth;
+pub mod announcements;
 pub mod characters;
 pub mod chat;
 pub mod config;
@@ -51,6 +52,7 @@ pub(crate) struct AppState {
     auth: Option<auth::AuthService>,
     world: Option<Arc<world::WorldHub>>,
     metrics: Arc<observability::Observability>,
+    announcements: Arc<announcements::Announcements>,
 }
 
 pub fn app(config: config::Config) -> Router {
@@ -82,6 +84,7 @@ pub fn apps(
         auth,
         world,
         metrics: metrics.clone(),
+        announcements: Arc::new(announcements::Announcements::default()),
     });
     monitor::sample_database(&state);
     let router = Router::new()

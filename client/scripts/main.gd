@@ -7,6 +7,7 @@ const GOLD := Color("e9c67c")
 const TEAL := Color("7cc7bd")
 var mode := "home"
 @onready var ui: Control = $UI
+@onready var announcement_banner: AnnouncementBanner = $Announcements/Banner
 var world_view: TextureRect
 var viewport: SubViewport
 var world: ShushanWorld
@@ -186,6 +187,7 @@ func _button(parent: Node, text_value: String, rect: Rect2, callback: Callable, 
 	return button
 
 func _clear_ui() -> void:
+	announcement_banner.present({})
 	battle_transition_epoch += 1
 	battle_transition = null
 	modal = null
@@ -280,6 +282,7 @@ func _enter_online_world(character_id: String) -> void:
 	view.name = "OnlineWorld"
 	view.character_id = character_id
 	ui.add_child(view)
+	view.network.announcements.changed.connect(announcement_banner.present)
 	view.close_requested.connect(_return_to_server_login)
 
 func _create() -> void:

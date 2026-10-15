@@ -53,6 +53,7 @@ func _ready() -> void:
 	screen.hud.get_node("Minimap").set_shared_world(map_data, {}, character_id)
 	menu.chosen.connect(_scene_action)
 	attributes.back_requested.connect(_close_attributes)
+	attributes.allocation_requested.connect(_allocate_attributes)
 	$Menu/Panel/Continue.pressed.connect(func() -> void: details.hide())
 	$Menu/Panel/Leave.pressed.connect(_leave_world)
 	$Menu/Panel/Chat.pressed.connect(_focus_chat)
@@ -312,6 +313,7 @@ func _update_chat_controls() -> void:
 
 func _process(delta: float) -> void:
 	_update_chat_controls()
+	_update_allocation_controls()
 	if network == null or not network.world_ready: return
 	for resident in residents.values(): resident.advance(delta)
 	for id in actors:
@@ -413,7 +415,7 @@ func _pve_changed() -> void:
 		_character.max_hp = model.state.stats.hp
 		_character.max_mp = model.state.stats.mp
 		_character.next_xp = int(_character.level) * 40
-		if attributes.visible: attributes.display_online(_character, model.state.stats)
+		if attributes.visible: attributes.display_online(_character, model.state.stats, model.state.get("attributes", {}))
 		screen.chrome.display_character(_character)
 		screen.hud.get_node("WorldIdentity").text = "等级 %d\n%s派" % [int(_character.level), ["峨眉", "花涧", "昆仑"][int(_character.school)]]
 		_population(network.population.entities)
@@ -526,8 +528,9 @@ func _open_attributes() -> void:
 	if _character.is_empty():
 		chat_status.text = "角色数据正在同步，请稍候。"
 		return
-	attributes.display_online(_character, network.pve.state.get("stats", {}))
+	attributes.display_online(_character, network.pve.state.get("stats", {}), network.pve.state.get("attributes", {}))
 	attributes.show()
+	_update_allocation_controls()
 	battle_view.set_process_unhandled_key_input(false)
 
 func _close_attributes() -> void:
@@ -535,3 +538,22 @@ func _close_attributes() -> void:
 	attributes.signature.release_focus()
 	attributes.hide()
 	battle_view.set_process_unhandled_key_input(true)
+
+func _can_allocate() -> bool:
+	if network == null or not network.world_ready or not network.pve.ready or network.pve.pending() or network.pve.active() or not network.entities.has(character_id): return false
+	var own: Dictionary = network.entities[character_id]
+	return own.next_cell == null and network._pending_motion.is_empty() and int(own.last_input_seq) >= network._input_seq
+
+func _update_allocation_controls() -> void:
+	if not attributes.visible: return
+	var hint := "停稳后可加点"
+	if network.pve.pending(): hint = "正在保存，请稍候"
+	elif not network.world_ready or not network.pve.ready: hint = "重新连接后可加点"
+	elif network.pve.active(): hint = "战斗结束后可加点"
+	attributes.set_allocation_enabled(_can_allocate(), hint)
+
+func _allocate_attributes(points: Array) -> void:
+	if not _can_allocate(): return
+	if network.pve.submit("allocate", "", points):
+		attributes.set_allocation_enabled(false, "正在保存，请稍候")
+		chat_status.text = "正在保存属性点……"

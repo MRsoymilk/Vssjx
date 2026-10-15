@@ -42,7 +42,7 @@ func _run() -> void:
 	output = OS.get_environment("SSJX_ATTRIBUTES_CAPTURE_PATH")
 	await capture("online_attributes_regular")
 	page.get_node("TabButtons1").pressed.emit()
-	check(page.selected_tab == 1 and page.content.get_node("StatValue5").text == "28" and page.content.get_node("StatValue11").text == "4", "Extended tab uses server attack and defense")
+	check(page.selected_tab == 1 and page.content.get_node("Value_physical_attack").value == "28" and page.content.get_node("Value_physical_defense").value == "4", "Extended tab uses server attack and defense")
 	await capture("online_attributes_extended")
 	var updated := pve_state(2)
 	updated.character.level = 2
@@ -52,13 +52,13 @@ func _run() -> void:
 	updated.character.xp = 8
 	updated.stats = {"hp":113,"mp":53,"attack":32,"defense":6}
 	check(view.network.pve.receive({"type":"pve.state","state":updated}), "New authoritative stats accepted while page remains open")
-	check(page.visible and page.selected_tab == 1 and page.content.get_node("StatValue5").text == "32" and page.content.get_node("StatValue11").text == "6", "Live update preserves selected tab and refreshes its values")
+	check(page.visible and page.selected_tab == 1 and page.content.get_node("Value_physical_attack").value == "32" and page.content.get_node("Value_physical_defense").value == "6", "Live update preserves selected tab and refreshes its values")
 	page.select_tab(0)
 	check(page.numbers.hp.value == "107/113" and page.numbers.mp.value == "49/53" and page.numbers.xp.value == "8/80" and page.numbers.gold.value == "57", "Level and wallet changes refresh the original regular tab")
 	page.display_online(updated.character,{})
 	check(page.numbers.hp.value == "107" and not page.bars.hp.visible, "Missing server maxima never fall back to offline stats")
 	page.select_tab(1)
-	check(page.content.get_node("StatValue5").text == "—" and page.content.get_node("StatValue11").text == "—", "Unknown extended stats remain blank until synchronized")
+	check(page.content.get_node("Unknown_physical_attack").visible and page.content.get_node("Unknown_physical_defense").visible, "Unknown extended stats remain blank until synchronized")
 	page.display_online(updated.character,updated.stats)
 	page.get_node("TabButtons2").pressed.emit()
 	check(page.selected_tab == 2 and page.content.get_node("SkillName").text == "御剑诀", "Original skill tab matches the online job")

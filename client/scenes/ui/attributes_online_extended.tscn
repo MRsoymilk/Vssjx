@@ -1,0 +1,1026 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/ui/original_number.tscn" id="Number"]
+
+[sub_resource type="StyleBoxFlat" id="Slot"]
+bg_color = Color(0.97, 0.87, 0.57, 1)
+
+[sub_resource type="StyleBoxFlat" id="Red"]
+bg_color = Color(1, 0.36, 0.26, 1)
+
+[sub_resource type="StyleBoxFlat" id="Field"]
+bg_color = Color(1, 0.95, 0.73, 1)
+
+[sub_resource type="StyleBoxFlat" id="Button"]
+bg_color = Color(1, 0.43, 0.33, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.83, 0.65, 0.27, 1)
+
+[sub_resource type="StyleBoxFlat" id="Hover"]
+bg_color = Color(1, 0.57, 0.38, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 0.88, 0.48, 1)
+
+[sub_resource type="StyleBoxEmpty" id="Empty"]
+
+[node name="AttributesOnlineExtended" type="Control"]
+mouse_filter = 2
+
+[node name="Label_hp" type="Label" parent="."]
+layout_mode = 0
+offset_left = 17.0
+offset_top = 91.0
+offset_right = 60.0
+offset_bottom = 117.0
+theme_override_colors/font_color = Color(0.396, 0.27, 0.094, 1)
+theme_override_font_sizes/font_size = 16
+text = "气血"
+vertical_alignment = 1
+
+
+[node name="Slot_hp" type="Panel" parent="."]
+layout_mode = 0
+offset_left = 63.0
+offset_top = 93.0
+offset_right = 132.0
+offset_bottom = 116.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("Slot")
+
+[node name="Value_hp" parent="." instance=ExtResource("Number")]
+offset_left = 67.0
+offset_top = 96.0
+offset_right = 128.0
+offset_bottom = 114.0
+value = ""
+
+[node name="Unknown_hp" type="Label" parent="."]
+layout_mode = 0
+offset_left = 63.0
+offset_top = 93.0
+offset_right = 132.0
+offset_bottom = 116.0
+theme_override_colors/font_color = Color(0.396, 0.27, 0.094, 1)
+theme_override_font_sizes/font_size = 16
+text = "—"
+vertical_alignment = 1
+horizontal_alignment = 1
+
+
+[node name="Label_physical_attack" type="Label" parent="."]
+layout_mode = 0
+offset_left = 17.0
+offset_top = 122.0
+offset_right = 60.0
+offset_bottom = 148.0
+theme_override_colors/font_color = Color(0.396, 0.27, 0.094, 1)
+theme_override_font_sizes/font_size = 16
+text = "物攻"
+vertical_alignment = 1
+
+
+[node name="Slot_physical_attack" type="Panel" parent="."]
+layout_mode = 0
+offset_left = 63.0
+offset_top = 124.0
+offset_right = 132.0
+offset_bottom = 147.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("Slot")
+
+[node name="Value_physical_attack" parent="." instance=ExtResource("Number")]
+offset_left = 67.0
+offset_top = 127.0
+offset_right = 128.0
+offset_bottom = 145.0
+value = ""
+
+[node name="Unknown_physical_attack" type="Label" parent="."]
+layout_mode = 0
+offset_left = 63.0
+offset_top = 124.0
+offset_right = 132.0
+offset_bottom = 147.0
+theme_override_colors/font_color = Color(0.396, 0.27, 0.094, 1)
+theme_override_font_sizes/font_size = 16
+text = "—"
+vertical_alignment = 1
+horizontal_alignment = 1
+
+
+[node name="Label_physical_defense" type="Label" parent="."]
+layout_mode = 0
+offset_left = 17.0
+offset_top = 153.0
+offset_right = 60.0
+offset_bottom = 179.0
+theme_override_colors/font_color = Color(0.396, 0.27, 0.094, 1)
+theme_override_font_sizes/font_size = 16
+text = "物防"
+vertical_alignment = 1
+
+
+[node name="Slot_physical_defense" type="Panel" parent="."]
+layout_mode = 0
+offset_left = 63.0
+offset_top = 155.0
+offset_right = 132.0
+offset_bottom = 178.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("Slot")
+
+[node name="Value_physical_defense" parent="." instance=ExtResource("Number")]
+offset_left = 67.0
+offset_top = 158.0
+offset_right = 128.0
+offset_bottom = 176.0
+value = ""
+
+[node name="Unknown_physical_defense" type="Label" parent="."]
+layout_mode = 0
+offset_left = 63.0
+offset_top = 155.0
+offset_right = 132.0
+offset_bottom = 178.0
+theme_override_colors/font_color = Color(0.396, 0.27, 0.094, 1)
+theme_override_font_sizes/font_size = 16
+text = "—"
+vertical_alignment = 1
+horizontal_alignment = 1
+
+
+[node name="Label_physical_crit" type="Label" parent="."]
+layout_mode = 0
+offset_left = 17.0
+offset_top = 184.0
+offset_right = 60.0
+offset_bottom = 210.0
+theme_override_colors/font_color = Color(0.396, 0.27, 0.094, 1)
+theme_override_font_sizes/font_size = 16
+text = "物暴"
+vertical_alignment = 1
+
+
+[node name="Slot_physical_crit" type="Panel" parent="."]
+layout_mode = 0
+offset_left = 63.0
+offset_top = 186.0
+offset_right = 132.0
+offset_bottom = 209.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("Slot")
+
+[node name="Value_physical_crit" parent="." instance=ExtResource("Number")]
+offset_left = 67.0
+offset_top = 189.0
+offset_right = 128.0
+offset_bottom = 207.0
+value = ""
+
+[node name="Unknown_physical_crit" type="Label" parent="."]
+layout_mode = 0
+offset_left = 63.0
+offset_top = 186.0
+offset_right = 132.0
+offset_bottom = 209.0
+theme_override_colors/font_color = Color(0.396, 0.27, 0.094, 1)
+theme_override_font_sizes/font_size = 16
+text = "—"
+vertical_alignment = 1
+horizontal_alignment = 1
+
+
+[node name="Label_physical_hit" type="Label" parent="."]
+layout_mode = 0
+offset_left = 17.0
+offset_top = 215.0
+offset_right = 60.0
+offset_bottom = 241.0
+theme_override_colors/font_color = Color(0.396, 0.27, 0.094, 1)
+theme_override_font_sizes/font_size = 16
+text = "命中"
+vertical_alignment = 1
+
+
+[node name="Slot_physical_hit" type="Panel" parent="."]
+layout_mode = 0
+offset_left = 63.0
+offset_top = 217.0
+offset_right = 132.0
+offset_bottom = 240.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("Slot")
+
+[node name="Value_physical_hit" parent="." instance=ExtResource("Number")]
+offset_left = 67.0
+offset_top = 220.0
+offset_right = 128.0
+offset_bottom = 238.0
+value = ""
+
+[node name="Unknown_physical_hit" type="Label" parent="."]
+layout_mode = 0
+offset_left = 63.0
+offset_top = 217.0
+offset_right = 132.0
+offset_bottom = 240.0
+theme_override_colors/font_color = Color(0.396, 0.27, 0.094, 1)
+theme_override_font_sizes/font_size = 16
+text = "—"
+vertical_alignment = 1
+horizontal_alignment = 1
+
+
+[node name="Label_magic_hit" type="Label" parent="."]
+layout_mode = 0
+offset_left = 17.0
+offset_top = 246.0
+offset_right = 60.0
+offset_bottom = 272.0
+theme_override_colors/font_color = Color(0.396, 0.27, 0.094, 1)
+theme_override_font_sizes/font_size = 16
+text = "法命"
+vertical_alignment = 1
+
+
+[node name="Slot_magic_hit" type="Panel" parent="."]
+layout_mode = 0
+offset_left = 63.0
+offset_top = 248.0
+offset_right = 132.0
+offset_bottom = 271.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("Slot")
+
+[node name="Value_magic_hit" parent="." instance=ExtResource("Number")]
+offset_left = 67.0
+offset_top = 251.0
+offset_right = 128.0
+offset_bottom = 269.0
+value = ""
+
+[node name="Unknown_magic_hit" type="Label" parent="."]
+layout_mode = 0
+offset_left = 63.0
+offset_top = 248.0
+offset_right = 132.0
+offset_bottom = 271.0
+theme_override_colors/font_color = Color(0.396, 0.27, 0.094, 1)
+theme_override_font_sizes/font_size = 16
+text = "—"
+vertical_alignment = 1
+horizontal_alignment = 1
+
+
+[node name="Label_physical_evasion" type="Label" parent="."]
+layout_mode = 0
+offset_left = 17.0
+offset_top = 277.0
+offset_right = 60.0
+offset_bottom = 303.0
+theme_override_colors/font_color = Color(0.396, 0.27, 0.094, 1)
+theme_override_font_sizes/font_size = 16
+text = "物闪"
+vertical_alignment = 1
+
+
+[node name="Slot_physical_evasion" type="Panel" parent="."]
+layout_mode = 0
+offset_left = 63.0
+offset_top = 279.0
+offset_right = 132.0
+offset_bottom = 302.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("Slot")
+
+[node name="Value_physical_evasion" parent="." instance=ExtResource("Number")]
+offset_left = 67.0
+offset_top = 282.0
+offset_right = 128.0
+offset_bottom = 300.0
+value = ""
+
+[node name="Unknown_physical_evasion" type="Label" parent="."]
+layout_mode = 0
+offset_left = 63.0
+offset_top = 279.0
+offset_right = 132.0
+offset_bottom = 302.0
+theme_override_colors/font_color = Color(0.396, 0.27, 0.094, 1)
+theme_override_font_sizes/font_size = 16
+text = "—"
+vertical_alignment = 1
+horizontal_alignment = 1
+
+
+[node name="Label_magic_evasion" type="Label" parent="."]
+layout_mode = 0
+offset_left = 17.0
+offset_top = 308.0
+offset_right = 60.0
+offset_bottom = 334.0
+theme_override_colors/font_color = Color(0.396, 0.27, 0.094, 1)
+theme_override_font_sizes/font_size = 16
+text = "法闪"
+vertical_alignment = 1
+
+
+[node name="Slot_magic_evasion" type="Panel" parent="."]
+layout_mode = 0
+offset_left = 63.0
+offset_top = 310.0
+offset_right = 132.0
+offset_bottom = 333.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("Slot")
+
+[node name="Value_magic_evasion" parent="." instance=ExtResource("Number")]
+offset_left = 67.0
+offset_top = 313.0
+offset_right = 128.0
+offset_bottom = 331.0
+value = ""
+
+[node name="Unknown_magic_evasion" type="Label" parent="."]
+layout_mode = 0
+offset_left = 63.0
+offset_top = 310.0
+offset_right = 132.0
+offset_bottom = 333.0
+theme_override_colors/font_color = Color(0.396, 0.27, 0.094, 1)
+theme_override_font_sizes/font_size = 16
+text = "—"
+vertical_alignment = 1
+horizontal_alignment = 1
+
+
+[node name="Label_damage_reduction" type="Label" parent="."]
+layout_mode = 0
+offset_left = 17.0
+offset_top = 339.0
+offset_right = 60.0
+offset_bottom = 365.0
+theme_override_colors/font_color = Color(0.396, 0.27, 0.094, 1)
+theme_override_font_sizes/font_size = 16
+text = "减伤"
+vertical_alignment = 1
+
+
+[node name="Slot_damage_reduction" type="Panel" parent="."]
+layout_mode = 0
+offset_left = 63.0
+offset_top = 341.0
+offset_right = 132.0
+offset_bottom = 364.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("Slot")
+
+[node name="Value_damage_reduction" parent="." instance=ExtResource("Number")]
+offset_left = 67.0
+offset_top = 344.0
+offset_right = 128.0
+offset_bottom = 362.0
+value = ""
+
+[node name="Unknown_damage_reduction" type="Label" parent="."]
+layout_mode = 0
+offset_left = 63.0
+offset_top = 341.0
+offset_right = 132.0
+offset_bottom = 364.0
+theme_override_colors/font_color = Color(0.396, 0.27, 0.094, 1)
+theme_override_font_sizes/font_size = 16
+text = "—"
+vertical_alignment = 1
+horizontal_alignment = 1
+
+
+[node name="Label_mp" type="Label" parent="."]
+layout_mode = 0
+offset_left = 166.0
+offset_top = 91.0
+offset_right = 209.0
+offset_bottom = 117.0
+theme_override_colors/font_color = Color(0.396, 0.27, 0.094, 1)
+theme_override_font_sizes/font_size = 16
+text = "灵力"
+vertical_alignment = 1
+
+
+[node name="Slot_mp" type="Panel" parent="."]
+layout_mode = 0
+offset_left = 212.0
+offset_top = 93.0
+offset_right = 281.0
+offset_bottom = 116.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("Slot")
+
+[node name="Value_mp" parent="." instance=ExtResource("Number")]
+offset_left = 216.0
+offset_top = 96.0
+offset_right = 277.0
+offset_bottom = 114.0
+value = ""
+
+[node name="Unknown_mp" type="Label" parent="."]
+layout_mode = 0
+offset_left = 212.0
+offset_top = 93.0
+offset_right = 281.0
+offset_bottom = 116.0
+theme_override_colors/font_color = Color(0.396, 0.27, 0.094, 1)
+theme_override_font_sizes/font_size = 16
+text = "—"
+vertical_alignment = 1
+horizontal_alignment = 1
+
+
+[node name="Label_magic_attack" type="Label" parent="."]
+layout_mode = 0
+offset_left = 166.0
+offset_top = 122.0
+offset_right = 209.0
+offset_bottom = 148.0
+theme_override_colors/font_color = Color(0.396, 0.27, 0.094, 1)
+theme_override_font_sizes/font_size = 16
+text = "法攻"
+vertical_alignment = 1
+
+
+[node name="Slot_magic_attack" type="Panel" parent="."]
+layout_mode = 0
+offset_left = 212.0
+offset_top = 124.0
+offset_right = 281.0
+offset_bottom = 147.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("Slot")
+
+[node name="Value_magic_attack" parent="." instance=ExtResource("Number")]
+offset_left = 216.0
+offset_top = 127.0
+offset_right = 277.0
+offset_bottom = 145.0
+value = ""
+
+[node name="Unknown_magic_attack" type="Label" parent="."]
+layout_mode = 0
+offset_left = 212.0
+offset_top = 124.0
+offset_right = 281.0
+offset_bottom = 147.0
+theme_override_colors/font_color = Color(0.396, 0.27, 0.094, 1)
+theme_override_font_sizes/font_size = 16
+text = "—"
+vertical_alignment = 1
+horizontal_alignment = 1
+
+
+[node name="Label_magic_defense" type="Label" parent="."]
+layout_mode = 0
+offset_left = 166.0
+offset_top = 153.0
+offset_right = 209.0
+offset_bottom = 179.0
+theme_override_colors/font_color = Color(0.396, 0.27, 0.094, 1)
+theme_override_font_sizes/font_size = 16
+text = "法防"
+vertical_alignment = 1
+
+
+[node name="Slot_magic_defense" type="Panel" parent="."]
+layout_mode = 0
+offset_left = 212.0
+offset_top = 155.0
+offset_right = 281.0
+offset_bottom = 178.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("Slot")
+
+[node name="Value_magic_defense" parent="." instance=ExtResource("Number")]
+offset_left = 216.0
+offset_top = 158.0
+offset_right = 277.0
+offset_bottom = 176.0
+value = ""
+
+[node name="Unknown_magic_defense" type="Label" parent="."]
+layout_mode = 0
+offset_left = 212.0
+offset_top = 155.0
+offset_right = 281.0
+offset_bottom = 178.0
+theme_override_colors/font_color = Color(0.396, 0.27, 0.094, 1)
+theme_override_font_sizes/font_size = 16
+text = "—"
+vertical_alignment = 1
+horizontal_alignment = 1
+
+
+[node name="Label_magic_crit" type="Label" parent="."]
+layout_mode = 0
+offset_left = 166.0
+offset_top = 184.0
+offset_right = 209.0
+offset_bottom = 210.0
+theme_override_colors/font_color = Color(0.396, 0.27, 0.094, 1)
+theme_override_font_sizes/font_size = 16
+text = "法暴"
+vertical_alignment = 1
+
+
+[node name="Slot_magic_crit" type="Panel" parent="."]
+layout_mode = 0
+offset_left = 212.0
+offset_top = 186.0
+offset_right = 281.0
+offset_bottom = 209.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("Slot")
+
+[node name="Value_magic_crit" parent="." instance=ExtResource("Number")]
+offset_left = 216.0
+offset_top = 189.0
+offset_right = 277.0
+offset_bottom = 207.0
+value = ""
+
+[node name="Unknown_magic_crit" type="Label" parent="."]
+layout_mode = 0
+offset_left = 212.0
+offset_top = 186.0
+offset_right = 281.0
+offset_bottom = 209.0
+theme_override_colors/font_color = Color(0.396, 0.27, 0.094, 1)
+theme_override_font_sizes/font_size = 16
+text = "—"
+vertical_alignment = 1
+horizontal_alignment = 1
+
+
+[node name="AllocationPanel" type="Panel" parent="."]
+layout_mode = 0
+offset_left = 158.0
+offset_top = 214.0
+offset_right = 301.0
+offset_bottom = 378.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("Red")
+
+[node name="Attribute0" type="Label" parent="."]
+layout_mode = 0
+offset_left = 164.0
+offset_top = 218.0
+offset_right = 204.0
+offset_bottom = 246.0
+theme_override_colors/font_color = Color(1, 0.91, 0.27, 1)
+theme_override_font_sizes/font_size = 16
+text = "体质"
+vertical_alignment = 1
+
+
+[node name="Field0" type="Panel" parent="."]
+layout_mode = 0
+offset_left = 225.0
+offset_top = 220.0
+offset_right = 268.0
+offset_bottom = 245.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("Field")
+
+[node name="Points0" type="Label" parent="."]
+layout_mode = 0
+offset_left = 225.0
+offset_top = 220.0
+offset_right = 268.0
+offset_bottom = 245.0
+theme_override_colors/font_color = Color(0.396, 0.27, 0.094, 1)
+theme_override_font_sizes/font_size = 16
+text = "—"
+vertical_alignment = 1
+horizontal_alignment = 1
+
+
+[node name="Minus0" type="Button" parent="."]
+layout_mode = 0
+offset_left = 204.0
+offset_top = 218.0
+offset_right = 227.0
+offset_bottom = 246.0
+focus_mode = 0
+theme_override_colors/font_color = Color(1, 0.91, 0.6, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 0.8, 1)
+theme_override_colors/font_disabled_color = Color(0.72, 0.38, 0.24, 1)
+theme_override_colors/font_outline_color = Color(0.55, 0.3, 0.12, 1)
+theme_override_constants/outline_size = 1
+theme_override_font_sizes/font_size = 21
+theme_override_styles/normal = SubResource("Empty")
+theme_override_styles/hover = SubResource("Empty")
+theme_override_styles/pressed = SubResource("Empty")
+theme_override_styles/disabled = SubResource("Empty")
+text = "◀"
+disabled = true
+
+[node name="Plus0" type="Button" parent="."]
+layout_mode = 0
+offset_left = 271.0
+offset_top = 218.0
+offset_right = 294.0
+offset_bottom = 246.0
+focus_mode = 0
+theme_override_colors/font_color = Color(1, 0.91, 0.6, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 0.8, 1)
+theme_override_colors/font_disabled_color = Color(0.72, 0.38, 0.24, 1)
+theme_override_colors/font_outline_color = Color(0.55, 0.3, 0.12, 1)
+theme_override_constants/outline_size = 1
+theme_override_font_sizes/font_size = 21
+theme_override_styles/normal = SubResource("Empty")
+theme_override_styles/hover = SubResource("Empty")
+theme_override_styles/pressed = SubResource("Empty")
+theme_override_styles/disabled = SubResource("Empty")
+text = "▶"
+disabled = true
+
+[node name="Attribute1" type="Label" parent="."]
+layout_mode = 0
+offset_left = 164.0
+offset_top = 249.0
+offset_right = 204.0
+offset_bottom = 277.0
+theme_override_colors/font_color = Color(1, 0.91, 0.27, 1)
+theme_override_font_sizes/font_size = 16
+text = "灵性"
+vertical_alignment = 1
+
+
+[node name="Field1" type="Panel" parent="."]
+layout_mode = 0
+offset_left = 225.0
+offset_top = 251.0
+offset_right = 268.0
+offset_bottom = 276.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("Field")
+
+[node name="Points1" type="Label" parent="."]
+layout_mode = 0
+offset_left = 225.0
+offset_top = 251.0
+offset_right = 268.0
+offset_bottom = 276.0
+theme_override_colors/font_color = Color(0.396, 0.27, 0.094, 1)
+theme_override_font_sizes/font_size = 16
+text = "—"
+vertical_alignment = 1
+horizontal_alignment = 1
+
+
+[node name="Minus1" type="Button" parent="."]
+layout_mode = 0
+offset_left = 204.0
+offset_top = 249.0
+offset_right = 227.0
+offset_bottom = 277.0
+focus_mode = 0
+theme_override_colors/font_color = Color(1, 0.91, 0.6, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 0.8, 1)
+theme_override_colors/font_disabled_color = Color(0.72, 0.38, 0.24, 1)
+theme_override_colors/font_outline_color = Color(0.55, 0.3, 0.12, 1)
+theme_override_constants/outline_size = 1
+theme_override_font_sizes/font_size = 21
+theme_override_styles/normal = SubResource("Empty")
+theme_override_styles/hover = SubResource("Empty")
+theme_override_styles/pressed = SubResource("Empty")
+theme_override_styles/disabled = SubResource("Empty")
+text = "◀"
+disabled = true
+
+[node name="Plus1" type="Button" parent="."]
+layout_mode = 0
+offset_left = 271.0
+offset_top = 249.0
+offset_right = 294.0
+offset_bottom = 277.0
+focus_mode = 0
+theme_override_colors/font_color = Color(1, 0.91, 0.6, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 0.8, 1)
+theme_override_colors/font_disabled_color = Color(0.72, 0.38, 0.24, 1)
+theme_override_colors/font_outline_color = Color(0.55, 0.3, 0.12, 1)
+theme_override_constants/outline_size = 1
+theme_override_font_sizes/font_size = 21
+theme_override_styles/normal = SubResource("Empty")
+theme_override_styles/hover = SubResource("Empty")
+theme_override_styles/pressed = SubResource("Empty")
+theme_override_styles/disabled = SubResource("Empty")
+text = "▶"
+disabled = true
+
+[node name="Attribute2" type="Label" parent="."]
+layout_mode = 0
+offset_left = 164.0
+offset_top = 280.0
+offset_right = 204.0
+offset_bottom = 308.0
+theme_override_colors/font_color = Color(1, 0.91, 0.27, 1)
+theme_override_font_sizes/font_size = 16
+text = "力量"
+vertical_alignment = 1
+
+
+[node name="Field2" type="Panel" parent="."]
+layout_mode = 0
+offset_left = 225.0
+offset_top = 282.0
+offset_right = 268.0
+offset_bottom = 307.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("Field")
+
+[node name="Points2" type="Label" parent="."]
+layout_mode = 0
+offset_left = 225.0
+offset_top = 282.0
+offset_right = 268.0
+offset_bottom = 307.0
+theme_override_colors/font_color = Color(0.396, 0.27, 0.094, 1)
+theme_override_font_sizes/font_size = 16
+text = "—"
+vertical_alignment = 1
+horizontal_alignment = 1
+
+
+[node name="Minus2" type="Button" parent="."]
+layout_mode = 0
+offset_left = 204.0
+offset_top = 280.0
+offset_right = 227.0
+offset_bottom = 308.0
+focus_mode = 0
+theme_override_colors/font_color = Color(1, 0.91, 0.6, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 0.8, 1)
+theme_override_colors/font_disabled_color = Color(0.72, 0.38, 0.24, 1)
+theme_override_colors/font_outline_color = Color(0.55, 0.3, 0.12, 1)
+theme_override_constants/outline_size = 1
+theme_override_font_sizes/font_size = 21
+theme_override_styles/normal = SubResource("Empty")
+theme_override_styles/hover = SubResource("Empty")
+theme_override_styles/pressed = SubResource("Empty")
+theme_override_styles/disabled = SubResource("Empty")
+text = "◀"
+disabled = true
+
+[node name="Plus2" type="Button" parent="."]
+layout_mode = 0
+offset_left = 271.0
+offset_top = 280.0
+offset_right = 294.0
+offset_bottom = 308.0
+focus_mode = 0
+theme_override_colors/font_color = Color(1, 0.91, 0.6, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 0.8, 1)
+theme_override_colors/font_disabled_color = Color(0.72, 0.38, 0.24, 1)
+theme_override_colors/font_outline_color = Color(0.55, 0.3, 0.12, 1)
+theme_override_constants/outline_size = 1
+theme_override_font_sizes/font_size = 21
+theme_override_styles/normal = SubResource("Empty")
+theme_override_styles/hover = SubResource("Empty")
+theme_override_styles/pressed = SubResource("Empty")
+theme_override_styles/disabled = SubResource("Empty")
+text = "▶"
+disabled = true
+
+[node name="Attribute3" type="Label" parent="."]
+layout_mode = 0
+offset_left = 164.0
+offset_top = 311.0
+offset_right = 204.0
+offset_bottom = 339.0
+theme_override_colors/font_color = Color(1, 0.91, 0.27, 1)
+theme_override_font_sizes/font_size = 16
+text = "敏捷"
+vertical_alignment = 1
+
+
+[node name="Field3" type="Panel" parent="."]
+layout_mode = 0
+offset_left = 225.0
+offset_top = 313.0
+offset_right = 268.0
+offset_bottom = 338.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("Field")
+
+[node name="Points3" type="Label" parent="."]
+layout_mode = 0
+offset_left = 225.0
+offset_top = 313.0
+offset_right = 268.0
+offset_bottom = 338.0
+theme_override_colors/font_color = Color(0.396, 0.27, 0.094, 1)
+theme_override_font_sizes/font_size = 16
+text = "—"
+vertical_alignment = 1
+horizontal_alignment = 1
+
+
+[node name="Minus3" type="Button" parent="."]
+layout_mode = 0
+offset_left = 204.0
+offset_top = 311.0
+offset_right = 227.0
+offset_bottom = 339.0
+focus_mode = 0
+theme_override_colors/font_color = Color(1, 0.91, 0.6, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 0.8, 1)
+theme_override_colors/font_disabled_color = Color(0.72, 0.38, 0.24, 1)
+theme_override_colors/font_outline_color = Color(0.55, 0.3, 0.12, 1)
+theme_override_constants/outline_size = 1
+theme_override_font_sizes/font_size = 21
+theme_override_styles/normal = SubResource("Empty")
+theme_override_styles/hover = SubResource("Empty")
+theme_override_styles/pressed = SubResource("Empty")
+theme_override_styles/disabled = SubResource("Empty")
+text = "◀"
+disabled = true
+
+[node name="Plus3" type="Button" parent="."]
+layout_mode = 0
+offset_left = 271.0
+offset_top = 311.0
+offset_right = 294.0
+offset_bottom = 339.0
+focus_mode = 0
+theme_override_colors/font_color = Color(1, 0.91, 0.6, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 0.8, 1)
+theme_override_colors/font_disabled_color = Color(0.72, 0.38, 0.24, 1)
+theme_override_colors/font_outline_color = Color(0.55, 0.3, 0.12, 1)
+theme_override_constants/outline_size = 1
+theme_override_font_sizes/font_size = 21
+theme_override_styles/normal = SubResource("Empty")
+theme_override_styles/hover = SubResource("Empty")
+theme_override_styles/pressed = SubResource("Empty")
+theme_override_styles/disabled = SubResource("Empty")
+text = "▶"
+disabled = true
+
+[node name="Attribute4" type="Label" parent="."]
+layout_mode = 0
+offset_left = 164.0
+offset_top = 342.0
+offset_right = 204.0
+offset_bottom = 370.0
+theme_override_colors/font_color = Color(1, 0.91, 0.27, 1)
+theme_override_font_sizes/font_size = 16
+text = "定力"
+vertical_alignment = 1
+
+
+[node name="Field4" type="Panel" parent="."]
+layout_mode = 0
+offset_left = 225.0
+offset_top = 344.0
+offset_right = 268.0
+offset_bottom = 369.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("Field")
+
+[node name="Points4" type="Label" parent="."]
+layout_mode = 0
+offset_left = 225.0
+offset_top = 344.0
+offset_right = 268.0
+offset_bottom = 369.0
+theme_override_colors/font_color = Color(0.396, 0.27, 0.094, 1)
+theme_override_font_sizes/font_size = 16
+text = "—"
+vertical_alignment = 1
+horizontal_alignment = 1
+
+
+[node name="Minus4" type="Button" parent="."]
+layout_mode = 0
+offset_left = 204.0
+offset_top = 342.0
+offset_right = 227.0
+offset_bottom = 370.0
+focus_mode = 0
+theme_override_colors/font_color = Color(1, 0.91, 0.6, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 0.8, 1)
+theme_override_colors/font_disabled_color = Color(0.72, 0.38, 0.24, 1)
+theme_override_colors/font_outline_color = Color(0.55, 0.3, 0.12, 1)
+theme_override_constants/outline_size = 1
+theme_override_font_sizes/font_size = 21
+theme_override_styles/normal = SubResource("Empty")
+theme_override_styles/hover = SubResource("Empty")
+theme_override_styles/pressed = SubResource("Empty")
+theme_override_styles/disabled = SubResource("Empty")
+text = "◀"
+disabled = true
+
+[node name="Plus4" type="Button" parent="."]
+layout_mode = 0
+offset_left = 271.0
+offset_top = 342.0
+offset_right = 294.0
+offset_bottom = 370.0
+focus_mode = 0
+theme_override_colors/font_color = Color(1, 0.91, 0.6, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 0.8, 1)
+theme_override_colors/font_disabled_color = Color(0.72, 0.38, 0.24, 1)
+theme_override_colors/font_outline_color = Color(0.55, 0.3, 0.12, 1)
+theme_override_constants/outline_size = 1
+theme_override_font_sizes/font_size = 21
+theme_override_styles/normal = SubResource("Empty")
+theme_override_styles/hover = SubResource("Empty")
+theme_override_styles/pressed = SubResource("Empty")
+theme_override_styles/disabled = SubResource("Empty")
+text = "▶"
+disabled = true
+
+[node name="RemainingSlot" type="Panel" parent="."]
+layout_mode = 0
+offset_left = 17.0
+offset_top = 389.0
+offset_right = 141.0
+offset_bottom = 419.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("Slot")
+
+[node name="RemainingLabel" type="Label" parent="."]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 389.0
+offset_right = 89.0
+offset_bottom = 419.0
+theme_override_colors/font_color = Color(0.396, 0.27, 0.094, 1)
+theme_override_font_sizes/font_size = 16
+text = "属性点"
+vertical_alignment = 1
+
+
+[node name="Remaining" type="Label" parent="."]
+layout_mode = 0
+offset_left = 91.0
+offset_top = 389.0
+offset_right = 135.0
+offset_bottom = 419.0
+theme_override_colors/font_color = Color(0.396, 0.27, 0.094, 1)
+theme_override_font_sizes/font_size = 16
+text = "—"
+vertical_alignment = 1
+horizontal_alignment = 1
+
+
+[node name="Recommend" type="Button" parent="."]
+layout_mode = 0
+offset_left = 169.0
+offset_top = 387.0
+offset_right = 230.0
+offset_bottom = 421.0
+focus_mode = 0
+theme_override_colors/font_color = Color(0.48, 0.35, 0.12, 1)
+theme_override_colors/font_disabled_color = Color(0.6, 0.41, 0.24, 1)
+theme_override_font_sizes/font_size = 17
+theme_override_styles/normal = SubResource("Button")
+theme_override_styles/hover = SubResource("Hover")
+theme_override_styles/pressed = SubResource("Hover")
+theme_override_styles/disabled = SubResource("Slot")
+text = "推荐"
+disabled = true
+
+[node name="Confirm" type="Button" parent="."]
+layout_mode = 0
+offset_left = 241.0
+offset_top = 387.0
+offset_right = 302.0
+offset_bottom = 421.0
+focus_mode = 0
+theme_override_colors/font_color = Color(0.48, 0.35, 0.12, 1)
+theme_override_colors/font_disabled_color = Color(0.6, 0.41, 0.24, 1)
+theme_override_font_sizes/font_size = 17
+theme_override_styles/normal = SubResource("Button")
+theme_override_styles/hover = SubResource("Hover")
+theme_override_styles/pressed = SubResource("Hover")
+theme_override_styles/disabled = SubResource("Slot")
+text = "确认"
+disabled = true
+
+[node name="Status" type="Label" parent="."]
+layout_mode = 0
+offset_left = 19.0
+offset_top = 422.0
+offset_right = 299.0
+offset_bottom = 439.0
+theme_override_colors/font_color = Color(0.396, 0.27, 0.094, 1)
+theme_override_font_sizes/font_size = 10
+text = "同步中，请稍候"
+vertical_alignment = 1
+horizontal_alignment = 1
+

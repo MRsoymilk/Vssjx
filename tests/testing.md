@@ -1,0 +1,96 @@
+# 当前客户端测试说明
+
+本文记录已存在的测试入口、运行方式和隔离要求。未来联机版的测试与容量验收见[online_test_plan.md](online_test_plan.md)。测试说明和结果统一放在`tests/`，不写入项目或设计目录的README。
+
+除非特别说明，命令均在`Vssjx/`项目根目录执行。当前Godot工程尚未迁移到`client/`；迁移时应同步更新命令中的工程路径。
+
+## 环境与隔离
+
+- Godot 4.7系列；原工程记录的验证引擎为`4.7.1.stable.official.a13da4feb`，本轮Linux行走验证使用`4.7.2.stable.gentoo.ed1daf0bf`。
+- Python素材测试需要Pillow，资源重建另外需要NumPy。
+- 普通`--headless`只检查逻辑，不能代替真实渲染截图。
+- Linux真实渲染离屏运行需要Xvfb与OpenGL驱动，可使用Mesa软件渲染，不向桌面弹窗。
+- 场景使用各自的独立测试存档；不能把测试配置指向玩家的`user://shushan_save.json`。
+- 普通启动的隔离存档可用`SSJX_SAVE_PATH`指定；下列测试场景会自行设置独立存档路径。
+- 截图输出目录必须先创建。测试产物不混入`assets/`或玩家数据。
+
+## 1. 素材与动画导入回归
+
+```sh
+python -m unittest discover -s tests -p 'test_*.py'
+```
+
+`test_asset_decoder.py`检查静态资源解码；`test_actor_import.py`检查六个角色的完整步伐朝向，以及侠客待机和六帧行走中双刀与身体的像素连接，防止较大的武器孤立像素部件。
+
+## 2. 游戏逻辑与完整流程
+
+```sh
+godot --headless --path . res://tests/test_runner.tscn
+```
+
+覆盖战斗、存档、寻路、背包、界面操作与完整任务流程，使用独立的`test_save.json`。
+
+Windows PowerShell示例：
+
+```powershell
+& 'E:/Godot_v4.7.1-stable_win64.exe/Godot_v4.7.1-stable_win64_console.exe' --headless --path . res://tests/test_runner.tscn
+```
+
+## 3. 行走专项逻辑回归
+
+```sh
+godot --headless --path . res://tests/motion_regression.tscn
+```
+
+覆盖六角色、WASD四向、跨格、转向、暂停、松键、阻挡、点击寻路与15/30/60/120 FPS速度和步伐一致性。不读写玩家存档。
+
+## 4. Linux真实渲染离屏
+
+```sh
+mkdir -p /tmp/opencode/vssjx-motion
+SSJX_MOTION_PATH=/tmp/opencode/vssjx-motion LIBGL_ALWAYS_SOFTWARE=1 \
+  python tests/run_offscreen.py --path . --rendering-driver opengl3_es res://tests/motion_regression.tscn
+```
+
+输出204张截图和`motion_trace.json`逐帧位置、朝向、动画与步伐记录。`GODOT_BIN`、`XVFB_BIN`可指定引擎与虚拟显示器路径；辅助脚本位于`tests/run_offscreen.py`。
+
+连续行走录制：
+
+```sh
+mkdir -p /tmp/opencode/vssjx-motion-smoke
+SSJX_MOTION_PATH=/tmp/opencode/vssjx-motion-smoke LIBGL_ALWAYS_SOFTWARE=1 \
+  python tests/run_offscreen.py --path . --rendering-driver opengl3_es res://tests/motion_smoke.tscn
+```
+
+记录72帧待机、右行、左行、停下过程，使用独立测试存档。
+
+## 5. 战斗回合渲染
+
+```sh
+mkdir -p /tmp/opencode/vssjx-turn
+SSJX_TURN_PATH=/tmp/opencode/vssjx-turn LIBGL_ALWAYS_SOFTWARE=1 \
+  python tests/run_offscreen.py --path . --rendering-driver opengl3_es res://tests/turn_smoke.tscn
+```
+
+记录105帧指令选择、我方行动、敌方行动、回合结算和下一次选择，并输出阶段截图，使用独立测试存档。
+
+## 6. 页面与场景截图
+
+```sh
+mkdir -p /tmp/opencode/vssjx-visual
+SSJX_CAPTURE_PATH=/tmp/opencode/vssjx-visual LIBGL_ALWAYS_SOFTWARE=1 \
+  python tests/run_offscreen.py --path . --rendering-driver opengl3_es res://tests/visual_smoke.tscn
+```
+
+Windows直接运行会短暂打开窗口：
+
+```powershell
+$env:SSJX_CAPTURE_PATH = '指定一个已存在的绝对目录'
+& 'E:/Godot_v4.7.1-stable_win64.exe/Godot_v4.7.1-stable_win64_console.exe' --path . res://tests/visual_smoke.tscn
+```
+
+## 行走修正验证记录
+
+本轮行走修正曾在Linux Godot 4.7.2下运行：素材单元测试6项通过，游戏逻辑回归379项零失败，行走无渲染回归6018项零失败，真实渲染离屏回归6426项零失败，并录制72帧连续行走。
+
+这些是对应行走修正的验证记录，不表示未实施的联网功能或1000人容量已通过验收。后续修改需要重新运行相应入口。

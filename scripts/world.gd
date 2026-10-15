@@ -5,6 +5,8 @@ signal interaction(kind: String, data: Dictionary)
 signal moved
 const CELL := 16
 const MAP_SIZE := 32
+const WALK_SPEED := 72.0
+const WALK_CYCLE_DISTANCE := 32.0 # One full left/right stride, in map pixels.
 enum Ground { GRASS, DIRT, WATER, BRIDGE }
 const PATROL_OFFSETS := [Vector2i(2, 0), Vector2i(2, 1), Vector2i(0, 1), Vector2i(-2, 1), Vector2i(-2, 0), Vector2i.ZERO]
 const ENEMIES := [
@@ -34,6 +36,7 @@ var pending: Dictionary = {}
 var enemy_nodes: Dictionary = {}
 var patrols: Dictionary = {}
 var facing_left := true # Native stand and walk composites face left.
+var walk_distance := 0.0
 var portal_marker: Node2D
 
 func _ready() -> void:
@@ -263,36 +266,68 @@ func _interact_pending() -> void:
 func _process(delta: float) -> void:
 	if not enabled or hero == null: return
 	_update_patrols(delta)
-	if next_cell.x < 0 and path.is_empty():
-		var direction := Vector2i.ZERO
-		if Input.is_physical_key_pressed(KEY_A) or Input.is_physical_key_pressed(KEY_LEFT): direction.x = -1
-		elif Input.is_physical_key_pressed(KEY_D) or Input.is_physical_key_pressed(KEY_RIGHT): direction.x = 1
-		elif Input.is_physical_key_pressed(KEY_W) or Input.is_physical_key_pressed(KEY_UP): direction.y = -1
-		elif Input.is_physical_key_pressed(KEY_S) or Input.is_physical_key_pressed(KEY_DOWN): direction.y = 1
-		if direction != Vector2i.ZERO:
-			pending = {}
-			var destination := cell + direction
-			if astar.region.has_point(destination) and not astar.is_point_solid(destination):
-				path.append(destination)
-	if next_cell.x < 0 and not path.is_empty():
-		next_cell = path.pop_front()
-		if next_cell == cell:
-			next_cell = Vector2i(-1, -1)
-			return
-		if next_cell.x != cell.x:
-			facing_left = next_cell.x < cell.x
-		_face_actor(hero, facing_left)
-		hero.play("walk")
-	if next_cell.x >= 0:
-		hero.position = hero.position.move_toward(cell_center(next_cell), 72.0 * delta)
-		if hero.position.distance_to(cell_center(next_cell)) < 0.1:
+	var remaining := WALK_SPEED * delta
+	while remaining > 0.0:
+		if next_cell.x < 0 and not _begin_step():
+			_idle_hero()
+			break
+		var target := cell_center(next_cell)
+		var distance := hero.position.distance_to(target)
+		var travel := minf(remaining, distance)
+		hero.position = hero.position.move_toward(target, travel)
+		_advance_walk(travel)
+		remaining -= travel
+		if travel >= distance:
 			cell = next_cell
 			next_cell = Vector2i(-1, -1)
 			_save_position()
-			if path.is_empty():
-				hero.play("idle")
-				if not pending.is_empty(): _interact_pending()
+			if path.is_empty() and not pending.is_empty():
+				_idle_hero()
+				_interact_pending()
+				break
+			# Continue held keys without inserting idle at every grid boundary.
+			# Spend leftover distance too, so speed does not depend on frame rate.
+			if not _begin_step():
+				_idle_hero()
+				break
 	camera.position = hero.position
+
+func _keyboard_direction() -> Vector2i:
+	if Input.is_physical_key_pressed(KEY_A) or Input.is_physical_key_pressed(KEY_LEFT): return Vector2i.LEFT
+	if Input.is_physical_key_pressed(KEY_D) or Input.is_physical_key_pressed(KEY_RIGHT): return Vector2i.RIGHT
+	if Input.is_physical_key_pressed(KEY_W) or Input.is_physical_key_pressed(KEY_UP): return Vector2i.UP
+	if Input.is_physical_key_pressed(KEY_S) or Input.is_physical_key_pressed(KEY_DOWN): return Vector2i.DOWN
+	return Vector2i.ZERO
+
+func _begin_step() -> bool:
+	if path.is_empty():
+		var direction := _keyboard_direction()
+		var destination := cell + direction
+		if direction != Vector2i.ZERO and astar.region.has_point(destination) and not astar.is_point_solid(destination):
+			pending = {}
+			path.append(destination)
+	while not path.is_empty():
+		var destination: Vector2i = path.pop_front()
+		if destination == cell: continue
+		next_cell = destination
+		if next_cell.x != cell.x:
+			facing_left = next_cell.x < cell.x
+		_face_actor(hero, facing_left)
+		return true
+	return false
+
+func _advance_walk(distance: float) -> void:
+	# The world owns locomotion, including its animation clock. Pauses, turns
+	# and cell transitions must not restart the gait or animate sliding feet.
+	walk_distance = fposmod(walk_distance + distance, WALK_CYCLE_DISTANCE)
+	hero.animation = "walk"
+	hero.pause()
+	var phase := walk_distance / WALK_CYCLE_DISTANCE * hero.sprite_frames.get_frame_count("walk")
+	hero.set_frame_and_progress(int(phase), fposmod(phase, 1.0))
+
+func _idle_hero() -> void:
+	walk_distance = 0.0
+	if hero.animation != "idle": hero.play("idle")
 
 func _face_actor(sprite: AnimatedSprite2D, left: bool) -> void:
 	sprite.scale.x = 1.0 if left else -1.0
@@ -356,5 +391,5 @@ func stop_moving() -> void:
 	pending = {}
 	next_cell = Vector2i(-1, -1)
 	hero.position = cell_center(cell)
-	hero.play("idle")
+	_idle_hero()
 	_save_position()

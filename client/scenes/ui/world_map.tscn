@@ -1,0 +1,253 @@
+[gd_scene format=3]
+[ext_resource type="Script" path="res://scripts/world_map.gd" id="Script"]
+[ext_resource type="PackedScene" path="res://scenes/ui/world_map_graph.tscn" id="Graph"]
+[ext_resource type="Texture2D" path="res://assets/ui/worldmap_node_0.png" id="Wild"]
+[ext_resource type="Texture2D" path="res://assets/ui/worldmap_node_1.png" id="City"]
+[ext_resource type="Texture2D" path="res://assets/ui/worldmap_node_2.png" id="School"]
+[ext_resource type="Texture2D" path="res://assets/ui/create_cursor.png" id="Cursor"]
+[sub_resource type="SystemFont" id="Font"]
+font_names = PackedStringArray("SimHei", "Microsoft YaHei", "sans-serif")
+antialiasing = 0
+[sub_resource type="StyleBoxFlat" id="Orange"]
+bg_color = Color(0.95, 0.62, 0.16, 1)
+border_color = Color(1, 0.88, 0.58, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+[sub_resource type="StyleBoxFlat" id="Button"]
+bg_color = Color(0.78, 0.49, 0.12, 1)
+border_color = Color(1, 0.94, 0.71, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+[sub_resource type="StyleBoxFlat" id="Hover"]
+bg_color = Color(1, 0.74, 0.26, 1)
+border_color = Color(0.51, 0.29, 0.06, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+[sub_resource type="StyleBoxFlat" id="Tip"]
+bg_color = Color(1, 0.93, 0.62, 1)
+border_color = Color(0.72, 0.39, 0.07, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+[sub_resource type="StyleBoxEmpty" id="Empty"]
+[sub_resource type="Theme" id="Theme"]
+default_font = SubResource("Font")
+default_font_size = 15
+Button/styles/normal = SubResource("Button")
+Button/styles/hover = SubResource("Hover")
+Button/styles/pressed = SubResource("Hover")
+Button/styles/disabled = SubResource("Empty")
+Button/styles/focus = SubResource("Hover")
+Button/colors/font_color = Color(1, 0.98, 0.72, 1)
+Button/colors/font_hover_color = Color(1, 1, 0.8, 1)
+Button/colors/font_outline_color = Color(0.34, 0.21, 0.05, 1)
+Button/constants/outline_size = 1
+
+[node name="WorldMap" type="Control"]
+z_index = 20
+offset_right = 320.0
+offset_bottom = 480.0
+texture_filter = 1
+theme = SubResource("Theme")
+script = ExtResource("Script")
+
+[node name="Shade" type="ColorRect" parent="."]
+offset_right = 320.0
+offset_bottom = 480.0
+mouse_filter = 2
+color = Color(0.02, 0.10, 0.06, 0.58)
+
+[node name="MapArea" type="Control" parent="."]
+clip_contents = true
+offset_top = 44.0
+offset_right = 320.0
+offset_bottom = 444.0
+mouse_default_cursor_shape = 6
+
+[node name="Graph" parent="MapArea" instance=ExtResource("Graph")]
+
+[node name="Selection" type="TextureRect" parent="MapArea"]
+offset_right = 20.0
+offset_bottom = 20.0
+mouse_filter = 2
+texture = ExtResource("Cursor")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="LocationTip" type="Panel" parent="MapArea"]
+offset_right = 110.0
+offset_bottom = 52.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("Tip")
+
+[node name="Name" type="Label" parent="MapArea/LocationTip"]
+offset_left = 4.0
+offset_top = 3.0
+offset_right = 106.0
+offset_bottom = 26.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.33, 0.20, 0.05, 1)
+text = "卧云镇北"
+horizontal_alignment = 1
+vertical_alignment = 1
+clip_text = true
+
+[node name="Level" type="Label" parent="MapArea/LocationTip"]
+offset_left = 4.0
+offset_top = 25.0
+offset_right = 106.0
+offset_bottom = 48.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.33, 0.20, 0.05, 1)
+text = "20～25级"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Header" type="Panel" parent="."]
+offset_left = 2.0
+offset_top = 2.0
+offset_right = 318.0
+offset_bottom = 44.0
+theme_override_styles/panel = SubResource("Orange")
+
+[node name="Wild" type="Button" parent="Header"]
+offset_left = 0.0
+offset_right = 104.0
+offset_bottom = 42.0
+focus_mode = 0
+theme_override_styles/normal = SubResource("Empty")
+theme_override_styles/hover = SubResource("Empty")
+theme_override_styles/pressed = SubResource("Empty")
+theme_override_colors/font_color = Color(1, 0.98, 0.30, 1)
+theme_override_font_sizes/font_size = 17
+text = "野外"
+icon = ExtResource("Wild")
+icon_alignment = 0
+alignment = 0
+
+[node name="City" type="Button" parent="Header"]
+offset_left = 105.0
+offset_right = 209.0
+offset_bottom = 42.0
+focus_mode = 0
+theme_override_styles/normal = SubResource("Empty")
+theme_override_styles/hover = SubResource("Empty")
+theme_override_styles/pressed = SubResource("Empty")
+theme_override_colors/font_color = Color(1, 0.98, 0.30, 1)
+theme_override_font_sizes/font_size = 17
+text = "城市"
+icon = ExtResource("City")
+icon_alignment = 0
+alignment = 0
+
+[node name="School" type="Button" parent="Header"]
+offset_left = 210.0
+offset_right = 314.0
+offset_bottom = 42.0
+focus_mode = 0
+theme_override_styles/normal = SubResource("Empty")
+theme_override_styles/hover = SubResource("Empty")
+theme_override_styles/pressed = SubResource("Empty")
+theme_override_colors/font_color = Color(1, 0.98, 0.30, 1)
+theme_override_font_sizes/font_size = 17
+text = "门派"
+icon = ExtResource("School")
+icon_alignment = 0
+alignment = 0
+
+[node name="MainCity" type="Button" parent="."]
+offset_left = 204.0
+offset_top = 45.0
+offset_right = 318.0
+offset_bottom = 71.0
+focus_mode = 0
+theme_override_styles/normal = SubResource("Orange")
+theme_override_styles/hover = SubResource("Hover")
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(1, 0.97, 0.2, 1)
+text = "0键切换主城"
+
+[node name="Footer" type="Panel" parent="."]
+offset_left = 2.0
+offset_top = 444.0
+offset_right = 318.0
+offset_bottom = 478.0
+theme_override_styles/panel = SubResource("Orange")
+
+[node name="Menu" type="Button" parent="Footer"]
+offset_left = 3.0
+offset_top = 3.0
+offset_right = 49.0
+offset_bottom = 31.0
+focus_mode = 0
+text = "菜单"
+
+[node name="Travel" type="Button" parent="Footer"]
+offset_left = 82.0
+offset_top = 3.0
+offset_right = 167.0
+offset_bottom = 31.0
+focus_mode = 0
+disabled = true
+tooltip_text = "神行符数量暂未同步，传送暂未开放"
+theme_override_colors/font_disabled_color = Color(1, 0.95, 0.2, 1)
+text = "神行符"
+
+[node name="TravelCount" type="Label" parent="Footer"]
+offset_left = 185.0
+offset_top = 3.0
+offset_right = 218.0
+offset_bottom = 31.0
+theme_override_colors/font_color = Color(1, 1, 0.85, 1)
+theme_override_colors/font_outline_color = Color(0.28, 0.2, 0.05, 1)
+theme_override_constants/outline_size = 2
+text = "—"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Back" type="Button" parent="Footer"]
+offset_left = 265.0
+offset_top = 3.0
+offset_right = 313.0
+offset_bottom = 31.0
+focus_mode = 0
+text = "返回"
+
+[node name="MapMenu" type="Panel" parent="."]
+visible = false
+offset_left = 4.0
+offset_top = 345.0
+offset_right = 124.0
+offset_bottom = 441.0
+theme_override_styles/panel = SubResource("Tip")
+
+[node name="Details" type="Button" parent="MapMenu"]
+offset_left = 3.0
+offset_top = 3.0
+offset_right = 117.0
+offset_bottom = 33.0
+focus_mode = 0
+text = "查看地点"
+
+[node name="City" type="Button" parent="MapMenu"]
+offset_left = 3.0
+offset_top = 33.0
+offset_right = 117.0
+offset_bottom = 63.0
+focus_mode = 0
+text = "切换主城"
+
+[node name="Close" type="Button" parent="MapMenu"]
+offset_left = 3.0
+offset_top = 63.0
+offset_right = 117.0
+offset_bottom = 93.0
+focus_mode = 0
+text = "关闭地图"

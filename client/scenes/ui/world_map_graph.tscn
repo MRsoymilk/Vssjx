@@ -1,0 +1,796 @@
+[gd_scene format=3]
+[ext_resource type="Texture2D" path="res://assets/ui/worldmap_node_0.png" id="Kind0"]
+[ext_resource type="Texture2D" path="res://assets/ui/worldmap_node_1.png" id="Kind1"]
+[ext_resource type="Texture2D" path="res://assets/ui/worldmap_node_2.png" id="Kind2"]
+
+[node name="WorldMapGraph" type="Node2D"]
+texture_filter = 1
+
+[node name="Routes" type="Node2D" parent="."]
+
+[node name="Route0" type="Line2D" parent="Routes"]
+points = PackedVector2Array(208, 584, 254, 584)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route1" type="Line2D" parent="Routes"]
+points = PackedVector2Array(254, 584, 254, 640)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route2" type="Line2D" parent="Routes"]
+points = PackedVector2Array(254, 640, 254, 696)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route3" type="Line2D" parent="Routes"]
+points = PackedVector2Array(254, 696, 208, 696)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route4" type="Line2D" parent="Routes"]
+points = PackedVector2Array(254, 808, 346, 808)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route5" type="Line2D" parent="Routes"]
+points = PackedVector2Array(346, 808, 346, 752)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route6" type="Line2D" parent="Routes"]
+points = PackedVector2Array(346, 752, 346, 696)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route7" type="Line2D" parent="Routes"]
+points = PackedVector2Array(346, 808, 346, 864)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route8" type="Line2D" parent="Routes"]
+points = PackedVector2Array(346, 864, 300, 864)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route9" type="Line2D" parent="Routes"]
+points = PackedVector2Array(300, 864, 300, 920)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route10" type="Line2D" parent="Routes"]
+points = PackedVector2Array(300, 920, 392, 920)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route11" type="Line2D" parent="Routes"]
+points = PackedVector2Array(392, 920, 392, 976)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route12" type="Line2D" parent="Routes"]
+points = PackedVector2Array(392, 976, 484, 976)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route13" type="Line2D" parent="Routes"]
+points = PackedVector2Array(484, 976, 484, 1032)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route14" type="Line2D" parent="Routes"]
+points = PackedVector2Array(484, 1032, 438, 1032)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route15" type="Line2D" parent="Routes"]
+points = PackedVector2Array(484, 1032, 484, 1088)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route16" type="Line2D" parent="Routes"]
+points = PackedVector2Array(484, 976, 576, 976)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route17" type="Line2D" parent="Routes"]
+points = PackedVector2Array(576, 976, 622, 976)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route18" type="Line2D" parent="Routes"]
+points = PackedVector2Array(622, 976, 622, 920)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route19" type="Line2D" parent="Routes"]
+points = PackedVector2Array(622, 920, 668, 920)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route20" type="Line2D" parent="Routes"]
+points = PackedVector2Array(668, 920, 714, 920)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route21" type="Line2D" parent="Routes"]
+points = PackedVector2Array(714, 920, 760, 920)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route22" type="Line2D" parent="Routes"]
+points = PackedVector2Array(760, 920, 806, 920)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route23" type="Line2D" parent="Routes"]
+points = PackedVector2Array(806, 976, 806, 1032)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route24" type="Line2D" parent="Routes"]
+points = PackedVector2Array(806, 1032, 760, 1032)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route25" type="Line2D" parent="Routes"]
+points = PackedVector2Array(760, 1032, 760, 1088)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route26" type="Line2D" parent="Routes"]
+points = PackedVector2Array(760, 1088, 760, 1144)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route27" type="Line2D" parent="Routes"]
+points = PackedVector2Array(484, 976, 484, 864)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route28" type="Line2D" parent="Routes"]
+points = PackedVector2Array(484, 864, 484, 808)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route29" type="Line2D" parent="Routes"]
+points = PackedVector2Array(484, 808, 530, 808)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route30" type="Line2D" parent="Routes"]
+points = PackedVector2Array(530, 808, 530, 752)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route31" type="Line2D" parent="Routes"]
+points = PackedVector2Array(530, 752, 530, 696)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route32" type="Line2D" parent="Routes"]
+points = PackedVector2Array(530, 696, 530, 584)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route33" type="Line2D" parent="Routes"]
+points = PackedVector2Array(484, 584, 530, 584)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route34" type="Line2D" parent="Routes"]
+points = PackedVector2Array(530, 584, 576, 584)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route35" type="Line2D" parent="Routes"]
+points = PackedVector2Array(530, 584, 530, 528)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route36" type="Line2D" parent="Routes"]
+points = PackedVector2Array(530, 528, 576, 528)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route37" type="Line2D" parent="Routes"]
+points = PackedVector2Array(576, 528, 576, 416)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route38" type="Line2D" parent="Routes"]
+points = PackedVector2Array(530, 416, 576, 416)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route39" type="Line2D" parent="Routes"]
+points = PackedVector2Array(576, 416, 622, 416)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route40" type="Line2D" parent="Routes"]
+points = PackedVector2Array(530, 416, 484, 416)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route41" type="Line2D" parent="Routes"]
+points = PackedVector2Array(622, 416, 622, 360)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route42" type="Line2D" parent="Routes"]
+points = PackedVector2Array(576, 416, 576, 304)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route43" type="Line2D" parent="Routes"]
+points = PackedVector2Array(622, 360, 668, 360)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route44" type="Line2D" parent="Routes"]
+points = PackedVector2Array(576, 304, 576, 248)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route45" type="Line2D" parent="Routes"]
+points = PackedVector2Array(576, 248, 622, 248)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route46" type="Line2D" parent="Routes"]
+points = PackedVector2Array(622, 248, 668, 248)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route47" type="Line2D" parent="Routes"]
+points = PackedVector2Array(576, 248, 576, 192)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route48" type="Line2D" parent="Routes"]
+points = PackedVector2Array(576, 192, 484, 192)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route49" type="Line2D" parent="Routes"]
+points = PackedVector2Array(484, 192, 484, 248)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route50" type="Line2D" parent="Routes"]
+points = PackedVector2Array(484, 248, 484, 304)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route51" type="Line2D" parent="Routes"]
+points = PackedVector2Array(346, 248, 346, 304)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route52" type="Line2D" parent="Routes"]
+points = PackedVector2Array(346, 248, 346, 136)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route53" type="Line2D" parent="Routes"]
+points = PackedVector2Array(346, 136, 300, 136)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route54" type="Line2D" parent="Routes"]
+points = PackedVector2Array(484, 304, 392, 304)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route55" type="Line2D" parent="Routes"]
+points = PackedVector2Array(392, 304, 346, 304)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route56" type="Line2D" parent="Routes"]
+points = PackedVector2Array(392, 304, 392, 248)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route57" type="Line2D" parent="Routes"]
+points = PackedVector2Array(760, 1144, 714, 1144)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route58" type="Line2D" parent="Routes"]
+points = PackedVector2Array(852, 1088, 898, 1088)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route59" type="Line2D" parent="Routes"]
+points = PackedVector2Array(852, 1088, 852, 1144)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route60" type="Line2D" parent="Routes"]
+points = PackedVector2Array(852, 1144, 760, 1144)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route61" type="Line2D" parent="Routes"]
+points = PackedVector2Array(208, 584, 208, 528)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route62" type="Line2D" parent="Routes"]
+points = PackedVector2Array(208, 528, 162, 528)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route63" type="Line2D" parent="Routes"]
+points = PackedVector2Array(806, 920, 806, 976)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route64" type="Line2D" parent="Routes"]
+points = PackedVector2Array(806, 920, 852, 920)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route65" type="Line2D" parent="Routes"]
+points = PackedVector2Array(208, 1088, 162, 1088)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route66" type="Line2D" parent="Routes"]
+points = PackedVector2Array(208, 1088, 254, 1088)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route67" type="Line2D" parent="Routes"]
+points = PackedVector2Array(254, 1088, 254, 1032)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route68" type="Line2D" parent="Routes"]
+points = PackedVector2Array(254, 1032, 208, 1032)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route69" type="Line2D" parent="Routes"]
+points = PackedVector2Array(208, 1032, 208, 976)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route70" type="Line2D" parent="Routes"]
+points = PackedVector2Array(208, 976, 208, 920)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route71" type="Line2D" parent="Routes"]
+points = PackedVector2Array(208, 920, 208, 808)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route72" type="Line2D" parent="Routes"]
+points = PackedVector2Array(208, 696, 208, 808)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route73" type="Line2D" parent="Routes"]
+points = PackedVector2Array(208, 808, 254, 808)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route74" type="Line2D" parent="Routes"]
+points = PackedVector2Array(1036, 696, 1036, 472)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route75" type="Line2D" parent="Routes"]
+points = PackedVector2Array(300, 1200, 346, 1200)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route76" type="Line2D" parent="Routes"]
+points = PackedVector2Array(346, 1200, 346, 1144)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Route77" type="Line2D" parent="Routes"]
+points = PackedVector2Array(714, 696, 714, 696)
+width = 1.0
+default_color = Color(1, 0.98, 0.83, 1)
+
+[node name="Locations" type="Node2D" parent="."]
+
+[node name="Location1" type="Sprite2D" parent="Locations"]
+position = Vector2(300, 1200)
+texture = ExtResource("Kind0")
+metadata/map_id = 1
+
+[node name="Location2" type="Sprite2D" parent="Locations"]
+position = Vector2(346, 1200)
+texture = ExtResource("Kind0")
+metadata/map_id = 2
+
+[node name="Location4" type="Sprite2D" parent="Locations"]
+position = Vector2(208, 528)
+texture = ExtResource("Kind2")
+metadata/map_id = 4
+
+[node name="Location5" type="Sprite2D" parent="Locations"]
+position = Vector2(162, 528)
+texture = ExtResource("Kind0")
+metadata/map_id = 5
+
+[node name="Location6" type="Sprite2D" parent="Locations"]
+position = Vector2(208, 584)
+texture = ExtResource("Kind0")
+metadata/map_id = 6
+
+[node name="Location7" type="Sprite2D" parent="Locations"]
+position = Vector2(254, 584)
+texture = ExtResource("Kind0")
+metadata/map_id = 7
+
+[node name="Location8" type="Sprite2D" parent="Locations"]
+position = Vector2(254, 640)
+texture = ExtResource("Kind0")
+metadata/map_id = 8
+
+[node name="Location9" type="Sprite2D" parent="Locations"]
+position = Vector2(254, 696)
+texture = ExtResource("Kind0")
+metadata/map_id = 9
+
+[node name="Location10" type="Sprite2D" parent="Locations"]
+position = Vector2(208, 696)
+texture = ExtResource("Kind0")
+metadata/map_id = 10
+
+[node name="Location11" type="Sprite2D" parent="Locations"]
+position = Vector2(208, 808)
+texture = ExtResource("Kind0")
+metadata/map_id = 11
+
+[node name="Location12" type="Sprite2D" parent="Locations"]
+position = Vector2(254, 808)
+texture = ExtResource("Kind0")
+metadata/map_id = 12
+
+[node name="Location13" type="Sprite2D" parent="Locations"]
+position = Vector2(346, 808)
+texture = ExtResource("Kind1")
+metadata/map_id = 13
+
+[node name="Location14" type="Sprite2D" parent="Locations"]
+position = Vector2(346, 752)
+texture = ExtResource("Kind0")
+metadata/map_id = 14
+
+[node name="Location15" type="Sprite2D" parent="Locations"]
+position = Vector2(346, 696)
+texture = ExtResource("Kind0")
+metadata/map_id = 15
+
+[node name="Location16" type="Sprite2D" parent="Locations"]
+position = Vector2(346, 864)
+texture = ExtResource("Kind0")
+metadata/map_id = 16
+
+[node name="Location17" type="Sprite2D" parent="Locations"]
+position = Vector2(300, 864)
+texture = ExtResource("Kind0")
+metadata/map_id = 17
+
+[node name="Location18" type="Sprite2D" parent="Locations"]
+position = Vector2(300, 920)
+texture = ExtResource("Kind0")
+metadata/map_id = 18
+
+[node name="Location19" type="Sprite2D" parent="Locations"]
+position = Vector2(392, 920)
+texture = ExtResource("Kind0")
+metadata/map_id = 19
+
+[node name="Location20" type="Sprite2D" parent="Locations"]
+position = Vector2(392, 976)
+texture = ExtResource("Kind0")
+metadata/map_id = 20
+
+[node name="Location21" type="Sprite2D" parent="Locations"]
+position = Vector2(208, 1088)
+texture = ExtResource("Kind2")
+metadata/map_id = 21
+
+[node name="Location22" type="Sprite2D" parent="Locations"]
+position = Vector2(162, 1088)
+texture = ExtResource("Kind0")
+metadata/map_id = 22
+
+[node name="Location23" type="Sprite2D" parent="Locations"]
+position = Vector2(254, 1088)
+texture = ExtResource("Kind0")
+metadata/map_id = 23
+
+[node name="Location24" type="Sprite2D" parent="Locations"]
+position = Vector2(254, 1032)
+texture = ExtResource("Kind0")
+metadata/map_id = 24
+
+[node name="Location25" type="Sprite2D" parent="Locations"]
+position = Vector2(208, 1032)
+texture = ExtResource("Kind0")
+metadata/map_id = 25
+
+[node name="Location26" type="Sprite2D" parent="Locations"]
+position = Vector2(208, 976)
+texture = ExtResource("Kind0")
+metadata/map_id = 26
+
+[node name="Location27" type="Sprite2D" parent="Locations"]
+position = Vector2(208, 920)
+texture = ExtResource("Kind0")
+metadata/map_id = 27
+
+[node name="Location28" type="Sprite2D" parent="Locations"]
+position = Vector2(484, 976)
+texture = ExtResource("Kind0")
+metadata/map_id = 28
+
+[node name="Location29" type="Sprite2D" parent="Locations"]
+position = Vector2(484, 1032)
+texture = ExtResource("Kind1")
+metadata/map_id = 29
+
+[node name="Location30" type="Sprite2D" parent="Locations"]
+position = Vector2(438, 1032)
+texture = ExtResource("Kind0")
+metadata/map_id = 30
+
+[node name="Location31" type="Sprite2D" parent="Locations"]
+position = Vector2(484, 1088)
+texture = ExtResource("Kind0")
+metadata/map_id = 31
+
+[node name="Location32" type="Sprite2D" parent="Locations"]
+position = Vector2(852, 1088)
+texture = ExtResource("Kind2")
+metadata/map_id = 32
+
+[node name="Location33" type="Sprite2D" parent="Locations"]
+position = Vector2(898, 1088)
+texture = ExtResource("Kind0")
+metadata/map_id = 33
+
+[node name="Location34" type="Sprite2D" parent="Locations"]
+position = Vector2(852, 1144)
+texture = ExtResource("Kind0")
+metadata/map_id = 34
+
+[node name="Location35" type="Sprite2D" parent="Locations"]
+position = Vector2(760, 1144)
+texture = ExtResource("Kind0")
+metadata/map_id = 35
+
+[node name="Location36" type="Sprite2D" parent="Locations"]
+position = Vector2(714, 1144)
+texture = ExtResource("Kind0")
+metadata/map_id = 36
+
+[node name="Location37" type="Sprite2D" parent="Locations"]
+position = Vector2(760, 1088)
+texture = ExtResource("Kind0")
+metadata/map_id = 37
+
+[node name="Location38" type="Sprite2D" parent="Locations"]
+position = Vector2(760, 1032)
+texture = ExtResource("Kind0")
+metadata/map_id = 38
+
+[node name="Location39" type="Sprite2D" parent="Locations"]
+position = Vector2(806, 1032)
+texture = ExtResource("Kind0")
+metadata/map_id = 39
+
+[node name="Location40" type="Sprite2D" parent="Locations"]
+position = Vector2(806, 976)
+texture = ExtResource("Kind0")
+metadata/map_id = 40
+
+[node name="Location41" type="Sprite2D" parent="Locations"]
+position = Vector2(806, 920)
+texture = ExtResource("Kind1")
+metadata/map_id = 41
+
+[node name="Location42" type="Sprite2D" parent="Locations"]
+position = Vector2(760, 920)
+texture = ExtResource("Kind0")
+metadata/map_id = 42
+
+[node name="Location43" type="Sprite2D" parent="Locations"]
+position = Vector2(852, 920)
+texture = ExtResource("Kind0")
+metadata/map_id = 43
+
+[node name="Location44" type="Sprite2D" parent="Locations"]
+position = Vector2(714, 920)
+texture = ExtResource("Kind0")
+metadata/map_id = 44
+
+[node name="Location45" type="Sprite2D" parent="Locations"]
+position = Vector2(668, 920)
+texture = ExtResource("Kind0")
+metadata/map_id = 45
+
+[node name="Location46" type="Sprite2D" parent="Locations"]
+position = Vector2(622, 920)
+texture = ExtResource("Kind0")
+metadata/map_id = 46
+
+[node name="Location47" type="Sprite2D" parent="Locations"]
+position = Vector2(622, 976)
+texture = ExtResource("Kind0")
+metadata/map_id = 47
+
+[node name="Location48" type="Sprite2D" parent="Locations"]
+position = Vector2(576, 976)
+texture = ExtResource("Kind0")
+metadata/map_id = 48
+
+[node name="Location49" type="Sprite2D" parent="Locations"]
+position = Vector2(484, 864)
+texture = ExtResource("Kind0")
+metadata/map_id = 49
+
+[node name="Location50" type="Sprite2D" parent="Locations"]
+position = Vector2(484, 808)
+texture = ExtResource("Kind0")
+metadata/map_id = 50
+
+[node name="Location51" type="Sprite2D" parent="Locations"]
+position = Vector2(530, 808)
+texture = ExtResource("Kind0")
+metadata/map_id = 51
+
+[node name="Location52" type="Sprite2D" parent="Locations"]
+position = Vector2(530, 752)
+texture = ExtResource("Kind0")
+metadata/map_id = 52
+
+[node name="Location53" type="Sprite2D" parent="Locations"]
+position = Vector2(530, 696)
+texture = ExtResource("Kind0")
+metadata/map_id = 53
+
+[node name="Location54" type="Sprite2D" parent="Locations"]
+position = Vector2(530, 584)
+texture = ExtResource("Kind0")
+metadata/map_id = 54
+
+[node name="Location55" type="Sprite2D" parent="Locations"]
+position = Vector2(484, 584)
+texture = ExtResource("Kind0")
+metadata/map_id = 55
+
+[node name="Location56" type="Sprite2D" parent="Locations"]
+position = Vector2(576, 584)
+texture = ExtResource("Kind0")
+metadata/map_id = 56
+
+[node name="Location57" type="Sprite2D" parent="Locations"]
+position = Vector2(530, 528)
+texture = ExtResource("Kind0")
+metadata/map_id = 57
+
+[node name="Location58" type="Sprite2D" parent="Locations"]
+position = Vector2(576, 528)
+texture = ExtResource("Kind0")
+metadata/map_id = 58
+
+[node name="Location59" type="Sprite2D" parent="Locations"]
+position = Vector2(576, 416)
+texture = ExtResource("Kind1")
+metadata/map_id = 59
+
+[node name="Location60" type="Sprite2D" parent="Locations"]
+position = Vector2(530, 416)
+texture = ExtResource("Kind0")
+metadata/map_id = 60
+
+[node name="Location61" type="Sprite2D" parent="Locations"]
+position = Vector2(484, 416)
+texture = ExtResource("Kind0")
+metadata/map_id = 61
+
+[node name="Location62" type="Sprite2D" parent="Locations"]
+position = Vector2(622, 416)
+texture = ExtResource("Kind0")
+metadata/map_id = 62
+
+[node name="Location63" type="Sprite2D" parent="Locations"]
+position = Vector2(668, 360)
+texture = ExtResource("Kind0")
+metadata/map_id = 63
+
+[node name="Location64" type="Sprite2D" parent="Locations"]
+position = Vector2(622, 360)
+texture = ExtResource("Kind0")
+metadata/map_id = 64
+
+[node name="Location65" type="Sprite2D" parent="Locations"]
+position = Vector2(576, 304)
+texture = ExtResource("Kind0")
+metadata/map_id = 65
+
+[node name="Location66" type="Sprite2D" parent="Locations"]
+position = Vector2(576, 248)
+texture = ExtResource("Kind0")
+metadata/map_id = 66
+
+[node name="Location67" type="Sprite2D" parent="Locations"]
+position = Vector2(622, 248)
+texture = ExtResource("Kind0")
+metadata/map_id = 67
+
+[node name="Location68" type="Sprite2D" parent="Locations"]
+position = Vector2(668, 248)
+texture = ExtResource("Kind0")
+metadata/map_id = 68
+
+[node name="Location69" type="Sprite2D" parent="Locations"]
+position = Vector2(576, 192)
+texture = ExtResource("Kind0")
+metadata/map_id = 69
+
+[node name="Location70" type="Sprite2D" parent="Locations"]
+position = Vector2(484, 192)
+texture = ExtResource("Kind0")
+metadata/map_id = 70
+
+[node name="Location71" type="Sprite2D" parent="Locations"]
+position = Vector2(484, 248)
+texture = ExtResource("Kind0")
+metadata/map_id = 71
+
+[node name="Location72" type="Sprite2D" parent="Locations"]
+position = Vector2(484, 304)
+texture = ExtResource("Kind0")
+metadata/map_id = 72
+
+[node name="Location73" type="Sprite2D" parent="Locations"]
+position = Vector2(346, 304)
+texture = ExtResource("Kind0")
+metadata/map_id = 73
+
+[node name="Location74" type="Sprite2D" parent="Locations"]
+position = Vector2(392, 248)
+texture = ExtResource("Kind0")
+metadata/map_id = 74
+
+[node name="Location75" type="Sprite2D" parent="Locations"]
+position = Vector2(346, 248)
+texture = ExtResource("Kind0")
+metadata/map_id = 75
+
+[node name="Location76" type="Sprite2D" parent="Locations"]
+position = Vector2(392, 304)
+texture = ExtResource("Kind0")
+metadata/map_id = 76
+
+[node name="Location77" type="Sprite2D" parent="Locations"]
+position = Vector2(346, 136)
+texture = ExtResource("Kind0")
+metadata/map_id = 77
+
+[node name="Location78" type="Sprite2D" parent="Locations"]
+position = Vector2(300, 136)
+texture = ExtResource("Kind0")
+metadata/map_id = 78
+
+[node name="Location79" type="Sprite2D" parent="Locations"]
+position = Vector2(346, 1144)
+texture = ExtResource("Kind0")
+metadata/map_id = 79
+
+[node name="Location158" type="Sprite2D" parent="Locations"]
+position = Vector2(714, 808)
+texture = ExtResource("Kind0")
+metadata/map_id = 158

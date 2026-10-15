@@ -1,0 +1,86 @@
+extends "res://tests/shared_interface_test.gd"
+
+func mouse_event(point: Vector2, pressed: bool) -> InputEventMouseButton:
+	var event := InputEventMouseButton.new()
+	event.button_index = MOUSE_BUTTON_LEFT
+	event.position = point
+	event.pressed = pressed
+	return event
+
+func _run() -> void:
+	var old := Game.player.duplicate(true)
+	var old_path := Game.save_path
+	Game.save_path = "user://world_map_%d.json" % OS.get_process_id()
+	Game.new_player("地图修士",1,2)
+	var app: Control = load("res://scenes/main.tscn").instantiate()
+	add_child(app)
+	app._enter_world()
+	app._scene_action("map")
+	var page: OriginalWorldMap = app.modal
+	check(page != null and page.scene_file_path == "res://scenes/ui/world_map.tscn" and not app.world.enabled, "Map entry opens authored overview and pauses local world")
+	var before := Game.player.duplicate(true)
+	check(page.locations.size() == 79 and page.graph.get_node("Locations").get_child_count() == 79 and page.graph.get_node("Routes").get_child_count() == 78, "Overview preserves all recovered locations and routes")
+	var source: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://assets/data/original_world.json"))
+	var valid := true
+	for node in source.maps.world_overview.nodes:
+		var icon: Sprite2D = page.graph.get_node("Locations/Location%d" % int(node.original_map_id))
+		valid = valid and icon.position == page.location_point(int(node.original_map_id)) and icon.texture.resource_path == "res://assets/ui/worldmap_node_%d.png" % int(node.location_kind)
+	check(valid, "Scene positions and original icons match recovered data")
+	valid = true
+	for route in source.maps.world_overview.routes:
+		var line: Line2D = page.graph.get_node("Routes/Route%d" % int(route.index))
+		valid = valid and line.points[0] == Vector2(route["from"][0],route["from"][1])*page.STEP+page.PADDING and line.points[1] == Vector2(route.to[0],route.to[1])*page.STEP+page.PADDING
+	check(valid, "Authored lines preserve original endpoints without inventing connections")
+	check(page.selected_id == 14 and page.tooltip.get_node("Name").text == "卧云镇北" and page.tooltip.get_node("Level").text == "20～25级", "Reference selected location shows actual recovered name and levels")
+	check(page.get_node("Header/Wild").text == "野外" and page.get_node("Header/City").text == "城市" and page.get_node("Header/School").text == "门派", "Header matches reference legend")
+	check(page.get_node("Footer/Travel").disabled and page.get_node("Footer/TravelCount").text == "—", "Unknown travel item count cannot be fabricated or spent")
+	output = OS.get_environment("SSJX_WORLD_MAP_CAPTURE_PATH") if DisplayServer.get_name() != "headless" else ""
+	await capture("local_world_map")
+	var point := page.graph.position+page.location_point(15)
+	page._map_input(mouse_event(point,true))
+	page._map_input(mouse_event(point,false))
+	check(page.selected_id == 15 and page.tooltip.get_node("Name").text == "跃阳湖", "Mouse click selects actual map location")
+	var start := page.graph.position
+	page._map_input(mouse_event(Vector2(100,100),true))
+	var motion := InputEventMouseMotion.new(); motion.relative = Vector2(-50,30)
+	page._map_input(motion)
+	page._map_input(mouse_event(Vector2(50,130),false))
+	check(page.graph.position == start+Vector2(-50,30) and page.selected_id == 15, "Dragging pans map without accidentally selecting a location")
+	var touch := InputEventScreenTouch.new(); touch.index = 0; touch.pressed = true; touch.position = Vector2(100,100)
+	page._map_input(touch)
+	var drag := InputEventScreenDrag.new(); drag.index = 0; drag.relative = Vector2(20,-20)
+	start = page.graph.position
+	page._map_input(drag)
+	touch.pressed = false
+	page._map_input(touch)
+	check(page.graph.position == start+Vector2(20,-20), "Touch drag pans the same authored graph")
+	page.pan_by(Vector2(99999,99999))
+	check(page.graph.position == Vector2.ZERO and not page.selection.visible and not page.tooltip.visible, "Map bounds clamp panning and offscreen selection is hidden")
+	page.pan_by(Vector2(-99999,-99999))
+	check(page.graph.position == page.map_area.size-page.GRAPH_SIZE, "Bottom and right panning limits remain bounded")
+	page.get_node("MainCity").pressed.emit()
+	check(page.selected_id == 13 and page.selection.visible and int(page.locations[page.selected_id].location_kind) == 1, "Main city button centers first actual city")
+	var key := InputEventKey.new(); key.keycode = KEY_0; key.pressed = true
+	page._unhandled_key_input(key)
+	check(page.selected_id == 29 and page.tooltip.get_node("Name").text == "慈云寺", "Zero key cycles recovered cities")
+	page.get_node("Header/School").pressed.emit()
+	check(page.selected_id == 4 and page.tooltip.get_node("Name").text == "峨眉派", "School legend centers a recovered school")
+	page.get_node("Footer/Menu").pressed.emit()
+	check(page.popup.visible, "Reference footer menu opens authored options")
+	page.popup.get_node("City").pressed.emit()
+	check(not page.popup.visible and page.selected_id == 13, "Map menu switches city without changing game location")
+	check(Game.player == before, "Overview browsing does not change offline inventory, position or progress")
+	page.get_node("Footer/Back").pressed.emit()
+	check(app.modal == null and app.world.enabled, "Back resumes same local world")
+	key.keycode = KEY_3
+	app._unhandled_key_input(key)
+	check(app.modal is OriginalWorldMap and not app.world.enabled, "Three key opens world map")
+	key.keycode = KEY_ESCAPE
+	app.modal._unhandled_key_input(key)
+	check(app.modal == null and app.world.enabled, "Map Escape closes without consuming input through a detached node")
+	app.queue_free()
+	await get_tree().process_frame
+	Game.player = old
+	Game.save_path = old_path
+	print("WORLD MAP: %d checks, %d failures" % [checks,failures])
+	get_tree().quit(0 if failures == 0 else 1)

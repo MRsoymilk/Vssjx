@@ -102,6 +102,8 @@ func _unhandled_key_input(event: InputEvent) -> void:
 			_home()
 	elif mode == "world" and modal == null and event.keycode == KEY_C:
 		_attributes()
+	elif mode == "world" and modal == null and event.keycode == KEY_3:
+		_open_world_map()
 	elif mode == "world" and modal == null and event.keycode in [KEY_E, KEY_ENTER]:
 		world.interact_nearest()
 	elif mode == "battle" and modal == null:
@@ -388,7 +390,7 @@ func _scene_action(action: String) -> void:
 		"quest": _quest()
 		"bag": _bag()
 		"rest": _rest()
-		"map": _message("地图", ("青云山道" if int(Game.player.zone) == 0 else "古剑遗迹") + "\n\n当前位置：%d，%d\n" % [world.cell.x, world.cell.y] + Game.quest_text())
+		"map": _open_world_map()
 		"mail": _message("邮件", "暂无邮件。")
 		"social": _message("社交", "尚未结交好友。")
 		"system": _system_menu()
@@ -544,6 +546,20 @@ func _bag() -> void:
 	modal.add_child(backpack)
 	backpack.back_requested.connect(_close_modal)
 	backpack.changed.connect(_refresh_hud)
+
+func _open_world_map() -> void:
+	if modal is OriginalWorldMap:
+		_close_modal()
+		return
+	if mode != "world": return
+	_close_modal()
+	world.pause_moving()
+	world.enabled = false
+	var page: OriginalWorldMap = preload("res://scenes/ui/world_map.tscn").instantiate()
+	modal = page
+	ui.add_child(page)
+	page.back_requested.connect(_close_modal)
+	page.present()
 
 func _quest() -> void:
 	_message("蜀山初行", Game.quest_text() + "\n\n路线：道人领受试炼 → 三只山狼 →\n道人领取奖励 → 东侧灵门 → 遗迹妖王\n\n点击目标可自动寻路。战斗失败会回山门，\n保留任务进度、铜钱和装备。")

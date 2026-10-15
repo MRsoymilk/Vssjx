@@ -1,0 +1,14 @@
+{
+  "sources": ["m2"],
+  "frames": [
+    [
+      {"source": "m2", "frame": 0, "x": -16, "y": -78, "transform": 0}
+    ]
+  ],
+  "sequences": [
+    [
+      [0, 0]
+    ]
+  ],
+  "opaque_tail_hex": "0100000001"
+}

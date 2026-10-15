@@ -1,0 +1,26 @@
+{
+  "sources": ["tx12"],
+  "frames": [
+    [
+      {"source": "tx12", "frame": 0, "x": -11, "y": -19, "transform": 0}
+    ],
+    [
+      {"source": "tx12", "frame": 0, "x": -11, "y": -18, "transform": 0}
+    ],
+    [
+      {"source": "tx12", "frame": 1, "x": -12, "y": -20, "transform": 0}
+    ],
+    [
+      {"source": "tx12", "frame": 1, "x": -12, "y": -21, "transform": 0}
+    ]
+  ],
+  "sequences": [
+    [
+      [0, 1],
+      [1, 1],
+      [2, 1],
+      [3, 1]
+    ]
+  ],
+  "opaque_tail_hex": "00"
+}

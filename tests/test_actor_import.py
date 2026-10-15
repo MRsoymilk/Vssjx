@@ -8,6 +8,19 @@ from PIL import Image
 ROOT = Path(__file__).resolve().parents[1] / 'client'
 
 
+def runtime_actors():
+    index = json.loads((ROOT / 'assets/data/actors.json').read_text('utf8'))
+    return {key: json.loads((ROOT / path.removeprefix('res://')).read_text('utf8'))
+            for key, path in index['actors'].items()}
+
+
+def original_animations():
+    folder = ROOT.parent / 'analysis/animations'
+    index = json.loads((folder / 'index.json').read_text('utf8'))
+    return {key: json.loads((folder / path).read_text('utf8'))
+            for key, path in index['animations'].items()}
+
+
 def components(image):
     alpha = image.getchannel('A')
     points = {(x, y) for y in range(image.height) for x in range(image.width) if alpha.getpixel((x, y))}
@@ -31,8 +44,8 @@ def components(image):
 class ActorImportTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.actors = json.loads((ROOT / 'assets/data/actors.json').read_text('utf8'))
-        cls.source = json.loads((ROOT / 'assets/data/original_animations.json').read_text('utf8'))
+        cls.actors = runtime_actors()
+        cls.source = original_animations()
 
     def test_all_six_characters_hold_facing_through_the_entire_walk(self):
         for name in ('mck', 'wck', 'mzs', 'wzs', 'mfs', 'wfs'):

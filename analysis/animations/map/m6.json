@@ -1,0 +1,14 @@
+{
+  "sources": ["m6"],
+  "frames": [
+    [
+      {"source": "m6", "frame": 0, "x": -24, "y": -78, "transform": 0}
+    ]
+  ],
+  "sequences": [
+    [
+      [0, 1]
+    ]
+  ],
+  "opaque_tail_hex": "00"
+}

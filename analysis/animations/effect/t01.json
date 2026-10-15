@@ -1,0 +1,40 @@
+{
+  "sources": ["tx45"],
+  "frames": [
+    [
+      {"source": "tx45", "frame": 2, "x": 1, "y": -14, "transform": 0}
+    ],
+    [
+      {"source": "tx45", "frame": 1, "x": 1, "y": -12, "transform": 0},
+      {"source": "tx45", "frame": 2, "x": -2, "y": -28, "transform": 0}
+    ],
+    [
+      {"source": "tx45", "frame": 2, "x": 6, "y": -18, "transform": 0},
+      {"source": "tx45", "frame": 1, "x": -2, "y": -26, "transform": 0},
+      {"source": "tx45", "frame": 0, "x": 3, "y": -6, "transform": 0}
+    ],
+    [
+      {"source": "tx45", "frame": 2, "x": -9, "y": -14, "transform": 0},
+      {"source": "tx45", "frame": 1, "x": 6, "y": -16, "transform": 0},
+      {"source": "tx45", "frame": 0, "x": 0, "y": -20, "transform": 0}
+    ],
+    [
+      {"source": "tx45", "frame": 0, "x": 8, "y": -10, "transform": 0},
+      {"source": "tx45", "frame": 1, "x": -9, "y": -11, "transform": 0}
+    ],
+    [
+      {"source": "tx45", "frame": 0, "x": -6, "y": -5, "transform": 0}
+    ]
+  ],
+  "sequences": [
+    [
+      [0, 1],
+      [1, 1],
+      [2, 1],
+      [3, 1],
+      [4, 1],
+      [5, 1]
+    ]
+  ],
+  "opaque_tail_hex": "00"
+}

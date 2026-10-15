@@ -33,7 +33,10 @@ class ProjectLayoutTests(unittest.TestCase):
             for relative in re.findall(r'''["']res://([^"']+)["']''', source.read_text('utf-8')):
                 if '%' in relative:
                     continue  # Formatted resource names are covered by engine tests.
-                self.assertTrue((CLIENT / relative).is_file(), (source, relative))
+                if relative.endswith('/'):
+                    self.assertTrue((CLIENT / relative).is_dir(), (source, relative))
+                else:
+                    self.assertTrue((CLIENT / relative).is_file(), (source, relative))
                 checked += 1
         self.assertGreater(checked, 20)
 

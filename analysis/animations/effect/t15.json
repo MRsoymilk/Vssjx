@@ -1,0 +1,24 @@
+{
+  "sources": ["tx48"],
+  "frames": [
+    [],
+    [
+      {"source": "tx48", "frame": 2, "x": -21, "y": -16, "transform": 4}
+    ],
+    [
+      {"source": "tx48", "frame": 1, "x": -13, "y": -11, "transform": 4}
+    ],
+    [
+      {"source": "tx48", "frame": 0, "x": -7, "y": -7, "transform": 4}
+    ]
+  ],
+  "sequences": [
+    [
+      [0, 2],
+      [1, 2],
+      [2, 2],
+      [3, 4]
+    ]
+  ],
+  "opaque_tail_hex": "00"
+}

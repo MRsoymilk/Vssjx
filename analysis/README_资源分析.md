@@ -87,6 +87,8 @@ PNG 由像素／索引表直接还原，不是生成式重绘。`.img` 格式包
 
 ## 输出文件与使用方式
 
+原始ANI层、序列和未解释尾部现在按资源保存于`animations/<分类>/<名称>.json`，共310份，由`animations/index.json`索引；数据语义不变。运行时33份烘焙角色元数据另存于`../client/assets/data/actors/`并按需加载，本目录的分析编排不随Godot项目打包。两类文件均由`../tools/import_assets.py`生成，勿把分析原始编排当作运行时角色清单。
+
 1. 打开 `index.html` 可**完全离线**浏览所有解码的 PNG（可搜索文件名／筛选模块）。
 2. `preview_original_assets.png` 为精简拼图预览。
 3. `decoded_png/` 按主程序、地图、英雄、怪物、物品、特效分类保存 **3,300 张** PNG；多帧精灵名带 `_frame000`。

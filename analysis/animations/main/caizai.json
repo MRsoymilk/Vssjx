@@ -1,0 +1,18 @@
+{
+  "sources": ["found01", "found02"],
+  "frames": [
+    [
+      {"source": "found01", "frame": 0, "x": -10, "y": -26, "transform": 0}
+    ],
+    [
+      {"source": "found02", "frame": 0, "x": -11, "y": -27, "transform": 0}
+    ]
+  ],
+  "sequences": [
+    [
+      [0, 2],
+      [1, 2]
+    ]
+  ],
+  "opaque_tail_hex": "00"
+}

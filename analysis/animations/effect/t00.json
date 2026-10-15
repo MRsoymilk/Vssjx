@@ -1,0 +1,26 @@
+{
+  "sources": ["tx34"],
+  "frames": [
+    [
+      {"source": "tx34", "frame": 0, "x": -5, "y": -21, "transform": 4}
+    ],
+    [
+      {"source": "tx34", "frame": 0, "x": -5, "y": -20, "transform": 4}
+    ],
+    [
+      {"source": "tx34", "frame": 1, "x": -6, "y": -22, "transform": 4}
+    ],
+    [
+      {"source": "tx34", "frame": 1, "x": -6, "y": -23, "transform": 4}
+    ]
+  ],
+  "sequences": [
+    [
+      [0, 2],
+      [1, 2],
+      [2, 2],
+      [3, 2]
+    ]
+  ],
+  "opaque_tail_hex": "00"
+}

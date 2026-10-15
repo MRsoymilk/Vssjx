@@ -653,10 +653,11 @@ func _encounter_battle(enemy: Dictionary) -> void:
 	var keys: Array[String] = [Game.actor_key(), String(enemy.get("art", "")), "effect/flash", ["effect/t71", "effect/t36", "effect/t47"][int(Game.player.job)]]
 	var paths: Array[String] = ["res://assets/tiles/original_tiles.png"]
 	for key in keys:
-		if not OriginalArt.catalog.has(key):
+		var info := OriginalArt.actor_info(key)
+		if info.is_empty():
 			_encounter_failed()
 			return
-		var path := String(OriginalArt.catalog[key].texture)
+		var path := String(info.texture)
 		if not paths.has(path): paths.append(path)
 	var resources: Dictionary = {}
 	for path in paths:

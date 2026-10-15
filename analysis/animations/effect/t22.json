@@ -1,0 +1,14 @@
+{
+  "sources": ["tx53", "tx38"],
+  "frames": [
+    [
+      {"source": "tx53", "frame": 0, "x": -6, "y": -24, "transform": 0}
+    ]
+  ],
+  "sequences": [
+    [
+      [0, 1]
+    ]
+  ],
+  "opaque_tail_hex": "00"
+}

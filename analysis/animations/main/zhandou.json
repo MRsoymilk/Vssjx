@@ -1,0 +1,18 @@
+{
+  "sources": ["flight01", "flight02"],
+  "frames": [
+    [
+      {"source": "flight02", "frame": 0, "x": -17, "y": -31, "transform": 0}
+    ],
+    [
+      {"source": "flight01", "frame": 0, "x": -19, "y": -35, "transform": 0}
+    ]
+  ],
+  "sequences": [
+    [
+      [0, 2],
+      [1, 2]
+    ]
+  ],
+  "opaque_tail_hex": "00"
+}

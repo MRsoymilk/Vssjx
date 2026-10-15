@@ -1,0 +1,10 @@
+{
+  "format_version": 1,
+  "runtime_records": 33,
+  "original_records": 310,
+  "runtime_canonical_sha256": "58921daa8e23cc77f5f13e532ac4a98bee43c33c1606b90ab146e04cd9c90a46",
+  "original_canonical_sha256": "7274a4297e3508ac4b1296b907ebf009995bf726458f0a8c666a4a8cee4acf16",
+  "texture_set_sha256": "1eff36abd996a0654e6f887fa2b460f46d952ee616fd135dac9c5ffc79323785",
+  "legacy_runtime_bytes": 50026,
+  "legacy_original_bytes": 1830575
+}

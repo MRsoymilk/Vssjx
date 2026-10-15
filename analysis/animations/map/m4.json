@@ -1,0 +1,21 @@
+{
+  "sources": ["m4", "m1"],
+  "frames": [
+    [
+      {"source": "m1", "frame": 0, "x": -30, "y": -74, "transform": 0}
+    ],
+    [
+      {"source": "m4", "frame": 0, "x": -15, "y": -52, "transform": 0},
+      {"source": "m4", "frame": 0, "x": 16, "y": -52, "transform": 4}
+    ]
+  ],
+  "sequences": [
+    [
+      [1, 1]
+    ],
+    [
+      [0, 0]
+    ]
+  ],
+  "opaque_tail_hex": "00"
+}

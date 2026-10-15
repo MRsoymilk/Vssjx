@@ -1,0 +1,75 @@
+{
+  "sources": ["tx38", "tx53", "tx3"],
+  "frames": [
+    [
+      {"source": "tx38", "frame": 2, "x": 5, "y": -43, "transform": 0},
+      {"source": "tx38", "frame": 1, "x": 8, "y": -28, "transform": 0}
+    ],
+    [
+      {"source": "tx38", "frame": 2, "x": -16, "y": -47, "transform": 0},
+      {"source": "tx38", "frame": 1, "x": -13, "y": -31, "transform": 0},
+      {"source": "tx38", "frame": 0, "x": 7, "y": -37, "transform": 0}
+    ],
+    [
+      {"source": "tx38", "frame": 2, "x": 3, "y": -63, "transform": 0},
+      {"source": "tx38", "frame": 3, "x": 5, "y": -35, "transform": 0},
+      {"source": "tx38", "frame": 1, "x": 5, "y": -48, "transform": 0},
+      {"source": "tx38", "frame": 0, "x": -18, "y": -45, "transform": 0}
+    ],
+    [
+      {"source": "tx38", "frame": 0, "x": 7, "y": -61, "transform": 0},
+      {"source": "tx38", "frame": 3, "x": -12, "y": -46, "transform": 0}
+    ],
+    [
+      {"source": "tx3", "frame": 0, "x": -18, "y": -48, "transform": 0},
+      {"source": "tx3", "frame": 1, "x": 22, "y": -47, "transform": 0},
+      {"source": "tx3", "frame": 3, "x": -13, "y": -14, "transform": 0},
+      {"source": "tx3", "frame": 2, "x": 10, "y": -58, "transform": 0},
+      {"source": "tx38", "frame": 3, "x": 13, "y": -56, "transform": 0}
+    ],
+    [
+      {"source": "tx3", "frame": 0, "x": 20, "y": -48, "transform": 0},
+      {"source": "tx3", "frame": 1, "x": -13, "y": -15, "transform": 0},
+      {"source": "tx3", "frame": 3, "x": 7, "y": -60, "transform": 0},
+      {"source": "tx3", "frame": 2, "x": 4, "y": -15, "transform": 0},
+      {"source": "tx53", "frame": 0, "x": 16, "y": -41, "transform": 0}
+    ],
+    [
+      {"source": "tx3", "frame": 0, "x": -15, "y": -16, "transform": 0},
+      {"source": "tx3", "frame": 3, "x": 2, "y": -16, "transform": 0},
+      {"source": "tx3", "frame": 2, "x": -20, "y": -36, "transform": 0},
+      {"source": "tx3", "frame": 1, "x": 8, "y": -60, "transform": 0},
+      {"source": "tx53", "frame": 0, "x": 13, "y": -32, "transform": 0}
+    ],
+    [
+      {"source": "tx3", "frame": 0, "x": 4, "y": -62, "transform": 0},
+      {"source": "tx3", "frame": 3, "x": -22, "y": -38, "transform": 0},
+      {"source": "tx3", "frame": 1, "x": 4, "y": -16, "transform": 0},
+      {"source": "tx53", "frame": 0, "x": -6, "y": -28, "transform": 0}
+    ],
+    [
+      {"source": "tx3", "frame": 1, "x": -20, "y": -37, "transform": 0},
+      {"source": "tx3", "frame": 0, "x": -1, "y": -18, "transform": 0},
+      {"source": "tx53", "frame": 0, "x": -19, "y": -31, "transform": 0}
+    ],
+    [
+      {"source": "tx3", "frame": 0, "x": -22, "y": -40, "transform": 0},
+      {"source": "tx53", "frame": 0, "x": -29, "y": -46, "transform": 0}
+    ]
+  ],
+  "sequences": [
+    [
+      [0, 1],
+      [1, 1],
+      [2, 1],
+      [3, 1],
+      [4, 1],
+      [5, 1],
+      [6, 1],
+      [7, 1],
+      [8, 1],
+      [9, 1]
+    ]
+  ],
+  "opaque_tail_hex": "02000000a000000002"
+}

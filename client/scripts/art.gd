@@ -3,16 +3,75 @@ extends RefCounted
 
 static var catalog: Dictionary = {}
 static var cached: Dictionary = {}
+static var _index: Dictionary = {}
+static var _index_loaded := false
+static var _metadata_reads := 0
+static var _metadata_bytes := 0
+const INDEX_PATH := "res://assets/data/actors.json"
+
+static func _read_metadata(path: String) -> Dictionary:
+	var file := FileAccess.open(path, FileAccess.READ)
+	if file == null: return {}
+	_metadata_reads += 1
+	_metadata_bytes += file.get_length()
+	var parser := JSON.new()
+	if parser.parse(file.get_as_text()) != OK or not parser.data is Dictionary: return {}
+	return parser.data
+
+static func has_actor(key: String) -> bool:
+	if not _index_loaded:
+		var manifest := _read_metadata(INDEX_PATH)
+		if manifest.get("format_version") != 2 or not manifest.get("actors") is Dictionary: return false
+		_index = manifest.actors
+		_index_loaded = true
+	return _index.has(key)
+
+static func actor_info(key: String) -> Dictionary:
+	# Metadata and SpriteFrames are separate caches: battle preparation may read
+	# only the requested metadata before loading its texture asynchronously.
+	if catalog.has(key): return catalog[key]
+	if not has_actor(key): return {}
+	var path: Variant = _index[key]
+	if not path is String or path != "res://assets/data/actors/" + key + ".json": return {}
+	var info := _read_metadata(path)
+	if not _valid_info(info): return {}
+	catalog[key] = info
+	return info
+
+static func metadata_stats() -> Dictionary:
+	return {"indexed_actors": _index.size(), "loaded_actors": catalog.size(), "sprite_frames": cached.size(), "json_files_read": _metadata_reads, "json_bytes_read": _metadata_bytes}
+
+static func _integer(value: Variant, minimum: int, maximum: int) -> bool:
+	return (value is int or value is float) and is_finite(float(value)) and value >= minimum and value <= maximum and float(value) == floor(float(value))
+
+static func _valid_steps(value: Variant, count: int) -> bool:
+	if not value is Array: return false
+	for step in value:
+		if not step is Array or step.size() != 2 or not _integer(step[0], 0, count - 1) or not _integer(step[1], 0, 255): return false
+	return true
+
+static func _valid_info(info: Dictionary) -> bool:
+	if not info.get("texture") is String or not info.texture.begins_with("res://assets/actors/") or not info.texture.ends_with(".png"): return false
+	for key in ["width", "height", "columns", "count"]:
+		if not _integer(info.get(key), 1, 4096): return false
+	if not info.get("origin") is Array or info.origin.size() != 2: return false
+	for coordinate in info.origin:
+		if not _integer(coordinate, -4096, 4096): return false
+	if not _integer(info.get("anchor_x", 0), -4096, 4096): return false
+	if not info.get("sequences") is Array or info.sequences.is_empty() or not info.get("playback", {}) is Dictionary: return false
+	for sequence in info.sequences:
+		if not _valid_steps(sequence, int(info.count)): return false
+	for sequence in info.get("playback", {}).values():
+		if not _valid_steps(sequence, int(info.count)): return false
+	return true
 
 static func actor(key: String) -> AnimatedSprite2D:
-	if catalog.is_empty():
-		catalog = JSON.parse_string(FileAccess.get_file_as_string("res://assets/data/actors.json"))
 	var sprite := AnimatedSprite2D.new()
 	sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-	if not catalog.has(key):
+	var info := actor_info(key)
+	if info.is_empty():
 		push_error("Missing original actor: " + key)
 		return sprite
-	var info: Dictionary = catalog[key]
 	if not cached.has(key):
 		var frames := SpriteFrames.new()
 		frames.remove_animation("default")

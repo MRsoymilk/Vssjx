@@ -97,7 +97,7 @@ python analysis/decode_assets.py
 python tools/import_assets.py
 ```
 
-在仓库根目录执行以上命令，资源转换输出到`client/assets/`；报告与动画数据位于`client/assets/data/import_report.json`、`actors.json`与`original_animations.json`。ANI变换按低两位旋转、高位镜像的八种图像变换解释；人物idle选取静止姿态，walk采用原始行走序列，attack采用单次攻击序列，原始编号序列保留为 `source_N`。组合人物帧会按头部中心对齐Godot角色锚点，地图位移由寻路控制，原始层位移仍保留在JSON中。未恢复原客户端的动画事件和碰撞语义。
+在仓库根目录执行以上命令，资源转换输出到`client/assets/`。`client/assets/data/actors.json`仅保存轻量索引，每个角色/特效的元数据位于`client/assets/data/actors/<分类>/<名称>.json`，游戏按需加载并缓存。原始310份ANI编排位于`analysis/animations/`（索引为`index.json`），不放入Godot客户端目录；导入报告仍为`client/assets/data/import_report.json`。仅重建JSON可运行`python tools/import_assets.py --metadata-only`，不会重写图片。导出游戏时需包含`assets/data/`下的全部JSON（如使用`*.json`非资源包含过滤器），不能只包含索引。ANI变换按低两位旋转、高位镜像的八种图像变换解释；人物idle选取静止姿态，walk采用原始行走序列，attack采用单次攻击序列，原始编号序列保留为 `source_N`。组合人物帧会按头部中心对齐Godot角色锚点，地图位移由寻路控制，原始层位移仍保留在分析JSON中。未恢复原客户端的动画事件和碰撞语义。
 
 IMG/IMGS类型3是经过顺时针旋转存储的RLE图像。解码版本2会先逆时针转回正常方向，再应用ANI层变换；由此修正隐者头部侧倒及脚部散落的问题。标题图也使用统一解码，避免重复旋转。
 

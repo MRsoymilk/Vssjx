@@ -1,0 +1,44 @@
+{
+  "sources": ["tx22", "tx39"],
+  "frames": [
+    [
+      {"source": "tx22", "frame": 3, "x": -7, "y": -70, "transform": 0},
+      {"source": "tx22", "frame": 6, "x": -10, "y": -4, "transform": 0}
+    ],
+    [
+      {"source": "tx22", "frame": 4, "x": -5, "y": -67, "transform": 0},
+      {"source": "tx22", "frame": 5, "x": -11, "y": -18, "transform": 0}
+    ],
+    [
+      {"source": "tx22", "frame": 2, "x": -11, "y": -59, "transform": 0}
+    ],
+    [
+      {"source": "tx22", "frame": 1, "x": -11, "y": -50, "transform": 0}
+    ],
+    [
+      {"source": "tx22", "frame": 0, "x": -9, "y": -12, "transform": 0}
+    ],
+    [
+      {"source": "tx39", "frame": 0, "x": -9, "y": -49, "transform": 0}
+    ],
+    [
+      {"source": "tx39", "frame": 0, "x": -9, "y": -88, "transform": 0}
+    ],
+    [
+      {"source": "tx39", "frame": 0, "x": -9, "y": -150, "transform": 0}
+    ]
+  ],
+  "sequences": [
+    [
+      [0, 1],
+      [1, 1],
+      [2, 1],
+      [3, 1],
+      [4, 1],
+      [5, 1],
+      [6, 1],
+      [7, 1]
+    ]
+  ],
+  "opaque_tail_hex": "020000000c00000002"
+}

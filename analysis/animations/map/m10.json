@@ -1,0 +1,20 @@
+{
+  "sources": ["m10", "m11"],
+  "frames": [
+    [
+      {"source": "m11", "frame": 0, "x": -11, "y": -52, "transform": 0}
+    ],
+    [
+      {"source": "m10", "frame": 0, "x": -19, "y": -62, "transform": 0}
+    ]
+  ],
+  "sequences": [
+    [
+      [1, 1]
+    ],
+    [
+      [0, 1]
+    ]
+  ],
+  "opaque_tail_hex": "00"
+}

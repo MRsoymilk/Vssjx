@@ -1,0 +1,25 @@
+{
+  "sources": ["tx46"],
+  "frames": [
+    [
+      {"source": "tx46", "frame": 0, "x": -9, "y": -20, "transform": 0}
+    ],
+    [
+      {"source": "tx46", "frame": 1, "x": -10, "y": -26, "transform": 0}
+    ],
+    [
+      {"source": "tx46", "frame": 2, "x": -7, "y": -15, "transform": 0}
+    ]
+  ],
+  "sequences": [
+    [
+      [0, 1],
+      [1, 1],
+      [2, 1],
+      [0, 1],
+      [1, 1],
+      [2, 1]
+    ]
+  ],
+  "opaque_tail_hex": "00"
+}

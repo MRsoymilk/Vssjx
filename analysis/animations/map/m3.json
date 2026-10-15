@@ -1,0 +1,14 @@
+{
+  "sources": ["m3"],
+  "frames": [
+    [
+      {"source": "m3", "frame": 0, "x": -23, "y": -55, "transform": 0}
+    ]
+  ],
+  "sequences": [
+    [
+      [0, 1]
+    ]
+  ],
+  "opaque_tail_hex": "00"
+}

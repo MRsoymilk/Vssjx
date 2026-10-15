@@ -3,10 +3,12 @@
 Requires Python 3, Pillow and NumPy. Run from any working directory.
 """
 from pathlib import Path
+import argparse
 import importlib.util
 import json
 import struct
 import copy
+import re
 from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -72,7 +74,7 @@ def parse_ani(path):
             'opaque_tail_hex': blob[pos:].hex()}
 
 
-def bake(key, animation, output_key=None):
+def bake(key, animation, output_key=None, write_texture=True):
     folder, name = key.split('/')
     source_dir = ANALYSIS / 'decoded_png/ssjx' / ('' if folder == 'main' else folder)
     frames = []
@@ -91,7 +93,7 @@ def bake(key, animation, output_key=None):
             images.append((img, x, y))
         # ANI frames may carry the old client's lunge/root motion. The Godot
         # world owns movement, so keep each hero's head above its actor anchor.
-        # Source offsets remain intact in original_animations.json.
+        # Source offsets remain intact in analysis/animations/<group>/<name>.json.
         if head_center is not None:
             images = [(img, x - head_center, y) for img, x, y in images]
         for img, x, y in images:
@@ -101,13 +103,14 @@ def bake(key, animation, output_key=None):
     left, top, right, bottom = bounds
     width, height = right - left, bottom - top
     columns = min(8, len(frames))
-    atlas = Image.new('RGBA', (width * columns, height * ((len(frames) + columns - 1) // columns)))
-    for i, layers in enumerate(frames):
-        for img, x, y in layers:
-            atlas.alpha_composite(img, ((i % columns) * width + x - left,
-                                        (i // columns) * height + y - top))
     filename = (output_key or key).replace('/', '_') + '.png'
-    atlas.save(DEST / 'actors' / filename, optimize=True)
+    if write_texture:
+        atlas = Image.new('RGBA', (width * columns, height * ((len(frames) + columns - 1) // columns)))
+        for i, layers in enumerate(frames):
+            for img, x, y in layers:
+                atlas.alpha_composite(img, ((i % columns) * width + x - left,
+                                            (i // columns) * height + y - top))
+        atlas.save(DEST / 'actors' / filename, optimize=True)
     sequences = animation['sequences']
     playback = {}
     if folder == 'hero':
@@ -125,7 +128,7 @@ def bake(key, animation, output_key=None):
                     and not any(layer['source'].endswith('x') or layer['source'].startswith('tx') for layer in layers)]
         playback = {'idle': [[standing[-1], 1]],
                     'walk': [[index, 1] for index in native_walk], 'attack': sequences[-1]}
-        if key in ('hero/mfs', 'hero/wfs'):
+        if key in ('hero/mfs', 'hero/wfs') and not (output_key or '').startswith('creation/'):
             # The last sequence faces right. Battle heroes stand on the right
             # and must keep the native left-facing staff motion instead.
             playback['attack'] = sequences[4]
@@ -139,7 +142,79 @@ def bake(key, animation, output_key=None):
             'count': len(frames), 'sequences': animation['sequences']}
 
 
+def read_animations():
+    parsed, errors = {}, []
+    for path in sorted((ANALYSIS / 'unpacked/ssjx').rglob('*.ani')):
+        rel = path.relative_to(ANALYSIS / 'unpacked/ssjx').with_suffix('').as_posix()
+        key = rel if '/' in rel else 'main/' + rel
+        try:
+            parsed[key] = parse_ani(path)
+        except (IndexError, AssertionError, ValueError, struct.error) as error:
+            errors.append({'file': rel, 'error': repr(error)})
+    return parsed, errors
+
+
+def build_actor_catalog(parsed, write_textures=True):
+    baked = {key: bake(key, parsed[key], write_texture=write_textures) for key in SELECTED if key in parsed}
+    for stem in ['mzs', 'wzs', 'mck', 'wck', 'mfs', 'wfs']:
+        key, preview_key = 'hero/' + stem, 'creation/' + stem
+        preview = copy.deepcopy(parsed[key])
+        if stem in ['mzs', 'wzs']:
+            preview['sources'] = ['ezs2' if name == 'ezs1' else name for name in preview['sources']]
+            for layers in preview['frames']:
+                for layer in layers:
+                    if layer['source'] == 'ezs1': layer['source'] = 'ezs2'
+        baked[preview_key] = bake(key, preview, preview_key, write_texture=write_textures)
+        if stem == 'mzs': baked[preview_key]['playback']['idle'] = [[65, 1]]
+    return baked
+
+
+def readable_json(value, level=0):
+    """Keep primitive arrays / leaf records on one line, nested structure indented."""
+    scalar = lambda item: not isinstance(item, (dict, list, tuple))
+    if isinstance(value, dict) and value and not all(scalar(item) for item in value.values()):
+        return '{\n' + ',\n'.join('  ' * (level + 1) + json.dumps(key, ensure_ascii=False) + ': ' + readable_json(item, level + 1) for key, item in value.items()) + '\n' + '  ' * level + '}'
+    if isinstance(value, (list, tuple)) and value and not all(scalar(item) for item in value):
+        return '[\n' + ',\n'.join('  ' * (level + 1) + readable_json(item, level + 1) for item in value) + '\n' + '  ' * level + ']'
+    return json.dumps(value, ensure_ascii=False)
+
+
+def write_metadata(baked, parsed, data_dir=None, analysis_dir=None):
+    data_dir = Path(data_dir) if data_dir is not None else DEST / 'data'
+    analysis_dir = Path(analysis_dir) if analysis_dir is not None else ANALYSIS / 'animations'
+    for key in set(baked) | set(parsed):
+        if not re.fullmatch(r'[A-Za-z0-9_]+/[A-Za-z0-9_]+', key):
+            raise ValueError('Invalid animation key: ' + key)
+    # Publish manifests last; never delete unrelated data or hand-authored files.
+    index = {}
+    for key in sorted(baked):
+        path = data_dir / 'actors' / (key + '.json')
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(readable_json(baked[key]) + '\n', 'utf-8')
+        index[key] = 'res://assets/data/actors/' + key + '.json'
+    data_dir.mkdir(parents=True, exist_ok=True)
+    (data_dir / 'actors.json').write_text(json.dumps({'format_version': 2, 'actors': index}, ensure_ascii=False, indent=2) + '\n', 'utf-8')
+    original_index = {}
+    for key in sorted(parsed):
+        path = analysis_dir / (key + '.json')
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(readable_json(parsed[key]) + '\n', 'utf-8')
+        original_index[key] = key + '.json'
+    analysis_dir.mkdir(parents=True, exist_ok=True)
+    (analysis_dir / 'index.json').write_text(json.dumps({'format_version': 1, 'animations': original_index}, ensure_ascii=False, indent=2) + '\n', 'utf-8')
+
+
 def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--metadata-only', action='store_true', help='Regenerate split JSON metadata without rewriting any textures/UI assets; requires decoded source PNGs.')
+    args = parser.parse_args()
+    if args.metadata_only:
+        parsed, errors = read_animations()
+        if errors: raise RuntimeError(f'Animation parse errors: {errors}')
+        baked = build_actor_catalog(parsed, write_textures=False)
+        write_metadata(baked, parsed)
+        print(f'Metadata only: {len(baked)} actor shards; {len(parsed)} original ANI shards; textures unchanged')
+        return
     manifest_path = ANALYSIS / 'image_manifest.json'
     spec = importlib.util.spec_from_file_location('decoder', ANALYSIS / 'decode_assets.py')
     decoder = importlib.util.module_from_spec(spec)
@@ -170,15 +245,8 @@ def main():
     (DEST / 'data' / 'cover.json').write_text(json.dumps({'menu': cover_text[:9], 'help': cover_text[9], 'about': cover_text[10], 'quit': cover_text[11]}, ensure_ascii=False, indent=2), 'utf-8')
     for i in range(4):
         Image.open(ANALYSIS / f'decoded_png/ssjx/select_frame{i:03}.png').save(DEST / 'ui' / f'select_{i}.png')
-    parsed, errors = {}, []
-    for path in sorted((ANALYSIS / 'unpacked/ssjx').rglob('*.ani')):
-        rel = path.relative_to(ANALYSIS / 'unpacked/ssjx').with_suffix('').as_posix()
-        key = rel if '/' in rel else 'main/' + rel
-        try:
-            parsed[key] = parse_ani(path)
-        except (IndexError, AssertionError, ValueError, struct.error) as error:
-            errors.append({'file': rel, 'error': repr(error)})
-    baked = {key: bake(key, parsed[key]) for key in SELECTED if key in parsed}
+    parsed, errors = read_animations()
+    baked = build_actor_catalog(parsed)
     choices = []
     stems = ['mzs', 'wzs', 'mck', 'wck', 'mfs', 'wfs']
     head_stems = ['mzst1', 'wzst1', 'mckt1', 'wckt1', 'mfst2', 'wfst2']
@@ -186,14 +254,6 @@ def main():
     for i, (stem, head_stem) in enumerate(zip(stems, head_stems)):
         key = 'hero/' + stem
         preview_key = 'creation/' + stem
-        preview_animation = copy.deepcopy(parsed[key])
-        if i < 2:
-            preview_animation['sources'] = ['ezs2' if name == 'ezs1' else name for name in preview_animation['sources']]
-            for layers in preview_animation['frames']:
-                for layer in layers:
-                    if layer['source'] == 'ezs1': layer['source'] = 'ezs2'
-        baked[preview_key] = bake(key, preview_animation, preview_key)
-        if stem == 'mzs': baked[preview_key]['playback']['idle'] = [[65, 1]]
         head = Image.open(ANALYSIS / f'decoded_png/ssjx/hero/{head_stem}_frame000.png').convert('RGBA')
         # Original 32px portrait slots show the face; long hair is clipped at
         # the slot edge rather than squashing the whole head into the slot.
@@ -230,8 +290,7 @@ def main():
     for name, source_name in {'bag_sword': 'item/iw28.png', 'bag_potion': 'item/ix28.png',
                               'bag_corner': 'neverpic_frame019.png', 'scene_reward': 'sceneui_frame011.png'}.items():
         Image.open(ANALYSIS / 'decoded_png/ssjx' / source_name).save(DEST / 'ui' / (name + '.png'))
-    (DEST / 'data' / 'actors.json').write_text(json.dumps(baked, ensure_ascii=False, indent=2), 'utf-8')
-    (DEST / 'data' / 'original_animations.json').write_text(json.dumps(parsed, ensure_ascii=False), 'utf-8')
+    write_metadata(baked, parsed)
     (DEST / 'data' / 'import_report.json').write_text(json.dumps({'decoded_png': 3300, 'tiles': len(tiles), 'parsed_animations': len(parsed), 'baked': list(baked), 'errors': errors}, ensure_ascii=False, indent=2), 'utf-8')
     # Copy a small set of original inventory/UI graphics; no redraws.
     for source in ['ssjx/item/yao1_frame000.png', 'ssjx/item/yao2_frame000.png']:

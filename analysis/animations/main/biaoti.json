@@ -1,0 +1,63 @@
+{
+  "sources": ["bt1", "bt2", "bt3"],
+  "frames": [
+    [
+      {"source": "bt2", "frame": 0, "x": -64, "y": -24, "transform": 0},
+      {"source": "bt2", "frame": 0, "x": -32, "y": -24, "transform": 0},
+      {"source": "bt2", "frame": 0, "x": 0, "y": -24, "transform": 0},
+      {"source": "bt2", "frame": 0, "x": 32, "y": -24, "transform": 0},
+      {"source": "bt1", "frame": 0, "x": 62, "y": -25, "transform": 4},
+      {"source": "bt1", "frame": 0, "x": -75, "y": -25, "transform": 0},
+      {"source": "bt3", "frame": 0, "x": -50, "y": -20, "transform": 0},
+      {"source": "bt3", "frame": 0, "x": 33, "y": -20, "transform": 0}
+    ],
+    [
+      {"source": "bt1", "frame": 0, "x": -77, "y": -25, "transform": 0},
+      {"source": "bt1", "frame": 0, "x": 64, "y": -25, "transform": 4},
+      {"source": "bt2", "frame": 0, "x": -64, "y": -24, "transform": 0},
+      {"source": "bt2", "frame": 0, "x": -32, "y": -24, "transform": 0},
+      {"source": "bt2", "frame": 0, "x": 0, "y": -24, "transform": 0},
+      {"source": "bt2", "frame": 0, "x": 32, "y": -24, "transform": 0},
+      {"source": "bt3", "frame": 0, "x": -52, "y": -20, "transform": 0},
+      {"source": "bt3", "frame": 0, "x": 35, "y": -20, "transform": 0}
+    ],
+    [
+      {"source": "bt1", "frame": 0, "x": -61, "y": -25, "transform": 0},
+      {"source": "bt1", "frame": 0, "x": 48, "y": -25, "transform": 4},
+      {"source": "bt2", "frame": 0, "x": -48, "y": -24, "transform": 0},
+      {"source": "bt2", "frame": 0, "x": -16, "y": -24, "transform": 0},
+      {"source": "bt2", "frame": 0, "x": 16, "y": -24, "transform": 0},
+      {"source": "bt3", "frame": 0, "x": -36, "y": -20, "transform": 0},
+      {"source": "bt3", "frame": 0, "x": 19, "y": -20, "transform": 0}
+    ],
+    [
+      {"source": "bt1", "frame": 0, "x": -45, "y": -25, "transform": 0},
+      {"source": "bt1", "frame": 0, "x": 32, "y": -25, "transform": 4},
+      {"source": "bt2", "frame": 0, "x": -32, "y": -24, "transform": 0},
+      {"source": "bt2", "frame": 0, "x": 0, "y": -24, "transform": 0},
+      {"source": "bt3", "frame": 0, "x": -20, "y": -20, "transform": 0},
+      {"source": "bt3", "frame": 0, "x": 3, "y": -20, "transform": 0}
+    ],
+    [
+      {"source": "bt1", "frame": 0, "x": -29, "y": -25, "transform": 0},
+      {"source": "bt1", "frame": 0, "x": 16, "y": -25, "transform": 4},
+      {"source": "bt2", "frame": 0, "x": -16, "y": -24, "transform": 0},
+      {"source": "bt3", "frame": 0, "x": -9, "y": -20, "transform": 0}
+    ],
+    [
+      {"source": "bt1", "frame": 0, "x": -13, "y": -25, "transform": 0},
+      {"source": "bt1", "frame": 0, "x": 0, "y": -25, "transform": 4}
+    ]
+  ],
+  "sequences": [
+    [
+      [0, 1],
+      [1, 1],
+      [2, 1],
+      [3, 1],
+      [4, 1],
+      [5, 2]
+    ]
+  ],
+  "opaque_tail_hex": "00"
+}

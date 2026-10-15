@@ -1,0 +1,18 @@
+{
+  "sources": ["ltz_win"],
+  "frames": [
+    [
+      {"source": "ltz_win", "frame": 0, "x": -27, "y": -37, "transform": 0}
+    ],
+    [
+      {"source": "ltz_win", "frame": 0, "x": -30, "y": -34, "transform": 0}
+    ]
+  ],
+  "sequences": [
+    [
+      [0, 2],
+      [1, 2]
+    ]
+  ],
+  "opaque_tail_hex": "00"
+}

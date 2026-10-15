@@ -1,0 +1,69 @@
+{
+  "sources": ["tx43", "tx21"],
+  "frames": [
+    [
+      {"source": "tx21", "frame": 3, "x": -12, "y": -59, "transform": 0}
+    ],
+    [
+      {"source": "tx21", "frame": 2, "x": -5, "y": -59, "transform": 0}
+    ],
+    [
+      {"source": "tx21", "frame": 1, "x": 0, "y": -51, "transform": 0}
+    ],
+    [
+      {"source": "tx21", "frame": 3, "x": -42, "y": -49, "transform": 0},
+      {"source": "tx21", "frame": 0, "x": 4, "y": -46, "transform": 0}
+    ],
+    [
+      {"source": "tx21", "frame": 2, "x": -39, "y": -45, "transform": 0},
+      {"source": "tx43", "frame": 0, "x": 50, "y": -48, "transform": 1}
+    ],
+    [
+      {"source": "tx21", "frame": 1, "x": -32, "y": -37, "transform": 0},
+      {"source": "tx43", "frame": 0, "x": 111, "y": -49, "transform": 1}
+    ],
+    [
+      {"source": "tx21", "frame": 0, "x": -28, "y": -32, "transform": 0},
+      {"source": "tx21", "frame": 3, "x": -24, "y": -30, "transform": 0}
+    ],
+    [
+      {"source": "tx43", "frame": 0, "x": 4, "y": -34, "transform": 1},
+      {"source": "tx21", "frame": 2, "x": -19, "y": -29, "transform": 0}
+    ],
+    [
+      {"source": "tx21", "frame": 1, "x": -10, "y": -21, "transform": 0},
+      {"source": "tx43", "frame": 0, "x": 69, "y": -34, "transform": 1}
+    ],
+    [
+      {"source": "tx21", "frame": 0, "x": -9, "y": -17, "transform": 0},
+      {"source": "tx43", "frame": 0, "x": 109, "y": -35, "transform": 1}
+    ],
+    [
+      {"source": "tx43", "frame": 0, "x": 10, "y": -19, "transform": 1}
+    ],
+    [
+      {"source": "tx43", "frame": 0, "x": 41, "y": -19, "transform": 1}
+    ],
+    [
+      {"source": "tx43", "frame": 0, "x": 72, "y": -19, "transform": 1}
+    ]
+  ],
+  "sequences": [
+    [
+      [0, 1],
+      [1, 1],
+      [2, 1],
+      [3, 1],
+      [4, 1],
+      [5, 1],
+      [6, 1],
+      [7, 1],
+      [8, 1],
+      [9, 1],
+      [10, 1],
+      [11, 1],
+      [12, 1]
+    ]
+  ],
+  "opaque_tail_hex": "020000024800000002"
+}

@@ -1,0 +1,32 @@
+{
+  "sources": ["tx25"],
+  "frames": [
+    [],
+    [
+      {"source": "tx25", "frame": 2, "x": -15, "y": -27, "transform": 0}
+    ],
+    [
+      {"source": "tx25", "frame": 1, "x": -14, "y": -27, "transform": 0}
+    ],
+    [
+      {"source": "tx25", "frame": 0, "x": -12, "y": -40, "transform": 0}
+    ],
+    [
+      {"source": "tx25", "frame": 0, "x": -12, "y": -89, "transform": 0}
+    ],
+    [
+      {"source": "tx25", "frame": 0, "x": -12, "y": -170, "transform": 0}
+    ]
+  ],
+  "sequences": [
+    [
+      [0, 1],
+      [1, 1],
+      [2, 1],
+      [3, 1],
+      [4, 1],
+      [5, 1]
+    ]
+  ],
+  "opaque_tail_hex": "020000000400000002"
+}

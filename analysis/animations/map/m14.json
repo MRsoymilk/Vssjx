@@ -1,0 +1,24 @@
+{
+  "sources": ["m5-2"],
+  "frames": [
+    [
+      {"source": "m5-2", "frame": 0, "x": -31, "y": -78, "transform": 4}
+    ],
+    [
+      {"source": "m5-2", "frame": 0, "x": -31, "y": -78, "transform": 0}
+    ],
+    []
+  ],
+  "sequences": [
+    [
+      [2, 1]
+    ],
+    [
+      [1, 1]
+    ],
+    [
+      [0, 1]
+    ]
+  ],
+  "opaque_tail_hex": "00"
+}

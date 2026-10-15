@@ -1,0 +1,79 @@
+{
+  "sources": ["tx63", "tx2"],
+  "frames": [
+    [
+      {"source": "tx63", "frame": 2, "x": 0, "y": -40, "transform": 4},
+      {"source": "tx63", "frame": 3, "x": -20, "y": -40, "transform": 2},
+      {"source": "tx63", "frame": 1, "x": 1, "y": -12, "transform": 4},
+      {"source": "tx63", "frame": 0, "x": -20, "y": -12, "transform": 0},
+      {"source": "tx63", "frame": 0, "x": -18, "y": -25, "transform": 4},
+      {"source": "tx63", "frame": 2, "x": 1, "y": -26, "transform": 0}
+    ],
+    [
+      {"source": "tx63", "frame": 2, "x": 0, "y": -25, "transform": 4},
+      {"source": "tx63", "frame": 3, "x": -20, "y": -25, "transform": 2},
+      {"source": "tx63", "frame": 1, "x": 1, "y": -38, "transform": 4},
+      {"source": "tx63", "frame": 0, "x": -20, "y": -38, "transform": 0},
+      {"source": "tx63", "frame": 0, "x": -18, "y": -10, "transform": 4},
+      {"source": "tx63", "frame": 0, "x": 6, "y": -13, "transform": 2}
+    ],
+    [
+      {"source": "tx63", "frame": 2, "x": 0, "y": -10, "transform": 4},
+      {"source": "tx63", "frame": 3, "x": -20, "y": -10, "transform": 2},
+      {"source": "tx63", "frame": 1, "x": 1, "y": -23, "transform": 4},
+      {"source": "tx63", "frame": 0, "x": -20, "y": -23, "transform": 0},
+      {"source": "tx63", "frame": 2, "x": 1, "y": -38, "transform": 2},
+      {"source": "tx63", "frame": 0, "x": -18, "y": -37, "transform": 4},
+      {"source": "tx2", "frame": 2, "x": -12, "y": -30, "transform": 0}
+    ],
+    [
+      {"source": "tx63", "frame": 3, "x": 4, "y": -28, "transform": 0},
+      {"source": "tx63", "frame": 2, "x": 0, "y": -42, "transform": 4},
+      {"source": "tx63", "frame": 3, "x": -20, "y": -40, "transform": 2},
+      {"source": "tx63", "frame": 1, "x": 1, "y": -12, "transform": 4},
+      {"source": "tx63", "frame": 0, "x": -20, "y": -12, "transform": 0},
+      {"source": "tx63", "frame": 0, "x": -18, "y": -25, "transform": 4}
+    ],
+    [
+      {"source": "tx63", "frame": 2, "x": 0, "y": -25, "transform": 4},
+      {"source": "tx63", "frame": 3, "x": -20, "y": -25, "transform": 2},
+      {"source": "tx63", "frame": 1, "x": 1, "y": -38, "transform": 4},
+      {"source": "tx63", "frame": 0, "x": -20, "y": -38, "transform": 0},
+      {"source": "tx63", "frame": 0, "x": -18, "y": -10, "transform": 4},
+      {"source": "tx63", "frame": 2, "x": 0, "y": -11, "transform": 0}
+    ],
+    [
+      {"source": "tx63", "frame": 2, "x": 0, "y": -10, "transform": 4},
+      {"source": "tx63", "frame": 3, "x": -20, "y": -10, "transform": 2},
+      {"source": "tx63", "frame": 1, "x": 1, "y": -23, "transform": 4},
+      {"source": "tx63", "frame": 0, "x": -20, "y": -23, "transform": 0},
+      {"source": "tx63", "frame": 2, "x": 1, "y": -38, "transform": 2},
+      {"source": "tx63", "frame": 0, "x": -18, "y": -37, "transform": 4}
+    ],
+    [
+      {"source": "tx63", "frame": 3, "x": 0, "y": -9, "transform": 0},
+      {"source": "tx63", "frame": 2, "x": -19, "y": -9, "transform": 0},
+      {"source": "tx63", "frame": 1, "x": -19, "y": -25, "transform": 0},
+      {"source": "tx63", "frame": 0, "x": 5, "y": -24, "transform": 0}
+    ],
+    [
+      {"source": "tx63", "frame": 0, "x": 5, "y": -8, "transform": 0},
+      {"source": "tx63", "frame": 1, "x": -18, "y": -8, "transform": 0}
+    ],
+    []
+  ],
+  "sequences": [
+    [
+      [0, 1],
+      [1, 1],
+      [2, 1],
+      [3, 1],
+      [4, 1],
+      [5, 1],
+      [6, 1],
+      [7, 1],
+      [8, 1]
+    ]
+  ],
+  "opaque_tail_hex": "02000000a800000009"
+}

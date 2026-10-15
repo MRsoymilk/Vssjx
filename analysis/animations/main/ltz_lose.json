@@ -1,0 +1,18 @@
+{
+  "sources": ["ltz_lose"],
+  "frames": [
+    [
+      {"source": "ltz_lose", "frame": 0, "x": -30, "y": -37, "transform": 0}
+    ],
+    [
+      {"source": "ltz_lose", "frame": 0, "x": -32, "y": -35, "transform": 0}
+    ]
+  ],
+  "sequences": [
+    [
+      [0, 2],
+      [1, 2]
+    ]
+  ],
+  "opaque_tail_hex": "00"
+}

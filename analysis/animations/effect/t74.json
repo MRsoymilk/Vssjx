@@ -1,0 +1,42 @@
+{
+  "sources": ["tx74"],
+  "frames": [
+    [],
+    [
+      {"source": "tx74", "frame": 2, "x": -33, "y": -28, "transform": 0}
+    ],
+    [
+      {"source": "tx74", "frame": 2, "x": 6, "y": -28, "transform": 0},
+      {"source": "tx74", "frame": 1, "x": -30, "y": -25, "transform": 0}
+    ],
+    [
+      {"source": "tx74", "frame": 2, "x": -15, "y": -21, "transform": 0},
+      {"source": "tx74", "frame": 1, "x": 8, "y": -35, "transform": 0},
+      {"source": "tx74", "frame": 0, "x": -33, "y": -89, "transform": 0}
+    ],
+    [
+      {"source": "tx74", "frame": 1, "x": -13, "y": -24, "transform": 0},
+      {"source": "tx74", "frame": 0, "x": 8, "y": -76, "transform": 0},
+      {"source": "tx74", "frame": 0, "x": -33, "y": -171, "transform": 0}
+    ],
+    [
+      {"source": "tx74", "frame": 0, "x": -13, "y": -93, "transform": 0},
+      {"source": "tx74", "frame": 0, "x": 6, "y": -174, "transform": 0}
+    ],
+    [
+      {"source": "tx74", "frame": 0, "x": -13, "y": -147, "transform": 0}
+    ]
+  ],
+  "sequences": [
+    [
+      [0, 1],
+      [1, 1],
+      [2, 1],
+      [3, 1],
+      [4, 1],
+      [5, 1],
+      [6, 1]
+    ]
+  ],
+  "opaque_tail_hex": "020000001400000002"
+}

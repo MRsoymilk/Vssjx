@@ -1,0 +1,48 @@
+{
+  "sources": ["npc37"],
+  "frames": [
+    [
+      {"source": "npc37", "frame": 0, "x": -14, "y": -48, "transform": 4},
+      {"source": "npc37", "frame": 1, "x": -6, "y": -12, "transform": 4}
+    ],
+    [
+      {"source": "npc37", "frame": 0, "x": -14, "y": -47, "transform": 4},
+      {"source": "npc37", "frame": 1, "x": -6, "y": -12, "transform": 4},
+      {"source": "npc37", "frame": 2, "x": -6, "y": -29, "transform": 4}
+    ],
+    [
+      {"source": "npc37", "frame": 0, "x": -14, "y": -47, "transform": 4},
+      {"source": "npc37", "frame": 1, "x": -6, "y": -12, "transform": 4}
+    ],
+    [
+      {"source": "npc37", "frame": 0, "x": -13, "y": -48, "transform": 0},
+      {"source": "npc37", "frame": 1, "x": -6, "y": -12, "transform": 0}
+    ],
+    [
+      {"source": "npc37", "frame": 0, "x": -13, "y": -47, "transform": 0},
+      {"source": "npc37", "frame": 1, "x": -6, "y": -12, "transform": 0},
+      {"source": "npc37", "frame": 2, "x": -10, "y": -29, "transform": 0}
+    ],
+    [
+      {"source": "npc37", "frame": 0, "x": -13, "y": -47, "transform": 0},
+      {"source": "npc37", "frame": 1, "x": -6, "y": -12, "transform": 0}
+    ]
+  ],
+  "sequences": [
+    [
+      [3, 2],
+      [4, 1],
+      [3, 5],
+      [5, 8]
+    ],
+    [
+      [0, 2],
+      [1, 1],
+      [0, 5],
+      [2, 8]
+    ],
+    [],
+    []
+  ],
+  "opaque_tail_hex": "001e31"
+}

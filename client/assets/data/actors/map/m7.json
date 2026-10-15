@@ -1,0 +1,18 @@
+{
+  "texture": "res://assets/actors/map_m7.png",
+  "width": 64,
+  "height": 88,
+  "columns": 2,
+  "origin": [-30, -87],
+  "anchor_x": 0,
+  "playback": {},
+  "count": 2,
+  "sequences": [
+    [
+      [1, 1]
+    ],
+    [
+      [0, 1]
+    ]
+  ]
+}

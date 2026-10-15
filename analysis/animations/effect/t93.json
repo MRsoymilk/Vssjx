@@ -1,0 +1,32 @@
+{
+  "sources": ["tx16"],
+  "frames": [
+    [],
+    [
+      {"source": "tx16", "frame": 3, "x": -29, "y": -44, "transform": 4},
+      {"source": "tx16", "frame": 3, "x": -29, "y": -15, "transform": 2}
+    ],
+    [
+      {"source": "tx16", "frame": 2, "x": -16, "y": -44, "transform": 4},
+      {"source": "tx16", "frame": 2, "x": -16, "y": -15, "transform": 2}
+    ],
+    [
+      {"source": "tx16", "frame": 1, "x": -6, "y": -40, "transform": 4},
+      {"source": "tx16", "frame": 1, "x": -6, "y": -15, "transform": 2}
+    ],
+    [
+      {"source": "tx16", "frame": 0, "x": 0, "y": -33, "transform": 4},
+      {"source": "tx16", "frame": 0, "x": 0, "y": -15, "transform": 2}
+    ]
+  ],
+  "sequences": [
+    [
+      [0, 1],
+      [1, 1],
+      [2, 1],
+      [3, 1],
+      [4, 1]
+    ]
+  ],
+  "opaque_tail_hex": "020000000200000008"
+}

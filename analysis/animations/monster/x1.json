@@ -1,0 +1,213 @@
+{
+  "sources": ["x1", "tx69", "tx38"],
+  "frames": [
+    [
+      {"source": "x1", "frame": 4, "x": -17, "y": -7, "transform": 0},
+      {"source": "x1", "frame": 5, "x": -35, "y": -36, "transform": 0},
+      {"source": "x1", "frame": 7, "x": -18, "y": -55, "transform": 0},
+      {"source": "x1", "frame": 0, "x": -25, "y": -39, "transform": 0}
+    ],
+    [
+      {"source": "x1", "frame": 4, "x": -16, "y": -7, "transform": 0},
+      {"source": "x1", "frame": 5, "x": -34, "y": -36, "transform": 0},
+      {"source": "x1", "frame": 7, "x": -17, "y": -55, "transform": 0},
+      {"source": "x1", "frame": 0, "x": -24, "y": -39, "transform": 0}
+    ],
+    [
+      {"source": "x1", "frame": 4, "x": -15, "y": -8, "transform": 0},
+      {"source": "x1", "frame": 5, "x": -33, "y": -37, "transform": 0},
+      {"source": "x1", "frame": 7, "x": -16, "y": -56, "transform": 0},
+      {"source": "x1", "frame": 0, "x": -23, "y": -40, "transform": 0}
+    ],
+    [
+      {"source": "x1", "frame": 4, "x": -14, "y": -6, "transform": 0},
+      {"source": "x1", "frame": 5, "x": -34, "y": -34, "transform": 0},
+      {"source": "x1", "frame": 7, "x": -15, "y": -54, "transform": 0},
+      {"source": "x1", "frame": 0, "x": -22, "y": -38, "transform": 0},
+      {"source": "x1", "frame": 6, "x": -35, "y": -52, "transform": 0}
+    ],
+    [
+      {"source": "x1", "frame": 1, "x": -8, "y": -64, "transform": 1},
+      {"source": "x1", "frame": 4, "x": -12, "y": -7, "transform": 0},
+      {"source": "x1", "frame": 7, "x": -13, "y": -55, "transform": 0},
+      {"source": "x1", "frame": 2, "x": 7, "y": -64, "transform": 1}
+    ],
+    [
+      {"source": "x1", "frame": 1, "x": -9, "y": -64, "transform": 1},
+      {"source": "x1", "frame": 4, "x": -13, "y": -7, "transform": 0},
+      {"source": "x1", "frame": 7, "x": -14, "y": -55, "transform": 0},
+      {"source": "x1", "frame": 2, "x": 6, "y": -64, "transform": 1}
+    ],
+    [
+      {"source": "x1", "frame": 4, "x": -14, "y": -7, "transform": 0},
+      {"source": "x1", "frame": 1, "x": -28, "y": -46, "transform": 0},
+      {"source": "x1", "frame": 7, "x": -15, "y": -55, "transform": 0},
+      {"source": "x1", "frame": 2, "x": -17, "y": -46, "transform": 0}
+    ],
+    [
+      {"source": "x1", "frame": 1, "x": -15, "y": -32, "transform": 3},
+      {"source": "x1", "frame": 4, "x": -10, "y": -7, "transform": 0},
+      {"source": "x1", "frame": 7, "x": -11, "y": -55, "transform": 0},
+      {"source": "x1", "frame": 3, "x": -8, "y": -48, "transform": 0},
+      {"source": "x1", "frame": 2, "x": 7, "y": -36, "transform": 3}
+    ],
+    [
+      {"source": "x1", "frame": 1, "x": -16, "y": -32, "transform": 3},
+      {"source": "x1", "frame": 4, "x": -11, "y": -7, "transform": 0},
+      {"source": "x1", "frame": 7, "x": -12, "y": -55, "transform": 0},
+      {"source": "x1", "frame": 3, "x": -9, "y": -48, "transform": 0},
+      {"source": "x1", "frame": 2, "x": 6, "y": -36, "transform": 3}
+    ],
+    [
+      {"source": "tx69", "frame": 5, "x": -15, "y": -56, "transform": 0},
+      {"source": "tx69", "frame": 4, "x": -16, "y": -49, "transform": 0},
+      {"source": "tx69", "frame": 2, "x": -17, "y": -53, "transform": 0},
+      {"source": "x1", "frame": 4, "x": -12, "y": -6, "transform": 0},
+      {"source": "x1", "frame": 1, "x": -17, "y": -31, "transform": 3},
+      {"source": "x1", "frame": 7, "x": -13, "y": -54, "transform": 0},
+      {"source": "x1", "frame": 2, "x": 5, "y": -35, "transform": 3},
+      {"source": "x1", "frame": 3, "x": -10, "y": -47, "transform": 0}
+    ],
+    [
+      {"source": "x1", "frame": 1, "x": -18, "y": -33, "transform": 3},
+      {"source": "x1", "frame": 4, "x": -13, "y": -8, "transform": 0},
+      {"source": "tx69", "frame": 0, "x": -17, "y": -54, "transform": 0},
+      {"source": "tx69", "frame": 1, "x": -14, "y": -56, "transform": 0},
+      {"source": "tx69", "frame": 2, "x": -15, "y": -50, "transform": 0},
+      {"source": "x1", "frame": 7, "x": -14, "y": -56, "transform": 0},
+      {"source": "x1", "frame": 3, "x": -11, "y": -49, "transform": 0},
+      {"source": "x1", "frame": 2, "x": 4, "y": -37, "transform": 3}
+    ],
+    [
+      {"source": "x1", "frame": 4, "x": -15, "y": -7, "transform": 0},
+      {"source": "x1", "frame": 1, "x": -20, "y": -32, "transform": 3},
+      {"source": "x1", "frame": 7, "x": -16, "y": -55, "transform": 0},
+      {"source": "x1", "frame": 2, "x": 2, "y": -36, "transform": 3}
+    ],
+    [
+      {"source": "x1", "frame": 4, "x": 12, "y": -7, "transform": 0},
+      {"source": "x1", "frame": 5, "x": -6, "y": -36, "transform": 0},
+      {"source": "x1", "frame": 7, "x": 11, "y": -55, "transform": 0},
+      {"source": "x1", "frame": 0, "x": 4, "y": -39, "transform": 0}
+    ],
+    [
+      {"source": "x1", "frame": 4, "x": 13, "y": -7, "transform": 0},
+      {"source": "x1", "frame": 5, "x": -5, "y": -36, "transform": 0},
+      {"source": "x1", "frame": 7, "x": 12, "y": -55, "transform": 0},
+      {"source": "x1", "frame": 0, "x": 5, "y": -39, "transform": 0}
+    ],
+    [
+      {"source": "x1", "frame": 4, "x": 14, "y": -8, "transform": 0},
+      {"source": "x1", "frame": 5, "x": -4, "y": -37, "transform": 0},
+      {"source": "x1", "frame": 7, "x": 13, "y": -56, "transform": 0},
+      {"source": "x1", "frame": 0, "x": 6, "y": -40, "transform": 0}
+    ],
+    [
+      {"source": "x1", "frame": 4, "x": 15, "y": -6, "transform": 0},
+      {"source": "x1", "frame": 5, "x": -5, "y": -34, "transform": 0},
+      {"source": "x1", "frame": 7, "x": 14, "y": -54, "transform": 0},
+      {"source": "x1", "frame": 0, "x": 7, "y": -38, "transform": 0},
+      {"source": "x1", "frame": 6, "x": -6, "y": -52, "transform": 0}
+    ],
+    [
+      {"source": "x1", "frame": 1, "x": 21, "y": -64, "transform": 1},
+      {"source": "x1", "frame": 4, "x": 17, "y": -7, "transform": 0},
+      {"source": "x1", "frame": 7, "x": 16, "y": -55, "transform": 0},
+      {"source": "x1", "frame": 2, "x": 36, "y": -64, "transform": 1}
+    ],
+    [
+      {"source": "x1", "frame": 1, "x": 20, "y": -64, "transform": 1},
+      {"source": "x1", "frame": 4, "x": 16, "y": -7, "transform": 0},
+      {"source": "x1", "frame": 7, "x": 15, "y": -55, "transform": 0},
+      {"source": "x1", "frame": 2, "x": 35, "y": -64, "transform": 1}
+    ],
+    [
+      {"source": "x1", "frame": 4, "x": 15, "y": -7, "transform": 0},
+      {"source": "x1", "frame": 1, "x": 1, "y": -46, "transform": 0},
+      {"source": "x1", "frame": 7, "x": 14, "y": -55, "transform": 0},
+      {"source": "x1", "frame": 2, "x": 12, "y": -46, "transform": 0}
+    ],
+    [
+      {"source": "x1", "frame": 1, "x": 59, "y": -33, "transform": 3},
+      {"source": "x1", "frame": 4, "x": 64, "y": -7, "transform": 0},
+      {"source": "x1", "frame": 7, "x": 63, "y": -55, "transform": 0},
+      {"source": "x1", "frame": 2, "x": 81, "y": -37, "transform": 3}
+    ],
+    [
+      {"source": "x1", "frame": 1, "x": 91, "y": -33, "transform": 3},
+      {"source": "x1", "frame": 4, "x": 96, "y": -7, "transform": 0},
+      {"source": "x1", "frame": 7, "x": 95, "y": -55, "transform": 0},
+      {"source": "x1", "frame": 2, "x": 113, "y": -37, "transform": 3}
+    ],
+    [
+      {"source": "x1", "frame": 4, "x": -20, "y": -7, "transform": 4},
+      {"source": "x1", "frame": 1, "x": 4, "y": -33, "transform": 5},
+      {"source": "x1", "frame": 7, "x": -25, "y": -55, "transform": 4},
+      {"source": "x1", "frame": 2, "x": -18, "y": -37, "transform": 5}
+    ],
+    [
+      {"source": "x1", "frame": 4, "x": -20, "y": -7, "transform": 4},
+      {"source": "x1", "frame": 1, "x": 4, "y": -32, "transform": 5},
+      {"source": "x1", "frame": 7, "x": -25, "y": -54, "transform": 4},
+      {"source": "x1", "frame": 2, "x": -18, "y": -36, "transform": 5}
+    ],
+    [
+      {"source": "x1", "frame": 4, "x": -15, "y": -7, "transform": 0},
+      {"source": "x1", "frame": 1, "x": -20, "y": -33, "transform": 3},
+      {"source": "x1", "frame": 7, "x": -16, "y": -55, "transform": 0},
+      {"source": "x1", "frame": 2, "x": 2, "y": -37, "transform": 3}
+    ],
+    [
+      {"source": "x1", "frame": 4, "x": -15, "y": -7, "transform": 0},
+      {"source": "x1", "frame": 1, "x": -20, "y": -32, "transform": 3},
+      {"source": "x1", "frame": 7, "x": -16, "y": -54, "transform": 0},
+      {"source": "x1", "frame": 2, "x": 2, "y": -36, "transform": 3}
+    ]
+  ],
+  "sequences": [
+    [
+      [18, 1],
+      [19, 1],
+      [20, 2],
+      [21, 1],
+      [22, 1],
+      [23, 1],
+      [24, 2]
+    ],
+    [
+      [13, 1],
+      [14, 1],
+      [15, 1],
+      [16, 1],
+      [17, 2]
+    ],
+    [
+      [4, 1],
+      [5, 1],
+      [6, 1],
+      [7, 1],
+      [8, 2],
+      [9, 1],
+      [10, 1],
+      [11, 1],
+      [12, 2],
+      [5, 1],
+      [4, 1]
+    ],
+    [
+      [0, 8],
+      [1, 8]
+    ],
+    [
+      [2, 8],
+      [3, 8]
+    ],
+    [
+      [0, 8],
+      [1, 8]
+    ],
+    [],
+    []
+  ],
+  "opaque_tail_hex": "0a000000000000000000000000000000000000000000000020000000000000000800000000000001013c38"
+}

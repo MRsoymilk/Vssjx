@@ -1,0 +1,15 @@
+{
+  "texture": "res://assets/actors/map_m9.png",
+  "width": 32,
+  "height": 33,
+  "columns": 1,
+  "origin": [-14, -32],
+  "anchor_x": 0,
+  "playback": {},
+  "count": 1,
+  "sequences": [
+    [
+      [0, 1]
+    ]
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "sources": ["tx63"],
+  "frames": [
+    [
+      {"source": "tx63", "frame": 2, "x": -1, "y": -28, "transform": 6},
+      {"source": "tx63", "frame": 3, "x": -19, "y": -27, "transform": 2}
+    ],
+    [
+      {"source": "tx63", "frame": 1, "x": 1, "y": -24, "transform": 4},
+      {"source": "tx63", "frame": 0, "x": -17, "y": -25, "transform": 0}
+    ],
+    [
+      {"source": "tx63", "frame": 1, "x": -22, "y": -24, "transform": 0},
+      {"source": "tx63", "frame": 2, "x": -2, "y": -24, "transform": 0}
+    ],
+    []
+  ],
+  "sequences": [
+    [
+      [0, 1],
+      [0, 1],
+      [0, 3],
+      [0, 1],
+      [1, 1],
+      [2, 1],
+      [3, 1],
+      [2, 1],
+      [0, 1],
+      [0, 1]
+    ]
+  ],
+  "opaque_tail_hex": "02000000a000000002"
+}

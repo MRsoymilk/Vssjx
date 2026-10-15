@@ -233,13 +233,22 @@ func _cover_choice(option: String) -> void:
 		"快速登录":
 			if FileAccess.file_exists(Game.save_path): _continue()
 			else: _create()
-		"登录游戏", "注册账号":
+		"登录游戏": _server_login()
+		"注册账号":
 			_message(option, "账号服务器尚未连接。\n可选择「游戏试玩」进入游戏。")
 		"游戏帮助":
 			_message("游戏帮助", "【触屏】\n人物移动：点击屏幕目的地控制角色行走。\n功能选择：点击图标或者文字即可选择。\n\n【按键】\n方向键移动，E键交互。")
 		"关于": _message("关于", String(original_cover.original_text.about))
 		"退出游戏": _cover_exit()
 		_: _message(option, "该服务暂未连接。")
+
+func _server_login() -> void:
+	var panel := _modal_panel("登录游戏", 324)
+	var login := ServerLogin.new()
+	login.name = "ServerLogin"
+	login.position = Vector2(0, 54)
+	panel.add_child(login)
+	login.close_requested.connect(_close_modal)
 
 func _cover_exit() -> void:
 	var panel := _modal_panel("退出游戏")

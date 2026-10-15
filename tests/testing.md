@@ -2,6 +2,8 @@
 
 本文记录已存在的测试入口、运行方式和隔离要求。未来联机版的测试与容量验收见[online_test_plan.md](online_test_plan.md)。测试说明和结果统一放在`tests/`，不写入项目或设计目录的README。
 
+Rust基础服务、登录服务器地址、重启保存与真实网络联调见[server_connection.md](server_connection.md)。
+
 除非特别说明，命令均在`Vssjx/`仓库根目录执行，Godot工程路径为`client/`。
 
 - `tests/`：Python回归、离屏辅助脚本、测试说明和容量验收方案。

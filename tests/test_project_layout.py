@@ -17,14 +17,14 @@ class ProjectLayoutTests(unittest.TestCase):
             self.assertTrue((CLIENT / folder).is_dir(), folder)
 
     def test_godot_test_scenes_remain_inside_project(self):
-        for stem in ('test_runner', 'motion_regression', 'motion_smoke', 'turn_smoke', 'visual_smoke'):
+        for stem in ('test_runner', 'motion_regression', 'motion_smoke', 'turn_smoke', 'visual_smoke', 'server_connection_test'):
             for suffix in ('.gd', '.gd.uid', '.tscn'):
                 self.assertTrue((CLIENT / 'tests' / (stem + suffix)).is_file())
                 self.assertFalse((ROOT / 'tests' / (stem + suffix)).exists())
 
     def test_literal_resource_paths_resolve_with_new_project_root(self):
         sources = [CLIENT / 'project.godot']
-        sources += list((CLIENT / 'scripts').glob('*.gd'))
+        sources += list((CLIENT / 'scripts').rglob('*.gd'))
         sources += list((CLIENT / 'scenes').glob('*.tscn'))
         sources += list((CLIENT / 'tests').glob('*.gd'))
         sources += list((CLIENT / 'tests').glob('*.tscn'))
@@ -45,18 +45,17 @@ class ProjectLayoutTests(unittest.TestCase):
         self.assertEqual(builder.ANALYSIS, ROOT / 'analysis')
         self.assertTrue(builder.ANALYSIS.is_dir())
 
-    def test_launchers_target_client(self):
-        powershell = (ROOT / '启动游戏.ps1').read_text('utf-8')
-        batch = (ROOT / '启动游戏.bat').read_text('utf-8')
-        self.assertIn("Join-Path $PSScriptRoot 'client'", powershell)
-        self.assertIn("@('--path', $clientPath)", powershell)
-        self.assertIn('set "CLIENT=%~dp0client"', batch)
-        self.assertIn('--path "%CLIENT%"', batch)
+    def test_startup_instructions_target_client(self):
+        readme = (ROOT / 'README.md').read_text('utf-8')
+        self.assertIn('client/project.godot', readme)
+        self.assertIn('godot --path client', readme)
 
-    def test_rust_server_is_reserved_separately(self):
+    def test_rust_server_is_separate_from_godot(self):
         self.assertTrue((ROOT / 'server/src').is_dir())
         self.assertTrue((ROOT / 'server/migrations').is_dir())
         self.assertTrue((ROOT / 'server/README.md').is_file())
+        self.assertTrue((ROOT / 'server/Cargo.toml').is_file())
+        self.assertTrue((ROOT / 'server/src/main.rs').is_file())
         self.assertFalse((ROOT / 'server/project.godot').exists())
 
 

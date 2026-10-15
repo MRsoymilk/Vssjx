@@ -6,6 +6,7 @@ pub mod config;
 pub mod logging;
 mod monitor;
 pub mod observability;
+pub mod population;
 pub mod world;
 pub mod world_map;
 pub mod world_replication;

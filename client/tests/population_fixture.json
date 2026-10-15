@@ -1,0 +1,7 @@
+[
+  {"id":"qingwei","name":"清微道人","kind":"npc","art":"hero/mfs","cell":[10,13],"level":1,"hp":85,"attack":0,"defense":0,"gold":0,"xp":0},
+  {"id":"wolf_a","name":"山狼","kind":"wolf","art":"monster/langw","cell":[18,10],"level":1,"hp":62,"attack":13,"defense":3,"gold":12,"xp":16},
+  {"id":"wolf_b","name":"山狼","kind":"wolf","art":"monster/langw","cell":[24,20],"level":1,"hp":72,"attack":15,"defense":4,"gold":14,"xp":18},
+  {"id":"wolf_c","name":"山狼","kind":"wolf","art":"monster/langw","cell":[15,24],"level":1,"hp":82,"attack":17,"defense":4,"gold":16,"xp":20},
+  {"id":"spirit","name":"山灵","kind":"spirit","art":"monster/hs1","cell":[22,8],"level":2,"hp":70,"attack":14,"defense":2,"gold":20,"xp":22}
+]

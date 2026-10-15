@@ -2,16 +2,19 @@ class_name OnlineWorldView
 extends Control
 ## Shared game interface backed by online state; never installs Game.player.
 signal close_requested
+signal resident_selected(id: String)
 var character_id := ""
 @onready var network: OnlineWorldClient = $Network
 @onready var viewport: SubViewport = $Viewport
 @onready var scene: Node2D = $Viewport/Scene
+@onready var actor_layer: Node2D = $Viewport/Scene/Actors
 @onready var camera: Camera2D = $Viewport/Scene/Camera
 @onready var image: TextureRect = $Image
 @onready var screen: GameWorldScreen = $Screen
 @onready var status: Label = $Screen/Chrome/MessagePanel/LogLabel
 @onready var count_label: Label = $Screen/CountLabel
 var actors: Dictionary = {}
+var residents: Dictionary = {}
 var map_data: Dictionary
 var _motion_grid := AStarGrid2D.new()
 var _key_timer := 0.0
@@ -61,6 +64,7 @@ func _ready() -> void:
 			chat_input.accept_event()
 	)
 	network.changed.connect(_snapshot)
+	network.population.changed.connect(_population)
 	network.status_changed.connect(_status_changed)
 	network.chat.changed.connect(_chat_changed)
 	network.chat.status_changed.connect(func(text_value: String) -> void: chat_status.text = text_value)
@@ -133,6 +137,19 @@ func _build_map() -> void:
 		actor.position = Vector2(prop.x, prop.y)
 		scene.add_child(actor)
 
+func _population(values: Dictionary) -> void:
+	for id in residents.keys():
+		if not values.has(id):
+			residents[id].queue_free()
+			residents.erase(id)
+	for id in values:
+		if not residents.has(id):
+			var resident: OnlineResident = preload("res://scenes/actors/online_resident.tscn").instantiate()
+			actor_layer.add_child(resident)
+			residents[id] = resident
+		residents[id].receive(values[id], _motion_grid)
+	screen.hud.get_node("Minimap").set_shared_population(values)
+
 func _snapshot(values: Dictionary) -> void:
 	for id in actors.keys():
 		if not values.has(id):
@@ -147,7 +164,7 @@ func _snapshot(values: Dictionary) -> void:
 			var root := Node2D.new()
 			root.position = point
 			root.z_index = 2
-			scene.add_child(root)
+			actor_layer.add_child(root)
 			var key: String = (["mzs", "mck", "mfs"] if int(entity.gender) == 0 else ["wzs", "wck", "wfs"])[int(entity.job)]
 			var sprite := OriginalArt.actor("hero/" + key)
 			root.add_child(sprite)
@@ -241,6 +258,7 @@ func _update_chat_controls() -> void:
 func _process(delta: float) -> void:
 	_update_chat_controls()
 	if network == null or not network.world_ready: return
+	for resident in residents.values(): resident.advance(delta)
 	for id in actors:
 		var actor: Dictionary = actors[id]
 		var old: Vector2 = actor.root.position
@@ -292,6 +310,10 @@ func _map_input(event: InputEvent) -> void:
 	chat_input.release_focus()
 	_was_keyboard = false
 	var world_point := camera.get_screen_center_position() + point - Vector2(viewport.size) / 2.0
+	for id in residents:
+		if residents[id].hit(world_point):
+			resident_selected.emit(id)
+			return
 	var destination := Vector2i(floori(world_point.x / 16.0), floori(world_point.y / 16.0))
 	if _motion_grid.region.has_point(destination) and not _motion_grid.is_point_solid(destination): network.move_to(destination)
 	else:

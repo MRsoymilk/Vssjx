@@ -14,6 +14,8 @@ handle_input_locally = false
 size = Vector2i(320, 375)
 render_target_update_mode = 4
 [node name="Scene" type="Node2D" parent="Viewport"]
+[node name="Actors" type="Node2D" parent="Viewport/Scene"]
+y_sort_enabled = true
 [node name="Camera" type="Camera2D" parent="Viewport/Scene"]
 position = Vector2(168, 264)
 limit_left = 0

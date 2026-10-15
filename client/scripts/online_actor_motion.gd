@@ -2,6 +2,7 @@ class_name OnlineActorMotion
 extends RefCounted
 ## Follow received grid segments, preserving corners instead of chasing chords.
 const SPEED := 72.0
+var speed := SPEED
 var position := Vector2.ZERO
 var travelled := 0.0
 var waypoints: Array[Vector2] = []
@@ -75,8 +76,8 @@ func advance(delta: float) -> void:
 		previous = point
 	# Ordinary 100ms updates render at 72px/s. Only a genuine backlog permits
 	# bounded catch-up; never use the old permanently faster chase speed.
-	var speed := SPEED * clampf(backlog / 14.4, 1.0, 1.5)
-	var budget := speed * minf(maxf(delta, 0.0), 0.1)
+	var render_speed := speed * clampf(backlog / (speed * 0.2), 1.0, 1.5)
+	var budget := render_speed * minf(maxf(delta, 0.0), 0.1)
 	while budget > 0 and not waypoints.is_empty():
 		var distance := position.distance_to(waypoints[0])
 		var step := minf(distance, budget)

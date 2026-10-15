@@ -103,6 +103,7 @@ struct StateData {
     revision: u64,
     chat: ChatHub,
     next_net_id: u32,
+    population: crate::population::Population,
 }
 pub struct WorldHub {
     metrics: Arc<Observability>,
@@ -142,6 +143,7 @@ impl WorldHub {
                 revision: 0,
                 chat: ChatHub::new(config.chat),
                 next_net_id: 1,
+                population: crate::population::Population::new(&WorldMap::default()),
             }),
             admissions: AsyncMutex::new(()),
             map: WorldMap::default(),
@@ -172,6 +174,7 @@ impl WorldHub {
                         state.revision += 1;
                     }
                     state.chat.drain(now);
+                    state.population.advance(&hub.map, dt);
                     let entities: Vec<_> = state
                         .actors
                         .values()
@@ -510,7 +513,7 @@ pub(crate) async fn ticket(
         .bind(auth::token_digest(&raw)?).bind(session).bind(request.character_id).execute(&mut *tx).await.map_err(db_error)?;
     tx.commit().await.map_err(db_error)?;
     Ok(Json(
-        json!({"ticket":raw,"expires_in":20,"character_id":request.character_id,"config_hash":config_hash(),"announcement_version":1}),
+        json!({"ticket":raw,"expires_in":20,"character_id":request.character_id,"config_hash":config_hash(),"announcement_version":1,"population_version":1}),
     ))
 }
 #[derive(Deserialize)]
@@ -525,6 +528,8 @@ pub enum ClientMessage {
         world_sync_version: u32,
         #[serde(default)]
         announcement_version: u32,
+        #[serde(default)]
+        population_version: u32,
     },
     #[serde(rename = "world.move_to")]
     MoveTo {
@@ -665,6 +670,7 @@ async fn connection(socket: WebSocket, auth: AuthService, hub: Arc<WorldHub>, an
         config_hash: hash,
         world_sync_version,
         announcement_version,
+        population_version,
     }) = serde_json::from_str::<ClientMessage>(&text)
     else {
         fail(&mut socket, "INVALID_HANDSHAKE").await;
@@ -750,6 +756,7 @@ async fn connection(socket: WebSocket, auth: AuthService, hub: Arc<WorldHub>, an
     }
     let mut chat_pending: Option<Uuid> = None;
     let mut announcement_revision = None;
+    let mut population_revision = None;
     let mut pulse = tokio::time::interval(Duration::from_millis(100));
     pulse.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Skip);
     let mut checked = Instant::now();
@@ -789,6 +796,13 @@ async fn connection(socket: WebSocket, auth: AuthService, hub: Arc<WorldHub>, an
             },
             _=pulse.tick()=>{
                 if !hub.current(&owner){fail(&mut socket,"SESSION_REPLACED").await;break;}
+                if population_version == 1 {
+                    let packet = hub.data.lock().expect("world state").population.packet_since(population_revision);
+                    if let Some((revision, packet)) = packet {
+                        if send_raw(&mut socket, packet.to_string()).await.is_err(){break;}
+                        population_revision=Some(revision);
+                    }
+                }
                 if announcement_version == 1 && let Some((revision,packet))=announcements.packet_since(announcement_revision, Instant::now()) {
                     if send(&mut socket,packet).await.is_err(){break;}
                     announcement_revision=Some(revision);

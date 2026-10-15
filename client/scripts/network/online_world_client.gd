@@ -20,8 +20,10 @@ var _net_ids: Dictionary = {}
 var socket: WebSocketPeer
 var chat := OnlinePublicChat.new()
 var announcements := OnlineAnnouncements.new()
+var population := OnlinePopulation.new()
 var _ticket := ""
 var _announcement_version := 0
+var _population_version := 0
 var _state := "idle"
 var _deadline := 0.0
 var _heartbeat := 0.0
@@ -70,6 +72,7 @@ func leave() -> void:
 	_records = {}
 	chat.clear()
 	announcements.clear()
+	population.clear()
 
 func _exit_tree() -> void:
 	leave()
@@ -78,6 +81,7 @@ func _failed(code: String, retry: bool = false) -> void:
 	_pending_motion.clear()
 	chat.disconnect_channel()
 	announcements.clear()
+	population.clear()
 	world_ready = false
 	_ticket = ""
 	_snapshot = {}
@@ -100,6 +104,7 @@ func _on_ticket(result: Dictionary) -> void:
 		return
 	_ticket = result.ticket
 	_announcement_version = 1 if result.get("announcement_version") == 1 else 0
+	_population_version = 1 if result.get("population_version") == 1 else 0
 	socket = WebSocketPeer.new()
 	socket.inbound_buffer_size = 2097152
 	socket.outbound_buffer_size = 8192
@@ -172,6 +177,7 @@ func _process(_delta: float) -> void:
 func _exchange_packet() -> Dictionary:
 	var packet := {"type": "auth.exchange", "ticket": _ticket, "protocol_version": 1, "config_hash": config_hash, "world_sync_version": 2}
 	if _announcement_version == 1: packet.announcement_version = 1
+	if _population_version == 1: packet.population_version = 1
 	return packet
 
 static func _decimal(value: Variant) -> bool:
@@ -209,6 +215,9 @@ func _receive(data: Dictionary, raw: PackedByteArray) -> void:
 		else: _failed(code, code in ["DATABASE_UNAVAILABLE", "SERVER_BUSY", "WORLD_STREAM_LAGGED"])
 		return
 	if kind == "pong": return
+	if kind == "population.state":
+		if stream.is_empty() or not population.receive(data): _failed("INVALID_POPULATION")
+		return
 	if kind == "announcement.state":
 		if stream.is_empty() or not announcements.receive(data): _failed("INVALID_ANNOUNCEMENT")
 		return

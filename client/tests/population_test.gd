@@ -1,0 +1,49 @@
+extends "res://tests/shared_interface_test.gd"
+
+func residents_packet(revision: int = 1) -> Dictionary:
+	var definitions: Array = JSON.parse_string(FileAccess.get_file_as_string("res://tests/population_fixture.json"))
+	for entry in definitions:
+		entry.next_cell = null
+		entry.segment_progress = 0
+		entry.world_epoch = "1"
+		entry.entity_revision = "0"
+	return {"type": "population.state", "epoch": EPOCH, "revision": str(revision), "entities": definitions}
+
+func _run() -> void:
+	var old := Game.player.duplicate(true)
+	var app: Control = load("res://scenes/main.tscn").instantiate()
+	add_child(app)
+	app._enter_online_world(SELF)
+	var view: OnlineWorldView = app.ui.get_node("OnlineWorld")
+	view.network.set_process(false)
+	view.network.stream = EPOCH
+	view.network.world_ready = true
+	view.network.entities = {SELF: entity(SELF, 1, "昆仑客", 1, 0, [10,16])}
+	view.network.changed.emit(view.network.entities)
+	var packet := residents_packet()
+	view.network._receive(packet, JSON.stringify(packet).to_utf8_buffer())
+	check(view.residents.size() == 5 and view.actors.size() == 1 and view.count_label.text == "同图1人", "Five server residents appear without changing online player counts")
+	for resident in view.residents.values():
+		check(resident.scene_file_path == "res://scenes/actors/online_resident.tscn" and resident.sprite is AnimatedSprite2D and resident.sprite.is_playing(), "Resident scene uses animated original art and static name label")
+	check(view.screen.hud.get_node("Minimap").shared_population.size() == 5, "NPC and monster markers reach the minimap")
+	var invalid := residents_packet(2)
+	invalid.entities[1].art = "res://scripts/main.gd"
+	check(not view.network.population.receive(invalid) and view.residents.size() == 5, "Untrusted resource paths cannot replace the current population")
+	packet = residents_packet(2)
+	packet.entities[1].next_cell = [19,10]
+	packet.entities[1].segment_progress = 175
+	check(view.network.population.receive(packet), "Server wolf motion accepted")
+	var wolf: OnlineResident = view.residents.wolf_a
+	var before := wolf.position
+	view._process(0.1)
+	check(wolf.position.x > before.x and wolf.position.distance_to(before) <= 2.81 and wolf.sprite.animation == "walk", "Wolf follows the authoritative patrol at 28 pixels per second")
+	check(view.residents.qingwei.position == Vector2(168,216), "Quest NPC remains at the bridge")
+	output = OS.get_environment("SSJX_POPULATION_CAPTURE_PATH")
+	await capture("online_population")
+	view.network.population.clear()
+	check(view.residents.is_empty(), "Disconnect clears resident nodes")
+	check(Game.player == old, "Shared residents never modify local progress")
+	app.queue_free()
+	await get_tree().process_frame
+	print("ONLINE POPULATION: %d checks, %d failures" % [checks, failures])
+	get_tree().quit(0 if failures == 0 else 1)

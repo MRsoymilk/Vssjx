@@ -6,12 +6,17 @@ var world: ShushanWorld
 var expanded := true
 var shared_map: Dictionary = {}
 var shared_entities: Dictionary = {}
+var shared_population: Dictionary = {}
 var shared_character_id := ""
 
 func set_shared_world(data: Dictionary, entities: Dictionary, character_id: String) -> void:
 	shared_map = data
 	shared_entities = entities
 	shared_character_id = character_id
+	queue_redraw()
+
+func set_shared_population(entities: Dictionary) -> void:
+	shared_population = entities
 	queue_redraw()
 
 func _ready() -> void:
@@ -59,6 +64,8 @@ func _draw() -> void:
 			if local and world.astar.is_point_solid(point): fill = fill.darkened(0.35)
 			draw_rect(Rect2(origin + Vector2(point) * scale_value, Vector2.ONE * scale_value), fill)
 	if not local:
+		for entry in shared_population.values():
+			draw_rect(Rect2(origin + Vector2(entry.cell[0], entry.cell[1]) * scale_value, Vector2(2, 2)), Color("e2e29b") if entry.kind == "npc" else Color("d27950"))
 		for id in shared_entities:
 			var entry: Dictionary = shared_entities[id]
 			var own: bool = id == shared_character_id

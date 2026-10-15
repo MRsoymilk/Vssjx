@@ -153,7 +153,7 @@ func _on_response(result: int, code: int, _headers: PackedStringArray, body: Pac
 		if not data.get("ticket") is String or RegEx.create_from_string("^[0-9a-f]{64}\\z").search(data.ticket) == null:
 			_finish({"ok": false, "code": "INVALID_RESPONSE"})
 		else:
-			_finish({"ok": true, "ticket": data.ticket, "announcement_version": 1 if data.get("announcement_version") == 1 else 0})
+			_finish({"ok": true, "ticket": data.ticket, "announcement_version": 1 if data.get("announcement_version") == 1 else 0, "population_version": 1 if data.get("population_version") == 1 else 0})
 		return
 	if code not in [200, 201]:
 		if _action == "character_create" and code in [409, 422] and data.get("operation_id") == pending_creation.get("operation_id"): pending_creation = {}

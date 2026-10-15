@@ -16,6 +16,7 @@ func form(app: Control) -> ServerLogin:
 	var page := app.modal.find_child("ServerLogin", true, false) as ServerLogin
 	# Isolate auth/session checks here; registration_flow_test covers navigation.
 	page.characters_requested.disconnect(Callable(app, "_online_characters"))
+	page.registration_requested.disconnect(Callable(app, "_online_creation"))
 	return page
 
 func capture(name_value: String) -> void:
@@ -74,7 +75,7 @@ func _run() -> void:
 	app._close_modal()
 	check(OnlineAccount.is_logged_in(), "Closing a page does not destroy the authenticated session")
 	login = form(app)
-	check(login.address_input.text == backend and login.auth_button.text == "进入游戏" and login.switch_button.text == "退出账号", "Reopened page restores address and memory-only account status")
+	check(login.address_input.text == backend and login.auth_button.text == "选择角色" and login.switch_button.text == "退出账号", "Reopened page restores address and memory-only account status")
 	OnlineAccount.inspect_session()
 	var me: Array = await OnlineAccount.completed
 	check(me[1].ok and me[1].account.username == "ui_player", "Account identity is fetched from the server")

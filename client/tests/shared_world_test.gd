@@ -56,7 +56,9 @@ func _run() -> void:
 	var app: Control = load("res://scenes/main.tscn").instantiate()
 	get_tree().root.add_child(app)
 	app._online_characters()
-	check(await wait_until(func() -> bool: return app.mode == "online_world"), "Existing account character enters the shared world")
+	check(await wait_until(func() -> bool: return app.mode == "online_select" and app.character_selection != null and app.character_selection.get_node("Online")._loaded), "Authenticated character waits in selection")
+	app.character_selection.enter_button.pressed.emit()
+	check(await wait_until(func() -> bool: return app.mode == "online_world"), "Explicit Enter joins shared world")
 	view = app.ui.get_node("OnlineWorld") as OnlineWorldView
 	check(await wait_until(func() -> bool: return view.network.world_ready and view.actors.size() == 2), "Both independent clients share the map")
 	if not view.network.world_ready: get_tree().quit(1); return

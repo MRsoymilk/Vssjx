@@ -57,6 +57,7 @@ var backpack: OriginalInventory
 var minimap: OriginalWorldMinimap
 var map_name: Label
 var map_coordinates: Label
+var character_selection: OriginalCharacterSelection
 
 func _ready() -> void:
 	get_tree().auto_accept_quit = false
@@ -189,6 +190,7 @@ func _button(parent: Node, text_value: String, rect: Rect2, callback: Callable, 
 	return button
 
 func _clear_ui() -> void:
+	character_selection = null
 	announcement_banner.present({})
 	battle_transition_epoch += 1
 	battle_transition = null
@@ -247,21 +249,55 @@ func _server_login() -> void:
 	modal.add_child(login)
 	login.close_requested.connect(_close_modal)
 	login.characters_requested.connect(_online_characters, CONNECT_DEFERRED)
+	login.registration_requested.connect(_online_creation, CONNECT_DEFERRED)
 	login.local_requested.connect(_enter_local_game)
 
 func _enter_local_game() -> void:
 	OnlineAccount.suspend_network()
-	if FileAccess.file_exists(Game.save_path): _continue()
+	if FileAccess.file_exists(Game.save_path):
+		if Game.load_game(): _local_character_selection()
+		else: _message("无法读取", Game.last_save_error)
 	else: _create()
 
-func _online_characters() -> void:
+func _online_characters(_character_id: String = "") -> void:
+	mode = "online_select"
+	_clear_ui()
+	_dispose_world()
+	character_selection = preload("res://scenes/ui/character_selection.tscn").instantiate()
+	character_selection.online_mode = true
+	var flow: OnlineSelectionFlow = character_selection.get_node("Online")
+	flow.enter_requested.connect(_enter_selected_online, CONNECT_DEFERRED)
+	flow.create_requested.connect(_online_creation, CONNECT_DEFERRED)
+	character_selection.back_requested.connect(_return_to_server_login, CONNECT_DEFERRED)
+	ui.add_child(character_selection)
+
+func _enter_selected_online(character_id: String) -> void:
+	if mode != "online_select" or not OnlineAccount.is_logged_in(): return
+	for character in OnlineAccount.characters:
+		if character.id == character_id:
+			_enter_online_world(character_id)
+			return
+
+func _local_character_selection() -> void:
+	mode = "local_select"
+	_clear_ui()
+	_dispose_world()
+	character_selection = preload("res://scenes/ui/character_selection.tscn").instantiate()
+	ui.add_child(character_selection)
+	character_selection.display_characters([Game.player])
+	character_selection.set_controls(false, false)
+	character_selection.status.text = "请选择角色后进入游戏"
+	character_selection.enter_requested.connect(func(_id: String) -> void: _continue())
+	character_selection.back_requested.connect(_return_to_server_login)
+
+func _online_creation() -> void:
 	mode = "online_create"
 	_clear_ui()
 	_dispose_world()
 	creation = load("res://scenes/ui/character_creation.tscn").instantiate()
 	creation.online_mode = true
 	var flow: OnlineCreationFlow = creation.get_node("Online")
-	flow.enter_requested.connect(_enter_online_world, CONNECT_DEFERRED)
+	flow.enter_requested.connect(_online_characters, CONNECT_DEFERRED)
 	flow.close_requested.connect(_return_to_server_login, CONNECT_DEFERRED)
 	ui.add_child(creation)
 	ui.theme = creation.theme

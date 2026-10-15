@@ -1,5 +1,6 @@
 [gd_scene format=3]
 [ext_resource type="Script" path="res://scripts/character_selection.gd" id="Script"]
+[ext_resource type="Script" path="res://scripts/online_selection_flow.gd" id="OnlineFlow"]
 [ext_resource type="Texture2D" path="res://assets/ui/create_header_end.png" id="End"]
 [ext_resource type="Texture2D" path="res://assets/ui/attribute_spiral.png" id="Spiral"]
 [ext_resource type="Texture2D" path="res://assets/ui/chat_frame_corner.svg" id="Corner"]
@@ -69,6 +70,9 @@ offset_bottom = 480.0
 texture_filter = 1
 theme = SubResource("Theme")
 script = ExtResource("Script")
+
+[node name="Online" type="Node" parent="."]
+script = ExtResource("OnlineFlow")
 
 [node name="Background" type="ColorRect" parent="."]
 offset_left = 0.0

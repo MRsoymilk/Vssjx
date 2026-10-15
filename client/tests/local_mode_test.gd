@@ -61,7 +61,9 @@ func _run() -> void:
 		var form: ServerLogin = app.modal.get_node("ServerLogin")
 		check(form.address_input.text == "local", "Local service preference survives reopening or a process restart")
 		form.auth_button.pressed.emit()
-		check(app.mode == "world" and app.creation == null, "An existing local save resumes without recreating the character")
+		check(app.mode == "local_select" and app.world == null and app.character_selection != null, "Existing local save stops on character selection")
+		app.character_selection.enter_button.pressed.emit()
+		check(app.mode == "world" and app.creation == null, "Explicit local Enter resumes saved character")
 		var expected := {"name": "本地青衫", "job": 2, "gender": 1, "school": 1, "hp": 51, "mp": 23, "gold": 73, "potions": 4, "quest": 2, "equipped": true, "signature": "本地保存", "cell": [17, 17]}
 		for key in expected:
 			var actual: Variant = Game.player.get(key)

@@ -86,7 +86,7 @@ func _result(action: String, result: Dictionary) -> void:
 	else:
 		_loaded = true
 		_entering = true
-		status.text = "正在进入该账号的角色……"
+		status.text = "正在打开角色选择面板……"
 		enter_requested.emit(String(OnlineAccount.characters[0].id))
 	_update_controls()
 

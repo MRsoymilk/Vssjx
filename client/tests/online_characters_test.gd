@@ -16,6 +16,14 @@ func until(predicate: Callable, message: String) -> void:
 	while not predicate.call() and Time.get_ticks_msec() < deadline: await get_tree().process_frame
 	check(predicate.call(), message)
 
+func selecting() -> bool:
+	return app.mode == "online_select" and app.character_selection != null and app.character_selection.get_node("Online")._loaded and not OnlineAccount.busy
+
+func open_creation() -> void:
+	await until(selecting, "Character selection finishes account lookup")
+	app.character_selection.get_node("Options/Create").pressed.emit()
+	await until(func() -> bool: return app.mode == "online_create" and app.creation != null and app.creation.get_node("Online")._loaded, "Selection opens original creation scene")
+
 func capture(stem: String) -> void:
 	var folder := OS.get_environment("SSJX_CHARACTER_CAPTURE_PATH")
 	if folder.is_empty(): return
@@ -53,9 +61,9 @@ func _run() -> void:
 	add_child(app)
 	app._server_login()
 	var login: ServerLogin = app.modal.get_node("ServerLogin")
-	check(login.auth_button.text == "进入游戏", "Authenticated account can continue")
+	check(login.auth_button.text == "选择角色", "Authenticated account can continue")
 	login.auth_button.pressed.emit()
-	await until(func() -> bool: return app.mode == "online_create" and app.creation.get_node("Online")._loaded, "Empty account opens original creation scene")
+	await open_creation()
 	var page: OriginalCharacterCreation = app.creation
 	var flow: OnlineCreationFlow = page.get_node("Online")
 	check(page.scene_file_path == "res://scenes/ui/character_creation.tscn" and not page.get_node("Create").disabled, "Original scene offers server-backed creation")
@@ -78,7 +86,10 @@ func _run() -> void:
 	var original := OnlineAccount.pending_creation.duplicate(true)
 	await capture("02_unknown_result")
 	page.get_node("Create").pressed.emit()
-	await until(func() -> bool: return app.mode == "online_world", "Retry resolves receipt and enters shared world")
+	await until(selecting, "Retry resolves receipt and opens selection")
+	check(not app.ui.has_node("OnlineWorld"), "Creation retry does not automatically enter world")
+	app.character_selection.enter_button.pressed.emit()
+	await until(func() -> bool: return app.mode == "online_world", "Explicit Enter starts shared world")
 	check(OnlineAccount.pending_creation.is_empty() and OnlineAccount.characters.size() == 1, "Retry resolves original receipt")
 	var character: Dictionary = OnlineAccount.characters[0]
 	check(character.display_name == "界面青衫" and int(character.job) == 2 and int(character.gender) == 1 and int(character.school) == 1, "Server confirms portrait and school selection")
@@ -103,7 +114,7 @@ func _run() -> void:
 	await idle_account()
 	OnlineAccount._expires_at = Time.get_unix_time_from_system() - 1.0
 	app._online_characters()
-	await until(func() -> bool: return app.mode == "online_world", "Relogin with automatic refresh recovers existing character")
+	await until(selecting, "Relogin with automatic refresh stops on existing character selection")
 	check(OnlineAccount.characters.size() == 1 and OnlineAccount.characters[0].id == character.id and app.creation == null, "Recovered character is reused without creating again")
 	app._home()
 	await idle_account()
@@ -115,7 +126,7 @@ func _run() -> void:
 	await idle_account()
 	OnlineAccount.refresh()
 	app._online_characters()
-	await until(func() -> bool: return app.creation.get_node("Online")._loaded, "Page opened during background refresh eventually loads")
+	await open_creation()
 	page = app.creation
 	flow = page.get_node("Online")
 	page.nickname.text = "未决修士"
@@ -124,23 +135,22 @@ func _run() -> void:
 	var unconfirmed := OnlineAccount.pending_creation.duplicate(true)
 	app._home()
 	app._online_characters()
-	await until(func() -> bool: return app.creation.get_node("Online")._loaded, "Reopened creation finishes server lookup")
+	await open_creation()
 	page = app.creation
 	flow = page.get_node("Online")
 	check(OnlineAccount.characters.is_empty() and OnlineAccount.pending_creation == unconfirmed and not unconfirmed.is_empty(), "Empty list preserves unresolved operation")
 	check(page.nickname.text == "未决修士" and not page.nickname.editable and not page.get_node("Create").disabled, "Reopened scene offers original-request retry")
 	page.get_node("Create").pressed.emit()
-	await until(func() -> bool: return app.mode == "online_world", "Uncommitted request can be retried after reopening")
+	await until(selecting, "Uncommitted retry returns to role selection")
 	check(OnlineAccount.characters.size() == 1 and OnlineAccount.characters[0].display_name == "未决修士", "Retried creation belongs to the current account")
 	app._home()
 	await idle_account()
-	# Test expiry on the same creation scene before its deferred existing-character entry.
+	# Session expiry must fence selection and discard a late character list.
 	app._online_characters()
-	page = app.creation
-	flow = page.get_node("Online")
+	var selection: OriginalCharacterSelection = app.character_selection
 	OnlineAccount._refresh_expires_at = Time.get_unix_time_from_system() - 1.0
 	OnlineAccount._process(0.0)
-	check(not page.nickname.editable and flow.status.text.contains("失效"), "Expired session disables creation")
+	check(selection.enter_button.disabled and selection.status.text.contains("失效"), "Expired session disables selection entry")
 	await idle_account()
 	check(OnlineAccount.characters.is_empty() and not OnlineAccount.is_logged_in(), "Late response cannot restore data after session expiry")
 	check(Game.player == before and FileAccess.get_file_as_string(Game.save_path) == "offline-save-sentinel", "All account transitions preserve local save")

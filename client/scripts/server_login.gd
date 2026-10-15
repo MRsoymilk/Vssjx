@@ -3,6 +3,7 @@ extends Control
 
 signal close_requested
 signal characters_requested
+signal registration_requested
 signal local_requested
 var settings := ServerConnectionSettings.new()
 var remembered := RememberedLogin.new()
@@ -23,6 +24,11 @@ var _registered_login := false
 var _pending_credentials: Dictionary = {}
 var _restored_password := false
 var _credentials_address := ""
+var _last_busy := false
+
+func _process(_delta: float) -> void:
+	# A world-ticket request can finish after returning here, without an auth event.
+	if _last_busy != OnlineAccount.busy: _update_controls()
 
 func _ready() -> void:
 	address_input.text = settings.load_address()
@@ -139,6 +145,7 @@ func _connection_result(result: Dictionary) -> void:
 		status.text = "已连接：%s\n账号服务尚未开放。" % display_name
 
 func _update_controls() -> void:
+	_last_busy = OnlineAccount.busy
 	var local := ServerConnectionSettings.is_local(address_input.text)
 	var locked := _probing or (OnlineAccount.busy and not local)
 	connect_button.disabled = locked
@@ -150,7 +157,7 @@ func _update_controls() -> void:
 	username_input.placeholder_text = "本地模式，无需账号" if local else ""
 	address_input.editable = not locked and _editing_address
 	connect_button.text = "保存" if _editing_address else "修改"
-	auth_button.text = "进入游戏" if local or OnlineAccount.is_logged_in() else "登陆"
+	auth_button.text = "进入游戏" if local else ("选择角色" if OnlineAccount.is_logged_in() else "登陆")
 	switch_button.text = "退出账号" if not local and OnlineAccount.is_logged_in() else "注册"
 
 func _submit_account() -> void:
@@ -182,7 +189,7 @@ func _submit_account() -> void:
 
 func _show_account() -> void:
 	username_input.text = String(OnlineAccount.account.get("username", ""))
-	status.text = "已登录：%s\n点击进入游戏，查看线上角色。" % username_input.text
+	status.text = "已登录：%s\n点击选择角色，查看已有角色。" % username_input.text
 	if address_input.text != OnlineAccount.server_address:
 		status.text = "已登录其他服务器：%s\n请先退出原账号，再更换服务器登录。" % username_input.text
 	_update_controls()
@@ -232,8 +239,10 @@ func _account_result(action: String, result: Dictionary) -> void:
 				return
 		_show_account()
 		if action == "login":
+			var registered := _registered_login
 			_registered_login = false
-			characters_requested.emit()
+			if registered: registration_requested.emit()
+			else: characters_requested.emit()
 
 func _return() -> void:
 	if ServerConnectionSettings.normalize(address_input.text).ok and not save_draft(): return

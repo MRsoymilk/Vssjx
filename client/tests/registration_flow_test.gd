@@ -27,6 +27,9 @@ func login_form() -> ServerLogin:
 	form.address_input.text_changed.emit(backend)
 	return form
 
+func selecting() -> bool:
+	return app.mode == "online_select" and app.character_selection != null and app.character_selection.get_node("Online")._loaded and not OnlineAccount.busy
+
 func creating() -> bool:
 	return app.mode == "online_create" and app.creation != null and app.creation.get_node("Online")._loaded and not OnlineAccount.busy
 
@@ -36,6 +39,13 @@ func capture() -> void:
 	await get_tree().process_frame
 	await RenderingServer.frame_post_draw
 	check(get_viewport().get_texture().get_image().save_png(path) == OK, "Capture actual registration scene")
+
+func capture_selection(stem: String) -> void:
+	var folder := OS.get_environment("SSJX_SELECTION_CAPTURE_PATH")
+	if folder.is_empty() or DisplayServer.get_name() == "headless": return
+	await get_tree().process_frame
+	await RenderingServer.frame_post_draw
+	check(get_viewport().get_texture().get_image().save_png(folder.path_join(stem + ".png")) == OK, "Capture authenticated character selection")
 
 func _run() -> void:
 	backend = OS.get_environment("SSJX_TEST_SERVER_URL")
@@ -78,7 +88,11 @@ func _run() -> void:
 	form = app.modal.get_node("ServerLogin")
 	check(OnlineAccount.is_logged_in() and form.username_input.text == "registration_ui", "Cancelling creation keeps the registered account")
 	form.auth_button.pressed.emit()
-	await until(creating, "Same account can resume creation")
+	await until(selecting, "Same account opens empty character selection")
+	await capture_selection("character_selection_empty")
+	check(app.world == null and not app.ui.has_node("OnlineWorld"), "Login never enters game before explicit Enter")
+	app.character_selection.get_node("Options/Create").pressed.emit()
+	await until(creating, "Empty selection can resume original creation scene")
 	page = app.creation
 	flow = page.get_node("Online")
 	for index in 6:
@@ -103,12 +117,16 @@ func _run() -> void:
 	page.select_variant(0)
 	check(page.selected_variant == 5 and not page.nickname.editable, "Unknown request prevents changing the original selection")
 	page.get_node("Create").pressed.emit()
-	await until(func() -> bool: return app.mode == "online_world", "Original creation button retries and enters the shared world")
+	await until(selecting, "Original creation retry returns to character selection")
+	check(app.character_selection.get_node("Details/Name").text == "注册青衫" and not app.ui.has_node("OnlineWorld"), "Created role waits for explicit entry")
+	app.character_selection.enter_button.pressed.emit()
+	await until(func() -> bool: return app.mode == "online_world", "Explicit Enter opens the shared world")
 	var character: Dictionary = OnlineAccount.characters[0]
 	check(character.display_name == "注册青衫" and character.job == 2 and character.gender == 1 and character.school == 1, "Server character matches selected variant and school")
 	check(app.ui.get_node("OnlineWorld").character_id == character.id and app.world == null, "Created character enters shared world without offline simulation")
 	check(OnlineAccount.pending_creation.is_empty(), "Original operation receipt is resolved after retry")
 	form = login_form()
+	await until(func() -> bool: return not OnlineAccount.busy and not form.switch_button.disabled, "Returned login unlocks after any in-flight world ticket")
 	form.switch_button.pressed.emit()
 	await until(func() -> bool: return not OnlineAccount.busy, "Account logout completes")
 	check(not OnlineAccount.is_logged_in(), "Logout forgets current session")
@@ -125,7 +143,11 @@ func _run() -> void:
 	check(remembered.load_saved(backend).password == "registration-password-1234", "Failed login cannot overwrite the saved valid password")
 	form.password_input.text = "registration-password-1234"
 	form.auth_button.pressed.emit()
-	await until(func() -> bool: return app.mode == "online_world", "Later login re-enters existing character")
+	await until(selecting, "Later login stops on existing character selection")
+	await capture_selection("character_selection_login")
+	check(app.world == null and not app.ui.has_node("OnlineWorld"), "Existing character does not auto-enter after login")
+	app.character_selection.enter_button.pressed.emit()
+	await until(func() -> bool: return app.mode == "online_world", "Later login enters only after confirmation")
 	check(OnlineAccount.characters.size() == 1 and OnlineAccount.characters[0].id == character.id, "Later login recovers the same server character")
 	check(Game.player == offline and FileAccess.get_file_as_string(Game.save_path) == "offline-sentinel", "Registration and later login preserve offline player and save")
 	var saved := FileAccess.get_file_as_string(prefs)

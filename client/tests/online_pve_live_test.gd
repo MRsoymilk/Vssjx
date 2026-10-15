@@ -25,7 +25,11 @@ func _run() -> void:
 	own_id = OnlineAccount.characters[0].id
 	var app: Control = load("res://scenes/main.tscn").instantiate()
 	add_child(app)
-	app._enter_online_world(own_id)
+	app._online_characters()
+	check(await wait_until(func() -> bool: return app.mode == "online_select" and app.character_selection != null and app.character_selection.get_node("Online")._loaded), "Real authenticated account stops at character selection")
+	check(not app.ui.has_node("OnlineWorld") and app.world == null and app.character_selection.characters[0].id == own_id, "Character selection does not start online or offline world automatically")
+	app.character_selection.enter_button.pressed.emit()
+	check(await wait_until(func() -> bool: return app.mode == "online_world"), "Explicit Enter starts selected server character")
 	view = app.ui.get_node("OnlineWorld")
 	check(await wait_until(func() -> bool: return view.network.world_ready and view.network.pve.ready and view.residents.size() == 5), "Real server negotiates population and private quest state")
 	if not view.network.pve.ready: get_tree().quit(1); return

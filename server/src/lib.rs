@@ -1,6 +1,7 @@
 pub mod auth;
 pub mod characters;
 pub mod config;
+pub mod world_map;
 
 use axum::response::IntoResponse;
 use axum::{

@@ -9,6 +9,7 @@
 - 使用 Godot 4.7 打开 `client/project.godot`，按 **F5** 运行项目。
 - 命令行在仓库根目录运行：`godot --path client`。
 - 服务端启动：`cargo run --locked --manifest-path server/Cargo.toml`，默认监听`127.0.0.1:8080`，详见[server/README.md](server/README.md)。
+- 只读服务监控：启动后打开`http://127.0.0.1:9090/`；JSON日志默认在启动目录`logs/`，自动限量轮转，远程访问使用SSH隧道。配置与安全边界见[日志与监控](server/README.md#日志与只读-web-监控)。
 
 服务端部署参数读取根目录`.env`，参考[.env.sample.txt](.env.sample.txt)填写；`.env`不会提交Git。默认数据库URL为空，仅运行连接检查，启用账号前需配置数据库。客户端不读取服务端秘密配置。
 

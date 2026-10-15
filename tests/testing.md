@@ -12,6 +12,8 @@ PostgreSQL账号、密码、会话、注销与账号界面验证见[account_auth
 
 角色元数据分片、按需加载、无损重建与读取微基准见[actor_catalog.md](actor_catalog.md)。
 
+服务端结构化日志、只读Web监控、真实浏览器与数据库故障验证见[observability.md](observability.md)。
+
 除非特别说明，命令均在`Vssjx/`仓库根目录执行，Godot工程路径为`client/`。
 
 - `tests/`：Python回归、离屏辅助脚本、测试说明和容量验收方案。

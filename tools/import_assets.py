@@ -125,6 +125,11 @@ def bake(key, animation, output_key=None):
                     and not any(layer['source'].endswith('x') or layer['source'].startswith('tx') for layer in layers)]
         playback = {'idle': [[standing[-1], 1]],
                     'walk': [[index, 1] for index in native_walk], 'attack': sequences[-1]}
+        if key in ('hero/mfs', 'hero/wfs'):
+            # The last sequence faces right. Battle heroes stand on the right
+            # and must keep the native left-facing staff motion instead.
+            playback['attack'] = sequences[4]
+            playback['cast'] = sequences[6]  # Original floating-staff flourish.
     elif key == 'monster/langw':
         playback = {'idle': sequences[3], 'walk': sequences[0],
                     'attack': sequences[2]}

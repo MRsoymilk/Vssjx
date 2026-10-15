@@ -46,6 +46,7 @@ var auto_button: Button
 var battle_selected_enemy := false
 var battle_field: OriginalBattleField
 var field_kind := "courtyard"
+var battle_move_callout: BattleMoveCallout
 var clock_timer := 0.0
 var effects_layer: Control
 var world_identity: Label
@@ -648,6 +649,8 @@ func _start_battle(enemy: Dictionary) -> void:
 	effects_layer.clip_contents = true
 	effects_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	ui.add_child(effects_layer)
+	battle_move_callout = BattleMoveCallout.new()
+	ui.add_child(battle_move_callout)
 	_battle_menu()
 	action_menu.hide()
 	_refresh_battle()
@@ -720,21 +723,24 @@ func _battle_turn(command: String) -> void:
 		return
 	if action_menu != null: action_menu.hide()
 	battle_stage = "player"
+	var animation: StringName = &"cast" if command == "skill" and battle_hero.sprite_frames.has_animation("cast") else &"attack"
+	battle_move_callout.present(ShushanBattle.action_name(command, int(Game.player.job)), battle_hero.position + Vector2(0, -88), _battle_action_duration(battle_hero, animation) + 0.15 if command in ["attack", "skill"] else 0.75)
 	_refresh_battle()
 	await get_tree().create_timer(0.15).timeout
 	if mode != "battle" or battle != active_battle: return
 	var result := battle.resolve_player()
 	_battle_lines(result.lines)
 	if command in ["attack", "skill"]:
-		battle_hero.play("attack")
+		battle_hero.play(animation)
 		var effect_key: String = "effect/flash" if command == "attack" else ["effect/t71", "effect/t36", "effect/t47"][int(Game.player.job)]
 		var effect := OriginalArt.effect(effect_key)
 		effect.position = battle_enemy.position - effects_layer.position
 		effects_layer.add_child(effect)
 		_damage_number(int(result.damage), battle_enemy.position + Vector2(-3, -53))
 	_refresh_battle()
-	await get_tree().create_timer(_battle_action_duration(battle_hero) if command in ["attack", "skill"] else 0.6).timeout
+	await get_tree().create_timer(_battle_action_duration(battle_hero, animation) if command in ["attack", "skill"] else 0.6).timeout
 	if mode != "battle" or battle != active_battle: return
+	battle_move_callout.clear()
 	if battle.phase == "enemy":
 		battle_stage = "enemy"
 		_refresh_battle()
@@ -759,11 +765,11 @@ func _battle_turn(command: String) -> void:
 	_refresh_battle()
 	if battle.finished: _battle_result()
 
-func _battle_action_duration(actor: AnimatedSprite2D) -> float:
+func _battle_action_duration(actor: AnimatedSprite2D, animation: StringName = &"attack") -> float:
 	var frames := actor.sprite_frames
 	var duration := 0.0
-	for i in frames.get_frame_count("attack"):
-		duration += frames.get_frame_duration("attack", i) / frames.get_animation_speed("attack")
+	for i in frames.get_frame_count(animation):
+		duration += frames.get_frame_duration(animation, i) / frames.get_animation_speed(animation)
 	return maxf(0.6, duration)
 
 func _battle_lines(lines: Array) -> void:

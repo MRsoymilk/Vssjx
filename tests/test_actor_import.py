@@ -59,6 +59,22 @@ class ActorImportTests(unittest.TestCase):
             self.assertEqual(len(large), 1, (index, large))
             self.assertGreater(large[0], 850)
 
+    def test_mage_attacks_and_casts_keep_native_facing_and_staff_motion(self):
+        for key in ('hero/mfs', 'hero/wfs'):
+            source = self.source[key]
+            playback = self.actors[key]['playback']
+            self.assertEqual(playback['attack'], source['sequences'][4])
+            self.assertEqual(playback['cast'], source['sequences'][6])
+            for mode in ('attack', 'cast'):
+                for index, _ in playback[mode]:
+                    head = next(layer for layer in source['frames'][index]
+                                if layer['source'] == source['sources'][0] and layer['frame'] == 0)
+                    self.assertEqual(head['transform'], 0, (key, mode, index))
+            staff = source['sources'][2]
+            poses = {(layer['x'], layer['y'], layer['transform']) for index, _ in playback['cast']
+                     for layer in source['frames'][index] if layer['source'] == staff}
+            self.assertGreaterEqual(len(poses), 3, key)
+
 
 if __name__ == '__main__':
     unittest.main()

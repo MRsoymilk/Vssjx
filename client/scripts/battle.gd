@@ -7,6 +7,7 @@ var hp: int
 var mp: int
 var potions: int
 const MAX_ROUNDS := 30
+const SKILL_NAMES := ["破山诀", "御剑诀", "摄灵诀"]
 var round_number := 0
 ## select -> player -> enemy -> settlement -> select/finished.
 var phase := "select"
@@ -17,6 +18,11 @@ var victory := false
 var escaped := false
 var committed := false
 var rng := RandomNumberGenerator.new()
+
+static func action_name(command: String, job: int) -> String:
+	if command == "skill": return SKILL_NAMES[clampi(job, 0, 2)]
+	if command == "attack": return ["锤击", "剑击", "杖击"][clampi(job, 0, 2)]
+	return String({"guard": "凝神防御", "potion": "回春散", "flee": "撤退"}.get(command, ""))
 
 func _init(opponent: Dictionary) -> void:
 	enemy = opponent.duplicate(true)
@@ -54,12 +60,11 @@ func resolve_player() -> Dictionary:
 	match pending_command:
 		"attack":
 			damage = maxi(1, int(values.attack) - int(enemy.defense) + rng.randi_range(-2, 2))
-			lines.append("你挥剑出击，造成 %d 点伤害。" % damage)
+			lines.append("你%s出击，造成 %d 点伤害。" % [["挥锤", "挥剑", "挥杖"][int(Game.player.job)], damage])
 		"skill":
 			mp -= 9
 			damage = maxi(1, int(float(values.attack) * 1.8) - int(enemy.defense))
-			var names := ["破山诀", "御剑诀", "摄灵诀"]
-			lines.append("你施展%s，造成 %d 点伤害。" % [names[int(Game.player.job)], damage])
+			lines.append("你施展%s，造成 %d 点伤害。" % [action_name("skill", int(Game.player.job)), damage])
 			if int(Game.player.job) == 2:
 				hp = mini(int(values.hp), hp + 16)
 				lines.append("摄灵恢复了 16 点生命。")

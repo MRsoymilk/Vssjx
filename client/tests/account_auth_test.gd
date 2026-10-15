@@ -66,6 +66,7 @@ func _run() -> void:
 	await OnlineAccount.completed
 	check(OnlineAccount.is_logged_in() and OnlineAccount.account.username == "ui_player", "Real account login succeeds")
 	check(login.password_input.text.is_empty(), "No password remains in the form")
+	check(not FileAccess.file_exists(RememberedLogin.new().path), "Successful login without remember selected never persists credentials")
 	check(app.mode == "home" and Game.player == player_before, "Account authentication does not import local character assets")
 	var saved := FileAccess.get_file_as_string(isolated)
 	check(not saved.contains("ui_player") and not saved.contains("ui-password") and not saved.contains(OnlineAccount._access_token), "Only server address is persisted")

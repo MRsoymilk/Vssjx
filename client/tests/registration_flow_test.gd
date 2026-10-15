@@ -56,14 +56,18 @@ func _run() -> void:
 	var form := login_form()
 	form.username_input.text = "registration_ui"
 	form.password_input.text = "short"
+	form.remember_me.button_pressed = true
 	form.switch_button.pressed.emit()
 	await until(func() -> bool: return not OnlineAccount.busy, "Invalid registration completes")
 	check(not OnlineAccount.is_logged_in() and form.status.text.contains("密码") and form._registration_secret.is_empty(), "Refused registration clears temporary secret and stays on login")
+	check(not FileAccess.file_exists(RememberedLogin.new().path), "Refused registration does not remember its password")
 	form.password_input.text = "registration-password-1234"
 	form.switch_button.pressed.emit()
 	check(form.password_input.text.is_empty() and form.auth_button.disabled, "Registration clears visible password and locks duplicate requests")
 	if not await until(creating, "Registration authenticates and opens character creation"): get_tree().quit(1); return
 	check(OnlineAccount.is_logged_in() and OnlineAccount.account.username == "registration_ui", "Registered account is the authenticated owner")
+	var remembered := RememberedLogin.new()
+	check(remembered.load_saved(backend) == {"username": "registration_ui", "password": "registration-password-1234"}, "Successful registration and auto-login remember the account when selected")
 	var page: OriginalCharacterCreation = app.creation
 	var flow: OnlineCreationFlow = page.get_node("Online")
 	check(page.scene_file_path == "res://scenes/ui/character_creation.tscn" and page.online_mode, "Registration uses the exact requested PackedScene")
@@ -108,13 +112,17 @@ func _run() -> void:
 	form.switch_button.pressed.emit()
 	await until(func() -> bool: return not OnlineAccount.busy, "Account logout completes")
 	check(not OnlineAccount.is_logged_in(), "Logout forgets current session")
+	check(form.remember_me.button_pressed and form.password_input.text == "registration-password-1234", "Logout restores remembered credentials without restoring a session")
 	# Recreate the page to ensure its ephemeral state is not needed for later login.
 	form = login_form()
+	form._restore_credentials()
+	check(form.username_input.text == "registration_ui" and form.password_input.text == "registration-password-1234", "New login page autofills the previously registered account")
 	form.username_input.text = "registration_ui"
 	form.password_input.text = "wrong-password"
 	form.auth_button.pressed.emit()
 	await until(func() -> bool: return not OnlineAccount.busy, "Wrong password completes")
 	check(not OnlineAccount.is_logged_in() and form.status.text.contains("错误"), "The same account still requires its registered password")
+	check(remembered.load_saved(backend).password == "registration-password-1234", "Failed login cannot overwrite the saved valid password")
 	form.password_input.text = "registration-password-1234"
 	form.auth_button.pressed.emit()
 	await until(func() -> bool: return app.mode == "online_world", "Later login re-enters existing character")
@@ -122,6 +130,10 @@ func _run() -> void:
 	check(Game.player == offline and FileAccess.get_file_as_string(Game.save_path) == "offline-sentinel", "Registration and later login preserve offline player and save")
 	var saved := FileAccess.get_file_as_string(prefs)
 	check(not saved.contains("registration_ui") and not saved.contains("password") and not saved.contains(OnlineAccount._access_token), "No account credentials or online snapshots are persisted in preferences")
+	form = login_form()
+	form._restore_credentials()
+	form.remember_me.button_pressed = false
+	check(not FileAccess.file_exists(remembered.path), "Disabling remember after authentication clears stored credentials")
 	app._home()
 	OnlineAccount.suspend_network()
 	OnlineAccount.clear()

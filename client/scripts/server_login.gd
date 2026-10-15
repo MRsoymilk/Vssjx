@@ -5,6 +5,7 @@ signal close_requested
 signal characters_requested
 signal local_requested
 var settings := ServerConnectionSettings.new()
+var remembered := RememberedLogin.new()
 @onready var address_input: LineEdit = $ServerAddress
 @onready var status: Label = $Status
 @onready var connect_button: Button = $ConnectButton
@@ -14,14 +15,20 @@ var register_mode := false
 @onready var password_input: LineEdit = $Password
 @onready var auth_button: Button = $AuthButton
 @onready var switch_button: Button = $SwitchButton
+@onready var remember_me: CheckBox = $RememberMe
 var _probing := false
 var _editing_address := false
 var _registration_secret := ""
 var _registered_login := false
+var _pending_credentials: Dictionary = {}
+var _restored_password := false
+var _credentials_address := ""
 
 func _ready() -> void:
 	address_input.text = settings.load_address()
 	if not settings.last_error.is_empty(): status.text = settings.last_error
+	_restore_credentials()
+	remember_me.toggled.connect(_remember_toggled)
 	auth_button.pressed.connect(_login)
 	switch_button.pressed.connect(_register)
 	connect_button.pressed.connect(_edit_address)
@@ -29,6 +36,9 @@ func _ready() -> void:
 	discovery.completed.connect(_connection_result)
 	OnlineAccount.completed.connect(_account_result)
 	address_input.text_changed.connect(func(_value: String) -> void:
+		if _restored_password: password_input.clear()
+		_restored_password = false
+		remember_me.set_pressed_no_signal(false)
 		status.text = "地址已修改，点击保存后生效。"
 		_update_controls()
 	)
@@ -39,6 +49,22 @@ func _ready() -> void:
 	if ServerConnectionSettings.is_local(address_input.text): status.text = "本地单人模式，进度保存在此设备。"
 	elif OnlineAccount.is_logged_in(): _show_account()
 	username_input.grab_focus()
+
+func _restore_credentials() -> void:
+	if _restored_password: password_input.clear()
+	_credentials_address = address_input.text
+	var saved := remembered.load_saved(address_input.text)
+	remember_me.set_pressed_no_signal(not saved.is_empty())
+	_restored_password = not saved.is_empty()
+	if not saved.is_empty():
+		username_input.text = saved.username
+		password_input.text = saved.password
+	if not remembered.last_error.is_empty(): status.text = remembered.last_error
+
+func _remember_toggled(enabled: bool) -> void:
+	if enabled: return
+	_pending_credentials = {}
+	if not remembered.forget(): status.text = remembered.last_error
 
 func _edit_address() -> void:
 	if connect_button.disabled: return
@@ -84,6 +110,7 @@ func connect_server() -> void:
 	if connect_button.disabled: return
 	if not save_draft(): return
 	address_input.text = ServerConnectionSettings.normalize(address_input.text).address
+	if _credentials_address != address_input.text: _restore_credentials()
 	if ServerConnectionSettings.is_local(address_input.text):
 		discovery.cancel()
 		_probing = false
@@ -117,6 +144,7 @@ func _update_controls() -> void:
 	connect_button.disabled = locked
 	auth_button.disabled = locked
 	switch_button.disabled = locked or local
+	remember_me.disabled = locked or local
 	username_input.editable = not locked and not local and not OnlineAccount.is_logged_in()
 	password_input.editable = not locked and not local and not OnlineAccount.is_logged_in()
 	username_input.placeholder_text = "本地模式，无需账号" if local else ""
@@ -134,12 +162,17 @@ func _submit_account() -> void:
 		return
 	if not save_draft(): return
 	address_input.text = ServerConnectionSettings.normalize(address_input.text).address
+	if _restored_password and _credentials_address != address_input.text:
+		password_input.clear()
+		_restore_credentials()
 	if username_input.text.strip_edges().is_empty() or password_input.text.is_empty():
 		status.text = "请输入账号和密码。"
 		return
 	_editing_address = false
 	status.text = "正在注册账号……" if register_mode else "正在登录……"
 	var secret := password_input.text
+	_pending_credentials = {"server": address_input.text, "username": username_input.text.strip_edges().to_lower(), "password": secret} if remember_me.button_pressed else {}
+	_restored_password = false
 	password_input.clear()
 	if register_mode:
 		_registration_secret = secret
@@ -159,6 +192,7 @@ func _account_result(action: String, result: Dictionary) -> void:
 	password_input.clear()
 	_update_controls()
 	if not result.ok:
+		_pending_credentials = {}
 		_registration_secret = ""
 		var errors := {
 			"INVALID_USERNAME": "账号须为3～32位英数字或下划线。", "WEAK_PASSWORD": "密码须为12～128个字符，不能全为空白。",
@@ -185,8 +219,17 @@ func _account_result(action: String, result: Dictionary) -> void:
 		_registered_login = true
 		OnlineAccount.login(address_input.text, username_input.text, secret)
 		_update_controls()
-	elif action == "logout": status.text = "账号已退出，服务器地址仍会保留。"
+	elif action == "logout":
+		_restore_credentials()
+		status.text = "账号已退出，服务器地址仍会保留。"
 	else:
+		if action == "login" and not _pending_credentials.is_empty():
+			var saved := remembered.remember(_pending_credentials.server, _pending_credentials.username, _pending_credentials.password)
+			_pending_credentials = {}
+			if not saved:
+				_show_account()
+				status.text += "\n" + remembered.last_error
+				return
 		_show_account()
 		if action == "login":
 			_registered_login = false
@@ -198,6 +241,7 @@ func _return() -> void:
 	close_requested.emit()
 
 func _exit_tree() -> void:
+	_pending_credentials = {}
 	_registration_secret = ""
 	if OnlineAccount.completed.is_connected(_account_result): OnlineAccount.completed.disconnect(_account_result)
 	# Escape/window close also remembers a valid draft, without touching saves.

@@ -5,7 +5,7 @@ import json
 import unittest
 from PIL import Image
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[1] / 'client'
 
 
 def components(image):

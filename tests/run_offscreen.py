@@ -1,6 +1,6 @@
 """Run Godot with real rendering on an isolated virtual X11 display.
 
-Usage: python tests/run_offscreen.py --path . res://tests/motion_regression.tscn
+Usage: python tests/run_offscreen.py --path client res://tests/motion_regression.tscn
 Requires Xvfb and an OpenGL driver (Mesa software rendering works).
 GODOT_BIN / XVFB_BIN can override the executable paths. No desktop is touched.
 """

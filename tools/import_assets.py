@@ -11,7 +11,7 @@ from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[1]
 ANALYSIS = ROOT / 'analysis'
-DEST = ROOT / 'assets'
+DEST = ROOT / 'client' / 'assets'
 TRANSFORMS = {
     # ANI rotates clockwise; reflection is applied before rotation. This
     # differs from restoring the clockwise type-3 image storage in decoder.

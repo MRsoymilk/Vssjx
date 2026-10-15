@@ -5,3 +5,4 @@ work/
 __pycache__/
 *.py[cod]
 *.zip
+/server/target/

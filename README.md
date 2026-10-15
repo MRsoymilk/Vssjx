@@ -2,11 +2,11 @@
 
 基于 `analysis/` 中原始《蜀山剑侠Online》320×480 客户端素材，用 **Godot 4.7** 编写的离线可玩原型。
 
+工程已划分为`client/`（Godot客户端）和`server/`（Rust服务端预留目录）。当前玩法仍为离线模式，服务器尚未实现；联机方案见[design/README.md](design/README.md)。
+
 ## 启动
 
-- 双击项目根目录的 `启动游戏.bat`，使用本机已安装的 Godot 4.7.1 启动游戏。
-- 或用 Godot 4.7 打开 `project.godot`，按 **F5** 运行项目。
-- PowerShell：`./启动游戏.ps1`。打开编辑器：`./启动游戏.ps1 -Editor`。引擎不在默认位置时，通过 `-GodotPath` 指定路径。
+- 使用 Godot 4.7 打开 `client/project.godot`，按 **F5** 运行项目。
 
 已生成所需 Godot 素材，正常运行不依赖 Python，也不需要联网。启动脚本在首次运行时自动执行Godot导入。本项目采用 OpenGL Compatibility 渲染器。
 
@@ -29,7 +29,7 @@
 - 背包用药、购药、青锋剑装备、铜钱、修为、升级、元气恢复。
 - 背包按参考图改为覆盖场景的卷轴窗口、角色预览与两条状态条、十个装备位置、六列四行可见物品格、60格滚动区域、选中指针、物品提示、整理、菜单、铜币和返回。物品图标复用原包iw28/ix28；显示真实占用格数、当前装备、堆叠与铜币，不复制参考图高等级装备。现有回春散每格99个；装备/卸下、使用、购药、整理和确认丢弃均写入存档，丢弃仅移除选中堆叠。
 - 常规界面按补充图加入左上实时小地图、地图名和坐标、经验条、“常规模式”牌、奖励入口及同色分格工具栏；点击小地图可收起/展开。小地图显示真实地形、角色、任务人物与未击败怪物位置。
-- 功能页配色参照真实游玩视频与截图：常规/战斗蓝、背包绿、人物属性红、奖励红，合成橙作为后续页面色表。配置集中在`scripts/ui_theme.gd`，更换门派不会改变页面颜色。菜单→门派仍可保存角色身份，目前没有额外门派技能规则；合成业务未实现，色表不表示功能已开放。
+- 功能页配色参照真实游玩视频与截图：常规/战斗蓝、背包绿、人物属性红、奖励红，合成橙作为后续页面色表。配置集中在`client/scripts/ui_theme.gd`，更换门派不会改变页面颜色。菜单→门派仍可保存角色身份，目前没有额外门派技能规则；合成业务未实现，色表不表示功能已开放。
 - 参考视频《冒泡蜀山剑侠.mp4》长29:56.47，270×480、15fps；已检查120张总览并整理12张精确时间点关键帧，参考记录位于`analysis/video_reference.json`。视频进入战斗时指令菜单收起，点击人物后展开；本版已同步这一行为。
 - 修正人物走路反复左右翻面：原始序列混合两种朝向，现六个男女角色均使用末尾同朝向的六帧完整步伐，角色只随实际行进方向转身。修正侠客左刀脱离手掌：ANI的旋转1为顺时针、3为逆时针，镜像在旋转之前；这与类型3图片存储方向还原是两个步骤。
 - 优化行走滑步/倒退感：键盘连续移动不再每格插入待机，步伐按实际位移推进（32像素一整轮），跨格和转弯保留步伐相位。移动速度仍为每秒72像素，跨格保留本帧剩余位移，15/30/60/120 FPS速度一致；松键走完当前格后待机，阻挡和暂停不再空播步伐。
@@ -53,22 +53,25 @@
 
 | 路径 | 用途 |
 |---|---|
-| `scenes/main.tscn` | 启动场景 |
-| `scripts/main.gd` | 标题、角色创建、HUD、弹窗与战斗界面 |
-| `scripts/character_creation.gd` | 按原版参考布局实现的六角色创建页 |
-| `scripts/character_attributes.gd` | 按参考图实现的人物属性页及四页签 |
-| `scripts/original_number.gd` | 原包白色/绿色像素数字绘制 |
-| `scripts/world.gd` | 两张地图、碰撞、寻路、NPC、敌人和交互 |
-| `scripts/battle.gd` | 回合战斗、胜负与一次性奖励结算 |
-| `scripts/scene_chrome.gd` | 参考图蓝色顶栏、像素时钟、消息栏和原包图标工具栏 |
-| `scripts/inventory.gd` | 参考图背包、装备位置、60格物品与操作菜单 |
-| `scripts/world_minimap.gd` | 可展开/收起的实时地图与角色/怪物位置 |
-| `scripts/ui_theme.gd` | 按视频与截图确认的功能页配色表 |
-| `scripts/battle_field.gd` | 原包图块组成的庭院/荒地/雪地/遗迹战斗底图 |
-| `scripts/game_state.gd` | 角色状态、任务、升级、存档与格式校验 |
-| `scripts/art.gd` | 原始组合帧图集转SpriteFrames |
-| `scripts/portal.gd` | 灵门标记 |
-| `assets/` | 已转换的图块、角色图集、标题和动画数据 |
+| `client/project.godot` | Godot客户端工程入口 |
+| `client/scenes/main.tscn` | 启动场景 |
+| `client/scripts/main.gd` | 标题、角色创建、HUD、弹窗与战斗界面 |
+| `client/scripts/character_creation.gd` | 按原版参考布局实现的六角色创建页 |
+| `client/scripts/character_attributes.gd` | 按参考图实现的人物属性页及四页签 |
+| `client/scripts/original_number.gd` | 原包白色/绿色像素数字绘制 |
+| `client/scripts/world.gd` | 两张地图、碰撞、寻路、NPC、敌人和交互 |
+| `client/scripts/battle.gd` | 回合战斗、胜负与一次性奖励结算 |
+| `client/scripts/scene_chrome.gd` | 参考图蓝色顶栏、像素时钟、消息栏和原包图标工具栏 |
+| `client/scripts/inventory.gd` | 参考图背包、装备位置、60格物品与操作菜单 |
+| `client/scripts/world_minimap.gd` | 可展开/收起的实时地图与角色/怪物位置 |
+| `client/scripts/ui_theme.gd` | 按视频与截图确认的功能页配色表 |
+| `client/scripts/battle_field.gd` | 原包图块组成的庭院/荒地/雪地/遗迹战斗底图 |
+| `client/scripts/game_state.gd` | 角色状态、任务、升级、存档与格式校验 |
+| `client/scripts/art.gd` | 原始组合帧图集转SpriteFrames |
+| `client/scripts/portal.gd` | 灵门标记 |
+| `client/assets/` | 已转换的图块、角色图集、标题和动画数据 |
+| `server/` | Rust服务端预留目录，尚无运行服务 |
+| `design/` | 联机架构、协议草案与实施规划 |
 | `tools/import_assets.py` | 可重复执行的静态资源转换程序 |
 | `analysis/` | 用户提供的原始静态解析材料，保留并排除Godot扫描 |
 
@@ -81,7 +84,7 @@ python analysis/decode_assets.py
 python tools/import_assets.py
 ```
 
-资源转换输出 `assets/data/import_report.json`、`actors.json` 与 `original_animations.json`。ANI变换按低两位旋转、高位镜像的八种图像变换解释；人物idle选取静止姿态，walk采用原始行走序列，attack采用单次攻击序列，原始编号序列保留为 `source_N`。组合人物帧会按头部中心对齐Godot角色锚点，地图位移由寻路控制，原始层位移仍保留在JSON中。未恢复原客户端的动画事件和碰撞语义。
+在仓库根目录执行以上命令，资源转换输出到`client/assets/`；报告与动画数据位于`client/assets/data/import_report.json`、`actors.json`与`original_animations.json`。ANI变换按低两位旋转、高位镜像的八种图像变换解释；人物idle选取静止姿态，walk采用原始行走序列，attack采用单次攻击序列，原始编号序列保留为 `source_N`。组合人物帧会按头部中心对齐Godot角色锚点，地图位移由寻路控制，原始层位移仍保留在JSON中。未恢复原客户端的动画事件和碰撞语义。
 
 IMG/IMGS类型3是经过顺时针旋转存储的RLE图像。解码版本2会先逆时针转回正常方向，再应用ANI层变换；由此修正隐者头部侧倒及脚部散落的问题。标题图也使用统一解码，避免重复旋转。
 

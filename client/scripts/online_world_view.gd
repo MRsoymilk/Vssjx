@@ -163,7 +163,7 @@ func _build_map() -> void:
 	_motion_grid.default_estimate_heuristic = AStarGrid2D.HEURISTIC_MANHATTAN
 	_motion_grid.update()
 	for index in map_data.blocked.size(): _motion_grid.set_point_solid(Vector2i(index % 32, index / 32), map_data.blocked[index])
-	var terrain := TileMapLayer.new()
+	var terrain: TileMapLayer = $Viewport/Scene/Terrain
 	var tiles := TileSet.new()
 	tiles.tile_size = Vector2i(16, 16)
 	var atlas := TileSetAtlasSource.new()
@@ -172,14 +172,13 @@ func _build_map() -> void:
 	for index in 756: atlas.create_tile(Vector2i(index % 32, index / 32))
 	tiles.add_source(atlas)
 	terrain.tile_set = tiles
-	scene.add_child(terrain)
 	for index in map_data.tiles.size():
 		var tile := int(map_data.tiles[index])
 		terrain.set_cell(Vector2i(index % 32, index / 32), 0, Vector2i(tile % 32, tile / 32))
 	for prop in map_data.scenery:
 		var actor := OriginalArt.actor(prop.art)
 		actor.position = Vector2(prop.x, prop.y)
-		scene.add_child(actor)
+		actor_layer.add_child(actor)
 
 func _population(values: Dictionary) -> void:
 	var visible_values := values.duplicate()
@@ -209,7 +208,6 @@ func _snapshot(values: Dictionary) -> void:
 		if not actors.has(id):
 			var root := Node2D.new()
 			root.position = point
-			root.z_index = 2
 			actor_layer.add_child(root)
 			var key: String = (["mzs", "mck", "mfs"] if int(entity.gender) == 0 else ["wzs", "wck", "wfs"])[int(entity.job)]
 			var sprite := OriginalArt.actor("hero/" + key)

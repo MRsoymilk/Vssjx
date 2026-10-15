@@ -2,7 +2,6 @@
 [ext_resource type="Script" path="res://scripts/online_resident.gd" id="Script"]
 [ext_resource type="Theme" path="res://scenes/ui/login_theme.tres" id="Theme"]
 [node name="OnlineResident" type="Node2D"]
-z_index = 2
 script = ExtResource("Script")
 [node name="Sprite" type="Node2D" parent="."]
 [node name="Name" type="Label" parent="."]

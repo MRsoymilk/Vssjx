@@ -65,6 +65,12 @@ func _verify() -> void:
 	var profile = load("res://scripts/interface/profiles/web_runtime.tres")
 	check(profile.api_prefix == "" and not profile.allow_loopback_http, "Packed public build profile has safe root/HTTPS defaults")
 	check(load("res://scripts/interface/platform_factory.gd").create("web") == null, "Packed factory does not enable incomplete Web runtime")
+	check(FileAccess.file_exists("res://scripts/interface/adapters/web/indexeddb_storage.js"), "Trusted JS storage module is included as a raw packaged file")
+	var web_storage = load("res://scripts/interface/adapters/web/web_storage.gd").new()
+	var web_initialization = await web_storage.initialize().wait()
+	check(not web_initialization.ok and web_storage.status().retention == "unknown", "Packed Web storage cannot silently inherit native guarantees")
+	check(web_config.local_path("save").value == "offline://save-v1" and not web_config.local_path("save", "user://override.json").ok, "Packed Web configuration pins the logical slot")
+	web_storage.close()
 	scene._close_modal()
 	scene.queue_free()
 	await process_frame

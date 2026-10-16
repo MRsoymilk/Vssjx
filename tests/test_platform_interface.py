@@ -79,10 +79,28 @@ class PlatformBoundaryTests(unittest.TestCase):
         self.assertIn('"SAVE_UNCONFIRMED"', game)
         self.assertIn('"STORAGE_BUSY"', game)
 
-    def test_browser_persistence_is_not_enabled_by_the_async_contract(self):
+    def test_web_factory_remains_disabled_despite_storage_adapter(self):
         factory = (INTERFACE / 'platform_factory.gd').read_text('utf8')
         self.assertIn('if OS.has_feature("web"): return null', factory)
-        self.assertFalse((INTERFACE / 'adapters/web/web_storage.gd').exists())
+        self.assertTrue((INTERFACE / 'adapters/web/web_storage.gd').exists())
+
+    def test_web_storage_has_no_native_or_query_credentials_fallback(self):
+        gd = (INTERFACE / 'adapters/web/web_storage.gd').read_text('utf8')
+        js = (INTERFACE / 'adapters/web/indexeddb_storage.js').read_text('utf8')
+        for text in [gd, js]:
+            for forbidden in ['localStorage', 'sessionStorage', 'syncfs(', 'force_fs_sync(', 'location.', 'OS.get_environment(']:
+                self.assertNotIn(forbidden, text)
+        self.assertNotIn('FileAccess.open(', gd)
+        self.assertNotIn('write_text_atomic(', gd)
+        self.assertIn('weakref(self)', gd)
+        self.assertIn('NOTIFICATION_PREDELETE', gd)
+        self.assertIn('transaction.oncomplete', js)
+        self.assertIn('transaction.onabort', js)
+        self.assertIn('store.openCursor(KEY)', js)
+        self.assertIn("durability: 'browser_sync'", js)
+        self.assertIn("'vssjx-offline-v1'", js)
+        presets = (CLIENT / 'export_presets.cfg').read_text('utf8')
+        self.assertEqual(presets.count('scripts/interface/adapters/web/*.js'), 2)
 
     def test_game_canvas_and_existing_exports_are_preserved(self):
         config = (CLIENT / 'project.godot').read_text('utf8')

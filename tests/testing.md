@@ -24,6 +24,8 @@ P1c文本焦点、组合状态提交防护和原生退出/窗口关闭保存验�
 
 P2c-1可等待存档契约、全部游戏调用方迁移、延迟完成/失败与退出等待验证见[storage_async.md](storage_async.md)；不等于实现或验收浏览器持久化。
 
+P2c-2真实Godot Web存储夹具、IndexedDB事务确认、跨刷新/浏览器进程恢复及失败/超时验证见[web_storage.md](web_storage.md)；生产Web游戏工厂仍未启用。
+
 同一游戏界面的多人角色、内嵌聊天与本地入口验证见[shared_interface.md](shared_interface.md)及[local_mode.md](local_mode.md)。
 
 底部内置表情面板、标记传输与双方贴图显示验证见[chat_emotes.md](chat_emotes.md)。

@@ -90,7 +90,7 @@ func _run() -> void:
 	await capture("01_saved_server")
 	form.address_input.text = "invalid address"
 	form.connect_server()
-	check(not form.connect_button.disabled and not form.status.text.is_empty(), "Invalid input reports error without connecting")
+	check(form.address_input.editable and not form.status.text.is_empty(), "Invalid input reports error without connecting")
 	check(settings.load_address() == "http://192.168.1.10:9000", "Invalid UI input preserves saved server")
 	app._close_modal()
 	var backend := OS.get_environment("SSJX_TEST_SERVER_URL")
@@ -124,7 +124,7 @@ func _run() -> void:
 		form = login_form()
 		form.address_input.text = fixture + "/slow"
 		form.connect_server()
-		check(form.connect_button.disabled, "Repeated connect is locked during request")
+		check(not form.address_input.editable and form.auth_button.disabled, "Repeated connect is locked during request")
 		form._return()
 		check(app.modal == null and app.original_cover.active, "Pending connection can be cancelled")
 		await get_tree().create_timer(0.1).timeout

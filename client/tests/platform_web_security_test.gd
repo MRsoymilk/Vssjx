@@ -47,6 +47,7 @@ func _run() -> void:
 	check(DirAccess.make_dir_absolute(directory) == OK, "Owned test directory")
 	_test_config()
 	await _test_credentials_and_ui()
+	OnlineAccount.resume_network() # Test online target policy after the credential-only suspension.
 	await _test_network_denials()
 	Platform.context = original
 	OnlineAccount.clear()
@@ -110,7 +111,7 @@ func _test_credentials_and_ui() -> void:
 	check(not web_store.remember(config.origin, "test", "not-persisted-1234") and not web_store.forget(), "Every operation rechecks policy")
 	var form := load("res://scenes/ui/server_login.tscn").instantiate() as ServerLogin
 	add_child(form)
-	check(form.address_input.text == "https://game.example.com/ssjx" and not form.address_input.editable and not form.connect_button.visible, "Web UI has a fixed read-only address and no Modify action")
+	check(form.address_input.text == "https://game.example.com/ssjx" and not form.address_input.editable and not form.has_node("ConnectButton"), "Web UI keeps its fixed read-only address")
 	check(not form.remember_me.visible and form.remember_me.disabled and not form.remember_me.button_pressed and form.password_input.text.is_empty(), "Web UI offers no remembering or credential restoration")
 	form.remembered.path = path
 	form.remember_me.button_pressed = true

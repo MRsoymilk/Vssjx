@@ -209,21 +209,11 @@ vertical_alignment = 1
 layout_mode = 0
 offset_left = 96.0
 offset_top = 112.0
-offset_right = 241.0
+offset_right = 286.0
 offset_bottom = 140.0
 theme_override_font_sizes/font_size = 10
 placeholder_text = "请设置服务地址"
 max_length = 1024
-editable = false
-
-[node name="ConnectButton" type="Button" parent="."]
-layout_mode = 0
-offset_left = 247.0
-offset_top = 112.0
-offset_right = 287.0
-offset_bottom = 140.0
-theme_override_font_sizes/font_size = 12
-text = "修改"
 
 [node name="UsernameLabel" type="Label" parent="."]
 layout_mode = 0
@@ -299,9 +289,11 @@ offset_left = 218.0
 offset_top = 263.0
 offset_right = 286.0
 offset_bottom = 287.0
-tooltip_text = "在此设备记住账号和密码，取消勾选可清除。"
+tooltip_text = "在此设备记住账号和密码。\n取消勾选可清除。"
 theme_override_colors/font_color = Color(0.46, 0.32, 0.16, 1)
 theme_override_colors/font_hover_color = Color(0.64, 0.24, 0.16, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.64, 0.24, 0.16, 1)
+theme_override_colors/font_focus_color = Color(0.46, 0.32, 0.16, 1)
 theme_override_colors/font_pressed_color = Color(0.46, 0.32, 0.16, 1)
 theme_override_colors/font_disabled_color = Color(0.62, 0.56, 0.42, 1)
 theme_override_constants/outline_size = 0

@@ -41,18 +41,17 @@ func _run() -> void:
 	check(login != null and not cover.active, "Title login opens the scene and pauses title input")
 	check(login.auth_button.text == "登陆" and login.switch_button.text == "注册" and login.get_node("Back").text == "返回", "Login page uses the requested action labels")
 	check(login.auth_button.position.y < login.switch_button.position.y and login.switch_button.position.y < login.get_node("Back").position.y, "Login, register and return follow the requested vertical order")
-	check(not login.address_input.editable and login.connect_button.text == "修改", "Server address is read-only until Modify is selected")
+	check(login.address_input.editable and not login.has_node("ConnectButton"), "Server address can be edited immediately without a Modify button")
 	check(login.address_input.text == "https://game.example.com/ssjx" and login.password_input.secret, "Saved address is shown and password stays masked")
 	check(not login.remember_me.button_pressed and not FileAccess.file_exists(login.remembered.path), "Remembering credentials is opt-in")
-	for node_name in ["ServerAddress", "ConnectButton", "Username", "Password", "AuthButton", "SwitchButton", "RememberMe", "Status", "Back"]:
+	for node_name in ["ServerAddress", "Username", "Password", "AuthButton", "SwitchButton", "RememberMe", "Status", "Back"]:
 		var control: Control = login.get_node(node_name)
 		check(Rect2(0, 0, 320, 480).encloses(control.get_rect()), "Control remains inside the game area: " + node_name)
 	await capture("02_login")
-	login.connect_button.pressed.emit()
-	check(login.address_input.editable and login.connect_button.text == "保存", "Modify enables editing and changes the action to Save")
+	check(login.address_input.get_rect().end.x == login.password_input.get_rect().end.x, "Address field uses the freed button space and aligns with credentials")
 	login.address_input.text = "invalid address"
-	login.connect_button.pressed.emit()
-	check(login.address_input.editable and not login.connect_button.disabled and not login.status.text.is_empty(), "Invalid address stays editable and reports an error")
+	login.address_input.text_submitted.emit(login.address_input.text)
+	check(login.address_input.editable and not login.status.text.is_empty(), "Enter validates an edited address while keeping invalid input editable")
 	check(settings.load_address() == "https://game.example.com/ssjx" and login.discovery.request == null, "Invalid edits preserve the saved address without sending a request")
 	login.address_input.text = "https://game.example.com/ssjx"
 	login.auth_button.pressed.emit()
@@ -86,6 +85,14 @@ func _run() -> void:
 	check(login.remember_me.position.y > login.password_input.get_rect().end.y and login.remember_me.get_rect().end.y < login.auth_button.position.y, "Remember control has its own aligned row between password and login")
 	login._account_result("logout", {"ok": true})
 	await capture("03_remembered_login")
+	var hover := InputEventMouseMotion.new()
+	hover.position = login.remember_me.get_global_rect().get_center()
+	get_viewport().push_input(hover, true)
+	await get_tree().process_frame
+	check(login.remember_me.get_draw_mode() == BaseButton.DRAW_HOVER_PRESSED, "Checked Remember Me actually enters hovered-pressed state")
+	var hovered_color := login.remember_me.get_theme_color("font_hover_pressed_color")
+	check(hovered_color.srgb_to_linear().get_luminance() < 0.25 and login.remember_me.get_theme_color("font_focus_color").srgb_to_linear().get_luminance() < 0.25, "Checked hover and keyboard focus retain readable dark text")
+	await capture("04_remembered_hover")
 	login.address_input.text = "https://other.example.com"
 	login.address_input.text_changed.emit(login.address_input.text)
 	check(login.password_input.text.is_empty() and not login.remember_me.button_pressed, "Editing the server clears the autofilled password")

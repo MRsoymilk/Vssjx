@@ -9,7 +9,6 @@ var settings := ServerConnectionSettings.new()
 var remembered := RememberedLogin.new()
 @onready var address_input: LineEdit = $ServerAddress
 @onready var status: Label = $Status
-@onready var connect_button: Button = $ConnectButton
 @onready var discovery: ServerDiscovery = $Discovery
 var register_mode := false
 @onready var username_input: LineEdit = $Username
@@ -18,7 +17,6 @@ var register_mode := false
 @onready var switch_button: Button = $SwitchButton
 @onready var remember_me: CheckBox = $RememberMe
 var _probing := false
-var _editing_address := false
 var _registration_secret := ""
 var _registered_login := false
 var _pending_credentials: Dictionary = {}
@@ -37,7 +35,6 @@ func _ready() -> void:
 	remember_me.toggled.connect(_remember_toggled)
 	auth_button.pressed.connect(_login)
 	switch_button.pressed.connect(_register)
-	connect_button.pressed.connect(_edit_address)
 	$Back.pressed.connect(_return)
 	discovery.completed.connect(_connection_result)
 	OnlineAccount.completed.connect(_account_result)
@@ -45,7 +42,7 @@ func _ready() -> void:
 		if _restored_password: password_input.clear()
 		_restored_password = false
 		remember_me.set_pressed_no_signal(false)
-		status.text = "地址已修改，点击保存后生效。"
+		status.text = "地址已修改，登陆或注册时使用。"
 		_update_controls()
 	)
 	address_input.text_submitted.connect(func(_value: String) -> void: connect_server())
@@ -82,15 +79,6 @@ func _remember_toggled(enabled: bool) -> void:
 	_pending_credentials = {}
 	if not remembered.forget(): status.text = remembered.last_error
 
-func _edit_address() -> void:
-	if connect_button.disabled: return
-	if _editing_address:
-		connect_server()
-		return
-	_editing_address = true
-	_update_controls()
-	Platform.context.text_input.request_focus(address_input, true)
-
 func _login() -> void:
 	if auth_button.disabled: return
 	if not _input_ready(): return
@@ -123,7 +111,7 @@ func save_draft(show_error: bool = true) -> bool:
 	return true
 
 func connect_server() -> void:
-	if connect_button.disabled: return
+	if not address_input.editable: return
 	var input_result := Platform.context.text_input.check_submission([address_input])
 	if not input_result.ok:
 		status.text = input_result.message
@@ -134,14 +122,12 @@ func connect_server() -> void:
 	if ServerConnectionSettings.is_local(address_input.text):
 		discovery.cancel()
 		_probing = false
-		_editing_address = false
 		password_input.clear()
 		status.text = "本地单人模式，进度保存在此设备。"
 		_update_controls()
 		return
 	status.text = "地址已保存，正在连接服务器……"
 	_probing = true
-	_editing_address = false
 	_update_controls()
 	discovery.check_server(address_input.text)
 
@@ -165,8 +151,6 @@ func _update_controls() -> void:
 	var locked := _probing or (OnlineAccount.busy and not local)
 	var options := settings.connection_options()
 	var editable_address: bool = options.ok and options.value.editable
-	connect_button.visible = editable_address
-	connect_button.disabled = locked or not editable_address
 	auth_button.disabled = locked
 	switch_button.disabled = locked or local
 	remember_me.visible = remembered.is_supported()
@@ -175,8 +159,7 @@ func _update_controls() -> void:
 	username_input.editable = not locked and not local and not OnlineAccount.is_logged_in()
 	password_input.editable = not locked and not local and not OnlineAccount.is_logged_in()
 	username_input.placeholder_text = "本地模式，无需账号" if local else ""
-	address_input.editable = editable_address and not locked and _editing_address
-	connect_button.text = "保存" if _editing_address else "修改"
+	address_input.editable = editable_address and not locked
 	auth_button.text = "进入游戏" if local else ("选择角色" if OnlineAccount.is_logged_in() else "登陆")
 	switch_button.text = "退出账号" if not local and OnlineAccount.is_logged_in() else "注册"
 
@@ -196,7 +179,6 @@ func _submit_account() -> void:
 	if username_input.text.strip_edges().is_empty() or password_input.text.is_empty():
 		status.text = "请输入账号和密码。"
 		return
-	_editing_address = false
 	status.text = "正在注册账号……" if register_mode else "正在登录……"
 	var secret := password_input.text
 	_pending_credentials = {"server": address_input.text, "username": username_input.text.strip_edges().to_lower(), "password": secret} if remembered.is_supported() and remember_me.button_pressed else {}

@@ -1,0 +1,50 @@
+server {
+    listen 443 ssl;
+    server_name _;
+    server_tokens off;
+    ssl_certificate /etc/nginx/lan-tls/server.crt;
+    ssl_certificate_key /etc/nginx/lan-tls/server.key;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    root /usr/share/nginx/html;
+    index index.html;
+    access_log off;
+    add_header X-Content-Type-Options nosniff always;
+    add_header Cache-Control "no-cache" always;
+
+    location ^~ /api/v1/ {
+        proxy_pass ${SSJX_WEB_UPSTREAM};
+        proxy_http_version 1.1;
+        proxy_set_header Host $http_host;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection $connection_upgrade;
+        proxy_read_timeout 300s;
+        proxy_send_timeout 300s;
+        proxy_buffering off;
+        proxy_cache off;
+    }
+    location ~ /\. { return 404; }
+    location / { try_files $uri $uri/ =404; }
+}
+
+# This HTTP listener only distributes public certificates and setup instructions.
+# It never serves the game, credentials, API, private keys or the CA signing key.
+server {
+    listen 81;
+    server_name _;
+    server_tokens off;
+    root /usr/share/nginx/lan-setup;
+    index index.html;
+    access_log off;
+    add_header X-Content-Type-Options nosniff always;
+    add_header Cache-Control "no-store" always;
+    location = /vssjx-lan.mobileconfig {
+        types { application/x-apple-aspen-config mobileconfig; }
+        try_files $uri =404;
+    }
+    location = /vssjx-lan-ca.cer {
+        types { application/x-x509-ca-cert cer; }
+        try_files $uri =404;
+    }
+    location ~ /\. { return 404; }
+    location / { try_files $uri $uri/ =404; }
+}

@@ -1,0 +1,23 @@
+# Combine with web.compose.yaml; public certificates and server keys are separate.
+services:
+  web:
+    ports:
+      - "${SSJX_LAN_IP:?Set SSJX_LAN_IP}:${SSJX_LAN_TLS_PORT:-8443}:443"
+      - "${SSJX_LAN_IP:?Set SSJX_LAN_IP}:${SSJX_LAN_SETUP_PORT:-8001}:81"
+    volumes:
+      - type: bind
+        source: ${SSJX_LAN_DIR:?Run tools/prepare_lan_https.py}/server
+        target: /etc/nginx/lan-tls
+        read_only: true
+        bind:
+          create_host_path: false
+      - type: bind
+        source: ${SSJX_LAN_DIR:?Run tools/prepare_lan_https.py}/public
+        target: /usr/share/nginx/lan-setup
+        read_only: true
+        bind:
+          create_host_path: false
+      - type: bind
+        source: ./web.lan.nginx.conf.template
+        target: /etc/nginx/templates/lan.conf.template
+        read_only: true

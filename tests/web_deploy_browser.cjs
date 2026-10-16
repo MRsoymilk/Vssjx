@@ -27,14 +27,14 @@ fs.mkdirSync(output, {recursive: true});
         await page.locator('#start').click();
         await page.waitForFunction(() => document.getElementById('loading').style.display === 'none', null, {timeout: 90000});
         await page.waitForTimeout(1500);
-        check(await page.evaluate(() => window.isSecureContext), 'Loopback deployment is a browser secure context');
+        check(await page.evaluate(() => window.isSecureContext), 'Deployed page is a browser secure context');
         await click(235, 414);
         await click(160, 292); // Web mode choice -> same-site online game.
         await page.screenshot({path: path.join(output, 'online-login.png')});
         await click(160, 192);
-        await page.keyboard.type('deploy_probe_' + Date.now().toString(36));
+        await page.keyboard.type('deploy_probe_' + Date.now().toString(36), {delay: 80});
         await click(160, 240);
-        await page.keyboard.type('nonexistent-account-probe-password');
+        await page.keyboard.type('nonexistent-account-probe-password', {delay: 80});
         const reply = page.waitForResponse(response => response.url() === base + '/api/v1/auth/login', {timeout: 15000});
         await click(160, 317);
         check((await reply).status() === 401, 'Real Godot login reaches the deployed same-origin API and receives an auth rejection');
@@ -50,7 +50,7 @@ fs.mkdirSync(output, {recursive: true});
         check(await page.evaluate(() => localStorage.length === 0 && sessionStorage.length === 0), 'Probe leaves no credentials in browser key/value storage');
         check(errors.length === 0, 'No browser or Godot runtime script errors');
         fs.writeFileSync(path.join(output, 'report.json'), JSON.stringify({checks, failures: 0, browser: browser.version(),
-            scope: 'Existing Windows loopback deployment, not mobile, authenticated play or public HTTPS acceptance'}, null, 2));
+            scope: 'Deployed Godot Web entry in Windows Chromium, not mobile, authenticated play or capacity acceptance'}, null, 2));
         console.log(`WEB DEPLOY BROWSER: ${checks} checks, 0 failures`);
     } catch (error) {
         await page.screenshot({path: path.join(output, 'failure.png')}).catch(() => {});

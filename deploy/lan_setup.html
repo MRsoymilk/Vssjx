@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="zh-CN">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>蜀山剑侠 · 局域网入口</title>
+<style>
+body{font-family:system-ui,sans-serif;max-width:640px;margin:32px auto;padding:0 20px;line-height:1.7;color:#263746;background:#fffaf0}
+a{color:#245e93} .button{display:inline-block;padding:10px 18px;border-radius:6px;background:#245e93;color:white;text-decoration:none;margin:8px 8px 8px 0}
+code{overflow-wrap:anywhere} small{color:#58616a}
+</style>
+<h1>蜀山剑侠 · 局域网</h1>
+<p>与服务器连接同一个局域网。首次访问先安装并信任本机生成的局域网证书，之后即可直接进入游戏，各自注册或登录账号。</p>
+<p><a class="button" href="{{GAME_URL}}">进入游戏</a></p>
+<h2>首次安装证书</h2>
+<p><a href="vssjx-lan-ca.cer">下载证书（Android / Windows）</a> · <a href="vssjx-lan.mobileconfig">下载 iPhone / iPad 配置描述文件</a></p>
+<p><strong>Android：</strong>在系统设置中搜索“安装证书”，选择“CA 证书”，安装下载的证书。不同品牌的入口名称可能不同。完成后用 Chrome 等浏览器访问游戏。</p>
+<p><strong>iPhone / iPad：</strong>用 Safari 下载描述文件，在“设置 → 通用 → VPN 与设备管理”安装，然后到“通用 → 关于本机 → 证书信任设置”，开启这张根证书的完全信任。<a href="https://support.apple.com/102390">Apple 官方说明</a>。</p>
+<p><strong>Windows：</strong>打开证书，选择“安装证书 → 当前用户 → 将所有证书放入下列存储 → 受信任的根证书颁发机构”。完成后重新打开浏览器。</p>
+<p>证书名称：<code>{{CA_NAME}}</code><br>SHA-256 指纹：<code>{{FINGERPRINT}}</code></p>
+<small>本页只提供公开证书，不包含私钥。只在自己信任的设备上安装；不再使用时，可从系统的用户证书中删除这张证书。此入口不代表已配置公网访问。</small>
+</html>

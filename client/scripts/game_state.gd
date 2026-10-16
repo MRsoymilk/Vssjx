@@ -8,11 +8,23 @@ const START_CELL := Vector2i(10, 16)
 var save_path := "user://shushan_save.json"
 var player: Dictionary = {}
 var last_save_error := ""
+var _initialization_result: PlatformResult
 
 func _ready() -> void:
-	var override := OS.get_environment("SSJX_SAVE_PATH")
-	if not override.is_empty():
-		save_path = override
+	await when_ready()
+
+func when_ready() -> PlatformResult:
+	if _initialization_result != null: return _initialization_result
+	var result := await Platform.when_ready()
+	if not result.ok:
+		last_save_error = result.message
+		return result
+	if _initialization_result != null: return _initialization_result
+	var path := Platform.context.runtime_config.local_path("save")
+	if path.ok: save_path = path.value
+	else: last_save_error = path.message
+	_initialization_result = path
+	return path
 
 func new_player(nickname: String, job: int, school: int, gender: int = 0) -> void:
 	player = {
@@ -107,24 +119,27 @@ func save_game() -> bool:
 	if player.is_empty():
 		return false
 	last_save_error = ""
-	var file := FileAccess.open(save_path + ".tmp", FileAccess.WRITE)
-	if file == null:
-		last_save_error = "无法写入本地存档"
+	if not Platform.is_available():
+		last_save_error = "平台尚未就绪，无法保存。"
 		return false
-	file.store_string(JSON.stringify(player, "\t"))
-	file.flush()
-	file.close()
-	var error := DirAccess.rename_absolute(save_path + ".tmp", save_path)
-	if error != OK:
-		last_save_error = "保存失败（%d）" % error
-		return false
-	return true
+	var result := Platform.context.storage.write_text_atomic(save_path, JSON.stringify(player, "\t"))
+	if not result.ok: last_save_error = result.message
+	return result.ok
+
+func has_save() -> bool:
+	return Platform.is_available() and Platform.context.storage.exists(save_path)
 
 func load_game() -> bool:
-	if not FileAccess.file_exists(save_path):
+	last_save_error = ""
+	if not Platform.is_available():
+		last_save_error = "平台尚未就绪，无法读取存档。"
+		return false
+	var result := Platform.context.storage.read_text(save_path)
+	if not result.ok:
+		if result.code != "NOT_FOUND": last_save_error = result.message
 		return false
 	var parser := JSON.new()
-	if parser.parse(FileAccess.get_file_as_string(save_path)) != OK:
+	if parser.parse(result.value) != OK:
 		last_save_error = "存档格式不正确，原文件已保留"
 		return false
 	var data: Variant = parser.data

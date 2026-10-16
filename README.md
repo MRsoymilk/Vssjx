@@ -13,6 +13,8 @@
 
 服务端部署参数读取根目录`.env`，参考[.env.sample.txt](.env.sample.txt)填写；`.env`不会提交Git。默认数据库URL为空，仅运行连接检查，启用账号前需配置数据库。客户端不读取服务端秘密配置。
 
+多平台接入已从P1开始：`client/scripts/interface/`提供平台入口和原生配置、存储、显示、生命周期边界，保留现有存档格式及游戏画布。Web导出、手机浏览器及其他接口仍按[平台方案](design/platform_interface.md)推进，当前不是网页版交付。
+
 已生成所需 Godot 素材，离线试玩不依赖Python或联网；Godot首次打开客户端时导入素材。本项目采用OpenGL Compatibility渲染器。
 
 ## 项目数据管理

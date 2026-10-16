@@ -6,9 +6,12 @@ var settings_path := ""
 var last_error := ""
 
 func _init(path: String = "") -> void:
-	settings_path = path if not path.is_empty() else OS.get_environment("SSJX_CONNECTION_PATH")
-	if settings_path.is_empty(): settings_path = "user://connection.cfg"
-	if OS.get_name() == "Windows": settings_path = settings_path.replace("\\", "/")
+	if not Platform.is_available():
+		last_error = "平台尚未就绪，无法读取连接配置。"
+		return
+	var result := Platform.context.runtime_config.local_path("connection", path)
+	if result.ok: settings_path = result.value
+	else: last_error = result.message
 
 static func normalize(raw: String) -> Dictionary:
 	var value := raw.strip_edges()
@@ -60,9 +63,13 @@ static func _invalid(message: String) -> Dictionary:
 
 func load_address() -> String:
 	last_error = ""
-	if not FileAccess.file_exists(settings_path): return ""
+	if not _storage_ready(): return ""
+	var read := Platform.context.storage.read_text(settings_path, 65536)
+	if not read.ok:
+		if read.code != "NOT_FOUND": last_error = "无法读取已保存的服务器地址，请重新填写。"
+		return ""
 	var config := ConfigFile.new()
-	if config.load(settings_path) != OK:
+	if config.parse(read.value) != OK:
 		last_error = "无法读取已保存的服务器地址，请重新填写。"
 		return ""
 	var value: Variant = config.get_value("connection", "server_address", "")
@@ -77,15 +84,20 @@ func load_address() -> String:
 
 func save_address(raw: String) -> bool:
 	last_error = ""
+	if not _storage_ready(): return false
 	var result := normalize(raw)
 	if not result.ok:
 		last_error = result.error
 		return false
 	var config := ConfigFile.new()
 	config.set_value("connection", "server_address", result.address)
-	var error := config.save(settings_path + ".tmp")
-	if error == OK: error = DirAccess.rename_absolute(settings_path + ".tmp", settings_path)
-	if error != OK:
-		last_error = "服务器地址保存失败（%d），请检查本地目录权限。" % error
+	var write := Platform.context.storage.write_text_atomic(settings_path, config.encode_to_text())
+	if not write.ok:
+		last_error = "服务器地址保存失败，请检查本地目录权限。"
 		return false
 	return true
+
+func _storage_ready() -> bool:
+	if Platform.is_available() and not settings_path.is_empty(): return true
+	last_error = "平台尚未就绪，无法读写连接配置。"
+	return false

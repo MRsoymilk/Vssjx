@@ -61,6 +61,13 @@ var character_selection: OriginalCharacterSelection
 
 func _ready() -> void:
 	get_tree().auto_accept_quit = false
+	var platform_result := await Platform.when_ready()
+	if platform_result.ok: platform_result = await Game.when_ready()
+	if not platform_result.ok:
+		_label(ui, platform_result.message, Rect2(16, 80, 288, 180), 16)
+		set_process(false)
+		set_process_unhandled_key_input(false)
+		return
 	_home()
 
 func _process(delta: float) -> void:
@@ -254,7 +261,7 @@ func _server_login() -> void:
 
 func _enter_local_game() -> void:
 	OnlineAccount.suspend_network()
-	if FileAccess.file_exists(Game.save_path):
+	if Game.has_save():
 		if Game.load_game(): _local_character_selection()
 		else: _message("无法读取", Game.last_save_error)
 	else: _create()
@@ -350,7 +357,7 @@ func _start_new() -> void:
 	if name_value.is_empty():
 		_message("请输入昵称", "请先输入昵称。")
 		return
-	if FileAccess.file_exists(Game.save_path):
+	if Game.has_save():
 		var panel := _modal_panel("开启新的修行")
 		_label(panel, "当前只有一个本地存档槽。\n入山后将覆盖已有角色存档。", Rect2(18, 56, 248, 70), 13)
 		_button(panel, "确认入山", Rect2(18, 180, 148, 32), _begin_new.bind(name_value), true)

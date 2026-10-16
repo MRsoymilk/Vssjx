@@ -119,7 +119,7 @@ def main():
             command += ['--position', '-2000,-2000', '--audio-driver', 'Dummy']
         else:
             command += ['--headless']
-        command += ['--path', str(ROOT / 'client')]
+        command += ['--path', env.get('SSJX_TEST_CLIENT_PATH', str(ROOT / 'client'))]
         startup = None
         if os.name == 'nt' and args.render:
             startup = subprocess.STARTUPINFO()

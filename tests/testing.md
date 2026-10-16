@@ -16,6 +16,8 @@ PostgreSQL账号、密码、会话、注销与账号界面验证见[account_auth
 
 项目数据管理与世界总图独立桌面窗口、小窗口布局验证见[data_browser.md](data_browser.md#独立桌面工具布局)；开发工具不进入游戏包的真实导出检查见[game_export.md](game_export.md)。
 
+多平台接口P1的原生入口、配置/存储兼容、显示/生命周期及失败路径验证见[platform_interface.md](platform_interface.md)，不等于Web或手机兼容验收。
+
 同一游戏界面的多人角色、内嵌聊天与本地入口验证见[shared_interface.md](shared_interface.md)及[local_mode.md](local_mode.md)。
 
 底部内置表情面板、标记传输与双方贴图显示验证见[chat_emotes.md](chat_emotes.md)。

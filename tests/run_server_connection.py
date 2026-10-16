@@ -51,7 +51,7 @@ def run_godot(env, render=False):
         command = [sys.executable, str(ROOT / 'tests/run_offscreen.py')]
     else:
         command = [env.get('GODOT_BIN', 'godot'), '--headless']
-    command += ['--path', str(ROOT / 'client')]
+    command += ['--path', env.get('SSJX_TEST_CLIENT_PATH', str(ROOT / 'client'))]
     if render:
         command += ['--rendering-driver', 'opengl3_es']
     command += ['res://tests/server_connection_test.tscn']

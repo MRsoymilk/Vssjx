@@ -16,6 +16,7 @@ config/features=PackedStringArray("4.7", "GL Compatibility")
 
 [autoload]
 
+Platform="*res://scripts/interface/platform.gd"
 Game="*res://scripts/game_state.gd"
 OnlineAccount="*res://scripts/network/online_account.gd"
 

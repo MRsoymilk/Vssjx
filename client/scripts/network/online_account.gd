@@ -99,6 +99,11 @@ func logout() -> void:
 
 func _send(action: String, address: String, payload: Dictionary, bearer: bool = false) -> void:
 	if busy: return
+	if not Platform.is_available():
+		var result := {"ok": false, "code": "PLATFORM_NOT_READY"}
+		if action == "world_ticket": world_ticket_received.emit(result)
+		else: completed.emit(action, result)
+		return
 	if bearer and action != "logout":
 		if not is_logged_in():
 			completed.emit(action, {"ok": false, "code": "UNAUTHORIZED"})

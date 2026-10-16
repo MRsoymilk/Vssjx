@@ -95,7 +95,10 @@ func _run() -> void:
 	var late_deadline := Time.get_ticks_msec() + 5000
 	while app.mode == "battle_loading" and app.battle_transition.progress == 0.0 and Time.get_ticks_msec() < late_deadline: await get_tree().process_frame
 	check(app.mode == "battle_loading" and app.battle_transition.progress > 0.0, "Cancellation fixture reaches actual cache preparation")
+	var preparation: PlatformResourceRequest = app.battle_resource_request
+	check(preparation != null and preparation.generation == app.battle_transition_epoch, "Encounter uses the platform resource request with its own generation")
 	app._home()
+	check(app.battle_resource_request == null, "Leaving the world releases its resource request handle")
 	await get_tree().create_timer(0.4).timeout
 	check(app.mode == "home" and app.battle_transition == null, "Cancellation during cache preparation rejects its late continuation")
 	app._enter_world()

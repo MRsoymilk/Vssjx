@@ -48,6 +48,13 @@ class PlatformBoundaryTests(unittest.TestCase):
         for platform in ['Game (Linux)', 'Game (Windows)']:
             self.assertIn(platform, presets)
 
+    def test_threaded_loading_is_not_a_page_responsibility(self):
+        main = (CLIENT / 'scripts/main.gd').read_text('utf8')
+        self.assertNotIn('ResourceLoader.', main)
+        self.assertIn('Platform.context.resource_loader.prepare(', main)
+        self.assertIn('request.generation != epoch', main)
+        self.assertIn('battle_resource_request.cancel()', main)
+
 
 if __name__ == '__main__':
     unittest.main()

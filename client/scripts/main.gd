@@ -50,6 +50,7 @@ var field_kind := "courtyard"
 var battle_move_callout: BattleMoveCallout
 var battle_transition: BattleEncounterTransition
 var battle_transition_epoch := 0
+var battle_resource_request: PlatformResourceRequest
 var clock_timer := 0.0
 var effects_layer: Control
 var world_identity: Label
@@ -200,6 +201,8 @@ func _clear_ui() -> void:
 	character_selection = null
 	announcement_banner.present({})
 	battle_transition_epoch += 1
+	if battle_resource_request != null: battle_resource_request.cancel()
+	battle_resource_request = null
 	battle_transition = null
 	modal = null
 	original_cover = null
@@ -685,15 +688,17 @@ func _about() -> void:
 func _encounter_current(epoch: int, world_id: int) -> bool:
 	return epoch == battle_transition_epoch and mode == "battle_loading" and is_instance_valid(world) and world.get_instance_id() == world_id and is_instance_valid(battle_transition)
 
-func _encounter_failed() -> void:
+func _encounter_failed(explanation: String = "本地战斗资源未能准备完成，请检查游戏文件后重试。") -> void:
 	battle_transition_epoch += 1
+	if battle_resource_request != null: battle_resource_request.cancel()
+	battle_resource_request = null
 	if is_instance_valid(battle_transition):
 		ui.remove_child(battle_transition)
 		battle_transition.queue_free()
 	battle_transition = null
 	mode = "world"
 	chrome.hint.show()
-	_message("无法进入战斗", "本地战斗资源未能准备完成，请检查游戏文件后重试。\n当前角色资源没有扣除。")
+	_message("无法进入战斗", explanation + "\n当前角色资源没有扣除。")
 
 func _encounter_battle(enemy: Dictionary) -> void:
 	if mode != "world" or modal != null or not is_instance_valid(world): return
@@ -721,38 +726,18 @@ func _encounter_battle(enemy: Dictionary) -> void:
 			return
 		var path := String(info.texture)
 		if not paths.has(path): paths.append(path)
-	var resources: Dictionary = {}
-	for path in paths:
-		if not ResourceLoader.exists(path, "Texture2D"):
-			_encounter_failed()
-			return
-		if ResourceLoader.has_cached(path): resources[path] = load(path)
-		else:
-			var status := ResourceLoader.load_threaded_get_status(path)
-			if status not in [ResourceLoader.THREAD_LOAD_IN_PROGRESS, ResourceLoader.THREAD_LOAD_LOADED] and ResourceLoader.load_threaded_request(path, "Texture2D") != OK:
-				_encounter_failed()
-				return
-	var deadline := Time.get_ticks_msec() + 15000
-	while resources.size() < paths.size():
-		var done := float(resources.size())
-		for path in paths:
-			if resources.has(path): continue
-			var amount: Array = []
-			var status := ResourceLoader.load_threaded_get_status(path, amount)
-			if status == ResourceLoader.THREAD_LOAD_LOADED:
-				var resource := ResourceLoader.load_threaded_get(path)
-				if not resource is Texture2D:
-					_encounter_failed()
-					return
-				resources[path] = resource
-				done += 1.0
-			elif status in [ResourceLoader.THREAD_LOAD_FAILED, ResourceLoader.THREAD_LOAD_INVALID_RESOURCE] or Time.get_ticks_msec() >= deadline:
-				_encounter_failed()
-				return
-			elif not amount.is_empty(): done += clampf(float(amount[0]), 0.0, 1.0)
-		battle_transition.set_progress(0.75 * done / paths.size(), "准备战斗图像与场景")
+	var request := Platform.context.resource_loader.prepare(PackedStringArray(paths), battle_transition, epoch)
+	battle_resource_request = request
+	while not request.is_finished():
+		battle_transition.set_progress(0.75 * request.progress, "准备战斗图像与场景")
 		await get_tree().process_frame
-		if not _encounter_current(epoch, world_id): return
+		if not _encounter_current(epoch, world_id):
+			request.cancel()
+			return
+	if not _encounter_current(epoch, world_id) or request.generation != epoch: return
+	if not request.result.ok:
+		_encounter_failed(request.result.message)
+		return
 	for index in keys.size():
 		# SpriteFrames preparation is bounded to these four battle actors/effects.
 		var prepared := OriginalArt.actor(keys[index])

@@ -1,6 +1,6 @@
 # 多平台接口层与移动浏览器导出方案
 
-设计修订：2026-10-16。状态：P1已开始实施，先建立原生平台入口及配置/存储、显示、生命周期边界；其余契约与P2～P4继续按阶段推进。实现边界与验证记录见[平台接口测试](../tests/platform_interface.md)，不代表完成Web导出或通过手机真机测试。
+设计修订：2026-10-16。状态：P1实施中，已建立原生平台入口及配置/存储、显示、生命周期边界，并接入原生资源准备与战斗加载；输入、系统动作及P2～P4继续按阶段推进。实现边界与验证记录见[平台基础](../tests/platform_interface.md)、[资源准备](../tests/platform_resources.md)，不代表完成Web导出或通过手机真机测试。
 
 用户目标：后续支持多平台导出，建立对应的`interface`目录；首期让iOS和Android手机通过默认浏览器打开链接游玩。产品范围见[设计入口D09](README.md)，离线/在线业务边界见[architecture.md](architecture.md)，认证与世界协议继续遵循[protocol.md](protocol.md)、[auth.md](auth.md)和[shared_world.md](shared_world.md)。本文不替代这些契约，也不调整D01～D08的既有决策。
 
@@ -22,6 +22,8 @@
 “默认浏览器”不是固定产品名称。Safari/Chrome是首期验证基线，不等于覆盖所有用户选择和所有厂商浏览器。实施时记录设备、系统、浏览器及版本，形成明确的“通过/有条件通过/不支持”名单。最低系统与浏览器版本待真机验证后冻结，不在本方案中虚构下限。
 
 首期非目标：重写JavaScript游戏客户端、把原始`gameonline.ext`或MRP运行时直接搬进浏览器、恢复原版服务端、应用商店上架、复杂PWA缓存、远程分包下载、增加新的玩法及数值规则。网页化对象是已经重建的`client/`，与原客户端逆向工作独立。
+
+管理工具边界：`scenes/admin/`及其专用脚本仅在PC原生桌面运行，不属于Web/手机适配或浏览器验收范围，也不进入游戏导出。平台化只迁移游戏的真实调用方，不为admin增加网页实现。
 
 ## 2. 当前依据与必须处理的问题
 
@@ -64,6 +66,7 @@ Vssjx/
 │   │   │   ├── platform.gd
 │   │   │   ├── platform_factory.gd
 │   │   │   ├── platform_context.gd
+│   │   │   ├── resource_request.gd
 │   │   │   ├── contracts/
 │   │   │   │   ├── display_interface.gd
 │   │   │   │   ├── text_input_interface.gd

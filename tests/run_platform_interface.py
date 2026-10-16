@@ -52,7 +52,9 @@ def main():
         print(name + ': PASS', flush=True)
 
     run('import', [godot, '--headless', '--editor', '--path', str(project), '--import'])
-    suites = ['platform_interface_test', 'test_runner', 'server_connection_test',
+    run('resource-loader-parse', [godot, '--headless', '--path', str(project), '--check-only', '--script',
+                                'res://scripts/interface/adapters/native/native_resource_loader.gd'])
+    suites = ['resource_loader_test', 'platform_interface_test', 'test_runner', 'server_connection_test',
               'world_delta_test', 'public_chat_test', 'shared_interface_test',
               'local_mode_test', 'login_ui_test', 'character_selection_test',
               'game_menu_test', 'movement_control_test', 'motion_regression', 'battle_transition_test']
@@ -61,14 +63,24 @@ def main():
     run('auth-character-contract-fixture', [sys.executable, str(ROOT / 'tests/run_registration_flow.py')],
         r'ACCOUNT AUTH UI: \d+ checks, 0 failures')
     if args.render:
-        for suite in ['platform_interface_test', 'visual_smoke']:
+        for suite in ['resource_loader_test', 'platform_interface_test', 'battle_transition_test', 'visual_smoke']:
             if suite == 'visual_smoke':
                 capture = output / 'screenshots'
                 capture.mkdir(exist_ok=True)
                 env['SSJX_CAPTURE_PATH'] = str(capture)
+            if suite == 'battle_transition_test':
+                encounter = output / 'encounter-screenshots'
+                encounter.mkdir(exist_ok=True)
+                env['SSJX_ENCOUNTER_CAPTURE_PATH'] = str(encounter)
+            expected = {
+                'resource_loader_test': r'RESOURCE LOADER: \d+ checks, 0 failures',
+                'platform_interface_test': r'PLATFORM INTERFACE: \d+ checks, 0 failures',
+                'battle_transition_test': r'BATTLE TRANSITION: \d+ checks, 0 failures',
+                'visual_smoke': r'VISUAL SMOKE: 37 screenshots saved',
+            }[suite]
             run(suite + '-rendered', [sys.executable, str(ROOT / 'tests/run_offscreen.py'), '--path', str(project),
-                                    '--rendering-driver', 'opengl3_es', 'res://tests/' + suite + '.tscn'],
-                r'PLATFORM INTERFACE: \d+ checks, 0 failures' if suite == 'platform_interface_test' else r'VISUAL SMOKE: 37 screenshots saved')
+                                     '--rendering-driver', 'opengl3_es', 'res://tests/' + suite + '.tscn'],
+                expected)
             if suite == 'visual_smoke' and len(list(capture.glob('*.png'))) != 37:
                 raise RuntimeError('visual_smoke: expected 37 actual PNG captures')
     if args.network:

@@ -21,6 +21,7 @@ func initialize(target: String = "") -> void:
 	else:
 		add_child(context.display)
 		add_child(context.lifecycle)
+		add_child(context.resource_loader)
 		state = State.READY
 		last_result = PlatformResult.success()
 	initialization_finished.emit(last_result)

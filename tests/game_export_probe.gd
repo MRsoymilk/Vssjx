@@ -30,6 +30,14 @@ func _verify() -> void:
 	for frame in 5: await process_frame
 	check(scene.mode == "home" and is_instance_valid(scene.original_cover), "The exported game reaches its normal home screen")
 	check(root.content_scale_size == Vector2i(320, 480), "Game export keeps its portrait viewport")
+	var platform = root.get_node("Platform")
+	check(platform.is_available() and platform.context.capabilities().resource_preparation, "Packed project publishes the resource interface")
+	var texture_path := "res://assets/actors/map_m10.png"
+	var request = platform.context.resource_loader.prepare(PackedStringArray([texture_path]), scene, 1)
+	var deadline := Time.get_ticks_msec() + 5000
+	while not request.is_finished() and Time.get_ticks_msec() < deadline: await process_frame
+	check(request.is_finished() and request.result.ok and request.result.value[texture_path] is Texture2D, "Threaded preparation reads the actual packed texture")
+	check(request.progress == 1.0 and request.generation == 1, "Packed resource request completes with its generation")
 	scene.queue_free()
 	await process_frame
 	print("GAME EXPORT: %d checks, 0 failures" % checks)

@@ -356,17 +356,16 @@ impl AuthService {
         }
         sqlx::query("DELETE FROM sessions WHERE account_id = $1 AND (revoked_at IS NOT NULL OR refresh_expires_at <= NOW())")
             .bind(account_id).execute(&mut *transaction).await.map_err(database_unavailable)?;
-        let count: i64 = sqlx::query_scalar("SELECT COUNT(*) FROM sessions WHERE account_id = $1")
+        // A closed client cannot revoke its memory-only credentials. Keep the
+        // newest sessions and make room after verifying the password, rather
+        // than locking the account out until abandoned refresh tokens expire.
+        // The account row lock serializes concurrent logins and enforces the cap.
+        sqlx::query("DELETE FROM sessions WHERE id IN (SELECT id FROM sessions WHERE account_id=$1 ORDER BY created_at DESC, id DESC OFFSET $2)")
             .bind(account_id)
-            .fetch_one(&mut *transaction)
+            .bind(i64::from(self.settings.max_sessions - 1))
+            .execute(&mut *transaction)
             .await
             .map_err(database_unavailable)?;
-        if count >= i64::from(self.settings.max_sessions) {
-            return Err(AuthError(
-                StatusCode::TOO_MANY_REQUESTS,
-                "SESSION_LIMIT_REACHED",
-            ));
-        }
         let response = SessionResponse {
             account: Account {
                 id: account_id,
@@ -378,7 +377,7 @@ impl AuthService {
             expires_in: self.settings.access_seconds,
             refresh_expires_in: self.settings.refresh_seconds,
         };
-        sqlx::query("INSERT INTO sessions (id, account_id, access_digest, refresh_digest, access_expires_at, refresh_expires_at) VALUES ($1, $2, $3, $4, NOW() + $5 * INTERVAL '1 second', NOW() + $6 * INTERVAL '1 second')")
+        sqlx::query("INSERT INTO sessions (id, account_id, access_digest, refresh_digest, access_expires_at, refresh_expires_at, created_at) VALUES ($1, $2, $3, $4, NOW() + $5 * INTERVAL '1 second', NOW() + $6 * INTERVAL '1 second', clock_timestamp())")
             .bind(response.session_id).bind(account_id).bind(token_digest(&response.access_token)?).bind(token_digest(&response.refresh_token)?)
             .bind(response.expires_in).bind(response.refresh_expires_in).execute(&mut *transaction).await.map_err(database_unavailable)?;
         sqlx::query("INSERT INTO session_access_history (access_digest, session_id, expires_at) VALUES ($1, $2, NOW() + $3 * INTERVAL '1 second')")

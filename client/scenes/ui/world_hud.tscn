@@ -1,8 +1,11 @@
 [gd_scene format=3]
 
+[ext_resource type="Script" path="res://scripts/interface/adapters/common/cjk_system_font.gd" id="BundledCjk"]
+
 [ext_resource type="Script" path="res://scripts/world_minimap.gd" id="1_3ies8"]
 
 [sub_resource type="SystemFont" id="SystemFont_dcm0e"]
+script = ExtResource("BundledCjk")
 font_names = PackedStringArray("SimHei", "Microsoft YaHei", "sans-serif")
 antialiasing = 0
 

@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>$GODOT_PROJECT_NAME</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; width: 100%; height: 100%; background: #0b131a; color: #eee6cc; font-family: sans-serif; }
+    body { display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); overflow: hidden; }
+    #frame { position: relative; flex: 0 0 auto; width: min(100%, calc((100dvh - 48px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) * 2 / 3)); aspect-ratio: 2 / 3; }
+    #canvas { position: absolute; inset: 0; width: 100% !important; height: 100% !important; display: block; outline: none; touch-action: none; }
+    #loading { position: absolute; inset: 0; background: #0b131a; display: flex; gap: 16px; padding: 20px; align-items: center; justify-content: center; flex-direction: column; text-align: center; }
+    #start { padding: 12px 28px; font-size: 18px; cursor: pointer; }
+    #progress { width: 80%; }
+    footer { height: 48px; padding: 4px 10px; max-width: 600px; font-size: 11px; text-align: center; }
+  </style>
+  $GODOT_HEAD_INCLUDE
+</head>
+<body>
+  <main id="frame">
+    <canvas id="canvas" width="640" height="960" tabindex="0">此浏览器不支持游戏画布。</canvas>
+    <section id="loading"><button id="start">开始游戏</button><div id="notice">首次加载需要下载游戏资源。</div><progress id="progress" hidden></progress></section>
+  </main>
+  <footer>离线进度仅存于本站浏览器；清除站点数据会丢失。关闭前请在游戏内保存。联机需要本站部署游戏服务。</footer>
+  <script src="$GODOT_URL"></script>
+  <script>
+    'use strict';
+    const config = $GODOT_CONFIG;
+    // Fixed portrait render surface; CSS fits it without stretching or cropping.
+    config.canvasResizePolicy = 0;
+    const engine = new Engine(config);
+    const start = document.getElementById('start');
+    const notice = document.getElementById('notice');
+    const progress = document.getElementById('progress');
+    start.addEventListener('click', async () => {
+      start.disabled = true;
+      notice.textContent = '正在加载游戏……';
+      progress.hidden = false;
+      try {
+        const missing = Engine.getMissingFeatures({ threads: false });
+        if (missing.length) throw new Error('浏览器缺少功能：' + missing.join(', '));
+        await engine.startGame({ canvas: document.getElementById('canvas'),
+          onProgress: (current, total) => { if (total > 0) { progress.max = total; progress.value = current; } },
+          onExit: () => { notice.textContent = '游戏已停止，请刷新页面重试。'; document.getElementById('loading').hidden = false; }
+        });
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('canvas').focus();
+      } catch (error) {
+        notice.textContent = '启动失败：' + (error.message || String(error)) + '。请使用 HTTPS 或本机 localhost，并确认 WebGL 2 可用。';
+        progress.hidden = true;
+      }
+    }, { once: true });
+    // No unload-time save promise: an IndexedDB completion cannot be awaited here.
+    window.addEventListener('pagehide', () => document.activeElement?.blur());
+  </script>
+</body>
+</html>

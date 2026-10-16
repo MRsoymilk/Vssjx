@@ -1,6 +1,9 @@
 [gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/interface/adapters/common/cjk_system_font.gd" id="BundledCjk"]
 [ext_resource type="Script" path="res://scripts/game_menu.gd" id="Script"]
 [sub_resource type="SystemFont" id="Font"]
+script = ExtResource("BundledCjk")
 font_names = PackedStringArray("SimHei", "Microsoft YaHei", "Noto Sans CJK SC", "sans-serif")
 antialiasing = 0
 [sub_resource type="StyleBoxFlat" id="Paper"]

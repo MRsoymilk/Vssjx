@@ -9,6 +9,8 @@ client/assets/data/actors/** text eol=lf
 .gitattributes text eol=lf
 .gitignore text eol=lf
 LICENSE text eol=lf
+# Font provenance verifies the exact license bytes on every platform.
+client/assets/fonts/OFL.txt text eol=lf
 # Preserve bytes in the original decoded and unpacked reference materials.
 analysis/** -text
 # Generated catalogs/evidence use stable line endings; original source bytes stay untouched.

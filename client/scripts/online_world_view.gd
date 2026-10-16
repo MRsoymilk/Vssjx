@@ -45,6 +45,7 @@ var _pve_log := ""
 var _closed_battle := ""
 
 func _ready() -> void:
+	if OS.has_feature("web"): Platform.context.lifecycle.changed.connect(_web_lifecycle)
 	map_data = JSON.parse_string(FileAccess.get_file_as_string(OnlineWorldClient.MAP_PATH))
 	_build_map()
 	image.texture = viewport.get_texture()
@@ -353,6 +354,7 @@ func _process(delta: float) -> void:
 			actor.sprite.play("idle")
 	if actors.has(character_id): camera.position = actors[character_id].root.position
 	_update_move_target(delta)
+	if OS.has_feature("web") and (not Platform.context.lifecycle.focused or Platform.context.lifecycle.suspended): return
 	_advance_approach()
 	if chat_input.has_focus() or menu.visible or details.visible or emote_picker.visible or encounter.visible or battle_view.visible or expanded_chat.visible or attributes.visible or world_map.visible or network.pve.pending():
 		_was_keyboard = false
@@ -524,6 +526,13 @@ func _advance_approach() -> void:
 		_approach.stopped = false
 		network.move_to(best)
 		_mark_destination(best)
+
+func _web_lifecycle(event: String) -> void:
+	if event not in ["focus_lost", "suspended"]: return
+	_cancel_approach()
+	move_target.clear()
+	_was_keyboard = false
+	if network.world_ready: network.stop_moving()
 
 func _mark_destination(cell: Vector2i) -> void:
 	move_target.clear()

@@ -1,5 +1,8 @@
 [gd_resource type="Theme" format=3]
+
+[ext_resource type="Script" path="res://scripts/interface/adapters/common/cjk_system_font.gd" id="BundledCjk"]
 [sub_resource type="SystemFont" id="Font"]
+script = ExtResource("BundledCjk")
 font_names = PackedStringArray("SimHei", "Microsoft YaHei", "sans-serif")
 antialiasing = 0
 [sub_resource type="StyleBoxFlat" id="Normal"]

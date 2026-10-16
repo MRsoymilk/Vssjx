@@ -82,6 +82,7 @@ func _ready() -> void:
 		set_process_unhandled_key_input(false)
 		return
 	Game.storage_changed.connect(_storage_changed)
+	if OS.has_feature("web"): Platform.context.lifecycle.changed.connect(_web_lifecycle)
 	_home()
 	if Game.storage_busy: _storage_changed(true)
 
@@ -121,6 +122,7 @@ func _autosave() -> void:
 
 func _process(delta: float) -> void:
 	if Game.storage_busy or _closing: return
+	if OS.has_feature("web") and (not Platform.context.lifecycle.focused or Platform.context.lifecycle.suspended): return
 	if battle_playback != null: battle_playback.advance(delta)
 	clock_timer += delta
 	if clock_timer >= 1.0 and chrome != null and is_instance_valid(chrome):
@@ -302,8 +304,23 @@ func _home() -> void:
 
 func _cover_choice(option: String) -> void:
 	match option:
-		"登陆游戏", "登录游戏": _server_login()
+		"登陆游戏", "登录游戏":
+			if OS.has_feature("web"): _web_entry()
+			else: _server_login()
 		"退出游戏": _cover_exit()
+
+func _web_entry() -> void:
+	var panel := _modal_panel("选择游戏模式")
+	_label(panel, "离线存档仅保存在本站浏览器，不会导入线上角色。清除站点数据会删除进度。", Rect2(18, 48, 248, 68), 13)
+	_button(panel, "离线单人", Rect2(18, 124, 248, 30), _enter_local_game, true)
+	_button(panel, "本站联机", Rect2(18, 160, 248, 30), _server_login)
+	_button(panel, "返回", Rect2(18, 196, 248, 30), _close_modal)
+
+func _web_lifecycle(event: String) -> void:
+	if event not in ["focus_lost", "suspended"]: return
+	if is_instance_valid(world): world.pause_moving()
+	# Unload/visibility is not a reliable asynchronous save boundary.
+	# No auto-settlement, reward replay or claimed save success here.
 
 func _server_login() -> void:
 	_close_modal()

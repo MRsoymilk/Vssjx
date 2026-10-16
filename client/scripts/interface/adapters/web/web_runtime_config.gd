@@ -3,6 +3,10 @@ extends PlatformRuntimeConfigInterface
 ## Page path, query, fragment, JS config globals and saved preferences are ignored.
 var _profile: Resource = preload("res://scripts/interface/profiles/web_runtime.tres")
 
+func local_path(kind: String, explicit_path: String = "") -> PlatformResult:
+	if kind == "save" and explicit_path.is_empty(): return PlatformResult.success("offline://save-v1")
+	return PlatformResult.new(PlatformResult.Status.INVALID_DATA, "UNKNOWN_SETTING", "网页不接受本地路径或环境变量覆盖。")
+
 func _page_origin() -> String:
 	if not OS.has_feature("web"): return ""
 	var value: Variant = JavaScriptBridge.eval("window.location.origin", true)

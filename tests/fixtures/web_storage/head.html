@@ -1,0 +1,8 @@
+<script>
+"use strict";
+globalThis.__vssjxStorageTest = {
+    results: [], command: null,
+    attach(callback) { this.command = callback; },
+    done(text) { this.results.push(JSON.parse(text)); },
+};
+</script>

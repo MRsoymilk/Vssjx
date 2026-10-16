@@ -1,9 +1,9 @@
 {
   "texture": "res://assets/actors/monster_langw.png",
-  "width": 189,
+  "width": 76,
   "height": 50,
   "columns": 8,
-  "origin": [-34, -47],
+  "origin": [-45, -47],
   "anchor_x": 0,
   "playback": {
     "idle": [

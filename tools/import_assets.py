@@ -29,6 +29,37 @@ SELECTED = ['hero/mck', 'hero/mzs', 'hero/mfs', 'hero/wck', 'hero/wzs', 'hero/wf
             'map/m7', 'map/m9', 'map/m10', 'main/biaoti',
             'effect/flash', 'effect/t1', 'effect/t20', 'effect/t36', 'effect/t44', 'effect/t47', 'effect/t71']
 
+# Explicitly audited gameplay actors. Raw archive/admin atlases keep their
+# original displacement and facing; only these runtime sheets are corrected.
+MONSTER_PLAYBACK = {
+    'monster/langw': {'idle': 3, 'walk': 0, 'attack': 2},
+    'monster/xt1': {'idle': 3, 'walk': 0, 'attack': 2},
+    'monster/hs1': {'idle': 4, 'walk': 1, 'attack': 3},
+    'monster/nt1': {'idle': 3, 'walk': 0, 'attack': 2},
+}
+
+
+def align_monster_frame(key, animation, layers, images):
+    """Keep the immutable main body in native facing above the actor anchor.
+
+    Whole-pose mirroring includes weapons/effects; retain vertical animation.
+    The world/battle owns travel instead of replaying the old ANI root motion.
+    """
+    bodies = [i for i, layer in enumerate(layers)
+              if layer['source'] == animation['sources'][0] and layer['frame'] == 0]
+    if len(bodies) != 1:
+        raise ValueError(f'{key}: expected exactly one audited main body per frame')
+    index = bodies[0]
+    transform = layers[index]['transform']
+    if transform not in (0, 4):
+        raise ValueError(f'{key}: unaudited body orientation {transform}')
+    if transform == 4:
+        images = [(image.transpose(Image.Transpose.FLIP_LEFT_RIGHT), -x - image.width, y)
+                  for image, x, y in images]
+    image, x, _ = images[index]
+    center = x + image.width // 2
+    return [(image, x - center, y) for image, x, y in images]
+
 
 def parse_ani(path):
     blob = path.read_bytes()
@@ -97,6 +128,8 @@ def bake(key, animation, output_key=None, write_texture=True, texture_dir=None,
         # Source offsets remain intact in analysis/animations/<group>/<name>.json.
         if head_center is not None:
             images = [(img, x - head_center, y) for img, x, y in images]
+        if key in MONSTER_PLAYBACK and output_key is None:
+            images = align_monster_frame(key, animation, layers, images)
         for img, x, y in images:
             bounds = [min(bounds[0], x), min(bounds[1], y),
                       max(bounds[2], x + img.width), max(bounds[3], y + img.height)]
@@ -141,9 +174,8 @@ def bake(key, animation, output_key=None, write_texture=True, texture_dir=None,
             # and must keep the native left-facing staff motion instead.
             playback['attack'] = sequences[4]
             playback['cast'] = sequences[6]  # Original floating-staff flourish.
-    elif key == 'monster/langw':
-        playback = {'idle': sequences[3], 'walk': sequences[0],
-                    'attack': sequences[2]}
+    elif key in MONSTER_PLAYBACK and output_key is None:
+        playback = {mode: sequences[index] for mode, index in MONSTER_PLAYBACK[key].items()}
     return {'texture': texture_prefix + filename, 'width': width,
             'height': height, 'columns': columns, 'origin': [left, top],
             'anchor_x': 0, 'playback': playback,

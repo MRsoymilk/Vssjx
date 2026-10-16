@@ -21,11 +21,12 @@ class ActorCatalogTests(unittest.TestCase):
         cls.expected = json.loads((ROOT.parent / 'tests/fixtures/actor_catalog_v1.json').read_text())
         cls.actors = runtime_actors()
         cls.source = original_animations()
+        cls.monster_alignment = json.loads((ROOT.parent / 'tests/fixtures/monster_alignment.json').read_text('utf-8'))
         spec = importlib.util.spec_from_file_location('actor_importer', ROOT.parent / 'tools/import_assets.py')
         cls.importer = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(cls.importer)
 
-    def test_runtime_records_only_change_restored_idle_and_forward_walk(self):
+    def test_runtime_records_only_change_audited_playback_and_alignment(self):
         self.assertEqual(len(self.actors), self.expected['runtime_records'])
         path = ROOT.parent / 'tests/fixtures/actors_v1.json.zlib.b64'
         expected = json.loads(zlib.decompress(base64.b64decode(path.read_text())))
@@ -33,6 +34,8 @@ class ActorCatalogTests(unittest.TestCase):
             if key.startswith(('hero/', 'creation/')):
                 info['playback']['idle'] = [[info['count'] - 14, 4], [info['count'] - 13, 4]]
                 info['playback']['walk'].reverse()
+            elif key in self.monster_alignment['runtime_overrides']:
+                info.update(self.monster_alignment['runtime_overrides'][key])
         self.assertEqual(canonical(self.actors), canonical(expected))
 
     def test_benchmark_fixture_is_the_exact_legacy_catalog_size_and_content(self):
@@ -48,11 +51,12 @@ class ActorCatalogTests(unittest.TestCase):
         self.assertEqual(errors, [])
         self.assertEqual(canonical(parsed), self.expected['original_canonical_sha256'])
 
-    def test_atlas_bytes_are_unchanged(self):
+    def test_atlas_bytes_outside_monster_alignment_are_unchanged(self):
         digest = hashlib.sha256()
-        for texture in sorted({info['texture'] for info in self.actors.values()}):
+        for texture in sorted({info['texture'] for key, info in self.actors.items()
+                               if key not in self.monster_alignment['runtime_overrides']}):
             digest.update(texture.encode() + b'\0' + (ROOT / texture.removeprefix('res://')).read_bytes())
-        self.assertEqual(digest.hexdigest(), self.expected['texture_set_sha256'])
+        self.assertEqual(digest.hexdigest(), self.monster_alignment['unchanged_texture_set_sha256'])
 
     def test_runtime_index_is_small_and_references_one_shard_per_actor(self):
         path = ROOT / 'assets/data/actors.json'

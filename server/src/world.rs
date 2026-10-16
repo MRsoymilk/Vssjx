@@ -648,12 +648,11 @@ pub(crate) async fn upgrade(
     headers: HeaderMap,
     ws: WebSocketUpgrade,
 ) -> Result<Response, AuthError> {
-    let auth = auth::service(&state)?;
-    auth.admit(auth::peer_ip(peer), None)?;
-    // This native-client slice has no browser Origin allowlist yet.
-    if headers.contains_key("origin") {
+    if !state.config.web_origins.allows(&headers) {
         return Err(error(403, "ORIGIN_NOT_ALLOWED"));
     }
+    let auth = auth::service(&state)?;
+    auth.admit(auth::peer_ip(peer), None)?;
     let hub = state.world.clone().ok_or(error(503, "AUTH_UNAVAILABLE"))?;
     let permit = hub
         .sockets

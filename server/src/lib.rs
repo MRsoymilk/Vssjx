@@ -13,6 +13,7 @@ pub mod pve;
 pub mod world;
 pub mod world_map;
 pub mod world_replication;
+pub mod web_origin;
 
 use axum::response::IntoResponse;
 use axum::{

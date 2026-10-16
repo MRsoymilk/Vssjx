@@ -1,6 +1,6 @@
 # 多平台接口层与移动浏览器导出方案
 
-设计修订：2026-10-16。状态：P1七类接口已分步接入原生基础实现，包括配置/存储、显示、生命周期、资源准备、输入焦点/组合状态检查及系统退出请求；Windows实际运行和P2～P4仍待验收。实现边界与记录见[平台基础](../tests/platform_interface.md)、[资源准备](../tests/platform_resources.md)、[输入与系统动作](../tests/platform_input_actions.md)，不代表完成Web导出或通过手机真机测试。
+设计修订：2026-10-16。状态：P1七类接口已分步接入原生基础实现，包括配置/存储、显示、生命周期、资源准备、输入焦点/组合状态检查及系统退出请求；P2a已接入服务端精确Origin白名单，见[来源安全前置](../tests/web_origins.md)。Windows实际运行和P2整体～P4仍待验收。其他实现边界与记录见[平台基础](../tests/platform_interface.md)、[资源准备](../tests/platform_resources.md)、[输入与系统动作](../tests/platform_input_actions.md)，不代表完成Web导出或通过手机真机测试。
 
 用户目标：后续支持多平台导出，建立对应的`interface`目录；首期让iOS和Android手机通过默认浏览器打开链接游玩。产品范围见[设计入口D09](README.md)，离线/在线业务边界见[architecture.md](architecture.md)，认证与世界协议继续遵循[protocol.md](protocol.md)、[auth.md](auth.md)和[shared_world.md](shared_world.md)。本文不替代这些契约，也不调整D01～D08的既有决策。
 
@@ -33,7 +33,7 @@
 |---|---|---|
 | `client/project.godot` | 标注`4.7`特性、`gl_compatibility`、320×480；自动加载`Game`和`OnlineAccount` | 保留逻辑画布与渲染基线，增加平台初始化边界；配置标识不等于实际工具链版本证明 |
 | `client/export_presets.cfg` | 仅有Linux和Windows预设 | 新增Web预设，不覆盖原有平台；继续排除管理界面、测试与分析材料 |
-| `server/src/world.rs::upgrade` | 请求只要携带`Origin`就返回`403 ORIGIN_NOT_ALLOWED` | 在开放网页联机前改为精确来源白名单，不能只导出客户端 |
+| `server/src/world.rs::upgrade` | 初始快照为携带`Origin`即返回`403 ORIGIN_NOT_ALLOWED`；P2a已接入精确白名单，默认仍拒绝 | 网页部署须显式配置可信来源，不能只导出客户端 |
 | `design/architecture.md` | 已设计`GameService`、`OfflineAdapter`、`OnlineAdapter`业务边界 | 平台接口与业务适配正交，不把离线/在线选择变成平台类型 |
 
 此前方案中已识别的接入点包括`game_state.gd`本地存档、`network/server_connection_settings.gd`运行配置、`main.gd`战斗资源加载及部分鼠标专用事件。实施前逐项核对当时版本和调用方，不依据旧行号机械修改。
@@ -207,7 +207,7 @@ D02不允许通过静默隐藏玩家、减少应互见范围来掩盖手机性�
 
 ### 8.1 Origin处理
 
-当前服务端拒绝一切携带`Origin`的请求，浏览器WebSocket连接将被阻断；同域部署也不会绕过这段代码。必须先将其改为可信网页来源白名单。浏览器握手行为参照R7。
+P2a已将原先一律拒绝的逻辑改为显式可信网页来源白名单，配置及验证见[来源安全前置](../tests/web_origins.md)。默认配置仍拒绝一切携带`Origin`的请求；同域部署不会自动放行。浏览器握手行为参照R7。
 
 白名单按规范化的协议、主机和有效端口精确匹配，正式和本地开发来源分开配置。不使用任意通配、字符串包含、删除Origin或全部放行作为兼容修复；默认拒绝未知来源、`null`来源及异常多值。开发调试仅开放明确的测试来源。
 

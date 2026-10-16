@@ -10,7 +10,7 @@ from urllib.parse import urlsplit
 
 
 class WebSocket:
-    def __init__(self, url, timeout=5):
+    def __init__(self, url, timeout=5, origin=None):
         parsed = urlsplit(url)
         assert parsed.scheme == 'ws' and parsed.hostname == '127.0.0.1'
         self.socket = socket.create_connection((parsed.hostname, parsed.port), timeout)
@@ -22,7 +22,9 @@ class WebSocket:
         self.world_seq = 0
         self.assembly = None
         key = base64.b64encode(os.urandom(16)).decode()
-        self.socket.sendall((f'GET {parsed.path} HTTP/1.1\r\nHost: {parsed.netloc}\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Version: 13\r\nSec-WebSocket-Key: {key}\r\n\r\n').encode())
+        assert origin is None or not any(char in origin for char in '\r\n')
+        origin_header = '' if origin is None else f'Origin: {origin}\r\n'
+        self.socket.sendall((f'GET {parsed.path} HTTP/1.1\r\nHost: {parsed.netloc}\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Version: 13\r\nSec-WebSocket-Key: {key}\r\n{origin_header}\r\n').encode())
         while b'\r\n\r\n' not in self.buffer:
             self.buffer += self.socket.recv(4096)
             assert len(self.buffer) <= 16384

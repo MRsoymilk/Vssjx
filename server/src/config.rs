@@ -15,6 +15,7 @@ pub struct Config {
     pub monitoring: MonitoringConfig,
     pub auth: AuthConfig,
     pub world: crate::world::WorldConfig,
+    pub web_origins: crate::web_origin::OriginPolicy,
 }
 
 impl Config {
@@ -81,6 +82,16 @@ impl Config {
         }
         config.auth = AuthConfig::from_values(values)?;
         config.monitoring = MonitoringConfig::from_values(values)?;
+        config.web_origins = crate::web_origin::OriginPolicy::from_lists(
+            values
+                .get("SSJX_WEB_ALLOWED_ORIGINS")
+                .map(String::as_str)
+                .unwrap_or(""),
+            values
+                .get("SSJX_WEB_DEV_ORIGINS")
+                .map(String::as_str)
+                .unwrap_or(""),
+        )?;
         config.world = crate::world::WorldConfig {
             max_players: number(values, "SSJX_WORLD_MAX_PLAYERS", 1000, 2, 1000)? as usize,
             save_seconds: u64::from(number(values, "SSJX_WORLD_SAVE_SECONDS", 10, 1, 30)?),
@@ -123,6 +134,7 @@ impl Config {
             monitoring: MonitoringConfig::default(),
             auth: AuthConfig::default(),
             world: crate::world::WorldConfig::default(),
+            web_origins: crate::web_origin::OriginPolicy::default(),
         })
     }
 }

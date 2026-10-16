@@ -37,6 +37,7 @@ Rust自动读取当前工作目录的`.env`；当前目录没有时，开发构�
 | `SSJX_AUTH_RATE_*` | 限流窗口、全局/IP/账号额度及键数量上限 |
 | `SSJX_DB_*` | 数据库连接池、查询、等待、空闲事务及就绪检查超时 |
 | `SSJX_WORLD_*` | 世界准入人数、位置保存间隔及重连所有权窗口；人数上限不是容量实测结论 |
+| `SSJX_WEB_ALLOWED_ORIGINS`、`SSJX_WEB_DEV_ORIGINS` | 浏览器WebSocket精确来源白名单；默认均为空，开发项仅允许显式回环来源 |
 | `SSJX_CHAT_*` | 公共聊天有限历史、去重窗口、有界队列与个人/全局额度 |
 | `SSJX_MONITOR_BIND_ADDR` | 独立本机监控/通知监听，默认`127.0.0.1:9090`；只能用回环IP，空值关闭 |
 | `SSJX_LOG_DIR` | JSON日志目录，相对服务启动工作目录；默认`logs`，空值只保留控制台日志 |
@@ -131,6 +132,23 @@ SSJX_SERVER_NAME="蜀山剑侠服务器"
 
 域名无需修改客户端或重新编译服务端；把客户端地址改为域名即可。客户端不关闭证书校验，也不自动跟随重定向。完整地址与保存规则见[连接入口设计](../design/connection.md)。
 
-共享地图还需代理支持WebSocket升级，并保留相同路径前缀；客户端将HTTPS地址转换为WSS。Rust本体不终止TLS；仅原生客户端接入，本阶段拒绝浏览器Origin。
+共享地图还需代理支持WebSocket升级，并保留相同路径前缀；客户端将HTTPS地址转换为WSS。Rust本体不终止TLS。浏览器Web客户端尚未完成；服务端已提供下述Origin安全前置，不代表已交付Web游戏。
+
+### 浏览器WebSocket来源
+
+默认拒绝所有携带`Origin`的世界连接。未来部署网页时，在服务端私有配置中明确填写网页来源，例如：
+
+```dotenv
+SSJX_WEB_ALLOWED_ORIGINS=https://game.example.com,https://game.example.com:8443
+SSJX_WEB_DEV_ORIGINS=
+```
+
+只填写协议、主机和可选端口，不能带路径（即使网页位于`/ssjx`）、尾部`/`、查询、片段、用户信息或通配符。按协议、规范化主机和有效端口精确匹配；DNS大小写、IPv6等价表示及省略的默认端口归一化，但子域、尾点域名和不同端口不自动获准。国际化域名使用浏览器序列化后的ASCII/Punycode形式。
+
+正式项只接受HTTPS；本地测试另用`SSJX_WEB_DEV_ORIGINS=http://127.0.0.1:8060`，仅允许显式`localhost`、`127.*`或`[::1]`回环来源，生产保持为空。每项最多32个逗号分隔来源、总长8192字节、单来源2048字节；配置无效时拒绝启动且不回显原始值。
+
+未知、`null`、空值、异常多值或重复Origin头均返回`403 ORIGIN_NOT_ALLOWED`；不根据Host、Forwarded类代理头或客户端URL参数扩大白名单。代理必须保留真实Origin，不删除、合并或替换成受信值。无Origin的原生连接仍须票据认证；来源匹配也不能跳过版本、角色归属、占用、限流或消息大小约束。
+
+这里只配置游戏世界WebSocket，不启用HTTP跨域CORS，也不开放本机监控/通知或PC admin场景。公开网页仍需受控同域HTTPS/WSS入口，不能把Origin当身份凭据。验证范围见[tests/web_origins.md](../tests/web_origins.md)。
 
 客户端发送密码或令牌要求HTTPS，仅`localhost`、`127.*`、`[::1]`允许本机HTTP。局域网HTTP地址仍可用于连接检查，账号操作需要HTTPS；Rust本身当前不终止TLS，公网部署必须由受控反向代理提供TLS且限制后端直连。应用不信任任意`X-Forwarded-For`来放宽限流。

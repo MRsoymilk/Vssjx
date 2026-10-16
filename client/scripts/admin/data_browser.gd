@@ -128,7 +128,7 @@ func _category_selected(index: int) -> void:
 func _fill_list(preferred_id: String = "") -> void:
 	for item in CATALOG.CATEGORIES:
 		if item[0] == category: %Section.text = item[1]
-	%Context.visible = category in ["maps", "quests", "enemies"]
+	%Context.visible = category in ["maps", "quests", "enemies", "effects", "archive"]
 	if category == "maps":
 		%Context.text = "原包目录 %d 条（%d 个不同名称）；世界总图 %d 个位置 / %d 条连线已恢复。单张场景地形仍缺失。另有 %d 条重建场景定义。" % [catalog.original_map_names, catalog.original_distinct_map_names, int(catalog.original_overview.get("visible_location_count", 0)), int(catalog.original_overview.get("route_count", 0)), catalog.find("maps", "", "已接入").size()]
 	elif category == "quests":
@@ -136,6 +136,10 @@ func _fill_list(preferred_id: String = "") -> void:
 		%Context.text = "重建：1 条任务链 / %d 个阶段；原包：%d 组文案与引导线索。原版任务总数未知。" % [stages, catalog.find("quests").size() - stages]
 	elif category == "enemies":
 		%Context.text = "已接入 %d 条重建定义；原包 %d 份怪物动画。素材条目不等于怪物种类，原版名称、等级与属性尚未恢复。" % [catalog.find("enemies", "", "已接入").size(), catalog.find("enemies", "", "原包资源").size()]
+	elif category == "effects":
+		%Context.text = "原包 %d 份特效动画，按原始序列播放；名称和技能对应关系尚未恢复，不等同于已接入技能。" % catalog.find("effects").size()
+	elif category == "archive":
+		%Context.text = "全部 %d 条：已解析 %d · 部分解析 %d · 未解析 %d · 解析失败 %d。只要有原始条目就保留，不因不能预览而省略。" % [catalog.find("archive").size(), catalog.find("archive", "", "已解析").size(), catalog.find("archive", "", "部分解析").size(), catalog.find("archive", "", "未解析").size(), catalog.find("archive", "", "解析失败").size()]
 	visible_entries = catalog.find(category, %Search.text, %StatusFilter.get_item_text(%StatusFilter.selected))
 	%Count.text = "%d / %d 条" % [visible_entries.size(), catalog.find(category).size()]
 	%Records.clear()
@@ -177,7 +181,7 @@ func _show_entry(entry: Dictionary) -> void:
 	%DetailTitle.text = entry.get("name", "未选择条目")
 	%Summary.text = entry.get("summary", "当前分类没有匹配结果，请调整搜索或筛选条件。")
 	%Source.text = entry.get("source", "")
-	%AnimationBar.visible = entry.get("preview", {}).get("kind") in ["actor", "monster"]
+	%AnimationBar.visible = entry.get("preview", {}).get("kind") in ["actor", "original_animation", "image_frames"]
 	%Collision.visible = entry.get("preview", {}).get("kind") == "map"
 	var preview_kind: String = entry.get("preview", {}).get("kind", "")
 	%ExpandOverview.visible = preview_kind == "world_overview"

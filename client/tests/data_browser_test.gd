@@ -23,7 +23,7 @@ func _ready() -> void:
 	var catalog := CATALOG.new()
 	catalog.reload()
 	check(catalog.errors.is_empty(), "All JSON sources load")
-	var counts := {"weapons": 57, "equipment": 91, "items": 210, "characters": 6, "quests": 16, "maps": 217, "enemies": 123, "art": 33}
+	var counts := {"weapons": 57, "equipment": 91, "items": 210, "characters": 6, "quests": 16, "maps": 217, "enemies": 123, "effects": 159, "art": 33, "archive": 1917}
 	for category in counts:
 		check(catalog.find(category).size() == counts[category], "Expected current definitions for " + category)
 	var keys: Dictionary = {}
@@ -45,6 +45,11 @@ func _ready() -> void:
 	check(catalog.find("enemies", "", "已接入").size() == 6, "Six authored enemy definitions remain separate")
 	check(catalog.find("enemies", "", "原包资源").size() == 117, "All original monster animations are included")
 	check(catalog.find("enemies", "zbjl2", "原包资源").size() == 1, "Original monster resource IDs are searchable")
+	check(catalog.find("effects", "", "原包资源").size() == 159, "Every original effect animation is indexed")
+	for entry in catalog.find("effects"):
+		check(entry.data["原版名称"] == null and entry.data["原版特效ID"] == null and entry.data["技能对应关系"] == null, "No invented effect names or skill rules: " + entry.id)
+	check(catalog.find("archive", "", "未解析").size() == 9 and catalog.find("archive", "", "部分解析").size() == 321, "Unsupported and partially parsed members remain archived")
+	check(catalog.find("archive", "archive/ssjx.mrp/sfc.bin").size() == 1, "Unsupported binary is searchable by original archive path")
 	for entry in catalog.find("enemies", "", "原包资源"):
 		check(entry.data["原版名称"] == null and entry.data["原版属性"] == null and entry.data["原版等级"] == null and entry.data["原版怪物ID"] == null, "Unknown monster identity and rules remain unknown: " + entry.id)
 	check(catalog.find("weapons", "青锋 5").size() == 1, "Multiple words search across name and actual stat fields")
@@ -94,6 +99,21 @@ func _ready() -> void:
 	browser.get_node("%Search").text = "zbjl2"
 	browser._fill_list()
 	check(browser.visible_entries.size() == 1 and browser.current.id == "original/monster/zbjl2", "UI finds a previously missing monster animation")
+	browser.select_category("effects")
+	check(browser.visible_entries.size() == 159 and browser.get_node("%Context").text.contains("技能对应关系"), "Complete effect category explains its recovery boundary")
+	browser.get_node("%Search").text = "original/effect/t180"
+	browser._fill_list()
+	check(browser.visible_entries.size() == 1 and browser.current.id == "original/effect/t180" and browser.get_node("%AnimationBar").visible, "UI can find and play a previously missing effect")
+	browser.select_category("archive")
+	browser.get_node("%StatusFilter").select(11)
+	browser._fill_list()
+	check(browser.visible_entries.size() == 9 and browser.get_node("%PreviewMessage").visible, "Unparsed filter never hides unsupported members")
+	browser.get_node("%Search").text = "archive/ssjx.mrp/sfc.bin"
+	browser._fill_list()
+	check(browser.visible_entries.size() == 1 and browser.current.data["SHA256"] != null and browser.current.data["原始前128字节（十六进制）"] != "", "Unparsed member exposes source evidence and binary prefix")
+	browser.get_node("%StatusFilter").select(12)
+	browser._fill_list()
+	check(browser.visible_entries.is_empty() and browser.get_node("%Empty").visible, "Failed-parse filter supports empty results without inventing failures")
 	browser.select_category("items")
 	browser.get_node("%Search").text = "回春"
 	browser._fill_list()
@@ -139,7 +159,15 @@ func _ready() -> void:
 	for category in counts:
 		browser.select_category(category)
 		check(browser.visible_entries.size() == counts[category], "UI category switches: " + category)
-		for entry in browser.visible_entries:
+		var preview_entries: Array = browser.visible_entries
+		if category == "archive":
+			# All members are checked above; exercise each parser/preview type here.
+			preview_entries = []
+			for path in ["archive/ssjx.mrp/bag.str", "archive/ssjx.mrp/fm1.img", "archive/ssjx.mrp/bigscroll.imgs", "archive/ssjx/effect.mrp/t180.ani", "archive/ssjx/hero.mrp/mck.ani", "archive/ssjx/map.mrp/m0.ani", "archive/ssjx/map.mrp/m1.ani", "archive/ssjx.mrp/start.mr"]:
+				var matches := catalog.find("archive", path)
+				check(matches.size() == 1, "Archive member is accessible: " + path)
+				if matches.size() == 1: preview_entries.append(matches[0])
+		for entry in preview_entries:
 			browser._show_entry(entry)
 			if entry.preview.get("kind") == "icon":
 				check(browser.get_node("%Preview").icon != null, "Decoded icon loads: " + entry.id)
@@ -149,15 +177,15 @@ func _ready() -> void:
 				var attack_loop: bool = preview.sprite.sprite_frames.get_animation_loop("attack")
 				preview.play_animation("attack")
 				check(preview.sprite.sprite_frames.get_animation_loop("attack") == attack_loop, "Preview leaves shared animation loop unchanged: " + entry.id)
-			if entry.preview.get("kind") == "monster":
+			if entry.preview.get("kind") in ["original_animation", "image_frames"]:
 				var preview: Control = browser.get_node("%Preview")
-				check(is_instance_valid(preview.sprite), "Original monster atlas loads: " + entry.id)
+				check(is_instance_valid(preview.sprite), "Original atlas loads: " + entry.id)
 				var info: Dictionary = entry.preview.animation
 				var atlas_center: Vector2 = preview.sprite.offset + Vector2(info.width, info.height) * 0.5
 				check(not preview.sprite.centered and (preview.sprite.transform * atlas_center).is_equal_approx(preview.size * 0.5), "Original monster atlas is centered inside the visible preview: " + entry.id)
 				for index in entry.preview.animation.sequences.size():
 					var steps: Array = entry.preview.animation.sequences[index]
-					var animation := "source_%d" % index
+					var animation := ("frame_%d" if entry.preview.kind == "image_frames" else "source_%d") % index
 					if steps.is_empty():
 						check(not preview.sprite.sprite_frames.has_animation(animation), "Empty source sequence is not played: " + entry.id)
 						continue

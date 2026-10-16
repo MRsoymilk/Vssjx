@@ -27,9 +27,9 @@ godot --path client res://scenes/admin/data_browser.tscn
 
 Windows 也可运行 `./tools/open-data-browser.ps1 -GodotBin "你的Godot可执行文件路径"`，支持 `GODOT_BIN` 环境变量或 PATH 中的 `godot` / `godot4`。
 
-管理页提供武器、人物装备、物品、人物、任务、地图、怪物、素材/动画八类目录，可搜索名称、ID 和属性，按状态筛选，查看字段、JSON 数据和定义来源；人物支持动画预览，地图支持地形与阻挡预览。**只读浏览项目定义与原包资源**，不连接数据库或读取玩家存档。按 F5 刷新 JSON 与列表，修改脚本常量后需重新运行场景。
+管理页提供武器、人物装备、物品、人物、任务、地图、怪物、特效、素材/动画、原包归档十类目录，可搜索名称、ID 和属性，按状态筛选，查看字段、JSON 数据和定义来源；人物和特效支持动画预览，地图支持地形与阻挡预览。**只读浏览项目定义与原包资源**，不连接数据库或读取玩家存档。按 F5 刷新 JSON 与列表，修改脚本常量后需重新运行场景。
 
-`client/scenes/admin/data_browser.tscn`和`client/scenes/admin/world_overview.tscn`是**独立桌面开发工具，不是游戏内页面，也不随游戏导出**。两页及总图弹窗默认使用 **960×540桌面窗口和逻辑画布**，可放大到1280×720等尺寸，不沿用手机画幅；世界总图采用地图与说明左右布局。在编辑器中关闭 **Embed Game on Play / 嵌入游戏** 后按F6运行；或用上面的命令行直接打开独立窗口。世界总图也可单独运行：`godot --path client res://scenes/admin/world_overview.tscn`。工具不修改游戏的320×480基础视口。
+`client/scenes/admin/data_browser.tscn`和`client/scenes/admin/world_overview.tscn`是**独立桌面开发工具，不是游戏内页面，也不随游戏导出**。数据管理页使用 **960×640桌面窗口和逻辑画布**，世界总图及其弹窗为960×540，可放大到1280×720等尺寸，不沿用手机画幅；世界总图采用地图与说明左右布局。按F6运行时自动将管理工具放到独立窗口，避开编辑器的手机比例宿主；也可用上面的命令行直接打开。世界总图可单独运行：`godot --path client res://scenes/admin/world_overview.tscn`。工具不修改游戏的320×480基础视口。
 
 游戏导出使用`client/export_presets.cfg`中的`Game (Linux)`或`Game (Windows)`预设：明确排除`scenes/admin/`、`scripts/admin/`和`tests/`，保留游戏运行所需的JSON与共享资源。新增游戏预设时应保留同样的排除规则；完整可执行文件导出还需要对应Godot导出模板。导出边界验证见[tests/game_export.md](tests/game_export.md)。
 
@@ -38,6 +38,10 @@ Windows 也可运行 `./tools/open-data-browser.ps1 -GodotBin "你的Godot可执
 重新导出物品索引与无损图标：`python tools/import_item_catalog.py`（使用 `analysis/image_manifest.json` 与已解码 PNG；修改原始解码结果后再运行）。
 
 怪物目录同时收录 **6 条已接入的重建定义**和`monster.mrp`的**全部117份原始动画（覆盖142份图片成员）**，可按“已接入”/“原包资源”筛选。原包条目可查看图像、播放`source_N`原始序列并核对来源校验；资源编号不是恢复的怪物名称，原版名称、ID、等级及属性未知，117份素材不代表117种完整怪物定义。重新生成：`python tools/import_monster_catalog.py`。管理专用资源位于`client/assets/admin/monsters/`，不进入游戏导出。
+
+特效分类收录`effect.mrp`**全部159份原始动画（覆盖75份图片成员）**，不再仅显示游戏运行时已导入的7份。支持原始序列播放与来源核对，名称和技能对应关系未知。生成命令：`python tools/import_effect_catalog.py`。
+
+**原包归档不按能否解析筛掉条目**：包含6个MRP的1916条成员记录与1份原始版本文件，共1917条。已解析图片可切换全部帧，ANI可播放原始序列，文本可直接阅读；部分解析、未解析、空动画、解析失败或缺失源文件仍保留原始路径、大小、SHA256、目录记录、字节摘要和原因。按“已解析 / 部分解析 / 未解析 / 解析失败”筛选。生成命令：`python tools/import_resource_archive.py`；原始二进制仍保留在`analysis/`，管理专用预览不进入游戏导出。
 
 地图页收录 Online 原包 `worldmap.data` 的 **214 条目录（157 个不同名称）**，并保留 3 条当前已接入的场景定义；可筛选“原包目录”或“已接入”。对照原生代码恢复了 **79 个世界总图位置、78条连线**，可展开查看、悬停查询名称与等级；目录还显示原包编号、位置、类型、原始记录与来源校验。单张场景地形仍缺少对应`.map`缓存，明确显示提示；[恢复记录与复现方式](analysis/recovery/maps/README.md)保留格式、扫描结果和证据。
 

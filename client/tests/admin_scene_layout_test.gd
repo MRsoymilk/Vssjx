@@ -48,7 +48,7 @@ func _ready() -> void:
 		if dimensions == Vector2i(960, 640): await capture("browser-desktop")
 	get_window().size = Vector2i(960, 640)
 	await settle()
-	for category in ["weapons", "equipment", "items", "characters", "quests", "maps", "enemies", "art"]:
+	for category in ["weapons", "equipment", "items", "characters", "quests", "maps", "enemies", "effects", "art", "archive"]:
 		browser.select_category(category)
 		await settle()
 		fits(browser.get_node("%Inspector"), "Desktop inspector fits category " + category)
@@ -64,6 +64,22 @@ func _ready() -> void:
 			fits(browser.get_node("%Copy"), "Original monster animation actions fit 960x640")
 			check(browser.visible_entries.size() == 1 and browser.current.id == "original/monster/zbjl2", "Desktop can preview a previously missing monster")
 			await capture("browser-original-monsters-desktop")
+		if category == "effects":
+			browser.get_node("%Search").text = "original/effect/t180"
+			browser._fill_list()
+			await settle()
+			fits(browser.get_node("%Copy"), "Effect preview actions fit 960x640")
+			check(browser.visible_entries.size() == 1 and is_instance_valid(browser.get_node("%Preview").sprite), "Previously missing effect is playable")
+			await capture("browser-effects-desktop")
+		if category == "archive":
+			browser.get_node("%StatusFilter").select(11)
+			browser._fill_list()
+			browser.get_node("%Search").text = "archive/ssjx.mrp/sfc.bin"
+			browser._fill_list()
+			await settle()
+			fits(browser.get_node("%Copy"), "Unparsed archive entry fits 960x640")
+			check(browser.visible_entries.size() == 1 and browser.get_node("%PreviewMessage").visible, "Unparsed member remains browsable")
+			await capture("browser-archive-unparsed-desktop")
 	browser.select_category("maps")
 	browser.get_node("%StatusFilter").select(5)
 	browser._fill_list()

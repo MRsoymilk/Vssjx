@@ -57,7 +57,7 @@ python tests/run_admin_scene_layout.py --render --output /tmp/opencode/vssjx-adm
 - 原包物品从 `client/assets/data/original_items.json` 读取，使用 `tools/import_item_catalog.py` 从原包目录与解码清单完整导出。共 208 件：56 武器、81 装备、71 其他；所有图标逐字节复制至客户端，不重新绘制。按 iw/if/ix 文件名前缀分类，明确不将该前缀当作完整的原服物品类型表。
 - 原版名称、物品ID映射、等级、装备槽位与属性尚未恢复，保留 null，并在界面显示“—”。管理页按原始资源编号展示全部图标，不因为业务逻辑尚未接入而隐藏。
 - 本地武器规则青锋剑、消耗品规则回春散仍独立显示，状态为“已接入”；不将重建版名称或数值冒充原包定义。装备槽位直接使用背包中的十个定义，九个未接入装备规则的槽位标为“预留”。
-- 分类索引共753条，包含跨分类引用：武器57、装备91、物品210、人物6、任务/线索16、地图217、怪物123、素材/动画33。怪物由6条重建定义和117份原包动画组成；总索引数不等于独立物品、怪物种类、任务或可游玩地图数量。
+- 分类索引共2829条，包含跨分类引用：武器57、装备91、物品210、人物6、任务/线索16、地图217、怪物123、特效159、素材/动画33、原包归档1917。怪物由6条重建定义和117份原包动画组成；归档按原始文件成员计数，与各分类的资源引用有重叠。总索引数不等于独立物品、怪物种类、技能、任务或可游玩地图数量。
 
 - 地图217条包括214条已审核的Online原包目录及3条已接入场景定义；原包目录保留同名记录。世界总图已恢复79个位置与78条线段，可展开、悬停查看地点类型与等级；135条隐藏位置保持未知。场景地形未取得时明确提示，不生成猜测地形。原包编号不等同于重建服务器ID，总图连线不当作完整传送配置。来源索引为 `analysis/catalogs/online_world.json` 及其客户端副本，证据及候选格式见 `analysis/recovery/maps/README.md`。
 - 任务/线索16条包括5个重建阶段、1组任务界面文案、10组引导文案/线索（teach.str及teach1～teach9）。界面单列原版任务总数未知，不能把16或5当作原版任务数量。文字仅在字段、JSON与文本摘录中展示，不作为指令执行。
@@ -83,3 +83,21 @@ python tests/run_game_export.py
 Python回归核对117份ANI/142份图片全覆盖、成员与原包SHA256、每个动画序列、图集尺寸与校验、可重复生成及未知字段；Godot回归遍历所有怪物预览与全部非空序列，并验证筛选、搜索、960×640布局和原包怪物截图。导出探针对Linux/Windows真实PCK检查管理资源目录不存在。
 
 2026-10-16验证：Python65项、数据浏览4542项全部通过；布局无头及实际渲染、独立窗口和模拟F6宿主启动均通过。已检查`/tmp/opencode/vssjx-monster-catalog-checked/browser-original-monsters-desktop.png`，960×640下怪物图像、原始序列与未知字段均可见。Linux/Windows实际PCK导出及排除管理资源审计通过，日志位于`/tmp/opencode/vssjx-monster-catalog-export/`。
+
+## 特效与全量原包归档
+
+- `effect.mrp`的159份ANI全部展示于“特效”，覆盖75份图片成员；只播放原始`source_N`，不推断技能名称或业务映射。不改变游戏的33项运行时资源索引。
+- “原包归档”收录全部6个MRP的1916条成员和`commonRecord/version`，共1917条；保留原始来源、包目录记录、大小、SHA256与前128字节摘要。图片解码覆盖3300帧，37份STR文本共802项；图片帧通过`frame_N`选择，不虚构动画时序。
+- 结构已解析但尾部事件/碰撞语义不明的ANI标为“部分解析”；空的`map/m0.ani`也保留。原生扩展标明静态分析边界，MR字节码和未知二进制不执行。
+- 解析失败、源文件缺失或校验异常时先保留目录条目，再记录失败原因，不能静默省略。测试使用未知、损坏、缺失和校验不符的合成成员验证此规则。
+- 目录和预览在`client/assets/admin/`，沿用游戏导出的排除规则；原始二进制不复制到Godot，也不修改`analysis/`原始输入。
+
+```sh
+python tools/import_effect_catalog.py
+python tools/import_resource_archive.py
+python -m unittest discover -s tests -v
+python tests/run_admin_scene_layout.py --render
+python tests/run_game_export.py
+```
+
+全量归档验证（2026-10-16）：1917条中已解析1587、部分解析321、未解析9、解析失败0；未解析成员不隐藏。Python80项及Godot目录9575项通过，覆盖全部特效序列与归档各格式；960×640实际渲染、模拟F6启动和Linux/Windows实际PCK排除审计均通过。截图与日志在`/tmp/opencode/vssjx-all-resources-rendered/`，导出日志在`/tmp/opencode/vssjx-all-resources-export/`。

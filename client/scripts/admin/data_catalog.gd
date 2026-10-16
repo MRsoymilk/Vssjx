@@ -9,10 +9,12 @@ const ONLINE_MAP := "res://assets/data/qingyun-v1.json"
 const ORIGINAL_ITEMS := "res://assets/data/original_items.json"
 const ORIGINAL_WORLD := "res://assets/data/original_world.json"
 const ORIGINAL_MONSTERS := "res://assets/admin/monsters/catalog.json"
+const ORIGINAL_EFFECTS := "res://assets/admin/effects/catalog.json"
+const RESOURCE_ARCHIVE := "res://assets/admin/archive/catalog.json"
 const CATEGORIES := [
 	["weapons", "武器"], ["equipment", "人物装备"], ["items", "物品"],
 	["characters", "人物"], ["quests", "任务 / 线索"], ["maps", "地图"],
-	["enemies", "怪物"], ["art", "素材 / 动画"]
+	["enemies", "怪物"], ["effects", "特效"], ["art", "素材 / 动画"], ["archive", "原包归档"]
 ]
 var entries: Array[Dictionary] = []
 var errors: Array[String] = []
@@ -70,6 +72,8 @@ func reload() -> void:
 		data["区域"] = "古剑遗迹" if enemy.id in ["guardian", "boss"] else "青云山道"
 		_add("enemies", enemy.id, enemy.name, "气血 %s / 攻击 %s / %s" % [enemy.hp, enemy.attack, data["区域"]], "已接入", "res://scripts/world.gd", data, {"kind": "actor", "art": enemy.art})
 	_load_original_monsters()
+	_load_original_effects()
+	_load_resource_archive()
 	_load_maps()
 	_load_original_world()
 	var manifest := _read_json(ART.INDEX_PATH)
@@ -101,7 +105,54 @@ func _load_original_monsters() -> void:
 		}
 		_add("enemies", record.id, record.display_name,
 			"%d 帧 · %d 组原始序列 · 名称 / 数值未恢复" % [int(info.count), info.sequences.size()],
-			"原包资源", ORIGINAL_MONSTERS, data, {"kind": "monster", "animation": info})
+			"原包资源", ORIGINAL_MONSTERS, data, {"kind": "original_animation", "animation": info})
+
+func _load_resource_archive() -> void:
+	var manifest := _read_json(RESOURCE_ARCHIVE)
+	if manifest.get("format_version") != 1 or not manifest.get("records") is Array or manifest.records.size() != int(manifest.get("record_count", -1)):
+		errors.append("原包归档格式或数量不正确")
+		return
+	for record in manifest.records:
+		var preview: Dictionary = record.preview.duplicate(true)
+		if preview.kind == "unavailable":
+			preview["message"] = record.status + "\n\n" + record.reason + "\n\n原始条目已归档，可查看来源、大小、SHA256与原始字节摘要"
+		var data := {
+			"原始资源路径": record.resource_path, "解析状态": record.status, "说明": record.reason,
+			"原始大小（字节）": int(record.size) if record.size != null else null, "SHA256": record.sha256,
+			"原始文件": record.source_file, "来源包": record.source_package,
+			"原始目录记录": record.member, "原始前128字节（十六进制）": record.hex_prefix,
+			"解析数据": record.parsed
+		}
+		var excerpts: Array[String] = []
+		for group in record.parsed.get("text_groups", []):
+			for text in group: excerpts.append(String(text))
+		for fragment in record.parsed.get("text_fragments", []): excerpts.append(String(fragment.text))
+		if not excerpts.is_empty(): data["文本摘录"] = excerpts
+		var bytes_text := str(int(record.size)) if record.size != null else "缺失"
+		_add("archive", record.id, record.resource_path, "%s · %s 字节 · %s" % [record.status, bytes_text, record.reason], record.status, RESOURCE_ARCHIVE, data, preview)
+
+func _load_original_effects() -> void:
+	var manifest := _read_json(ORIGINAL_EFFECTS)
+	if manifest.get("format_version") != 1 or manifest.get("source_package") != "ssjx/effect.mrp" or not manifest.get("effects") is Array:
+		errors.append("原包特效目录身份或格式不正确")
+		return
+	if manifest.effects.size() != int(manifest.get("animation_count", -1)):
+		errors.append("原包特效动画数量不匹配")
+		return
+	for record in manifest.effects:
+		var info: Dictionary = record.animation
+		if not FileAccess.file_exists(info.texture):
+			errors.append("原包特效图集缺失：" + record.resource_id)
+			continue
+		var data := {
+			"资源编号": record.resource_id, "原版名称": null, "原版特效ID": null, "技能对应关系": null,
+			"恢复范围": "原包特效动画素材；名称、技能对应关系与业务规则尚未恢复",
+			"动画说明": "source_N 对应原始序列编号；原始帧索引与时长完整保留",
+			"来源资源": record.duplicate(true), "原包SHA256": manifest.source_sha256
+		}
+		_add("effects", record.id, record.display_name,
+			"%d 帧 · %d 组原始序列 · 名称 / 技能对应关系未恢复" % [int(info.count), info.sequences.size()],
+			"原包资源", ORIGINAL_EFFECTS, data, {"kind": "original_animation", "animation": info})
 
 func _load_original_world() -> void:
 	var manifest := _read_json(ORIGINAL_WORLD)
@@ -212,6 +263,9 @@ func find(category: String, query: String = "", status: String = "全部") -> Ar
 	var words := query.strip_edges().to_lower().split(" ", false)
 	for entry in entries:
 		if entry.category != category or (status != "全部" and entry.status != status): continue
+		if words.is_empty():
+			result.append(entry)
+			continue
 		var haystack: String = (String(entry.id) + " " + String(entry.name) + " " + String(entry.summary) + " " + JSON.stringify(entry.data)).to_lower()
 		var matches := true
 		for word in words:

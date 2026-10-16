@@ -26,7 +26,7 @@ func display(entry: Dictionary) -> void:
 				sprite = OriginalArt.actor(preview.art)
 				add_child(sprite)
 				_place_sprite()
-		"monster":
+		"original_animation", "image_frames":
 			var info: Dictionary = preview.animation
 			var frames := SpriteFrames.new()
 			frames.remove_animation("default")
@@ -34,7 +34,7 @@ func display(entry: Dictionary) -> void:
 			for index in info.sequences.size():
 				var steps: Array = info.sequences[index]
 				if steps.is_empty(): continue
-				var animation := "source_%d" % index
+				var animation := ("frame_%d" if preview.kind == "image_frames" else "source_%d") % index
 				frames.add_animation(animation)
 				frames.set_animation_speed(animation, 10.0)
 				for step in steps:
@@ -133,7 +133,7 @@ func _draw_overview() -> void:
 
 func _place_sprite() -> void:
 	if not is_instance_valid(sprite): return
-	var info: Dictionary = record.preview.animation if record.preview.kind == "monster" else OriginalArt.actor_info(record.preview.art)
+	var info: Dictionary = record.preview.animation if record.preview.kind in ["original_animation", "image_frames"] else OriginalArt.actor_info(record.preview.art)
 	var dimensions := Vector2(info.width, info.height)
 	var zoom := maxf(0.25, minf(2.0, minf((size.x - 30) / dimensions.x, (size.y - 24) / dimensions.y)))
 	sprite.scale = Vector2.ONE * zoom

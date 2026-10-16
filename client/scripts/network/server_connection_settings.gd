@@ -9,6 +9,11 @@ func _init(path: String = "") -> void:
 	if not Platform.is_available():
 		last_error = "平台尚未就绪，无法读取连接配置。"
 		return
+	var options := Platform.context.runtime_config.connection_options()
+	if not options.ok:
+		last_error = options.message
+		return
+	if not options.value.editable: return
 	var result := Platform.context.runtime_config.local_path("connection", path)
 	if result.ok: settings_path = result.value
 	else: last_error = result.message
@@ -63,6 +68,11 @@ static func _invalid(message: String) -> Dictionary:
 
 func load_address() -> String:
 	last_error = ""
+	var options := connection_options()
+	if not options.ok:
+		last_error = options.message
+		return ""
+	if not options.value.editable: return options.value.server_address
 	if not _storage_ready(): return ""
 	var read := Platform.context.storage.read_text(settings_path, 65536)
 	if not read.ok:
@@ -84,11 +94,20 @@ func load_address() -> String:
 
 func save_address(raw: String) -> bool:
 	last_error = ""
-	if not _storage_ready(): return false
+	var options := connection_options()
+	if not options.ok:
+		last_error = options.message
+		return false
 	var result := normalize(raw)
 	if not result.ok:
 		last_error = result.error
 		return false
+	if not options.value.editable:
+		if result.address == "local": return true # Offline entry is not a network target.
+		var allowed := Platform.context.runtime_config.check_network_target(result.address)
+		if not allowed.ok: last_error = allowed.message
+		return allowed.ok # Derived config is never written to synchronous storage.
+	if not _storage_ready(): return false
 	var config := ConfigFile.new()
 	config.set_value("connection", "server_address", result.address)
 	var write := Platform.context.storage.write_text_atomic(settings_path, config.encode_to_text())
@@ -96,6 +115,11 @@ func save_address(raw: String) -> bool:
 		last_error = "服务器地址保存失败，请检查本地目录权限。"
 		return false
 	return true
+
+func connection_options() -> PlatformResult:
+	if not Platform.is_available():
+		return PlatformResult.new(PlatformResult.Status.TEMPORARY_FAILURE, "PLATFORM_NOT_READY", "平台尚未就绪，无法读取连接配置。")
+	return Platform.context.runtime_config.connection_options()
 
 func _storage_ready() -> bool:
 	if Platform.is_available() and not settings_path.is_empty(): return true

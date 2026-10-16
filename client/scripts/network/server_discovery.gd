@@ -17,6 +17,13 @@ func cancel() -> void:
 
 func check_server(address: String) -> void:
 	cancel()
+	if not Platform.is_available():
+		completed.emit({"ok": false, "error": "平台尚未就绪，无法连接服务器。"})
+		return
+	var allowed := Platform.context.runtime_config.check_network_target(address)
+	if not allowed.ok:
+		completed.emit({"ok": false, "error": allowed.message})
+		return
 	request = HTTPRequest.new()
 	request.timeout = timeout_seconds
 	request.body_size_limit = 32768

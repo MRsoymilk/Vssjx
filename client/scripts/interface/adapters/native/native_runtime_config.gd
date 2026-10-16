@@ -13,3 +13,13 @@ func local_path(kind: String, explicit_path: String = "") -> PlatformResult:
 	if path.is_empty(): path = PATHS[kind].default
 	if OS.get_name() == "Windows": path = path.replace("\\", "/")
 	return PlatformResult.success(path)
+
+func connection_options() -> PlatformResult:
+	return PlatformResult.success({"editable": true, "server_address": ""})
+
+func check_network_target(address: String) -> PlatformResult:
+	# Existing native callers retain their own normalization and HTTPS checks.
+	return PlatformResult.success(address)
+
+func allows_remembered_login() -> bool:
+	return true

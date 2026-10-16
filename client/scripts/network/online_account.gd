@@ -104,6 +104,19 @@ func _send(action: String, address: String, payload: Dictionary, bearer: bool = 
 		if action == "world_ticket": world_ticket_received.emit(result)
 		else: completed.emit(action, result)
 		return
+	var normalized := ServerConnectionSettings.normalize(address)
+	if not normalized.ok:
+		completed.emit(action, {"ok": false, "code": "INVALID_ADDRESS"})
+		return
+	var target_result := Platform.context.runtime_config.check_network_target(normalized.address)
+	if not target_result.ok:
+		var result := {"ok": false, "code": target_result.code}
+		if action == "world_ticket": world_ticket_received.emit(result)
+		else: completed.emit(action, result)
+		return
+	if not secure_credentials_target(normalized.address):
+		completed.emit(action, {"ok": false, "code": "HTTPS_REQUIRED"})
+		return
 	if bearer and action != "logout":
 		if not is_logged_in():
 			completed.emit(action, {"ok": false, "code": "UNAUTHORIZED"})
@@ -112,13 +125,6 @@ func _send(action: String, address: String, payload: Dictionary, bearer: bool = 
 			_after_refresh = {"action": action, "payload": payload.duplicate(true)}
 			refresh()
 			return
-	var normalized := ServerConnectionSettings.normalize(address)
-	if not normalized.ok:
-		completed.emit(action, {"ok": false, "code": "INVALID_ADDRESS"})
-		return
-	if not secure_credentials_target(normalized.address):
-		completed.emit(action, {"ok": false, "code": "HTTPS_REQUIRED"})
-		return
 	if is_logged_in() and action in ["login", "register"]:
 		completed.emit(action, {"ok": false, "code": "LOGOUT_REQUIRED"})
 		return

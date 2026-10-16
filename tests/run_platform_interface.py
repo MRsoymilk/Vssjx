@@ -1,4 +1,4 @@
-"""P1 native platform regression in an isolated source copy and user directory."""
+"""Native platform regression, including injected Web policy, in an isolated copy."""
 import argparse
 import json
 import os
@@ -54,7 +54,7 @@ def main():
     run('import', [godot, '--headless', '--editor', '--path', str(project), '--import'])
     run('resource-loader-parse', [godot, '--headless', '--path', str(project), '--check-only', '--script',
                                 'res://scripts/interface/adapters/native/native_resource_loader.gd'])
-    suites = ['platform_input_actions_test', 'resource_loader_test', 'platform_interface_test', 'test_runner', 'server_connection_test',
+    suites = ['platform_web_security_test', 'platform_input_actions_test', 'resource_loader_test', 'platform_interface_test', 'test_runner', 'server_connection_test',
               'world_delta_test', 'public_chat_test', 'shared_interface_test', 'chat_emotes_test',
               'expanded_chat_test', 'online_attributes_test', 'online_allocation_test',
               'local_mode_test', 'login_ui_test', 'character_selection_test',
@@ -75,7 +75,7 @@ def main():
         raise RuntimeError('Native window close did not preserve the offline save')
     env['SSJX_SAVE_PATH'] = original_save
     if args.render:
-        for suite in ['platform_input_actions_test', 'resource_loader_test', 'platform_interface_test', 'battle_transition_test', 'visual_smoke']:
+        for suite in ['platform_web_security_test', 'platform_input_actions_test', 'resource_loader_test', 'platform_interface_test', 'battle_transition_test', 'visual_smoke']:
             if suite == 'visual_smoke':
                 capture = output / 'screenshots'
                 capture.mkdir(exist_ok=True)
@@ -85,6 +85,7 @@ def main():
                 encounter.mkdir(exist_ok=True)
                 env['SSJX_ENCOUNTER_CAPTURE_PATH'] = str(encounter)
             expected = {
+                'platform_web_security_test': r'PLATFORM WEB SECURITY: \d+ checks, 0 failures',
                 'platform_input_actions_test': r'PLATFORM INPUT ACTIONS: \d+ checks, 0 failures',
                 'resource_loader_test': r'RESOURCE LOADER: \d+ checks, 0 failures',
                 'platform_interface_test': r'PLATFORM INTERFACE: \d+ checks, 0 failures',
@@ -101,7 +102,7 @@ def main():
             r'PASS: Rust discovery')
     (output / 'report.json').write_text(json.dumps({'runs': records, 'failures': 0,
         'engine': subprocess.check_output([godot, '--version'], text=True).strip(),
-        'scope': 'P1 native only; not Web export, Windows runtime or mobile browser acceptance'}, indent=2), encoding='utf8')
+        'scope': 'Native regression with injected Web security policy; not Web export, Windows runtime or mobile browser acceptance'}, indent=2), encoding='utf8')
 
 
 if __name__ == '__main__':

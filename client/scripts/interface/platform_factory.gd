@@ -2,6 +2,8 @@ extends RefCounted
 ## Do not let Web silently inherit native storage durability or OS config.
 
 static func create(target: String = "") -> PlatformContext:
+	# Until all Web ports exist, even an explicit native override must fail closed.
+	if OS.has_feature("web"): return null
 	var selected := target if not target.is_empty() else ("web" if OS.has_feature("web") else "native")
 	if selected != "native": return null
 	return PlatformContext.new("native",

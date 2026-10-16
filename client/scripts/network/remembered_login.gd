@@ -6,10 +6,21 @@ var path: String
 var last_error := ""
 
 func _init(storage_path: String = "") -> void:
+	if not is_supported(): return
 	path = storage_path if not storage_path.is_empty() else ServerConnectionSettings.new().settings_path + ".login"
+
+static func is_supported() -> bool:
+	# Even a mistakenly injected native context cannot enable browser file access.
+	return not OS.has_feature("web") and Platform.is_available() and Platform.context.runtime_config.allows_remembered_login()
+
+func _allowed() -> bool:
+	if is_supported() and not path.is_empty(): return true
+	last_error = "当前平台不保存账号密码，请重新输入。"
+	return false
 
 func load_saved(server: String) -> Dictionary:
 	last_error = ""
+	if not _allowed(): return {}
 	if not FileAccess.file_exists(path): return {}
 	var key := FileAccess.get_file_as_bytes(path + ".key") if FileAccess.file_exists(path + ".key") else PackedByteArray()
 	if key.size() != 32:
@@ -28,6 +39,7 @@ func load_saved(server: String) -> Dictionary:
 
 func remember(server: String, username: String, password: String) -> bool:
 	last_error = ""
+	if not _allowed(): return false
 	var target := ServerConnectionSettings.normalize(server)
 	if not target.ok or target.address == "local" or not OnlineAccount.secure_credentials_target(target.address): return false
 	var key := PackedByteArray()
@@ -51,6 +63,7 @@ func remember(server: String, username: String, password: String) -> bool:
 
 func forget() -> bool:
 	last_error = ""
+	if not _allowed(): return false
 	for file in [path, path + ".tmp", path + ".key"]:
 		if FileAccess.file_exists(file) and DirAccess.remove_absolute(file) != OK: return _failed()
 	return true

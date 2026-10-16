@@ -54,11 +54,17 @@ func _ready() -> void:
 	_update_controls()
 	if ServerConnectionSettings.is_local(address_input.text): status.text = "本地单人模式，进度保存在此设备。"
 	elif OnlineAccount.is_logged_in(): _show_account()
+	elif not remembered.is_supported() and status.text.is_empty(): status.text = "网页账号仅在当前页面内存中使用，刷新后需重新登录。"
 	Platform.context.text_input.request_focus(username_input)
 
 func _restore_credentials() -> void:
 	if _restored_password: password_input.clear()
 	_credentials_address = address_input.text
+	if not remembered.is_supported():
+		_restored_password = false
+		_pending_credentials = {}
+		remember_me.set_pressed_no_signal(false)
+		return
 	var saved := remembered.load_saved(address_input.text)
 	remember_me.set_pressed_no_signal(not saved.is_empty())
 	_restored_password = not saved.is_empty()
@@ -68,6 +74,10 @@ func _restore_credentials() -> void:
 	if not remembered.last_error.is_empty(): status.text = remembered.last_error
 
 func _remember_toggled(enabled: bool) -> void:
+	if not remembered.is_supported():
+		_pending_credentials = {}
+		remember_me.set_pressed_no_signal(false)
+		return
 	if enabled: return
 	_pending_credentials = {}
 	if not remembered.forget(): status.text = remembered.last_error
@@ -139,7 +149,8 @@ func _connection_result(result: Dictionary) -> void:
 	_probing = false
 	_update_controls()
 	if not result.ok:
-		status.text = result.error + "\n已保存的有效地址不会被清除。"
+		var options := settings.connection_options()
+		status.text = result.error + ("\n已保存的有效地址不会被清除。" if options.ok and options.value.editable else "\n本站服务配置不会改变。")
 		return
 	var display_name := String(result.server_name).left(24)
 	if String(result.server_name).length() > 24: display_name += "…"
@@ -152,14 +163,19 @@ func _update_controls() -> void:
 	_last_busy = OnlineAccount.busy
 	var local := ServerConnectionSettings.is_local(address_input.text)
 	var locked := _probing or (OnlineAccount.busy and not local)
-	connect_button.disabled = locked
+	var options := settings.connection_options()
+	var editable_address: bool = options.ok and options.value.editable
+	connect_button.visible = editable_address
+	connect_button.disabled = locked or not editable_address
 	auth_button.disabled = locked
 	switch_button.disabled = locked or local
-	remember_me.disabled = locked or local
+	remember_me.visible = remembered.is_supported()
+	remember_me.disabled = locked or local or not remembered.is_supported()
+	if not remembered.is_supported(): remember_me.set_pressed_no_signal(false)
 	username_input.editable = not locked and not local and not OnlineAccount.is_logged_in()
 	password_input.editable = not locked and not local and not OnlineAccount.is_logged_in()
 	username_input.placeholder_text = "本地模式，无需账号" if local else ""
-	address_input.editable = not locked and _editing_address
+	address_input.editable = editable_address and not locked and _editing_address
 	connect_button.text = "保存" if _editing_address else "修改"
 	auth_button.text = "进入游戏" if local else ("选择角色" if OnlineAccount.is_logged_in() else "登陆")
 	switch_button.text = "退出账号" if not local and OnlineAccount.is_logged_in() else "注册"
@@ -183,7 +199,7 @@ func _submit_account() -> void:
 	_editing_address = false
 	status.text = "正在注册账号……" if register_mode else "正在登录……"
 	var secret := password_input.text
-	_pending_credentials = {"server": address_input.text, "username": username_input.text.strip_edges().to_lower(), "password": secret} if remember_me.button_pressed else {}
+	_pending_credentials = {"server": address_input.text, "username": username_input.text.strip_edges().to_lower(), "password": secret} if remembered.is_supported() and remember_me.button_pressed else {}
 	_restored_password = false
 	password_input.clear()
 	if register_mode:
@@ -218,6 +234,7 @@ func _account_result(action: String, result: Dictionary) -> void:
 			"DATABASE_UNAVAILABLE": "数据库暂不可用，请稍后再试。", "RATE_LIMITED": "操作过于频繁，请稍后再试。",
 			"SERVER_BUSY": "服务器繁忙，请稍后再试。", "SESSION_LIMIT_REACHED": "有效登录会话过多，请退出旧会话或稍后重试。",
 			"LOGOUT_REQUIRED": "请先退出原服务器账号，再登录其他账号。", "NETWORK_ERROR": "网络请求未确认；注册可尝试登录，刷新失败请重新登录。",
+			"TARGET_NOT_ALLOWED": "网页仅可连接本站配置的游戏服务。", "WEB_CONFIG_INVALID": "网页服务配置不可用，请从受信任的HTTPS入口打开。",
 		}
 		status.text = String(errors.get(result.get("code", ""), "账号请求失败，请检查服务器与客户端版本。"))
 		if _registered_login: status.text = "注册成功，请使用刚才的账号密码登陆。\n" + status.text
@@ -238,8 +255,10 @@ func _account_result(action: String, result: Dictionary) -> void:
 		_update_controls()
 	elif action == "logout":
 		_restore_credentials()
-		status.text = "账号已退出，服务器地址仍会保留。"
+		var options := settings.connection_options()
+		status.text = "账号已退出，服务器地址仍会保留。" if options.ok and options.value.editable else "账号已退出，本站服务地址由网页配置提供。"
 	else:
+		if not remembered.is_supported(): _pending_credentials = {}
 		if action == "login" and not _pending_credentials.is_empty():
 			var saved := remembered.remember(_pending_credentials.server, _pending_credentials.username, _pending_credentials.password)
 			_pending_credentials = {}

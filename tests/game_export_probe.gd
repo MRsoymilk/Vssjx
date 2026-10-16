@@ -43,6 +43,13 @@ func _verify() -> void:
 	check(platform.context.text_input.request_focus(login.username_input).ok and login.username_input.has_focus(), "Packed login uses the actual text-input adapter")
 	check(platform.context.text_input.check_submission([login.username_input, login.password_input]).ok, "Packed native controls support the submission guard")
 	check(platform.context.capabilities().exit_application and platform.context.system_actions.is_inside_tree(), "Packed project owns its native system-actions adapter")
+	check(platform.context.runtime_config.connection_options().value.editable and platform.context.runtime_config.allows_remembered_login(), "Packed native policy retains address selection and opt-in remembering")
+	check(platform.context.runtime_config.check_network_target("https://game.example.com/ssjx").ok, "Packed native target policy leaves HTTPS validation with the account client")
+	var web_config = load("res://scripts/interface/adapters/web/web_runtime_config.gd").new()
+	check(not web_config.connection_options().ok and not web_config.allows_remembered_login(), "Packed Web config cannot silently use native config or credential storage")
+	var profile = load("res://scripts/interface/profiles/web_runtime.tres")
+	check(profile.api_prefix == "" and not profile.allow_loopback_http, "Packed public build profile has safe root/HTTPS defaults")
+	check(load("res://scripts/interface/platform_factory.gd").create("web") == null, "Packed factory does not enable incomplete Web runtime")
 	scene._close_modal()
 	scene.queue_free()
 	await process_frame

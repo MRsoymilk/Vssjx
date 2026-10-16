@@ -4,3 +4,13 @@ extends RefCounted
 
 func local_path(_kind: String, _explicit_path: String = "") -> PlatformResult:
 	return PlatformResult.unsupported()
+
+## Fixed Web endpoints bypass saved/native address preferences entirely.
+func connection_options() -> PlatformResult:
+	return PlatformResult.unsupported()
+
+func check_network_target(_address: String) -> PlatformResult:
+	return PlatformResult.unsupported()
+
+func allows_remembered_login() -> bool:
+	return false

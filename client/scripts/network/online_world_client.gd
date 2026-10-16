@@ -112,6 +112,13 @@ func _on_ticket(result: Dictionary) -> void:
 	if not result.ok:
 		_failed(String(result.get("code", "TICKET_FAILED")), result.get("code") in ["NETWORK_ERROR", "SERVER_BUSY", "RATE_LIMITED", "DATABASE_UNAVAILABLE"])
 		return
+	if not Platform.is_available():
+		_failed("PLATFORM_NOT_READY")
+		return
+	var allowed := Platform.context.runtime_config.check_network_target(server)
+	if not allowed.ok:
+		_failed(allowed.code)
+		return
 	_ticket = result.ticket
 	_announcement_version = 1 if result.get("announcement_version") == 1 else 0
 	_pve_version = 1 if result.get("pve_version") == 1 else 0

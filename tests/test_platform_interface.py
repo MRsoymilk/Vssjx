@@ -39,6 +39,33 @@ class PlatformBoundaryTests(unittest.TestCase):
         for literal in re.findall(r'"([^"\n]*)"', text):
             self.assertNotIn('.env', literal)
 
+    def test_web_config_uses_only_origin_and_build_profile(self):
+        text = (INTERFACE / 'adapters/web/web_runtime_config.gd').read_text('utf8')
+        self.assertEqual(re.findall(r'JavaScriptBridge\.eval\(([^\n]+)\)', text), ['"window.location.origin", true'])
+        for forbidden in ['OS.get_environment(', 'FileAccess.', 'localStorage', 'sessionStorage',
+                          'location.search', 'location.hash', 'location.href', 'document.', 'window.config']:
+            self.assertNotIn(forbidden, text)
+        profile = (INTERFACE / 'profiles/web_runtime.tres').read_text('utf8')
+        self.assertIn('api_prefix = ""', profile)
+        self.assertIn('allow_loopback_http = false', profile)
+        factory = (INTERFACE / 'platform_factory.gd').read_text('utf8')
+        self.assertIn('if selected != "native": return null', factory)
+
+    def test_credential_io_has_an_unconditional_web_guard(self):
+        text = (CLIENT / 'scripts/network/remembered_login.gd').read_text('utf8')
+        self.assertIn('not OS.has_feature("web") and Platform.is_available()', text)
+        self.assertIn('runtime_config.allows_remembered_login()', text)
+        for name in ['load_saved', 'remember', 'forget']:
+            body = text.split('func ' + name + '(', 1)[1].split('\nfunc ', 1)[0]
+            self.assertLess(body.index('if not _allowed():'), body.index('FileAccess.'))
+
+    def test_every_network_consumer_checks_the_platform_target(self):
+        for name, request in [('online_account.gd', '_request.request('),
+                              ('server_discovery.gd', 'request.request('),
+                              ('online_world_client.gd', 'socket.connect_to_url(')]:
+            text = (CLIENT / 'scripts/network' / name).read_text('utf8')
+            self.assertLess(text.index('runtime_config.check_network_target('), text.index(request), name)
+
     def test_game_canvas_and_existing_exports_are_preserved(self):
         config = (CLIENT / 'project.godot').read_text('utf8')
         for setting in ['window/size/viewport_width=320', 'window/size/viewport_height=480',

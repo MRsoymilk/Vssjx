@@ -2,6 +2,8 @@
 
 设计修订：2026-10-16。状态：P1七类接口已分步接入原生基础实现，包括配置/存储、显示、生命周期、资源准备、输入焦点/组合状态检查及系统退出请求；P2a已接入服务端精确Origin白名单，见[来源安全前置](../tests/web_origins.md)。Windows实际运行和P2整体～P4仍待验收。其他实现边界与记录见[平台基础](../tests/platform_interface.md)、[资源准备](../tests/platform_resources.md)、[输入与系统动作](../tests/platform_input_actions.md)，不代表完成Web导出或通过手机真机测试。
 
+P2b已增加Web凭据隔离、构建控制的同域配置及HTTP/发现/WebSocket调用方的目标校验，见[配置与凭据安全前置](../tests/web_security.md)。验证使用原生Godot注入Web策略；Web工厂仍明确不支持，浏览器适配尚未开放。
+
 用户目标：后续支持多平台导出，建立对应的`interface`目录；首期让iOS和Android手机通过默认浏览器打开链接游玩。产品范围见[设计入口D09](README.md)，离线/在线业务边界见[architecture.md](architecture.md)，认证与世界协议继续遵循[protocol.md](protocol.md)、[auth.md](auth.md)和[shared_world.md](shared_world.md)。本文不替代这些契约，也不调整D01～D08的既有决策。
 
 ## 1. 目标、范围与支持口径
@@ -227,6 +229,8 @@ P2a已将原先一律拒绝的逻辑改为显式可信网页来源白名单，�
 正式入口统一HTTPS/WSS，反向代理转发游戏接口和WebSocket升级。页面静态资源可以位于`/game/`，API根仍按受控配置独立确定，不能错误拼成`/game/api/v1/`。
 
 浏览器默认使用当前站点的受控服务地址；原生客户端保留现有服务器选择能力。正式网页不从任意查询参数接收认证服务地址，不向非预期服务发送凭据。仅需要公开的数据进入运行配置。
+
+P2b实现只取页面`location.origin`和随包发布的`interface/profiles/web_runtime.tres`（默认根API、强制HTTPS；本机开发HTTP需构建时显式开启）。`api_prefix`只能由发布方提供安全路径段，不读取页面查询/片段、DOM或本地地址偏好。平台契约在所有网络出口检查固定基址，Web不使用原生记住密码文件。具体契约、真实调用方与尚未验收的浏览器行为见[实现记录](../tests/web_security.md)。
 
 首期同域避免额外HTTP跨域配置。未来确需跨域时再明确HTTP CORS预检、允许来源/方法/请求头及凭据策略；CORS配置不能替代WebSocket Origin校验。浏览器离线入口仍是本地离线玩法，不意味网页可以任意访问手机或局域网中的HTTP服务。
 

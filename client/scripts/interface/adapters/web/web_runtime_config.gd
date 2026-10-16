@@ -1,5 +1,5 @@
 extends PlatformRuntimeConfigInterface
-## Security foundation only: not installed by the factory until Web ports exist.
+## Same-origin network configuration controlled by the exported build.
 ## Page path, query, fragment, JS config globals and saved preferences are ignored.
 var _profile: Resource = preload("res://scripts/interface/profiles/web_runtime.tres")
 

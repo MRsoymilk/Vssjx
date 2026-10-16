@@ -1,4 +1,6 @@
 [gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/interface/adapters/common/cjk_system_font.gd" id="BundledCjk"]
 [ext_resource type="Script" path="res://scripts/game_world_screen.gd" id="Script"]
 [ext_resource type="PackedScene" path="res://scenes/ui/scene_chrome.tscn" id="Chrome"]
 [ext_resource type="PackedScene" path="res://scenes/ui/world_hud.tscn" id="Hud"]
@@ -9,6 +11,7 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/expanded_chat_panel.tscn" id="ExpandedChat"]
 
 [sub_resource type="SystemFont" id="Font"]
+script = ExtResource("BundledCjk")
 font_names = PackedStringArray("SimHei", "Microsoft YaHei", "sans-serif")
 antialiasing = 0
 [sub_resource type="Theme" id="Theme"]

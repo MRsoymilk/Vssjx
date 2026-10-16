@@ -1,12 +1,12 @@
 # 多平台接口层与移动浏览器导出方案
 
-设计修订：2026-10-16。状态：P1七类接口已分步接入原生基础实现，包括配置/存储、显示、生命周期、资源准备、输入焦点/组合状态检查及系统退出请求；P2a已接入服务端精确Origin白名单，见[来源安全前置](../tests/web_origins.md)。Windows实际运行和P2整体～P4仍待验收。其他实现边界与记录见[平台基础](../tests/platform_interface.md)、[资源准备](../tests/platform_resources.md)、[输入与系统动作](../tests/platform_input_actions.md)，不代表完成Web导出或通过手机真机测试。
+设计修订：2026-10-16。状态：P1七类接口已分步接入原生基础实现；P2a精确Origin白名单、P2b配置/凭据隔离及P2c可等待存档/IndexedDB已落地。现新增主游戏Web预设、外壳及浏览器端口，见[主游戏Web导出](../tests/web_game.md)。Windows实际运行、完整线上浏览器闭环、手机真机及P2整体～P4仍待验收；能导出不代表公网发布通过。早期实现记录见[平台基础](../tests/platform_interface.md)、[资源准备](../tests/platform_resources.md)、[输入与系统动作](../tests/platform_input_actions.md)。
 
-P2b已增加Web凭据隔离、构建控制的同域配置及HTTP/发现/WebSocket调用方的目标校验，见[配置与凭据安全前置](../tests/web_security.md)。验证使用原生Godot注入Web策略；Web工厂仍明确不支持，浏览器适配尚未开放。
+P2b已增加Web凭据隔离、构建控制的同域配置及HTTP/发现/WebSocket调用方的目标校验，见[配置与凭据安全前置](../tests/web_security.md)。该阶段使用原生Godot注入Web策略；当前工厂已在真实Web运行时接入浏览器端口，不允许原生回退。
 
 P2c-1已迁移可等待的存档请求和全部游戏调用方，原生仍即时完成、v1文件不变，见[异步存档前置](../tests/storage_async.md)。该迁移本身不代表浏览器存储通过，Web适配的独立结果见下列P2c-2。
 
-P2c-2已增加独立IndexedDB离线槽及实际Godot Web存储夹具，验证事务确认、重开恢复及失败/超时，见[浏览器持久化](../tests/web_storage.md)。生产Web工厂仍未启用；不代表主游戏、Safari或手机真机闭环通过。
+P2c-2已增加独立IndexedDB离线槽及实际Godot Web存储夹具，验证事务确认、重开恢复及失败/超时，见[浏览器持久化](../tests/web_storage.md)。当前主游戏启动已等待同一存储端口初始化；存储夹具不替代主游戏、Safari或手机真机验收。
 
 用户目标：后续支持多平台导出，建立对应的`interface`目录；首期让iOS和Android手机通过默认浏览器打开链接游玩。产品范围见[设计入口D09](README.md)，离线/在线业务边界见[architecture.md](architecture.md)，认证与世界协议继续遵循[protocol.md](protocol.md)、[auth.md](auth.md)和[shared_world.md](shared_world.md)。本文不替代这些契约，也不调整D01～D08的既有决策。
 

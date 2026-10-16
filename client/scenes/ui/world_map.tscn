@@ -1,4 +1,6 @@
 [gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/interface/adapters/common/cjk_system_font.gd" id="BundledCjk"]
 [ext_resource type="Script" path="res://scripts/world_map.gd" id="Script"]
 [ext_resource type="PackedScene" path="res://scenes/ui/world_map_graph.tscn" id="Graph"]
 [ext_resource type="Texture2D" path="res://assets/ui/worldmap_node_0.png" id="Wild"]
@@ -6,6 +8,7 @@
 [ext_resource type="Texture2D" path="res://assets/ui/worldmap_node_2.png" id="School"]
 [ext_resource type="Texture2D" path="res://assets/ui/create_cursor.png" id="Cursor"]
 [sub_resource type="SystemFont" id="Font"]
+script = ExtResource("BundledCjk")
 font_names = PackedStringArray("SimHei", "Microsoft YaHei", "sans-serif")
 antialiasing = 0
 [sub_resource type="StyleBoxFlat" id="Orange"]

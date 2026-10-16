@@ -20,6 +20,8 @@ PostgreSQL账号、密码、会话、注销与账号界面验证见[account_auth
 
 P1b资源准备接口、并发取消、超时、遇敌接入及真实PCK异步读取见[platform_resources.md](platform_resources.md)。
 
+P1c文本焦点、组合状态提交防护和原生退出/窗口关闭保存验证见[platform_input_actions.md](platform_input_actions.md)。
+
 同一游戏界面的多人角色、内嵌聊天与本地入口验证见[shared_interface.md](shared_interface.md)及[local_mode.md](local_mode.md)。
 
 底部内置表情面板、标记传输与双方贴图显示验证见[chat_emotes.md](chat_emotes.md)。

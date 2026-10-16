@@ -56,6 +56,10 @@ func _refresh() -> void:
 
 func _create() -> void:
 	if $"../Create".disabled: return
+	var input_result := Platform.context.text_input.check_submission([page.nickname])
+	if not input_result.ok:
+		status.text = input_result.message
+		return
 	if not _loaded:
 		_refresh()
 		return

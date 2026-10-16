@@ -60,8 +60,7 @@ func select_variant(index: int) -> void:
 
 func edit_name() -> void:
 	if not active: return
-	nickname.grab_focus()
-	nickname.select_all()
+	Platform.context.text_input.request_focus(nickname, true)
 
 func random_name() -> void:
 	if not active: return
@@ -70,6 +69,7 @@ func random_name() -> void:
 	nickname.caret_column = nickname.text.length()
 
 func _request_create() -> void:
+	if not Platform.context.text_input.check_submission([nickname]).ok: return
 	if active or online_mode: create_requested.emit()
 
 func _unhandled_key_input(event: InputEvent) -> void:

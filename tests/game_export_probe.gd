@@ -38,6 +38,12 @@ func _verify() -> void:
 	while not request.is_finished() and Time.get_ticks_msec() < deadline: await process_frame
 	check(request.is_finished() and request.result.ok and request.result.value[texture_path] is Texture2D, "Threaded preparation reads the actual packed texture")
 	check(request.progress == 1.0 and request.generation == 1, "Packed resource request completes with its generation")
+	scene._server_login()
+	var login = scene.modal.get_node("ServerLogin")
+	check(platform.context.text_input.request_focus(login.username_input).ok and login.username_input.has_focus(), "Packed login uses the actual text-input adapter")
+	check(platform.context.text_input.check_submission([login.username_input, login.password_input]).ok, "Packed native controls support the submission guard")
+	check(platform.context.capabilities().exit_application and platform.context.system_actions.is_inside_tree(), "Packed project owns its native system-actions adapter")
+	scene._close_modal()
 	scene.queue_free()
 	await process_frame
 	print("GAME EXPORT: %d checks, 0 failures" % checks)

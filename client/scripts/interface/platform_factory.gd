@@ -9,4 +9,6 @@ static func create(target: String = "") -> PlatformContext:
 		preload("res://scripts/interface/adapters/native/native_runtime_config.gd").new(),
 		preload("res://scripts/interface/adapters/native/native_display.gd").new(),
 		preload("res://scripts/interface/adapters/native/native_lifecycle.gd").new(),
-		preload("res://scripts/interface/adapters/native/native_resource_loader.gd").new())
+		preload("res://scripts/interface/adapters/native/native_resource_loader.gd").new(),
+		preload("res://scripts/interface/adapters/common/godot_text_input.gd").new(),
+		preload("res://scripts/interface/adapters/native/native_system_actions.gd").new())

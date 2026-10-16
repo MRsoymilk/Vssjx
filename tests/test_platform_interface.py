@@ -55,6 +55,21 @@ class PlatformBoundaryTests(unittest.TestCase):
         self.assertIn('request.generation != epoch', main)
         self.assertIn('battle_resource_request.cancel()', main)
 
+    def test_game_text_entry_uses_platform_guards(self):
+        for name in ['server_login.gd', 'character_creation.gd', 'online_creation_flow.gd', 'online_world_view.gd']:
+            text = (CLIENT / 'scripts' / name).read_text('utf8')
+            self.assertIn('text_input.check_submission(', text, name)
+            self.assertNotIn('.has_ime_text()', text, name)
+            self.assertNotIn('.grab_focus()', text, name)
+        common = (INTERFACE / 'adapters/common/godot_text_input.gd').read_text('utf8')
+        self.assertIn('field.has_ime_text()', common)
+        self.assertNotRegex(common, r'\bfield\.text\b')
+
+    def test_game_exit_is_a_platform_action(self):
+        main = (CLIENT / 'scripts/main.gd').read_text('utf8')
+        self.assertNotIn('get_tree().quit()', main)
+        self.assertIn('Platform.context.system_actions.request_exit()', main)
+
 
 if __name__ == '__main__':
     unittest.main()

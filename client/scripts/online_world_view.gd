@@ -66,12 +66,12 @@ func _ready() -> void:
 	expanded_chat.dismissed.connect(_expanded_chat_dismissed)
 	expanded_chat.emotes_requested.connect(_toggle_emotes)
 	expanded_chat.emote_chosen.connect(_insert_emote)
-	expanded_chat.focus_requested.connect(func() -> void: chat_input.grab_focus())
+	expanded_chat.focus_requested.connect(func() -> void: Platform.context.text_input.request_focus(chat_input))
 	expanded_chat.add_system(_system_text)
 	chat_send.pressed.connect(_send_chat)
 	emote_button.pressed.connect(_toggle_emotes)
 	emote_picker.chosen.connect(_insert_emote)
-	emote_picker.dismissed.connect(func() -> void: chat_input.grab_focus())
+	emote_picker.dismissed.connect(func() -> void: Platform.context.text_input.request_focus(chat_input))
 	chat_input.text_submitted.connect(func(_text: String) -> void: _send_chat())
 	chat_input.focus_entered.connect(func() -> void:
 		if network.world_ready: network.stop_moving()
@@ -83,7 +83,7 @@ func _ready() -> void:
 			if expanded_chat.visible and expanded_chat.picker.visible: expanded_chat.close_emotes()
 			elif emote_picker.visible: emote_picker.hide()
 			elif expanded_chat.visible: expanded_chat.dismiss()
-			else: chat_input.release_focus()
+			else: Platform.context.text_input.release_focus(chat_input)
 			chat_input.accept_event()
 	)
 	resident_selected.connect(_select_resident)
@@ -132,7 +132,7 @@ func _scene_action(action: String) -> void:
 	if action == "menu":
 		details.hide()
 		emote_picker.hide()
-		chat_input.release_focus()
+		Platform.context.text_input.release_focus(chat_input)
 		if network.world_ready: network.stop_moving()
 		_was_keyboard = false
 		if menu.visible: menu.dismiss()
@@ -144,7 +144,7 @@ func _scene_action(action: String) -> void:
 		return
 	if network.world_ready: network.stop_moving()
 	emote_picker.hide()
-	chat_input.release_focus()
+	Platform.context.text_input.release_focus(chat_input)
 	_was_keyboard = false
 	if action == "properties":
 		_open_attributes()
@@ -249,7 +249,7 @@ func _toggle_chat() -> void:
 	menu.hide()
 	details.hide()
 	emote_picker.hide()
-	if chat_input.has_focus(): chat_input.release_focus()
+	if chat_input.has_focus(): Platform.context.text_input.release_focus(chat_input)
 	else: _focus_chat()
 
 func _focus_chat() -> void:
@@ -257,13 +257,13 @@ func _focus_chat() -> void:
 	menu.hide()
 	details.hide()
 	emote_picker.hide()
-	chat_input.grab_focus()
+	Platform.context.text_input.request_focus(chat_input)
 
 func _toggle_emotes() -> void:
 	if not _can_insert_emote(): return
 	menu.hide()
 	details.hide()
-	chat_input.grab_focus()
+	Platform.context.text_input.request_focus(chat_input)
 	if network.world_ready: network.stop_moving()
 	_was_keyboard = false
 	if expanded_chat.visible: expanded_chat.toggle_emotes()
@@ -283,12 +283,17 @@ func _insert_emote(token: String) -> void:
 	chat_input.deselect()
 	chat_input.caret_column = start + token.length()
 	emote_picker.hide()
-	chat_input.grab_focus()
+	Platform.context.text_input.request_focus(chat_input)
 
 func _can_insert_emote() -> bool:
-	return network.world_ready and network.chat.connected and network.chat.pending.is_empty()
+	return network.world_ready and network.chat.connected and network.chat.pending.is_empty() and Platform.context.text_input.check_submission([chat_input]).ok
 
 func _send_chat() -> void:
+	var input_result := Platform.context.text_input.check_submission([chat_input])
+	if not input_result.ok:
+		chat_status.text = input_result.message
+		expanded_chat.set_status(input_result.message)
+		return
 	emote_picker.hide()
 	expanded_chat.close_emotes()
 	network.chat.submit(chat_input.text)
@@ -377,7 +382,7 @@ func _map_input(event: InputEvent) -> void:
 	if emote_picker.visible:
 		emote_picker.hide()
 		return
-	chat_input.release_focus()
+	Platform.context.text_input.release_focus(chat_input)
 	_was_keyboard = false
 	var world_point := camera.get_screen_center_position() + point - Vector2(viewport.size) / 2.0
 	for id in residents:
@@ -418,7 +423,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		elif emote_picker.visible: emote_picker.hide()
 		elif menu.visible: menu.dismiss()
 		elif details.visible: details.hide()
-		elif chat_input.has_focus(): chat_input.release_focus()
+		elif chat_input.has_focus(): Platform.context.text_input.release_focus(chat_input)
 		else: _scene_action("menu")
 	elif event.keycode == KEY_C and not expanded_chat.visible and not battle_view.visible and not chat_input.has_focus(): _scene_action("properties")
 	elif event.keycode == KEY_3 and not expanded_chat.visible and not battle_view.visible and not chat_input.has_focus(): _scene_action("map")
@@ -567,12 +572,12 @@ func _open_expanded_chat() -> void:
 	details.hide()
 	encounter.hide()
 	emote_picker.hide()
-	chat_input.release_focus()
+	Platform.context.text_input.release_focus(chat_input)
 	battle_view.set_process_unhandled_key_input(false)
 	expanded_chat.open()
 
 func _expanded_chat_dismissed() -> void:
-	chat_input.release_focus()
+	Platform.context.text_input.release_focus(chat_input)
 	battle_view.set_process_unhandled_key_input(true)
 
 func _open_attributes() -> void:
@@ -588,14 +593,14 @@ func _open_attributes() -> void:
 
 func _close_attributes() -> void:
 	if not attributes.visible: return
-	attributes.signature.release_focus()
+	Platform.context.text_input.release_focus(attributes.signature)
 	attributes.hide()
 	battle_view.set_process_unhandled_key_input(true)
 
 func _open_world_map() -> void:
 	if battle_view.visible or network.pve.active(): return
 	details.hide()
-	chat_input.release_focus()
+	Platform.context.text_input.release_focus(chat_input)
 	world_map.present()
 	battle_view.set_process_unhandled_key_input(false)
 

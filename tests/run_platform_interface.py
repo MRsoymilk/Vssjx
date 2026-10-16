@@ -54,16 +54,28 @@ def main():
     run('import', [godot, '--headless', '--editor', '--path', str(project), '--import'])
     run('resource-loader-parse', [godot, '--headless', '--path', str(project), '--check-only', '--script',
                                 'res://scripts/interface/adapters/native/native_resource_loader.gd'])
-    suites = ['resource_loader_test', 'platform_interface_test', 'test_runner', 'server_connection_test',
-              'world_delta_test', 'public_chat_test', 'shared_interface_test',
+    suites = ['platform_input_actions_test', 'resource_loader_test', 'platform_interface_test', 'test_runner', 'server_connection_test',
+              'world_delta_test', 'public_chat_test', 'shared_interface_test', 'chat_emotes_test',
+              'expanded_chat_test', 'online_attributes_test', 'online_allocation_test',
               'local_mode_test', 'login_ui_test', 'character_selection_test',
               'game_menu_test', 'movement_control_test', 'motion_regression', 'battle_transition_test']
     for suite in suites:
         run(suite, [godot, '--headless', '--path', str(project), 'res://tests/' + suite + '.tscn'], r'\d+ checks, 0 failures')
     run('auth-character-contract-fixture', [sys.executable, str(ROOT / 'tests/run_registration_flow.py')],
         r'ACCOUNT AUTH UI: \d+ checks, 0 failures')
+    run('native-exit', [godot, '--headless', '--path', str(project), 'res://tests/platform_exit_probe.tscn'],
+        r'PLATFORM EXIT: native request issued')
+    original_save = env['SSJX_SAVE_PATH']
+    exit_save = output / ('exit-save-' + identity + '.json')
+    env['SSJX_SAVE_PATH'] = str(exit_save)
+    run('native-window-close', [godot, '--headless', '--path', str(project), 'res://tests/platform_exit_probe.tscn', '--', '--window-close'],
+        r'PLATFORM EXIT: native request issued')
+    saved = json.loads(exit_save.read_text('utf8'))
+    if saved.get('name') != '退出验证' or saved.get('gold') != 73 or saved.get('version') != 1:
+        raise RuntimeError('Native window close did not preserve the offline save')
+    env['SSJX_SAVE_PATH'] = original_save
     if args.render:
-        for suite in ['resource_loader_test', 'platform_interface_test', 'battle_transition_test', 'visual_smoke']:
+        for suite in ['platform_input_actions_test', 'resource_loader_test', 'platform_interface_test', 'battle_transition_test', 'visual_smoke']:
             if suite == 'visual_smoke':
                 capture = output / 'screenshots'
                 capture.mkdir(exist_ok=True)
@@ -73,6 +85,7 @@ def main():
                 encounter.mkdir(exist_ok=True)
                 env['SSJX_ENCOUNTER_CAPTURE_PATH'] = str(encounter)
             expected = {
+                'platform_input_actions_test': r'PLATFORM INPUT ACTIONS: \d+ checks, 0 failures',
                 'resource_loader_test': r'RESOURCE LOADER: \d+ checks, 0 failures',
                 'platform_interface_test': r'PLATFORM INTERFACE: \d+ checks, 0 failures',
                 'battle_transition_test': r'BATTLE TRANSITION: \d+ checks, 0 failures',

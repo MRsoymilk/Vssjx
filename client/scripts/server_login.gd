@@ -54,7 +54,7 @@ func _ready() -> void:
 	_update_controls()
 	if ServerConnectionSettings.is_local(address_input.text): status.text = "本地单人模式，进度保存在此设备。"
 	elif OnlineAccount.is_logged_in(): _show_account()
-	username_input.grab_focus()
+	Platform.context.text_input.request_focus(username_input)
 
 func _restore_credentials() -> void:
 	if _restored_password: password_input.clear()
@@ -79,11 +79,11 @@ func _edit_address() -> void:
 		return
 	_editing_address = true
 	_update_controls()
-	address_input.grab_focus()
-	address_input.select_all()
+	Platform.context.text_input.request_focus(address_input, true)
 
 func _login() -> void:
 	if auth_button.disabled: return
+	if not _input_ready(): return
 	if ServerConnectionSettings.is_local(address_input.text):
 		if not save_draft(): return
 		password_input.clear()
@@ -114,6 +114,10 @@ func save_draft(show_error: bool = true) -> bool:
 
 func connect_server() -> void:
 	if connect_button.disabled: return
+	var input_result := Platform.context.text_input.check_submission([address_input])
+	if not input_result.ok:
+		status.text = input_result.message
+		return
 	if not save_draft(): return
 	address_input.text = ServerConnectionSettings.normalize(address_input.text).address
 	if _credentials_address != address_input.text: _restore_credentials()
@@ -162,6 +166,7 @@ func _update_controls() -> void:
 
 func _submit_account() -> void:
 	if auth_button.disabled: return
+	if not _input_ready(): return
 	if OnlineAccount.is_logged_in():
 		status.text = "正在退出账号……"
 		OnlineAccount.logout()
@@ -186,6 +191,11 @@ func _submit_account() -> void:
 		OnlineAccount.register_account(address_input.text, username_input.text, secret)
 	else: OnlineAccount.login(address_input.text, username_input.text, secret)
 	_update_controls()
+
+func _input_ready() -> bool:
+	var result := Platform.context.text_input.check_submission([address_input, username_input, password_input])
+	if not result.ok: status.text = result.message
+	return result.ok
 
 func _show_account() -> void:
 	username_input.text = String(OnlineAccount.account.get("username", ""))

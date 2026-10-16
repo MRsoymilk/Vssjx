@@ -319,7 +319,7 @@ func _return_to_server_login() -> void:
 func _cover_exit() -> void:
 	var panel := _modal_panel("退出游戏")
 	_label(panel, String(original_cover.original_text.quit), Rect2(18, 56, 248, 90), 14)
-	_button(panel, "确定", Rect2(18, 186, 148, 32), func() -> void: get_tree().quit(), true)
+	_button(panel, "确定", Rect2(18, 186, 148, 32), _request_exit, true)
 	_button(panel, "取消", Rect2(176, 186, 88, 32), _close_modal)
 
 func _enter_online_world(character_id: String) -> void:
@@ -356,6 +356,7 @@ func _select_job(index: int) -> void:
 	if creation != null: creation.select_variant(clampi(index, 0, 2) * 2 + selected_gender)
 
 func _start_new() -> void:
+	if not Platform.context.text_input.check_submission([nickname]).ok: return
 	var name_value := nickname.text.strip_edges()
 	if name_value.is_empty():
 		_message("请输入昵称", "请先输入昵称。")
@@ -674,6 +675,7 @@ func _attributes() -> void:
 	attributes.back_requested.connect(_return_from_attributes)
 
 func _return_from_attributes() -> void:
+	if not Platform.context.text_input.check_submission([attributes.signature]).ok: return
 	Game.player.signature = attributes.signature.text
 	if not Game.save_game():
 		_message("保存失败", Game.last_save_error)
@@ -963,6 +965,10 @@ func _battle_result() -> void:
 	_label(panel, description, Rect2(18, 56, 248, 126), 12)
 	_button(panel, "返回山道", Rect2(18, 192, 248, 32), _enter_world, true)
 
+func _request_exit() -> void:
+	var result := Platform.context.system_actions.request_exit() if Platform.is_available() else PlatformResult.new(PlatformResult.Status.TEMPORARY_FAILURE, "PLATFORM_NOT_READY", "平台尚未就绪，暂时无法处理退出请求。")
+	if not result.ok: _message("无法退出", result.message)
+
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_CLOSE_REQUEST:
 		if mode != "online_world" and not Game.player.is_empty():
@@ -975,7 +981,7 @@ func _notification(what: int) -> void:
 					Game.player.mp = battle.mp
 					Game.player.potions = battle.potions
 			Game.save_game()
-		get_tree().quit()
+		_request_exit()
 
 func _draw() -> void:
 	draw_rect(Rect2(0, 0, 320, 480), INK)

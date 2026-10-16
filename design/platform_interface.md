@@ -1,6 +1,6 @@
 # 多平台接口层与移动浏览器导出方案
 
-设计修订：2026-10-16。状态：P1实施中，已建立原生平台入口及配置/存储、显示、生命周期边界，并接入原生资源准备与战斗加载；输入、系统动作及P2～P4继续按阶段推进。实现边界与验证记录见[平台基础](../tests/platform_interface.md)、[资源准备](../tests/platform_resources.md)，不代表完成Web导出或通过手机真机测试。
+设计修订：2026-10-16。状态：P1七类接口已分步接入原生基础实现，包括配置/存储、显示、生命周期、资源准备、输入焦点/组合状态检查及系统退出请求；Windows实际运行和P2～P4仍待验收。实现边界与记录见[平台基础](../tests/platform_interface.md)、[资源准备](../tests/platform_resources.md)、[输入与系统动作](../tests/platform_input_actions.md)，不代表完成Web导出或通过手机真机测试。
 
 用户目标：后续支持多平台导出，建立对应的`interface`目录；首期让iOS和Android手机通过默认浏览器打开链接游玩。产品范围见[设计入口D09](README.md)，离线/在线业务边界见[architecture.md](architecture.md)，认证与世界协议继续遵循[protocol.md](protocol.md)、[auth.md](auth.md)和[shared_world.md](shared_world.md)。本文不替代这些契约，也不调整D01～D08的既有决策。
 
@@ -116,7 +116,7 @@ Vssjx/
 | `StorageInterface` | 本地数据读写、存储状态、持久化状态、导入导出 | 在线数据库、密码管理、账号认证 |
 | `ResourceLoaderInterface` | 资源准备、缓存复用、进度、取消、失败 | 战斗输赢、奖励选择、服务端资源权威 |
 | `RuntimeConfigInterface` | 服务入口、构建版本、受控运行配置来源 | 私钥、服务端密钥、玩家密码 |
-| `SystemActionsInterface` | 音频启用、全屏请求、复制等平台动作 | 具体游戏操作和业务状态机 |
+| `SystemActionsInterface` | 退出请求、音频启用、全屏请求、复制等平台动作 | 保存/结算、具体游戏操作和业务状态机 |
 
 ### 5.1 初始化与依赖
 

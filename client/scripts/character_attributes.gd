@@ -41,8 +41,10 @@ func _ready() -> void:
 	signature.text_changed.connect(func(value: String) -> void:
 		if not online_mode: Game.player.signature = value
 	)
-	signature.text_submitted.connect(func(_value: String) -> void: signature.release_focus())
-	$EditSignature.pressed.connect(func() -> void: signature.grab_focus(); signature.caret_column = signature.text.length())
+	signature.text_submitted.connect(func(_value: String) -> void:
+		if Platform.context.text_input.check_submission([signature]).ok: Platform.context.text_input.release_focus(signature)
+	)
+	$EditSignature.pressed.connect(func() -> void: Platform.context.text_input.request_focus(signature); signature.caret_column = signature.text.length())
 	$Back.pressed.connect(func() -> void: back_requested.emit())
 	select_tab(0)
 

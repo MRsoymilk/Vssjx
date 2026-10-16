@@ -53,6 +53,20 @@ python3 tests/run_web_game.py --public /path/to/export/public \
 
 浏览器使用Chromium `153.0.8010.12`及官方Godot `4.7.2` WASM；debug开发包显式允许回环HTTP联机，release配置保持HTTPS-only。测试中离线流程没有请求账号/世界API。
 
+### 本机交付产物
+
+从干净的代码提交`3aed515`重新构建release，输出`work/builds/web/`及`work/builds/vssjx-web.zip`（25,536,955字节）。ZIP根目录即完整public内容，已逐文件对照构建报告核验摘要和ZIP CRC；包SHA-256为`ae863db946fde029e96a72dc59704d760951714824d392fd0b337e05d6bca954`，旁置`vssjx-web.sha256`及`web-build-report.json`。这些是忽略的本机构建产物，不提交到仓库。
+
+最终交付目录再次通过真实Chromium完整**14项**及Web PCK **70项**检查。证据在`/tmp/opencode/vssjx-web-game-final-package-browser/`及`/tmp/opencode/vssjx-web-release-3aed515/pck-audit.log`，构建报告记录代码提交、工作区是否干净及公开源文件摘要；不将测试profile、源副本或日志放入ZIP。
+
+在项目根目录预览：
+
+```sh
+python3 -m http.server 8000 --bind 127.0.0.1 --directory work/builds/web
+```
+
+访问`http://127.0.0.1:8000/`，选择开始游戏→登陆游戏→离线单人。请勿直接双击HTML，也不要将此开发HTTP服务暴露公网。
+
 ## 尚未验收
 
 完整线上登录/角色/共享世界浏览器闭环、HTTPS/WSS部署、严格CSP（可信JSBridge模块仍使用eval）、Safari/WebKit、iOS/Android真机、系统中文IME和软键盘、触摸/横竖屏设备矩阵、真实配额/驱逐/崩溃、持久存储权限UX及离线导入导出。能打包和Chromium离线通过不等于P2整体、P3/P4或公网发布验收通过。

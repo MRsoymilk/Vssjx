@@ -6,9 +6,11 @@ var waiting := false
 var _phase := 0.0
 
 func present(action: String, resident_name: String, hero_point: Vector2) -> void:
+	if action != "challenge":
+		hide()
+		return
 	progress = 0.0
 	configure(resident_name, hero_point)
-	if action != "challenge": caption.text = "与%s交谈" % resident_name
 	set_waiting("等待服务器确认……")
 	show()
 

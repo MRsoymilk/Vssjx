@@ -11,6 +11,7 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/character_attributes.tscn" id="Attributes"]
 [ext_resource type="PackedScene" path="res://scenes/world_move_target.tscn" id="MoveTarget"]
 [ext_resource type="PackedScene" path="res://scenes/ui/world_map.tscn" id="WorldMap"]
+[ext_resource type="PackedScene" path="res://scenes/ui/npc_dialog.tscn" id="Npc"]
 
 [node name="OnlineWorldView" type="Control"]
 offset_right = 320.0
@@ -46,6 +47,7 @@ visible = false
 z_index = 10
 [node name="GameMenu" parent="." instance=ExtResource("GameMenu")]
 z_index = 11
+[node name="NpcDialog" parent="." instance=ExtResource("Npc")]
 [node name="Network" type="Node" parent="."]
 script = ExtResource("Network")
 

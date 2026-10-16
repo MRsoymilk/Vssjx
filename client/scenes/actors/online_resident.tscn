@@ -16,3 +16,18 @@ theme_override_colors/font_outline_color = Color(0.12, 0.2, 0.22, 1)
 theme_override_constants/outline_size = 1
 theme_override_font_sizes/font_size = 10
 horizontal_alignment = 1
+
+[node name="QuestMarker" type="Label" parent="."]
+visible = false
+offset_left = -10.0
+offset_top = -100.0
+offset_right = 10.0
+offset_bottom = -74.0
+mouse_filter = 2
+theme = ExtResource("Theme")
+theme_override_colors/font_color = Color(1, 0.98, 0.35, 1)
+theme_override_colors/font_outline_color = Color(0.35, 0.20, 0.08, 1)
+theme_override_constants/outline_size = 2
+theme_override_font_sizes/font_size = 24
+text = "!"
+horizontal_alignment = 1

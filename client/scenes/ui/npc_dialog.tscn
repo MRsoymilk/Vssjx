@@ -1,0 +1,139 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/npc_dialog.gd" id="Script"]
+[ext_resource type="Theme" path="res://scenes/ui/online_pve_theme.tres" id="Font"]
+[ext_resource type="Texture2D" path="res://assets/ui/chat_frame_corner.svg" id="Corner"]
+
+[sub_resource type="StyleBoxEmpty" id="Empty"]
+[sub_resource type="StyleBoxFlat" id="Paper"]
+bg_color = Color(1, 0.957, 0.765, 1)
+border_color = Color(0.47, 0.30, 0.12, 1)
+border_width_left = 2
+border_width_right = 2
+border_width_top = 2
+border_width_bottom = 2
+shadow_color = Color(0.1, 0.1, 0.08, 0.3)
+shadow_size = 2
+[sub_resource type="StyleBoxFlat" id="Selected"]
+bg_color = Color(1, 0.77, 0.25, 1)
+[sub_resource type="StyleBoxFlat" id="Row"]
+bg_color = Color(1, 0.86, 0.62, 1)
+
+[node name="NpcDialog" type="Control"]
+visible = false
+z_index = 12
+offset_top = 28.0
+offset_right = 320.0
+offset_bottom = 403.0
+theme = ExtResource("Font")
+script = ExtResource("Script")
+
+[node name="Shade" type="ColorRect" parent="."]
+offset_right = 320.0
+offset_bottom = 375.0
+mouse_filter = 2
+color = Color(0.08, 0.10, 0.08, 0.35)
+[node name="Dismiss" type="Button" parent="."]
+offset_right = 320.0
+offset_bottom = 375.0
+focus_mode = 0
+theme_override_styles/normal = SubResource("Empty")
+theme_override_styles/hover = SubResource("Empty")
+theme_override_styles/pressed = SubResource("Empty")
+theme_override_styles/focus = SubResource("Empty")
+[node name="Paper" type="Panel" parent="."]
+offset_left = 6.0
+offset_top = 125.0
+offset_right = 314.0
+offset_bottom = 282.0
+mouse_filter = 0
+theme_override_styles/panel = SubResource("Paper")
+[node name="Name" type="Label" parent="Paper"]
+offset_left = 12.0
+offset_top = 9.0
+offset_right = 296.0
+offset_bottom = 30.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0, 0.63, 0.91, 1)
+theme_override_font_sizes/font_size = 13
+[node name="Greeting" type="Label" parent="Paper"]
+offset_left = 12.0
+offset_top = 34.0
+offset_right = 296.0
+offset_bottom = 54.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.40, 0.28, 0.12, 1)
+[node name="Rule" type="ColorRect" parent="Paper"]
+offset_left = 12.0
+offset_top = 59.0
+offset_right = 296.0
+offset_bottom = 60.0
+mouse_filter = 2
+color = Color(0.72, 0.60, 0.38, 1)
+[node name="Quest" type="Button" parent="Paper"]
+offset_left = 12.0
+offset_top = 66.0
+offset_right = 296.0
+offset_bottom = 93.0
+focus_mode = 0
+alignment = 0
+theme_override_colors/font_color = Color(0.87, 0.24, 0.05, 1)
+theme_override_colors/font_hover_color = Color(0.87, 0.24, 0.05, 1)
+theme_override_colors/font_pressed_color = Color(0.87, 0.24, 0.05, 1)
+theme_override_colors/font_disabled_color = Color(0.46, 0.32, 0.15, 1)
+theme_override_styles/normal = SubResource("Selected")
+theme_override_styles/hover = SubResource("Selected")
+theme_override_styles/pressed = SubResource("Selected")
+theme_override_styles/disabled = SubResource("Row")
+[node name="Restore" type="Button" parent="Paper"]
+offset_left = 12.0
+offset_top = 96.0
+offset_right = 296.0
+offset_bottom = 123.0
+focus_mode = 0
+alignment = 0
+theme_override_colors/font_color = Color(0.40, 0.28, 0.12, 1)
+theme_override_colors/font_hover_color = Color(0.40, 0.28, 0.12, 1)
+theme_override_colors/font_pressed_color = Color(0.40, 0.28, 0.12, 1)
+theme_override_colors/font_disabled_color = Color(0.60, 0.51, 0.35, 1)
+theme_override_styles/normal = SubResource("Row")
+theme_override_styles/hover = SubResource("Selected")
+theme_override_styles/pressed = SubResource("Selected")
+theme_override_styles/disabled = SubResource("Row")
+text = "恢复元气"
+[node name="Hint" type="Label" parent="Paper"]
+offset_left = 12.0
+offset_top = 130.0
+offset_right = 296.0
+offset_bottom = 150.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.46, 0.34, 0.17, 1)
+theme_override_font_sizes/font_size = 10
+[node name="TL" type="TextureRect" parent="Paper"]
+offset_right = 14.0
+offset_bottom = 14.0
+mouse_filter = 2
+texture = ExtResource("Corner")
+[node name="TR" type="TextureRect" parent="Paper"]
+offset_left = 294.0
+offset_right = 308.0
+offset_bottom = 14.0
+mouse_filter = 2
+texture = ExtResource("Corner")
+flip_h = true
+[node name="BL" type="TextureRect" parent="Paper"]
+offset_top = 143.0
+offset_right = 14.0
+offset_bottom = 157.0
+mouse_filter = 2
+texture = ExtResource("Corner")
+flip_v = true
+[node name="BR" type="TextureRect" parent="Paper"]
+offset_left = 294.0
+offset_top = 143.0
+offset_right = 308.0
+offset_bottom = 157.0
+mouse_filter = 2
+texture = ExtResource("Corner")
+flip_h = true
+flip_v = true

@@ -39,6 +39,7 @@ var _character: Dictionary = {}
 var _system_text := "正在连接共享地图……"
 var _rendered_chat := ""
 @onready var encounter: OnlineEncounter = $Encounter
+@onready var npc_dialog: OriginalNpcDialog = $NpcDialog
 @onready var battle_view: OnlineBattleView = $Battle
 var _approach: Dictionary = {}
 var _pve_log := ""
@@ -92,6 +93,8 @@ func _ready() -> void:
 			chat_input.accept_event()
 	)
 	resident_selected.connect(_select_resident)
+	npc_dialog.action_requested.connect(_npc_action_chosen)
+	npc_dialog.dismissed.connect(_cancel_approach)
 	battle_view.settings_requested.connect(func() -> void: _scene_action("system"))
 	battle_view.action_requested.connect(func(action: String) -> void: network.pve.submit(action))
 	battle_view.dismissed.connect(func() -> void:
@@ -108,6 +111,7 @@ func _ready() -> void:
 		expanded_chat.add_system(text)
 		_chat_changed()
 		if _loading_battle.is_empty(): encounter.hide()
+		if network.pve.last_code.is_empty() and network.pve.last_action in ["accept", "claim", "restore"]: npc_dialog.hide()
 	)
 	network.changed.connect(_snapshot)
 	network.population.changed.connect(_population)
@@ -132,6 +136,7 @@ func _scene_action(action: String) -> void:
 	_close_attributes()
 	if expanded_chat.visible: expanded_chat.dismiss()
 	_cancel_approach()
+	npc_dialog.hide()
 	if _loading_battle.is_empty() and not network.pve.pending(): encounter.hide()
 	if action == "menu":
 		details.hide()
@@ -192,6 +197,7 @@ func _population(values: Dictionary) -> void:
 			actor_layer.add_child(resident)
 			residents[id] = resident
 		residents[id].receive(visible_values[id], _motion_grid)
+		residents[id].set_quest_available(network.pve.ready and int(network.pve.state.get("character", {}).get("quest_stage", -1)) == 0)
 	screen.hud.get_node("Minimap").set_shared_population(visible_values)
 
 func _snapshot(values: Dictionary) -> void:
@@ -341,7 +347,7 @@ func _process(delta: float) -> void:
 	_update_move_target(delta)
 	if OS.has_feature("web") and (not Platform.context.lifecycle.focused or Platform.context.lifecycle.suspended): return
 	_advance_approach()
-	if chat_input.has_focus() or menu.visible or details.visible or emote_picker.visible or encounter.visible or battle_view.visible or expanded_chat.visible or attributes.visible or world_map.visible or network.pve.pending() or network.pve.active():
+	if chat_input.has_focus() or menu.visible or details.visible or npc_dialog.visible or emote_picker.visible or encounter.visible or battle_view.visible or expanded_chat.visible or attributes.visible or world_map.visible or network.pve.pending() or network.pve.active():
 		_was_keyboard = false
 		return
 	_key_timer -= delta
@@ -365,7 +371,7 @@ func _map_input(event: InputEvent) -> void:
 	if _battle_load_failed:
 		if (event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed) or (event is InputEventScreenTouch and event.pressed): _pve_changed()
 		return
-	if not network.world_ready or menu.visible or details.visible or encounter.visible or battle_view.visible or expanded_chat.visible or attributes.visible or world_map.visible or network.pve.pending() or network.pve.active(): return
+	if not network.world_ready or menu.visible or details.visible or npc_dialog.visible or encounter.visible or battle_view.visible or expanded_chat.visible or attributes.visible or world_map.visible or network.pve.pending() or network.pve.active(): return
 	var point := Vector2.ZERO
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed: point = event.position
 	elif event is InputEventScreenTouch and event.pressed: point = event.position
@@ -391,6 +397,11 @@ func _map_input(event: InputEvent) -> void:
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	if not event is InputEventKey or not event.pressed: return
+	if npc_dialog.visible:
+		if event.keycode == KEY_ESCAPE:
+			npc_dialog.dismiss()
+			get_viewport().set_input_as_handled()
+		return
 	if world_map.visible:
 		if event.keycode in [KEY_ESCAPE, KEY_3]:
 			_close_world_map()
@@ -425,6 +436,7 @@ func _pve_changed() -> void:
 	var model := network.pve
 	if not model.ready or model.active(): move_target.clear()
 	if model.active(): _close_world_map()
+	if model.active(): npc_dialog.hide()
 	if not model.ready:
 		_cancel_approach()
 		_cancel_battle_preparation()
@@ -450,6 +462,7 @@ func _pve_changed() -> void:
 			screen.hud.show()
 			count_label.show()
 	if _loading_battle.is_empty(): _refresh_interaction_wait()
+	npc_dialog.refresh()
 	battle_view.refresh()
 
 func _select_resident(id: String) -> void:
@@ -459,11 +472,22 @@ func _select_resident(id: String) -> void:
 	menu.hide()
 	details.hide()
 	emote_picker.hide()
+	npc_dialog.hide()
 	_resident_action("npc" if id == "qingwei" else "challenge", id)
 
 func _cancel_approach() -> void:
 	if not _approach.is_empty() and network.world_ready: network.stop_moving()
 	_approach = {}
+	if npc_dialog != null:
+		npc_dialog.approaching = false
+		npc_dialog.refresh()
+
+func _npc_action_chosen(action: String, target: String) -> void:
+	if not npc_dialog.visible or not _approach.is_empty() or not network.world_ready or not network.pve.ready or network.pve.pending() or network.pve.active(): return
+	if target != npc_dialog.target or action not in ["accept", "claim", "restore"]: return
+	_resident_action(action, target)
+	npc_dialog.approaching = true
+	npc_dialog.refresh()
 
 func _resident_action(action: String, target: String) -> void:
 	if not network.pve.ready or network.pve.pending(): return
@@ -496,14 +520,9 @@ func _advance_approach() -> void:
 		_approach = {}
 		var action: String = request.action
 		if action == "npc":
-			var stage := int(network.pve.state.character.quest_stage)
-			action = "accept" if stage == 0 else ("claim" if stage == 2 else "restore")
-			if stage in [1, 3] and int(network.pve.state.character.hp) == int(network.pve.state.stats.hp) and int(network.pve.state.character.mp) == int(network.pve.state.stats.mp):
-				_pve_log = network.pve.quest_text()
-				_system_text = _pve_log
-				expanded_chat.add_system(_pve_log)
-				_chat_changed()
-				return
+			npc_dialog.present(request.target, resident, network.pve)
+			return
+		npc_dialog.approaching = false
 		network.pve.submit(action, request.target)
 		return
 	var best := Vector2i(-1, -1)
@@ -532,11 +551,11 @@ func _refresh_interaction_wait() -> void:
 		encounter.hide()
 		return
 	var command: Dictionary = OnlineAccount.pending_pve.command
-	if not command.action in ["accept", "claim", "restore", "challenge"]:
+	if command.action != "challenge":
 		encounter.hide()
 		return
 	var resident: Dictionary = network.population.entities.get(command.get("target", ""), {})
-	encounter.present(command.action, resident.get("name", "清微道人" if command.action != "challenge" else "妖物"), _hero_screen_point())
+	encounter.present("challenge", resident.get("name", "妖物"), _hero_screen_point())
 	if not network.pve.ready: encounter.set_waiting("连接中断，正在确认交互结果……")
 
 func _cancel_battle_preparation() -> void:
@@ -557,6 +576,7 @@ func _battle_preparation_failed() -> void:
 
 func _prepare_battle(snapshot: Dictionary) -> void:
 	_cancel_battle_preparation()
+	npc_dialog.hide()
 	battle_view.hide()
 	_set_battle_layout(false)
 	screen.chrome.round_label.text = "常规模式"
@@ -663,6 +683,7 @@ func _open_expanded_chat() -> void:
 	_close_world_map()
 	_close_attributes()
 	_cancel_approach()
+	npc_dialog.hide()
 	if network.world_ready: network.stop_moving()
 	_was_keyboard = false
 	menu.hide()

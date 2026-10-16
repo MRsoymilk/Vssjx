@@ -5,6 +5,9 @@ var sprite: AnimatedSprite2D
 var motion := OnlineActorMotion.new()
 var distance := 0.0
 
+func set_quest_available(available: bool) -> void:
+	$QuestMarker.visible = available and data.get("kind") == "npc"
+
 func receive(value: Dictionary, grid: AStarGrid2D) -> void:
 	if sprite == null:
 		sprite = OriginalArt.actor(value.art)

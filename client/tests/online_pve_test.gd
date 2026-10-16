@@ -40,19 +40,27 @@ func _run() -> void:
 	view.network._pending_motion = {}
 	view.network.entities[SELF].cell = [10,14]
 	view._advance_approach()
-	check(model.pending() and sent.size() == 1 and sent[0].command.action == "accept", "Stationary character sends one authoritative quest operation")
-	check(view.encounter.visible and view.encounter.waiting and view.encounter.progress == 0.0, "Server wait uses the local visual with indeterminate progress")
-	check(view.encounter is BattleEncounterTransition and view.encounter.mouse_filter == Control.MOUSE_FILTER_IGNORE, "Indicator reuses local transition and does not block chat")
+	check(view.npc_dialog.visible and not model.pending() and sent.is_empty(), "Reaching NPC opens a conversation before accepting a quest")
+	check(view.residents.qingwei.get_node("QuestMarker").visible and not view.residents.wolf_a.get_node("QuestMarker").visible, "Available quest has a yellow NPC marker; monsters never acquire it")
+	check(view.npc_dialog.quest_button.text.contains("接受") and not view.encounter.visible, "NPC option uses original mission wording, without battle overlay")
+	await capture("npc_available")
+	view.npc_dialog.quest_button.pressed.emit()
+	view.network._pending_motion = {}
+	view._advance_approach()
+	check(model.pending() and sent.size() == 1 and sent[0].command.action == "accept", "Quest row sends one stationary authoritative operation")
+	check(view.npc_dialog.visible and view.npc_dialog.hint.text.contains("正在接受任务") and not view.encounter.visible, "Task wait stays in paper dialogue without encounter burst or progress bar")
+	check(view.npc_dialog.quest_button.disabled and view.npc_dialog.restore_button.disabled, "Pending task disables repeat actions")
 	view.resident_selected.emit("qingwei")
 	view._advance_approach()
 	check(sent.size() == 1 and view._approach.is_empty(), "Repeated resident clicks cannot submit another pending operation")
 	var operation: String = sent[0].command.operation_id
 	check(not model.submit("accept", "qingwei"), "Pending command blocks double-clicks")
 	model.disconnect_channel()
-	check(model.pending() and not model.ready and view.encounter.waiting and view.encounter.detail.text.contains("连接中断"), "Unknown result survives channel loss with reconnect indicator")
+	check(model.pending() and not model.ready and view.npc_dialog.visible and view.npc_dialog.hint.text.contains("连接中断") and not view.encounter.visible, "Task reconnect remains inline in NPC dialogue without combat visuals")
 	check(model.receive({"type":"pve.state","state":pve_state(2,1)}) and sent.size() == 2 and sent[1] == sent[0], "Reconnect retries exact original operation and payload")
 	var result := {"type":"pve.result","operation_id":operation,"ok":true,"replayed":true,"lines":["已领受山林试炼"],"state":pve_state(2,1)}
-	check(model.receive(result) and not model.pending() and not view.encounter.visible, "Receipt clears pending action and updates UI")
+	check(model.receive(result) and not model.pending() and not view.encounter.visible and not view.npc_dialog.visible, "Quest receipt clears pending and closes the conversation")
+	check(not view.residents.qingwei.get_node("QuestMarker").visible, "Accepted quest removes the available-quest marker")
 	view._scene_action("quest")
 	check(view.get_node("Menu/Panel/Body").text.contains("0 / 3"), "Quest menu shows live server progress")
 	view.details.hide()
@@ -60,7 +68,9 @@ func _run() -> void:
 	view.resident_selected.emit("qingwei")
 	view.network._pending_motion = {}
 	view._advance_approach()
-	check(sent.size() == no_request and not view.encounter.visible and view._system_text.contains("0 / 3"), "Full-health NPC interaction shows quest progress without an unnecessary restore")
+	check(sent.size() == no_request and not view.encounter.visible and view.npc_dialog.quest_button.text.contains("0/3") and view.npc_dialog.restore_button.disabled, "Quest progress remains in NPC dialogue without automatic restore")
+	view.npc_dialog.dismiss()
+	check(not view.npc_dialog.visible and sent.size() == no_request, "Dismissing an NPC conversation does not submit a command")
 	var state := pve_state(3,1)
 	state.character.hp = 85
 	state.character.mp = 36
@@ -130,10 +140,14 @@ func _run() -> void:
 	view.battle_view.refresh()
 	view.battle_view.get_node("Result/Return").pressed.emit()
 	view.resident_selected.emit("qingwei")
-	await capture("online_npc")
 	view.network._pending_motion = {}
 	view._advance_approach()
-	check(model.pending() and sent[-1].command.action == "restore" and not view.battle_view.visible, "Injured NPC interaction restores directly without reopening the dismissed battle")
+	await capture("online_npc")
+	check(view.npc_dialog.visible and not model.pending() and not view.npc_dialog.restore_button.disabled, "Injured character receives an explicit restore option")
+	view.npc_dialog.restore_button.pressed.emit()
+	view.network._pending_motion = {}
+	view._advance_approach()
+	check(model.pending() and sent[-1].command.action == "restore" and not view.battle_view.visible and not view.encounter.visible, "Restore remains a dialogue request and cannot reopen a battle")
 	var restored := finished.duplicate(true)
 	restored.character.state_revision = "5"
 	restored.character.hp = 95
@@ -147,7 +161,11 @@ func _run() -> void:
 	view.resident_selected.emit("qingwei")
 	view.network._pending_motion = {}
 	view._advance_approach()
-	check(sent[-1].command.action == "claim", "Completed quest directly claims its reward when NPC is reached")
+	check(view.npc_dialog.quest_button.text.contains("完成") and not model.pending(), "Completed quest offers the original completion option before claiming")
+	view.npc_dialog.quest_button.pressed.emit()
+	view.network._pending_motion = {}
+	view._advance_approach()
+	check(sent[-1].command.action == "claim" and not view.encounter.visible, "Complete option submits a reward request without battle visuals")
 	OnlineAccount.pending_pve = {}
 	# Failed preparation remains a recoverable server battle, never a fake success.
 	var next_battle := state.duplicate(true)

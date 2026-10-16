@@ -57,7 +57,8 @@ python tests/run_admin_scene_layout.py --render --output /tmp/opencode/vssjx-adm
 - 原包物品从 `client/assets/data/original_items.json` 读取，使用 `tools/import_item_catalog.py` 从原包目录与解码清单完整导出。共 208 件：56 武器、81 装备、71 其他；所有图标逐字节复制至客户端，不重新绘制。按 iw/if/ix 文件名前缀分类，明确不将该前缀当作完整的原服物品类型表。
 - 原版名称、物品ID映射、等级、装备槽位与属性尚未恢复，保留 null，并在界面显示“—”。管理页按原始资源编号展示全部图标，不因为业务逻辑尚未接入而隐藏。
 - 本地武器规则青锋剑、消耗品规则回春散仍独立显示，状态为“已接入”；不将重建版名称或数值冒充原包定义。装备槽位直接使用背包中的十个定义，九个未接入装备规则的槽位标为“预留”。
-- 分类索引共636条，包含跨分类引用：武器57、装备91、物品210、人物6、任务/线索16、地图217、怪物6、素材/动画33。总索引数不等于独立物品、任务或可游玩地图数量。
+- 分类索引共753条，包含跨分类引用：武器57、装备91、物品210、人物6、任务/线索16、地图217、怪物123、素材/动画33。怪物由6条重建定义和117份原包动画组成；总索引数不等于独立物品、怪物种类、任务或可游玩地图数量。
+
 - 地图217条包括214条已审核的Online原包目录及3条已接入场景定义；原包目录保留同名记录。世界总图已恢复79个位置与78条线段，可展开、悬停查看地点类型与等级；135条隐藏位置保持未知。场景地形未取得时明确提示，不生成猜测地形。原包编号不等同于重建服务器ID，总图连线不当作完整传送配置。来源索引为 `analysis/catalogs/online_world.json` 及其客户端副本，证据及候选格式见 `analysis/recovery/maps/README.md`。
 - 任务/线索16条包括5个重建阶段、1组任务界面文案、10组引导文案/线索（teach.str及teach1～teach9）。界面单列原版任务总数未知，不能把16或5当作原版任务数量。文字仅在字段、JSON与文本摘录中展示，不作为指令执行。
 - 离线地图调用原有 `_build_map()`，仅生成地形与阻挡，不调用 `_ready()` 或添加到场景树；不模拟角色、NPC、怪物及树木。其阻挡预览明确只表示地形。
@@ -65,3 +66,20 @@ python tests/run_admin_scene_layout.py --render --output /tmp/opencode/vssjx-adm
 - 动画、特效、地图装饰等从演员索引和分片读取。动画预览不修改全局 SpriteFrames 的循环属性。
 - 刷新重新读取 JSON 和定义列表。修改 GDScript 常量后需重新运行场景，管理页不是热重载编辑器。
 - 玩家状态、密钥与代理配置不属于数据浏览范围。管理页没有写入或删除操作。
+
+## 完整原包怪物资源
+
+此前怪物分类仅遍历`WORLD.ENEMIES`，所以只显示6条重建玩法定义；现在额外加载`assets/admin/monsters/catalog.json`中的117份原始ANI，覆盖`monster.mrp`全部142份图片成员。原包条目使用独立的`original/monster/`编号和“原包资源”状态；不修改游戏的怪物表或33项运行时动画索引。
+
+预览按原ANI组合图片，播放非空的`source_N`原始序列并保留原编号；不猜测序列对应的动作语义，也不虚构名称、等级、属性或怪物ID。图集和目录仅由管理页使用，游戏导出排除`assets/admin/*`。
+
+```sh
+python tools/import_monster_catalog.py
+python -m unittest discover -s tests -p 'test_original_monsters.py' -v
+python tests/run_admin_scene_layout.py --render
+python tests/run_game_export.py
+```
+
+Python回归核对117份ANI/142份图片全覆盖、成员与原包SHA256、每个动画序列、图集尺寸与校验、可重复生成及未知字段；Godot回归遍历所有怪物预览与全部非空序列，并验证筛选、搜索、960×640布局和原包怪物截图。导出探针对Linux/Windows真实PCK检查管理资源目录不存在。
+
+2026-10-16验证：Python65项、数据浏览4542项全部通过；布局无头及实际渲染、独立窗口和模拟F6宿主启动均通过。已检查`/tmp/opencode/vssjx-monster-catalog-checked/browser-original-monsters-desktop.png`，960×640下怪物图像、原始序列与未知字段均可见。Linux/Windows实际PCK导出及排除管理资源审计通过，日志位于`/tmp/opencode/vssjx-monster-catalog-export/`。

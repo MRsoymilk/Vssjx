@@ -8,6 +8,7 @@ const ART := preload("res://scripts/art.gd")
 const ONLINE_MAP := "res://assets/data/qingyun-v1.json"
 const ORIGINAL_ITEMS := "res://assets/data/original_items.json"
 const ORIGINAL_WORLD := "res://assets/data/original_world.json"
+const ORIGINAL_MONSTERS := "res://assets/admin/monsters/catalog.json"
 const CATEGORIES := [
 	["weapons", "武器"], ["equipment", "人物装备"], ["items", "物品"],
 	["characters", "人物"], ["quests", "任务 / 线索"], ["maps", "地图"],
@@ -68,6 +69,7 @@ func reload() -> void:
 		var data: Dictionary = enemy.duplicate(true)
 		data["区域"] = "古剑遗迹" if enemy.id in ["guardian", "boss"] else "青云山道"
 		_add("enemies", enemy.id, enemy.name, "气血 %s / 攻击 %s / %s" % [enemy.hp, enemy.attack, data["区域"]], "已接入", "res://scripts/world.gd", data, {"kind": "actor", "art": enemy.art})
+	_load_original_monsters()
 	_load_maps()
 	_load_original_world()
 	var manifest := _read_json(ART.INDEX_PATH)
@@ -76,6 +78,30 @@ func reload() -> void:
 		var info := _read_json(actors[key])
 		if info.is_empty(): continue
 		_add("art", key, key, "%s 帧 · %s × %s" % [info.get("count", 0), info.get("width", 0), info.get("height", 0)], "资源", actors[key], info, {"kind": "actor", "art": key})
+
+func _load_original_monsters() -> void:
+	var manifest := _read_json(ORIGINAL_MONSTERS)
+	if manifest.get("format_version") != 1 or manifest.get("source_package") != "ssjx/monster.mrp" or not manifest.get("monsters") is Array:
+		errors.append("原包怪物目录身份或格式不正确")
+		return
+	if manifest.monsters.size() != int(manifest.get("animation_count", -1)):
+		errors.append("原包怪物动画数量不匹配")
+		return
+	for record in manifest.monsters:
+		var info: Dictionary = record.animation
+		if not FileAccess.file_exists(info.texture):
+			errors.append("原包怪物图集缺失：" + record.resource_id)
+			continue
+		var data := {
+			"资源编号": record.resource_id, "原版名称": null, "原版怪物ID": null,
+			"原版等级": null, "原版属性": null,
+			"恢复范围": "原包怪物目录中的动画素材；不等于已恢复怪物定义，名称与数值未知",
+			"动画说明": "source_N 对应原始序列编号；未推断待机、行走或攻击语义",
+			"来源资源": record.duplicate(true), "原包SHA256": manifest.source_sha256
+		}
+		_add("enemies", record.id, record.display_name,
+			"%d 帧 · %d 组原始序列 · 名称 / 数值未恢复" % [int(info.count), info.sequences.size()],
+			"原包资源", ORIGINAL_MONSTERS, data, {"kind": "monster", "animation": info})
 
 func _load_original_world() -> void:
 	var manifest := _read_json(ORIGINAL_WORLD)

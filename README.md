@@ -37,6 +37,8 @@ Windows 也可运行 `./tools/open-data-browser.ps1 -GodotBin "你的Godot可执
 
 重新导出物品索引与无损图标：`python tools/import_item_catalog.py`（使用 `analysis/image_manifest.json` 与已解码 PNG；修改原始解码结果后再运行）。
 
+怪物目录同时收录 **6 条已接入的重建定义**和`monster.mrp`的**全部117份原始动画（覆盖142份图片成员）**，可按“已接入”/“原包资源”筛选。原包条目可查看图像、播放`source_N`原始序列并核对来源校验；资源编号不是恢复的怪物名称，原版名称、ID、等级及属性未知，117份素材不代表117种完整怪物定义。重新生成：`python tools/import_monster_catalog.py`。管理专用资源位于`client/assets/admin/monsters/`，不进入游戏导出。
+
 地图页收录 Online 原包 `worldmap.data` 的 **214 条目录（157 个不同名称）**，并保留 3 条当前已接入的场景定义；可筛选“原包目录”或“已接入”。对照原生代码恢复了 **79 个世界总图位置、78条连线**，可展开查看、悬停查询名称与等级；目录还显示原包编号、位置、类型、原始记录与来源校验。单张场景地形仍缺少对应`.map`缓存，明确显示提示；[恢复记录与复现方式](analysis/recovery/maps/README.md)保留格式、扫描结果和证据。
 
 “任务 / 线索”页区分一条重建任务链的 5 个阶段与 11 组原包界面文案、引导资料；原版任务总数仍未知。原包文字可在“文本摘录”页查看，文案和引导线索不当作完整任务定义。重新导出：`python tools/import_original_world.py`；该命令核验 Online 应用 ID 与原包成员，并同步生成 `analysis/catalogs/online_world.json` 和客户端只读索引。

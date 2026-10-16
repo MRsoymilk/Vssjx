@@ -23,7 +23,7 @@ func _ready() -> void:
 	var catalog := CATALOG.new()
 	catalog.reload()
 	check(catalog.errors.is_empty(), "All JSON sources load")
-	var counts := {"weapons": 57, "equipment": 91, "items": 210, "characters": 6, "quests": 16, "maps": 217, "enemies": 6, "art": 33}
+	var counts := {"weapons": 57, "equipment": 91, "items": 210, "characters": 6, "quests": 16, "maps": 217, "enemies": 123, "art": 33}
 	for category in counts:
 		check(catalog.find(category).size() == counts[category], "Expected current definitions for " + category)
 	var keys: Dictionary = {}
@@ -42,6 +42,11 @@ func _ready() -> void:
 	check(catalog.find("items", "", "已接入").size() == 2, "Original icons are distinct from authored runtime rules")
 	check(catalog.find("items", "青锋").size() == 1, "Chinese item search")
 	check(catalog.find("enemies", "WOLF_A").size() == 1, "Case-insensitive ID search")
+	check(catalog.find("enemies", "", "已接入").size() == 6, "Six authored enemy definitions remain separate")
+	check(catalog.find("enemies", "", "原包资源").size() == 117, "All original monster animations are included")
+	check(catalog.find("enemies", "zbjl2", "原包资源").size() == 1, "Original monster resource IDs are searchable")
+	for entry in catalog.find("enemies", "", "原包资源"):
+		check(entry.data["原版名称"] == null and entry.data["原版属性"] == null and entry.data["原版等级"] == null and entry.data["原版怪物ID"] == null, "Unknown monster identity and rules remain unknown: " + entry.id)
 	check(catalog.find("weapons", "青锋 5").size() == 1, "Multiple words search across name and actual stat fields")
 	check(catalog.find("items", "不存在的道具").is_empty(), "No fabricated fallback items")
 	var sword: Dictionary = catalog.find("weapons")[0]
@@ -81,6 +86,14 @@ func _ready() -> void:
 	browser.get_node("%StatusFilter").select(2)
 	browser._fill_list()
 	check(browser.visible_entries.size() == 9, "UI status filter")
+	browser.select_category("enemies")
+	check(browser.visible_entries.size() == 123 and browser.get_node("%Context").text.contains("117"), "Monster category explains definitions versus all original resources")
+	browser.get_node("%StatusFilter").select(4)
+	browser._fill_list()
+	check(browser.visible_entries.size() == 117 and browser.get_node("%AnimationBar").visible, "Original monster filter exposes playable previews")
+	browser.get_node("%Search").text = "zbjl2"
+	browser._fill_list()
+	check(browser.visible_entries.size() == 1 and browser.current.id == "original/monster/zbjl2", "UI finds a previously missing monster animation")
 	browser.select_category("items")
 	browser.get_node("%Search").text = "回春"
 	browser._fill_list()
@@ -136,6 +149,21 @@ func _ready() -> void:
 				var attack_loop: bool = preview.sprite.sprite_frames.get_animation_loop("attack")
 				preview.play_animation("attack")
 				check(preview.sprite.sprite_frames.get_animation_loop("attack") == attack_loop, "Preview leaves shared animation loop unchanged: " + entry.id)
+			if entry.preview.get("kind") == "monster":
+				var preview: Control = browser.get_node("%Preview")
+				check(is_instance_valid(preview.sprite), "Original monster atlas loads: " + entry.id)
+				var info: Dictionary = entry.preview.animation
+				var atlas_center: Vector2 = preview.sprite.offset + Vector2(info.width, info.height) * 0.5
+				check(not preview.sprite.centered and (preview.sprite.transform * atlas_center).is_equal_approx(preview.size * 0.5), "Original monster atlas is centered inside the visible preview: " + entry.id)
+				for index in entry.preview.animation.sequences.size():
+					var steps: Array = entry.preview.animation.sequences[index]
+					var animation := "source_%d" % index
+					if steps.is_empty():
+						check(not preview.sprite.sprite_frames.has_animation(animation), "Empty source sequence is not played: " + entry.id)
+						continue
+					check(preview.sprite.sprite_frames.get_frame_count(animation) == steps.size(), "Original monster sequence is complete: " + entry.id + " / " + animation)
+					preview.play_animation(animation)
+					check(preview.sprite.animation == animation and preview.sprite.is_playing(), "Original monster animation plays: " + entry.id + " / " + animation)
 	browser.select_category("characters")
 	await get_tree().process_frame
 	check(browser.get_node("%Inspector").size.x >= 360, "Readable desktop inspector width")
@@ -154,6 +182,13 @@ func _ready() -> void:
 			var output := argument.trim_prefix("--capture-data-browser=")
 			if DisplayServer.get_name() != "headless":
 				check(capture_image(output), "Rendered browser screenshot")
+				browser.select_category("enemies")
+				browser.get_node("%StatusFilter").select(4)
+				browser._fill_list()
+				browser.get_node("%Search").text = "zbjl2"
+				browser._fill_list()
+				await get_tree().process_frame
+				check(capture_image(output.get_basename() + "-original-monsters.png"), "Rendered complete monster catalog and original animation")
 				browser.select_category("maps")
 				browser.get_node("%Records").get_root().get_child(2).select(0)
 				await get_tree().process_frame

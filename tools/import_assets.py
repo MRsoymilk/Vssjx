@@ -74,7 +74,8 @@ def parse_ani(path):
             'opaque_tail_hex': blob[pos:].hex()}
 
 
-def bake(key, animation, output_key=None, write_texture=True):
+def bake(key, animation, output_key=None, write_texture=True, texture_dir=None,
+         texture_prefix='res://assets/actors/'):
     folder, name = key.split('/')
     source_dir = ANALYSIS / 'decoded_png/ssjx' / ('' if folder == 'main' else folder)
     frames = []
@@ -110,7 +111,7 @@ def bake(key, animation, output_key=None, write_texture=True):
             for img, x, y in layers:
                 atlas.alpha_composite(img, ((i % columns) * width + x - left,
                                             (i // columns) * height + y - top))
-        atlas.save(DEST / 'actors' / filename, optimize=True)
+        atlas.save((Path(texture_dir) if texture_dir is not None else DEST / 'actors') / filename, optimize=True)
     sequences = animation['sequences']
     playback = {}
     if folder == 'hero':
@@ -143,7 +144,7 @@ def bake(key, animation, output_key=None, write_texture=True):
     elif key == 'monster/langw':
         playback = {'idle': sequences[3], 'walk': sequences[0],
                     'attack': sequences[2]}
-    return {'texture': 'res://assets/actors/' + filename, 'width': width,
+    return {'texture': texture_prefix + filename, 'width': width,
             'height': height, 'columns': columns, 'origin': [left, top],
             'anchor_x': 0, 'playback': playback,
             'count': len(frames), 'sequences': animation['sequences']}

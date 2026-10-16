@@ -26,6 +26,30 @@ func display(entry: Dictionary) -> void:
 				sprite = OriginalArt.actor(preview.art)
 				add_child(sprite)
 				_place_sprite()
+		"monster":
+			var info: Dictionary = preview.animation
+			var frames := SpriteFrames.new()
+			frames.remove_animation("default")
+			var texture: Texture2D = load(info.texture)
+			for index in info.sequences.size():
+				var steps: Array = info.sequences[index]
+				if steps.is_empty(): continue
+				var animation := "source_%d" % index
+				frames.add_animation(animation)
+				frames.set_animation_speed(animation, 10.0)
+				for step in steps:
+					var region := AtlasTexture.new()
+					region.atlas = texture
+					var frame := int(step[0])
+					region.region = Rect2((frame % int(info.columns)) * int(info.width), (frame / int(info.columns)) * int(info.height), info.width, info.height)
+					frames.add_frame(animation, region, maxf(1.0, float(step[1])))
+			sprite = AnimatedSprite2D.new()
+			sprite.centered = false
+			sprite.sprite_frames = frames
+			sprite.offset = Vector2(info.origin[0], info.origin[1])
+			add_child(sprite)
+			_place_sprite()
+			if frames.get_animation_names().size() > 0: sprite.play(frames.get_animation_names()[0])
 		"icon": icon = load(preview.path)
 		"map": atlas = load("res://assets/tiles/original_tiles.png")
 		"world_overview":
@@ -109,7 +133,7 @@ func _draw_overview() -> void:
 
 func _place_sprite() -> void:
 	if not is_instance_valid(sprite): return
-	var info := OriginalArt.actor_info(record.preview.art)
+	var info: Dictionary = record.preview.animation if record.preview.kind == "monster" else OriginalArt.actor_info(record.preview.art)
 	var dimensions := Vector2(info.width, info.height)
 	var zoom := maxf(0.25, minf(2.0, minf((size.x - 30) / dimensions.x, (size.y - 24) / dimensions.y)))
 	sprite.scale = Vector2.ONE * zoom

@@ -16,7 +16,7 @@ class GameExportPolicyTests(unittest.TestCase):
         self.assertGreaterEqual(len(presets), 1)
         for section in presets:
             exclusions = {item.strip() for item in json.loads(config[section]['exclude_filter']).split(',')}
-            self.assertTrue({'scenes/admin/*', 'scripts/admin/*', 'tests/*'} <= exclusions, section)
+            self.assertTrue({'scenes/admin/*', 'scripts/admin/*', 'assets/admin/*', 'tests/*'} <= exclusions, section)
             self.assertIn('assets/data/*.json', json.loads(config[section]['include_filter']))
 
     def test_runtime_does_not_reference_developer_pages(self):

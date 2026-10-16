@@ -55,6 +55,15 @@ func _ready() -> void:
 		fits(browser.get_node("%Copy"), "Desktop actions fit category " + category)
 		fits(browser.get_node("%Footer"), "Desktop footer fits category " + category)
 		if category == "characters": await capture("browser-characters-desktop")
+		if category == "enemies":
+			browser.get_node("%StatusFilter").select(4)
+			browser._fill_list()
+			browser.get_node("%Search").text = "zbjl2"
+			browser._fill_list()
+			await settle()
+			fits(browser.get_node("%Copy"), "Original monster animation actions fit 960x640")
+			check(browser.visible_entries.size() == 1 and browser.current.id == "original/monster/zbjl2", "Desktop can preview a previously missing monster")
+			await capture("browser-original-monsters-desktop")
 	browser.select_category("maps")
 	browser.get_node("%StatusFilter").select(5)
 	browser._fill_list()

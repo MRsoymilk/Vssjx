@@ -8,6 +8,8 @@ var atlas: Texture2D
 var show_blocked := false
 var overview_icons: Array[Texture2D] = []
 var hovered_node: Dictionary = {}
+const ACTION_LABELS := {"idle": "待机", "walk": "行走", "attack": "普通攻击", "cast": "施法", "hurt": "受击"}
+const ACTION_ORDER := ["idle", "walk", "attack", "cast", "hurt"]
 
 func display(entry: Dictionary) -> void:
 	if is_instance_valid(sprite):
@@ -142,6 +144,49 @@ func _place_sprite() -> void:
 func animations() -> PackedStringArray:
 	if not is_instance_valid(sprite): return PackedStringArray()
 	return sprite.sprite_frames.get_animation_names()
+
+func animation_options(include_sources: bool = false) -> Array[Dictionary]:
+	var options: Array[Dictionary] = []
+	if not is_instance_valid(sprite): return options
+	var kind: String = record.get("preview", {}).get("kind", "")
+	var info: Dictionary = OriginalArt.actor_info(record.preview.art) if kind == "actor" else record.preview.animation
+	var playback: Dictionary = info.get("playback", {}) if kind == "actor" else {}
+	for mode in ACTION_ORDER:
+		# OriginalArt also creates fallback names for unclassified scenery/effects.
+		# Only explicit runtime mappings justify a named action in the browser.
+		if playback.has(mode) and not playback[mode].is_empty():
+			options.append({"id": mode, "label": ACTION_LABELS[mode],
+				"description": "当前游戏的%s动作 · %s · 已接入的动作映射" % [ACTION_LABELS[mode], "循环播放" if mode in ["idle", "walk"] else "单次播放"]})
+	if not include_sources and not options.is_empty(): return options
+	var derived: Dictionary = {}
+	for row in info.get("derived_frames", []): derived[int(row.frame)] = int(row.source_frame)
+	for index in info.sequences.size():
+		var steps: Array = info.sequences[index]
+		if steps.is_empty(): continue
+		var id := ("frame_%d" if kind == "image_frames" else "source_%d") % index
+		var label := "图像帧 %d" % index if kind == "image_frames" else "原始序列 %d · 用途未确认" % index
+		var description := "图像帧编号，不是动作名称。" if kind == "image_frames" else "原包仅记录帧索引与时长，没有动作名称；该序列的实际用途尚未确认。"
+		var matches: Array[String] = []
+		var corrected := false
+		for mode in ACTION_ORDER:
+			if not playback.has(mode): continue
+			var restored: Array = []
+			for step in playback[mode]: restored.append([derived.get(int(step[0]), int(step[0])), step[1]])
+			if _same_steps(restored, steps):
+				matches.append(ACTION_LABELS[mode])
+				corrected = corrected or not _same_steps(playback[mode], steps)
+		if not matches.is_empty():
+			label = "原始序列 %d · %s来源" % [index, "／".join(matches)]
+			description = "与当前游戏的「%s」映射%s；原始序列仍保留原始位移、朝向和特效。" % ["／".join(matches), "同源，运行时使用修正后的派生帧" if corrected else "相同"]
+		options.append({"id": id, "label": label, "description": "%s\n%s · %d 步" % [description, id, steps.size()]})
+	return options
+
+func _same_steps(left: Array, right: Array) -> bool:
+	# JSON stores numbers as floats; derived frame IDs are native integers.
+	if left.size() != right.size(): return false
+	for index in left.size():
+		if int(left[index][0]) != int(right[index][0]) or int(left[index][1]) != int(right[index][1]): return false
+	return true
 
 func play_animation(animation: String) -> void:
 	if is_instance_valid(sprite) and sprite.sprite_frames.has_animation(animation):

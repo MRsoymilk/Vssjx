@@ -38,10 +38,11 @@ func _ready() -> void:
 			DisplayServer.clipboard_set(JSON.stringify(current.data, "  "))
 			%Footer.text = "已复制当前条目数据 · " + String(current.id)
 	)
-	%Animations.item_selected.connect(func(index: int) -> void: %Preview.play_animation(%Animations.get_item_text(index)))
+	%Animations.item_selected.connect(_select_animation)
 	%Replay.pressed.connect(func() -> void:
-		if %Animations.item_count > 0: %Preview.play_animation(%Animations.get_item_text(%Animations.selected))
+		if %Animations.item_count > 0: _select_animation(%Animations.selected)
 	)
+	%RawAnimations.toggled.connect(func(_value: bool) -> void: _fill_animations())
 	%Collision.toggled.connect(func(value: bool) -> void: %Preview.show_blocked = value; %Preview.queue_redraw())
 	%ExpandOverview.pressed.connect(open_world_overview)
 	reload_data()
@@ -176,6 +177,10 @@ func _show_entry(entry: Dictionary) -> void:
 	%Raw.text = ""
 	%Texts.text = ""
 	%Animations.clear()
+	%RawAnimations.set_pressed_no_signal(false)
+	%RawAnimations.visible = false
+	%AnimationHelp.text = ""
+	%AnimationHelp.visible = false
 	%Preview.display(entry)
 	%Copy.disabled = entry.is_empty()
 	%DetailTitle.text = entry.get("name", "未选择条目")
@@ -200,10 +205,37 @@ func _show_entry(entry: Dictionary) -> void:
 	var root: TreeItem = %Fields.create_item()
 	_append_fields(root, entry.data)
 	%Raw.text = JSON.stringify(entry.data, "  ")
-	var names: PackedStringArray = %Preview.animations()
-	for name in names:
-		%Animations.add_item(name)
-		if name == "idle": %Animations.select(%Animations.item_count - 1)
+	_fill_animations()
+
+func _fill_animations() -> void:
+	var previous := String(%Preview.sprite.animation) if is_instance_valid(%Preview.sprite) else ""
+	%Animations.clear()
+	var all_options: Array[Dictionary] = %Preview.animation_options(true)
+	var known := 0
+	var raw := 0
+	for option in all_options:
+		if option.id.begins_with("source_"): raw += 1
+		elif not option.id.begins_with("frame_"): known += 1
+	%RawAnimations.visible = known > 0 and raw > 0
+	%RawAnimations.text = "显示原始序列（%d）" % raw
+	var options: Array[Dictionary] = %Preview.animation_options(%RawAnimations.button_pressed)
+	var selected := 0
+	for option in options:
+		%Animations.add_item(option.label)
+		var index: int = %Animations.item_count - 1
+		%Animations.set_item_metadata(index, option.id)
+		%Animations.get_popup().set_item_tooltip(index, option.description)
+		if option.id == previous: selected = index
+	%AnimationHelp.visible = not options.is_empty()
+	if not options.is_empty():
+		%Animations.select(selected)
+		_select_animation(selected)
+
+func _select_animation(index: int) -> void:
+	if index < 0 or index >= %Animations.item_count: return
+	%Preview.play_animation(String(%Animations.get_item_metadata(index)))
+	%AnimationHelp.text = %Animations.get_popup().get_item_tooltip(index)
+	%AnimationHelp.tooltip_text = %AnimationHelp.text
 
 func _update_preview_height() -> void:
 	var minimum := 120.0 if current.get("preview", {}).get("kind") == "unavailable" else 96.0

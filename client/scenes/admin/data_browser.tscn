@@ -218,10 +218,27 @@ text = "动画"
 [node name="Animations" type="OptionButton" parent="Margin/Layout/Body/Split/Inspector/Details/AnimationBar"]
 unique_name_in_owner = true
 size_flags_horizontal = 3
+fit_to_longest_item = false
+text_overrun_behavior = 3
 
 [node name="Replay" type="Button" parent="Margin/Layout/Body/Split/Inspector/Details/AnimationBar"]
 unique_name_in_owner = true
 text = "播放"
+
+[node name="RawAnimations" type="CheckBox" parent="Margin/Layout/Body/Split/Inspector/Details"]
+unique_name_in_owner = true
+visible = false
+text = "显示原始序列"
+tooltip_text = "查看原始编号、当前动作对应关系及尚未确认的序列。"
+theme_override_font_sizes/font_size = 13
+
+[node name="AnimationHelp" type="Label" parent="Margin/Layout/Body/Split/Inspector/Details"]
+unique_name_in_owner = true
+visible = false
+autowrap_mode = 3
+max_lines_visible = 2
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.6, 0.74, 0.82, 1)
 
 [node name="Collision" type="CheckBox" parent="Margin/Layout/Body/Split/Inspector/Details"]
 unique_name_in_owner = true

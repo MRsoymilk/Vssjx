@@ -80,6 +80,56 @@ func _ready() -> void:
 	await get_tree().process_frame
 	await get_tree().process_frame
 	check(browser.catalog.errors.is_empty() and browser.visible_entries.size() == 57, "Standalone browser opens with all original weapons and local rule")
+	for entry in catalog.find("characters"):
+		browser._show_entry(entry)
+		var chooser: OptionButton = browser.get_node("%Animations")
+		var preview: Control = browser.get_node("%Preview")
+		var info := OriginalArt.actor_info(entry.preview.art)
+		check(chooser.item_count == info.playback.size() and chooser.get_item_text(0) == "待机", "Characters default to named Chinese runtime actions: " + entry.id)
+		check(chooser.get_item_metadata(chooser.selected) == "idle", "Visible action matches the actual idle preview: " + entry.id)
+		browser.get_node("%RawAnimations").button_pressed = true
+		var previous_source := -1
+		for index in chooser.item_count:
+			var id: String = chooser.get_item_metadata(index)
+			check(not chooser.get_item_text(index).begins_with("source_"), "User-facing actions have descriptive labels: " + id)
+			if not id.begins_with("source_"): continue
+			var source_index := int(id.trim_prefix("source_"))
+			check(source_index > previous_source, "Raw sequence IDs use numerical ordering")
+			previous_source = source_index
+			chooser.select(index)
+			chooser.item_selected.emit(index)
+			check(preview.sprite.animation == id, "Chinese labels still play the correct raw sequence: " + id)
+			check(browser.get_node("%AnimationHelp").text.contains(id), "Sequence evidence remains visible: " + id)
+			if source_index == (4 if entry.preview.art.ends_with("fs") else 17):
+				check(chooser.get_item_text(index).contains("普通攻击来源"), "An exact runtime attack mapping explains the source sequence")
+			if source_index == 0:
+				check(chooser.get_item_text(index).contains("用途未确认"), "Unverified original actions are not guessed")
+		var replay_id: String = chooser.get_item_metadata(chooser.selected)
+		preview.sprite.pause()
+		browser.get_node("%Replay").pressed.emit()
+		check(preview.sprite.animation == replay_id and preview.sprite.is_playing(), "Replay uses the stable ID instead of the translated label")
+		browser.get_node("%RawAnimations").button_pressed = false
+		check(chooser.item_count == info.playback.size() and preview.sprite.animation == "idle", "Closing raw sequences returns to a valid named action")
+	for entry in catalog.find("enemies", "", "已接入"):
+		browser._show_entry(entry)
+		var chooser: OptionButton = browser.get_node("%Animations")
+		check(chooser.item_count == 4, "Every active monster exposes idle/walk/attack/hurt")
+		browser.get_node("%RawAnimations").button_pressed = true
+		var raw_count := 0
+		var attack_source := false
+		for index in chooser.item_count:
+			var id: String = chooser.get_item_metadata(index)
+			if not id.begins_with("source_"): continue
+			raw_count += 1
+			check(not OriginalArt.actor_info(entry.preview.art).sequences[int(id.trim_prefix("source_"))].is_empty(), "Empty source sequences are not offered")
+			if chooser.get_item_text(index).contains("普通攻击来源"):
+				attack_source = true
+				if entry.preview.art == "monster/langw":
+					check(chooser.get_popup().get_item_tooltip(index).contains("派生帧"), "Wolf original impact-bearing frames are distinguished from corrected attack")
+		check(raw_count > 0 and attack_source, "Monster attacks remain traceable to original sequences")
+	var scenery := catalog.find("art", "map/m1")[0]
+	browser._show_entry(scenery)
+	check(not browser.get_node("%RawAnimations").visible and browser.get_node("%Animations").get_item_metadata(0).begins_with("source_"), "Unmapped scenery is not given the renderer's fallback attack/walk labels")
 	browser.select_category("items")
 	browser.get_node("%StatusFilter").select(4)
 	browser._fill_list()
@@ -210,6 +260,20 @@ func _ready() -> void:
 	await get_tree().process_frame
 	await get_tree().process_frame
 	for argument in OS.get_cmdline_user_args():
+		if argument.begins_with("--capture-animation-labels=") and DisplayServer.get_name() != "headless":
+			var output := argument.trim_prefix("--capture-animation-labels=")
+			browser.select_category("characters")
+			await get_tree().process_frame
+			await get_tree().process_frame
+			check(capture_image(output), "Rendered Chinese action labels")
+			browser.get_node("%RawAnimations").button_pressed = true
+			var chooser: OptionButton = browser.get_node("%Animations")
+			for index in chooser.item_count:
+				if chooser.get_item_metadata(index) == "source_17":
+					chooser.select(index)
+					chooser.item_selected.emit(index)
+			await get_tree().process_frame
+			check(capture_image(output.get_basename() + "-raw.png"), "Rendered original-sequence action provenance")
 		if argument.begins_with("--capture-data-browser="):
 			var output := argument.trim_prefix("--capture-data-browser=")
 			if DisplayServer.get_name() != "headless":

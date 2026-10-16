@@ -1,0 +1,33 @@
+name: vssjx-web
+
+services:
+  web:
+    image: nginx:stable-alpine@sha256:970364228b1e4f932abc22d321932816782cca8a20b85a77552a7cfe9acfb3b5
+    restart: unless-stopped
+    ports:
+      - "${SSJX_WEB_BIND_ADDR:-127.0.0.1}:${SSJX_WEB_PORT:-8000}:80"
+    environment:
+      SSJX_WEB_UPSTREAM: ${SSJX_WEB_UPSTREAM:-http://host.docker.internal:8080}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - type: bind
+        source: ${SSJX_WEB_ROOT:?Set SSJX_WEB_ROOT to the exported public directory}
+        target: /usr/share/nginx/html
+        read_only: true
+        bind:
+          create_host_path: false
+      - type: bind
+        source: ./web.nginx.conf.template
+        target: /etc/nginx/templates/default.conf.template
+        read_only: true
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1/index.html && wget -q -O /dev/null http://127.0.0.1/api/v1/server-info"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"

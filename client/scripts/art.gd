@@ -90,7 +90,8 @@ static func actor(key: String) -> AnimatedSprite2D:
 			for step in sequences[i]:
 				frames.add_frame(animation, regions[int(step[0])], maxf(1.0, float(step[1])))
 		var modes := ["idle", "walk", "attack"]
-		if info.get("playback", {}).has("cast"): modes.append("cast")
+		for optional in ["cast", "hurt"]:
+			if info.get("playback", {}).has(optional): modes.append(optional)
 		for mode in modes:
 			frames.add_animation(mode)
 			frames.set_animation_speed(mode, 6.0 if mode == "idle" else (8.0 if mode == "cast" else 10.0))
@@ -107,7 +108,7 @@ static func actor(key: String) -> AnimatedSprite2D:
 	sprite.sprite_frames = cached[key]
 	sprite.offset = Vector2(info.origin[0] - info.get("anchor_x", 0), info.origin[1])
 	sprite.animation_finished.connect(func() -> void:
-		if sprite.animation in ["attack", "cast"]: sprite.play("idle")
+		if sprite.animation in ["attack", "cast", "hurt"]: sprite.play("idle")
 	)
 	sprite.play("idle")
 	return sprite

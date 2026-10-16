@@ -25,12 +25,13 @@ class MonsterMotionTests(unittest.TestCase):
             with Image.open(ROOT / f"analysis/decoded_png/ssjx/monster/{animation['sources'][0]}_frame000.png") as image:
                 body = image.convert('RGBA')
             reverse = body.transpose(Image.Transpose.FLIP_LEFT_RIGHT)
+            derived = {row['frame']: row['source_frame'] for row in info.get('derived_frames', [])}
             masks = [[(x, y) for y in range(body.height) for x in range(body.width) if template.getpixel((x, y))[3]]
                      for template in (body, reverse)]
             for mode in ('idle', 'walk', 'attack'):
                 for index, _ in info['playback'][mode]:
                     with self.subTest(monster=name, mode=mode, frame=index):
-                        layer = next(layer for layer in animation['frames'][index]
+                        layer = next(layer for layer in animation['frames'][derived.get(index, index)]
                                      if layer['source'] == animation['sources'][0] and layer['frame'] == 0)
                         # Search neither coordinates nor direction: inspect the fixed actor
                         # anchor where the original, unmirrored head/body MUST be rendered.
@@ -56,7 +57,9 @@ class MonsterMotionTests(unittest.TestCase):
             self.assertEqual(json.loads(json.dumps(raw)), archived[name]['animation'])
             self.assertEqual([list(map(list, seq)) for seq in runtime['sequences']], archived[name]['animation']['sequences'])
             for mode, index in art.MONSTER_PLAYBACK['monster/' + name].items():
-                self.assertEqual(runtime['playback'][mode], animation['sequences'][index])
+                derived = {row['frame']: row['source_frame'] for row in runtime.get('derived_frames', [])}
+                restored = [(derived.get(frame, frame), duration) for frame, duration in runtime['playback'][mode]]
+                self.assertEqual(restored, animation['sequences'][index])
             texture = ROOT / 'client' / raw['texture'].removeprefix('res://')
             self.assertEqual(hashlib.sha256(texture.read_bytes()).hexdigest(), archived[name]['texture_sha256'])
 
@@ -70,6 +73,25 @@ class MonsterMotionTests(unittest.TestCase):
                 with Image.open(Path(folder) / f'monster_{name}.png') as actual, Image.open(ROOT / 'client' / info['texture'].removeprefix('res://')) as expected:
                     self.assertEqual(actual.size, expected.size)
                     self.assertEqual(actual.convert('RGBA').tobytes(), expected.convert('RGBA').tobytes())
+
+    def test_wolf_impact_pixels_belong_to_hurt_not_attack(self):
+        info = json.loads((ROOT / 'client/assets/data/actors/monster/langw.json').read_text('utf-8'))
+        with Image.open(ROOT / 'client/assets/actors/monster_langw.png') as image:
+            atlas = image.convert('RGBA')
+        def impact_pixels(frame):
+            x, y = frame % info['columns'] * info['width'], frame // info['columns'] * info['height']
+            pose = atlas.crop((x, y, x + info['width'], y + info['height']))
+            count = 0
+            for y in range(pose.height):
+                for x in range(pose.width):
+                    red, green, blue, alpha = pose.getpixel((x, y))
+                    if alpha and red > 235 and green > 180 and blue < 100:
+                        count += 1
+            return count
+        self.assertTrue(set(frame for frame, _ in info['playback']['attack']).isdisjoint(
+                        frame for frame, _ in info['playback']['hurt']))
+        self.assertTrue(all(impact_pixels(frame) == 0 for frame, _ in info['playback']['attack']))
+        self.assertTrue(all(impact_pixels(frame) >= 40 for frame, _ in info['playback']['hurt']))
 
 
 if __name__ == '__main__':

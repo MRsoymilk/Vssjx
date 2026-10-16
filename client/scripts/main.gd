@@ -867,6 +867,8 @@ func _battle_turn(command: String) -> void:
 	_battle_lines(result.lines)
 	if command in ["attack", "skill"]:
 		battle_hero.play(animation)
+		if int(result.damage) > 0 and battle_enemy.sprite_frames.has_animation("hurt"):
+			battle_enemy.play("hurt")
 		var effect_key: String = "effect/flash" if command == "attack" else ["effect/t71", "effect/t36", "effect/t47"][int(Game.player.job)]
 		var effect := OriginalArt.effect(effect_key)
 		effect.position = battle_enemy.position - effects_layer.position

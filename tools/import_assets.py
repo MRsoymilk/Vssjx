@@ -111,7 +111,19 @@ def bake(key, animation, output_key=None, write_texture=True, texture_dir=None,
     source_dir = ANALYSIS / 'decoded_png/ssjx' / ('' if folder == 'main' else folder)
     frames = []
     bounds = [0, 0, 1, 1]
-    for layers in animation['frames']:
+    composites = list(animation['frames'])
+    derived_frames = []
+    if key == 'monster/langw' and output_key is None:
+        # The original attack reuses impact-bearing poses. Retain those poses
+        # for hurt/source_N; gameplay attack uses copies without the tx38 star.
+        for source_frame in (6, 7, 8):
+            layers = animation['frames'][source_frame]
+            if not any(layer['source'] == 'tx38' for layer in layers):
+                raise ValueError('Wolf impact layer no longer matches audited frames')
+            derived_frames.append({'frame': len(composites), 'source_frame': source_frame,
+                                   'excluded_sources': ['tx38']})
+            composites.append([layer for layer in layers if layer['source'] != 'tx38'])
+    for layers in composites:
         images = []
         head_center = None
         for layer in layers:
@@ -176,10 +188,18 @@ def bake(key, animation, output_key=None, write_texture=True, texture_dir=None,
             playback['cast'] = sequences[6]  # Original floating-staff flourish.
     elif key in MONSTER_PLAYBACK and output_key is None:
         playback = {mode: sequences[index] for mode, index in MONSTER_PLAYBACK[key].items()}
-    return {'texture': texture_prefix + filename, 'width': width,
+        if derived_frames:
+            replacements = {row['source_frame']: row['frame'] for row in derived_frames}
+            playback['attack'] = [[replacements.get(index, index), duration]
+                                  for index, duration in playback['attack']]
+            playback['hurt'] = [[6, 1], [7, 1], [8, 1]]
+    result = {'texture': texture_prefix + filename, 'width': width,
             'height': height, 'columns': columns, 'origin': [left, top],
             'anchor_x': 0, 'playback': playback,
             'count': len(frames), 'sequences': animation['sequences']}
+    if derived_frames:
+        result['derived_frames'] = derived_frames
+    return result
 
 
 def read_animations():

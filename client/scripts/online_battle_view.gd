@@ -10,6 +10,8 @@ var enemy: AnimatedSprite2D
 var battle_id := ""
 var revision := ""
 var animation_time := 0.0
+var _previous_enemy_hp := -1
+var _enemy_attack_delay := 0.0
 var countdown := 30.0
 var automatic := false
 var auto_time := 0.0
@@ -46,6 +48,9 @@ func present(pve: OnlinePve) -> void:
 	if battle_id != b.id:
 		battle_id = b.id
 		revision = ""
+		_previous_enemy_hp = -1
+		_enemy_attack_delay = 0.0
+		animation_time = 0.0
 		automatic = false
 		countdown = 30.0
 		$Choice.hide()
@@ -65,12 +70,19 @@ func present(pve: OnlinePve) -> void:
 		countdown = 30.0
 		auto_time = 0.0
 		if not revision.is_empty() and model.last_code.is_empty():
+			_enemy_attack_delay = 0.0
+			animation_time = 0.8
 			if model.last_action in ["attack", "skill"]:
 				hero.play("cast" if model.last_action == "skill" and hero.sprite_frames.has_animation("cast") else "attack")
-			if b.outcome == "active": enemy.play("attack")
-			animation_time = 0.8
+				if _previous_enemy_hp > int(b.enemy_hp) and enemy.sprite_frames.has_animation("hurt"):
+					enemy.play("hurt")
+					if b.outcome == "active":
+						_enemy_attack_delay = maxf(_action_duration(hero, hero.animation), _action_duration(enemy, &"hurt"))
+						animation_time = _enemy_attack_delay + _action_duration(enemy, &"attack")
+			if b.outcome == "active" and _enemy_attack_delay == 0: enemy.play("attack")
 			$Hud/ActionMenu.hide()
 	revision = b.revision
+	_previous_enemy_hp = int(b.enemy_hp)
 	if model.ready and not model.pending() and not model.last_code.is_empty() and model.active(): _open_menu()
 	$Hud/Level.text = str(int(c.level))
 	$EnemyLevel.text = str(int(b.enemy.level))
@@ -84,6 +96,13 @@ func present(pve: OnlinePve) -> void:
 	$Hud/BattleEnemyHp.tooltip_text = "%s  气血 %d/%d" % [b.enemy.name, int(b.enemy_hp), int(b.enemy.hp)]
 	show()
 	refresh()
+
+func _action_duration(actor: AnimatedSprite2D, action: StringName) -> float:
+	var frames := actor.sprite_frames
+	var duration := 0.0
+	for index in frames.get_frame_count(action):
+		duration += frames.get_frame_duration(action, index) / frames.get_animation_speed(action)
+	return duration
 
 func refresh() -> void:
 	if model == null or not model.state.get("battle") is Dictionary: return
@@ -167,6 +186,14 @@ func _process(delta: float) -> void:
 	var was_animating := animation_time > 0
 	animation_time = maxf(0.0, animation_time - delta)
 	if not visible or model == null: return
+	if _enemy_attack_delay > 0:
+		if not model.ready or not model.active():
+			_enemy_attack_delay = 0.0
+		else:
+			_enemy_attack_delay = maxf(0.0, _enemy_attack_delay - delta)
+			if _enemy_attack_delay == 0:
+				enemy.play("attack")
+				animation_time = maxf(animation_time, _action_duration(enemy, &"attack"))
 	if was_animating and animation_time == 0 and model.active() and not automatic: _open_menu()
 	if model.ready and model.active() and not model.pending() and animation_time == 0:
 		countdown = maxf(0.0, countdown - delta)

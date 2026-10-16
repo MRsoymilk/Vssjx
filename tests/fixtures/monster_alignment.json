@@ -47,15 +47,15 @@
         ],
         "attack": [
           [
-            6,
+            18,
             1
           ],
           [
-            7,
+            19,
             1
           ],
           [
-            8,
+            20,
             1
           ],
           [
@@ -75,15 +75,53 @@
             2
           ],
           [
+            19,
+            1
+          ],
+          [
+            18,
+            1
+          ]
+        ],
+        "hurt": [
+          [
+            6,
+            1
+          ],
+          [
             7,
             1
           ],
           [
-            6,
+            8,
             1
           ]
         ]
-      }
+      },
+      "count": 21,
+      "derived_frames": [
+        {
+          "frame": 18,
+          "source_frame": 6,
+          "excluded_sources": [
+            "tx38"
+          ]
+        },
+        {
+          "frame": 19,
+          "source_frame": 7,
+          "excluded_sources": [
+            "tx38"
+          ]
+        },
+        {
+          "frame": 20,
+          "source_frame": 8,
+          "excluded_sources": [
+            "tx38"
+          ]
+        }
+      ]
     },
     "monster/xt1": {
       "width": 79,

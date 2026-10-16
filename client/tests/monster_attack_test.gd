@@ -40,12 +40,12 @@ func _ready() -> void:
 				check(texture.region.position == Vector2((frame % int(info.columns)) * int(info.width), (frame / int(info.columns)) * int(info.height)), name + " loads corrected attack region")
 			actor.play("attack")
 			playing.append(actor)
-			if name == "langw":
+			if actor.sprite_frames.has_animation("hurt"):
 				var hurt := OriginalArt.actor("monster/" + name)
 				add_child(hurt)
 				hurt.position = Vector2(100, 100)
 				hurt.scale = Vector2(facing, 1)
-				check(hurt.sprite_frames.has_animation("hurt") and not hurt.sprite_frames.get_animation_loop("hurt"), "Wolf has an independent one-shot hurt state")
+				check(not hurt.sprite_frames.get_animation_loop("hurt"), name + " has an independent one-shot hurt state")
 				hurt.play("hurt")
 				playing.append(hurt)
 	await get_tree().create_timer(2.1).timeout

@@ -10,13 +10,13 @@
       [0, 3],
       [1, 5],
       [0, 3],
-      [2, 5]
+      [21, 5]
     ],
     "walk": [
       [0, 2],
       [1, 2],
       [0, 2],
-      [2, 2]
+      [21, 2]
     ],
     "attack": [
       [18, 1],
@@ -35,7 +35,7 @@
       [8, 1]
     ]
   },
-  "count": 21,
+  "count": 22,
   "sequences": [
     [
       [0, 2],
@@ -97,6 +97,11 @@
       "frame": 20,
       "source_frame": 8,
       "excluded_sources": ["tx38"]
+    },
+    {
+      "frame": 21,
+      "source_frame": 2,
+      "excluded_sources": ["tx69"]
     }
   ]
 }

@@ -113,6 +113,19 @@ def bake(key, animation, output_key=None, write_texture=True, texture_dir=None,
     bounds = [0, 0, 1, 1]
     composites = list(animation['frames'])
     derived_frames = []
+    runtime_monster = key in MONSTER_PLAYBACK and output_key is None
+    monster_playback = ({mode: list(animation['sequences'][index])
+                         for mode, index in MONSTER_PLAYBACK[key].items()}
+                        if runtime_monster else {})
+
+    def derive(source_frame, excluded_sources):
+        index = len(composites)
+        derived_frames.append({'frame': index, 'source_frame': source_frame,
+                               'excluded_sources': sorted(excluded_sources)})
+        composites.append([layer for layer in animation['frames'][source_frame]
+                           if layer['source'] not in excluded_sources])
+        return index
+
     if key == 'monster/langw' and output_key is None:
         # The original attack reuses impact-bearing poses. Retain those poses
         # for hurt/source_N; gameplay attack uses copies without the tx38 star.
@@ -120,9 +133,34 @@ def bake(key, animation, output_key=None, write_texture=True, texture_dir=None,
             layers = animation['frames'][source_frame]
             if not any(layer['source'] == 'tx38' for layer in layers):
                 raise ValueError('Wolf impact layer no longer matches audited frames')
-            derived_frames.append({'frame': len(composites), 'source_frame': source_frame,
-                                   'excluded_sources': ['tx38']})
-            composites.append([layer for layer in layers if layer['source'] != 'tx38'])
+            derive(source_frame, {'tx38'})
+        replacements = {row['source_frame']: row['frame'] for row in derived_frames}
+        monster_playback['attack'] = [[replacements.get(index, index), duration]
+                                      for index, duration in monster_playback['attack']]
+        monster_playback['hurt'] = [[6, 1], [7, 1], [8, 1]]
+    if runtime_monster:
+        # A loop must not continuously emit attack/impact effects. Keep the
+        # complete source composites and outgoing attack effects untouched.
+        clean_frames = {}
+        for mode in ('idle', 'walk'):
+            clean = []
+            for index, duration in monster_playback[mode]:
+                excluded = {layer['source'] for layer in animation['frames'][index]
+                            if layer['source'].startswith('tx')}
+                if excluded:
+                    if index not in clean_frames:
+                        clean_frames[index] = derive(index, excluded)
+                    index = clean_frames[index]
+                clean.append([index, duration])
+            monster_playback[mode] = clean
+        if 'hurt' not in monster_playback:
+            # No native hurt sequence has been verified for these actors.
+            # Hold a separate neutral pose while the battle impact plays,
+            # rather than playing their outgoing attack on incoming damage.
+            source_frame = animation['sequences'][MONSTER_PLAYBACK[key]['idle']][0][0]
+            excluded = {layer['source'] for layer in animation['frames'][source_frame]
+                        if layer['source'].startswith('tx')}
+            monster_playback['hurt'] = [[derive(source_frame, excluded), 3]]
     for layers in composites:
         images = []
         head_center = None
@@ -187,12 +225,7 @@ def bake(key, animation, output_key=None, write_texture=True, texture_dir=None,
             playback['attack'] = sequences[4]
             playback['cast'] = sequences[6]  # Original floating-staff flourish.
     elif key in MONSTER_PLAYBACK and output_key is None:
-        playback = {mode: sequences[index] for mode, index in MONSTER_PLAYBACK[key].items()}
-        if derived_frames:
-            replacements = {row['source_frame']: row['frame'] for row in derived_frames}
-            playback['attack'] = [[replacements.get(index, index), duration]
-                                  for index, duration in playback['attack']]
-            playback['hurt'] = [[6, 1], [7, 1], [8, 1]]
+        playback = monster_playback
     result = {'texture': texture_prefix + filename, 'width': width,
             'height': height, 'columns': columns, 'origin': [left, top],
             'anchor_x': 0, 'playback': playback,

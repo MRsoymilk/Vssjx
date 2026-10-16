@@ -35,9 +35,12 @@
       [15, 1],
       [9, 1],
       [8, 1]
+    ],
+    "hurt": [
+      [28, 3]
     ]
   },
-  "count": 28,
+  "count": 29,
   "sequences": [
     [
       [20, 1],
@@ -93,5 +96,12 @@
     ],
     [],
     []
+  ],
+  "derived_frames": [
+    {
+      "frame": 28,
+      "source_frame": 0,
+      "excluded_sources": []
+    }
   ]
 }

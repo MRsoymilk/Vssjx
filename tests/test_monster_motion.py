@@ -28,7 +28,7 @@ class MonsterMotionTests(unittest.TestCase):
             derived = {row['frame']: row['source_frame'] for row in info.get('derived_frames', [])}
             masks = [[(x, y) for y in range(body.height) for x in range(body.width) if template.getpixel((x, y))[3]]
                      for template in (body, reverse)]
-            for mode in ('idle', 'walk', 'attack'):
+            for mode in ('idle', 'walk', 'attack', 'hurt'):
                 for index, _ in info['playback'][mode]:
                     with self.subTest(monster=name, mode=mode, frame=index):
                         layer = next(layer for layer in animation['frames'][derived.get(index, index)]
@@ -92,6 +92,31 @@ class MonsterMotionTests(unittest.TestCase):
                         frame for frame, _ in info['playback']['hurt']))
         self.assertTrue(all(impact_pixels(frame) == 0 for frame, _ in info['playback']['attack']))
         self.assertTrue(all(impact_pixels(frame) >= 40 for frame, _ in info['playback']['hurt']))
+
+    def test_all_runtime_monsters_separate_hurt_and_keep_combat_effects_out_of_loops(self):
+        for key in art.MONSTER_PLAYBACK:
+            animation = art.parse_ani(ROOT / 'analysis/unpacked/ssjx' / (key + '.ani'))
+            info = json.loads((ROOT / 'client/assets/data/actors' / (key + '.json')).read_text('utf-8'))
+            derived = {row['frame']: row for row in info['derived_frames']}
+            with self.subTest(monster=key):
+                attack = {index for index, _ in info['playback']['attack']}
+                hurt = {index for index, _ in info['playback']['hurt']}
+                self.assertTrue(attack.isdisjoint(hurt))
+                for mode in ('idle', 'walk'):
+                    for index, _ in info['playback'][mode]:
+                        row = derived.get(index, {'source_frame': index, 'excluded_sources': []})
+                        effects = {layer['source'] for layer in animation['frames'][row['source_frame']]
+                                   if layer['source'].startswith('tx')}
+                        self.assertTrue(effects.issubset(row['excluded_sources']), (key, mode, index))
+                if key != 'monster/langw':
+                    # Outgoing slash/projectile effects are not incoming damage.
+                    self.assertEqual(info['playback']['attack'],
+                                     [list(step) for step in animation['sequences'][art.MONSTER_PLAYBACK[key]['attack']]])
+                    for frame in hurt:
+                        row = derived[frame]
+                        self.assertTrue(all(not layer['source'].startswith('tx')
+                                            or layer['source'] in row['excluded_sources']
+                                            for layer in animation['frames'][row['source_frame']]))
 
 
 if __name__ == '__main__':

@@ -879,15 +879,6 @@ func _start_battle(enemy: Dictionary) -> void:
 	battle_selected_enemy = false
 	field_kind = String(enemy.get("terrain", "ruins" if int(Game.player.zone) == 1 else ("wilderness" if enemy.kind == "wolf" else "courtyard")))
 	_battle_scenery()
-	var ring := Node2D.new()
-	ring.position = Vector2(256, 282)
-	ring.draw.connect(func() -> void:
-		for i in 4:
-			ring.draw_arc(Vector2.ZERO, 17, i * PI / 2 + 0.15, (i + 1) * PI / 2 - 0.15, 8, Color("30bcf0"), 3)
-	)
-	ring.scale.y = 0.4
-	ui.add_child(ring)
-	battle_ring = ring
 	battle_enemy = OriginalArt.battle_actor(String(enemy.art))
 	battle_enemy.position = Vector2(58, 282)
 	battle_enemy.scale = Vector2(-1.1, 1.1)
@@ -896,6 +887,8 @@ func _start_battle(enemy: Dictionary) -> void:
 	battle_hero.position = Vector2(256, 282)
 	battle_hero.scale = Vector2(1.2, 1.2)
 	ui.add_child(battle_hero)
+	battle_ring = preload("res://scenes/actors/player_ring.tscn").instantiate()
+	battle_hero.add_child(battle_ring)
 	chrome = load("res://scenes/ui/battle_chrome.tscn").instantiate()
 	ui.add_child(chrome)
 	chrome.action_requested.connect(_scene_action)

@@ -228,6 +228,7 @@ func _snapshot(values: Dictionary) -> void:
 			var key: String = (["mzs", "mck", "mfs"] if int(entity.gender) == 0 else ["wzs", "wck", "wfs"])[int(entity.job)]
 			var sprite := OriginalArt.actor("hero/" + key)
 			root.add_child(sprite)
+			if id == character_id: root.add_child(preload("res://scenes/actors/player_ring.tscn").instantiate())
 			var label := OriginalSceneChrome.label(root, entity.display_name, Rect2(-65, -72, 130, 18), 11, Color("fff0a5") if id == character_id else Color("9ef6ff"))
 			label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 			label.add_theme_constant_override("outline_size", 1)

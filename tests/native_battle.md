@@ -88,6 +88,30 @@ godot --path client res://tests/wolf_reaction_test.tscn -- --capture-battle-laye
 实际 OpenGL 离线 90 项、联机 100 项通过，已查看双方命中截图。
 本机截图在忽略目录 `work/battle-layering/native-*`，此前错误的受击方前置截图不作为验收依据。
 
+## 原版人物脚环（2026-10-17）
+
+原包 `2e544..2e56a` 加载 `dongtai%d` 并存入 `SB+a38`；`2bb54..2bb5e` 在地图角色坐标绘制，
+`2d98..2db8` 在战斗角色前一层绘制，并在普攻等动作状态跳过。三段证据已加入同一份静态恢复记录。
+蓝色脚环使用 `dongtai1.ani` 的 `dttx0.imgs`，30×16 像素、原点 `(-15,-10)`，
+按原生帧表的 `[3,2,1,0]` 循环。直接恢复像素，替换自绘圆弧与 SVG；
+原包另有橙色版本，但 `heroData+0d` 选择字段的游戏含义尚未确认，因此沿用用户提供的蓝色参考，不猜测门派或性别配色。
+
+单机、联机地图均为自己的角色添加脚环；其位置随站立／移动更新，绘制在人物下方，
+转向和人物缩放不改变圆环像素。战斗沿用当前原版普攻期间隐藏、归位后显示的规则。
+移动目的地标记保持独立，其他玩家、NPC 和怪物不会获得自己的角色标记。
+
+```text
+python -c "from tools.import_assets import bake_player_ring; bake_player_ring()"
+python -m unittest discover -s tests -p test_native_battle_ani.py
+godot --headless --path client --editor --import --quit
+godot --headless --path client res://tests/player_ring_test.tscn
+godot --path client res://tests/player_ring_test.tscn -- --capture-rings=/absolute/path/screenshots
+```
+
+Windows/Godot 4.7.1：脚环专项 169 项、真实 OpenGL 172 项、行走回归 6018 项、原生战斗流程 100 项、
+怪物反应 98 项、共享界面 28 项、完整玩法 385 项通过；原包证据与脚环逐像素检查 7 项、游戏导出策略 4 项通过。
+已查看单机地图、战斗和联机地图截图，本机结果保存在忽略目录 `work/player-ring/`。
+
 ## 明确限制
 
 原客户端定时器周期尚未确认，沿用当前10fps攻击时钟与原始每步拍数。

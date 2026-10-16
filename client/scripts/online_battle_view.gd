@@ -189,7 +189,7 @@ func refresh() -> void:
 	var hero_attacking := _hero_motion != null and _hero_motion.active and _hero_motion.action == &"attack"
 	$Hud/BattleHeroHp.visible = not hero_attacking
 	$Hud/BattleHeroMp.visible = not hero_attacking
-	$Ring.visible = not hero_attacking
+	$Hero/Ring.visible = not hero_attacking
 	$Hud/BattleEnemyHp.visible = _enemy_motion == null or not _enemy_motion.active
 	$Countdown.visible = model.active()
 	$Countdown.value = str(maxi(0, ceili(countdown)))

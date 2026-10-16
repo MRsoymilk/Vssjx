@@ -166,6 +166,13 @@ def bake(key, animation, output_key=None, write_texture=True, texture_dir=None,
     return result
 
 
+def bake_player_ring(write_texture=True):
+    animation = parse_ani(ANALYSIS / 'unpacked/ssjx/dongtai1.ani')
+    return bake('main/dongtai1', animation, output_key='player_ring',
+                write_texture=write_texture, texture_dir=DEST / 'ui',
+                texture_prefix='res://assets/ui/')
+
+
 def read_animations():
     parsed, errors = {}, []
     for path in sorted((ANALYSIS / 'unpacked/ssjx').rglob('*.ani')):
@@ -246,6 +253,7 @@ def main():
         decoder.main()
     for name in ['actors', 'tiles', 'ui', 'data']:
         (DEST / name).mkdir(parents=True, exist_ok=True)
+    bake_player_ring()
     atlas = Image.new('RGBA', (16 * 32, 16 * 24))
     tiles = sorted((ANALYSIS / 'decoded_png/ssjx/map').glob('tile*.png'), key=lambda p: int(p.stem[4:]))
     for path in tiles:

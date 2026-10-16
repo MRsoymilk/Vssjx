@@ -63,6 +63,7 @@ func _ready() -> void:
 	hero.position = cell_center(cell)
 	actors.add_child(hero)
 	_name_tag(hero, String(Game.player.name), Color("fff4c9"))
+	hero.add_child(preload("res://scenes/actors/player_ring.tscn").instantiate())
 	if zone == 0:
 		var npc := OriginalArt.actor("hero/mfs")
 		npc.position = cell_center(Vector2i(10, 13))

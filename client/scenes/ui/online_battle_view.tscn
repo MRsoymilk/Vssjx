@@ -5,7 +5,7 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/battle_hud.tscn" id="Hud"]
 [ext_resource type="PackedScene" path="res://scenes/ui/battle_inspect.tscn" id="Inspect"]
 [ext_resource type="Theme" path="res://scenes/ui/online_pve_theme.tres" id="Theme"]
-[ext_resource type="Texture2D" path="res://assets/ui/battle_ring.svg" id="Ring"]
+[ext_resource type="PackedScene" path="res://scenes/actors/player_ring.tscn" id="Ring"]
 [ext_resource type="Texture2D" path="res://assets/ui/create_cursor.png" id="Cursor"]
 [sub_resource type="StyleBoxFlat" id="Paper"]
 bg_color = Color(1, 0.953, 0.678, 1)
@@ -35,12 +35,10 @@ script = ExtResource("Script")
 [node name="Field" type="Node2D" parent="."]
 script = ExtResource("Field")
 kind = "arena"
-[node name="Ring" type="Sprite2D" parent="."]
-position = Vector2(265, 252)
-texture = ExtResource("Ring")
 [node name="Hero" type="Node2D" parent="."]
 position = Vector2(265, 252)
 scale = Vector2(1.2, 1.2)
+[node name="Ring" parent="Hero" instance=ExtResource("Ring")]
 [node name="Enemy" type="Node2D" parent="."]
 position = Vector2(59, 246)
 scale = Vector2(1.1, 1.1)

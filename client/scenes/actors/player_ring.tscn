@@ -1,0 +1,40 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://scripts/player_ring.gd" id="Script"]
+[ext_resource type="Texture2D" path="res://assets/ui/player_ring.png" id="Texture"]
+
+[sub_resource type="AtlasTexture" id="Frame0"]
+atlas = ExtResource("Texture")
+region = Rect2(90, 0, 30, 16)
+
+[sub_resource type="AtlasTexture" id="Frame1"]
+atlas = ExtResource("Texture")
+region = Rect2(60, 0, 30, 16)
+
+[sub_resource type="AtlasTexture" id="Frame2"]
+atlas = ExtResource("Texture")
+region = Rect2(30, 0, 30, 16)
+
+[sub_resource type="AtlasTexture" id="Frame3"]
+atlas = ExtResource("Texture")
+region = Rect2(0, 0, 30, 16)
+
+[sub_resource type="SpriteFrames" id="Frames"]
+animations = [{
+"frames": [{"duration": 1.0, "texture": SubResource("Frame0")}, {"duration": 1.0, "texture": SubResource("Frame1")}, {"duration": 1.0, "texture": SubResource("Frame2")}, {"duration": 1.0, "texture": SubResource("Frame3")}],
+"loop": true,
+"name": &"idle",
+"speed": 10.0
+}]
+
+[node name="PlayerRing" type="Node2D"]
+show_behind_parent = true
+texture_filter = 1
+script = ExtResource("Script")
+
+[node name="Animation" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("Frames")
+animation = &"idle"
+autoplay = "idle"
+centered = false
+offset = Vector2(-15, -10)

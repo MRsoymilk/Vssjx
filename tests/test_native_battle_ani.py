@@ -4,11 +4,13 @@ import struct
 from pathlib import Path
 import sys
 import unittest
+from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from tools.native_ani import native_steps, event_masks
 from tools.recover_native_battle import evidence
+from tools.import_assets import bake_player_ring, TRANSFORMS
 
 
 class NativeBattleAniTests(unittest.TestCase):
@@ -46,6 +48,26 @@ class NativeBattleAniTests(unittest.TestCase):
         for key, expected in [('hero/wck', [4,6,7,8,9]), ('monster/langw', [3,4,5,6,7])]:
             info = json.loads((ROOT / 'client/assets/data/actors' / (key + '.json')).read_text('utf8'))
             self.assertEqual(info['native_battle']['pose_x']['hurt'], expected)
+
+    def test_player_ring_preserves_original_pixels_and_native_order(self):
+        source = json.loads((ROOT / 'analysis/animations/main/dongtai1.json').read_text('utf8'))
+        self.assertEqual(native_steps(source, 0), [[3,1],[2,1],[1,1],[0,1]])
+        info = bake_player_ring(write_texture=False)
+        self.assertEqual((info['width'], info['height'], info['origin']), (30, 16, [-15, -10]))
+        atlas = Image.open(ROOT / 'client/assets/ui/player_ring.png').convert('RGBA')
+        self.assertEqual(atlas.size, (120, 16))
+        for frame, _ticks in native_steps(source, 0):
+            layer = source['frames'][frame][0]
+            image = Image.open(ROOT / f"analysis/decoded_png/ssjx/{layer['source']}_frame{layer['frame']:03}.png").convert('RGBA')
+            if layer['transform']: image = image.transpose(TRANSFORMS[layer['transform']])
+            expected = Image.new('RGBA', (30, 16))
+            expected.alpha_composite(image)
+            self.assertEqual(atlas.crop((frame * 30, 0, frame * 30 + 30, 16)).tobytes(), expected.tobytes())
+        scene = (ROOT / 'client/scenes/actors/player_ring.tscn').read_text('utf8')
+        for x in [90,60,30,0]:
+            self.assertIn(f'region = Rect2({x}, 0, 30, 16)', scene)
+        blob = (ROOT / 'analysis/unpacked/ssjx/gameonline.ext').read_bytes()
+        self.assertEqual(struct.unpack_from('<I', blob, 0x2e5b8)[0], 0xa38)
 
     def test_all_16_runtime_actor_variants_match_native_tables_and_masks(self):
         for folder in ('hero', 'creation', 'monster'):

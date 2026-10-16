@@ -21,6 +21,9 @@ RANGES = [
     ('team_side_assignment', 0x36fc, 0x371e),
     ('actor_side_flag_assignment', 0x4948, 0x4960),
     ('reverse_list_renderer', 0x21050, 0x21072),
+    ('player_ring_resource_load', 0x2e544, 0x2e56c),
+    ('world_player_ring_draw', 0x2bb54, 0x2bb62),
+    ('battle_player_ring_draw', 0x2d98, 0x2dbc),
 ]
 
 
@@ -44,6 +47,7 @@ def evidence():
         'restore': 'State 5 completion dispatches to 2c24, copies home (+10) to render (+18), then 2ea4 enters state 4 if alive.',
         'actor_draw_order': '4914 stores team side at actor+51. 2f28..2f40 selects the acting team as global list+48; 3174..317e draws list+4c first, then +48 (same order at 3948..3954). The acting side is in front; HUD/effect passes follow.',
         'hurt_recoil': '22c64 renders the original signed ANI layer x/y offsets. Stabilized atlases must restore state-6 body/head centers; e.g. wck 4,6,7,8,9 and langw 3,4,5,6,7.',
+        'player_ring': '2e544..2e56a loads dongtai%d and stores its animation at SB+a38. 2bb54..2bb5e draws it at world actor coordinates; 2d98..2db8 draws it before the selected battle actor, excluding states 5,15,16,17. Blue dongtai1.ani uses dttx0.imgs, origin (-15,-10), native steps [3,2,1,0], 30x16 pixels. The original selector field at heroData+0d is not assigned a reconstructed gameplay meaning; the supplied blue reference is used.',
         'limitations': [
             'Native timer cadence has not been verified; Godot currently uses its existing 10 FPS attack clock.',
             'Native masks can contain multiple hit events. Current reconstructed/server rules supply one damage result per action; do not invent extra damage.',

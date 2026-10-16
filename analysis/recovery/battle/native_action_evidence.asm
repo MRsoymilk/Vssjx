@@ -571,3 +571,51 @@
 0002106c 2416         asrs      r4, r4, #0x18
 0002106e f7d5         bpl       #0x21060
 00021070 70bd         pop       {r4, r5, r6, pc}
+
+; player_ring_resource_load [0x2e544, 0x2e56c)
+0002e544 2068         ldr       r0, [r4]
+0002e546 0221         movs      r1, #2
+0002e548 c056         ldrsb     r0, [r0, r3]
+0002e54a 0a1a         subs      r2, r1, r0
+0002e54c 1749         ldr       r1, [pc, #0x5c]
+0002e54e 7944         add       r1, pc
+0002e550 174d         ldr       r5, [pc, #0x5c]
+0002e552 184b         ldr       r3, [pc, #0x60]
+0002e554 4d44         add       r5, sb
+0002e556 2868         ldr       r0, [r5]
+0002e558 4b44         add       r3, sb
+0002e55a 1b68         ldr       r3, [r3]
+0002e55c 9847         blx       r3
+0002e55e 0021         movs      r1, #0
+0002e560 2868         ldr       r0, [r5]
+0002e562 f4f745fb     bl        #0x22bf0
+0002e566 1449         ldr       r1, [pc, #0x50]
+0002e568 4944         add       r1, sb
+0002e56a 0860         str       r0, [r1]
+
+; world_player_ring_draw [0x2bb54, 0x2bb62)
+0002bb54 9f48         ldr       r0, [pc, #0x27c]
+0002bb56 109a         ldr       r2, [sp, #0x40]
+0002bb58 4844         add       r0, sb
+0002bb5a 0068         ldr       r0, [r0]
+0002bb5c 291c         adds      r1, r5, #0
+0002bb5e f7f7c7f8     bl        #0x22cf0
+
+; battle_player_ring_draw [0x2d98, 0x2dbc)
+00002d98 c969         ldr       r1, [r1, #0x1c]
+00002d9a 8c42         cmp       r4, r1
+00002d9c 0ed1         bne       #0x2dbc
+00002d9e 0528         cmp       r0, #5
+00002da0 0cd0         beq       #0x2dbc
+00002da2 0f28         cmp       r0, #0xf
+00002da4 0ad0         beq       #0x2dbc
+00002da6 1028         cmp       r0, #0x10
+00002da8 08d0         beq       #0x2dbc
+00002daa 1128         cmp       r0, #0x11
+00002dac 06d0         beq       #0x2dbc
+00002dae 2848         ldr       r0, [pc, #0xa0]
+00002db0 3a1c         adds      r2, r7, #0
+00002db2 4844         add       r0, sb
+00002db4 0068         ldr       r0, [r0]
+00002db6 311c         adds      r1, r6, #0
+00002db8 1ff09aff     bl        #0x22cf0

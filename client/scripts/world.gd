@@ -22,6 +22,7 @@ var enabled := true:
 	set(value):
 		enabled = value
 		if not value and move_target != null: move_target.clear()
+		if value and actors != null: _sync_enemies()
 		for sprite in enemy_nodes.values():
 			if not value: sprite.pause()
 			else: sprite.play()
@@ -67,16 +68,7 @@ func _ready() -> void:
 		npc.position = cell_center(Vector2i(10, 13))
 		actors.add_child(npc)
 		_name_tag(npc, "清微道人 · 任务", Color("ffe095"))
-	for enemy in available_enemies():
-		var sprite := OriginalArt.actor(String(enemy.art))
-		sprite.position = cell_center(Vector2i(enemy.cell[0], enemy.cell[1]))
-		actors.add_child(sprite)
-		enemy_nodes[enemy.id] = sprite
-		_name_tag(sprite, String(enemy.name), Color("ffb29a"))
-		if enemy.kind == "wolf":
-			var home := Vector2i(enemy.cell[0], enemy.cell[1])
-			patrols[enemy.id] = {"home": home, "cell": home, "next": Vector2i(-1, -1),
-				"path": [], "waypoint": 0, "wait": 0.7 + patrols.size() * 0.25}
+	_sync_enemies()
 	camera = Camera2D.new()
 	camera.position = hero.position
 	camera.limit_left = 0
@@ -178,15 +170,43 @@ func _name_tag(sprite: Node2D, value: String, color: Color) -> void:
 	label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0))
 	sprite.add_child(label)
 
-func available_enemies() -> Array[Dictionary]:
-	var result: Array[Dictionary] = []
+func _sync_enemies() -> void:
+	var now := Time.get_unix_time_from_system()
 	for enemy in ENEMIES:
 		var enemy_zone := 1 if enemy.id in ["guardian", "boss"] else 0
-		if enemy_zone == zone and not Game.player.defeated.has(enemy.id):
+		if enemy_zone != zone or not Game.enemy_available(String(enemy.id), now):
+			if not enemy_nodes.has(enemy.id): continue
+			var removed: AnimatedSprite2D = enemy_nodes[enemy.id]
+			actors.remove_child(removed)
+			removed.queue_free()
+			enemy_nodes.erase(enemy.id)
+			patrols.erase(enemy.id)
+			if pending.get("kind") == "enemy" and pending.data.id == enemy.id:
+				pending = {}
+				path.clear()
+				move_target.clear()
+			continue
+		if enemy_nodes.has(enemy.id): continue
+		var sprite := OriginalArt.actor(String(enemy.art))
+		var home := Vector2i(enemy.cell[0], enemy.cell[1])
+		sprite.position = cell_center(home)
+		actors.add_child(sprite)
+		enemy_nodes[enemy.id] = sprite
+		_name_tag(sprite, String(enemy.name), Color("ffb29a"))
+		if not enabled: sprite.pause()
+		if enemy.kind == "wolf":
+			patrols[enemy.id] = {"home": home, "cell": home, "next": Vector2i(-1, -1),
+				"path": [], "waypoint": 0, "wait": 0.7 + patrols.size() * 0.25}
+
+func available_enemies() -> Array[Dictionary]:
+	var result: Array[Dictionary] = []
+	var now := Time.get_unix_time_from_system()
+	for enemy in ENEMIES:
+		var enemy_zone := 1 if enemy.id in ["guardian", "boss"] else 0
+		if enemy_zone == zone and enemy_nodes.has(enemy.id) and Game.enemy_available(String(enemy.id), now):
 			var current: Dictionary = enemy.duplicate(true)
-			if enemy_nodes.has(enemy.id):
-				var spot := _enemy_cell(enemy_nodes[enemy.id])
-				current.cell = [spot.x, spot.y]
+			var spot := _enemy_cell(enemy_nodes[enemy.id])
+			current.cell = [spot.x, spot.y]
 			result.append(current)
 	return result
 
@@ -288,6 +308,7 @@ func _interact_pending() -> void:
 
 func _process(delta: float) -> void:
 	if not enabled or hero == null: return
+	_sync_enemies()
 	if _keyboard_direction() != Vector2i.ZERO:
 		move_target.clear()
 		path.clear()

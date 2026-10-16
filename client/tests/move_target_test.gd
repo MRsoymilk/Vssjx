@@ -10,6 +10,7 @@ func _run() -> void:
 	Game.new_player("落点提示", 1, 0)
 	Game.player.cell = [16,17]
 	Game.player.defeated = ["wolf_a", "wolf_b", "wolf_c", "spirit", "guardian", "boss"]
+	for id in Game.player.defeated: Game.player.enemy_respawns[id] = Time.get_unix_time_from_system() + 3600.0
 	var viewport: SubViewport = load("res://scenes/ui/world_viewport.tscn").instantiate()
 	add_child(viewport)
 	var world := ShushanWorld.new()

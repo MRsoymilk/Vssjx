@@ -67,6 +67,7 @@ func _run() -> void:
 	await get_tree().process_frame
 	# No NPC, portal or patrol should turn a movement test into an interaction.
 	Game.player.defeated = ["wolf_a", "wolf_b", "wolf_c", "spirit", "guardian", "boss"]
+	for id in Game.player.defeated: Game.player.enemy_respawns[id] = Time.get_unix_time_from_system() + 3600.0
 	world.zone = 1
 	for direction in [Vector2i(1, 1), Vector2i(1, -1), Vector2i(-1, 1), Vector2i(-1, -1)]:
 		for offset in [Vector2(24, 40), Vector2(40, 24), Vector2(64, 64), Vector2(96, 48)]:

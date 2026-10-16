@@ -380,6 +380,7 @@ func _run() -> void:
 	check(app.battle.committed and app.modal != null, "Victory animation finishes before reward popup and save")
 	# Reset quest data so the subsequent complete quest flow starts with all wolves.
 	Game.player.defeated = []
+	Game.player.enemy_respawns = {}
 	Game.player.kills = 0
 	Game.player.quest = 1
 	press("返回山道")
@@ -393,7 +394,7 @@ func _run() -> void:
 		check(app.battle.victory and app.modal != null, "Battle UI displays victory")
 		press("返回山道")
 		await get_tree().process_frame
-	check(int(Game.player.quest) == 2 and app.world.available_enemies().size() == 1, "Defeated wolves removed from world")
+	check(int(Game.player.quest) == 2 and not Game.enemy_available("wolf_c"), "Quest completes while the last defeated wolf awaits respawn")
 	app._npc()
 	press("领取奖励")
 	check(int(Game.player.quest) == 3, "NPC reward unlocks ruins")

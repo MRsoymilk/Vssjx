@@ -5,6 +5,7 @@ const JOBS := ["力士", "侠客", "隐者"]
 const SCHOOLS := ["峨眉", "花涧", "昆仑"]
 const SAVE_VERSION := 1
 const START_CELL := Vector2i(10, 16)
+const ENEMY_RESPAWN_SECONDS := 30.0 # Offline rule; not a recovered original server value.
 var save_path := "user://shushan_save.json"
 var player: Dictionary = {}
 var last_save_error := ""
@@ -45,7 +46,7 @@ func new_player(nickname: String, job: int, school: int, gender: int = 0) -> voi
 		"level": 1, "xp": 0, "gold": 30, "potions": 6,
 		"hp": 0, "mp": 0, "quest": 0, "kills": 0,
 		"equipped": false, "zone": 0, "cell": [START_CELL.x, START_CELL.y],
-		"defeated": [], "signature": "", "title": "",
+		"defeated": [], "enemy_respawns": {}, "signature": "", "title": "",
 		"ingots": 0, "guild_contribution": 0, "essence": 0
 	}
 	if String(player.name).is_empty():
@@ -115,10 +116,23 @@ func quest_text() -> String:
 		3: return "穿过东侧灵门，击败遗迹妖王"
 		_: return "蜀山初行已完成 · 自由探索"
 
+func enemy_respawn_remaining(id: String, now: float = -1.0) -> float:
+	if now < 0.0: now = Time.get_unix_time_from_system()
+	return maxf(0.0, float(player.get("enemy_respawns", {}).get(id, 0.0)) - now)
+
+func enemy_available(id: String, now: float = -1.0) -> bool:
+	# Defeated is quest history, not the current world population. Missing
+	# deadlines in legacy saves allow those monsters to return immediately.
+	return enemy_respawn_remaining(id, now) <= 0.0
+
 func finish_enemy(enemy: Dictionary) -> bool:
 	var id := String(enemy.id)
 	if not player.defeated.has(id):
 		player.defeated.append(id)
+	if not player.has("enemy_respawns"): player.enemy_respawns = {}
+	# Persist wall-clock deadlines so changing maps or restarting the game
+	# neither restarts the cooldown nor loses time spent outside the world.
+	player.enemy_respawns[id] = Time.get_unix_time_from_system() + ENEMY_RESPAWN_SECONDS
 	if int(player.quest) == 1 and String(enemy.kind) == "wolf":
 		player.kills = mini(3, int(player.kills) + 1)
 		if int(player.kills) >= 3:
@@ -213,6 +227,7 @@ func load_game() -> PlatformResult:
 		if not player.has(key): player[key] = 0
 	if not player.has("weapon_owned"): player.weapon_owned = true
 	if not player.has("bag_order"): player.bag_order = ["potion", "sword"]
+	if not player.has("enemy_respawns"): player.enemy_respawns = {}
 	_player_generation += 1
 	result = _finish_storage(PlatformResult.success(), _player_generation)
 	return result
@@ -256,6 +271,13 @@ func valid_save(data: Variant) -> bool:
 	if not data.defeated is Array or data.defeated.size() > 20: return false
 	for value in data.defeated:
 		if not value is String: return false
+	var respawns: Variant = data.get("enemy_respawns", {})
+	if not respawns is Dictionary or respawns.size() > 20: return false
+	for id in respawns:
+		if not id is String or id.is_empty() or id.length() > 64: return false
+		var deadline: Variant = respawns[id]
+		if not (deadline is int or deadline is float) or not is_finite(float(deadline)): return false
+		if deadline < 0 or deadline > 253402300799.0: return false
 	var old := player
 	player = data
 	var values := stats()

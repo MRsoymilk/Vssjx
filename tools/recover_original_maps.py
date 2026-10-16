@@ -37,8 +37,8 @@ class MapReader:
         return self.take(length).decode('utf-16-be')
 
 
-def parse_scene(payload, expected_maps):
-    """Strict v48 parser, derived from native functions 0x137c8/0x2fb50."""
+def parse_scene_prefix(payload, expected_maps):
+    """Parse one candidate record and return its length, without claiming its trailer."""
     reader = MapReader(payload)
     map_id_text = reader.text()
     if not map_id_text.isascii() or not map_id_text.isdecimal():
@@ -71,15 +71,22 @@ def parse_scene(payload, expected_maps):
             raise ValueError('Interaction marker outside scene bounds')
         portals.append({'text_0': first, 'text_1': second, 'x': x, 'y': y,
                         'note': '两个字符串的业务含义待真实场景样本核验'})
-    if reader.offset != len(payload):
-        raise ValueError('Unparsed scene trailer; do not claim a complete layout')
-    return {'original_map_id': map_id, 'name': name, 'width': width, 'height': height,
+    scene = {'original_map_id': map_id, 'name': name, 'width': width, 'height': height,
             'cell_size': 16, 'terrain_indices': terrain, 'tile_palette_one_based': palette,
             'tiles': [palette[index - 1] - 1 if index else -1 for index in terrain],
             'interaction_bytes': interaction, 'metadata_bytes': metadata,
             'interaction_records': portals,
             'notes': ['地形0表示不绘制；其余索引经过图块表映射到tile编号。',
                       '第二字节层用于通行/交互，尚不将非零值统一解释为阻挡。']}
+    return scene, reader.offset
+
+
+def parse_scene(payload, expected_maps):
+    """Strict v48 standalone parser: an unexplained trailer is still rejected."""
+    scene, consumed = parse_scene_prefix(payload, expected_maps)
+    if consumed != len(payload):
+        raise ValueError('Unparsed scene trailer; do not claim a complete layout')
+    return scene
 
 
 def find_scene(data, expected_maps):

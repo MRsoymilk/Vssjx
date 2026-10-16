@@ -29,7 +29,7 @@ fs.mkdirSync(output, {recursive: true});
         await page.waitForTimeout(1500);
         check(await page.evaluate(() => window.isSecureContext), 'Deployed page is a browser secure context');
         await click(235, 414);
-        await click(160, 292); // Web mode choice -> same-site online game.
+        // Cover login now opens the account page directly, without a mode dialog.
         await page.screenshot({path: path.join(output, 'online-login.png')});
         await click(160, 192);
         await page.keyboard.type('deploy_probe_' + Date.now().toString(36), {delay: 80});

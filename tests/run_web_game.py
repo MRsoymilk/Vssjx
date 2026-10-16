@@ -1,4 +1,4 @@
-"""Serve an already exported real game on an owned loopback port for Chromium UI tests."""
+"""Serve the exported game with an explicitly rejecting login fixture for UI checks."""
 import argparse
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 import json
@@ -38,6 +38,20 @@ def main():
             self.send_header('Cache-Control', 'no-store')
             super().end_headers()
 
+        def do_POST(self):
+            requests.append(self.path)
+            length = int(self.headers.get('Content-Length', '0'))
+            if length < 0 or length > 65536:
+                self.send_error(413)
+                return
+            self.rfile.read(length)  # Test credentials are discarded, never logged.
+            body = b'{"code":"ACCOUNT_UNAVAILABLE"}'
+            self.send_response(503 if self.path == '/api/v1/auth/login' else 404)
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Content-Length', str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+
     server = ThreadingHTTPServer(('127.0.0.1', 0), Handler)
     thread = threading.Thread(target=server.serve_forever, daemon=True)
     thread.start()
@@ -50,7 +64,8 @@ def main():
         (output / 'requests.json').write_text(json.dumps(requests, indent=2))
         print(text, end='', flush=True)
         assert result.returncode == 0 and 'WEB GAME BROWSER:' in text, 'See browser.log/screenshots'
-        assert not any('/api/v1/' in request for request in requests), 'Offline gameplay must not contact account/world APIs'
+        api = [request for request in requests if '/api/v1/' in request]
+        assert api == ['/api/v1/auth/login'], 'Only the explicit direct-login fixture request is allowed'
     finally:
         server.shutdown()
         server.server_close()

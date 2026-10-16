@@ -310,16 +310,8 @@ func _home() -> void:
 func _cover_choice(option: String) -> void:
 	match option:
 		"登陆游戏", "登录游戏":
-			if OS.has_feature("web"): _web_entry()
-			else: _server_login()
+			_server_login()
 		"退出游戏": _cover_exit()
-
-func _web_entry() -> void:
-	var panel := _modal_panel("选择游戏模式")
-	_label(panel, "离线存档仅保存在本站浏览器，不会导入线上角色。清除站点数据会删除进度。", Rect2(18, 48, 248, 68), 13)
-	_button(panel, "离线单人", Rect2(18, 124, 248, 30), _enter_local_game, true)
-	_button(panel, "本站联机", Rect2(18, 160, 248, 30), _server_login)
-	_button(panel, "返回", Rect2(18, 196, 248, 30), _close_modal)
 
 func _web_lifecycle(event: String) -> void:
 	if event not in ["focus_lost", "suspended"]: return

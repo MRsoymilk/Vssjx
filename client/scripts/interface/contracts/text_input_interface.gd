@@ -1,6 +1,10 @@
 class_name PlatformTextInputInterface
 extends RefCounted
-## Focus and composition only. Never inspect, retain or log field contents.
+## Native focus/composition; Web may mirror a live field to an ephemeral DOM input.
+## Never persist, log or expose field contents through config or platform results.
+
+func attach(_owner: Node) -> void:
+	pass
 
 func request_focus(_field: LineEdit, _select_all: bool = false) -> PlatformResult:
 	return PlatformResult.unsupported()

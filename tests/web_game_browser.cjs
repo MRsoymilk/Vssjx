@@ -48,11 +48,13 @@ async function boot() {
         await click(45, 460);
         await shot('04-return-to-cover');
         await page.setViewportSize({width: 390, height: 844});
+        await page.waitForTimeout(300);
         const portrait = await page.locator('#canvas').boundingBox();
         check(Math.abs(portrait.width / portrait.height - 2 / 3) < 0.01 && portrait.x >= 0 && portrait.y >= 0 && portrait.x + portrait.width <= 391 && portrait.y + portrait.height <= 844, 'Mobile-sized portrait keeps the complete game in view');
         await click(235, 414, true);
         await shot('05-touch-login');
         await page.setViewportSize({width: 844, height: 390});
+        await page.waitForTimeout(300);
         const landscape = await page.locator('#canvas').boundingBox();
         check(Math.abs(landscape.width / landscape.height - 2 / 3) < 0.01 && landscape.y + landscape.height <= 390, 'Landscape size preserves the portrait login and footer');
         await shot('06-landscape-login');

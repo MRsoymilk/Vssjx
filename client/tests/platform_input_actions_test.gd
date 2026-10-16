@@ -142,7 +142,7 @@ func _test_game_and_exit(port, actions) -> void:
 	check(app.mode == "create" and not (await Game.probe_save()).value and Game.player == old_player, "Direct page submit cannot bypass the composition guard or mutate an offline save")
 	port.composing = false
 	app._start_new()
-	check(app.mode == "world" and Game.player.name == "输入验证" and (await Game.probe_save()).value, "Confirmed offline creation still reaches the normal saved world")
+	check(app.mode == "local_select" and Game.player.name == "输入验证" and (await Game.probe_save()).value, "Confirmed offline creation saves and reaches the shared character selection flow")
 	app._request_exit()
 	check(actions.requests == 1, "Game requests an exit through the system port")
 	Game.player.gold = 73

@@ -2,14 +2,14 @@
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
   <title>$GODOT_PROJECT_NAME</title>
   <style>
     * { box-sizing: border-box; }
     html, body { margin: 0; width: 100%; height: 100%; background: #0b131a; color: #eee6cc; font-family: sans-serif; }
-    body { display: flex; flex-direction: column; align-items: center; justify-content: center;
+    body { height: var(--game-visible-height, 100dvh); display: flex; flex-direction: column; align-items: center; justify-content: center;
       padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); overflow: hidden; }
-    #frame { position: relative; flex: 0 0 auto; width: min(100%, calc((100dvh - 48px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) * 2 / 3)); aspect-ratio: 2 / 3; }
+    #frame { position: relative; flex: 0 0 auto; width: min(100%, calc((var(--game-visible-height, 100dvh) - 48px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) * 2 / 3)); aspect-ratio: 2 / 3; }
     #canvas { position: absolute; inset: 0; width: 100% !important; height: 100% !important; display: block; outline: none; touch-action: none; }
     #loading { position: absolute; inset: 0; background: #0b131a; display: flex; gap: 16px; padding: 20px; align-items: center; justify-content: center; flex-direction: column; text-align: center; }
     #start { padding: 12px 28px; font-size: 18px; cursor: pointer; }

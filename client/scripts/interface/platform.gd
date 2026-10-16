@@ -23,6 +23,7 @@ func initialize(target: String = "") -> void:
 		add_child(context.lifecycle)
 		add_child(context.resource_loader)
 		add_child(context.system_actions)
+		context.text_input.attach(self)
 		if context.target == "web":
 			last_result = await context.storage.initialize().wait()
 		else:

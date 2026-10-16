@@ -11,7 +11,7 @@ static func create(target: String = "") -> PlatformContext:
 			load("res://scripts/interface/adapters/web/web_display.gd").new(),
 			load("res://scripts/interface/adapters/web/web_lifecycle.gd").new(),
 			load("res://scripts/interface/adapters/web/web_resource_loader.gd").new(),
-			preload("res://scripts/interface/adapters/common/godot_text_input.gd").new(),
+			load("res://scripts/interface/adapters/web/web_text_input.gd").new(),
 			load("res://scripts/interface/adapters/web/web_system_actions.gd").new())
 	if selected != "native": return null
 	return PlatformContext.new("native",

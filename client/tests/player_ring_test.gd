@@ -3,7 +3,14 @@ extends "res://tests/shared_interface_test.gd"
 func verify_ring(ring: Node2D, actor: Node2D, message: String) -> void:
 	ring._process(0.0)
 	check(ring.scene_file_path == "res://scenes/actors/player_ring.tscn" and ring.show_behind_parent, "Original ring draws below its actor: " + message)
-	check(ring.global_position.is_equal_approx(actor.global_position), "Ring follows the actual feet: " + message)
+	var visual: AnimatedSprite2D = ring._visual_actor
+	var expected := actor.global_position
+	if visual != null:
+		var poses: Dictionary = visual.get_meta("ground_pose_x", {})
+		var steps: Array = poses.get(String(visual.animation), poses.get("idle", []))
+		var offset := 0.0 if visual.get_meta("native_ground_anchor", false) or steps.is_empty() else -float(steps[mini(visual.frame, steps.size() - 1)])
+		expected = visual.to_global(Vector2(offset, 0))
+	check(ring.global_position.is_equal_approx(expected), "Ring follows the compensated foot anchor: " + message)
 	check(ring.global_transform.x.is_equal_approx(Vector2.RIGHT) and ring.global_transform.y.is_equal_approx(Vector2.DOWN), "Facing and actor scaling preserve ring pixels: " + message)
 	var animation: AnimatedSprite2D = ring.get_node("Animation")
 	check(animation.sprite_frames.get_frame_count("idle") == 4 and animation.sprite_frames.get_animation_loop("idle") and animation.is_playing(), "Four original animation steps loop: " + message)
@@ -28,11 +35,26 @@ func _run() -> void:
 		var hero: AnimatedSprite2D = app.world.hero
 		var ring: Node2D = hero.get_node("PlayerRing")
 		verify_ring(ring, hero, "world avatar " + str(variant))
+		# Source head centers are pinned independently of the runtime metadata.
+		var centers := {"idle": [5, 4, 0, 4, 2, 4][variant], "walk": [3, 1, -2, 2, 1, 2][variant]}
+		for side in [1.0, -1.0]:
+			hero.scale.x = side
+			for animation in ["idle", "walk"]:
+				hero.animation = animation
+				hero.pause()
+				for frame in hero.sprite_frames.get_frame_count(animation):
+					hero.frame = frame
+					ring._process(0.0)
+					check(ring.global_position.is_equal_approx(hero.to_global(Vector2(-centers[animation], 0))), "Native ground origin stays centered for variant %d, %s, frame %d, side %d" % [variant, animation, frame, side])
+		hero.play("idle")
+		app.world._face_actor(hero, true)
+		ring._process(0.0)
 		var former_position := ring.global_position
 		hero.position += Vector2(16, 0)
 		app.world._face_actor(hero, false)
 		verify_ring(ring, hero, "moving and facing right " + str(variant))
-		check(ring.global_position.x == former_position.x + 16, "World ring never stays at a previous cell")
+		check(is_equal_approx(ring.global_position.x, hero.global_position.x + float(centers.idle)), "Mirrored feet carry the ring to the correct side of the moving actor")
+		check(ring.global_position != former_position, "World ring never stays at a previous cell")
 		check(hero.get_child(0) is Label, "Adding a ring preserves the actor name tag facing logic")
 		if variant == 3: await capture("world-player-ring")
 		var enemy: Dictionary = ShushanWorld.ENEMIES[0].duplicate(true)
@@ -40,6 +62,7 @@ func _run() -> void:
 		enemy.attack = 1
 		app._start_battle(enemy)
 		verify_ring(app.battle_ring, app.battle_hero, "battle avatar " + str(variant))
+		check(app.battle_ring.global_position == app.battle_hero.global_position, "Native battle actors do not receive world compensation twice")
 		check(app.battle_ring.visible and not app.battle_enemy.has_node("PlayerRing"), "Ready battle marks only the local character")
 		app._battle_turn("attack")
 		await get_tree().create_timer(0.17).timeout
@@ -62,6 +85,12 @@ func _run() -> void:
 	view.network.changed.emit(view.network.entities)
 	var own: Node2D = view.actors[SELF].root
 	verify_ring(own.get_node("PlayerRing"), own, "online world")
+	var online_sprite: AnimatedSprite2D = view.actors[SELF].sprite
+	for side in [1.0, -1.0]:
+		online_sprite.scale.x = side
+		var online_marker: Node2D = own.get_node("PlayerRing")
+		online_marker._process(0.0)
+		check(online_marker.global_position == online_sprite.to_global(Vector2(-4, 0)), "Online sibling ring follows visual facing rather than its unmirrored container")
 	check(not view.actors[PEER].root.has_node("PlayerRing"), "Online peers do not receive the local-player marker")
 	own.position += Vector2(8, 12)
 	verify_ring(own.get_node("PlayerRing"), own, "online interpolated position")

@@ -42,7 +42,7 @@ def actor_playback(key, animation, source_dir):
                       if index < len(masks) and masks[index] & (1 << step)]
                for mode, index in ids.items()}
     centers = {}
-    for mode in ('idle', 'attack', 'hurt'):
+    for mode in (('idle', 'walk', 'attack', 'hurt') if key.startswith('hero/') else ('idle', 'attack', 'hurt')):
         centers[mode] = []
         for frame, _ in playback[mode]:
             bodies = [layer for layer in animation['frames'][frame]

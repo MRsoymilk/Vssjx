@@ -14,6 +14,19 @@ from tools.import_assets import bake_player_ring, TRANSFORMS
 
 
 class NativeBattleAniTests(unittest.TestCase):
+    def test_ring_compensation_matches_source_head_center_for_every_world_frame(self):
+        for key in ('mzs', 'wzs', 'mck', 'wck', 'mfs', 'wfs'):
+            source = json.loads((ROOT / f'analysis/animations/hero/{key}.json').read_text('utf8'))
+            info = json.loads((ROOT / f'client/assets/data/actors/hero/{key}.json').read_text('utf8'))
+            for mode in ('idle', 'walk'):
+                expected = []
+                for frame, _ in info['playback'][mode]:
+                    head = next(layer for layer in source['frames'][frame]
+                                if layer['source'] == source['sources'][0] and layer['frame'] == 0)
+                    with Image.open(ROOT / f"analysis/decoded_png/ssjx/hero/{head['source']}_frame000.png") as image:
+                        expected.append(head['x'] + image.width // 2)
+                self.assertEqual(info['native_battle']['pose_x'][mode], expected)
+
     def test_binary_identity_and_state_5_target_origin_are_pinned(self):
         report = evidence()
         self.assertEqual(report['attack_target'], '0x24636')

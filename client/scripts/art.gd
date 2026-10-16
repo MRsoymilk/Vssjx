@@ -107,6 +107,10 @@ static func actor(key: String) -> AnimatedSprite2D:
 		cached[key] = frames
 	sprite.sprite_frames = cached[key]
 	sprite.offset = Vector2(info.origin[0] - info.get("anchor_x", 0), info.origin[1])
+	if key.begins_with("hero/"):
+		# The atlas removes these source head translations to stabilize walking.
+		# Ground markers must undo that same translation to stay under the feet.
+		sprite.set_meta("ground_pose_x", info.get("native_battle", {}).get("pose_x", {}))
 	sprite.animation_finished.connect(func() -> void:
 		if sprite.animation in ["attack", "cast", "hurt"]: sprite.play("idle")
 	)
@@ -115,6 +119,7 @@ static func actor(key: String) -> AnimatedSprite2D:
 
 static func battle_actor(key: String) -> AnimatedSprite2D:
 	var sprite := actor(key)
+	sprite.set_meta("native_ground_anchor", true)
 	var base_offset := sprite.offset
 	var offsets: Dictionary = actor_info(key).get("native_battle", {}).get("pose_x", {})
 	# Gameplay atlases stabilize the body/head for walking. Battle rendering

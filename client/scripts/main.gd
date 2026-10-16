@@ -51,6 +51,8 @@ var battle_move_callout: BattleMoveCallout
 var battle_transition: BattleEncounterTransition
 var battle_transition_epoch := 0
 var battle_resource_request: PlatformResourceRequest
+var battle_playback: BattleActionPlayback
+var battle_ring: Node2D
 var clock_timer := 0.0
 var effects_layer: Control
 var world_identity: Label
@@ -65,6 +67,9 @@ var _ui_process_mode: ProcessMode
 var _closing := false
 
 func _exit_tree() -> void:
+	_ui_epoch += 1
+	if battle_playback != null: battle_playback.cancel()
+	battle_playback = null
 	Game.invalidate_load()
 
 func _ready() -> void:
@@ -116,6 +121,7 @@ func _autosave() -> void:
 
 func _process(delta: float) -> void:
 	if Game.storage_busy or _closing: return
+	if battle_playback != null: battle_playback.advance(delta)
 	clock_timer += delta
 	if clock_timer >= 1.0 and chrome != null and is_instance_valid(chrome):
 		clock_timer = 0.0
@@ -244,6 +250,9 @@ func _button(parent: Node, text_value: String, rect: Rect2, callback: Callable, 
 
 func _clear_ui() -> void:
 	_ui_epoch += 1
+	if battle_playback != null: battle_playback.cancel()
+	battle_playback = null
+	battle_ring = null
 	Game.invalidate_load()
 	character_selection = null
 	announcement_banner.present({})
@@ -859,6 +868,7 @@ func _start_battle(enemy: Dictionary) -> void:
 	)
 	ring.scale.y = 0.4
 	ui.add_child(ring)
+	battle_ring = ring
 	battle_enemy = OriginalArt.actor(String(enemy.art))
 	battle_enemy.position = Vector2(58, 282)
 	battle_enemy.scale = Vector2(-1.1, 1.1)
@@ -937,6 +947,7 @@ func _battle_inspect() -> void:
 func _battle_turn(command: String) -> void:
 	if mode != "battle" or battle.phase != "select" or modal != null: return
 	var active_battle := battle
+	var epoch := _ui_epoch
 	var start := battle.begin_action(command)
 	_battle_lines(start.lines)
 	if not start.ok:
@@ -948,11 +959,18 @@ func _battle_turn(command: String) -> void:
 	battle_move_callout.present(ShushanBattle.action_name(command, int(Game.player.job)), battle_hero.position + Vector2(0, -88), _battle_action_duration(battle_hero, animation) + 0.15 if command in ["attack", "skill"] else 0.75)
 	_refresh_battle()
 	await get_tree().create_timer(0.15).timeout
-	if mode != "battle" or battle != active_battle: return
+	if epoch != _ui_epoch or mode != "battle" or battle != active_battle: return
+	var player_motion: BattleActionPlayback
+	if command in ["attack", "skill"]:
+		player_motion = BattleActionPlayback.new()
+		battle_playback = player_motion
+		player_motion.start(battle_hero, OriginalArt.actor_info(Game.actor_key()), battle_enemy.global_position, animation)
+		_refresh_battle()
+		await player_motion.impact
+		if epoch != _ui_epoch or player_motion.cancelled or mode != "battle" or battle != active_battle: return
 	var result := battle.resolve_player()
 	_battle_lines(result.lines)
 	if command in ["attack", "skill"]:
-		battle_hero.play(animation)
 		if int(result.damage) > 0 and battle_enemy.sprite_frames.has_animation("hurt"):
 			battle_enemy.play("hurt")
 		var effect_key: String = "effect/flash" if command == "attack" else ["effect/t71", "effect/t36", "effect/t47"][int(Game.player.job)]
@@ -961,27 +979,36 @@ func _battle_turn(command: String) -> void:
 		effects_layer.add_child(effect)
 		_damage_number(int(result.damage), battle_enemy.position + Vector2(-3, -53))
 	_refresh_battle()
-	await get_tree().create_timer(_battle_action_duration(battle_hero, animation) if command in ["attack", "skill"] else 0.6).timeout
-	if mode != "battle" or battle != active_battle: return
+	if player_motion != null:
+		await player_motion.completed
+		if player_motion.cancelled: return
+	else:
+		await get_tree().create_timer(0.6).timeout
+	if epoch != _ui_epoch or mode != "battle" or battle != active_battle: return
+	battle_playback = null
 	battle_move_callout.clear()
 	if battle.phase == "enemy":
 		battle_stage = "enemy"
+		var enemy_motion := BattleActionPlayback.new()
+		battle_playback = enemy_motion
+		enemy_motion.start(battle_enemy, OriginalArt.actor_info(battle.enemy.art), battle_hero.global_position)
 		_refresh_battle()
-		battle_enemy.play("attack")
-		await get_tree().create_timer(0.15).timeout
-		if mode != "battle" or battle != active_battle: return
+		await enemy_motion.impact
+		if epoch != _ui_epoch or enemy_motion.cancelled or mode != "battle" or battle != active_battle: return
 		var response := battle.resolve_enemy()
 		_battle_lines(response.lines)
+		if int(response.incoming) > 0 and battle_hero.sprite_frames.has_animation("hurt"): battle_hero.play("hurt")
 		_damage_number(int(response.incoming), battle_hero.position + Vector2(-10, -53))
 		if int(response.reflected) > 0:
 			_damage_number(int(response.reflected), battle_enemy.position + Vector2(-3, -53))
 		_refresh_battle()
-		await get_tree().create_timer(_battle_action_duration(battle_enemy)).timeout
-		if mode != "battle" or battle != active_battle: return
+		await enemy_motion.completed
+		if epoch != _ui_epoch or enemy_motion.cancelled or mode != "battle" or battle != active_battle: return
+		battle_playback = null
 	battle_stage = "settlement"
 	_refresh_battle()
 	await get_tree().create_timer(0.35).timeout
-	if mode != "battle" or battle != active_battle: return
+	if epoch != _ui_epoch or mode != "battle" or battle != active_battle: return
 	_battle_lines(battle.finish_round().lines)
 	battle_stage = battle.phase
 	auto_timer = 0.0
@@ -1031,6 +1058,14 @@ func _refresh_battle() -> void:
 	battle_hero_mp.value = battle.mp
 	battle_enemy_hp.max_value = int(battle.enemy.hp)
 	battle_enemy_hp.value = battle.enemy_hp
+	var moving_hero := battle_playback != null and battle_playback.active and battle_playback.actor == battle_hero and battle_playback.action == &"attack"
+	var moving_enemy := battle_playback != null and battle_playback.active and battle_playback.actor == battle_enemy
+	battle_hero_hp.visible = not moving_hero
+	battle_hero_mp.visible = not moving_hero
+	battle_hero_status.visible = not moving_hero
+	if is_instance_valid(battle_ring): battle_ring.visible = not moving_hero
+	battle_enemy_hp.visible = not moving_enemy
+	battle_enemy_status.visible = not moving_enemy
 	if battle_buttons.size() == 6:
 		for button in battle_buttons: button.disabled = battle.phase != "select"
 		battle_buttons[1].disabled = battle.phase != "select" or battle.mp < 9

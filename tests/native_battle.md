@@ -32,6 +32,34 @@ godot --headless --path client res://tests/data_browser_test.tscn
 2026-10-16，Windows/Python3.11/Godot4.7.1：原生证据4项、角色15项、怪物8项通过；
 演员分片50项、管理页10316项通过。原始归档层／序列哈希保持不变。
 
+## 战斗播放阶段
+
+`BattleActionPlayback`使用已恢复的目标基点、逐步身体中心及命中事件位，控制整段普攻；
+不额外编造飞行轨迹或把原始动作拆成固定距离的缓动。结束／取消时精确恢复原位和待机。
+镜像侧使用实际变换基向量的符号，避免Godot的global_scale分解把负X翻转为负Y，导致怪物再次向外退。
+
+离线战斗在命中事件才结算伤害、受击和命中特效；先完成我方收招再开始敌方动作，
+敌方归位后进入回合结算。联机显示同样按这些时刻应用服务端已有血量结果，不修改服务端数值。
+致命反击、力士防御反震取胜仍播放敌方最后一击，之后才显示结果；主动逃跑不伪造攻击。
+普攻期间按原绘制分支隐藏攻击者原位的头顶血条与选择圈，归位后恢复。
+切换场景或断线会取消位移与待结算表现；离线等待通过UI epoch拒绝已放弃的命中回调。
+
+```text
+godot --headless --path client res://tests/native_battle_motion_test.tscn
+godot --headless --path client res://tests/native_battle_flow_test.tscn
+godot --headless --path client res://tests/wolf_reaction_test.tscn
+godot --headless --path client res://tests/online_pve_test.tscn
+godot --headless --path client res://tests/battle_casting_test.tscn
+godot --headless --path client res://tests/test_runner.tscn
+godot --path client res://tests/native_battle_flow_test.tscn -- --capture-native-flow=/absolute/path/native-combat
+```
+
+2026-10-16 Windows/Godot4.7.1：10种游戏演员、双侧方向的逐帧轨迹／命中／归位201项；
+6个人物实际离线流程及取消57项；4组怪物联机时序／致命反击／反震70项；联网界面28项；
+施法53项；完整玩法385项通过。实际OpenGL流程59项通过，已查看接近命中及归位截图。
+完整玩法测试由硬编码0.8秒等待调整为实际动画时长，伤害断言改为等待原生命中事件；
+另外检查潜在致命攻击在命中之前不能提前进入胜利结算。
+
 ## 明确限制
 
 原客户端定时器周期尚未确认，沿用当前10fps攻击时钟与原始每步拍数。

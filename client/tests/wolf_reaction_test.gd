@@ -29,12 +29,16 @@ func check_reactions(art_key: String) -> void:
 	model.state.battle.revision = "2"
 	model.state.battle.enemy_hp = 50
 	view.present(model)
-	check(view.enemy.animation == "hurt" and view.hero.animation == "attack", "Player strike triggers monster hurt, not monster attack")
+	check(view.enemy.animation == "idle" and view.hero.animation == "attack" and view.hero.position != Vector2.ZERO, "Approach begins before native impact; target is not hit early")
 	check(view._enemy_attack_delay > 0 and not view.get_node("Hud/ActionMenu").visible, "Counterattack is queued while impact plays")
-	view._process(0.1)
-	check(view.enemy.animation == "hurt", "Early turn time cannot overwrite hurt with attack")
+	view._process(view._hero_motion.impact_time - 0.01)
+	check(view.enemy.animation == "idle", "Target stays idle until native hit step")
+	view._process(0.02)
+	check(view.enemy.animation == "hurt", "Native hit step triggers the independent hurt sequence")
 	view._process(view._enemy_attack_delay + 0.01)
-	check(view.enemy.animation == "attack" and view.animation_time > 0, "Counterattack follows player action and hurt")
+	check(view.enemy.animation == "attack" and view.animation_time > 0 and view.hero.position == Vector2.ZERO, "Counterattack follows complete player return")
+	view._process(view._enemy_motion.remaining() + 0.01)
+	check(view.enemy.position == Vector2.ZERO and view.enemy.animation == "idle", "Counterattack also returns to its original station")
 	model.state.battle.revision = "3"
 	model.state.battle.enemy_hp = 38
 	view.present(model)
@@ -48,12 +52,40 @@ func check_reactions(art_key: String) -> void:
 	check(view._enemy_attack_delay == 0 and view.animation_time == 0 and view.enemy.animation == "idle", "A new battle clears old reaction state")
 	model.state.battle.revision = "2"
 	view.present(model)
-	check(view.enemy.animation == "attack", "No damage does not trigger a hurt reaction")
+	check(view.enemy.animation == "idle", "No damage does not trigger a fake hurt reaction")
+	view._process(view._hero_motion.remaining() + 0.001)
+	check(view.enemy.animation == "attack", "A miss still waits for the player return before retaliation")
 	model.state.battle.revision = "3"
 	model.state.battle.enemy_hp = 0
 	model.state.battle.outcome = "victory"
 	view.present(model)
+	view._process(view._hero_motion.impact_time + 0.01)
 	check(view.enemy.animation == "hurt" and view._enemy_attack_delay == 0, "Defeated monster cannot retaliate")
+	view._process(view._hero_motion.remaining() + 0.01)
+	check(view.hero.position == Vector2.ZERO and view.get_node("Result").visible, "Victory appears after the attacker returns")
+	model.state = state(art_key)
+	model.state.battle.id = "lethal_counter"
+	view.present(model)
+	model.state.battle.revision = "2"
+	model.state.battle.enemy_hp = 50
+	model.state.battle.hp = 0
+	model.state.battle.outcome = "defeat"
+	view.present(model)
+	view._process(view._hero_motion.remaining() + 0.001)
+	check(view.enemy.animation == "attack" and not view.get_node("Result").visible, "A lethal counterattack still plays before defeat is shown")
+	view._process(view._enemy_motion.remaining() + 0.001)
+	check(view.enemy.position == Vector2.ZERO and view.get_node("Result").visible and view.get_node("Hud/BattleHeroHp").value == 0, "Lethal counterattack returns before defeat settlement")
+	model.state = state(art_key)
+	model.state.battle.id = "guard_reflection"
+	view.present(model)
+	model.last_action = "guard"
+	model.state.battle.revision = "2"
+	model.state.battle.enemy_hp = 0
+	model.state.battle.outcome = "victory"
+	view.present(model)
+	check(view.enemy.animation == "attack" and not view.get_node("Result").visible, "Guard reflection victory includes the original enemy strike")
+	view._process(view._enemy_motion.remaining() + 0.001)
+	check(view.enemy.position == Vector2.ZERO and view.get_node("Result").visible, "Reflected victory settles after the enemy returns")
 	view.queue_free()
 	await get_tree().process_frame
 

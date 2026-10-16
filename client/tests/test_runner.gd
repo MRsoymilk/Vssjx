@@ -275,13 +275,15 @@ func _run() -> void:
 	check(app.world.hero.animation == "idle" and app.world.cell == Vector2i(11, 16), "Arriving switches back to idle")
 	app.world.enabled = false
 	var actors_to_check: Array[AnimatedSprite2D] = []
+	var longest_attack := 0.0
 	for key in ["hero/mzs", "hero/mck", "hero/mfs"]:
 		var actor := OriginalArt.actor(key)
 		app.ui.add_child(actor)
 		check(actor.sprite_frames.get_frame_count("idle") == 2 and actor.sprite_frames.get_animation_loop("idle") and actor.sprite_frames.get_frame_count("walk") == 6, "Distinct animated idle and walk for " + key)
 		actor.play("attack")
+		longest_attack = maxf(longest_attack, app._battle_action_duration(actor))
 		actors_to_check.append(actor)
-	await get_tree().create_timer(0.8).timeout
+	await get_tree().create_timer(longest_attack + 0.05).timeout
 	for actor in actors_to_check:
 		check(actor.animation == "idle", "Single attack returns to idle")
 		actor.queue_free()
@@ -319,6 +321,8 @@ func _run() -> void:
 	press("1 攻击")
 	check(app.battle.round_number == 1 and app.battle_stage == "player" and app.battle_buttons[0].disabled, "Submitting command advances visible round and locks input")
 	await get_tree().create_timer(0.2).timeout
+	check(app.battle.enemy_hp == int(app.battle.enemy.hp), "Native approach does not apply damage before the marked hit step")
+	if not app.battle_playback.impacted: await app.battle_playback.impact
 	check(app.battle.enemy_hp < int(app.battle.enemy.hp) and not app.action_menu.visible and app.battle_enemy_hp.value == app.battle.enemy_hp, "Attack closes menu and updates enemy bar")
 	check(app.battle.hp == hp_before_turn and app.battle_stage == "player", "Enemy damage is delayed until player animation completes")
 	app._battle_turn("attack")
@@ -365,6 +369,8 @@ func _run() -> void:
 	app.battle.enemy_hp = 1
 	app._battle_turn("attack")
 	await get_tree().create_timer(0.2).timeout
+	check(app.battle.phase == "player" and not app.battle.finished, "Potential lethal hit still waits for native impact")
+	if not app.battle_playback.impacted: await app.battle_playback.impact
 	var escape_key := InputEventKey.new()
 	escape_key.keycode = KEY_ESCAPE
 	escape_key.pressed = true

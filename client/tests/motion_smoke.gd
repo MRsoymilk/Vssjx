@@ -24,7 +24,7 @@ func _capture() -> void:
 	var variant := clampi(int(OS.get_environment("SSJX_MOTION_VARIANT")), 0, 5) if OS.has_environment("SSJX_MOTION_VARIANT") else 2
 	Game.new_player("行走验证", variant / 2, 0, variant % 2)
 	Game.player.cell = [14, 17]
-	Game.save_game()
+	await Game.save_game()
 	app = load("res://scenes/main.tscn").instantiate()
 	get_tree().root.add_child(app)
 	app._enter_world()

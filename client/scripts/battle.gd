@@ -17,6 +17,7 @@ var finished := false
 var victory := false
 var escaped := false
 var committed := false
+var save_result: PlatformResult
 var rng := RandomNumberGenerator.new()
 
 static func action_name(command: String, job: int) -> String:
@@ -149,5 +150,5 @@ func commit() -> bool:
 		Game.restore()
 		Game.player.zone = 0
 		Game.player.cell = [Game.START_CELL.x, Game.START_CELL.y]
-	Game.save_game()
+	save_result = await Game.save_game()
 	return leveled

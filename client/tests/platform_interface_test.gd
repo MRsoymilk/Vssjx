@@ -38,7 +38,7 @@ func _run() -> void:
 	check(DirAccess.make_dir_absolute(directory) == OK, "Create isolated test directory")
 	_test_config()
 	_test_storage()
-	_test_save_compatibility()
+	await _test_save_compatibility()
 	await _test_display()
 	_test_lifecycle()
 	await _test_initialization_failure(failed)
@@ -98,19 +98,19 @@ func _test_save_compatibility() -> void:
 	var file := FileAccess.open(Game.save_path, FileAccess.WRITE)
 	file.store_string(JSON.stringify(legacy))
 	file.close()
-	check(Game.has_save() and Game.load_game(), "Read pre-interface v1 save from its existing path")
+	check((await Game.probe_save()).value and (await Game.load_game()).ok, "Read pre-interface v1 save from its existing path")
 	check(Game.player.gender == 0 and Game.player.signature == "" and Game.player.weapon_owned, "Old optional defaults remain business-owned")
-	check(Game.save_game(), "Existing synchronous native save returns success")
+	check((await Game.save_game()).ok, "Awaitable native save returns its confirmed receipt")
 	var stored := Platform.context.storage.read_text(Game.save_path)
 	check(JSON.parse_string(stored.value) == JSON.parse_string(JSON.stringify(Game.player)) and int(Game.player.version) == 1, "No new wrapper, platform fields or save-version migration")
 	var player := Game.player.duplicate(true)
 	Platform.context.storage.write_text_atomic(Game.save_path, "{broken")
-	check(not Game.load_game() and Game.player == player and not Game.last_save_error.is_empty(), "Malformed file does not change current player")
+	check(not (await Game.load_game()).ok and Game.player == player and not Game.last_save_error.is_empty(), "Malformed file does not change current player")
 	check(Platform.context.storage.read_text(Game.save_path).value == "{broken", "Malformed original remains untouched")
 	Game.save_path = directory.path_join("missing_parent/save.json")
-	check(not Game.save_game() and not Game.last_save_error.is_empty(), "Failed native save remains a failure with readable explanation")
+	check(not (await Game.save_game()).ok and not Game.last_save_error.is_empty(), "Failed native save remains a failure with readable explanation")
 	Game.save_path = directory.path_join("absent.json")
-	check(not Game.load_game() and Game.last_save_error.is_empty(), "Missing slot clears stale errors")
+	check(not (await Game.load_game()).ok and Game.last_save_error.is_empty(), "Missing slot clears stale errors")
 	Game.save_path = previous_path
 	Game.player = previous_player
 
@@ -159,7 +159,7 @@ func _test_initialization_failure(failed: PlatformResult) -> void:
 	Game.new_player("就绪校验", 1, 0)
 	Platform.state = Platform.State.FAILED
 	Platform.last_result = failed
-	check(not Game.save_game() and not Game.last_save_error.is_empty(), "Game refuses storage while platform is unavailable")
+	check(not (await Game.save_game()).ok and not Game.last_save_error.is_empty(), "Game refuses storage while platform is unavailable")
 	var settings := ServerConnectionSettings.new()
 	check(not settings.save_address("local") and not settings.last_error.is_empty(), "Config refuses writes before readiness")
 	var responses: Array[Dictionary] = []

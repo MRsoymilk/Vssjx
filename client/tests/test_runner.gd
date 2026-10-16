@@ -35,13 +35,13 @@ func _run() -> void:
 	OS.set_environment("SSJX_CONNECTION_PATH", connection_test_path)
 	Game.save_path = "user://test_save.json"
 	Game.new_player("验证侠客", 1, 0)
-	check(Game.save_game(), "Initial save succeeds")
-	check(Game.save_game(), "Atomic replacement of existing save succeeds")
+	check((await Game.save_game()).ok, "Initial save succeeds")
+	check((await Game.save_game()).ok, "Atomic replacement of existing save succeeds")
 	Game.player.gold = 0
-	check(Game.load_game() and int(Game.player.gold) == 30, "Save reload restores state")
+	check((await Game.load_game()).ok and int(Game.player.gold) == 30, "Save reload restores state")
 	Game.new_player("我是你们永远超越不了的传说", 2, 0, 1)
 	check(Game.player.name == "我是你们永远超越不了的传说", "Reference-length nickname is preserved")
-	check(Game.save_game() and Game.load_game() and int(Game.player.gender) == 1 and Game.actor_key() == "hero/wfs", "Female avatar persists across save and reload")
+	check((await Game.save_game()).ok and (await Game.load_game()).ok and int(Game.player.gender) == 1 and Game.actor_key() == "hero/wfs", "Female avatar persists across save and reload")
 	var legacy := Game.player.duplicate(true)
 	legacy.erase("gender")
 	check(Game.valid_save(legacy), "Old saves without gender remain valid")
@@ -49,7 +49,7 @@ func _run() -> void:
 	invalid_gender.gender = 3
 	check(not Game.valid_save(invalid_gender), "Invalid gender is rejected")
 	Game.new_player("验证侠客", 1, 0)
-	Game.save_game()
+	await Game.save_game()
 	var malformed := Game.player.duplicate(true)
 	malformed.cell = [0, 100]
 	check(not Game.valid_save(malformed), "Reject invalid coordinates")
@@ -60,8 +60,8 @@ func _run() -> void:
 	file.store_string("{broken json")
 	file.close()
 	var previous := Game.player.duplicate(true)
-	check(not Game.load_game() and Game.player == previous, "Corrupt save does not change current player")
-	Game.save_game()
+	check(not (await Game.load_game()).ok and Game.player == previous, "Corrupt save does not change current player")
+	await Game.save_game()
 	for job in 3:
 		var limit_enemy: Dictionary = ShushanWorld.ENEMIES[0].duplicate(true)
 		limit_enemy.hp = 9999
@@ -84,7 +84,7 @@ func _run() -> void:
 		model.action("guard")
 		check(model.mp == 5, "Guard regenerates spirit")
 		model.action("flee")
-		model.commit()
+		await model.commit()
 		check(model.escaped and Game.player.defeated.is_empty(), "Escape does not reward or defeat enemy")
 		Game.new_player("职业验证", job, job)
 		Game.player.quest = 1
@@ -98,9 +98,9 @@ func _run() -> void:
 				duel.action("skill" if duel.mp >= 9 else "attack")
 				safety += 1
 			check(duel.victory, "Job %d wins wolf encounter" % job)
-			duel.commit()
+			await duel.commit()
 			var gold_after := int(Game.player.gold)
-			duel.commit()
+			await duel.commit()
 			check(int(Game.player.gold) == gold_after, "Battle reward committed only once")
 		check(int(Game.player.quest) == 2 and int(Game.player.kills) == 3, "Three wolves advance quest")
 		Game.player.quest = 3
@@ -115,9 +115,9 @@ func _run() -> void:
 			boss.action(command)
 			steps += 1
 		check(boss.victory, "Job %d can finish boss encounter" % job)
-		boss.commit()
+		await boss.commit()
 		check(int(Game.player.quest) == 4, "Boss advances final quest")
-		check(Game.load_game() and int(Game.player.quest) == 4, "Final quest persists")
+		check((await Game.load_game()).ok and int(Game.player.quest) == 4, "Final quest persists")
 	Game.new_player("失败验证", 1, 0)
 	Game.player.quest = 1
 	Game.player.hp = 1
@@ -125,7 +125,7 @@ func _run() -> void:
 	var loss := ShushanBattle.new(ShushanWorld.ENEMIES[5])
 	loss.action("attack")
 	check(loss.finished and not loss.victory, "Defeat outcome")
-	loss.commit()
+	await loss.commit()
 	check(int(Game.player.zone) == 0 and int(Game.player.hp) == int(Game.stats().hp), "Defeat restores hero at mountain gate")
 	Game.new_player("回合验证", 1, 0)
 	var staged := ShushanBattle.new(ShushanWorld.ENEMIES[0])
@@ -152,9 +152,9 @@ func _run() -> void:
 	lethal.begin_action("attack")
 	lethal.resolve_player()
 	check(lethal.finished and lethal.victory and lethal.phase == "settlement" and not lethal.resolve_enemy().ok, "Dead enemy never takes a turn")
-	check(not lethal.commit() and not lethal.committed, "Rewards cannot commit before final settlement")
+	check(not (await lethal.commit()) and not lethal.committed, "Rewards cannot commit before final settlement")
 	lethal.finish_round()
-	lethal.commit()
+	await lethal.commit()
 	check(lethal.committed and lethal.phase == "finished", "Rewards commit after final settlement")
 	var retreat := ShushanBattle.new(ShushanWorld.ENEMIES[0])
 	retreat.begin_action("flee")
@@ -427,14 +427,14 @@ func _run() -> void:
 	check(Game.player.signature == "蜀山修行，剑心长存", "Tab changes preserve edited signature")
 	press("返回")
 	check(app.mode == "world" and app.world.enabled, "Return resumes the same world")
-	check(Game.load_game() and Game.player.signature == "蜀山修行，剑心长存", "Signature persists across reload")
+	check((await Game.load_game()).ok and Game.player.signature == "蜀山修行，剑心长存", "Signature persists across reload")
 	var old_properties := Game.player.duplicate(true)
 	for key in ["signature", "title", "ingots", "guild_contribution", "essence"]: old_properties.erase(key)
 	check(Game.valid_save(old_properties), "Legacy saves without properties fields remain valid")
 	var old_file := FileAccess.open(Game.save_path, FileAccess.WRITE)
 	old_file.store_string(JSON.stringify(old_properties))
 	old_file.close()
-	check(Game.load_game() and Game.player.signature == "" and Game.player.ingots == 0, "Load migrates legacy properties fields")
+	check((await Game.load_game()).ok and Game.player.signature == "" and Game.player.ingots == 0, "Load migrates legacy properties fields")
 	Game.player.potions = 201
 	Game.player.equipped = false
 	Game.player.weapon_owned = true
@@ -466,14 +466,14 @@ func _run() -> void:
 	app.backpack._select_equipment(0)
 	press("卸下")
 	check(not Game.player.equipped and app.backpack.items[0].id == "sword", "Unequip returns weapon to inventory")
-	check(Game.load_game() and not Game.player.equipped and int(Game.player.potions) == 101 and Game.player.bag_order == ["sword", "potion"], "Inventory operations persist across save and reload")
+	check((await Game.load_game()).ok and not Game.player.equipped and int(Game.player.potions) == 101 and Game.player.bag_order == ["sword", "potion"], "Inventory operations persist across save and reload")
 	app._close_modal()
 	for school in 3:
 		app._menu()
 		press("系统")
 		press("门派")
 		press(Game.SCHOOLS[school] + "派")
-		check(Game.load_game() and int(Game.player.school) == school and app.mode == "world", "Menu school choice persists identity and returns to world")
+		check((await Game.load_game()).ok and int(Game.player.school) == school and app.mode == "world", "Menu school choice persists identity and returns to world")
 		var colors := OriginalUITheme.palette("scene")
 		check(app.chrome.palette.main == colors.main and app.chrome.toolbar.get_theme_stylebox("panel").bg_color == colors.main, "Scene remains blue independently of school")
 		app._bag()

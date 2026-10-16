@@ -27,7 +27,7 @@ func _run() -> void:
 	_test_fields(text_port)
 	_test_forms(text_port)
 	_test_chat(text_port)
-	_test_game_and_exit(text_port, actions)
+	await _test_game_and_exit(text_port, actions)
 	Platform.context._text_input = old_text
 	Platform.context._system_actions = old_actions
 	actions.queue_free()
@@ -139,10 +139,10 @@ func _test_game_and_exit(port, actions) -> void:
 	app.nickname.text = "输入验证"
 	port.composing = true
 	app._start_new()
-	check(app.mode == "create" and not Game.has_save() and Game.player == old_player, "Direct page submit cannot bypass the composition guard or mutate an offline save")
+	check(app.mode == "create" and not (await Game.probe_save()).value and Game.player == old_player, "Direct page submit cannot bypass the composition guard or mutate an offline save")
 	port.composing = false
 	app._start_new()
-	check(app.mode == "world" and Game.player.name == "输入验证" and Game.has_save(), "Confirmed offline creation still reaches the normal saved world")
+	check(app.mode == "world" and Game.player.name == "输入验证" and (await Game.probe_save()).value, "Confirmed offline creation still reaches the normal saved world")
 	app._request_exit()
 	check(actions.requests == 1, "Game requests an exit through the system port")
 	Game.player.gold = 73

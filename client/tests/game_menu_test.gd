@@ -76,7 +76,7 @@ func _run() -> void:
 	app._menu()
 	app.modal.get_node("Panel/Rows/System").pressed.emit()
 	app.modal.get_node("Panel/Leave").pressed.emit()
-	check(app.mode == "home" and app.modal.has_node("ServerLogin") and Game.load_game(), "System saves progress and returns to login")
+	check(app.mode == "home" and app.modal.has_node("ServerLogin") and (await Game.load_game()).ok, "System saves progress and returns to login")
 	check(Game.player.name == "本地修士", "Returning to login retains the local character save")
 	var saved := FileAccess.get_file_as_string(Game.save_path)
 	before = Game.player.duplicate(true)

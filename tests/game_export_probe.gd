@@ -32,6 +32,21 @@ func _verify() -> void:
 	check(root.content_scale_size == Vector2i(320, 480), "Game export keeps its portrait viewport")
 	var platform = root.get_node("Platform")
 	check(platform.is_available() and platform.context.capabilities().resource_preparation, "Packed project publishes the resource interface")
+	var game = root.get_node("Game")
+	var original_path: String = game.save_path
+	var original_player: Dictionary = game.player.duplicate(true)
+	game.save_path = "user://export_async_probe_%d.json" % OS.get_process_id()
+	game.new_player("包内存档", 1, 0)
+	var saved = await game.save_game()
+	check(saved.ok and saved.value.durability == "native_file", "Packed async save completes with the actual native-file receipt")
+	var probed = await game.probe_save()
+	check(probed.ok and probed.value, "Packed async probe confirms the slot")
+	game.player.gold = 0
+	var restored = await game.load_game()
+	check(restored.ok and game.player.gold == 30 and game.player.version == 1, "Packed async read preserves v1 save compatibility")
+	check(DirAccess.remove_absolute(game.save_path) == OK, "Remove only the owned export save fixture")
+	game.save_path = original_path
+	game.player = original_player
 	var texture_path := "res://assets/actors/map_m10.png"
 	var request = platform.context.resource_loader.prepare(PackedStringArray([texture_path]), scene, 1)
 	var deadline := Time.get_ticks_msec() + 5000

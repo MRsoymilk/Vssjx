@@ -9,6 +9,16 @@ var save_path := "user://shushan_save.json"
 var player: Dictionary = {}
 var last_save_error := ""
 var _initialization_result: PlatformResult
+signal storage_changed(active: bool)
+var storage_busy := false
+var last_save_receipt: Dictionary = {}
+var _player_generation := 0
+var _load_epoch := 0
+var _operation_path := ""
+var _storage_announced := false
+
+func invalidate_load() -> void:
+	_load_epoch += 1
 
 func _ready() -> void:
 	await when_ready()
@@ -27,6 +37,8 @@ func when_ready() -> PlatformResult:
 	return path
 
 func new_player(nickname: String, job: int, school: int, gender: int = 0) -> void:
+	_player_generation += 1
+	last_save_receipt = {}
 	player = {
 		"version": SAVE_VERSION, "name": nickname.strip_edges().left(24), "gender": clampi(gender, 0, 1),
 		"job": clampi(job, 0, 2), "school": clampi(school, 0, 2),
@@ -115,38 +127,85 @@ func finish_enemy(enemy: Dictionary) -> bool:
 		player.quest = 4
 	return add_rewards(int(enemy.gold), int(enemy.xp))
 
-func save_game() -> bool:
+func _begin_storage() -> PlatformResult:
+	if storage_busy: return PlatformResult.new(PlatformResult.Status.TEMPORARY_FAILURE, "STORAGE_BUSY", "存档操作尚未完成，请稍后重试。")
+	if not Platform.is_available():
+		last_save_error = "平台尚未就绪，无法读写存档。"
+		return PlatformResult.new(PlatformResult.Status.TEMPORARY_FAILURE, "PLATFORM_NOT_READY", last_save_error)
+	last_save_error = ""
+	storage_busy = true
+	_operation_path = save_path
+	_storage_announced = false
+	return PlatformResult.success()
+
+func _await_storage(request: PlatformStorageRequest) -> PlatformResult:
+	if request == null:
+		return PlatformResult.new(PlatformResult.Status.INVALID_DATA, "INVALID_STORAGE_REQUEST", "无法创建有效的存档操作。")
+	# Immediate native IO must not pause animations, clear movement markers or
+	# flash a loading overlay. Announce only an actual asynchronous barrier.
+	if request.result == null:
+		_storage_announced = true
+		storage_changed.emit(true)
+	return await request.wait()
+
+func _finish_storage(result: PlatformResult, generation: int) -> PlatformResult:
+	if generation != _player_generation or _operation_path != save_path:
+		result = PlatformResult.new(PlatformResult.Status.CANCELLED, "STALE_SAVE_OPERATION", "角色或存档路径已变化，旧存档操作结果未应用。")
+	elif result.status != PlatformResult.Status.CANCELLED:
+		last_save_error = result.message if not result.ok and result.code != "NOT_FOUND" else ""
+	storage_busy = false
+	var announced := _storage_announced
+	_storage_announced = false
+	if announced: storage_changed.emit(false)
+	return result
+
+func wait_for_storage() -> void:
+	while storage_busy: await storage_changed
+
+func save_game() -> PlatformResult:
+	var admitted := _begin_storage()
+	if not admitted.ok: return admitted
+	var generation := _player_generation
+	last_save_receipt = {}
 	if player.is_empty():
-		return false
-	last_save_error = ""
-	if not Platform.is_available():
-		last_save_error = "平台尚未就绪，无法保存。"
-		return false
-	var result := Platform.context.storage.write_text_atomic(save_path, JSON.stringify(player, "\t"))
-	if not result.ok: last_save_error = result.message
-	return result.ok
+		return _finish_storage(PlatformResult.new(PlatformResult.Status.INVALID_DATA, "EMPTY_PLAYER", "没有可保存的离线角色。"), generation)
+	# Serialize now: delayed IO must not observe subsequent dictionary mutations.
+	var result := await _await_storage(Platform.context.storage.write(_operation_path, JSON.stringify(player, "\t")))
+	if result.ok:
+		if not result.value is Dictionary or result.value.get("written") != true or result.value.get("durability") not in ["native_file", "browser_sync"]:
+			result = PlatformResult.new(PlatformResult.Status.TEMPORARY_FAILURE, "SAVE_UNCONFIRMED", "存档持久化未确认，请重试；当前进度仍在内存中。")
+		elif generation == _player_generation and _operation_path == save_path: last_save_receipt = result.value.duplicate(true)
+	return _finish_storage(result, generation)
 
-func has_save() -> bool:
-	return Platform.is_available() and Platform.context.storage.exists(save_path)
+func probe_save() -> PlatformResult:
+	var admitted := _begin_storage()
+	if not admitted.ok: return admitted
+	var generation := _player_generation
+	var epoch := _load_epoch
+	var result := await _await_storage(Platform.context.storage.probe(_operation_path))
+	if epoch != _load_epoch:
+		result = PlatformResult.new(PlatformResult.Status.CANCELLED, "STALE_LOAD", "旧页面的存档检查结果未应用。")
+	if result.ok and not result.value is bool:
+		result = PlatformResult.new(PlatformResult.Status.INVALID_DATA, "INVALID_STORAGE_RESULT", "无法确认存档是否存在，请重试。")
+	return _finish_storage(result, generation)
 
-func load_game() -> bool:
-	last_save_error = ""
-	if not Platform.is_available():
-		last_save_error = "平台尚未就绪，无法读取存档。"
-		return false
-	var result := Platform.context.storage.read_text(save_path)
-	if not result.ok:
-		if result.code != "NOT_FOUND": last_save_error = result.message
-		return false
+func load_game() -> PlatformResult:
+	var admitted := _begin_storage()
+	if not admitted.ok: return admitted
+	var generation := _player_generation
+	var epoch := _load_epoch
+	var result := await _await_storage(Platform.context.storage.read(_operation_path))
+	if epoch != _load_epoch:
+		result = PlatformResult.new(PlatformResult.Status.CANCELLED, "STALE_LOAD", "旧页面的读取结果未应用。")
+	if not result.ok or generation != _player_generation or _operation_path != save_path: return _finish_storage(result, generation)
 	var parser := JSON.new()
-	if parser.parse(result.value) != OK:
-		last_save_error = "存档格式不正确，原文件已保留"
-		return false
+	if not result.value is String or parser.parse(result.value) != OK:
+		return _finish_storage(_invalid_save(), generation)
 	var data: Variant = parser.data
 	if not valid_save(data):
-		last_save_error = "存档格式不正确，原文件已保留"
-		return false
+		return _finish_storage(_invalid_save(), generation)
 	player = data
+	last_save_receipt = {}
 	if not player.has("gender"): player.gender = 0
 	for key in ["signature", "title"]:
 		if not player.has(key): player[key] = ""
@@ -154,7 +213,12 @@ func load_game() -> bool:
 		if not player.has(key): player[key] = 0
 	if not player.has("weapon_owned"): player.weapon_owned = true
 	if not player.has("bag_order"): player.bag_order = ["potion", "sword"]
-	return true
+	_player_generation += 1
+	result = _finish_storage(PlatformResult.success(), _player_generation)
+	return result
+
+func _invalid_save() -> PlatformResult:
+	return PlatformResult.new(PlatformResult.Status.INVALID_DATA, "INVALID_SAVE", "存档格式不正确，原文件已保留")
 
 func valid_save(data: Variant) -> bool:
 	if not data is Dictionary:

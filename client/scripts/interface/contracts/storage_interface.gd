@@ -1,7 +1,19 @@
 class_name PlatformStorageInterface
 extends RefCounted
-## Native calls are synchronous. Web persistence needs a separate async contract;
-## do not substitute an in-memory write for this receipt's native-file guarantee.
+## Game save operations use requests, including immediate native completions.
+## A write may succeed only after its declared persistence boundary completes.
+
+func probe(_path: String) -> PlatformStorageRequest:
+	return PlatformStorageRequest.resolved(PlatformResult.unsupported())
+
+func read(_path: String, _maximum_bytes: int = 1048576) -> PlatformStorageRequest:
+	return PlatformStorageRequest.resolved(PlatformResult.unsupported())
+
+func write(_path: String, _text: String) -> PlatformStorageRequest:
+	return PlatformStorageRequest.resolved(PlatformResult.unsupported())
+
+## Native address preferences / native regression compatibility only.
+## Web must not implement these by reporting an in-memory write as durable.
 
 func exists(_path: String) -> bool:
 	return false

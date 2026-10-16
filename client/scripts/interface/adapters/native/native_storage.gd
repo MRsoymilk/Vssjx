@@ -1,5 +1,18 @@
 extends PlatformStorageInterface
 
+func probe(path: String) -> PlatformStorageRequest:
+	# An unreadable slot is not reported as an absent slot (safe overwrite checks).
+	var read_result := read_text(path)
+	if read_result.code == "NOT_FOUND": return PlatformStorageRequest.resolved(PlatformResult.success(false))
+	if not read_result.ok: return PlatformStorageRequest.resolved(read_result)
+	return PlatformStorageRequest.resolved(PlatformResult.success(true))
+
+func read(path: String, maximum_bytes: int = 1048576) -> PlatformStorageRequest:
+	return PlatformStorageRequest.resolved(read_text(path, maximum_bytes))
+
+func write(path: String, text: String) -> PlatformStorageRequest:
+	return PlatformStorageRequest.resolved(write_text_atomic(path, text))
+
 func exists(path: String) -> bool:
 	return FileAccess.file_exists(path)
 

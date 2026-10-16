@@ -54,7 +54,7 @@ def main():
     run('import', [godot, '--headless', '--editor', '--path', str(project), '--import'])
     run('resource-loader-parse', [godot, '--headless', '--path', str(project), '--check-only', '--script',
                                 'res://scripts/interface/adapters/native/native_resource_loader.gd'])
-    suites = ['platform_web_security_test', 'platform_input_actions_test', 'resource_loader_test', 'platform_interface_test', 'test_runner', 'server_connection_test',
+    suites = ['platform_storage_async_test', 'platform_web_security_test', 'platform_input_actions_test', 'resource_loader_test', 'platform_interface_test', 'test_runner', 'server_connection_test',
               'world_delta_test', 'public_chat_test', 'shared_interface_test', 'chat_emotes_test',
               'expanded_chat_test', 'online_attributes_test', 'online_allocation_test',
               'local_mode_test', 'login_ui_test', 'character_selection_test',
@@ -75,7 +75,7 @@ def main():
         raise RuntimeError('Native window close did not preserve the offline save')
     env['SSJX_SAVE_PATH'] = original_save
     if args.render:
-        for suite in ['platform_web_security_test', 'platform_input_actions_test', 'resource_loader_test', 'platform_interface_test', 'battle_transition_test', 'visual_smoke']:
+        for suite in ['platform_storage_async_test', 'platform_web_security_test', 'platform_input_actions_test', 'resource_loader_test', 'platform_interface_test', 'battle_transition_test', 'visual_smoke']:
             if suite == 'visual_smoke':
                 capture = output / 'screenshots'
                 capture.mkdir(exist_ok=True)
@@ -85,6 +85,7 @@ def main():
                 encounter.mkdir(exist_ok=True)
                 env['SSJX_ENCOUNTER_CAPTURE_PATH'] = str(encounter)
             expected = {
+                'platform_storage_async_test': r'PLATFORM ASYNC STORAGE: \d+ checks, 0 failures',
                 'platform_web_security_test': r'PLATFORM WEB SECURITY: \d+ checks, 0 failures',
                 'platform_input_actions_test': r'PLATFORM INPUT ACTIONS: \d+ checks, 0 failures',
                 'resource_loader_test': r'RESOURCE LOADER: \d+ checks, 0 failures',

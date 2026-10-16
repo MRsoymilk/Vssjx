@@ -174,12 +174,14 @@ func show_item() -> void:
 	move_child(tooltip, get_child_count() - 1)
 
 func use_item() -> void:
+	if Game.storage_busy: return
 	if _selected().get("id", "") != "potion" or int(Game.player.potions) < 1 or int(Game.player.hp) >= int(Game.stats().hp): return
 	Game.player.potions = int(Game.player.potions) - 1
 	Game.player.hp = mini(int(Game.stats().hp), int(Game.player.hp) + 45)
-	_save_refresh()
+	await _save_refresh()
 
 func equip_item() -> void:
+	if Game.storage_busy: return
 	if _selected().get("id", "") != "sword" or not Game.player.get("weapon_owned", true): return
 	if Game.player.equipped and items.size() >= 60:
 		description.text = "背包已满"
@@ -187,19 +189,20 @@ func equip_item() -> void:
 		return
 	Game.player.equipped = not Game.player.equipped
 	selected_equipment = bool(Game.player.equipped)
-	_save_refresh()
+	await _save_refresh()
 
 func buy_potion() -> void:
+	if Game.storage_busy: return
 	if not Game.bag_buy_potion(): description.text = "铜币不足或背包已满"; close_menu(); return
-	_save_refresh()
+	await _save_refresh()
 
 func sort_items() -> void:
+	if Game.storage_busy: return
 	Game.player.bag_order = ["sword", "potion"]
 	selected_equipment = false
 	selected_index = 0
 	scrollbar.value = 0
-	_save_refresh()
-	description.text = "整理完毕"
+	if await _save_refresh(): description.text = "整理完毕"
 
 func confirm_discard() -> void:
 	var item := _selected().duplicate()
@@ -210,21 +213,26 @@ func confirm_discard() -> void:
 	_text("确定丢弃“%s”？" % item.name, Rect2(8, 7, 178, 37), 12, Color("705321"), false, item_menu).autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	var yes := _button("确定", Rect2(17, 57, 57, 23), true, item_menu)
 	yes.pressed.connect(func() -> void:
+		if Game.storage_busy: return
 		if item.id == "potion": Game.player.potions = maxi(0, int(Game.player.potions) - int(item.count))
 		else: Game.player.equipped = false; Game.player.weapon_owned = false
 		selected_equipment = false
-		_save_refresh()
+		await _save_refresh()
 	)
 	_button("取消", Rect2(113, 57, 57, 23), true, item_menu).pressed.connect(close_menu)
 
-func _save_refresh() -> void:
+func _save_refresh() -> bool:
 	close_menu()
 	tooltip.hide()
 	refresh()
-	if not Game.save_game(): description.text = "保存失败：" + Game.last_save_error
+	var result := await Game.save_game()
+	if not is_inside_tree() or result.status == PlatformResult.Status.CANCELLED: return false
+	if not result.ok: description.text = "保存失败：" + result.message
 	changed.emit()
+	return result.ok
 
 func _unhandled_key_input(event: InputEvent) -> void:
+	if Game.storage_busy: return
 	if not event is InputEventKey or not event.pressed or event.echo: return
 	if event.keycode == KEY_ESCAPE and item_menu != null:
 		close_menu()

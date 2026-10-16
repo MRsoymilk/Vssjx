@@ -66,6 +66,24 @@ class PlatformBoundaryTests(unittest.TestCase):
             text = (CLIENT / 'scripts/network' / name).read_text('utf8')
             self.assertLess(text.index('runtime_config.check_network_target('), text.index(request), name)
 
+    def test_save_business_consumers_explicitly_await_results(self):
+        for name in ['main.gd', 'battle.gd', 'inventory.gd']:
+            text = (CLIENT / 'scripts' / name).read_text('utf8')
+            for line in text.splitlines():
+                if re.search(r'Game\.(?:save_game|load_game|probe_save)\(', line):
+                    self.assertIn('await Game.', line, name)
+            self.assertNotIn('Game.has_save()', text)
+        game = (CLIENT / 'scripts/game_state.gd').read_text('utf8')
+        for direct in ['storage.exists(', 'storage.read_text(', 'storage.write_text_atomic(']:
+            self.assertNotIn(direct, game)
+        self.assertIn('"SAVE_UNCONFIRMED"', game)
+        self.assertIn('"STORAGE_BUSY"', game)
+
+    def test_browser_persistence_is_not_enabled_by_the_async_contract(self):
+        factory = (INTERFACE / 'platform_factory.gd').read_text('utf8')
+        self.assertIn('if OS.has_feature("web"): return null', factory)
+        self.assertFalse((INTERFACE / 'adapters/web/web_storage.gd').exists())
+
     def test_game_canvas_and_existing_exports_are_preserved(self):
         config = (CLIENT / 'project.godot').read_text('utf8')
         for setting in ['window/size/viewport_width=320', 'window/size/viewport_height=480',

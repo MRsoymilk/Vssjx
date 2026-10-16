@@ -59,6 +59,13 @@ var minimap: OriginalWorldMinimap
 var map_name: Label
 var map_coordinates: Label
 var character_selection: OriginalCharacterSelection
+var _ui_epoch := 0
+var _storage_notice: Label
+var _ui_process_mode: ProcessMode
+var _closing := false
+
+func _exit_tree() -> void:
+	Game.invalidate_load()
 
 func _ready() -> void:
 	get_tree().auto_accept_quit = false
@@ -69,9 +76,46 @@ func _ready() -> void:
 		set_process(false)
 		set_process_unhandled_key_input(false)
 		return
+	Game.storage_changed.connect(_storage_changed)
 	_home()
+	if Game.storage_busy: _storage_changed(true)
+
+func _storage_changed(active: bool) -> void:
+	if active:
+		_ui_process_mode = ui.process_mode
+		ui.process_mode = Node.PROCESS_MODE_DISABLED
+		if is_instance_valid(world):
+			world.enabled = false
+		_storage_notice = _label(self, "正在处理本地存档，请稍候……", Rect2(12, 4, 296, 42), 13, GOLD, true)
+		_storage_notice.mouse_filter = Control.MOUSE_FILTER_STOP
+	else:
+		ui.process_mode = _ui_process_mode
+		if is_instance_valid(_storage_notice): _storage_notice.queue_free()
+		_storage_notice = null
+		if mode == "world" and modal == null and is_instance_valid(world): world.enabled = true
+
+func _save_current() -> PlatformResult:
+	var epoch := _ui_epoch
+	var result := await Game.save_game()
+	if not is_inside_tree() or epoch != _ui_epoch:
+		return PlatformResult.new(PlatformResult.Status.CANCELLED, "STALE_PAGE", "页面已变化。")
+	return result
+
+func _save_local_change() -> void:
+	var result := await _save_current()
+	if result.status == PlatformResult.Status.CANCELLED or _closing: return
+	_close_modal()
+	_refresh_hud()
+	if not result.ok: _message("保存失败", result.message + "\n当前变更仅在内存中，请重试保存。")
+
+func _autosave() -> void:
+	if Game.storage_busy or _closing: return
+	var result := await _save_current()
+	if not _closing and not result.ok and result.status != PlatformResult.Status.CANCELLED:
+		_message("自动保存失败", result.message + "\n当前进度仍在内存中。")
 
 func _process(delta: float) -> void:
+	if Game.storage_busy or _closing: return
 	clock_timer += delta
 	if clock_timer >= 1.0 and chrome != null and is_instance_valid(chrome):
 		clock_timer = 0.0
@@ -91,9 +135,10 @@ func _process(delta: float) -> void:
 		autosave_timer += delta
 		if autosave_timer >= 10.0:
 			autosave_timer = 0.0
-			Game.save_game()
+			_autosave()
 
 func _unhandled_key_input(event: InputEvent) -> void:
+	if Game.storage_busy or _closing: return
 	if not event is InputEventKey or not event.pressed or event.echo: return
 	if mode == "battle_loading":
 		get_viewport().set_input_as_handled()
@@ -198,6 +243,8 @@ func _button(parent: Node, text_value: String, rect: Rect2, callback: Callable, 
 	return button
 
 func _clear_ui() -> void:
+	_ui_epoch += 1
+	Game.invalidate_load()
 	character_selection = null
 	announcement_banner.present({})
 	battle_transition_epoch += 1
@@ -263,10 +310,18 @@ func _server_login() -> void:
 	login.local_requested.connect(_enter_local_game)
 
 func _enter_local_game() -> void:
+	if Game.storage_busy or _closing: return
 	OnlineAccount.suspend_network()
-	if Game.has_save():
-		if Game.load_game(): _local_character_selection()
-		else: _message("无法读取", Game.last_save_error)
+	var epoch := _ui_epoch
+	var probe := await Game.probe_save()
+	if epoch != _ui_epoch or probe.status == PlatformResult.Status.CANCELLED or _closing: return
+	if not probe.ok:
+		_message("无法确认存档", probe.message)
+	elif probe.value:
+		var result := await Game.load_game()
+		if epoch != _ui_epoch or result.status == PlatformResult.Status.CANCELLED or _closing: return
+		if result.ok: _local_character_selection()
+		else: _message("无法读取", result.message)
 	else: _create()
 
 func _online_characters(_character_id: String = "") -> void:
@@ -356,31 +411,47 @@ func _select_job(index: int) -> void:
 	if creation != null: creation.select_variant(clampi(index, 0, 2) * 2 + selected_gender)
 
 func _start_new() -> void:
+	if Game.storage_busy or _closing: return
 	if not Platform.context.text_input.check_submission([nickname]).ok: return
 	var name_value := nickname.text.strip_edges()
 	if name_value.is_empty():
 		_message("请输入昵称", "请先输入昵称。")
 		return
-	if Game.has_save():
+	var epoch := _ui_epoch
+	var probe := await Game.probe_save()
+	if epoch != _ui_epoch or probe.status == PlatformResult.Status.CANCELLED or _closing: return
+	if not probe.ok:
+		_message("无法确认存档", probe.message)
+		return
+	if probe.value:
 		var panel := _modal_panel("开启新的修行")
 		_label(panel, "当前只有一个本地存档槽。\n入山后将覆盖已有角色存档。", Rect2(18, 56, 248, 70), 13)
 		_button(panel, "确认入山", Rect2(18, 180, 148, 32), _begin_new.bind(name_value), true)
 		_button(panel, "返回", Rect2(176, 180, 88, 32), _close_modal)
 	else:
-		_begin_new(name_value)
+		await _begin_new(name_value)
 
 func _begin_new(name_value: String) -> void:
+	if Game.storage_busy or _closing: return
 	Game.new_player(name_value, selected_job, selected_school, selected_gender)
-	Game.save_game()
+	var result := await _save_current()
+	if result.status == PlatformResult.Status.CANCELLED or _closing: return
+	if not result.ok:
+		_message("创建存档失败", result.message + "\n尚未进入地图，请重试。")
+		return
 	_enter_world()
 	_message("山门初见", "蜀山山道妖气渐浓。\n先去石桥旁找清微道人，接取试炼。\n\n点击人物或怪物，会自动走近并交互。\nWASD / 方向键移动，E 键交互。")
 
 func _continue() -> void:
-	if Game.load_game():
+	if Game.storage_busy or _closing: return
+	var epoch := _ui_epoch
+	var result := await Game.load_game()
+	if epoch != _ui_epoch or result.status == PlatformResult.Status.CANCELLED or _closing: return
+	if result.ok:
 		if int(Game.player.hp) == 0: Game.restore()
 		_enter_world()
 	else:
-		_message("无法读取", Game.last_save_error if not Game.last_save_error.is_empty() else "尚无本地存档。")
+		_message("无法读取", result.message if result.code != "NOT_FOUND" else "尚无本地存档。")
 
 func _enter_world() -> void:
 	mode = "world"
@@ -428,6 +499,7 @@ func _world_ui() -> void:
 	_refresh_hud()
 
 func _scene_action(action: String) -> void:
+	if Game.storage_busy or _closing: return
 	if mode == "battle_loading": return
 	match action:
 		"menu": _menu()
@@ -460,6 +532,7 @@ func _refresh_hud() -> void:
 	chrome.update_header(int(Game.player.hp), int(Game.player.mp), 0)
 
 func _world_interaction(kind: String, data: Dictionary) -> void:
+	if Game.storage_busy or _closing: return
 	if mode == "battle_loading": return
 	match kind:
 		"npc": _npc()
@@ -473,8 +546,10 @@ func _world_interaction(kind: String, data: Dictionary) -> void:
 			else:
 				Game.player.zone = 1 - int(Game.player.zone)
 				Game.player.cell = [10, 16] if int(Game.player.zone) == 0 else [5, 16]
-				Game.save_game()
+				var result := await _save_current()
+				if result.status == PlatformResult.Status.CANCELLED or _closing: return
 				_enter_world()
+				if not result.ok: _message("保存失败", result.message + "\n当前位置仍在内存中，请重试保存。")
 		"hint": _message("交互", String(data.text))
 
 func _npc() -> void:
@@ -490,27 +565,24 @@ func _npc() -> void:
 	_label(panel, text_value, Rect2(18, 52, 248, 126), 12)
 	if stage == 0:
 		_button(panel, "领受试炼", Rect2(18, 186, 148, 32), func() -> void:
+			if Game.storage_busy or _closing or int(Game.player.quest) != stage: return
 			Game.player.quest = 1
 			Game.restore()
-			Game.save_game()
-			_close_modal()
-			_refresh_hud()
+			await _save_local_change()
 		, true)
 	elif stage == 2:
 		_button(panel, "领取奖励", Rect2(18, 186, 148, 32), func() -> void:
+			if Game.storage_busy or _closing or int(Game.player.quest) != stage: return
 			Game.player.quest = 3
 			Game.add_rewards(60, 35)
 			Game.restore()
-			Game.save_game()
-			_close_modal()
-			_refresh_hud()
+			await _save_local_change()
 		, true)
 	else:
 		_button(panel, "恢复元气", Rect2(18, 186, 148, 32), func() -> void:
+			if Game.storage_busy or _closing: return
 			Game.restore()
-			Game.save_game()
-			_close_modal()
-			_refresh_hud()
+			await _save_local_change()
 		, true)
 	_button(panel, "告辞", Rect2(176, 186, 88, 32), _close_modal)
 
@@ -547,6 +619,7 @@ func _modal_panel(title: String, height: int = 246, page: String = "scene") -> P
 	return panel
 
 func _close_modal() -> void:
+	if Game.storage_busy or _closing: return
 	if modal != null and is_instance_valid(modal):
 		ui.remove_child(modal)
 		modal.queue_free()
@@ -562,21 +635,25 @@ func _message(title: String, value: String) -> void:
 	_button(panel, "知道了", Rect2(18, 192, 248, 32), _close_modal, true)
 
 func _save_feedback() -> void:
+	if Game.storage_busy or _closing: return
 	world.pause_moving()
-	if Game.save_game():
-		_message("修行已保存", "下次将服务地址设为local，进入游戏即可继续。\n\n存档会记录角色、任务、背包及所在位置。")
+	var result := await _save_current()
+	if result.status == PlatformResult.Status.CANCELLED or _closing: return
+	if result.ok:
+		var explanation := "下次将服务地址设为local，进入游戏即可继续。\n\n存档会记录角色、任务、背包及所在位置。"
+		if result.value.durability == "browser_sync": explanation = "已同步到浏览器本地存储。\n清理站点数据或浏览器回收存储仍可能导致丢档，不保证永久保存。"
+		_message("修行已保存", explanation)
 	else:
-		_message("保存失败", Game.last_save_error)
+		_message("保存失败", result.message)
 
 func _rest() -> void:
 	var panel := _modal_panel("凝神调息")
 	_label(panel, "花费 5 铜钱，恢复全部生命与灵力。\n\n清微道人也可免费为你恢复元气。", Rect2(18, 58, 248, 110), 12)
 	var button := _button(panel, "调息 · 5 铜钱", Rect2(18, 184, 148, 32), func() -> void:
+		if Game.storage_busy or _closing: return
 		Game.player.gold = int(Game.player.gold) - 5
 		Game.restore()
-		Game.save_game()
-		_close_modal()
-		_refresh_hud()
+		await _save_local_change()
 	, true)
 	button.disabled = int(Game.player.gold) < 5
 	_button(panel, "返回", Rect2(176, 184, 88, 32), _close_modal)
@@ -641,8 +718,11 @@ func _system_menu() -> void:
 	modal.get_node("Panel/School").pressed.connect(_school)
 	modal.get_node("Panel/Rest").pressed.connect(_rest)
 	modal.get_node("Panel/Leave").pressed.connect(func() -> void:
-		if Game.save_game(): _return_to_server_login()
-		else: _message("保存失败", Game.last_save_error)
+		if Game.storage_busy or _closing: return
+		var result := await _save_current()
+		if result.status == PlatformResult.Status.CANCELLED or _closing: return
+		if result.ok: _return_to_server_login()
+		else: _message("保存失败", result.message)
 	)
 
 func _school() -> void:
@@ -650,12 +730,15 @@ func _school() -> void:
 	_label(panel, "选择角色门派。\n当前：" + Game.SCHOOLS[int(Game.player.school)] + "派", Rect2(18, 53, 248, 57), 12)
 	for i in 3:
 		var button := _button(panel, Game.SCHOOLS[i] + "派", Rect2(18 + i * 84, 118, 78, 34), func() -> void:
+			if Game.storage_busy or _closing: return
 			var previous_school := int(Game.player.school)
 			Game.player.school = i
-			if Game.save_game(): _world_ui()
+			var result := await _save_current()
+			if result.status == PlatformResult.Status.CANCELLED or _closing: return
+			if result.ok: _world_ui()
 			else:
 				Game.player.school = previous_school
-				_message("保存失败", Game.last_save_error)
+				_message("保存失败", result.message)
 		)
 		var colors := OriginalUITheme.palette("scene")
 		for state in ["normal", "hover", "pressed"]:
@@ -675,10 +758,13 @@ func _attributes() -> void:
 	attributes.back_requested.connect(_return_from_attributes)
 
 func _return_from_attributes() -> void:
+	if Game.storage_busy or _closing: return
 	if not Platform.context.text_input.check_submission([attributes.signature]).ok: return
 	Game.player.signature = attributes.signature.text
-	if not Game.save_game():
-		_message("保存失败", Game.last_save_error)
+	var result := await _save_current()
+	if result.status == PlatformResult.Status.CANCELLED or _closing: return
+	if not result.ok:
+		_message("保存失败", result.message)
 		return
 	_world_ui()
 
@@ -956,34 +1042,54 @@ func _battle_result() -> void:
 	battle_auto = false
 	battle_status.text = "战斗结束"
 	for button in battle_buttons: button.disabled = true
-	var leveled := battle.commit()
+	var epoch := _ui_epoch
+	var current := battle
+	var leveled := await battle.commit()
+	if epoch != _ui_epoch or current != battle or _closing: return
 	var title := "战 斗 胜 利" if battle.victory else ("撤离山林" if battle.escaped else "重整旗鼓")
 	var description := "获得 %d 铜钱、%d 修为。" % [int(battle.enemy.gold), int(battle.enemy.xp)] if battle.victory else ("未获得奖励，当前生命与灵力已保留。" if battle.escaped else "道人送你回到了山门，元气已经恢复。")
 	if leveled: description += "\n境界提升！生命与灵力已恢复。"
 	if int(Game.player.quest) == 4: description += "\n\n妖王伏诛，蜀山初行已完成！"
 	description += "\n\n" + Game.quest_text()
-	if not Game.last_save_error.is_empty(): description += "\n" + Game.last_save_error
+	if battle.save_result != null and not battle.save_result.ok: description += "\n保存未确认：" + battle.save_result.message
 	var panel := _modal_panel(title)
 	_label(panel, description, Rect2(18, 56, 248, 126), 12)
 	_button(panel, "返回山道", Rect2(18, 192, 248, 32), _enter_world, true)
 
 func _request_exit() -> void:
+	if Game.storage_busy: return
 	var result := Platform.context.system_actions.request_exit() if Platform.is_available() else PlatformResult.new(PlatformResult.Status.TEMPORARY_FAILURE, "PLATFORM_NOT_READY", "平台尚未就绪，暂时无法处理退出请求。")
-	if not result.ok: _message("无法退出", result.message)
+	if not result.ok:
+		_closing = false
+		_message("无法退出", result.message)
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_CLOSE_REQUEST:
-		if mode != "online_world" and not Game.player.is_empty():
-			if mode == "battle" and battle != null:
-				if battle.finished and battle.phase == "settlement":
-					battle.finish_round()
-					battle.commit()
-				elif not battle.finished:
-					Game.player.hp = battle.hp
-					Game.player.mp = battle.mp
-					Game.player.potions = battle.potions
-			Game.save_game()
-		_request_exit()
+		_close_requested()
+
+func _close_requested() -> void:
+	if _closing: return
+	_closing = true
+	await Game.wait_for_storage()
+	if not is_inside_tree(): return
+	if mode != "online_world" and not Game.player.is_empty():
+		if mode == "battle" and battle != null:
+			if battle.finished and battle.phase == "settlement":
+				battle.finish_round()
+				await battle.commit()
+			elif not battle.finished:
+				Game.player.hp = battle.hp
+				Game.player.mp = battle.mp
+				Game.player.potions = battle.potions
+		var result := await _save_current()
+		if result.status == PlatformResult.Status.CANCELLED:
+			_closing = false
+			return
+		if not result.ok:
+			_closing = false
+			_message("保存失败，尚未退出", result.message)
+			return
+	_request_exit()
 
 func _draw() -> void:
 	draw_rect(Rect2(0, 0, 320, 480), INK)

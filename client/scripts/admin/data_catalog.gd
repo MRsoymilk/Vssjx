@@ -9,6 +9,7 @@ const ONLINE_MAP := "res://assets/data/qingyun-v1.json"
 const ORIGINAL_ITEMS := "res://assets/data/original_items.json"
 const ORIGINAL_WORLD := "res://assets/data/original_world.json"
 const ORIGINAL_MONSTERS := "res://assets/admin/monsters/catalog.json"
+const MONSTER_AUDIT := "res://assets/admin/monsters/animation_audit.json"
 const ORIGINAL_EFFECTS := "res://assets/admin/effects/catalog.json"
 const RESOURCE_ARCHIVE := "res://assets/admin/archive/catalog.json"
 const CATEGORIES := [
@@ -91,6 +92,13 @@ func _load_original_monsters() -> void:
 	if manifest.monsters.size() != int(manifest.get("animation_count", -1)):
 		errors.append("原包怪物动画数量不匹配")
 		return
+	var audit := _read_json(MONSTER_AUDIT)
+	var audits: Dictionary = {}
+	if audit.get("format_version") == 1 and audit.get("source_package") == manifest.source_package and audit.get("source_sha256") == manifest.source_sha256 and audit.get("monsters") is Array:
+		for row in audit.monsters:
+			audits[row.resource_id] = row
+	if audits.size() != manifest.monsters.size():
+		errors.append("怪物动画检查报告缺失或与原包不匹配")
 	for record in manifest.monsters:
 		var info: Dictionary = record.animation
 		if not FileAccess.file_exists(info.texture):
@@ -103,6 +111,21 @@ func _load_original_monsters() -> void:
 			"动画说明": "source_N 对应原始序列编号；未推断待机、行走或攻击语义",
 			"来源资源": record.duplicate(true), "原包SHA256": manifest.source_sha256
 		}
+		if audits.has(record.resource_id):
+			var review: Dictionary = audits[record.resource_id]
+			data["动画检查"] = {
+				"结构检查": "通过" if review.structural_errors.is_empty() else review.structural_errors,
+				"接入状态": "运行时已修正：循环动作清除战斗特效，攻击与受击使用独立帧" if review.runtime_status == "corrected" else "已检查原始资源；动作语义未确认，尚未接入游戏",
+				"受击方式": "原始受击姿势" if review.hurt_policy == "original_impact_poses" else ("独立中性姿势配合战斗命中特效（重建）" if review.runtime_status == "corrected" else "未指定"),
+				"含星形层的原始帧": review.impact_layer_frames,
+				"含方向变化的原始序列": review.mixed_landmark_sequences,
+				"含横向位移的原始序列": review.root_travel_sequences,
+				"说明": "以上是原始图层观测，不等于异常或动作结论；攻击弹道、刀光等保留。source_N 预览保持原包数据。",
+				"逐序列检查": review.sequences,
+				"报告": MONSTER_AUDIT,
+			}
+		else:
+			errors.append("怪物动画检查条目缺失：" + record.resource_id)
 		_add("enemies", record.id, record.display_name,
 			"%d 帧 · %d 组原始序列 · 名称 / 数值未恢复" % [int(info.count), info.sequences.size()],
 			"原包资源", ORIGINAL_MONSTERS, data, {"kind": "original_animation", "animation": info})

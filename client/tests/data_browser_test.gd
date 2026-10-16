@@ -169,6 +169,10 @@ func _ready() -> void:
 				if matches.size() == 1: preview_entries.append(matches[0])
 		for entry in preview_entries:
 			browser._show_entry(entry)
+			if entry.id.begins_with("original/monster/"):
+				check(entry.data.has("动画检查"), "Every original monster exposes its animation audit: " + entry.id)
+				if entry.data.has("动画检查"):
+					check(entry.data["动画检查"]["结构检查"] == "通过", "Monster archive passes structural checks: " + entry.id)
 			if entry.preview.get("kind") == "icon":
 				check(browser.get_node("%Preview").icon != null, "Decoded icon loads: " + entry.id)
 			if entry.preview.get("kind") == "actor":

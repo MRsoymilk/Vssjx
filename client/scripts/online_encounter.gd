@@ -1,41 +1,36 @@
 class_name OnlineEncounter
-extends Control
-signal action_requested(action: String, target: String)
-signal dismissed
-var target := ""
-var action := ""
-var approaching := false
-var pve: OnlinePve
+extends BattleEncounterTransition
+## The local encounter visual, without another confirmation dialog.
+## An indeterminate segment means server acknowledgement, never a percentage.
+var waiting := false
+var _phase := 0.0
 
-func _ready() -> void:
-	$Panel/Primary.pressed.connect(func() -> void: action_requested.emit(action, target))
-	$Panel/Restore.pressed.connect(func() -> void: action_requested.emit("restore", target))
-	$Panel/Close.pressed.connect(func() -> void:
-		hide()
-		dismissed.emit()
-	)
-
-func present(id: String, resident: Dictionary, model: OnlinePve) -> void:
-	target = id
-	pve = model
-	approaching = false
-	$Panel/Title.text = resident.name
+func present(action: String, resident_name: String, hero_point: Vector2) -> void:
+	progress = 0.0
+	configure(resident_name, hero_point)
+	if action != "challenge": caption.text = "与%s交谈" % resident_name
+	set_waiting("等待服务器确认……")
 	show()
-	refresh()
 
-func refresh() -> void:
-	if pve == null: return
-	var npc := target == "qingwei"
-	var stage := int(pve.state.get("character", {}).get("quest_stage", 0))
-	action = ("claim" if stage == 2 else "accept") if npc else "challenge"
-	$Panel/Primary.text = ("领取奖励" if stage == 2 else "领受试炼") if npc else "迎战"
-	$Panel/Restore.visible = npc
-	$Panel/Primary.visible = true
-	if npc and stage in [1, 3]: $Panel/Primary.text = "山狼 %d / 3" % int(pve.state.get("progress", {}).get("kills", 0)) if stage == 1 else "试炼完成"
-	$Panel/Primary.disabled = not pve.ready or pve.pending() or approaching or (npc and stage in [1, 3])
-	$Panel/Restore.disabled = not pve.ready or pve.pending() or approaching
-	var body := pve.quest_text() if npc else "山林之中，妖兽出没。\n准备好便可迎战。\n靠近后开始遭遇战，胜利后获得铜钱与修为。"
-	if approaching: body = "正在靠近……\n抵达后自动交互。"
-	elif not pve.ready: body = "正在连接服务器，同步角色进度……"
-	elif pve.pending(): body = "正在处理，请稍候……\n若连接中断，重连后会确认处理结果。"
-	$Panel/Body.text = body
+func set_waiting(text_value: String) -> void:
+	waiting = true
+	progress = 0.0
+	detail.text = text_value
+	queue_redraw()
+
+func set_progress(value: float, text_value: String) -> void:
+	waiting = false
+	super.set_progress(value, text_value)
+
+func _process(delta: float) -> void:
+	if visible and waiting:
+		_phase = fposmod(_phase + delta * 0.8, 1.0)
+		queue_redraw()
+
+func _draw() -> void:
+	super._draw()
+	if not waiting: return
+	var track := BAR_RECT.grow(-6)
+	var width := 30.0
+	var offset := floorf((track.size.x - width) * (1.0 - absf(_phase * 2.0 - 1.0)))
+	draw_rect(Rect2(track.position + Vector2(offset, 0), Vector2(width, track.size.y)), Color("49b9d1"))

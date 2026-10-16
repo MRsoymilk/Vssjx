@@ -9,11 +9,14 @@ var warning_anchor := Vector2(134, 160)
 @onready var detail: Label = $Detail
 
 func configure(enemy_name: String, hero_point: Vector2) -> void:
-	warning_anchor = Vector2(clampf(roundf(hero_point.x - 25), 25, 295), clampf(roundf(hero_point.y - 45), 60, 310))
-	warning.position = warning_anchor - Vector2(5, 21)
+	set_hero_point(hero_point)
 	caption.text = "遭遇%s！" % enemy_name
 	caption.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	detail.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+
+func set_hero_point(hero_point: Vector2) -> void:
+	warning_anchor = Vector2(clampf(roundf(hero_point.x - 25), 25, 295), clampf(roundf(hero_point.y - 45), 60, 310))
+	warning.position = warning_anchor - Vector2(5, 21)
 	queue_redraw()
 
 func set_progress(value: float, text_value: String) -> void:

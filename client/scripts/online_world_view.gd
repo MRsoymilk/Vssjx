@@ -43,6 +43,10 @@ var _rendered_chat := ""
 var _approach: Dictionary = {}
 var _pve_log := ""
 var _closed_battle := ""
+var _loading_battle := ""
+var _battle_load_epoch := 0
+var _battle_resource_request: PlatformResourceRequest
+var _battle_load_failed := false
 
 func _ready() -> void:
 	if OS.has_feature("web"): Platform.context.lifecycle.changed.connect(_web_lifecycle)
@@ -88,8 +92,6 @@ func _ready() -> void:
 			chat_input.accept_event()
 	)
 	resident_selected.connect(_select_resident)
-	encounter.action_requested.connect(_resident_action)
-	encounter.dismissed.connect(_cancel_approach)
 	battle_view.settings_requested.connect(func() -> void: _scene_action("system"))
 	battle_view.action_requested.connect(func(action: String) -> void: network.pve.submit(action))
 	battle_view.dismissed.connect(func() -> void:
@@ -105,7 +107,7 @@ func _ready() -> void:
 		_system_text = text
 		expanded_chat.add_system(text)
 		_chat_changed()
-		if network.pve.last_code.is_empty(): encounter.hide()
+		if _loading_battle.is_empty(): encounter.hide()
 	)
 	network.changed.connect(_snapshot)
 	network.population.changed.connect(_population)
@@ -121,6 +123,7 @@ func _ready() -> void:
 	network.start(character_id)
 
 func _leave_world() -> void:
+	_cancel_battle_preparation()
 	network.leave()
 	close_requested.emit()
 
@@ -129,7 +132,7 @@ func _scene_action(action: String) -> void:
 	_close_attributes()
 	if expanded_chat.visible: expanded_chat.dismiss()
 	_cancel_approach()
-	encounter.hide()
+	if _loading_battle.is_empty() and not network.pve.pending(): encounter.hide()
 	if action == "menu":
 		details.hide()
 		emote_picker.hide()
@@ -334,15 +337,17 @@ func _process(delta: float) -> void:
 			actor.distance = 0.0
 			actor.sprite.play("idle")
 	if actors.has(character_id): camera.position = actors[character_id].root.position
+	if encounter.visible: encounter.set_hero_point(_hero_screen_point())
 	_update_move_target(delta)
 	if OS.has_feature("web") and (not Platform.context.lifecycle.focused or Platform.context.lifecycle.suspended): return
 	_advance_approach()
-	if chat_input.has_focus() or menu.visible or details.visible or emote_picker.visible or encounter.visible or battle_view.visible or expanded_chat.visible or attributes.visible or world_map.visible or network.pve.pending():
+	if chat_input.has_focus() or menu.visible or details.visible or emote_picker.visible or encounter.visible or battle_view.visible or expanded_chat.visible or attributes.visible or world_map.visible or network.pve.pending() or network.pve.active():
 		_was_keyboard = false
 		return
 	_key_timer -= delta
 	var direction := Vector2i(int(Input.is_physical_key_pressed(KEY_D) or Input.is_physical_key_pressed(KEY_RIGHT)) - int(Input.is_physical_key_pressed(KEY_A) or Input.is_physical_key_pressed(KEY_LEFT)), int(Input.is_physical_key_pressed(KEY_S) or Input.is_physical_key_pressed(KEY_DOWN)) - int(Input.is_physical_key_pressed(KEY_W) or Input.is_physical_key_pressed(KEY_UP)))
 	if direction.x != 0: direction.y = 0
+	if direction != Vector2i.ZERO: _cancel_approach()
 	if direction != Vector2i.ZERO: move_target.clear()
 	if direction != Vector2i.ZERO and _key_timer <= 0 and network.entities.has(character_id):
 		_key_timer = 0.15
@@ -357,7 +362,10 @@ func _process(delta: float) -> void:
 		_was_keyboard = false
 
 func _map_input(event: InputEvent) -> void:
-	if not network.world_ready or menu.visible or details.visible or encounter.visible or battle_view.visible or expanded_chat.visible or attributes.visible or world_map.visible or network.pve.pending(): return
+	if _battle_load_failed:
+		if (event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed) or (event is InputEventScreenTouch and event.pressed): _pve_changed()
+		return
+	if not network.world_ready or menu.visible or details.visible or encounter.visible or battle_view.visible or expanded_chat.visible or attributes.visible or world_map.visible or network.pve.pending() or network.pve.active(): return
 	var point := Vector2.ZERO
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed: point = event.position
 	elif event is InputEventScreenTouch and event.pressed: point = event.position
@@ -400,8 +408,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 			get_viewport().set_input_as_handled()
 			return
 		if battle_view.visible: return
-		if encounter.visible:
-			encounter.hide()
+		if not _approach.is_empty():
 			_cancel_approach()
 		elif emote_picker.visible: emote_picker.hide()
 		elif menu.visible: menu.dismiss()
@@ -420,6 +427,9 @@ func _pve_changed() -> void:
 	if model.active(): _close_world_map()
 	if not model.ready:
 		_cancel_approach()
+		_cancel_battle_preparation()
+	elif not _loading_battle.is_empty() and (not model.state.get("battle") is Dictionary or model.state.battle.id != _loading_battle):
+		_cancel_battle_preparation()
 	if not model.state.is_empty():
 		_character = model.state.character.duplicate(true)
 		_character.max_hp = model.state.stats.hp
@@ -430,45 +440,41 @@ func _pve_changed() -> void:
 		screen.hud.get_node("WorldIdentity").text = "等级 %d\n%s派" % [int(_character.level), ["峨眉", "花涧", "昆仑"][int(_character.school)]]
 		_population(network.population.entities)
 		if model.state.battle is Dictionary and (model.active() or model.state.battle.id != _closed_battle):
-			encounter.hide()
-			battle_view.present(model)
-			screen.chrome.round_label.text = "回合：%d/30" % int(model.state.battle.round)
-			_set_battle_layout(true)
-			screen.hud.hide()
-			count_label.hide()
+			if battle_view.battle_id == model.state.battle.id:
+				_present_battle()
+			elif model.ready and _loading_battle != model.state.battle.id:
+				_prepare_battle(model.state.battle)
 		elif battle_view.visible:
 			battle_view.hide()
 			_set_battle_layout(false)
 			screen.hud.show()
 			count_label.show()
-	encounter.refresh()
+	if _loading_battle.is_empty(): _refresh_interaction_wait()
 	battle_view.refresh()
 
 func _select_resident(id: String) -> void:
-	if not residents.has(id) or network.pve.active() or network.pve.pending(): return
+	if not network.world_ready or not network.pve.ready or not residents.has(id) or network.pve.active() or network.pve.pending(): return
 	_cancel_approach()
 	if network.world_ready: network.stop_moving()
 	menu.hide()
 	details.hide()
 	emote_picker.hide()
-	encounter.present(id, network.population.entities[id], network.pve)
+	_resident_action("npc" if id == "qingwei" else "challenge", id)
 
 func _cancel_approach() -> void:
 	if not _approach.is_empty() and network.world_ready: network.stop_moving()
 	_approach = {}
-	if encounter != null:
-		encounter.approaching = false
-		encounter.refresh()
 
 func _resident_action(action: String, target: String) -> void:
 	if not network.pve.ready or network.pve.pending(): return
 	_approach = {"action": action, "target": target, "deadline": Time.get_unix_time_from_system() + 30.0, "stopped": true}
-	encounter.approaching = true
-	encounter.refresh()
 	network.stop_moving()
 
 func _advance_approach() -> void:
 	if _approach.is_empty(): return
+	if network.pve.active() or network.pve.pending():
+		_cancel_approach()
+		return
 	if not network.world_ready or not network.pve.ready or Time.get_unix_time_from_system() > float(_approach.deadline):
 		_cancel_approach()
 		chat_status.text = "未能抵达，请重新选择目标。"
@@ -488,8 +494,17 @@ func _advance_approach() -> void:
 			return
 		var request := _approach
 		_approach = {}
-		encounter.approaching = false
-		network.pve.submit(request.action, request.target)
+		var action: String = request.action
+		if action == "npc":
+			var stage := int(network.pve.state.character.quest_stage)
+			action = "accept" if stage == 0 else ("claim" if stage == 2 else "restore")
+			if stage in [1, 3] and int(network.pve.state.character.hp) == int(network.pve.state.stats.hp) and int(network.pve.state.character.mp) == int(network.pve.state.stats.mp):
+				_pve_log = network.pve.quest_text()
+				_system_text = _pve_log
+				expanded_chat.add_system(_pve_log)
+				_chat_changed()
+				return
+		network.pve.submit(action, request.target)
 		return
 	var best := Vector2i(-1, -1)
 	var shortest := 9999
@@ -507,6 +522,98 @@ func _advance_approach() -> void:
 		_approach.stopped = false
 		network.move_to(best)
 		_mark_destination(best)
+
+func _hero_screen_point() -> Vector2:
+	if not actors.has(character_id): return Vector2(160, 216)
+	return actors[character_id].root.get_global_transform_with_canvas().origin + image.position
+
+func _refresh_interaction_wait() -> void:
+	if not network.pve.pending():
+		encounter.hide()
+		return
+	var command: Dictionary = OnlineAccount.pending_pve.command
+	if not command.action in ["accept", "claim", "restore", "challenge"]:
+		encounter.hide()
+		return
+	var resident: Dictionary = network.population.entities.get(command.get("target", ""), {})
+	encounter.present(command.action, resident.get("name", "清微道人" if command.action != "challenge" else "妖物"), _hero_screen_point())
+	if not network.pve.ready: encounter.set_waiting("连接中断，正在确认交互结果……")
+
+func _cancel_battle_preparation() -> void:
+	_battle_load_epoch += 1
+	if _battle_resource_request != null: _battle_resource_request.cancel()
+	_battle_resource_request = null
+	_loading_battle = ""
+	_battle_load_failed = false
+	if encounter != null: encounter.hide()
+
+func _battle_preparation_current(epoch: int, id: String) -> bool:
+	return is_inside_tree() and not is_queued_for_deletion() and epoch == _battle_load_epoch and network.pve.ready and network.pve.state.get("battle") is Dictionary and network.pve.state.battle.id == id
+
+func _battle_preparation_failed() -> void:
+	_cancel_battle_preparation()
+	_battle_load_failed = true
+	chat_status.text = "战斗资源读取失败，点击地图重试；战斗进度已由服务器保存。"
+
+func _prepare_battle(snapshot: Dictionary) -> void:
+	_cancel_battle_preparation()
+	battle_view.hide()
+	_set_battle_layout(false)
+	screen.chrome.round_label.text = "常规模式"
+	screen.hud.show()
+	count_label.show()
+	var epoch := _battle_load_epoch
+	var id: String = snapshot.id
+	_loading_battle = id
+	encounter.present("challenge", snapshot.enemy.name, _hero_screen_point())
+	encounter.set_progress(0.0, "准备战斗图像与场景")
+	await get_tree().create_timer(0.20).timeout
+	if not _battle_preparation_current(epoch, id): return
+	var c: Dictionary = network.pve.state.character
+	var key: String = (["mzs", "mck", "mfs"] if int(c.gender) == 0 else ["wzs", "wck", "wfs"])[int(c.job)]
+	var keys: Array[String] = ["hero/" + key, String(snapshot.enemy.art), "effect/flash", ["effect/t71", "effect/t36", "effect/t47"][int(c.job)]]
+	var paths: Array[String] = ["res://assets/tiles/original_tiles.png"]
+	for actor_key in keys:
+		var info := OriginalArt.actor_info(actor_key)
+		if info.is_empty():
+			_battle_preparation_failed()
+			return
+		if not paths.has(info.texture): paths.append(info.texture)
+	var request := Platform.context.resource_loader.prepare(PackedStringArray(paths), self, epoch)
+	_battle_resource_request = request
+	while not request.is_finished():
+		encounter.set_progress(0.75 * request.progress, "准备战斗图像与场景")
+		await get_tree().process_frame
+		if not _battle_preparation_current(epoch, id):
+			request.cancel()
+			return
+	if not request.result.ok:
+		_battle_preparation_failed()
+		return
+	for index in keys.size():
+		var prepared := OriginalArt.actor(keys[index])
+		prepared.free()
+		encounter.set_progress(0.75 + 0.20 * float(index + 1) / keys.size(), "准备角色动作与招式")
+		await get_tree().process_frame
+		if not _battle_preparation_current(epoch, id): return
+	encounter.set_progress(1.0, "准备就绪")
+	await get_tree().create_timer(0.16).timeout
+	if not _battle_preparation_current(epoch, id): return
+	_battle_resource_request = null
+	_loading_battle = ""
+	encounter.hide()
+	# Use the latest authoritative revision, including receipts arriving while loading.
+	_present_battle()
+
+func _present_battle() -> void:
+	battle_view.present(network.pve)
+	screen.chrome.round_label.text = "回合：%d/30" % int(network.pve.state.battle.round)
+	_set_battle_layout(true)
+	screen.hud.hide()
+	count_label.hide()
+
+func _exit_tree() -> void:
+	_cancel_battle_preparation()
 
 func _web_lifecycle(event: String) -> void:
 	if event not in ["focus_lost", "suspended"]: return
@@ -560,7 +667,7 @@ func _open_expanded_chat() -> void:
 	_was_keyboard = false
 	menu.hide()
 	details.hide()
-	encounter.hide()
+	if _loading_battle.is_empty() and not network.pve.pending(): encounter.hide()
 	emote_picker.hide()
 	Platform.context.text_input.release_focus(chat_input)
 	battle_view.set_process_unhandled_key_input(false)

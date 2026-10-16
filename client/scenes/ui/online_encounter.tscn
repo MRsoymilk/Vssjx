@@ -1,64 +1,18 @@
 [gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/ui/battle_encounter_transition.tscn" id="Base"]
 [ext_resource type="Script" path="res://scripts/online_encounter.gd" id="Script"]
-[ext_resource type="Theme" path="res://scenes/ui/online_pve_theme.tres" id="Theme"]
-[sub_resource type="StyleBoxFlat" id="Paper"]
-bg_color = Color(0.16, 0.30, 0.45, 0.98)
-border_color = Color(0.94, 0.87, 0.56, 1)
-border_width_left = 2
-border_width_right = 2
-border_width_top = 2
-border_width_bottom = 2
-[node name="Encounter" type="Control"]
+
+[node name="Encounter" instance=ExtResource("Base")]
 visible = false
-offset_top = 28.0
-offset_right = 320.0
-offset_bottom = 403.0
-theme = ExtResource("Theme")
+mouse_filter = 2
 script = ExtResource("Script")
-[node name="Shade" type="ColorRect" parent="."]
-offset_right = 320.0
-offset_bottom = 375.0
-color = Color(0.05, 0.13, 0.17, 0.55)
-[node name="Panel" type="Panel" parent="."]
-offset_left = 18.0
-offset_top = 86.0
-offset_right = 302.0
-offset_bottom = 320.0
-theme_override_styles/panel = SubResource("Paper")
-[node name="Title" type="Label" parent="Panel"]
-offset_left = 18.0
-offset_top = 10.0
-offset_right = 266.0
-offset_bottom = 35.0
-theme_override_font_sizes/font_size = 18
-text = "清微道人"
-[node name="Rule" type="ColorRect" parent="Panel"]
-offset_left = 18.0
-offset_top = 41.0
-offset_right = 266.0
-offset_bottom = 42.0
-color = Color(0.70, 0.76, 0.63, 1)
-[node name="Body" type="Label" parent="Panel"]
-offset_left = 18.0
-offset_top = 52.0
-offset_right = 266.0
-offset_bottom = 149.0
-autowrap_mode = 3
-[node name="Primary" type="Button" parent="Panel"]
-offset_left = 18.0
-offset_top = 154.0
-offset_right = 138.0
-offset_bottom = 185.0
-text = "领受试炼"
-[node name="Restore" type="Button" parent="Panel"]
-offset_left = 146.0
-offset_top = 154.0
-offset_right = 266.0
-offset_bottom = 185.0
-text = "恢复元气"
-[node name="Close" type="Button" parent="Panel"]
-offset_left = 18.0
-offset_top = 193.0
-offset_right = 266.0
-offset_bottom = 221.0
-text = "返回山道"
+
+[node name="Warning" parent="." index="0"]
+mouse_filter = 2
+
+[node name="Caption" parent="." index="1"]
+mouse_filter = 2
+
+[node name="Detail" parent="." index="2"]
+mouse_filter = 2

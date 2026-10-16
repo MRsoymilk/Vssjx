@@ -1,0 +1,12 @@
+{
+  "source_repository": "vmrp/vmrp",
+  "source_commit": "ffe01e9fc203a830ad55b6b9636500e0fdc971b4",
+  "source_file": "mrc/mr_table_offsets.c",
+  "source_blob_sha": "c660d512c0ec74412625333e9759d3b00bf0cd09",
+  "source_url": "https://github.com/vmrp/vmrp/blob/ffe01e9fc203a830ad55b6b9636500e0fdc971b4/mrc/mr_table_offsets.c",
+  "source_license": "GPL-3.0; this file records field names and provenance, not an imported SDK implementation",
+  "pointer_bytes": 4,
+  "scope": "Contiguous prefix of the public mr_table layout, through mr_sendto. Other offsets remain unnamed.",
+  "interpretation": "Layout match only. The original firmware/SDK build has not been recovered. The client loader references header[0]+0x64 with a callback pointer and size 0x14, corroborating _mr_c_function_new; +0x00/+0x0c/+0x38 corroborate allocation/copy/zeroing.",
+  "fields": ["mr_malloc", "mr_free", "mr_realloc", "memcpy", "memmove", "strcpy", "strncpy", "strcat", "strncat", "memcmp", "strcmp", "strncmp", "strcoll", "memchr", "memset", "strlen", "strstr", "sprintf", "atoi", "strtoul", "rand", "reserve0", "reserve1", "_mr_c_internal_table", "_mr_c_port_table", "_mr_c_function_new", "mr_printf", "mr_mem_get", "mr_mem_free", "mr_drawBitmap", "mr_getCharBitmap", "g_mr_timerStart", "g_mr_timerStop", "mr_getTime", "mr_getDatetime", "mr_getUserInfo", "mr_sleep", "mr_plat", "mr_platEx", "mr_ferrno", "mr_open", "mr_close", "mr_info", "mr_write", "mr_read", "mr_seek", "mr_getLen", "mr_remove", "mr_rename", "mr_mkDir", "mr_rmDir", "mr_findStart", "mr_findGetNext", "mr_findStop", "mr_exit", "mr_startShake", "mr_stopShake", "mr_playSound", "mr_stopSound", "mr_sendSms", "mr_call", "mr_getNetworkID", "mr_connectWAP", "mr_menuCreate", "mr_menuSetItem", "mr_menuShow", "reserve", "mr_menuRelease", "mr_menuRefresh", "mr_dialogCreate", "mr_dialogRelease", "mr_dialogRefresh", "mr_textCreate", "mr_textRelease", "mr_textRefresh", "mr_editCreate", "mr_editRelease", "mr_editGetText", "mr_winCreate", "mr_winRelease", "mr_getScreenInfo", "mr_initNetwork", "mr_closeNetwork", "mr_getHostByName", "mr_socket", "mr_connect", "mr_closeSocket", "mr_recv", "mr_recvfrom", "mr_send", "mr_sendto"]
+}

@@ -1,0 +1,106 @@
+{
+  "format": "MRPGCMAP",
+  "bytes": 204904,
+  "scan_offset": 8,
+  "scan_items": 51224,
+  "decoded_instructions": 39898,
+  "skipped_data_items": 11326,
+  "candidate_count": 14,
+  "prologue_count": 12,
+  "bl_target_count": 3,
+  "caveat": "Linear ARM disassembly includes data and may misidentify Thumb/code boundaries; function list is heuristic.",
+  "strings": [
+    {
+      "offset": 199256,
+      "string": "download.str"
+    },
+    {
+      "offset": 199936,
+      "string": "socketicon"
+    },
+    {
+      "offset": 202000,
+      "string": "login"
+    },
+    {
+      "offset": 202024,
+      "string": "login.str"
+    },
+    {
+      "offset": 203124,
+      "string": "autologin"
+    }
+  ],
+  "top_candidates": [
+    {
+      "offset": 1280,
+      "callers": 1,
+      "prologue": true
+    },
+    {
+      "offset": 8,
+      "callers": 0,
+      "prologue": true
+    },
+    {
+      "offset": 128,
+      "callers": 0,
+      "prologue": true
+    },
+    {
+      "offset": 376,
+      "callers": 0,
+      "prologue": true
+    },
+    {
+      "offset": 484,
+      "callers": 0,
+      "prologue": true
+    },
+    {
+      "offset": 756,
+      "callers": 0,
+      "prologue": true
+    },
+    {
+      "offset": 1396,
+      "callers": 0,
+      "prologue": true
+    },
+    {
+      "offset": 2116,
+      "callers": 0,
+      "prologue": true
+    },
+    {
+      "offset": 8524,
+      "callers": 0,
+      "prologue": true
+    },
+    {
+      "offset": 33508,
+      "callers": 0,
+      "prologue": true
+    },
+    {
+      "offset": 110256,
+      "callers": 0,
+      "prologue": true
+    },
+    {
+      "offset": 136116,
+      "callers": 0,
+      "prologue": true
+    },
+    {
+      "offset": 2144,
+      "callers": 1,
+      "prologue": false
+    },
+    {
+      "offset": 183652,
+      "callers": 1,
+      "prologue": false
+    }
+  ]
+}

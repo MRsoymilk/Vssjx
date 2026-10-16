@@ -1,0 +1,59 @@
+[
+  {
+    "file": "gameonline.ext",
+    "size": 204904,
+    "ascii_strings": 2586,
+    "hits": [
+      {
+        "offset": 199256,
+        "text": "download.str"
+      },
+      {
+        "offset": 199936,
+        "text": "socketicon"
+      },
+      {
+        "offset": 202000,
+        "text": "login"
+      },
+      {
+        "offset": 202024,
+        "text": "login.str"
+      },
+      {
+        "offset": 203124,
+        "text": "autologin"
+      }
+    ]
+  },
+  {
+    "file": "reg.ext",
+    "size": 1504,
+    "ascii_strings": 15,
+    "hits": []
+  },
+  {
+    "file": "start.mr",
+    "size": 3435,
+    "ascii_strings": 51,
+    "hits": []
+  },
+  {
+    "file": "download.str",
+    "size": 893,
+    "ascii_strings": 30,
+    "hits": []
+  },
+  {
+    "file": "sfc.bin",
+    "size": 2020,
+    "ascii_strings": 69,
+    "hits": []
+  },
+  {
+    "file": "worldmap.data",
+    "size": 3592,
+    "ascii_strings": 44,
+    "hits": []
+  }
+]

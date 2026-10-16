@@ -1,0 +1,8048 @@
+{
+  "schema_version": 1,
+  "input_sha256": "e08f93bebe133b700f2305bfbedd994b05cc8d04a5a854262af9ced956afbc03",
+  "sdk_reference": {
+    "source_repository": "vmrp/vmrp",
+    "source_commit": "ffe01e9fc203a830ad55b6b9636500e0fdc971b4",
+    "source_file": "mrc/mr_table_offsets.c",
+    "source_blob_sha": "c660d512c0ec74412625333e9759d3b00bf0cd09",
+    "source_url": "https://github.com/vmrp/vmrp/blob/ffe01e9fc203a830ad55b6b9636500e0fdc971b4/mrc/mr_table_offsets.c",
+    "source_license": "GPL-3.0; this file records field names and provenance, not an imported SDK implementation",
+    "pointer_bytes": 4,
+    "scope": "Contiguous prefix of the public mr_table layout, through mr_sendto. Other offsets remain unnamed.",
+    "interpretation": "Layout match only. The original firmware/SDK build has not been recovered. The client loader references header[0]+0x64 with a callback pointer and size 0x14, corroborating _mr_c_function_new; +0x00/+0x0c/+0x38 corroborate allocation/copy/zeroing.",
+    "fields": [
+      "mr_malloc",
+      "mr_free",
+      "mr_realloc",
+      "memcpy",
+      "memmove",
+      "strcpy",
+      "strncpy",
+      "strcat",
+      "strncat",
+      "memcmp",
+      "strcmp",
+      "strncmp",
+      "strcoll",
+      "memchr",
+      "memset",
+      "strlen",
+      "strstr",
+      "sprintf",
+      "atoi",
+      "strtoul",
+      "rand",
+      "reserve0",
+      "reserve1",
+      "_mr_c_internal_table",
+      "_mr_c_port_table",
+      "_mr_c_function_new",
+      "mr_printf",
+      "mr_mem_get",
+      "mr_mem_free",
+      "mr_drawBitmap",
+      "mr_getCharBitmap",
+      "g_mr_timerStart",
+      "g_mr_timerStop",
+      "mr_getTime",
+      "mr_getDatetime",
+      "mr_getUserInfo",
+      "mr_sleep",
+      "mr_plat",
+      "mr_platEx",
+      "mr_ferrno",
+      "mr_open",
+      "mr_close",
+      "mr_info",
+      "mr_write",
+      "mr_read",
+      "mr_seek",
+      "mr_getLen",
+      "mr_remove",
+      "mr_rename",
+      "mr_mkDir",
+      "mr_rmDir",
+      "mr_findStart",
+      "mr_findGetNext",
+      "mr_findStop",
+      "mr_exit",
+      "mr_startShake",
+      "mr_stopShake",
+      "mr_playSound",
+      "mr_stopSound",
+      "mr_sendSms",
+      "mr_call",
+      "mr_getNetworkID",
+      "mr_connectWAP",
+      "mr_menuCreate",
+      "mr_menuSetItem",
+      "mr_menuShow",
+      "reserve",
+      "mr_menuRelease",
+      "mr_menuRefresh",
+      "mr_dialogCreate",
+      "mr_dialogRelease",
+      "mr_dialogRefresh",
+      "mr_textCreate",
+      "mr_textRelease",
+      "mr_textRefresh",
+      "mr_editCreate",
+      "mr_editRelease",
+      "mr_editGetText",
+      "mr_winCreate",
+      "mr_winRelease",
+      "mr_getScreenInfo",
+      "mr_initNetwork",
+      "mr_closeNetwork",
+      "mr_getHostByName",
+      "mr_socket",
+      "mr_connect",
+      "mr_closeSocket",
+      "mr_recv",
+      "mr_recvfrom",
+      "mr_send",
+      "mr_sendto"
+    ]
+  },
+  "summary": {
+    "sdk_matched_sites": 156,
+    "network_matched_sites": 0,
+    "network_functions": 0,
+    "cached_sdk_alias_candidates": 18,
+    "local_numeric_map_files": 0,
+    "decoded_package_tables": 0
+  },
+  "sdk_matches": [
+    {
+      "site": 18838,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xd94)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "0x000307f4",
+        "?",
+        "mem[mem[(mem[(SB+0xe8)]+0x4)]]",
+        "mem[(SB+0xd94)]"
+      ],
+      "argument_strings": [
+        "add to allBattleRoles role%d->heroData->id=%d",
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_00004914",
+      "sdk_api": "mr_printf",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 104
+    },
+    {
+      "site": 20960,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xd98)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "?",
+        "0x00000040",
+        "mem[(SB+0xd98)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_00005104",
+      "sdk_api": "memcpy",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 12
+    },
+    {
+      "site": 21600,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xdd0)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "mem[(SB+0x61c)]",
+        "0x00030b58",
+        "?",
+        "mem[(SB+0xdd0)]"
+      ],
+      "argument_strings": [
+        null,
+        "ix%d",
+        null,
+        null
+      ],
+      "function": "thumb_00005434",
+      "sdk_api": "sprintf",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 68
+    },
+    {
+      "site": 28294,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xdc4)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "0x00000000",
+        "?",
+        "mem[(SB+0xdc4)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_00006e54",
+      "sdk_api": "memset",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 56
+    },
+    {
+      "site": 36998,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xdd0)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "mem[(SB+0x61c)]",
+        "0x00030a84",
+        "?",
+        "mem[(SB+0xdd0)]"
+      ],
+      "argument_strings": [
+        null,
+        "fm%d",
+        null,
+        null
+      ],
+      "function": "thumb_00008fa4",
+      "sdk_api": "sprintf",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 68
+    },
+    {
+      "site": 37402,
+      "mode": "thumb",
+      "instruction": "blx r7",
+      "target": null,
+      "expression": "mem[(SB+0xdd0)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "mem[(SB+0x274)]",
+        "0x00030a50",
+        "?",
+        "?"
+      ],
+      "argument_strings": [
+        null,
+        "%s%d",
+        null,
+        null
+      ],
+      "function": "thumb_000091f0",
+      "sdk_api": "sprintf",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 68
+    },
+    {
+      "site": 38084,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xdd0)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "mem[(SB+0x274)]",
+        "0x00030a68",
+        "?",
+        "mem[(SB+0xdd0)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_000093c0",
+      "sdk_api": "sprintf",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 68
+    },
+    {
+      "site": 48776,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xdc4)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "0x00000000",
+        "?",
+        "mem[(SB+0xdc4)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_0000be60",
+      "sdk_api": "memset",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 56
+    },
+    {
+      "site": 48800,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xdc4)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "0x00000000",
+        "?",
+        "mem[(SB+0xdc4)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_0000be60",
+      "sdk_api": "memset",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 56
+    },
+    {
+      "site": 48824,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xdc4)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "0x00000000",
+        "?",
+        "mem[(SB+0xdc4)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_0000be60",
+      "sdk_api": "memset",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 56
+    },
+    {
+      "site": 62282,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xdc4)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "(SB+0xcc4)",
+        "0x00000000",
+        "0x00000064",
+        "mem[(SB+0xdc4)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_0000f306",
+      "sdk_api": "memset",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 56
+    },
+    {
+      "site": 66762,
+      "mode": "thumb",
+      "instruction": "blx r6",
+      "target": null,
+      "expression": "mem[(SB+0xdd0)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "mem[(SB+0x61c)]",
+        "0x00031534",
+        "?",
+        "?"
+      ],
+      "argument_strings": [
+        null,
+        "%s%d",
+        null,
+        null
+      ],
+      "function": "thumb_00010410",
+      "sdk_api": "sprintf",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 68
+    },
+    {
+      "site": 78994,
+      "mode": "thumb",
+      "instruction": "blx r6",
+      "target": null,
+      "expression": "mem[(SB+0xdd0)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "0x00030954",
+        "0x0003095c",
+        "?"
+      ],
+      "argument_strings": [
+        null,
+        "%s%d",
+        null,
+        null
+      ],
+      "function": "thumb_00013470",
+      "sdk_api": "sprintf",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 68
+    },
+    {
+      "site": 79194,
+      "mode": "thumb",
+      "instruction": "blx r4",
+      "target": null,
+      "expression": "mem[(SB+0xdd0)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "(SB+0x138)",
+        "0x00030954",
+        "0x0003095c",
+        "?"
+      ],
+      "argument_strings": [
+        null,
+        "%s%d",
+        null,
+        null
+      ],
+      "function": "thumb_0001353c",
+      "sdk_api": "sprintf",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 68
+    },
+    {
+      "site": 79840,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xdd0)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "mem[(SB+0x61c)]",
+        "0x000314a0",
+        "mem[(SB+0x8a4)]",
+        "mem[(SB+0xdd0)]"
+      ],
+      "argument_strings": [
+        null,
+        "%d.map",
+        null,
+        null
+      ],
+      "function": "thumb_000137c8",
+      "sdk_api": "sprintf",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 68
+    },
+    {
+      "site": 80588,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xdd0)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "mem[(SB+0x61c)]",
+        "0x000314a0",
+        "mem[(SB+0x8a4)]",
+        "mem[(SB+0xdd0)]"
+      ],
+      "argument_strings": [
+        null,
+        "%d.map",
+        null,
+        null
+      ],
+      "function": "thumb_000139ac",
+      "sdk_api": "sprintf",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 68
+    },
+    {
+      "site": 86770,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xdd0)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "mem[(SB+0x61c)]",
+        "0x00031494",
+        "?",
+        "mem[(SB+0xdd0)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_000152d8",
+      "sdk_api": "sprintf",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 68
+    },
+    {
+      "site": 87040,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xdd0)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "mem[(SB+0x61c)]",
+        "0x0003147c",
+        "?",
+        "mem[(SB+0xdd0)]"
+      ],
+      "argument_strings": [
+        null,
+        "tips%d.str",
+        null,
+        null
+      ],
+      "function": "thumb_000153e4",
+      "sdk_api": "sprintf",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 68
+    },
+    {
+      "site": 87104,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xdc4)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "(SB+0x960)",
+        "0x00000000",
+        "0x00000008",
+        "mem[(SB+0xdc4)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_000153e4",
+      "sdk_api": "memset",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 56
+    },
+    {
+      "site": 87654,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xdd0)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "mem[(SB+0x61c)]",
+        "0x0003148c",
+        "?",
+        "mem[(SB+0xdd0)]"
+      ],
+      "argument_strings": [
+        null,
+        "tile%d",
+        null,
+        null
+      ],
+      "function": "thumb_00015618",
+      "sdk_api": "sprintf",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 68
+    },
+    {
+      "site": 88760,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xdc4)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "mem[(SB+0x93c)]",
+        "0x00000000",
+        "?",
+        "mem[(SB+0xdc4)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_00015a58",
+      "sdk_api": "memset",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 56
+    },
+    {
+      "site": 88776,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xdc4)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "mem[(SB+0x940)]",
+        "0x00000000",
+        "?",
+        "mem[(SB+0xdc4)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_00015a58",
+      "sdk_api": "memset",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 56
+    },
+    {
+      "site": 88792,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xdc4)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "mem[(SB+0x944)]",
+        "0x00000001",
+        "?",
+        "mem[(SB+0xdc4)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_00015a58",
+      "sdk_api": "memset",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 56
+    },
+    {
+      "site": 88812,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xdc4)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "mem[(SB+0x948)]",
+        "0xffffffff",
+        "?",
+        "mem[(SB+0xdc4)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_00015a58",
+      "sdk_api": "memset",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 56
+    },
+    {
+      "site": 97656,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xd98)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "?",
+        "?",
+        "mem[(SB+0xd98)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_00017d58",
+      "sdk_api": "memcpy",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 12
+    },
+    {
+      "site": 100830,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xd98)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "?",
+        "0x00000002",
+        "mem[(SB+0xd98)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_000189b4",
+      "sdk_api": "memcpy",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 12
+    },
+    {
+      "site": 100868,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xd98)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "?",
+        "?",
+        "mem[(SB+0xd98)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_000189b4",
+      "sdk_api": "memcpy",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 12
+    },
+    {
+      "site": 101202,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xd98)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "?",
+        "?",
+        "mem[(SB+0xd98)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_00018af4",
+      "sdk_api": "memcpy",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 12
+    },
+    {
+      "site": 102392,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xd98)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "?",
+        "?",
+        "mem[(SB+0xd98)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_00018fd0",
+      "sdk_api": "memcpy",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 12
+    },
+    {
+      "site": 102692,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xdc4)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "0x00000000",
+        "0x00000008",
+        "mem[(SB+0xdc4)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_00019100",
+      "sdk_api": "memset",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 56
+    },
+    {
+      "site": 102930,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xdc4)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "0x00000000",
+        "0x00000008",
+        "mem[(SB+0xdc4)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_000191f0",
+      "sdk_api": "memset",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 56
+    },
+    {
+      "site": 104172,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xdc4)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "(SB+0x588)",
+        "0xffffffff",
+        "0x00000003",
+        "mem[(SB+0xdc4)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_000196ca",
+      "sdk_api": "memset",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 56
+    },
+    {
+      "site": 105620,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xdc4)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "0x00000000",
+        "0x00000008",
+        "mem[(SB+0xdc4)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_00019c2c",
+      "sdk_api": "memset",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 56
+    },
+    {
+      "site": 110482,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xdc4)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "(SB+0x3b8)",
+        "0x00000000",
+        "0x0000000a",
+        "mem[(SB+0xdc4)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_0001af64",
+      "sdk_api": "memset",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 56
+    },
+    {
+      "site": 123692,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xdd0)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "mem[(SB+0x61c)]",
+        "0x000315d4",
+        "?",
+        "mem[(SB+0xdd0)]"
+      ],
+      "argument_strings": [
+        null,
+        "teach%d",
+        null,
+        null
+      ],
+      "function": "thumb_0001e238",
+      "sdk_api": "sprintf",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 68
+    },
+    {
+      "site": 124234,
+      "mode": "thumb",
+      "instruction": "blx r5",
+      "target": null,
+      "expression": "mem[(SB+0xdd0)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "mem[(SB+0x61c)]",
+        "0x000315c4",
+        "0x000315cc",
+        "mem[mem[(SB+0x448)]]"
+      ],
+      "argument_strings": [
+        null,
+        "%s%d",
+        "teach",
+        null
+      ],
+      "function": "thumb_0001e52c",
+      "sdk_api": "sprintf",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 68
+    },
+    {
+      "site": 128154,
+      "mode": "thumb",
+      "instruction": "blx r5",
+      "target": null,
+      "expression": "mem[(SB+0xdd0)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "mem[(SB+0x61c)]",
+        "0x000307b4",
+        "?",
+        "?"
+      ],
+      "argument_strings": [
+        null,
+        "%d/%d",
+        null,
+        null
+      ],
+      "function": "thumb_0001f484",
+      "sdk_api": "sprintf",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 68
+    },
+    {
+      "site": 128194,
+      "mode": "thumb",
+      "instruction": "blx r5",
+      "target": null,
+      "expression": "mem[(SB+0xdd0)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "mem[(SB+0x61c)]",
+        "0x000307b4",
+        "?",
+        "?"
+      ],
+      "argument_strings": [
+        null,
+        "%d/%d",
+        null,
+        null
+      ],
+      "function": "thumb_0001f4ac",
+      "sdk_api": "sprintf",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 68
+    },
+    {
+      "site": 128410,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xdd0)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "0x000307a4",
+        "?",
+        "mem[(SB+0xdd0)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_0001f574",
+      "sdk_api": "sprintf",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 68
+    },
+    {
+      "site": 128672,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xdc4)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "0x00000000",
+        "0x00000028",
+        "mem[(SB+0xdc4)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_0001f684",
+      "sdk_api": "memset",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 56
+    },
+    {
+      "site": 129552,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xdc4)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "mem[(SB+0xd60)]",
+        "0x00000000",
+        "0x00000028",
+        "mem[(SB+0xdc4)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_0001f990",
+      "sdk_api": "memset",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 56
+    },
+    {
+      "site": 133828,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xdd0)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "0x0003114c",
+        "?",
+        "mem[(SB+0xdd0)]"
+      ],
+      "argument_strings": [
+        null,
+        "shuzi0%d",
+        null,
+        null
+      ],
+      "function": "thumb_00020a3c",
+      "sdk_api": "sprintf",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 68
+    },
+    {
+      "site": 134332,
+      "mode": "thumb",
+      "instruction": "blx r7",
+      "target": null,
+      "expression": "mem[(SB+0xdd0)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "mem[(SB+0x61c)]",
+        "0x00031158",
+        "0x0000002b",
+        "?"
+      ],
+      "argument_strings": [
+        null,
+        "%c%d",
+        null,
+        null
+      ],
+      "function": "thumb_00020c9c",
+      "sdk_api": "sprintf",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 68
+    },
+    {
+      "site": 134342,
+      "mode": "thumb",
+      "instruction": "blx r7",
+      "target": null,
+      "expression": "mem[(SB+0xdd0)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "mem[(SB+0x61c)]",
+        "0x00031160",
+        "?",
+        "?"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_00020c9c",
+      "sdk_api": "sprintf",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 68
+    },
+    {
+      "site": 134882,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xd98)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "?",
+        "?",
+        "mem[(SB+0xd98)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_00020ea8",
+      "sdk_api": "memcpy",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 12
+    },
+    {
+      "site": 139920,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xdc4)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "mem[(SB+0xc9c)]",
+        "0x00000000",
+        "?",
+        "mem[(SB+0xdc4)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_00022264",
+      "sdk_api": "memset",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 56
+    },
+    {
+      "site": 141148,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(mem[0x00000000]+0x38)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "(SB+0xe7c)",
+        "0x00000000",
+        "0x0000001c",
+        "mem[(mem[0x00000000]+0x38)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_00022748",
+      "sdk_api": "memset",
+      "sdk_evidence": "direct_header_table_offset",
+      "sdk_slot": 56
+    },
+    {
+      "site": 142162,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xdd0)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "(SB+0xaec)",
+        "0x0003158c",
+        "?",
+        "mem[(SB+0xdd0)]"
+      ],
+      "argument_strings": [
+        null,
+        "%s.ani",
+        null,
+        null
+      ],
+      "function": "thumb_00022b3c",
+      "sdk_api": "sprintf",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 68
+    },
+    {
+      "site": 142956,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xdc4)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "?",
+        "0x00000000",
+        "mem[(SB+0xdc4)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_00022e44",
+      "sdk_api": "memset",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 56
+    },
+    {
+      "site": 150452,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xdd0)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "(SB+0x7e8)",
+        "0x000313d0",
+        "(SB+0x810)",
+        "mem[(SB+0xdd0)]"
+      ],
+      "argument_strings": [
+        null,
+        "gwy/%s",
+        null,
+        null
+      ],
+      "function": "thumb_00024b8c",
+      "sdk_api": "sprintf",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 68
+    },
+    {
+      "site": 151308,
+      "mode": "thumb",
+      "instruction": "blx r5",
+      "target": null,
+      "expression": "mem[(SB+0xdd0)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "mem[(SB+0x61c)]",
+        "0x00031110",
+        "?",
+        "?"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_00024ed8",
+      "sdk_api": "sprintf",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 68
+    },
+    {
+      "site": 151546,
+      "mode": "thumb",
+      "instruction": "blx r4",
+      "target": null,
+      "expression": "mem[(SB+0xdd0)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "(SB+0x6cc)",
+        "0x000311b0",
+        "0x000311b8",
+        "mem[mem[(SB+0x6c0)]]"
+      ],
+      "argument_strings": [
+        null,
+        "%s(%d)",
+        "record",
+        null
+      ],
+      "function": "thumb_00024fcc",
+      "sdk_api": "sprintf",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 68
+    },
+    {
+      "site": 153358,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xd98)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "?",
+        "?",
+        "mem[(SB+0xd98)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_00025694",
+      "sdk_api": "memcpy",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 12
+    },
+    {
+      "site": 153402,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xd98)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "?",
+        "?",
+        "mem[(SB+0xd98)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_00025694",
+      "sdk_api": "memcpy",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 12
+    },
+    {
+      "site": 153480,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xd98)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "mem[(SB+0x4c4)]",
+        "mem[(SB+0x4c0)]",
+        "?",
+        "mem[(SB+0xd98)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_00025760",
+      "sdk_api": "memcpy",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 12
+    },
+    {
+      "site": 153610,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xd98)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "?",
+        "?",
+        "mem[(SB+0xd98)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_00025760",
+      "sdk_api": "memcpy",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 12
+    },
+    {
+      "site": 153670,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xd98)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "?",
+        "?",
+        "mem[(SB+0xd98)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_00025820",
+      "sdk_api": "memcpy",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 12
+    },
+    {
+      "site": 153716,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xdd0)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "(SB+0x70c)",
+        "0x00031298",
+        "?",
+        "mem[(SB+0xdd0)]"
+      ],
+      "argument_strings": [
+        null,
+        "%s.img",
+        null,
+        null
+      ],
+      "function": "thumb_00025854",
+      "sdk_api": "sprintf",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 68
+    },
+    {
+      "site": 153764,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xd98)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "mem[(SB+0x790)]",
+        "mem[(SB+0x794)]",
+        "mem[(SB+0xd98)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_00025854",
+      "sdk_api": "memcpy",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 12
+    },
+    {
+      "site": 153812,
+      "mode": "thumb",
+      "instruction": "blx r2",
+      "target": null,
+      "expression": "mem[(SB+0xd94)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "0x000312d4",
+        "?",
+        "mem[(SB+0xd94)]",
+        "?"
+      ],
+      "argument_strings": [
+        "filename = %s",
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_00025854",
+      "sdk_api": "mr_printf",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 104
+    },
+    {
+      "site": 153822,
+      "mode": "thumb",
+      "instruction": "blx r2",
+      "target": null,
+      "expression": "mem[(SB+0xd94)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "0x000312c4",
+        "?",
+        "mem[(SB+0xd94)]",
+        "?"
+      ],
+      "argument_strings": [
+        "img->type = %d",
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_00025854",
+      "sdk_api": "mr_printf",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 104
+    },
+    {
+      "site": 153832,
+      "mode": "thumb",
+      "instruction": "blx r2",
+      "target": null,
+      "expression": "mem[(SB+0xd94)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "0x000312b4",
+        "?",
+        "mem[(SB+0xd94)]",
+        "?"
+      ],
+      "argument_strings": [
+        "img->width = %d",
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_00025854",
+      "sdk_api": "mr_printf",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 104
+    },
+    {
+      "site": 153842,
+      "mode": "thumb",
+      "instruction": "blx r2",
+      "target": null,
+      "expression": "mem[(SB+0xd94)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "0x000312a0",
+        "?",
+        "mem[(SB+0xd94)]",
+        "?"
+      ],
+      "argument_strings": [
+        "img->height = %d",
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_00025854",
+      "sdk_api": "mr_printf",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 104
+    },
+    {
+      "site": 153922,
+      "mode": "thumb",
+      "instruction": "blx r2",
+      "target": null,
+      "expression": "mem[(SB+0xd94)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "0x000312e4",
+        "?",
+        "mem[(SB+0xd94)]",
+        "?"
+      ],
+      "argument_strings": [
+        "size = %d",
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_00025854",
+      "sdk_api": "mr_printf",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 104
+    },
+    {
+      "site": 153946,
+      "mode": "thumb",
+      "instruction": "blx r2",
+      "target": null,
+      "expression": "mem[(SB+0xd94)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "0x000312e4",
+        "?",
+        "mem[(SB+0xd94)]",
+        "?"
+      ],
+      "argument_strings": [
+        "size = %d",
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_00025854",
+      "sdk_api": "mr_printf",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 104
+    },
+    {
+      "site": 154086,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xdd0)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "(SB+0x70c)",
+        "0x000312f0",
+        "?",
+        "mem[(SB+0xdd0)]"
+      ],
+      "argument_strings": [
+        null,
+        "%s.imgs",
+        null,
+        null
+      ],
+      "function": "thumb_000259cc",
+      "sdk_api": "sprintf",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 68
+    },
+    {
+      "site": 154134,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xd98)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "mem[(SB+0x790)]",
+        "mem[(SB+0x794)]",
+        "mem[(SB+0xd98)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_000259cc",
+      "sdk_api": "memcpy",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 12
+    },
+    {
+      "site": 157026,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xd98)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "?",
+        "?",
+        "mem[(SB+0xd98)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_00025fa4",
+      "sdk_api": "memcpy",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 12
+    },
+    {
+      "site": 157052,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xd98)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "?",
+        "?",
+        "mem[(SB+0xd98)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_00025fa4",
+      "sdk_api": "memcpy",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 12
+    },
+    {
+      "site": 158108,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xd98)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "?",
+        "?",
+        "mem[(SB+0xd98)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_000268ec",
+      "sdk_api": "memcpy",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 12
+    },
+    {
+      "site": 158788,
+      "mode": "thumb",
+      "instruction": "blx r1",
+      "target": null,
+      "expression": "mem[(SB+0xdc8)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "mem[(SB+0xdc8)]",
+        "?",
+        "?"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_00026c3c",
+      "sdk_api": "strlen",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 60
+    },
+    {
+      "site": 159268,
+      "mode": "thumb",
+      "instruction": "blx r7",
+      "target": null,
+      "expression": "mem[(SB+0xdd0)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "(SB+0x798)",
+        "0x000313e0",
+        "(SB+0x7e8)",
+        "?"
+      ],
+      "argument_strings": [
+        null,
+        "%s/%s",
+        null,
+        null
+      ],
+      "function": "thumb_00026df8",
+      "sdk_api": "sprintf",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 68
+    },
+    {
+      "site": 159320,
+      "mode": "thumb",
+      "instruction": "blx r4",
+      "target": null,
+      "expression": "mem[(SB+0xdd0)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "(SB+0x798)",
+        "0x000313e8",
+        "(SB+0x7e8)",
+        "?"
+      ],
+      "argument_strings": [
+        null,
+        "%s/%s/%s",
+        null,
+        null
+      ],
+      "function": "thumb_00026df8",
+      "sdk_api": "sprintf",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 68
+    },
+    {
+      "site": 159378,
+      "mode": "thumb",
+      "instruction": "blx r5",
+      "target": null,
+      "expression": "mem[(SB+0xdd0)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "(SB+0x798)",
+        "0x000313f4",
+        "(SB+0x7e8)",
+        "?"
+      ],
+      "argument_strings": [
+        null,
+        "%s/%s.mrp",
+        null,
+        null
+      ],
+      "function": "thumb_00026e74",
+      "sdk_api": "sprintf",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 68
+    },
+    {
+      "site": 159394,
+      "mode": "thumb",
+      "instruction": "blx r5",
+      "target": null,
+      "expression": "mem[(SB+0xdd0)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "(SB+0x798)",
+        "0x00031400",
+        "(SB+0x810)",
+        "?"
+      ],
+      "argument_strings": [
+        null,
+        "gwy/%s.mrp",
+        null,
+        null
+      ],
+      "function": "thumb_00026e74",
+      "sdk_api": "sprintf",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 68
+    },
+    {
+      "site": 159978,
+      "mode": "thumb",
+      "instruction": "blx r1",
+      "target": null,
+      "expression": "mem[(SB+0xdc8)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "mem[(SB+0xdc8)]",
+        "?",
+        "?"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_000270d4",
+      "sdk_api": "strlen",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 60
+    },
+    {
+      "site": 159988,
+      "mode": "thumb",
+      "instruction": "blx r1",
+      "target": null,
+      "expression": "mem[(SB+0xdc8)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "mem[(SB+0xdc8)]",
+        "?",
+        "?"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_000270d4",
+      "sdk_api": "strlen",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 60
+    },
+    {
+      "site": 160010,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xdb0)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "?",
+        "?",
+        "mem[(SB+0xdb0)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_000270d4",
+      "sdk_api": "memcmp",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 36
+    },
+    {
+      "site": 160218,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xdb0)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "?",
+        "?",
+        "mem[(SB+0xdb0)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_000271a0",
+      "sdk_api": "memcmp",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 36
+    },
+    {
+      "site": 160672,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xdc4)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "0x00000000",
+        "?",
+        "mem[(SB+0xdc4)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_0002737c",
+      "sdk_api": "memset",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 56
+    },
+    {
+      "site": 160760,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xdc4)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "0x00000000",
+        "?",
+        "mem[(SB+0xdc4)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_000273ac",
+      "sdk_api": "memset",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 56
+    },
+    {
+      "site": 160818,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xdc4)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "0x00000000",
+        "?",
+        "mem[(SB+0xdc4)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_0002740c",
+      "sdk_api": "memset",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 56
+    },
+    {
+      "site": 161792,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xd98)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "mem[(SB+0x78c)]",
+        "?",
+        "mem[(SB+0xd98)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_000277e8",
+      "sdk_api": "memcpy",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 12
+    },
+    {
+      "site": 161832,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xd98)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "mem[(SB+0x78c)]",
+        "?",
+        "mem[(SB+0xd98)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_00027814",
+      "sdk_api": "memcpy",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 12
+    },
+    {
+      "site": 162078,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xd98)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "mem[(SB+0x78c)]",
+        "?",
+        "mem[(SB+0xd98)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_000278f0",
+      "sdk_api": "memcpy",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 12
+    },
+    {
+      "site": 162196,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xd98)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "mem[(SB+0x78c)]",
+        "?",
+        "mem[(SB+0xd98)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_0002797c",
+      "sdk_api": "memcpy",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 12
+    },
+    {
+      "site": 163776,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xdc4)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "0x00000000",
+        "?",
+        "mem[(SB+0xdc4)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_00027fa4",
+      "sdk_api": "memset",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 56
+    },
+    {
+      "site": 164558,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xdc4)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "(SB+0xcb0)",
+        "0x00000000",
+        "0x00000004",
+        "mem[(SB+0xdc4)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_000282bc",
+      "sdk_api": "memset",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 56
+    },
+    {
+      "site": 169766,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xd98)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "?",
+        "?",
+        "mem[(SB+0xd98)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_0002960c",
+      "sdk_api": "memcpy",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 12
+    },
+    {
+      "site": 170368,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xd98)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "?",
+        "0x0000001a",
+        "mem[(SB+0xd98)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_00029940",
+      "sdk_api": "memcpy",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 12
+    },
+    {
+      "site": 170382,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xd98)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "?",
+        "0x0000001a",
+        "mem[(SB+0xd98)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_00029940",
+      "sdk_api": "memcpy",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 12
+    },
+    {
+      "site": 170416,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xd98)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "?",
+        "0x00000022",
+        "mem[(SB+0xd98)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_00029940",
+      "sdk_api": "memcpy",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 12
+    },
+    {
+      "site": 170598,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xdc4)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "(SB+0x960)",
+        "0x00000000",
+        "0x00000008",
+        "mem[(SB+0xdc4)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_00029a3c",
+      "sdk_api": "memset",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 56
+    },
+    {
+      "site": 170618,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xdc4)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "0x00000000",
+        "?",
+        "mem[(SB+0xdc4)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_00029a3c",
+      "sdk_api": "memset",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 56
+    },
+    {
+      "site": 172854,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xdc4)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "0x00000000",
+        "0x0000005c",
+        "mem[(SB+0xdc4)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_0002a280",
+      "sdk_api": "memset",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 56
+    },
+    {
+      "site": 172968,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xdc4)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "0x00000000",
+        "0x00000044",
+        "mem[(SB+0xdc4)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_0002a390",
+      "sdk_api": "memset",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 56
+    },
+    {
+      "site": 173786,
+      "mode": "thumb",
+      "instruction": "blx r2",
+      "target": null,
+      "expression": "mem[(mem[0x00000000]+0x4)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "?",
+        "mem[(mem[0x00000000]+0x4)]",
+        "?"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_0002a6c4",
+      "sdk_api": "mr_free",
+      "sdk_evidence": "direct_header_table_offset",
+      "sdk_slot": 4
+    },
+    {
+      "site": 175136,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xd98)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "?",
+        "?",
+        "mem[(SB+0xd98)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_0002a9ac",
+      "sdk_api": "memcpy",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 12
+    },
+    {
+      "site": 183672,
+      "mode": "thumb",
+      "instruction": "blx r2",
+      "target": null,
+      "expression": "mem[(mem[0x00000000]+0x64)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "0x0002d8b5",
+        "0x00000014",
+        "mem[(mem[0x00000000]+0x64)]",
+        "?"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_0002cd64",
+      "sdk_api": "_mr_c_function_new",
+      "sdk_evidence": "direct_header_table_offset",
+      "sdk_slot": 100
+    },
+    {
+      "site": 183724,
+      "mode": "thumb",
+      "instruction": "blx r1",
+      "target": null,
+      "expression": "mem[mem[0x00000000]]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "mem[mem[0x00000000]]",
+        "?",
+        "?"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_0002cd64",
+      "sdk_api": "mr_malloc",
+      "sdk_evidence": "direct_header_table_offset",
+      "sdk_slot": 0
+    },
+    {
+      "site": 183778,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(mem[0x00000000]+0xc)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "mem[mem[0x00000004]]",
+        "?",
+        "?",
+        "mem[(mem[0x00000000]+0xc)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_0002cd64",
+      "sdk_api": "memcpy",
+      "sdk_evidence": "direct_header_table_offset",
+      "sdk_slot": 12
+    },
+    {
+      "site": 183808,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(mem[0x00000000]+0x38)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "0x00000000",
+        "?",
+        "mem[(mem[0x00000000]+0x38)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_0002cd64",
+      "sdk_api": "memset",
+      "sdk_evidence": "direct_header_table_offset",
+      "sdk_slot": 56
+    },
+    {
+      "site": 183976,
+      "mode": "thumb",
+      "instruction": "bl #0x22",
+      "target": null,
+      "expression": "mem[(SB+0xdc4)]",
+      "resolution": "register_thunk",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "0x00000000",
+        "?",
+        "mem[(SB+0xdc4)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_0002ce1c",
+      "sdk_api": "memset",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 56
+    },
+    {
+      "site": 184530,
+      "mode": "thumb",
+      "instruction": "bl #0x22",
+      "target": null,
+      "expression": "mem[(SB+0xd98)]",
+      "resolution": "register_thunk",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "?",
+        "?",
+        "mem[(SB+0xd98)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_0002d0a8",
+      "sdk_api": "memcpy",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 12
+    },
+    {
+      "site": 184554,
+      "mode": "thumb",
+      "instruction": "bl #0x22",
+      "target": null,
+      "expression": "mem[(mem[0x00000000]+0xb4)]",
+      "resolution": "register_thunk",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "?",
+        "0x00000000",
+        "mem[(mem[0x00000000]+0xb4)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_0002d0a8",
+      "sdk_api": "mr_seek",
+      "sdk_evidence": "direct_header_table_offset",
+      "sdk_slot": 180
+    },
+    {
+      "site": 184684,
+      "mode": "thumb",
+      "instruction": "blx r1",
+      "target": null,
+      "expression": "mem[(mem[0x00000000]+0xa4)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "mem[(mem[0x00000000]+0xa4)]",
+        "?",
+        "?"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_0002d160",
+      "sdk_api": "mr_close",
+      "sdk_evidence": "direct_header_table_offset",
+      "sdk_slot": 164
+    },
+    {
+      "site": 184922,
+      "mode": "thumb",
+      "instruction": "blx r4",
+      "target": null,
+      "expression": "mem[(mem[0x00000000]+0x12c)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "?",
+        "?",
+        "?"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_0002d24c",
+      "sdk_api": "mr_editCreate",
+      "sdk_evidence": "direct_header_table_offset",
+      "sdk_slot": 300
+    },
+    {
+      "site": 184946,
+      "mode": "thumb",
+      "instruction": "blx r1",
+      "target": null,
+      "expression": "mem[(mem[0x00000000]+0x134)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "mem[(mem[0x00000000]+0x134)]",
+        "?",
+        "?"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_0002d264",
+      "sdk_api": "mr_editGetText",
+      "sdk_evidence": "direct_header_table_offset",
+      "sdk_slot": 308
+    },
+    {
+      "site": 184970,
+      "mode": "thumb",
+      "instruction": "blx r1",
+      "target": null,
+      "expression": "mem[(mem[0x00000000]+0x130)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "mem[(mem[0x00000000]+0x130)]",
+        "?",
+        "?"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_0002d27c",
+      "sdk_api": "mr_editRelease",
+      "sdk_evidence": "direct_header_table_offset",
+      "sdk_slot": 304
+    },
+    {
+      "site": 185396,
+      "mode": "thumb",
+      "instruction": "blx r1",
+      "target": null,
+      "expression": "mem[(mem[0x00000000]+0xa8)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "mem[(mem[0x00000000]+0xa8)]",
+        "?",
+        "?"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_0002d428",
+      "sdk_api": "mr_info",
+      "sdk_evidence": "direct_header_table_offset",
+      "sdk_slot": 168
+    },
+    {
+      "site": 185438,
+      "mode": "thumb",
+      "instruction": "blx r2",
+      "target": null,
+      "expression": "mem[(mem[0x00000000]+0x4)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "?",
+        "mem[(mem[0x00000000]+0x4)]",
+        "?"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_0002d43c",
+      "sdk_api": "mr_free",
+      "sdk_evidence": "direct_header_table_offset",
+      "sdk_slot": 4
+    },
+    {
+      "site": 185464,
+      "mode": "thumb",
+      "instruction": "blx r1",
+      "target": null,
+      "expression": "mem[(mem[0x00000000]+0x88)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "mem[(mem[0x00000000]+0x88)]",
+        "?",
+        "?"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_0002d46c",
+      "sdk_api": "mr_getDatetime",
+      "sdk_evidence": "direct_header_table_offset",
+      "sdk_slot": 136
+    },
+    {
+      "site": 185484,
+      "mode": "thumb",
+      "instruction": "blx r1",
+      "target": null,
+      "expression": "mem[(mem[0x00000000]+0xb8)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "mem[(mem[0x00000000]+0xb8)]",
+        "?",
+        "?"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_0002d480",
+      "sdk_api": "mr_getLen",
+      "sdk_evidence": "direct_header_table_offset",
+      "sdk_slot": 184
+    },
+    {
+      "site": 185524,
+      "mode": "thumb",
+      "instruction": "blx r0",
+      "target": null,
+      "expression": "mem[(mem[0x00000000]+0x84)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "mem[(mem[0x00000000]+0x84)]",
+        "?",
+        "?",
+        "?"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_0002d4a8",
+      "sdk_api": "mr_getTime",
+      "sdk_evidence": "direct_header_table_offset",
+      "sdk_slot": 132
+    },
+    {
+      "site": 185608,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xdb0)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "0x000317ac",
+        "0x00000002",
+        "mem[(SB+0xdb0)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_0002d4bc",
+      "sdk_api": "memcmp",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 36
+    },
+    {
+      "site": 185624,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xdb0)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "0x000317b0",
+        "0x00000002",
+        "mem[(SB+0xdb0)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_0002d4bc",
+      "sdk_api": "memcmp",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 36
+    },
+    {
+      "site": 186210,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xdc4)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "(SB+0x1b4)",
+        "0x00000000",
+        "0x00000081",
+        "mem[(SB+0xdc4)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_0002d714",
+      "sdk_api": "memset",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 56
+    },
+    {
+      "site": 186300,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xda4)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "(SB+0x1b4)",
+        "?",
+        "0x00000081",
+        "mem[(SB+0xda4)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_0002d714",
+      "sdk_api": "strncpy",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 24
+    },
+    {
+      "site": 186482,
+      "mode": "thumb",
+      "instruction": "blx r1",
+      "target": null,
+      "expression": "mem[mem[0x00000000]]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "mem[mem[0x00000000]]",
+        "?",
+        "?"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_0002d854",
+      "sdk_api": "mr_malloc",
+      "sdk_evidence": "direct_header_table_offset",
+      "sdk_slot": 0
+    },
+    {
+      "site": 186516,
+      "mode": "thumb",
+      "instruction": "blx r1",
+      "target": null,
+      "expression": "mem[(mem[0x00000000]+0xc4)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "mem[(mem[0x00000000]+0xc4)]",
+        "?",
+        "?"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_0002d888",
+      "sdk_api": "mr_mkDir",
+      "sdk_evidence": "direct_header_table_offset",
+      "sdk_slot": 196
+    },
+    {
+      "site": 186536,
+      "mode": "thumb",
+      "instruction": "blx r2",
+      "target": null,
+      "expression": "mem[(mem[0x00000000]+0xa0)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "?",
+        "mem[(mem[0x00000000]+0xa0)]",
+        "?"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_0002d89c",
+      "sdk_api": "mr_open",
+      "sdk_evidence": "direct_header_table_offset",
+      "sdk_slot": 160
+    },
+    {
+      "site": 186800,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(mem[0x00000000]+0xb0)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "?",
+        "?",
+        "mem[(mem[0x00000000]+0xb0)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_0002d9a4",
+      "sdk_api": "mr_read",
+      "sdk_evidence": "direct_header_table_offset",
+      "sdk_slot": 176
+    },
+    {
+      "site": 186826,
+      "mode": "thumb",
+      "instruction": "blx r1",
+      "target": null,
+      "expression": "mem[(mem[0x00000000]+0xa8)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "mem[(mem[0x00000000]+0xa8)]",
+        "?",
+        "?"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_0002d9b8",
+      "sdk_api": "mr_info",
+      "sdk_evidence": "direct_header_table_offset",
+      "sdk_slot": 168
+    },
+    {
+      "site": 186846,
+      "mode": "thumb",
+      "instruction": "blx r1",
+      "target": null,
+      "expression": "mem[(mem[0x00000000]+0xb8)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "mem[(mem[0x00000000]+0xb8)]",
+        "?",
+        "?"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_0002d9b8",
+      "sdk_api": "mr_getLen",
+      "sdk_evidence": "direct_header_table_offset",
+      "sdk_slot": 184
+    },
+    {
+      "site": 186868,
+      "mode": "thumb",
+      "instruction": "blx r2",
+      "target": null,
+      "expression": "mem[(mem[0x00000000]+0xa0)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "0x00000001",
+        "mem[(mem[0x00000000]+0xa0)]",
+        "?"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_0002d9b8",
+      "sdk_api": "mr_open",
+      "sdk_evidence": "direct_header_table_offset",
+      "sdk_slot": 160
+    },
+    {
+      "site": 186896,
+      "mode": "thumb",
+      "instruction": "blx r1",
+      "target": null,
+      "expression": "mem[(mem[0x00000000]+0xa4)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "mem[(mem[0x00000000]+0xa4)]",
+        "?",
+        "?"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_0002d9b8",
+      "sdk_api": "mr_close",
+      "sdk_evidence": "direct_header_table_offset",
+      "sdk_slot": 164
+    },
+    {
+      "site": 186918,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(mem[0x00000000]+0xb0)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "?",
+        "?",
+        "mem[(mem[0x00000000]+0xb0)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_0002d9b8",
+      "sdk_api": "mr_read",
+      "sdk_evidence": "direct_header_table_offset",
+      "sdk_slot": 176
+    },
+    {
+      "site": 186932,
+      "mode": "thumb",
+      "instruction": "blx r1",
+      "target": null,
+      "expression": "mem[(mem[0x00000000]+0xa4)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "mem[(mem[0x00000000]+0xa4)]",
+        "?",
+        "?"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_0002d9b8",
+      "sdk_api": "mr_close",
+      "sdk_evidence": "direct_header_table_offset",
+      "sdk_slot": 164
+    },
+    {
+      "site": 186958,
+      "mode": "thumb",
+      "instruction": "blx r1",
+      "target": null,
+      "expression": "mem[(mem[0x00000000]+0xa4)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "mem[(mem[0x00000000]+0xa4)]",
+        "?",
+        "?"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_0002d9b8",
+      "sdk_api": "mr_close",
+      "sdk_evidence": "direct_header_table_offset",
+      "sdk_slot": 164
+    },
+    {
+      "site": 187018,
+      "mode": "thumb",
+      "instruction": "blx r7",
+      "target": null,
+      "expression": "mem[(mem[0x00000000]+0x74)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "?",
+        "?",
+        "?"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_0002da5c",
+      "sdk_api": "mr_drawBitmap",
+      "sdk_evidence": "direct_header_table_offset",
+      "sdk_slot": 116
+    },
+    {
+      "site": 187044,
+      "mode": "thumb",
+      "instruction": "blx r1",
+      "target": null,
+      "expression": "mem[(mem[0x00000000]+0xbc)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "mem[(mem[0x00000000]+0xbc)]",
+        "?",
+        "?"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_0002da98",
+      "sdk_api": "mr_remove",
+      "sdk_evidence": "direct_header_table_offset",
+      "sdk_slot": 188
+    },
+    {
+      "site": 187064,
+      "mode": "thumb",
+      "instruction": "blx r2",
+      "target": null,
+      "expression": "mem[(mem[0x00000000]+0xc0)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "?",
+        "mem[(mem[0x00000000]+0xc0)]",
+        "?"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_0002daac",
+      "sdk_api": "mr_rename",
+      "sdk_evidence": "direct_header_table_offset",
+      "sdk_slot": 192
+    },
+    {
+      "site": 187100,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(mem[0x00000000]+0xb4)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "?",
+        "?",
+        "mem[(mem[0x00000000]+0xb4)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_0002dad0",
+      "sdk_api": "mr_seek",
+      "sdk_evidence": "direct_header_table_offset",
+      "sdk_slot": 180
+    },
+    {
+      "site": 187120,
+      "mode": "thumb",
+      "instruction": "blx r1",
+      "target": null,
+      "expression": "mem[(mem[0x00000000]+0x90)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "mem[(mem[0x00000000]+0x90)]",
+        "?",
+        "?"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_0002dae4",
+      "sdk_api": "mr_sleep",
+      "sdk_evidence": "direct_header_table_offset",
+      "sdk_slot": 144
+    },
+    {
+      "site": 187144,
+      "mode": "thumb",
+      "instruction": "blx r1",
+      "target": null,
+      "expression": "mem[(mem[0x00000000]+0xdc)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "mem[(mem[0x00000000]+0xdc)]",
+        "?",
+        "?"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_0002dafc",
+      "sdk_api": "mr_startShake",
+      "sdk_evidence": "direct_header_table_offset",
+      "sdk_slot": 220
+    },
+    {
+      "site": 187176,
+      "mode": "thumb",
+      "instruction": "blx r1",
+      "target": null,
+      "expression": "mem[(mem[0x00000000]+0x68)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "0x00031714",
+        "mem[(mem[0x00000000]+0x68)]",
+        "?",
+        "?"
+      ],
+      "argument_strings": [
+        "timerCreate err 01",
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_0002db10",
+      "sdk_api": "mr_printf",
+      "sdk_evidence": "direct_header_table_offset",
+      "sdk_slot": 104
+    },
+    {
+      "site": 187362,
+      "mode": "thumb",
+      "instruction": "blx r2",
+      "target": null,
+      "expression": "mem[(mem[0x00000000]+0x68)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "0x000316f8",
+        "0x000003e8",
+        "mem[(mem[0x00000000]+0x68)]",
+        "?"
+      ],
+      "argument_strings": [
+        "timer err:%d",
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_0002dbc4",
+      "sdk_api": "mr_printf",
+      "sdk_evidence": "direct_header_table_offset",
+      "sdk_slot": 104
+    },
+    {
+      "site": 187402,
+      "mode": "thumb",
+      "instruction": "blx r2",
+      "target": null,
+      "expression": "mem[(mem[0x00000000]+0x68)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "0x000316f8",
+        "0x000003e9",
+        "mem[(mem[0x00000000]+0x68)]",
+        "?"
+      ],
+      "argument_strings": [
+        "timer err:%d",
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_0002dbc4",
+      "sdk_api": "mr_printf",
+      "sdk_evidence": "direct_header_table_offset",
+      "sdk_slot": 104
+    },
+    {
+      "site": 187470,
+      "mode": "thumb",
+      "instruction": "blx r0",
+      "target": null,
+      "expression": "mem[(mem[0x00000000]+0x84)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "mem[(mem[0x00000000]+0x84)]",
+        "mem[(SB+0xdf8)]",
+        "?",
+        "?"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_0002dbc4",
+      "sdk_api": "mr_getTime",
+      "sdk_evidence": "direct_header_table_offset",
+      "sdk_slot": 132
+    },
+    {
+      "site": 187646,
+      "mode": "thumb",
+      "instruction": "blx r0",
+      "target": null,
+      "expression": "mem[(mem[0x00000000]+0x84)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "mem[(mem[0x00000000]+0x84)]",
+        "?",
+        "?",
+        "?"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_0002dcf0",
+      "sdk_api": "mr_getTime",
+      "sdk_evidence": "direct_header_table_offset",
+      "sdk_slot": 132
+    },
+    {
+      "site": 187662,
+      "mode": "thumb",
+      "instruction": "blx r0",
+      "target": null,
+      "expression": "mem[(mem[0x00000000]+0x80)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "mem[(mem[0x00000000]+0x80)]",
+        "(SB+0xde8)",
+        "?",
+        "?"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_0002dcf0",
+      "sdk_api": "g_mr_timerStop",
+      "sdk_evidence": "direct_header_table_offset",
+      "sdk_slot": 128
+    },
+    {
+      "site": 187672,
+      "mode": "thumb",
+      "instruction": "blx r1",
+      "target": null,
+      "expression": "mem[(mem[0x00000000]+0x7c)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "mem[(mem[0x00000000]+0x7c)]",
+        "?",
+        "?"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_0002dcf0",
+      "sdk_api": "g_mr_timerStart",
+      "sdk_evidence": "direct_header_table_offset",
+      "sdk_slot": 124
+    },
+    {
+      "site": 188112,
+      "mode": "thumb",
+      "instruction": "blx r2",
+      "target": null,
+      "expression": "mem[(mem[0x00000000]+0x68)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "0x0003176c",
+        "0x000013b2",
+        "mem[(mem[0x00000000]+0x68)]",
+        "0x0003176c"
+      ],
+      "argument_strings": [
+        "err:%d",
+        null,
+        null,
+        "err:%d"
+      ],
+      "function": "thumb_0002dea8",
+      "sdk_api": "mr_printf",
+      "sdk_evidence": "direct_header_table_offset",
+      "sdk_slot": 104
+    },
+    {
+      "site": 188132,
+      "mode": "thumb",
+      "instruction": "blx r2",
+      "target": null,
+      "expression": "mem[(mem[0x00000000]+0x68)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "0x0003176c",
+        "0x000013b3",
+        "mem[(mem[0x00000000]+0x68)]",
+        "0x0003176c"
+      ],
+      "argument_strings": [
+        "err:%d",
+        null,
+        null,
+        "err:%d"
+      ],
+      "function": "thumb_0002dea8",
+      "sdk_api": "mr_printf",
+      "sdk_evidence": "direct_header_table_offset",
+      "sdk_slot": 104
+    },
+    {
+      "site": 188244,
+      "mode": "thumb",
+      "instruction": "blx r1",
+      "target": null,
+      "expression": "mem[(mem[0x00000000]+0x68)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "0x00031794",
+        "mem[(mem[0x00000000]+0x68)]",
+        "?",
+        "?"
+      ],
+      "argument_strings": [
+        "crc err!",
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_0002dea8",
+      "sdk_api": "mr_printf",
+      "sdk_evidence": "direct_header_table_offset",
+      "sdk_slot": 104
+    },
+    {
+      "site": 188264,
+      "mode": "thumb",
+      "instruction": "blx r1",
+      "target": null,
+      "expression": "mem[(mem[0x00000000]+0x68)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "0x000317a0",
+        "mem[(mem[0x00000000]+0x68)]",
+        "?",
+        "?"
+      ],
+      "argument_strings": [
+        "length err!",
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_0002dea8",
+      "sdk_api": "mr_printf",
+      "sdk_evidence": "direct_header_table_offset",
+      "sdk_slot": 104
+    },
+    {
+      "site": 188488,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xdc4)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "(SB+0xb24)",
+        "0x00000000",
+        "0x00000078",
+        "mem[(SB+0xdc4)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_0002e028",
+      "sdk_api": "memset",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 56
+    },
+    {
+      "site": 188664,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(mem[0x00000000]+0xac)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "?",
+        "?",
+        "mem[(mem[0x00000000]+0xac)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_0002e0ec",
+      "sdk_api": "mr_write",
+      "sdk_evidence": "direct_header_table_offset",
+      "sdk_slot": 172
+    },
+    {
+      "site": 189788,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xdd0)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "mem[(SB+0x61c)]",
+        "0x0003125c",
+        "?",
+        "mem[(SB+0xdd0)]"
+      ],
+      "argument_strings": [
+        null,
+        "dongtai%d",
+        null,
+        null
+      ],
+      "function": "thumb_0002e43c",
+      "sdk_api": "sprintf",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 68
+    },
+    {
+      "site": 191062,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xd98)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "?",
+        "?",
+        "mem[(SB+0xd98)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_0002e924",
+      "sdk_api": "memcpy",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 12
+    },
+    {
+      "site": 191104,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xd98)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "?",
+        "?",
+        "mem[(SB+0xd98)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_0002e924",
+      "sdk_api": "memcpy",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 12
+    },
+    {
+      "site": 196640,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xd98)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "mem[(SB+0xc94)]",
+        "mem[(SB+0xc8c)]",
+        "?",
+        "mem[(SB+0xd98)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_0002fffc",
+      "sdk_api": "memcpy",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 12
+    },
+    {
+      "site": 198086,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xd98)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "?",
+        "?",
+        "mem[(SB+0xd98)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_0003045c",
+      "sdk_api": "memcpy",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 12
+    },
+    {
+      "site": 198158,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xdc4)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "0x00000000",
+        "?",
+        "mem[(SB+0xdc4)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_0003045c",
+      "sdk_api": "memset",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 56
+    },
+    {
+      "site": 198174,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xd98)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "?",
+        "?",
+        "mem[(SB+0xd98)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_0003045c",
+      "sdk_api": "memcpy",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 12
+    },
+    {
+      "site": 198196,
+      "mode": "thumb",
+      "instruction": "blx r3",
+      "target": null,
+      "expression": "mem[(SB+0xd98)]",
+      "resolution": "unresolved_indirect",
+      "conditional": false,
+      "arguments": [
+        "?",
+        "?",
+        "?",
+        "mem[(SB+0xd98)]"
+      ],
+      "argument_strings": [
+        null,
+        null,
+        null,
+        null
+      ],
+      "function": "thumb_0003045c",
+      "sdk_api": "memcpy",
+      "sdk_evidence": "cached_global_assignment_candidate",
+      "sdk_slot": 12
+    }
+  ],
+  "network_matches": [],
+  "network_upstream_callers": [],
+  "cached_sdk_alias_candidates": {
+    "mem[(SB+0xd94)]": [
+      {
+        "api": "mr_printf",
+        "function": "thumb_00022748",
+        "site": 141204,
+        "confidence": "heuristic_expansion"
+      }
+    ],
+    "mem[(SB+0xd98)]": [
+      {
+        "api": "memcpy",
+        "function": "thumb_00022748",
+        "site": 141210,
+        "confidence": "heuristic_expansion"
+      }
+    ],
+    "mem[(SB+0xd9c)]": [
+      {
+        "api": "memmove",
+        "function": "thumb_00022748",
+        "site": 141214,
+        "confidence": "heuristic_expansion"
+      }
+    ],
+    "mem[(SB+0xda0)]": [
+      {
+        "api": "strcpy",
+        "function": "thumb_00022748",
+        "site": 141218,
+        "confidence": "heuristic_expansion"
+      }
+    ],
+    "mem[(SB+0xda4)]": [
+      {
+        "api": "strncpy",
+        "function": "thumb_00022748",
+        "site": 141222,
+        "confidence": "heuristic_expansion"
+      }
+    ],
+    "mem[(SB+0xda8)]": [
+      {
+        "api": "strcat",
+        "function": "thumb_00022748",
+        "site": 141226,
+        "confidence": "heuristic_expansion"
+      }
+    ],
+    "mem[(SB+0xdac)]": [
+      {
+        "api": "strncat",
+        "function": "thumb_00022748",
+        "site": 141230,
+        "confidence": "heuristic_expansion"
+      }
+    ],
+    "mem[(SB+0xdb0)]": [
+      {
+        "api": "memcmp",
+        "function": "thumb_00022748",
+        "site": 141234,
+        "confidence": "heuristic_expansion"
+      }
+    ],
+    "mem[(SB+0xdb4)]": [
+      {
+        "api": "strcmp",
+        "function": "thumb_00022748",
+        "site": 141238,
+        "confidence": "heuristic_expansion"
+      }
+    ],
+    "mem[(SB+0xdb8)]": [
+      {
+        "api": "strncmp",
+        "function": "thumb_00022748",
+        "site": 141242,
+        "confidence": "heuristic_expansion"
+      }
+    ],
+    "mem[(SB+0xdbc)]": [
+      {
+        "api": "strcoll",
+        "function": "thumb_00022748",
+        "site": 141246,
+        "confidence": "heuristic_expansion"
+      }
+    ],
+    "mem[(SB+0xdc0)]": [
+      {
+        "api": "memchr",
+        "function": "thumb_00022748",
+        "site": 141250,
+        "confidence": "heuristic_expansion"
+      }
+    ],
+    "mem[(SB+0xdc4)]": [
+      {
+        "api": "memset",
+        "function": "thumb_00022748",
+        "site": 141254,
+        "confidence": "heuristic_expansion"
+      }
+    ],
+    "mem[(SB+0xdc8)]": [
+      {
+        "api": "strlen",
+        "function": "thumb_00022748",
+        "site": 141258,
+        "confidence": "heuristic_expansion"
+      }
+    ],
+    "mem[(SB+0xdcc)]": [
+      {
+        "api": "strstr",
+        "function": "thumb_00022748",
+        "site": 141262,
+        "confidence": "heuristic_expansion"
+      }
+    ],
+    "mem[(SB+0xdd0)]": [
+      {
+        "api": "sprintf",
+        "function": "thumb_00022748",
+        "site": 141266,
+        "confidence": "heuristic_expansion"
+      }
+    ],
+    "mem[(SB+0xdd4)]": [
+      {
+        "api": "atoi",
+        "function": "thumb_00022748",
+        "site": 141270,
+        "confidence": "heuristic_expansion"
+      }
+    ],
+    "mem[(SB+0xdd8)]": [
+      {
+        "api": "strtoul",
+        "function": "thumb_00022748",
+        "site": 141274,
+        "confidence": "heuristic_expansion"
+      }
+    ]
+  },
+  "filename_patterns": [
+    {
+      "site": 37948,
+      "mode": "thumb",
+      "offset": 199240,
+      "text": "version",
+      "interesting": true,
+      "basis": "pc_derived_address_not_plain_integer",
+      "function": "thumb_000093c0"
+    },
+    {
+      "site": 39206,
+      "mode": "thumb",
+      "offset": 199240,
+      "text": "version",
+      "interesting": true,
+      "basis": "pc_derived_address_not_plain_integer",
+      "function": "thumb_00009904"
+    },
+    {
+      "site": 61748,
+      "mode": "thumb",
+      "offset": 202296,
+      "text": "worldmap",
+      "interesting": false,
+      "basis": "pc_derived_address_not_plain_integer",
+      "function": "thumb_0000f118"
+    },
+    {
+      "site": 79824,
+      "mode": "thumb",
+      "offset": 201888,
+      "text": "%d.map",
+      "interesting": true,
+      "basis": "pc_derived_address_not_plain_integer",
+      "function": "thumb_000137c8"
+    },
+    {
+      "site": 80572,
+      "mode": "thumb",
+      "offset": 201888,
+      "text": "%d.map",
+      "interesting": true,
+      "basis": "pc_derived_address_not_plain_integer",
+      "function": "thumb_000139ac"
+    },
+    {
+      "site": 136996,
+      "mode": "thumb",
+      "offset": 202308,
+      "text": "worldmap.str",
+      "interesting": true,
+      "basis": "pc_derived_address_not_plain_integer",
+      "function": "thumb_0002171c"
+    },
+    {
+      "site": 137016,
+      "mode": "thumb",
+      "offset": 202296,
+      "text": "worldmap",
+      "interesting": false,
+      "basis": "pc_derived_address_not_plain_integer",
+      "function": "thumb_0002171c"
+    },
+    {
+      "site": 159374,
+      "mode": "thumb",
+      "offset": 201716,
+      "text": "%s/%s.mrp",
+      "interesting": true,
+      "basis": "pc_derived_address_not_plain_integer",
+      "function": "thumb_00026e74"
+    },
+    {
+      "site": 159390,
+      "mode": "thumb",
+      "offset": 201728,
+      "text": "gwy/%s.mrp",
+      "interesting": true,
+      "basis": "pc_derived_address_not_plain_integer",
+      "function": "thumb_00026e74"
+    },
+    {
+      "site": 176738,
+      "mode": "thumb",
+      "offset": 202280,
+      "text": "worldmap.data",
+      "interesting": true,
+      "basis": "pc_derived_address_not_plain_integer",
+      "function": "thumb_0002b25c"
+    }
+  ],
+  "utf16_resource_strings": [],
+  "package_tables": [],
+  "local_map_files": [],
+  "local_related_files": [
+    "effect/header.json",
+    "header.json",
+    "hero/header.json",
+    "item/header.json",
+    "map/header.json",
+    "monster/header.json",
+    "sfc.bin",
+    "worldmap.data"
+  ],
+  "resource_related_calls": {
+    "thumb_000093c0": [
+      {
+        "site": 37826,
+        "mode": "thumb",
+        "instruction": "bl #0x2d4a8",
+        "target": "thumb_0002d4a8",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": [
+          "mr_getTime"
+        ]
+      },
+      {
+        "site": 37830,
+        "mode": "thumb",
+        "instruction": "bl #0x278f0",
+        "target": "thumb_000278f0",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": [
+          "memcpy"
+        ]
+      },
+      {
+        "site": 37840,
+        "mode": "thumb",
+        "instruction": "bl #0x27f78",
+        "target": "thumb_00027f78",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "(SB+0x270)",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 37844,
+        "mode": "thumb",
+        "instruction": "bl #0x278f0",
+        "target": "thumb_000278f0",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": [
+          "memcpy"
+        ]
+      },
+      {
+        "site": 37850,
+        "mode": "thumb",
+        "instruction": "bl #0x27850",
+        "target": "thumb_00027850",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 37862,
+        "mode": "thumb",
+        "instruction": "bl #0x27850",
+        "target": "thumb_00027850",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 37892,
+        "mode": "thumb",
+        "instruction": "bl #0x25110",
+        "target": "thumb_00025110",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "mem[(SB+0x270)]",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 37898,
+        "mode": "thumb",
+        "instruction": "bl #0x270d4",
+        "target": "thumb_000270d4",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "mem[(SB+0x278)]",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": [
+          "memcmp",
+          "strlen"
+        ]
+      },
+      {
+        "site": 37914,
+        "mode": "thumb",
+        "instruction": "bl #0x271a0",
+        "target": "thumb_000271a0",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": [
+          "memcmp"
+        ]
+      },
+      {
+        "site": 37924,
+        "mode": "thumb",
+        "instruction": "bl #0x25820",
+        "target": "thumb_00025820",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": [
+          "memcpy"
+        ]
+      },
+      {
+        "site": 37934,
+        "mode": "thumb",
+        "instruction": "bl #0x27f78",
+        "target": "thumb_00027f78",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 37950,
+        "mode": "thumb",
+        "instruction": "bl #0x2f1cc",
+        "target": "thumb_0002f1cc",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "0x00030a48",
+          "0x00000000",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          "version",
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 37968,
+        "mode": "thumb",
+        "instruction": "bl #0x2f24c",
+        "target": "thumb_0002f24c",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 37982,
+        "mode": "thumb",
+        "instruction": "bl #0x2f234",
+        "target": "thumb_0002f234",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 37990,
+        "mode": "thumb",
+        "instruction": "bl #0x2f07c",
+        "target": "thumb_0002f07c",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 38016,
+        "mode": "thumb",
+        "instruction": "bl #0x91f0",
+        "target": "thumb_000091f0",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": [
+          "sprintf"
+        ]
+      },
+      {
+        "site": 38030,
+        "mode": "thumb",
+        "instruction": "bl #0x27c40",
+        "target": "thumb_00027c40",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "mem[(SB+0x280)]",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 38066,
+        "mode": "thumb",
+        "instruction": "bl #0x26e74",
+        "target": "thumb_00026e74",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "mem[(SB+0x274)]",
+          "mem[(SB+0x27c)]",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": [
+          "sprintf"
+        ]
+      },
+      {
+        "site": 38084,
+        "mode": "thumb",
+        "instruction": "blx r3",
+        "target": null,
+        "expression": "mem[(SB+0xdd0)]",
+        "resolution": "unresolved_indirect",
+        "conditional": false,
+        "arguments": [
+          "mem[(SB+0x274)]",
+          "0x00030a68",
+          "?",
+          "mem[(SB+0xdd0)]"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 38088,
+        "mode": "thumb",
+        "instruction": "bl #0x26e74",
+        "target": "thumb_00026e74",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "mem[(SB+0x278)]",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": [
+          "sprintf"
+        ]
+      },
+      {
+        "site": 38092,
+        "mode": "thumb",
+        "instruction": "bl #0x2da98",
+        "target": "thumb_0002da98",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": [
+          "mr_remove"
+        ]
+      },
+      {
+        "site": 38098,
+        "mode": "thumb",
+        "instruction": "bl #0x26e74",
+        "target": "thumb_00026e74",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "mem[(SB+0x278)]",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": [
+          "sprintf"
+        ]
+      },
+      {
+        "site": 38106,
+        "mode": "thumb",
+        "instruction": "bl #0x2daac",
+        "target": "thumb_0002daac",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "mem[(SB+0x274)]",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": [
+          "mr_rename"
+        ]
+      },
+      {
+        "site": 38122,
+        "mode": "thumb",
+        "instruction": "bl #0x98bc",
+        "target": "thumb_000098bc",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "(mem[(SB+0x28c)]+0x1)",
+          "mem[(SB+0x288)]",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 38130,
+        "mode": "thumb",
+        "instruction": "bl #0x61c8",
+        "target": "thumb_000061c8",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "0x00000001",
+          "0x00000002",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 38136,
+        "mode": "thumb",
+        "instruction": "bl #0x26bc8",
+        "target": "thumb_00026bc8",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      }
+    ],
+    "thumb_00009904": [
+      {
+        "site": 39176,
+        "mode": "thumb",
+        "instruction": "bl #0x2737c",
+        "target": "thumb_0002737c",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "0x00000030",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": [
+          "memset"
+        ]
+      },
+      {
+        "site": 39188,
+        "mode": "thumb",
+        "instruction": "bl #0x2740c",
+        "target": "thumb_0002740c",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "0x00000005",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": [
+          "memset"
+        ]
+      },
+      {
+        "site": 39196,
+        "mode": "thumb",
+        "instruction": "bl #0x2737c",
+        "target": "thumb_0002737c",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "0x00000014",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": [
+          "memset"
+        ]
+      },
+      {
+        "site": 39208,
+        "mode": "thumb",
+        "instruction": "bl #0x2f0b0",
+        "target": "thumb_0002f0b0",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "0x00030a48",
+          "0x00000000",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          "version",
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 39218,
+        "mode": "thumb",
+        "instruction": "bl #0x2f174",
+        "target": "thumb_0002f174",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 39228,
+        "mode": "thumb",
+        "instruction": "bl #0x2f144",
+        "target": "thumb_0002f144",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "mem[(SB+0x268)]",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 39240,
+        "mode": "thumb",
+        "instruction": "bl #0x2f07c",
+        "target": "thumb_0002f07c",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "mem[(SB+0x26c)]",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 39260,
+        "mode": "thumb",
+        "instruction": "bl #0x26e74",
+        "target": "thumb_00026e74",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": [
+          "sprintf"
+        ]
+      },
+      {
+        "site": 39264,
+        "mode": "thumb",
+        "instruction": "bl #0x270c0",
+        "target": "thumb_000270c0",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 39274,
+        "mode": "thumb",
+        "instruction": "bl #0x91f0",
+        "target": "thumb_000091f0",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": [
+          "sprintf"
+        ]
+      },
+      {
+        "site": 39282,
+        "mode": "thumb",
+        "instruction": "bl #0x26e74",
+        "target": "thumb_00026e74",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "mem[(SB+0x278)]",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": [
+          "sprintf"
+        ]
+      },
+      {
+        "site": 39286,
+        "mode": "thumb",
+        "instruction": "bl #0x26cd4",
+        "target": "thumb_00026cd4",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 39296,
+        "mode": "thumb",
+        "instruction": "bl #0x26e74",
+        "target": "thumb_00026e74",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "mem[(SB+0x278)]",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": [
+          "sprintf"
+        ]
+      },
+      {
+        "site": 39300,
+        "mode": "thumb",
+        "instruction": "bl #0x26cd4",
+        "target": "thumb_00026cd4",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 39322,
+        "mode": "thumb",
+        "instruction": "bl #0x19070",
+        "target": "thumb_00019070",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "0x00006a51",
+          "?",
+          "mem[(SB+0x26c)]",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 39330,
+        "mode": "thumb",
+        "instruction": "bl #0x18c8c",
+        "target": "thumb_00018c8c",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "0x00006a65",
+          "0x0100000d",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 39336,
+        "mode": "thumb",
+        "instruction": "bl #0x189a8",
+        "target": "thumb_000189a8",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "0x00000005",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 39350,
+        "mode": "thumb",
+        "instruction": "bl #0x247c4",
+        "target": "thumb_000247c4",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 39354,
+        "mode": "thumb",
+        "instruction": "bl #0x189b4",
+        "target": "thumb_000189b4",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": [
+          "memcpy"
+        ]
+      },
+      {
+        "site": 39364,
+        "mode": "thumb",
+        "instruction": "bl #0x189b4",
+        "target": "thumb_000189b4",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": [
+          "memcpy"
+        ]
+      },
+      {
+        "site": 39372,
+        "mode": "thumb",
+        "instruction": "bl #0x1899c",
+        "target": "thumb_0001899c",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 39382,
+        "mode": "thumb",
+        "instruction": "bl #0x18af4",
+        "target": "thumb_00018af4",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": [
+          "memcpy"
+        ]
+      },
+      {
+        "site": 39386,
+        "mode": "thumb",
+        "instruction": "bl #0x1907c",
+        "target": "thumb_0001907c",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 39398,
+        "mode": "thumb",
+        "instruction": "bl #0x3008c",
+        "target": "thumb_0003008c",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "(SB+0x25c)",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 39408,
+        "mode": "thumb",
+        "instruction": "bl #0x1f600",
+        "target": "thumb_0001f600",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "(SB+0x25c)",
+          "0x00030a58",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          "download.str",
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      }
+    ],
+    "thumb_0000f118": [
+      {
+        "site": 61730,
+        "mode": "thumb",
+        "instruction": "bl #0x1f600",
+        "target": "thumb_0001f600",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "(SB+0xcb4)",
+          "0x00031654",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          "landmap.str",
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 61750,
+        "mode": "thumb",
+        "instruction": "bl #0x259cc",
+        "target": "thumb_000259cc",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "0x00031638",
+          "0x00000000",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          "worldmap",
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": [
+          "memcpy",
+          "sprintf"
+        ]
+      },
+      {
+        "site": 61756,
+        "mode": "thumb",
+        "instruction": "bl #0x2b1b4",
+        "target": "thumb_0002b1b4",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 61762,
+        "mode": "thumb",
+        "instruction": "bl #0x223dc",
+        "target": "thumb_000223dc",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "0x00000001",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 61784,
+        "mode": "thumb",
+        "instruction": "bl #0x221e8",
+        "target": "thumb_000221e8",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "0x00000000"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 61788,
+        "mode": "thumb",
+        "instruction": "bl #0x22364",
+        "target": "thumb_00022364",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      }
+    ],
+    "thumb_000137c8": [
+      {
+        "site": 79840,
+        "mode": "thumb",
+        "instruction": "blx r3",
+        "target": null,
+        "expression": "mem[(SB+0xdd0)]",
+        "resolution": "unresolved_indirect",
+        "conditional": false,
+        "arguments": [
+          "mem[(SB+0x61c)]",
+          "0x000314a0",
+          "mem[(SB+0x8a4)]",
+          "mem[(SB+0xdd0)]"
+        ],
+        "argument_strings": [
+          null,
+          "%d.map",
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 79858,
+        "mode": "thumb",
+        "instruction": "bl #0x25430",
+        "target": "thumb_00025430",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "mem[(SB+0x61c)]",
+          "0x00031488",
+          "mem[(SB+0x838)]",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 79862,
+        "mode": "thumb",
+        "instruction": "bl #0x15ce0",
+        "target": "thumb_00015ce0",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 79866,
+        "mode": "thumb",
+        "instruction": "bl #0x27964",
+        "target": "thumb_00027964",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 79872,
+        "mode": "thumb",
+        "instruction": "bl #0x278f0",
+        "target": "thumb_000278f0",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": [
+          "memcpy"
+        ]
+      },
+      {
+        "site": 79878,
+        "mode": "thumb",
+        "instruction": "bl #0x277d0",
+        "target": "thumb_000277d0",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 79884,
+        "mode": "thumb",
+        "instruction": "bl #0x277d0",
+        "target": "thumb_000277d0",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 79900,
+        "mode": "thumb",
+        "instruction": "bl #0x277e8",
+        "target": "thumb_000277e8",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": [
+          "memcpy"
+        ]
+      },
+      {
+        "site": 79908,
+        "mode": "thumb",
+        "instruction": "bl #0x277e8",
+        "target": "thumb_000277e8",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": [
+          "memcpy"
+        ]
+      },
+      {
+        "site": 79916,
+        "mode": "thumb",
+        "instruction": "bl #0x2737c",
+        "target": "thumb_0002737c",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": [
+          "memset"
+        ]
+      },
+      {
+        "site": 79928,
+        "mode": "thumb",
+        "instruction": "bl #0x2737c",
+        "target": "thumb_0002737c",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": [
+          "memset"
+        ]
+      },
+      {
+        "site": 79936,
+        "mode": "thumb",
+        "instruction": "bl #0x2737c",
+        "target": "thumb_0002737c",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": [
+          "memset"
+        ]
+      },
+      {
+        "site": 79944,
+        "mode": "thumb",
+        "instruction": "bl #0x2737c",
+        "target": "thumb_0002737c",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": [
+          "memset"
+        ]
+      },
+      {
+        "site": 79950,
+        "mode": "thumb",
+        "instruction": "bl #0x2fb50",
+        "target": "thumb_0002fb50",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 79958,
+        "mode": "thumb",
+        "instruction": "bl #0x277d0",
+        "target": "thumb_000277d0",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 79964,
+        "mode": "thumb",
+        "instruction": "bl #0x277d0",
+        "target": "thumb_000277d0",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 79970,
+        "mode": "thumb",
+        "instruction": "bl #0x277d0",
+        "target": "thumb_000277d0",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 79984,
+        "mode": "thumb",
+        "instruction": "bl #0x2737c",
+        "target": "thumb_0002737c",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "0x0000000c",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": [
+          "memset"
+        ]
+      },
+      {
+        "site": 79990,
+        "mode": "thumb",
+        "instruction": "bl #0x278f0",
+        "target": "thumb_000278f0",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": [
+          "memcpy"
+        ]
+      },
+      {
+        "site": 79996,
+        "mode": "thumb",
+        "instruction": "bl #0x278f0",
+        "target": "thumb_000278f0",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": [
+          "memcpy"
+        ]
+      },
+      {
+        "site": 80002,
+        "mode": "thumb",
+        "instruction": "bl #0x277d0",
+        "target": "thumb_000277d0",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 80008,
+        "mode": "thumb",
+        "instruction": "bl #0x277d0",
+        "target": "thumb_000277d0",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 80038,
+        "mode": "thumb",
+        "instruction": "bl #0x20d14",
+        "target": "thumb_00020d14",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "mem[(SB+0x88c)]",
+          "?",
+          "mem[(SB+0x8b0)]",
+          "0x00000009"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 80048,
+        "mode": "thumb",
+        "instruction": "bl #0x254b4",
+        "target": "thumb_000254b4",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 80052,
+        "mode": "thumb",
+        "instruction": "bl #0x15ce0",
+        "target": "thumb_00015ce0",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 80062,
+        "mode": "thumb",
+        "instruction": "bl #0x21028",
+        "target": "thumb_00021028",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "mem[(SB+0x8b4)]",
+          "0x0002b041",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 80066,
+        "mode": "thumb",
+        "instruction": "bl #0x15ce0",
+        "target": "thumb_00015ce0",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 80070,
+        "mode": "thumb",
+        "instruction": "bl #0x15618",
+        "target": "thumb_00015618",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": [
+          "sprintf"
+        ]
+      },
+      {
+        "site": 80074,
+        "mode": "thumb",
+        "instruction": "bl #0x13fac",
+        "target": "thumb_00013fac",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 80078,
+        "mode": "thumb",
+        "instruction": "bl #0x15ce0",
+        "target": "thumb_00015ce0",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 80082,
+        "mode": "thumb",
+        "instruction": "bl #0x152d8",
+        "target": "thumb_000152d8",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": [
+          "sprintf"
+        ]
+      },
+      {
+        "site": 80092,
+        "mode": "thumb",
+        "instruction": "bl #0x221e8",
+        "target": "thumb_000221e8",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "mem[(SB+0x8a4)]",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 80100,
+        "mode": "thumb",
+        "instruction": "bl #0x13e7c",
+        "target": "thumb_00013e7c",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 80104,
+        "mode": "thumb",
+        "instruction": "bl #0x14148",
+        "target": "thumb_00014148",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 80118,
+        "mode": "thumb",
+        "instruction": "bl #0x25408",
+        "target": "thumb_00025408",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "0x00000000",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 80134,
+        "mode": "thumb",
+        "instruction": "bl #0x25408",
+        "target": "thumb_00025408",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "0x00000000",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 80144,
+        "mode": "thumb",
+        "instruction": "bl #0x2b984",
+        "target": "thumb_0002b984",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "mem[(SB+0x86c)]",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 80148,
+        "mode": "thumb",
+        "instruction": "bl #0x15488",
+        "target": "thumb_00015488",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 80156,
+        "mode": "thumb",
+        "instruction": "bl #0x1e518",
+        "target": "thumb_0001e518",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 80162,
+        "mode": "thumb",
+        "instruction": "bl #0x271a0",
+        "target": "thumb_000271a0",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "mem[(SB+0x8a8)]",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": [
+          "memcmp"
+        ]
+      },
+      {
+        "site": 80172,
+        "mode": "thumb",
+        "instruction": "bl #0x1e238",
+        "target": "thumb_0001e238",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": [
+          "sprintf"
+        ]
+      },
+      {
+        "site": 80180,
+        "mode": "thumb",
+        "instruction": "bl #0x1ea20",
+        "target": "thumb_0001ea20",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 80196,
+        "mode": "thumb",
+        "instruction": "bl #0x21018",
+        "target": "thumb_00021018",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "mem[(SB+0x894)]",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 80214,
+        "mode": "thumb",
+        "instruction": "bl #0x20e48",
+        "target": "thumb_00020e48",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "mem[(SB+0x894)]",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 80230,
+        "mode": "thumb",
+        "instruction": "bl #0x20d20",
+        "target": "thumb_00020d20",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "mem[(SB+0x8b8)]",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 80238,
+        "mode": "thumb",
+        "instruction": "bl #0x20d20",
+        "target": "thumb_00020d20",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "mem[(SB+0x8bc)]",
+          "mem[(SB+0x8c4)]",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 80246,
+        "mode": "thumb",
+        "instruction": "bl #0x15e8c",
+        "target": "thumb_00015e8c",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 80250,
+        "mode": "thumb",
+        "instruction": "bl #0x2c030",
+        "target": "thumb_0002c030",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 80262,
+        "mode": "thumb",
+        "instruction": "bl #0x14f50",
+        "target": "thumb_00014f50",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "0x00000014"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      }
+    ],
+    "thumb_000139ac": [
+      {
+        "site": 80302,
+        "mode": "thumb",
+        "instruction": "bl #0x4ad0",
+        "target": "thumb_00004ad0",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 80310,
+        "mode": "thumb",
+        "instruction": "bl #0x35bc",
+        "target": "thumb_000035bc",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 80314,
+        "mode": "thumb",
+        "instruction": "bl #0x1e46c",
+        "target": "thumb_0001e46c",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 80318,
+        "mode": "thumb",
+        "instruction": "bl #0xc114",
+        "target": "thumb_0000c114",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 80322,
+        "mode": "thumb",
+        "instruction": "bl #0x1f4e8",
+        "target": "thumb_0001f4e8",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 80326,
+        "mode": "thumb",
+        "instruction": "bl #0x13e48",
+        "target": "thumb_00013e48",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 80330,
+        "mode": "thumb",
+        "instruction": "bl #0x157bc",
+        "target": "thumb_000157bc",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 80348,
+        "mode": "thumb",
+        "instruction": "bl #0x20d14",
+        "target": "thumb_00020d14",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "mem[(SB+0x8c0)]",
+          "mem[(SB+0x86c)]",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 80352,
+        "mode": "thumb",
+        "instruction": "bl #0x277d0",
+        "target": "thumb_000277d0",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 80358,
+        "mode": "thumb",
+        "instruction": "bl #0x277d0",
+        "target": "thumb_000277d0",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 80370,
+        "mode": "thumb",
+        "instruction": "bl #0x20f1c",
+        "target": "thumb_00020f1c",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "mem[(SB+0x6f4)]",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 80380,
+        "mode": "thumb",
+        "instruction": "bl #0x20e64",
+        "target": "thumb_00020e64",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "mem[(SB+0x894)]",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 80388,
+        "mode": "thumb",
+        "instruction": "bl #0x2b984",
+        "target": "thumb_0002b984",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 80392,
+        "mode": "thumb",
+        "instruction": "bl #0x14028",
+        "target": "thumb_00014028",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 80408,
+        "mode": "thumb",
+        "instruction": "bl #0x2b984",
+        "target": "thumb_0002b984",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "mem[(SB+0x86c)]",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 80416,
+        "mode": "thumb",
+        "instruction": "bl #0x27964",
+        "target": "thumb_00027964",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 80426,
+        "mode": "thumb",
+        "instruction": "bl #0x27964",
+        "target": "thumb_00027964",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 80430,
+        "mode": "thumb",
+        "instruction": "bl #0x22358",
+        "target": "thumb_00022358",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 80434,
+        "mode": "thumb",
+        "instruction": "bl #0x27850",
+        "target": "thumb_00027850",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 80444,
+        "mode": "thumb",
+        "instruction": "bl #0x277d0",
+        "target": "thumb_000277d0",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "(SB+0x838)",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 80456,
+        "mode": "thumb",
+        "instruction": "bl #0x277d0",
+        "target": "thumb_000277d0",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 80460,
+        "mode": "thumb",
+        "instruction": "bl #0x2b800",
+        "target": "thumb_0002b800",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 80466,
+        "mode": "thumb",
+        "instruction": "bl #0x27850",
+        "target": "thumb_00027850",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 80472,
+        "mode": "thumb",
+        "instruction": "bl #0x278f0",
+        "target": "thumb_000278f0",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": [
+          "memcpy"
+        ]
+      },
+      {
+        "site": 80478,
+        "mode": "thumb",
+        "instruction": "bl #0x278f0",
+        "target": "thumb_000278f0",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": [
+          "memcpy"
+        ]
+      },
+      {
+        "site": 80484,
+        "mode": "thumb",
+        "instruction": "bl #0x277d0",
+        "target": "thumb_000277d0",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 80490,
+        "mode": "thumb",
+        "instruction": "bl #0x277d0",
+        "target": "thumb_000277d0",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 80500,
+        "mode": "thumb",
+        "instruction": "bl #0x2b984",
+        "target": "thumb_0002b984",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 80504,
+        "mode": "thumb",
+        "instruction": "bl #0x278f0",
+        "target": "thumb_000278f0",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": [
+          "memcpy"
+        ]
+      },
+      {
+        "site": 80522,
+        "mode": "thumb",
+        "instruction": "bl #0x277d0",
+        "target": "thumb_000277d0",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "0x00000012"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 80526,
+        "mode": "thumb",
+        "instruction": "bl #0x277d0",
+        "target": "thumb_000277d0",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 80538,
+        "mode": "thumb",
+        "instruction": "bl #0x20d14",
+        "target": "thumb_00020d14",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "mem[(SB+0x8b4)]",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 80552,
+        "mode": "thumb",
+        "instruction": "bl #0x20d14",
+        "target": "thumb_00020d14",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "mem[(SB+0x8c0)]",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 80562,
+        "mode": "thumb",
+        "instruction": "bl #0x15ce0",
+        "target": "thumb_00015ce0",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 80588,
+        "mode": "thumb",
+        "instruction": "blx r3",
+        "target": null,
+        "expression": "mem[(SB+0xdd0)]",
+        "resolution": "unresolved_indirect",
+        "conditional": false,
+        "arguments": [
+          "mem[(SB+0x61c)]",
+          "0x000314a0",
+          "mem[(SB+0x8a4)]",
+          "mem[(SB+0xdd0)]"
+        ],
+        "argument_strings": [
+          null,
+          "%d.map",
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 80602,
+        "mode": "thumb",
+        "instruction": "bl #0x27274",
+        "target": "thumb_00027274",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "mem[(SB+0x61c)]",
+          "0x00031488",
+          "mem[(SB+0x838)]",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 80610,
+        "mode": "thumb",
+        "instruction": "bl #0x137c8",
+        "target": "thumb_000137c8",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": [
+          "sprintf"
+        ]
+      },
+      {
+        "site": 80618,
+        "mode": "thumb",
+        "instruction": "bl #0x2737c",
+        "target": "thumb_0002737c",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "0x0000000c",
+          "?",
+          "?",
+          "0x00000012"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": [
+          "memset"
+        ]
+      },
+      {
+        "site": 80624,
+        "mode": "thumb",
+        "instruction": "bl #0x277b8",
+        "target": "thumb_000277b8",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 80630,
+        "mode": "thumb",
+        "instruction": "bl #0x277d0",
+        "target": "thumb_000277d0",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 80636,
+        "mode": "thumb",
+        "instruction": "bl #0x278f0",
+        "target": "thumb_000278f0",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": [
+          "memcpy"
+        ]
+      },
+      {
+        "site": 80642,
+        "mode": "thumb",
+        "instruction": "bl #0x278f0",
+        "target": "thumb_000278f0",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": [
+          "memcpy"
+        ]
+      },
+      {
+        "site": 80654,
+        "mode": "thumb",
+        "instruction": "bl #0x18a44",
+        "target": "thumb_00018a44",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "0x02000002",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      }
+    ],
+    "thumb_0002171c": [
+      {
+        "site": 137004,
+        "mode": "thumb",
+        "instruction": "bl #0x1f600",
+        "target": "thumb_0001f600",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "(SB+0xcb4)",
+          "0x00031644",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          "worldmap.str",
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 137018,
+        "mode": "thumb",
+        "instruction": "bl #0x259cc",
+        "target": "thumb_000259cc",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "0x00031638",
+          "0x00000000",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          "worldmap",
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": [
+          "memcpy",
+          "sprintf"
+        ]
+      },
+      {
+        "site": 137024,
+        "mode": "thumb",
+        "instruction": "bl #0x2b1b4",
+        "target": "thumb_0002b1b4",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 137030,
+        "mode": "thumb",
+        "instruction": "bl #0x223dc",
+        "target": "thumb_000223dc",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "0x00000001",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      }
+    ],
+    "thumb_00026e74": [
+      {
+        "site": 159378,
+        "mode": "thumb",
+        "instruction": "blx r5",
+        "target": null,
+        "expression": "mem[(SB+0xdd0)]",
+        "resolution": "unresolved_indirect",
+        "conditional": false,
+        "arguments": [
+          "(SB+0x798)",
+          "0x000313f4",
+          "(SB+0x7e8)",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          "%s/%s.mrp",
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 159394,
+        "mode": "thumb",
+        "instruction": "blx r5",
+        "target": null,
+        "expression": "mem[(SB+0xdd0)]",
+        "resolution": "unresolved_indirect",
+        "conditional": false,
+        "arguments": [
+          "(SB+0x798)",
+          "0x00031400",
+          "(SB+0x810)",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          "gwy/%s.mrp",
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      }
+    ],
+    "thumb_0002b25c": [
+      {
+        "site": 176740,
+        "mode": "thumb",
+        "instruction": "bl #0x27300",
+        "target": "thumb_00027300",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "0x00031628",
+          "0x00000000",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          "worldmap.data",
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 176744,
+        "mode": "thumb",
+        "instruction": "bl #0x277a4",
+        "target": "thumb_000277a4",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 176754,
+        "mode": "thumb",
+        "instruction": "bl #0x277a4",
+        "target": "thumb_000277a4",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 176760,
+        "mode": "thumb",
+        "instruction": "bl #0x277a4",
+        "target": "thumb_000277a4",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 176766,
+        "mode": "thumb",
+        "instruction": "bl #0x27940",
+        "target": "thumb_00027940",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 176782,
+        "mode": "thumb",
+        "instruction": "bl #0x277e8",
+        "target": "thumb_000277e8",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": [
+          "memcpy"
+        ]
+      },
+      {
+        "site": 176788,
+        "mode": "thumb",
+        "instruction": "bl #0x277a4",
+        "target": "thumb_000277a4",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 176796,
+        "mode": "thumb",
+        "instruction": "bl #0x277e8",
+        "target": "thumb_000277e8",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": [
+          "memcpy"
+        ]
+      },
+      {
+        "site": 176802,
+        "mode": "thumb",
+        "instruction": "bl #0x254b4",
+        "target": "thumb_000254b4",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "?"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": []
+      },
+      {
+        "site": 176810,
+        "mode": "thumb",
+        "instruction": "bl #0x2737c",
+        "target": "thumb_0002737c",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "0x00000010"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": [
+          "memset"
+        ]
+      },
+      {
+        "site": 176820,
+        "mode": "thumb",
+        "instruction": "bl #0x2737c",
+        "target": "thumb_0002737c",
+        "expression": null,
+        "resolution": "immediate",
+        "conditional": false,
+        "arguments": [
+          "?",
+          "?",
+          "?",
+          "0x00000010"
+        ],
+        "argument_strings": [
+          null,
+          null,
+          null,
+          null
+        ],
+        "callee_sdk_apis": [
+          "memset"
+        ]
+      }
+    ]
+  },
+  "limitations": [
+    "SDK field names match a public compatible layout; this is not proof of the original SDK version.",
+    "Cached global aliases may be overwritten at runtime.",
+    "Missing .map files are a resource-gap clue, not proof of a particular network command.",
+    "No original server address, live endpoint, packet capture, or recovered server-side resource is claimed."
+  ]
+}

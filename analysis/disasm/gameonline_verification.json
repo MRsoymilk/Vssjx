@@ -1,0 +1,110 @@
+{
+  "status": "passed",
+  "scope": "synthetic_engine_checks_and_artifact_consistency_NOT_proof_of_all_function_semantics",
+  "synthetic_checks": 10,
+  "consistency_checks": [
+    "input_and_report_hashes_match",
+    "function_count_consistent",
+    "mode_counts_consistent",
+    "confidence_counts_consistent",
+    "call_sites_deduplicated",
+    "nonempty_target_count_consistent",
+    "resolved_and_unresolved_partition",
+    "all_resolved_local_targets_present",
+    "unique_instruction_count_consistent",
+    "instruction_widths_valid",
+    "instruction_alignment_valid",
+    "legacy_instruction_and_data_counts_separated",
+    "legacy_empty_targets_not_counted",
+    "nonempty:gameonline_arm_candidates.asm",
+    "nonempty:gameonline_arm_candidates.json",
+    "nonempty:gameonline_mixed.json",
+    "nonempty:gameonline_functions.asm",
+    "nonempty:gameonline_functions.tsv",
+    "nonempty:gameonline_calls.tsv",
+    "nonempty:gameonline_strings.tsv",
+    "nonempty:gameonline_mixed_report.md",
+    "nonempty:gameonline_resource_findings.json",
+    "nonempty:gameonline_resource_findings.md"
+  ],
+  "input_sha256": "e08f93bebe133b700f2305bfbedd994b05cc8d04a5a854262af9ced956afbc03",
+  "counts": {
+    "functions": 1590,
+    "root_graph_functions": 8,
+    "heuristic_graph_functions": 1582,
+    "arm_functions": 42,
+    "thumb_functions": 1548,
+    "unique_instructions": 73785,
+    "decoded_code_bytes": 166614,
+    "mode_conflict_bytes": 0,
+    "literal_bytes": 12624,
+    "distinct_call_sites": 9113,
+    "ambiguous_indirect_branch_sites": 17,
+    "resolved_local_call_sites": 8901,
+    "unresolved_call_sites": 212,
+    "distinct_nonempty_call_targets": 1308,
+    "string_xrefs": 166,
+    "keyword_string_xrefs": 47,
+    "limit_hits": 0
+  },
+  "resource_summary": {
+    "sdk_matched_sites": 156,
+    "network_matched_sites": 0,
+    "network_functions": 0,
+    "cached_sdk_alias_candidates": 18,
+    "local_numeric_map_files": 0,
+    "decoded_package_tables": 0
+  },
+  "artifacts": [
+    {
+      "path": "gameonline_arm_candidates.asm",
+      "bytes": 48521,
+      "sha256": "553f3ccd51ec09311e031ce38c43ad98acc2b1c396a653f1837f237f227cc456"
+    },
+    {
+      "path": "gameonline_arm_candidates.json",
+      "bytes": 1812,
+      "sha256": "ca94b1c23369f07b38e57c65acb43184fe8b8ed22c061335ee94acdb1cc87884"
+    },
+    {
+      "path": "gameonline_mixed.json",
+      "bytes": 29137724,
+      "sha256": "065bfe66a9f81facf11e7b24d40259932ff0b9477136a9fb0e31108d6a8d48e1"
+    },
+    {
+      "path": "gameonline_functions.asm",
+      "bytes": 4157634,
+      "sha256": "8dd4bda66c67a9c5e451895d5d967c490a8c69163f20db15693b0a1d3bd16726"
+    },
+    {
+      "path": "gameonline_functions.tsv",
+      "bytes": 96186,
+      "sha256": "9c27810cdd6ba6cacc7136f40895cc01604d8eeb2fbc99102bb7a980e8d2a5ac"
+    },
+    {
+      "path": "gameonline_calls.tsv",
+      "bytes": 914741,
+      "sha256": "1415b3577b4e7d4e739d9729d55a433da2b861e0d237860ad064acc00d62768e"
+    },
+    {
+      "path": "gameonline_strings.tsv",
+      "bytes": 8803,
+      "sha256": "934a7d6c93cf4625968dbd6daad88bca710f34e41c528cc295133da0947ca90b"
+    },
+    {
+      "path": "gameonline_mixed_report.md",
+      "bytes": 3846,
+      "sha256": "6064b33211e7046267fa1b4cdb7bc0bed139bdee9dd160b807b8798be5ff65da"
+    },
+    {
+      "path": "gameonline_resource_findings.json",
+      "bytes": 177559,
+      "sha256": "644b8ddf2eb82d0fbf6abaad53795698993d5bbdbf2eee10fc4b259cc61724f6"
+    },
+    {
+      "path": "gameonline_resource_findings.md",
+      "bytes": 2024,
+      "sha256": "d49370f299d785e90a77fad9a21cf8fd5476e3d2a8369980c6a6ed9a2e91d8b7"
+    }
+  ]
+}

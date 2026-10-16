@@ -1,0 +1,167 @@
+function	site	mode	string_offset	interesting	text
+thumb_000008c0	0x8d0	thumb	0x319d4	False	Abnormal termination
+thumb_000008c0	0x8de	thumb	0x960	False	Invalid Operation
+thumb_000008c0	0x8e8	thumb	0x978	False	Divide By Zero
+thumb_000008c0	0x8f0	thumb	0x988	False	Overflow
+thumb_000008c0	0x8f8	thumb	0x994	False	Underflow
+thumb_000008c0	0x900	thumb	0x9a0	False	Inexact Result
+thumb_000008c0	0x914	thumb	0x9b0	False	: Heap memory corrupted
+thumb_000008c0	0x918	thumb	0x9c8	False	Unknown signal
+thumb_00000a2c	0xa3a	thumb	0x30a9c	False	itemflash
+thumb_00000acc	0xad0	thumb	0x30aa8	True	bag.str
+thumb_00002360	0x24b8	thumb	0x30a8c	False	stilettoItem
+thumb_000027b4	0x280c	thumb	0x3082c	False	select
+thumb_000027b4	0x2818	thumb	0x30824	False	death
+thumb_00002ae0	0x2baa	thumb	0x30838	True	battle.str
+thumb_00003dc0	0x3dd4	thumb	0x307d8	True	breakeffect.bin
+thumb_00004914	0x498e	thumb	0x307f4	False	add to allBattleRoles role%d->heroData->id=%d
+thumb_00005434	0x5456	thumb	0x30b58	False	ix%d
+thumb_00005434	0x5464	thumb	0x30b50	False	item
+thumb_00005434	0x547a	thumb	0x30b60	True	bet.str
+thumb_00008fa4	0x8fae	thumb	0x30a78	True	cover.str
+thumb_00008fa4	0x907c	thumb	0x30a84	False	fm%d
+thumb_00008fa4	0x90a4	thumb	0x30a6c	False	biaoti
+thumb_000091f0	0x920e	thumb	0x30a50	False	%s%d
+thumb_000093c0	0x943c	thumb	0x30a48	True	version
+thumb_00009514	0x953e	thumb	0x30a6c	False	biaoti
+thumb_00009904	0x9926	thumb	0x30a48	True	version
+thumb_00009904	0x99ec	thumb	0x30a58	True	download.str
+thumb_00009c44	0x9c5e	thumb	0x30d40	True	forge.str
+thumb_0000a8a4	0xa8ba	thumb	0x30d00	True	socketicon
+thumb_0000a8a4	0xa8ee	thumb	0x30d0c	False	item
+thumb_0000acc8	0xadf0	thumb	0x30d40	True	forge.str
+thumb_0000b644	0xb69c	thumb	0x30d00	True	socketicon
+thumb_0000d864	0xd868	thumb	0x30d4c	True	guild.str
+thumb_0000d9b0	0xd9b4	thumb	0x30d4c	True	guild.str
+thumb_0000daac	0xdab4	thumb	0x30df4	False	hero
+thumb_0000daac	0xdab6	thumb	0x30df4	False	hero
+thumb_0000daac	0xdab8	thumb	0x30de8	False	aidatexiao
+thumb_0000db74	0xdb78	thumb	0x30dfc	True	heroui.str
+thumb_0000f118	0xf11c	thumb	0x31654	True	landmap.str
+thumb_0000f118	0xf134	thumb	0x31638	False	worldmap
+thumb_0000fa3c	0xfa40	thumb	0x31528	True	login.str
+thumb_0000fa3c	0xfa70	thumb	0x31510	True	login
+thumb_0000fc04	0xfc2c	thumb	0x31510	True	login
+thumb_00010410	0x104bc	thumb	0x31534	False	%s%d
+thumb_00010410	0x104ce	thumb	0x31518	False	hero
+thumb_00010ce8	0x10d26	thumb	0x31518	False	hero
+thumb_00010ce8	0x10d44	thumb	0x31520	False	career
+thumb_00011010	0x11016	thumb	0x31510	True	login
+thumb_00011308	0x1130c	thumb	0x30e64	True	mail.str
+thumb_0001292c	0x1293a	thumb	0x3099c	True	mainmenu.str
+thumb_000129da	0x129f2	thumb	0x30960	True	set.str
+thumb_000129da	0x12a30	thumb	0x30960	True	set.str
+thumb_00013470	0x1348e	thumb	0x30954	False	%s%d
+thumb_0001353c	0x13554	thumb	0x30954	False	%s%d
+thumb_00013650	0x136dc	thumb	0x314b8	False	zhandou
+thumb_00013650	0x136e8	thumb	0x314b0	False	caizai
+thumb_00013650	0x136f4	thumb	0x314a8	False	sceneui
+thumb_000137c8	0x137d0	thumb	0x314a0	True	%d.map
+thumb_000139ac	0x13abc	thumb	0x314a0	True	%d.map
+thumb_00014290	0x14328	thumb	0x314c0	False	tiaozhan
+thumb_00015178	0x15188	thumb	0x31468	False	monster
+thumb_00015178	0x151be	thumb	0x31468	False	monster
+thumb_000152d8	0x153aa	thumb	0x31498	False	.ani
+thumb_000153e4	0x153f2	thumb	0x3147c	True	tips%d.str
+thumb_00015618	0x1565c	thumb	0x3148c	False	tile%d
+thumb_00016220	0x16224	thumb	0x30e84	True	mission.str
+thumb_00017434	0x17438	thumb	0x30f54	True	pay.str
+thumb_00017588	0x177ac	thumb	0x30f08	False	>iip iip iip iii iip iii iip iii iip iip iii iiH iii iip iii iip iii iip
+thumb_00019014	0x19030	thumb	0x31118	False	flow
+thumb_000191f0	0x19242	thumb	0x30fcc	False	SHOP_CZRM
+thumb_000196ca	0x196f0	thumb	0x31084	True	shizhuang.str
+thumb_000196ca	0x1979e	thumb	0x31078	False	discount
+thumb_00019d68	0x19d70	thumb	0x30fcc	False	SHOP_CZRM
+thumb_00019f58	0x1a100	thumb	0x30fcc	False	SHOP_CZRM
+thumb_0001a2f4	0x1a30c	thumb	0x3106c	True	shop.str
+thumb_0001a2f4	0x1a3d4	thumb	0x31078	False	discount
+thumb_0001ab90	0x1abae	thumb	0x3106c	True	shop.str
+thumb_0001ad8c	0x1ad94	thumb	0x30fcc	False	SHOP_CZRM
+thumb_0001adc8	0x1add4	thumb	0x30fcc	False	SHOP_CZRM
+thumb_0001af64	0x1af98	thumb	0x30b70	False	slotmachine
+thumb_0001af64	0x1afa0	thumb	0x30b68	True	sm.str
+thumb_0001b878	0x1b896	thumb	0x310f4	True	social.str
+thumb_0001b878	0x1b8a0	thumb	0x31104	False	talkmood
+thumb_0001b968	0x1b96c	thumb	0x310f4	True	social.str
+thumb_0001cc10	0x1cc2a	thumb	0x310ec	False	talkSet
+thumb_0001ce5c	0x1ce90	thumb	0x310f4	True	social.str
+thumb_0001d3b4	0x1d3ba	thumb	0x310ec	False	talkSet
+thumb_0001ddfc	0x1de06	thumb	0x315dc	True	teach.str
+thumb_0001e238	0x1e2ba	thumb	0x315cc	False	teach
+thumb_0001e238	0x1e31c	thumb	0x315d4	False	teach%d
+thumb_0001e3b8	0x1e444	thumb	0x315bc	False	jiaoxue
+thumb_0001e52c	0x1e536	thumb	0x315cc	False	teach
+thumb_0001e52c	0x1e546	thumb	0x315cc	False	teach
+thumb_0001e52c	0x1e548	thumb	0x315c4	False	%s%d
+thumb_0001e9c8	0x1e9ce	thumb	0x315cc	False	teach
+thumb_0001edf4	0x1ee0c	thumb	0x307a8	False	bigscroll
+thumb_0001f484	0x1f48c	thumb	0x307b4	False	%d/%d
+thumb_0001f4ac	0x1f4b4	thumb	0x307b4	False	%d/%d
+thumb_0001f79c	0x1f7a0	thumb	0x316bc	True	trade.str
+thumb_0002011c	0x20176	thumb	0x316b4	False	item
+thumb_00020968	0x2096e	thumb	0x31140	True	i18n.str
+thumb_00020968	0x2097e	thumb	0x31134	False	neverpic
+thumb_00020968	0x2098a	thumb	0x3112c	False	zairu
+thumb_00020968	0x20996	thumb	0x31124	False	flash
+thumb_00020a3c	0x20aba	thumb	0x3114c	False	shuzi0%d
+thumb_00020c9c	0x20cba	thumb	0x31158	False	%c%d
+thumb_0002171c	0x21724	thumb	0x31644	True	worldmap.str
+thumb_0002171c	0x21738	thumb	0x31638	False	worldmap
+thumb_00022b3c	0x22b44	thumb	0x3158c	False	%s.ani
+thumb_00023560	0x2357c	thumb	0x31290	False	.img
+thumb_00023560	0x23588	thumb	0x31288	False	item
+thumb_000235f8	0x2361c	thumb	0x31288	False	item
+thumb_00024b8c	0x24ba8	thumb	0x313d0	False	gwy/%s
+thumb_00024fcc	0x24fe6	thumb	0x311b8	False	record
+thumb_00024fcc	0x24fee	thumb	0x311b8	False	record
+thumb_00024fcc	0x24ff4	thumb	0x311b0	False	%s(%d)
+thumb_00025014	0x25026	thumb	0x31118	False	flow
+thumb_00025854	0x25866	thumb	0x31298	False	%s.img
+thumb_00025854	0x258cc	thumb	0x312d4	False	filename = %s
+thumb_00025854	0x258da	thumb	0x312c4	False	img->type = %d
+thumb_00025854	0x258e4	thumb	0x312b4	False	img->width = %d
+thumb_00025854	0x258ee	thumb	0x312a0	False	img->height = %d
+thumb_00025854	0x2593e	thumb	0x312e4	False	size = %d
+thumb_00025854	0x25956	thumb	0x312e4	False	size = %d
+thumb_000259cc	0x259d8	thumb	0x312f0	False	%s.imgs
+thumb_00026df8	0x26e08	thumb	0x313d8	False	other
+thumb_00026df8	0x26e0e	thumb	0x313d8	False	other
+thumb_00026df8	0x26e14	thumb	0x313e0	False	%s/%s
+thumb_00026df8	0x26e4c	thumb	0x313e8	False	%s/%s/%s
+thumb_00026e74	0x26e8e	thumb	0x313f4	True	%s/%s.mrp
+thumb_00026e74	0x26e9e	thumb	0x31400	True	gwy/%s.mrp
+thumb_00029df0	0x29e0c	thumb	0x31224	False	hero
+thumb_00029df0	0x29e78	thumb	0x31224	False	hero
+thumb_00029df0	0x29e84	thumb	0x31224	False	hero
+thumb_00029df0	0x29e9c	thumb	0x3122c	False	.imgs
+thumb_0002a00c	0x2a048	thumb	0x31250	False	effect
+thumb_0002a0e0	0x2a10a	thumb	0x31244	False	monster
+thumb_0002a0e0	0x2a12e	thumb	0x31224	False	hero
+thumb_0002b040	0x2b0ec	thumb	0x31468	False	monster
+thumb_0002b040	0x2b13c	thumb	0x31468	False	monster
+thumb_0002b040	0x2b13e	thumb	0x31468	False	monster
+thumb_0002b040	0x2b140	thumb	0x31470	False	npc39
+thumb_0002b25c	0x2b262	thumb	0x31628	True	worldmap.data
+thumb_0002c98c	0x2c9b8	thumb	0x31190	False	item
+thumb_0002ca30	0x2cab0	thumb	0x31190	False	item
+thumb_0002db10	0x2db26	thumb	0x31714	False	timerCreate err 01
+thumb_0002dbc4	0x2dbe0	thumb	0x316f8	False	timer err:%d
+thumb_0002dbc4	0x2dc08	thumb	0x316f8	False	timer err:%d
+thumb_0002dea8	0x2debe	thumb	0x3176c	False	err:%d
+thumb_0002dea8	0x2dece	thumb	0x3176c	False	err:%d
+thumb_0002dea8	0x2dee2	thumb	0x3176c	False	err:%d
+thumb_0002dea8	0x2df52	thumb	0x31794	False	crc err!
+thumb_0002dea8	0x2df66	thumb	0x317a0	False	length err!
+thumb_0002e120	0x2e146	thumb	0x3196c	False	>HHHHHH
+thumb_0002e120	0x2e184	thumb	0x3196c	False	>HHHHHH
+thumb_0002e380	0x2e386	thumb	0x3122c	False	.imgs
+thumb_0002e43c	0x2e54e	thumb	0x3125c	False	dongtai%d
+thumb_0002e724	0x2e77a	thumb	0x31250	False	effect
+thumb_0002e724	0x2e77c	thumb	0x31250	False	effect
+thumb_0002e724	0x2e78c	thumb	0x31250	False	effect
+thumb_0002e7bc	0x2e7ca	thumb	0x31250	False	effect
+thumb_0002e7bc	0x2e7cc	thumb	0x31250	False	effect
+thumb_0002f058	0x2f064	thumb	0x311c0	True	commonRecord
+thumb_0002f090	0x2f09c	thumb	0x311c0	True	commonRecord
+thumb_0002f0b0	0x2f0bc	thumb	0x311c0	True	commonRecord
+thumb_0002f1cc	0x2f1d8	thumb	0x311c0	True	commonRecord

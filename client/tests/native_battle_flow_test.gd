@@ -53,11 +53,13 @@ func run() -> void:
 			check(app.battle_hero.get_index() > app.battle_enemy.get_index(), "Native acting team draws the approaching hero in front")
 			check(app.effects_layer.get_parent().get_index() > app.battle_hero.get_index(), "Damage effects and overhead HUD remain above both actors")
 			check(absf(app.battle_hero.position.x - enemy_home.x) < 75, "Real battle attacker reaches weapon range")
+			check(app.battle_move_callout.visible and absf(app.battle_move_callout.position.x + app.battle_move_callout.tail_x - app.battle_hero.position.x) < 1.0, "Move bubble follows the actual native strike instead of the original station")
 			if job == 1 and gender == 1: await screenshot("-impact")
 			motion.advance(motion.remaining())
 			check(app.battle_hero.position == home and app.battle_playback != motion, "Full source sequence returns before enemy acts")
 			var response: BattleActionPlayback = app.battle_playback
 			check(response != null and response.actor == app.battle_enemy, "Enemy counterattack uses the same native playback")
+			check(not app.battle_move_callout.visible, "Player move bubble clears before enemy retaliation")
 			response.advance(response.impact_time + 0.001)
 			check(app.battle_hero.animation == "hurt" and app.battle_enemy.get_index() > app.battle_hero.get_index(), "Native acting team draws the retaliating monster in front")
 			app.battle_hero.set_frame_and_progress(2, 0.0)
@@ -84,7 +86,9 @@ func run() -> void:
 	# Leaving during approach releases the coroutine without damage or a stale counterattack.
 	var previous_battle: ShushanBattle = app.battle
 	var old_hp := previous_battle.enemy_hp
+	var old_callout: BattleMoveCallout = app.battle_move_callout
 	app._home()
+	check(not old_callout.visible and old_callout.remaining == 0.0 and app.battle_move_callout == null, "Abandoning a battle immediately detaches and clears its move bubble")
 	await get_tree().process_frame
 	check(casting.cancelled and previous_battle.enemy_hp == old_hp and app.battle_playback == null and app.mode == "home", "Scene change cancels presentation without resolving a pending hit")
 	app._enter_world()

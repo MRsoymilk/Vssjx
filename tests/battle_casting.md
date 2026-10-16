@@ -31,3 +31,15 @@ Godot 4.7.2、Xvfb、Mesa llvmpipe/OpenGL ES 3.2：headless 53项检查通过；
 首轮像素验收对女法师普通攻击误要求4种不同像素帧；核对原图集后确认前3帧确为相同持势，修正为普通攻击至少3种、浮杖施法至少4种，并保留引擎实际推进至少4个序号的独立检查。复验通过，没有通过改写原始图像来凑帧。
 
 截图/轨迹位于`/tmp/opencode/vssjx-battle-casting/`；例如`0_skill_11.png`、`1_skill_07.png`及`casting_trace.json`。运行时可用`XVFB_BIN=/tmp/opencode/vssjx-xvfb/usr/bin/Xvfb`和相应`LD_LIBRARY_PATH`使用本机离屏依赖；X11键盘映射/输入法警告不影响渲染，无GDScript错误。
+
+## 招式气泡跟随（2026-10-16）
+
+气泡此前只在出招时记录原站位，普攻接近目标后仍留在原处。现在使用弱引用绑定行动人物，按画布坐标持续更新气泡和尾尖；命中时同步更新，兼容缩放、镜像及不同父节点，保留原有高度、边缘限制和持续时间。收招、切换页面或人物释放时清除，不重复开始倒计时。
+
+Windows / Godot 4.7.1：`battle_casting_test.tscn` 61 项、`native_battle_flow_test.tscn` 100 项、`test_runner.tscn` 385 项，均为 0 失败。包含六个人物命中位置跟随、反击前清除、取消清除、不同站位坐标转换、镜像文字方向、屏幕边缘与对象释放检查。
+
+实际 OpenGL 战斗流程 103 项通过，已查看 `work/battle-layering/follow-callout-impact.png`，气泡位于普攻命中时的人物上方。截图在忽略目录，可通过以下命令重新生成：
+
+```sh
+godot --path client res://tests/native_battle_flow_test.tscn -- --capture-native-flow=/absolute/path/follow-callout
+```

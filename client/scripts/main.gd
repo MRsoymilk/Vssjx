@@ -252,6 +252,8 @@ func _button(parent: Node, text_value: String, rect: Rect2, callback: Callable, 
 
 func _clear_ui() -> void:
 	_ui_epoch += 1
+	if is_instance_valid(battle_move_callout): battle_move_callout.clear()
+	battle_move_callout = null
 	if battle_playback != null: battle_playback.cancel()
 	battle_playback = null
 	battle_ring = null
@@ -973,7 +975,7 @@ func _battle_turn(command: String) -> void:
 	if action_menu != null: action_menu.hide()
 	battle_stage = "player"
 	var animation: StringName = &"cast" if command == "skill" and battle_hero.sprite_frames.has_animation("cast") else &"attack"
-	battle_move_callout.present(ShushanBattle.action_name(command, int(Game.player.job)), battle_hero.position + Vector2(0, -88), _battle_action_duration(battle_hero, animation) + 0.15 if command in ["attack", "skill"] else 0.75)
+	battle_move_callout.present_for(ShushanBattle.action_name(command, int(Game.player.job)), battle_hero, _battle_action_duration(battle_hero, animation) + 0.15 if command in ["attack", "skill"] else 0.75)
 	_refresh_battle()
 	await get_tree().create_timer(0.15).timeout
 	if epoch != _ui_epoch or mode != "battle" or battle != active_battle: return
@@ -1062,6 +1064,7 @@ func _toggle_auto() -> void:
 	_refresh_battle()
 
 func _refresh_battle() -> void:
+	if is_instance_valid(battle_move_callout): battle_move_callout.update_anchor()
 	var values := Game.stats()
 	chrome.update_header(battle.hp, battle.mp, battle.round_number)
 	var stages := {"select": "请选择本回合指令", "player": "我方行动", "enemy": "敌方行动", "settlement": "回合结算", "finished": "战斗结束"}

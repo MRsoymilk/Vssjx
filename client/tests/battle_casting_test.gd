@@ -76,6 +76,34 @@ func _run() -> void:
 	check(bubble.position.x >= 0 and bubble.position.x + bubble.size.x <= 320, "Edge-anchored bubble is clamped inside the viewport")
 	bubble.clear()
 	check(not bubble.visible, "Clearing the announcement immediately hides it")
+	var station := Node2D.new()
+	station.position = Vector2(30, 20)
+	station.scale = Vector2(1.5, 1.5)
+	app.ui.add_child(station)
+	var subject := Node2D.new()
+	subject.position = Vector2(140, 160)
+	station.add_child(subject)
+	bubble.present_for("剑击", subject, 1.0)
+	check(is_equal_approx(bubble.position.x + bubble.tail_x, 240.0), "Attached bubble converts a scaled station into UI coordinates")
+	var before_move := bubble.position
+	subject.position.x = 100
+	bubble._process(0.1)
+	check(bubble.position.x < before_move.x and is_equal_approx(bubble.position.x + bubble.tail_x, 180.0), "Normal bubble processing follows the moving actor")
+	check(is_equal_approx(bubble.remaining, 0.9), "Reanchoring does not restart the announcement lifetime")
+	subject.scale.x = -1.0
+	bubble._process(0.0)
+	check(bubble.scale == Vector2.ONE and bubble.caption.scale == Vector2.ONE and is_equal_approx(bubble.position.x + bubble.tail_x, 180.0), "Actor facing never mirrors the move name")
+	for edge in [3.0, 317.0]:
+		subject.global_position.x = edge
+		bubble._process(0.0)
+		check(bubble.position.x >= 4 and bubble.get_rect().end.x <= 316 and bubble.tail_x >= 10 and bubble.tail_x <= bubble.size.x - 10, "Following at a screen edge keeps the bubble and pointer in bounds")
+	subject.free()
+	bubble._process(0.0)
+	check(not bubble.visible and bubble.remaining == 0.0, "Freed actor clears the attached announcement without stale access")
+	station.free()
+	bubble.present("摄灵诀", Vector2(160, 100), 0.2)
+	bubble._process(0.3)
+	check(not bubble.visible, "A reused static announcement still expires normally")
 	if not output.is_empty():
 		var file := FileAccess.open(output.path_join("casting_trace.json"), FileAccess.WRITE)
 		file.store_string(JSON.stringify(trace, "\t"))

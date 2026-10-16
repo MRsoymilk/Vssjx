@@ -113,6 +113,21 @@ static func actor(key: String) -> AnimatedSprite2D:
 	sprite.play("idle")
 	return sprite
 
+static func battle_actor(key: String) -> AnimatedSprite2D:
+	var sprite := actor(key)
+	var base_offset := sprite.offset
+	var offsets: Dictionary = actor_info(key).get("native_battle", {}).get("pose_x", {})
+	# Gameplay atlases stabilize the body/head for walking. Battle rendering
+	# must restore the source idle anchor and state-6 recoil at every frame.
+	# Attack translation is owned by BattleActionPlayback instead.
+	var sample := func() -> void:
+		var poses: Array = offsets.get(String(sprite.animation), [])
+		sprite.offset = base_offset + Vector2(float(poses[sprite.frame]) if sprite.frame < poses.size() else 0.0, 0.0)
+	sprite.animation_changed.connect(sample)
+	sprite.frame_changed.connect(sample)
+	sample.call()
+	return sprite
+
 static func source_steps(info: Dictionary, serialized_sequence: int) -> Array:
 	# Native 22d74 fills the frame pointer table from count-1 down to zero.
 	# Keep serialized evidence intact; resolve native frame references on use.

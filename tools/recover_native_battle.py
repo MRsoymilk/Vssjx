@@ -15,6 +15,12 @@ RANGES = [
     ('action_completion', 0x2be4, 0x2c38),
     ('restore_home_and_ready', 0x2ea4, 0x2ed6),
     ('copy_coordinates_source_to_destination', 0x2ee00, 0x2ee0a),
+    ('acting_side_draw_list_selection', 0x2f28, 0x2f42),
+    ('battle_draw_order', 0x316a, 0x3182),
+    ('battle_update_order', 0x3948, 0x3958),
+    ('team_side_assignment', 0x36fc, 0x371e),
+    ('actor_side_flag_assignment', 0x4948, 0x4960),
+    ('reverse_list_renderer', 0x21050, 0x21072),
 ]
 
 
@@ -36,6 +42,8 @@ def evidence():
         'attack_origin': '24636..24642 copies first target logical coordinates (+10) into attacker render coordinates (+18). ANI layer offsets then supply approach, strike and retreat.',
         'hit_timing': '22b78 loads forward BE32 masks. 22aa8 tests native sequence mask bit at sequence step, only on tick zero. 39d0 delivers queued action events at those steps.',
         'restore': 'State 5 completion dispatches to 2c24, copies home (+10) to render (+18), then 2ea4 enters state 4 if alive.',
+        'actor_draw_order': '4914 stores team side at actor+51. 2f28..2f40 selects the acting team as global list+48; 3174..317e draws list+4c first, then +48 (same order at 3948..3954). The acting side is in front; HUD/effect passes follow.',
+        'hurt_recoil': '22c64 renders the original signed ANI layer x/y offsets. Stabilized atlases must restore state-6 body/head centers; e.g. wck 4,6,7,8,9 and langw 3,4,5,6,7.',
         'limitations': [
             'Native timer cadence has not been verified; Godot currently uses its existing 10 FPS attack clock.',
             'Native masks can contain multiple hit events. Current reconstructed/server rules supply one damage result per action; do not invent extra damage.',

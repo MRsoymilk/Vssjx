@@ -70,9 +70,9 @@ func present(pve: OnlinePve) -> void:
 		if enemy != null: enemy.queue_free()
 		var key: String = (["mzs", "mck", "mfs"] if int(c.gender) == 0 else ["wzs", "wck", "wfs"])[int(c.job)]
 		_hero_key = "hero/" + key
-		hero = OriginalArt.actor(_hero_key)
+		hero = OriginalArt.battle_actor(_hero_key)
 		$Hero.add_child(hero)
-		enemy = OriginalArt.actor(b.enemy.art)
+		enemy = OriginalArt.battle_actor(b.enemy.art)
 		enemy.scale.x = -1
 		$Enemy.add_child(enemy)
 		_highlight(0)
@@ -88,7 +88,7 @@ func present(pve: OnlinePve) -> void:
 				_hero_motion.completed.connect(func() -> void:
 					if not _hero_motion.cancelled: _start_enemy_motion()
 				)
-				_hero_motion.start(hero, OriginalArt.actor_info(_hero_key), enemy.global_position, &"cast" if model.last_action == "skill" and hero.sprite_frames.has_animation("cast") else &"attack")
+				_hero_motion.start(hero, OriginalArt.actor_info(_hero_key), enemy.global_position, &"cast" if model.last_action == "skill" and hero.sprite_frames.has_animation("cast") else &"attack", enemy)
 				_enemy_attack_delay = _hero_motion.duration if _should_enemy_act() else 0.0
 				animation_time = _hero_motion.duration + (_action_duration(enemy, &"attack") if _should_enemy_act() else 0.0)
 			elif _should_enemy_act():
@@ -137,7 +137,7 @@ func _start_enemy_motion() -> void:
 		$Hud/BattleHeroHp.value = _shown_hero_hp
 		$Hud/BattleEnemyHp.value = _shown_enemy_hp
 	)
-	_enemy_motion.start(enemy, OriginalArt.actor_info(model.state.battle.enemy.art), hero.global_position)
+	_enemy_motion.start(enemy, OriginalArt.actor_info(model.state.battle.enemy.art), hero.global_position, &"attack", hero)
 	animation_time = _enemy_motion.duration
 
 func _should_enemy_act() -> bool:

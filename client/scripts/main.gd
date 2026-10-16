@@ -886,11 +886,11 @@ func _start_battle(enemy: Dictionary) -> void:
 	ring.scale.y = 0.4
 	ui.add_child(ring)
 	battle_ring = ring
-	battle_enemy = OriginalArt.actor(String(enemy.art))
+	battle_enemy = OriginalArt.battle_actor(String(enemy.art))
 	battle_enemy.position = Vector2(58, 282)
 	battle_enemy.scale = Vector2(-1.1, 1.1)
 	ui.add_child(battle_enemy)
-	battle_hero = OriginalArt.actor(Game.actor_key())
+	battle_hero = OriginalArt.battle_actor(Game.actor_key())
 	battle_hero.position = Vector2(256, 282)
 	battle_hero.scale = Vector2(1.2, 1.2)
 	ui.add_child(battle_hero)
@@ -981,7 +981,7 @@ func _battle_turn(command: String) -> void:
 	if command in ["attack", "skill"]:
 		player_motion = BattleActionPlayback.new()
 		battle_playback = player_motion
-		player_motion.start(battle_hero, OriginalArt.actor_info(Game.actor_key()), battle_enemy.global_position, animation)
+		player_motion.start(battle_hero, OriginalArt.actor_info(Game.actor_key()), battle_enemy.global_position, animation, battle_enemy)
 		_refresh_battle()
 		await player_motion.impact
 		if epoch != _ui_epoch or player_motion.cancelled or mode != "battle" or battle != active_battle: return
@@ -1008,7 +1008,7 @@ func _battle_turn(command: String) -> void:
 		battle_stage = "enemy"
 		var enemy_motion := BattleActionPlayback.new()
 		battle_playback = enemy_motion
-		enemy_motion.start(battle_enemy, OriginalArt.actor_info(battle.enemy.art), battle_hero.global_position)
+		enemy_motion.start(battle_enemy, OriginalArt.actor_info(battle.enemy.art), battle_hero.global_position, &"attack", battle_hero)
 		_refresh_battle()
 		await enemy_motion.impact
 		if epoch != _ui_epoch or enemy_motion.cancelled or mode != "battle" or battle != active_battle: return

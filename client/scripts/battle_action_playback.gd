@@ -15,8 +15,12 @@ var home := Vector2.ZERO
 var target := Vector2.ZERO
 var _durations: Array[float] = []
 var _x: Array = []
+var _front_root: Node
+var _front_parent: Node
+var _front_index := -1
 
-func start(subject: AnimatedSprite2D, info: Dictionary, target_position: Vector2, mode: StringName = &"attack") -> void:
+func start(subject: AnimatedSprite2D, info: Dictionary, target_position: Vector2, mode: StringName = &"attack", receiver: AnimatedSprite2D = null) -> void:
+	if active: cancel()
 	actor = subject
 	action = mode
 	home = actor.position
@@ -41,7 +45,26 @@ func start(subject: AnimatedSprite2D, info: Dictionary, target_position: Vector2
 		for index in int(hits[0]): impact_time += _durations[index]
 	actor.play(action)
 	actor.pause()
+	_layer_attacker(receiver)
 	_sample()
+
+func _layer_attacker(receiver: AnimatedSprite2D) -> void:
+	if not is_instance_valid(receiver) or receiver == actor: return
+	# Offline actors are siblings; online actors sit in separate station roots.
+	# Native 2f28..2f40 selects the acting side as list +48; 3174..317e
+	# renders +4c first and +48 last. Keep effects/HUD above both branches.
+	var parent := actor.get_parent()
+	while parent != null and not parent.is_ancestor_of(receiver): parent = parent.get_parent()
+	if parent == null: return
+	var back: Node = receiver
+	var front: Node = actor
+	while back.get_parent() != parent: back = back.get_parent()
+	while front.get_parent() != parent: front = front.get_parent()
+	if back == front or front.get_index() > back.get_index(): return
+	_front_root = front
+	_front_parent = parent
+	_front_index = front.get_index()
+	parent.move_child(front, back.get_index())
 
 func remaining() -> float:
 	return maxf(0.0, duration - elapsed) if active else 0.0
@@ -77,7 +100,14 @@ func _sample(at: float = -1.0) -> void:
 		# use the signed transform basis so enemy-side attacks move inward too.
 		actor.global_position = target + Vector2(float(_x[step]) * actor.global_transform.x.x, 0)
 
-func _restore() -> void:
+func _restore(restore_order: bool = false) -> void:
+	# 2c24/2ea4 restore coordinates and state, leaving the acting-side draw
+	# lists unchanged until the next action. Abandoned presentations roll back.
+	if restore_order and is_instance_valid(_front_parent) and is_instance_valid(_front_root) and _front_root.get_parent() == _front_parent:
+		_front_parent.move_child(_front_root, mini(_front_index, _front_parent.get_child_count() - 1))
+	_front_root = null
+	_front_parent = null
+	_front_index = -1
 	if is_instance_valid(actor):
 		actor.position = home
 		actor.play("idle")
@@ -86,7 +116,7 @@ func cancel() -> void:
 	if not active: return
 	active = false
 	cancelled = true
-	_restore()
+	_restore(true)
 	# Release callers awaiting either stage. They must inspect cancelled/epoch.
 	if not impacted: impact.emit()
 	completed.emit()

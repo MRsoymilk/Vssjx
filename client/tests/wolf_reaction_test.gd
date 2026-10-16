@@ -3,12 +3,19 @@ extends Node2D
 const VIEW := preload("res://scenes/ui/online_battle_view.tscn")
 var checks := 0
 var failures := 0
+var capture_prefix := ""
 
 func check(value: bool, message: String) -> void:
 	checks += 1
 	if not value:
 		failures += 1
 		push_error("FAIL: " + message)
+
+func capture(suffix: String) -> void:
+	if capture_prefix.is_empty() or DisplayServer.get_name() == "headless": return
+	await get_tree().process_frame
+	RenderingServer.force_draw()
+	check(get_viewport().get_texture().get_image().save_png(capture_prefix + suffix + ".png") == OK, "Rendered overlapping battle actors: " + suffix)
 
 func state(art_key: String) -> Dictionary:
 	return {"character": {"job":1,"gender":0,"level":1,"hp":100,"mp":40,"display_name":"Test"},
@@ -19,6 +26,7 @@ func state(art_key: String) -> Dictionary:
 func check_reactions(art_key: String) -> void:
 	var model := OnlinePve.new()
 	model.state = state(art_key)
+	model.state.character.gender = 1
 	model.ready = true
 	var view := VIEW.instantiate()
 	add_child(view)
@@ -28,6 +36,7 @@ func check_reactions(art_key: String) -> void:
 	model.last_action = "attack"
 	model.state.battle.revision = "2"
 	model.state.battle.enemy_hp = 50
+	model.state.battle.hp = 96
 	view.present(model)
 	check(view.enemy.animation == "idle" and view.hero.animation == "attack" and view.hero.position != Vector2.ZERO, "Approach begins before native impact; target is not hit early")
 	check(view._enemy_attack_delay > 0 and not view.get_node("Hud/ActionMenu").visible, "Counterattack is queued while impact plays")
@@ -35,16 +44,27 @@ func check_reactions(art_key: String) -> void:
 	check(view.enemy.animation == "idle", "Target stays idle until native hit step")
 	view._process(0.02)
 	check(view.enemy.animation == "hurt", "Native hit step triggers the independent hurt sequence")
+	check(view.get_node("Hero").get_index() > view.get_node("Enemy").get_index(), "Native acting team puts the player attack in front")
+	if art_key == "monster/langw": await capture("-online-monster-hurt")
 	view._process(view._enemy_attack_delay + 0.01)
 	check(view.enemy.animation == "attack" and view.animation_time > 0 and view.hero.position == Vector2.ZERO, "Counterattack follows complete player return")
+	view._process(view._enemy_motion.impact_time + 0.001)
+	check(view.get_node("Enemy").get_index() > view.get_node("Hero").get_index(), "Native acting team puts the monster retaliation in front")
+	check(view.hero.animation == "hurt", "Defender displays the genuine hurt sequence")
+	view.hero.set_frame_and_progress(2, 0.0)
+	check(view.hero.offset.x == float(OriginalArt.actor_info("hero/wck").origin[0]) + 7.0, "Female knight preserves native recoil at hurt frame two")
+	check(view.get_node("Hud").get_index() > view.get_node("Enemy").get_index(), "HUD and impact effects remain above the online actors")
+	if art_key == "monster/langw": await capture("-online-hero-hurt")
 	view._process(view._enemy_motion.remaining() + 0.01)
 	check(view.enemy.position == Vector2.ZERO and view.enemy.animation == "idle", "Counterattack also returns to its original station")
+	check(view.get_node("Hero").get_index() < view.get_node("Enemy").get_index(), "Online counterattack restores the original station order")
 	model.state.battle.revision = "3"
 	model.state.battle.enemy_hp = 38
 	view.present(model)
 	model.ready = false
 	view._process(10)
 	check(view._enemy_attack_delay == 0 and view.enemy.animation != "attack", "Disconnection cancels queued retaliation")
+	check(view.get_node("Hero").get_index() < view.get_node("Enemy").get_index(), "Disconnection restores drawing order")
 	model.ready = true
 	model.state = state(art_key)
 	model.state.battle.id = "second"
@@ -90,6 +110,8 @@ func check_reactions(art_key: String) -> void:
 	await get_tree().process_frame
 
 func _ready() -> void:
+	for argument in OS.get_cmdline_user_args():
+		if argument.begins_with("--capture-battle-layers="): capture_prefix = argument.trim_prefix("--capture-battle-layers=")
 	var player_before := Game.player.duplicate(true)
 	var count := 0
 	OriginalArt.has_actor("monster/langw")

@@ -14,6 +14,8 @@
   "attack_origin": "24636..24642 copies first target logical coordinates (+10) into attacker render coordinates (+18). ANI layer offsets then supply approach, strike and retreat.",
   "hit_timing": "22b78 loads forward BE32 masks. 22aa8 tests native sequence mask bit at sequence step, only on tick zero. 39d0 delivers queued action events at those steps.",
   "restore": "State 5 completion dispatches to 2c24, copies home (+10) to render (+18), then 2ea4 enters state 4 if alive.",
+  "actor_draw_order": "4914 stores team side at actor+51. 2f28..2f40 selects the acting team as global list+48; 3174..317e draws list+4c first, then +48 (same order at 3948..3954). The acting side is in front; HUD/effect passes follow.",
+  "hurt_recoil": "22c64 renders the original signed ANI layer x/y offsets. Stabilized atlases must restore state-6 body/head centers; e.g. wck 4,6,7,8,9 and langw 3,4,5,6,7.",
   "limitations": [
     "Native timer cadence has not been verified; Godot currently uses its existing 10 FPS attack clock.",
     "Native masks can contain multiple hit events. Current reconstructed/server rules supply one damage result per action; do not invent extra damage.",
@@ -74,6 +76,42 @@
       "start": "0x2ee00",
       "end_exclusive": "0x2ee0a",
       "sha256": "8c0653c0ce4d3b80766248f0a82f2e464494a9e8067387b918cfe5bed0cdd298"
+    },
+    {
+      "name": "acting_side_draw_list_selection",
+      "start": "0x2f28",
+      "end_exclusive": "0x2f42",
+      "sha256": "4aea9e6c3b34a8c04c1825bfff454d3cfb08b750f4f25b0070b2d6d8b25d6ae8"
+    },
+    {
+      "name": "battle_draw_order",
+      "start": "0x316a",
+      "end_exclusive": "0x3182",
+      "sha256": "c8e675f36eb9827aac764347ed3856a9822135b718eb546eb60bf3a7c5297a34"
+    },
+    {
+      "name": "battle_update_order",
+      "start": "0x3948",
+      "end_exclusive": "0x3958",
+      "sha256": "6da76ec870e928cd5f628f1c8d475c5f3f9b45948286932fa445b59ada93f6c3"
+    },
+    {
+      "name": "team_side_assignment",
+      "start": "0x36fc",
+      "end_exclusive": "0x371e",
+      "sha256": "3aabd72f63101083faccdf10a16634b0fc7f72713570359ef02a9dde7c72c7d4"
+    },
+    {
+      "name": "actor_side_flag_assignment",
+      "start": "0x4948",
+      "end_exclusive": "0x4960",
+      "sha256": "fa553c3d0e154ecc5c4881cb65844973e2aeb66a8f714005e0d6708b137914f6"
+    },
+    {
+      "name": "reverse_list_renderer",
+      "start": "0x21050",
+      "end_exclusive": "0x21072",
+      "sha256": "337c5c3df38d3451dd84b2a350bf01858ec413bd0cdcd912e94df38a1e992fd8"
     }
   ]
 }

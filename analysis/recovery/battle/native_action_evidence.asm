@@ -487,3 +487,87 @@
 0002ee04 4068         ldr       r0, [r0, #4]
 0002ee06 4860         str       r0, [r1, #4]
 0002ee08 7047         bx        lr
+
+; acting_side_draw_list_selection [0x2f28, 0x2f42)
+00002f28 6878         ldrb      r0, [r5, #1]
+00002f2a 0028         cmp       r0, #0
+00002f2c 04d1         bne       #0x2f38
+00002f2e b06a         ldr       r0, [r6, #0x28]
+00002f30 b064         str       r0, [r6, #0x48]
+00002f32 706a         ldr       r0, [r6, #0x24]
+00002f34 f064         str       r0, [r6, #0x4c]
+00002f36 0be0         b         #0x2f50
+00002f38 706a         ldr       r0, [r6, #0x24]
+00002f3a 0023         movs      r3, #0
+00002f3c b064         str       r0, [r6, #0x48]
+00002f3e b06a         ldr       r0, [r6, #0x28]
+00002f40 f064         str       r0, [r6, #0x4c]
+
+; battle_draw_order [0x316a, 0x3182)
+0000316a b54c         ldr       r4, [pc, #0x2d4]
+0000316c 7c44         add       r4, pc
+0000316e b24d         ldr       r5, [pc, #0x2c8]
+00003170 211c         adds      r1, r4, #0
+00003172 4d44         add       r5, sb
+00003174 e86c         ldr       r0, [r5, #0x4c]
+00003176 1df06bff     bl        #0x21050
+0000317a 211c         adds      r1, r4, #0
+0000317c a86c         ldr       r0, [r5, #0x48]
+0000317e 1df067ff     bl        #0x21050
+
+; battle_update_order [0x3948, 0x3958)
+00003948 211c         adds      r1, r4, #0
+0000394a e86c         ldr       r0, [r5, #0x4c]
+0000394c 1df080fb     bl        #0x21050
+00003950 211c         adds      r1, r4, #0
+00003952 a86c         ldr       r0, [r5, #0x48]
+00003954 1df07cfb     bl        #0x21050
+
+; team_side_assignment [0x36fc, 0x371e)
+000036fc 70b5         push      {r4, r5, r6, lr}
+000036fe 1b4d         ldr       r5, [pc, #0x6c]
+00003700 0021         movs      r1, #0
+00003702 4d44         add       r5, sb
+00003704 a86a         ldr       r0, [r5, #0x28]
+00003706 01f005f9     bl        #0x4914
+0000370a 0121         movs      r1, #1
+0000370c 686a         ldr       r0, [r5, #0x24]
+0000370e 01f001f9     bl        #0x4914
+00003712 a86a         ldr       r0, [r5, #0x28]
+00003714 1649         ldr       r1, [pc, #0x58]
+00003716 a864         str       r0, [r5, #0x48]
+00003718 686a         ldr       r0, [r5, #0x24]
+0000371a 7944         add       r1, pc
+0000371c e864         str       r0, [r5, #0x4c]
+
+; actor_side_flag_assignment [0x4948, 0x4960)
+00004948 306c         ldr       r0, [r6, #0x40]
+0000494a 0421         movs      r1, #4
+0000494c c173         strb      r1, [r0, #0xf]
+0000494e 8173         strb      r1, [r0, #0xe]
+00004950 b069         ldr       r0, [r6, #0x18]
+00004952 1df08bff     bl        #0x2286c
+00004956 316c         ldr       r1, [r6, #0x40]
+00004958 2a1c         adds      r2, r5, #0
+0000495a c862         str       r0, [r1, #0x2c]
+0000495c 5031         adds      r1, #0x50
+0000495e 4d70         strb      r5, [r1, #1]
+
+; reverse_list_renderer [0x21050, 0x21072)
+00021050 70b5         push      {r4, r5, r6, lr}
+00021052 051c         adds      r5, r0, #0
+00021054 0079         ldrb      r0, [r0, #4]
+00021056 0e1c         adds      r6, r1, #0
+00021058 ff30         adds      r0, #0xff
+0002105a 0406         lsls      r4, r0, #0x18
+0002105c 2416         asrs      r4, r4, #0x18
+0002105e 07d4         bmi       #0x21070
+00021060 2868         ldr       r0, [r5]
+00021062 a100         lsls      r1, r4, #2
+00021064 4058         ldr       r0, [r0, r1]
+00021066 b047         blx       r6
+00021068 ff34         adds      r4, #0xff
+0002106a 2406         lsls      r4, r4, #0x18
+0002106c 2416         asrs      r4, r4, #0x18
+0002106e f7d5         bpl       #0x21060
+00021070 70bd         pop       {r4, r5, r6, pc}

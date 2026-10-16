@@ -96,6 +96,10 @@
       "hurt": []
     },
     "attack_x": [122, 90, 45, 40, 39, 37, 36, 88, 122],
+    "pose_x": {
+      "idle": [5, 5, 5, 5],
+      "hurt": [5, 8, 9, 10, 11]
+    },
     "attack_basis": "target",
     "cast_mapping": null
   }

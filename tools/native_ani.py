@@ -41,17 +41,20 @@ def actor_playback(key, animation, source_dir):
     impacts = {mode: [step for step in range(len(playback[mode]))
                       if index < len(masks) and masks[index] & (1 << step)]
                for mode, index in ids.items()}
-    centers = []
-    for frame, _ in playback['attack']:
-        bodies = [layer for layer in animation['frames'][frame]
-                  if layer['source'] == animation['sources'][0] and layer['frame'] == 0]
-        if len(bodies) != 1 or bodies[0]['transform'] != 0:
-            raise ValueError(key + ': unaudited native attack body')
-        body = bodies[0]
-        with Image.open(source_dir / f"{body['source']}_frame000.png") as image:
-            centers.append(body['x'] + image.width // 2)
+    centers = {}
+    for mode in ('idle', 'attack', 'hurt'):
+        centers[mode] = []
+        for frame, _ in playback[mode]:
+            bodies = [layer for layer in animation['frames'][frame]
+                      if layer['source'] == animation['sources'][0] and layer['frame'] == 0]
+            if len(bodies) != 1 or bodies[0]['transform'] != 0:
+                raise ValueError(key + ': unaudited native ' + mode + ' body')
+            body = bodies[0]
+            with Image.open(source_dir / f"{body['source']}_frame000.png") as image:
+                centers[mode].append(body['x'] + image.width // 2)
     return playback, {
         'indexing': 'reverse_serialized_tables', 'source_frame_count': len(animation['frames']),
-        'sequence_ids': ids, 'impact_steps': impacts, 'attack_x': centers,
+        'sequence_ids': ids, 'impact_steps': impacts, 'attack_x': centers.pop('attack'),
+        'pose_x': centers,
         'attack_basis': 'target', 'cast_mapping': 'reviewed_pose_not_recovered_skill_id' if 'cast' in ids else None,
     }

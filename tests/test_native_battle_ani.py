@@ -1,5 +1,6 @@
 """Independent native slot/frame/mask regression anchors; original evidence stays raw."""
 import json
+import struct
 from pathlib import Path
 import sys
 import unittest
@@ -29,6 +30,22 @@ class NativeBattleAniTests(unittest.TestCase):
         self.assertEqual(event_masks(source)[5], 0x8)
         self.assertTrue(any(layer['source'] == 'tx38' for frame, _ in native_steps(source, 5) for layer in source['frames'][frame]))
         self.assertFalse(any(layer['source'] == 'tx38' for frame, _ in native_steps(source, 6) for layer in source['frames'][frame]))
+
+    def test_original_acting_side_is_drawn_last(self):
+        blob = (ROOT / 'analysis/unpacked/ssjx/gameonline.ext').read_bytes()
+        # Side 0 selects team +28 into draw list +48; side 1 selects +24.
+        self.assertEqual(struct.unpack_from('<HHHH', blob, 0x2f2e), (0x6ab0, 0x64b0, 0x6a70, 0x64f0))
+        self.assertEqual(struct.unpack_from('<HH', blob, 0x2f38), (0x6a70, 0x2300))
+        # Both draw entry points read +4c first, +48 second.
+        self.assertEqual(struct.unpack_from('<H', blob, 0x3174)[0], 0x6ce8)
+        self.assertEqual(struct.unpack_from('<H', blob, 0x317c)[0], 0x6ca8)
+        self.assertEqual(struct.unpack_from('<H', blob, 0x394a)[0], 0x6ce8)
+        self.assertEqual(struct.unpack_from('<H', blob, 0x3952)[0], 0x6ca8)
+
+    def test_original_recoil_centers_survive_atlas_stabilization(self):
+        for key, expected in [('hero/wck', [4,6,7,8,9]), ('monster/langw', [3,4,5,6,7])]:
+            info = json.loads((ROOT / 'client/assets/data/actors' / (key + '.json')).read_text('utf8'))
+            self.assertEqual(info['native_battle']['pose_x']['hurt'], expected)
 
     def test_all_16_runtime_actor_variants_match_native_tables_and_masks(self):
         for folder in ('hero', 'creation', 'monster'):

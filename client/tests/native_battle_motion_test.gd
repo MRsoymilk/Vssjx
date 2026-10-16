@@ -10,6 +10,35 @@ func check(value: bool, message: String) -> void:
 		failures += 1
 		push_error("FAIL: " + message)
 
+func check_layer_restore(nested: bool) -> void:
+	var stage := Node2D.new()
+	add_child(stage)
+	var field := Node2D.new()
+	stage.add_child(field)
+	var receiver := OriginalArt.actor("monster/langw")
+	var attacker := OriginalArt.actor("hero/wck")
+	var front: Node = receiver
+	var back: Node = attacker
+	if nested:
+		front = Node2D.new()
+		back = Node2D.new()
+		front.add_child(receiver)
+		back.add_child(attacker)
+	stage.add_child(back)
+	stage.add_child(front)
+	var hud := Control.new()
+	stage.add_child(hud)
+	var order := stage.get_children()
+	var playback := BattleActionPlayback.new()
+	playback.start(attacker, OriginalArt.actor_info("hero/wck"), receiver.global_position, &"attack", receiver)
+	check(back.get_index() > front.get_index() and hud.get_index() > back.get_index(), "Native attacker moves ahead of defender while HUD stays above: nested=" + str(nested))
+	playback.cancel()
+	check(stage.get_children() == order, "Cancellation restores every sibling index: nested=" + str(nested))
+	playback.start(attacker, OriginalArt.actor_info("hero/wck"), receiver.global_position, &"attack", receiver)
+	playback.advance(10)
+	check(back.get_index() > front.get_index() and hud.get_index() > back.get_index(), "Native completion retains acting-side order until the next action: nested=" + str(nested))
+	stage.free()
+
 func _ready() -> void:
 	var saved := Game.player.duplicate(true)
 	for key in ["hero/mzs", "hero/mck", "hero/mfs", "hero/wzs", "hero/wck", "hero/wfs", "monster/langw", "monster/xt1", "monster/hs1", "monster/nt1"]:
@@ -45,6 +74,21 @@ func _ready() -> void:
 			playback.cancel()
 			check(playback.cancelled and not playback.impacted and actor.position == home, "Cancellation restores home without resolving damage")
 			actor.queue_free()
+		var battle_actor := OriginalArt.battle_actor(key)
+		add_child(battle_actor)
+		var metadata := OriginalArt.actor_info(key)
+		var base_x := float(metadata.origin[0])
+		check(battle_actor.offset.x == base_x + float(metadata.native_battle.pose_x.idle[0]), "Battle idle restores the native anchor: " + key)
+		battle_actor.play("hurt")
+		battle_actor.pause()
+		for frame in battle_actor.sprite_frames.get_frame_count("hurt"):
+			battle_actor.set_frame_and_progress(frame, 0.0)
+			check(battle_actor.position == Vector2.ZERO and battle_actor.offset.x == base_x + float(metadata.native_battle.pose_x.hurt[frame]), "Source recoil changes the pose without moving its logical station: " + key + "/" + str(frame))
+		battle_actor.play("idle")
+		check(battle_actor.offset.x == base_x + float(metadata.native_battle.pose_x.idle[0]), "Hurt completion restores the native ready pose: " + key)
+		battle_actor.queue_free()
+	check_layer_restore(false)
+	check_layer_restore(true)
 	check(Game.player == saved, "Motion presentation does not modify rules or player data")
 	print("NATIVE BATTLE MOTION: %d checks, %d failures" % [checks, failures])
 	get_tree().quit(1 if failures else 0)

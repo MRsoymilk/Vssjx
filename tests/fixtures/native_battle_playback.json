@@ -136,7 +136,20 @@
         103
       ],
       "attack_basis": "target",
-      "cast_mapping": null
+      "cast_mapping": null,
+      "pose_x": {
+        "idle": [
+          0,
+          0
+        ],
+        "hurt": [
+          0,
+          2,
+          3,
+          4,
+          5
+        ]
+      }
     }
   },
   "creation/mfs": {
@@ -305,7 +318,20 @@
         117
       ],
       "attack_basis": "target",
-      "cast_mapping": "reviewed_pose_not_recovered_skill_id"
+      "cast_mapping": "reviewed_pose_not_recovered_skill_id",
+      "pose_x": {
+        "idle": [
+          2,
+          2
+        ],
+        "hurt": [
+          2,
+          4,
+          5,
+          6,
+          7
+        ]
+      }
     }
   },
   "creation/mzs": {
@@ -455,7 +481,20 @@
         114
       ],
       "attack_basis": "target",
-      "cast_mapping": null
+      "cast_mapping": null,
+      "pose_x": {
+        "idle": [
+          5,
+          5
+        ],
+        "hurt": [
+          5,
+          7,
+          8,
+          9,
+          10
+        ]
+      }
     }
   },
   "creation/wck": {
@@ -595,7 +634,20 @@
         113
       ],
       "attack_basis": "target",
-      "cast_mapping": null
+      "cast_mapping": null,
+      "pose_x": {
+        "idle": [
+          4,
+          4
+        ],
+        "hurt": [
+          4,
+          6,
+          7,
+          8,
+          9
+        ]
+      }
     }
   },
   "creation/wfs": {
@@ -764,7 +816,20 @@
         114
       ],
       "attack_basis": "target",
-      "cast_mapping": "reviewed_pose_not_recovered_skill_id"
+      "cast_mapping": "reviewed_pose_not_recovered_skill_id",
+      "pose_x": {
+        "idle": [
+          4,
+          4
+        ],
+        "hurt": [
+          4,
+          6,
+          7,
+          8,
+          9
+        ]
+      }
     }
   },
   "creation/wzs": {
@@ -909,7 +974,20 @@
         106
       ],
       "attack_basis": "target",
-      "cast_mapping": null
+      "cast_mapping": null,
+      "pose_x": {
+        "idle": [
+          4,
+          4
+        ],
+        "hurt": [
+          4,
+          6,
+          7,
+          8,
+          9
+        ]
+      }
     }
   },
   "hero/mck": {
@@ -1049,7 +1127,20 @@
         103
       ],
       "attack_basis": "target",
-      "cast_mapping": null
+      "cast_mapping": null,
+      "pose_x": {
+        "idle": [
+          0,
+          0
+        ],
+        "hurt": [
+          0,
+          2,
+          3,
+          4,
+          5
+        ]
+      }
     }
   },
   "hero/mfs": {
@@ -1218,7 +1309,20 @@
         117
       ],
       "attack_basis": "target",
-      "cast_mapping": "reviewed_pose_not_recovered_skill_id"
+      "cast_mapping": "reviewed_pose_not_recovered_skill_id",
+      "pose_x": {
+        "idle": [
+          2,
+          2
+        ],
+        "hurt": [
+          2,
+          4,
+          5,
+          6,
+          7
+        ]
+      }
     }
   },
   "hero/mzs": {
@@ -1368,7 +1472,20 @@
         114
       ],
       "attack_basis": "target",
-      "cast_mapping": null
+      "cast_mapping": null,
+      "pose_x": {
+        "idle": [
+          5,
+          5
+        ],
+        "hurt": [
+          5,
+          7,
+          8,
+          9,
+          10
+        ]
+      }
     }
   },
   "hero/wck": {
@@ -1508,7 +1625,20 @@
         113
       ],
       "attack_basis": "target",
-      "cast_mapping": null
+      "cast_mapping": null,
+      "pose_x": {
+        "idle": [
+          4,
+          4
+        ],
+        "hurt": [
+          4,
+          6,
+          7,
+          8,
+          9
+        ]
+      }
     }
   },
   "hero/wfs": {
@@ -1677,7 +1807,20 @@
         114
       ],
       "attack_basis": "target",
-      "cast_mapping": "reviewed_pose_not_recovered_skill_id"
+      "cast_mapping": "reviewed_pose_not_recovered_skill_id",
+      "pose_x": {
+        "idle": [
+          4,
+          4
+        ],
+        "hurt": [
+          4,
+          6,
+          7,
+          8,
+          9
+        ]
+      }
     }
   },
   "hero/wzs": {
@@ -1822,7 +1965,20 @@
         106
       ],
       "attack_basis": "target",
-      "cast_mapping": null
+      "cast_mapping": null,
+      "pose_x": {
+        "idle": [
+          4,
+          4
+        ],
+        "hurt": [
+          4,
+          6,
+          7,
+          8,
+          9
+        ]
+      }
     }
   },
   "monster/hs1": {
@@ -1985,7 +2141,20 @@
         104
       ],
       "attack_basis": "target",
-      "cast_mapping": null
+      "cast_mapping": null,
+      "pose_x": {
+        "idle": [
+          0,
+          0
+        ],
+        "hurt": [
+          0,
+          2,
+          3,
+          4,
+          5
+        ]
+      }
     }
   },
   "monster/langw": {
@@ -2125,7 +2294,22 @@
         126
       ],
       "attack_basis": "target",
-      "cast_mapping": null
+      "cast_mapping": null,
+      "pose_x": {
+        "idle": [
+          3,
+          3,
+          3,
+          3
+        ],
+        "hurt": [
+          3,
+          4,
+          5,
+          6,
+          7
+        ]
+      }
     }
   },
   "monster/nt1": {
@@ -2265,7 +2449,22 @@
         122
       ],
       "attack_basis": "target",
-      "cast_mapping": null
+      "cast_mapping": null,
+      "pose_x": {
+        "idle": [
+          5,
+          5,
+          5,
+          5
+        ],
+        "hurt": [
+          5,
+          8,
+          9,
+          10,
+          11
+        ]
+      }
     }
   },
   "monster/xt1": {
@@ -2422,7 +2621,23 @@
         120
       ],
       "attack_basis": "target",
-      "cast_mapping": null
+      "cast_mapping": null,
+      "pose_x": {
+        "idle": [
+          5,
+          5,
+          5,
+          5,
+          5,
+          5
+        ],
+        "hurt": [
+          5,
+          8,
+          8,
+          7
+        ]
+      }
     }
   }
 }

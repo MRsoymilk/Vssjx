@@ -14,7 +14,7 @@ PostgreSQL账号、密码、会话、注销与账号界面验证见[account_auth
 
 服务端结构化日志、只读Web监控、真实浏览器与数据库故障验证见[observability.md](observability.md)。
 
-项目数据管理与世界总图F6独立运行、小窗口及真实嵌入布局验证见[data_browser.md](data_browser.md#f6-独立运行与嵌入窗口布局)。
+项目数据管理与世界总图独立桌面窗口、小窗口布局验证见[data_browser.md](data_browser.md#独立桌面工具布局)；开发工具不进入游戏包的真实导出检查见[game_export.md](game_export.md)。
 
 同一游戏界面的多人角色、内嵌聊天与本地入口验证见[shared_interface.md](shared_interface.md)及[local_mode.md](local_mode.md)。
 

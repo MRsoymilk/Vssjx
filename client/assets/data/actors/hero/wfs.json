@@ -7,8 +7,8 @@
   "anchor_x": 0,
   "playback": {
     "idle": [
-      [49, 4],
-      [50, 4]
+      [50, 8],
+      [49, 8]
     ],
     "walk": [
       [62, 1],
@@ -19,18 +19,30 @@
       [57, 1]
     ],
     "attack": [
-      [37, 1],
-      [38, 1],
-      [39, 1],
+      [46, 1],
+      [45, 1],
+      [44, 1],
+      [43, 1],
+      [42, 1],
+      [41, 1],
       [40, 1],
-      [41, 2]
+      [39, 2],
+      [38, 1],
+      [37, 1]
+    ],
+    "hurt": [
+      [49, 1],
+      [36, 1],
+      [35, 1],
+      [34, 1],
+      [33, 2]
     ],
     "cast": [
-      [13, 1],
-      [26, 1],
-      [27, 1],
-      [28, 1],
-      [29, 2]
+      [25, 1],
+      [24, 1],
+      [23, 1],
+      [22, 1],
+      [21, 2]
     ]
   },
   "count": 63,
@@ -129,5 +141,20 @@
       [4, 1],
       [5, 1]
     ]
-  ]
+  ],
+  "native_battle": {
+    "indexing": "reverse_serialized_tables",
+    "source_frame_count": 63,
+    "sequence_ids": {"idle": 4, "walk": 0, "attack": 5, "hurt": 6, "cast": 8},
+    "impact_steps": {
+      "idle": [],
+      "walk": [],
+      "attack": [2],
+      "hurt": [],
+      "cast": []
+    },
+    "attack_x": [113, 85, 57, 56, 55, 54, 53, 52, 83, 114],
+    "attack_basis": "target",
+    "cast_mapping": "reviewed_pose_not_recovered_skill_id"
+  }
 }

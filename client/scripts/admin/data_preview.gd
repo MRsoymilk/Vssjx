@@ -34,7 +34,7 @@ func display(entry: Dictionary) -> void:
 			frames.remove_animation("default")
 			var texture: Texture2D = load(info.texture)
 			for index in info.sequences.size():
-				var steps: Array = info.sequences[index]
+				var steps: Array = info.sequences[index] if preview.kind == "image_frames" else OriginalArt.source_steps(info, index)
 				if steps.is_empty(): continue
 				var animation := ("frame_%d" if preview.kind == "image_frames" else "source_%d") % index
 				frames.add_animation(animation)
@@ -161,11 +161,11 @@ func animation_options(include_sources: bool = false) -> Array[Dictionary]:
 	var derived: Dictionary = {}
 	for row in info.get("derived_frames", []): derived[int(row.frame)] = int(row.source_frame)
 	for index in info.sequences.size():
-		var steps: Array = info.sequences[index]
+		var steps: Array = info.sequences[index] if kind == "image_frames" else OriginalArt.source_steps(info, index)
 		if steps.is_empty(): continue
 		var id := ("frame_%d" if kind == "image_frames" else "source_%d") % index
 		var label := "图像帧 %d" % index if kind == "image_frames" else "原始序列 %d · 用途未确认" % index
-		var description := "图像帧编号，不是动作名称。" if kind == "image_frames" else "原包仅记录帧索引与时长，没有动作名称；该序列的实际用途尚未确认。"
+		var description := "图像帧编号，不是动作名称。" if kind == "image_frames" else "原包文件序列 %d，对应原客户端序列 %d；已按原客户端倒序帧表解释，实际用途尚未确认。" % [index, info.sequences.size() - 1 - index]
 		var matches: Array[String] = []
 		var corrected := false
 		for mode in ACTION_ORDER:
@@ -178,6 +178,12 @@ func animation_options(include_sources: bool = false) -> Array[Dictionary]:
 		if not matches.is_empty():
 			label = "原始序列 %d · %s来源" % [index, "／".join(matches)]
 			description = "与当前游戏的「%s」映射%s；原始序列仍保留原始位移、朝向和特效。" % ["／".join(matches), "同源，运行时使用修正后的派生帧" if corrected else "相同"]
+		elif kind == "original_animation" and String(record.get("id", "")).begins_with("original/monster/"):
+			var native_id: int = info.sequences.size() - 1 - index
+			var slots := {4: "待机", 5: "普通攻击", 6: "受击"}
+			if slots.has(native_id):
+				label = "原始序列 %d · %s" % [index, slots[native_id]]
+				description = "原客户端战斗状态 %d 对应「%s」槽位；已按原客户端倒序帧表恢复播放，尚未接入游戏玩法。" % [native_id, slots[native_id]]
 		options.append({"id": id, "label": label, "description": "%s\n%s · %d 步" % [description, id, steps.size()]})
 	return options
 

@@ -36,6 +36,8 @@ class ActorCatalogTests(unittest.TestCase):
                 info['playback']['walk'].reverse()
             elif key in self.monster_alignment['runtime_overrides']:
                 info.update(self.monster_alignment['runtime_overrides'][key])
+        native = json.loads((ROOT.parent / 'tests/fixtures/native_battle_playback.json').read_text('utf-8'))
+        for key, overrides in native.items(): expected[key].update(overrides)
         self.assertEqual(canonical(self.actors), canonical(expected))
 
     def test_benchmark_fixture_is_the_exact_legacy_catalog_size_and_content(self):

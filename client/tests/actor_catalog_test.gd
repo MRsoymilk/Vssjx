@@ -35,7 +35,7 @@ func _ready() -> void:
 	var first_actor_stats := OriginalArt.metadata_stats()
 	check(OriginalArt.actor_info("effect/t47").texture.ends_with("effect_t47.png") and not OriginalArt.cached.has("effect/t47"), "Battle effect metadata is independently prepared before its texture")
 	var effect := OriginalArt.effect("effect/t47")
-	check(effect.sprite_frames.has_animation("source_0") and not effect.sprite_frames.get_animation_loop("source_0"), "Original numbered effect remains a one-shot")
+	check(not effect.sprite_frames.get_animation_loop(effect.animation), "Native sequence zero effect remains a one-shot")
 	for key in OriginalArt._index:
 		check(not OriginalArt.actor_info(key).is_empty(), "Every indexed shard passes validation: " + key)
 	check(OriginalArt.catalog.size() == 33 and OriginalArt.cached.size() == 2, "Enumerating metadata does not allocate all actor textures/frames")

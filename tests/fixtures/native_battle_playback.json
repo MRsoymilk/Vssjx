@@ -1,0 +1,2428 @@
+{
+  "creation/mck": {
+    "width": 144,
+    "height": 141,
+    "columns": 8,
+    "origin": [
+      -72,
+      -129
+    ],
+    "anchor_x": 0,
+    "playback": {
+      "idle": [
+        [
+          84,
+          8
+        ],
+        [
+          83,
+          8
+        ]
+      ],
+      "walk": [
+        [
+          96,
+          1
+        ],
+        [
+          95,
+          1
+        ],
+        [
+          94,
+          1
+        ],
+        [
+          93,
+          1
+        ],
+        [
+          92,
+          1
+        ],
+        [
+          91,
+          1
+        ]
+      ],
+      "attack": [
+        [
+          80,
+          1
+        ],
+        [
+          79,
+          1
+        ],
+        [
+          78,
+          1
+        ],
+        [
+          77,
+          1
+        ],
+        [
+          76,
+          1
+        ],
+        [
+          75,
+          1
+        ],
+        [
+          74,
+          2
+        ],
+        [
+          73,
+          1
+        ],
+        [
+          72,
+          1
+        ]
+      ],
+      "hurt": [
+        [
+          84,
+          1
+        ],
+        [
+          71,
+          1
+        ],
+        [
+          70,
+          1
+        ],
+        [
+          69,
+          1
+        ],
+        [
+          68,
+          2
+        ]
+      ]
+    },
+    "count": 97,
+    "native_battle": {
+      "indexing": "reverse_serialized_tables",
+      "source_frame_count": 97,
+      "sequence_ids": {
+        "idle": 4,
+        "walk": 0,
+        "attack": 5,
+        "hurt": 6
+      },
+      "impact_steps": {
+        "idle": [],
+        "walk": [],
+        "attack": [
+          2
+        ],
+        "hurt": []
+      },
+      "attack_x": [
+        102,
+        86,
+        39,
+        38,
+        37,
+        36,
+        35,
+        56,
+        103
+      ],
+      "attack_basis": "target",
+      "cast_mapping": null
+    }
+  },
+  "creation/mfs": {
+    "width": 150,
+    "height": 81,
+    "columns": 8,
+    "origin": [
+      -75,
+      -60
+    ],
+    "anchor_x": 0,
+    "playback": {
+      "idle": [
+        [
+          50,
+          8
+        ],
+        [
+          49,
+          8
+        ]
+      ],
+      "walk": [
+        [
+          62,
+          1
+        ],
+        [
+          61,
+          1
+        ],
+        [
+          60,
+          1
+        ],
+        [
+          59,
+          1
+        ],
+        [
+          58,
+          1
+        ],
+        [
+          57,
+          1
+        ]
+      ],
+      "attack": [
+        [
+          46,
+          1
+        ],
+        [
+          45,
+          1
+        ],
+        [
+          44,
+          1
+        ],
+        [
+          43,
+          1
+        ],
+        [
+          42,
+          1
+        ],
+        [
+          41,
+          1
+        ],
+        [
+          40,
+          1
+        ],
+        [
+          39,
+          2
+        ],
+        [
+          38,
+          1
+        ],
+        [
+          37,
+          1
+        ]
+      ],
+      "hurt": [
+        [
+          49,
+          1
+        ],
+        [
+          36,
+          1
+        ],
+        [
+          35,
+          1
+        ],
+        [
+          34,
+          1
+        ],
+        [
+          33,
+          2
+        ]
+      ],
+      "cast": [
+        [
+          32,
+          1
+        ],
+        [
+          24,
+          1
+        ],
+        [
+          23,
+          1
+        ],
+        [
+          22,
+          1
+        ],
+        [
+          21,
+          2
+        ]
+      ]
+    },
+    "count": 63,
+    "native_battle": {
+      "indexing": "reverse_serialized_tables",
+      "source_frame_count": 63,
+      "sequence_ids": {
+        "idle": 4,
+        "walk": 0,
+        "attack": 5,
+        "hurt": 6,
+        "cast": 8
+      },
+      "impact_steps": {
+        "idle": [],
+        "walk": [],
+        "attack": [
+          3
+        ],
+        "hurt": [],
+        "cast": []
+      },
+      "attack_x": [
+        113,
+        90,
+        59,
+        61,
+        57,
+        56,
+        55,
+        54,
+        95,
+        117
+      ],
+      "attack_basis": "target",
+      "cast_mapping": "reviewed_pose_not_recovered_skill_id"
+    }
+  },
+  "creation/mzs": {
+    "width": 176,
+    "height": 125,
+    "columns": 8,
+    "origin": [
+      -114,
+      -83
+    ],
+    "anchor_x": 0,
+    "playback": {
+      "idle": [
+        [
+          83,
+          8
+        ],
+        [
+          82,
+          8
+        ]
+      ],
+      "walk": [
+        [
+          95,
+          1
+        ],
+        [
+          94,
+          1
+        ],
+        [
+          93,
+          1
+        ],
+        [
+          92,
+          1
+        ],
+        [
+          91,
+          1
+        ],
+        [
+          90,
+          1
+        ]
+      ],
+      "attack": [
+        [
+          79,
+          1
+        ],
+        [
+          78,
+          1
+        ],
+        [
+          77,
+          1
+        ],
+        [
+          76,
+          1
+        ],
+        [
+          75,
+          1
+        ],
+        [
+          74,
+          1
+        ],
+        [
+          73,
+          1
+        ],
+        [
+          72,
+          2
+        ],
+        [
+          71,
+          1
+        ],
+        [
+          70,
+          1
+        ],
+        [
+          69,
+          1
+        ]
+      ],
+      "hurt": [
+        [
+          83,
+          1
+        ],
+        [
+          68,
+          1
+        ],
+        [
+          67,
+          1
+        ],
+        [
+          66,
+          1
+        ],
+        [
+          65,
+          2
+        ]
+      ]
+    },
+    "count": 96,
+    "native_battle": {
+      "indexing": "reverse_serialized_tables",
+      "source_frame_count": 96,
+      "sequence_ids": {
+        "idle": 4,
+        "walk": 0,
+        "attack": 5,
+        "hurt": 6
+      },
+      "impact_steps": {
+        "idle": [],
+        "walk": [],
+        "attack": [
+          3
+        ],
+        "hurt": []
+      },
+      "attack_x": [
+        110,
+        94,
+        57,
+        41,
+        40,
+        39,
+        38,
+        37,
+        59,
+        96,
+        114
+      ],
+      "attack_basis": "target",
+      "cast_mapping": null
+    }
+  },
+  "creation/wck": {
+    "width": 126,
+    "height": 135,
+    "columns": 8,
+    "origin": [
+      -63,
+      -120
+    ],
+    "anchor_x": 0,
+    "playback": {
+      "idle": [
+        [
+          78,
+          8
+        ],
+        [
+          77,
+          8
+        ]
+      ],
+      "walk": [
+        [
+          90,
+          1
+        ],
+        [
+          89,
+          1
+        ],
+        [
+          88,
+          1
+        ],
+        [
+          87,
+          1
+        ],
+        [
+          86,
+          1
+        ],
+        [
+          85,
+          1
+        ]
+      ],
+      "attack": [
+        [
+          74,
+          1
+        ],
+        [
+          73,
+          1
+        ],
+        [
+          72,
+          1
+        ],
+        [
+          71,
+          1
+        ],
+        [
+          70,
+          1
+        ],
+        [
+          69,
+          1
+        ],
+        [
+          68,
+          2
+        ],
+        [
+          67,
+          1
+        ],
+        [
+          66,
+          1
+        ]
+      ],
+      "hurt": [
+        [
+          65,
+          1
+        ],
+        [
+          64,
+          1
+        ],
+        [
+          63,
+          1
+        ],
+        [
+          62,
+          1
+        ],
+        [
+          61,
+          2
+        ]
+      ]
+    },
+    "count": 91,
+    "native_battle": {
+      "indexing": "reverse_serialized_tables",
+      "source_frame_count": 91,
+      "sequence_ids": {
+        "idle": 4,
+        "walk": 0,
+        "attack": 5,
+        "hurt": 6
+      },
+      "impact_steps": {
+        "idle": [],
+        "walk": [],
+        "attack": [
+          2
+        ],
+        "hurt": []
+      },
+      "attack_x": [
+        114,
+        80,
+        35,
+        34,
+        33,
+        32,
+        31,
+        75,
+        113
+      ],
+      "attack_basis": "target",
+      "cast_mapping": null
+    }
+  },
+  "creation/wfs": {
+    "width": 127,
+    "height": 69,
+    "columns": 8,
+    "origin": [
+      -73,
+      -60
+    ],
+    "anchor_x": 0,
+    "playback": {
+      "idle": [
+        [
+          50,
+          8
+        ],
+        [
+          49,
+          8
+        ]
+      ],
+      "walk": [
+        [
+          62,
+          1
+        ],
+        [
+          61,
+          1
+        ],
+        [
+          60,
+          1
+        ],
+        [
+          59,
+          1
+        ],
+        [
+          58,
+          1
+        ],
+        [
+          57,
+          1
+        ]
+      ],
+      "attack": [
+        [
+          46,
+          1
+        ],
+        [
+          45,
+          1
+        ],
+        [
+          44,
+          1
+        ],
+        [
+          43,
+          1
+        ],
+        [
+          42,
+          1
+        ],
+        [
+          41,
+          1
+        ],
+        [
+          40,
+          1
+        ],
+        [
+          39,
+          2
+        ],
+        [
+          38,
+          1
+        ],
+        [
+          37,
+          1
+        ]
+      ],
+      "hurt": [
+        [
+          49,
+          1
+        ],
+        [
+          36,
+          1
+        ],
+        [
+          35,
+          1
+        ],
+        [
+          34,
+          1
+        ],
+        [
+          33,
+          2
+        ]
+      ],
+      "cast": [
+        [
+          25,
+          1
+        ],
+        [
+          24,
+          1
+        ],
+        [
+          23,
+          1
+        ],
+        [
+          22,
+          1
+        ],
+        [
+          21,
+          2
+        ]
+      ]
+    },
+    "count": 63,
+    "native_battle": {
+      "indexing": "reverse_serialized_tables",
+      "source_frame_count": 63,
+      "sequence_ids": {
+        "idle": 4,
+        "walk": 0,
+        "attack": 5,
+        "hurt": 6,
+        "cast": 8
+      },
+      "impact_steps": {
+        "idle": [],
+        "walk": [],
+        "attack": [
+          2
+        ],
+        "hurt": [],
+        "cast": []
+      },
+      "attack_x": [
+        113,
+        85,
+        57,
+        56,
+        55,
+        54,
+        53,
+        52,
+        83,
+        114
+      ],
+      "attack_basis": "target",
+      "cast_mapping": "reviewed_pose_not_recovered_skill_id"
+    }
+  },
+  "creation/wzs": {
+    "width": 160,
+    "height": 116,
+    "columns": 8,
+    "origin": [
+      -94,
+      -77
+    ],
+    "anchor_x": 0,
+    "playback": {
+      "idle": [
+        [
+          78,
+          8
+        ],
+        [
+          77,
+          8
+        ]
+      ],
+      "walk": [
+        [
+          90,
+          1
+        ],
+        [
+          89,
+          1
+        ],
+        [
+          88,
+          1
+        ],
+        [
+          87,
+          1
+        ],
+        [
+          86,
+          1
+        ],
+        [
+          85,
+          1
+        ]
+      ],
+      "attack": [
+        [
+          74,
+          1
+        ],
+        [
+          73,
+          1
+        ],
+        [
+          72,
+          1
+        ],
+        [
+          71,
+          1
+        ],
+        [
+          70,
+          1
+        ],
+        [
+          69,
+          1
+        ],
+        [
+          68,
+          1
+        ],
+        [
+          67,
+          2
+        ],
+        [
+          66,
+          1
+        ],
+        [
+          65,
+          1
+        ]
+      ],
+      "hurt": [
+        [
+          64,
+          1
+        ],
+        [
+          63,
+          1
+        ],
+        [
+          62,
+          1
+        ],
+        [
+          61,
+          1
+        ],
+        [
+          60,
+          2
+        ]
+      ]
+    },
+    "count": 91,
+    "native_battle": {
+      "indexing": "reverse_serialized_tables",
+      "source_frame_count": 91,
+      "sequence_ids": {
+        "idle": 4,
+        "walk": 0,
+        "attack": 5,
+        "hurt": 6
+      },
+      "impact_steps": {
+        "idle": [],
+        "walk": [],
+        "attack": [
+          3
+        ],
+        "hurt": []
+      },
+      "attack_x": [
+        119,
+        67,
+        51,
+        46,
+        45,
+        44,
+        43,
+        42,
+        87,
+        106
+      ],
+      "attack_basis": "target",
+      "cast_mapping": null
+    }
+  },
+  "hero/mck": {
+    "width": 144,
+    "height": 141,
+    "columns": 8,
+    "origin": [
+      -72,
+      -129
+    ],
+    "anchor_x": 0,
+    "playback": {
+      "idle": [
+        [
+          84,
+          8
+        ],
+        [
+          83,
+          8
+        ]
+      ],
+      "walk": [
+        [
+          96,
+          1
+        ],
+        [
+          95,
+          1
+        ],
+        [
+          94,
+          1
+        ],
+        [
+          93,
+          1
+        ],
+        [
+          92,
+          1
+        ],
+        [
+          91,
+          1
+        ]
+      ],
+      "attack": [
+        [
+          80,
+          1
+        ],
+        [
+          79,
+          1
+        ],
+        [
+          78,
+          1
+        ],
+        [
+          77,
+          1
+        ],
+        [
+          76,
+          1
+        ],
+        [
+          75,
+          1
+        ],
+        [
+          74,
+          2
+        ],
+        [
+          73,
+          1
+        ],
+        [
+          72,
+          1
+        ]
+      ],
+      "hurt": [
+        [
+          84,
+          1
+        ],
+        [
+          71,
+          1
+        ],
+        [
+          70,
+          1
+        ],
+        [
+          69,
+          1
+        ],
+        [
+          68,
+          2
+        ]
+      ]
+    },
+    "count": 97,
+    "native_battle": {
+      "indexing": "reverse_serialized_tables",
+      "source_frame_count": 97,
+      "sequence_ids": {
+        "idle": 4,
+        "walk": 0,
+        "attack": 5,
+        "hurt": 6
+      },
+      "impact_steps": {
+        "idle": [],
+        "walk": [],
+        "attack": [
+          2
+        ],
+        "hurt": []
+      },
+      "attack_x": [
+        102,
+        86,
+        39,
+        38,
+        37,
+        36,
+        35,
+        56,
+        103
+      ],
+      "attack_basis": "target",
+      "cast_mapping": null
+    }
+  },
+  "hero/mfs": {
+    "width": 150,
+    "height": 81,
+    "columns": 8,
+    "origin": [
+      -75,
+      -60
+    ],
+    "anchor_x": 0,
+    "playback": {
+      "idle": [
+        [
+          50,
+          8
+        ],
+        [
+          49,
+          8
+        ]
+      ],
+      "walk": [
+        [
+          62,
+          1
+        ],
+        [
+          61,
+          1
+        ],
+        [
+          60,
+          1
+        ],
+        [
+          59,
+          1
+        ],
+        [
+          58,
+          1
+        ],
+        [
+          57,
+          1
+        ]
+      ],
+      "attack": [
+        [
+          46,
+          1
+        ],
+        [
+          45,
+          1
+        ],
+        [
+          44,
+          1
+        ],
+        [
+          43,
+          1
+        ],
+        [
+          42,
+          1
+        ],
+        [
+          41,
+          1
+        ],
+        [
+          40,
+          1
+        ],
+        [
+          39,
+          2
+        ],
+        [
+          38,
+          1
+        ],
+        [
+          37,
+          1
+        ]
+      ],
+      "hurt": [
+        [
+          49,
+          1
+        ],
+        [
+          36,
+          1
+        ],
+        [
+          35,
+          1
+        ],
+        [
+          34,
+          1
+        ],
+        [
+          33,
+          2
+        ]
+      ],
+      "cast": [
+        [
+          32,
+          1
+        ],
+        [
+          24,
+          1
+        ],
+        [
+          23,
+          1
+        ],
+        [
+          22,
+          1
+        ],
+        [
+          21,
+          2
+        ]
+      ]
+    },
+    "count": 63,
+    "native_battle": {
+      "indexing": "reverse_serialized_tables",
+      "source_frame_count": 63,
+      "sequence_ids": {
+        "idle": 4,
+        "walk": 0,
+        "attack": 5,
+        "hurt": 6,
+        "cast": 8
+      },
+      "impact_steps": {
+        "idle": [],
+        "walk": [],
+        "attack": [
+          3
+        ],
+        "hurt": [],
+        "cast": []
+      },
+      "attack_x": [
+        113,
+        90,
+        59,
+        61,
+        57,
+        56,
+        55,
+        54,
+        95,
+        117
+      ],
+      "attack_basis": "target",
+      "cast_mapping": "reviewed_pose_not_recovered_skill_id"
+    }
+  },
+  "hero/mzs": {
+    "width": 176,
+    "height": 125,
+    "columns": 8,
+    "origin": [
+      -114,
+      -83
+    ],
+    "anchor_x": 0,
+    "playback": {
+      "idle": [
+        [
+          83,
+          8
+        ],
+        [
+          82,
+          8
+        ]
+      ],
+      "walk": [
+        [
+          95,
+          1
+        ],
+        [
+          94,
+          1
+        ],
+        [
+          93,
+          1
+        ],
+        [
+          92,
+          1
+        ],
+        [
+          91,
+          1
+        ],
+        [
+          90,
+          1
+        ]
+      ],
+      "attack": [
+        [
+          79,
+          1
+        ],
+        [
+          78,
+          1
+        ],
+        [
+          77,
+          1
+        ],
+        [
+          76,
+          1
+        ],
+        [
+          75,
+          1
+        ],
+        [
+          74,
+          1
+        ],
+        [
+          73,
+          1
+        ],
+        [
+          72,
+          2
+        ],
+        [
+          71,
+          1
+        ],
+        [
+          70,
+          1
+        ],
+        [
+          69,
+          1
+        ]
+      ],
+      "hurt": [
+        [
+          83,
+          1
+        ],
+        [
+          68,
+          1
+        ],
+        [
+          67,
+          1
+        ],
+        [
+          66,
+          1
+        ],
+        [
+          65,
+          2
+        ]
+      ]
+    },
+    "count": 96,
+    "native_battle": {
+      "indexing": "reverse_serialized_tables",
+      "source_frame_count": 96,
+      "sequence_ids": {
+        "idle": 4,
+        "walk": 0,
+        "attack": 5,
+        "hurt": 6
+      },
+      "impact_steps": {
+        "idle": [],
+        "walk": [],
+        "attack": [
+          3
+        ],
+        "hurt": []
+      },
+      "attack_x": [
+        110,
+        94,
+        57,
+        41,
+        40,
+        39,
+        38,
+        37,
+        59,
+        96,
+        114
+      ],
+      "attack_basis": "target",
+      "cast_mapping": null
+    }
+  },
+  "hero/wck": {
+    "width": 126,
+    "height": 135,
+    "columns": 8,
+    "origin": [
+      -63,
+      -120
+    ],
+    "anchor_x": 0,
+    "playback": {
+      "idle": [
+        [
+          78,
+          8
+        ],
+        [
+          77,
+          8
+        ]
+      ],
+      "walk": [
+        [
+          90,
+          1
+        ],
+        [
+          89,
+          1
+        ],
+        [
+          88,
+          1
+        ],
+        [
+          87,
+          1
+        ],
+        [
+          86,
+          1
+        ],
+        [
+          85,
+          1
+        ]
+      ],
+      "attack": [
+        [
+          74,
+          1
+        ],
+        [
+          73,
+          1
+        ],
+        [
+          72,
+          1
+        ],
+        [
+          71,
+          1
+        ],
+        [
+          70,
+          1
+        ],
+        [
+          69,
+          1
+        ],
+        [
+          68,
+          2
+        ],
+        [
+          67,
+          1
+        ],
+        [
+          66,
+          1
+        ]
+      ],
+      "hurt": [
+        [
+          65,
+          1
+        ],
+        [
+          64,
+          1
+        ],
+        [
+          63,
+          1
+        ],
+        [
+          62,
+          1
+        ],
+        [
+          61,
+          2
+        ]
+      ]
+    },
+    "count": 91,
+    "native_battle": {
+      "indexing": "reverse_serialized_tables",
+      "source_frame_count": 91,
+      "sequence_ids": {
+        "idle": 4,
+        "walk": 0,
+        "attack": 5,
+        "hurt": 6
+      },
+      "impact_steps": {
+        "idle": [],
+        "walk": [],
+        "attack": [
+          2
+        ],
+        "hurt": []
+      },
+      "attack_x": [
+        114,
+        80,
+        35,
+        34,
+        33,
+        32,
+        31,
+        75,
+        113
+      ],
+      "attack_basis": "target",
+      "cast_mapping": null
+    }
+  },
+  "hero/wfs": {
+    "width": 127,
+    "height": 69,
+    "columns": 8,
+    "origin": [
+      -73,
+      -60
+    ],
+    "anchor_x": 0,
+    "playback": {
+      "idle": [
+        [
+          50,
+          8
+        ],
+        [
+          49,
+          8
+        ]
+      ],
+      "walk": [
+        [
+          62,
+          1
+        ],
+        [
+          61,
+          1
+        ],
+        [
+          60,
+          1
+        ],
+        [
+          59,
+          1
+        ],
+        [
+          58,
+          1
+        ],
+        [
+          57,
+          1
+        ]
+      ],
+      "attack": [
+        [
+          46,
+          1
+        ],
+        [
+          45,
+          1
+        ],
+        [
+          44,
+          1
+        ],
+        [
+          43,
+          1
+        ],
+        [
+          42,
+          1
+        ],
+        [
+          41,
+          1
+        ],
+        [
+          40,
+          1
+        ],
+        [
+          39,
+          2
+        ],
+        [
+          38,
+          1
+        ],
+        [
+          37,
+          1
+        ]
+      ],
+      "hurt": [
+        [
+          49,
+          1
+        ],
+        [
+          36,
+          1
+        ],
+        [
+          35,
+          1
+        ],
+        [
+          34,
+          1
+        ],
+        [
+          33,
+          2
+        ]
+      ],
+      "cast": [
+        [
+          25,
+          1
+        ],
+        [
+          24,
+          1
+        ],
+        [
+          23,
+          1
+        ],
+        [
+          22,
+          1
+        ],
+        [
+          21,
+          2
+        ]
+      ]
+    },
+    "count": 63,
+    "native_battle": {
+      "indexing": "reverse_serialized_tables",
+      "source_frame_count": 63,
+      "sequence_ids": {
+        "idle": 4,
+        "walk": 0,
+        "attack": 5,
+        "hurt": 6,
+        "cast": 8
+      },
+      "impact_steps": {
+        "idle": [],
+        "walk": [],
+        "attack": [
+          2
+        ],
+        "hurt": [],
+        "cast": []
+      },
+      "attack_x": [
+        113,
+        85,
+        57,
+        56,
+        55,
+        54,
+        53,
+        52,
+        83,
+        114
+      ],
+      "attack_basis": "target",
+      "cast_mapping": "reviewed_pose_not_recovered_skill_id"
+    }
+  },
+  "hero/wzs": {
+    "width": 160,
+    "height": 116,
+    "columns": 8,
+    "origin": [
+      -94,
+      -77
+    ],
+    "anchor_x": 0,
+    "playback": {
+      "idle": [
+        [
+          78,
+          8
+        ],
+        [
+          77,
+          8
+        ]
+      ],
+      "walk": [
+        [
+          90,
+          1
+        ],
+        [
+          89,
+          1
+        ],
+        [
+          88,
+          1
+        ],
+        [
+          87,
+          1
+        ],
+        [
+          86,
+          1
+        ],
+        [
+          85,
+          1
+        ]
+      ],
+      "attack": [
+        [
+          74,
+          1
+        ],
+        [
+          73,
+          1
+        ],
+        [
+          72,
+          1
+        ],
+        [
+          71,
+          1
+        ],
+        [
+          70,
+          1
+        ],
+        [
+          69,
+          1
+        ],
+        [
+          68,
+          1
+        ],
+        [
+          67,
+          2
+        ],
+        [
+          66,
+          1
+        ],
+        [
+          65,
+          1
+        ]
+      ],
+      "hurt": [
+        [
+          64,
+          1
+        ],
+        [
+          63,
+          1
+        ],
+        [
+          62,
+          1
+        ],
+        [
+          61,
+          1
+        ],
+        [
+          60,
+          2
+        ]
+      ]
+    },
+    "count": 91,
+    "native_battle": {
+      "indexing": "reverse_serialized_tables",
+      "source_frame_count": 91,
+      "sequence_ids": {
+        "idle": 4,
+        "walk": 0,
+        "attack": 5,
+        "hurt": 6
+      },
+      "impact_steps": {
+        "idle": [],
+        "walk": [],
+        "attack": [
+          3
+        ],
+        "hurt": []
+      },
+      "attack_x": [
+        119,
+        67,
+        51,
+        46,
+        45,
+        44,
+        43,
+        42,
+        87,
+        106
+      ],
+      "attack_basis": "target",
+      "cast_mapping": null
+    }
+  },
+  "monster/hs1": {
+    "width": 74,
+    "height": 57,
+    "columns": 8,
+    "origin": [
+      -58,
+      -55
+    ],
+    "anchor_x": 0,
+    "playback": {
+      "idle": [
+        [
+          35,
+          8
+        ],
+        [
+          34,
+          8
+        ]
+      ],
+      "walk": [
+        [
+          35,
+          8
+        ],
+        [
+          34,
+          8
+        ]
+      ],
+      "attack": [
+        [
+          31,
+          1
+        ],
+        [
+          30,
+          1
+        ],
+        [
+          29,
+          1
+        ],
+        [
+          28,
+          1
+        ],
+        [
+          27,
+          1
+        ],
+        [
+          26,
+          1
+        ],
+        [
+          25,
+          1
+        ],
+        [
+          24,
+          1
+        ],
+        [
+          23,
+          1
+        ],
+        [
+          22,
+          1
+        ],
+        [
+          21,
+          1
+        ],
+        [
+          20,
+          1
+        ],
+        [
+          19,
+          1
+        ],
+        [
+          18,
+          1
+        ],
+        [
+          30,
+          1
+        ],
+        [
+          31,
+          1
+        ]
+      ],
+      "hurt": [
+        [
+          17,
+          1
+        ],
+        [
+          16,
+          1
+        ],
+        [
+          15,
+          1
+        ],
+        [
+          14,
+          1
+        ],
+        [
+          13,
+          2
+        ]
+      ]
+    },
+    "count": 36,
+    "native_battle": {
+      "indexing": "reverse_serialized_tables",
+      "source_frame_count": 36,
+      "sequence_ids": {
+        "idle": 4,
+        "walk": 4,
+        "attack": 5,
+        "hurt": 6
+      },
+      "impact_steps": {
+        "idle": [],
+        "walk": [],
+        "attack": [
+          2,
+          4,
+          6,
+          8,
+          10
+        ],
+        "hurt": []
+      },
+      "attack_x": [
+        104,
+        72,
+        31,
+        32,
+        28,
+        29,
+        25,
+        26,
+        23,
+        24,
+        15,
+        14,
+        13,
+        12,
+        72,
+        104
+      ],
+      "attack_basis": "target",
+      "cast_mapping": null
+    }
+  },
+  "monster/langw": {
+    "width": 76,
+    "height": 50,
+    "columns": 8,
+    "origin": [
+      -45,
+      -47
+    ],
+    "anchor_x": 0,
+    "playback": {
+      "idle": [
+        [
+          17,
+          3
+        ],
+        [
+          16,
+          5
+        ],
+        [
+          17,
+          3
+        ],
+        [
+          15,
+          5
+        ]
+      ],
+      "walk": [
+        [
+          17,
+          3
+        ],
+        [
+          16,
+          5
+        ],
+        [
+          17,
+          3
+        ],
+        [
+          15,
+          5
+        ]
+      ],
+      "attack": [
+        [
+          11,
+          1
+        ],
+        [
+          10,
+          1
+        ],
+        [
+          9,
+          1
+        ],
+        [
+          8,
+          1
+        ],
+        [
+          7,
+          1
+        ],
+        [
+          6,
+          1
+        ],
+        [
+          5,
+          2
+        ],
+        [
+          10,
+          1
+        ],
+        [
+          11,
+          1
+        ]
+      ],
+      "hurt": [
+        [
+          4,
+          1
+        ],
+        [
+          3,
+          1
+        ],
+        [
+          2,
+          1
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          0,
+          2
+        ]
+      ]
+    },
+    "count": 18,
+    "native_battle": {
+      "indexing": "reverse_serialized_tables",
+      "source_frame_count": 18,
+      "sequence_ids": {
+        "idle": 4,
+        "walk": 4,
+        "attack": 5,
+        "hurt": 6
+      },
+      "impact_steps": {
+        "idle": [],
+        "walk": [],
+        "attack": [
+          3
+        ],
+        "hurt": []
+      },
+      "attack_x": [
+        126,
+        94,
+        50,
+        28,
+        27,
+        26,
+        25,
+        94,
+        126
+      ],
+      "attack_basis": "target",
+      "cast_mapping": null
+    }
+  },
+  "monster/nt1": {
+    "width": 130,
+    "height": 58,
+    "columns": 8,
+    "origin": [
+      -75,
+      -56
+    ],
+    "anchor_x": 0,
+    "playback": {
+      "idle": [
+        [
+          25,
+          5
+        ],
+        [
+          24,
+          3
+        ],
+        [
+          23,
+          5
+        ],
+        [
+          22,
+          3
+        ]
+      ],
+      "walk": [
+        [
+          25,
+          5
+        ],
+        [
+          24,
+          3
+        ],
+        [
+          23,
+          5
+        ],
+        [
+          22,
+          3
+        ]
+      ],
+      "attack": [
+        [
+          17,
+          1
+        ],
+        [
+          16,
+          1
+        ],
+        [
+          15,
+          2
+        ],
+        [
+          14,
+          1
+        ],
+        [
+          13,
+          1
+        ],
+        [
+          12,
+          1
+        ],
+        [
+          11,
+          1
+        ],
+        [
+          10,
+          1
+        ],
+        [
+          17,
+          1
+        ]
+      ],
+      "hurt": [
+        [
+          9,
+          1
+        ],
+        [
+          8,
+          1
+        ],
+        [
+          7,
+          1
+        ],
+        [
+          6,
+          1
+        ],
+        [
+          5,
+          2
+        ]
+      ]
+    },
+    "count": 26,
+    "native_battle": {
+      "indexing": "reverse_serialized_tables",
+      "source_frame_count": 26,
+      "sequence_ids": {
+        "idle": 4,
+        "walk": 4,
+        "attack": 5,
+        "hurt": 6
+      },
+      "impact_steps": {
+        "idle": [],
+        "walk": [],
+        "attack": [
+          3
+        ],
+        "hurt": []
+      },
+      "attack_x": [
+        122,
+        90,
+        45,
+        40,
+        39,
+        37,
+        36,
+        88,
+        122
+      ],
+      "attack_basis": "target",
+      "cast_mapping": null
+    }
+  },
+  "monster/xt1": {
+    "width": 79,
+    "height": 69,
+    "columns": 8,
+    "origin": [
+      -53,
+      -65
+    ],
+    "anchor_x": 0,
+    "playback": {
+      "idle": [
+        [
+          27,
+          5
+        ],
+        [
+          26,
+          3
+        ],
+        [
+          25,
+          2
+        ],
+        [
+          24,
+          1
+        ],
+        [
+          25,
+          2
+        ],
+        [
+          26,
+          3
+        ]
+      ],
+      "walk": [
+        [
+          27,
+          5
+        ],
+        [
+          26,
+          3
+        ],
+        [
+          25,
+          2
+        ],
+        [
+          24,
+          1
+        ],
+        [
+          25,
+          2
+        ],
+        [
+          26,
+          3
+        ]
+      ],
+      "attack": [
+        [
+          19,
+          1
+        ],
+        [
+          18,
+          1
+        ],
+        [
+          17,
+          1
+        ],
+        [
+          16,
+          2
+        ],
+        [
+          15,
+          1
+        ],
+        [
+          14,
+          1
+        ],
+        [
+          13,
+          1
+        ],
+        [
+          12,
+          1
+        ],
+        [
+          18,
+          1
+        ],
+        [
+          19,
+          1
+        ]
+      ],
+      "hurt": [
+        [
+          11,
+          1
+        ],
+        [
+          10,
+          1
+        ],
+        [
+          9,
+          1
+        ],
+        [
+          8,
+          1
+        ]
+      ]
+    },
+    "count": 28,
+    "native_battle": {
+      "indexing": "reverse_serialized_tables",
+      "source_frame_count": 28,
+      "sequence_ids": {
+        "idle": 4,
+        "walk": 4,
+        "attack": 5,
+        "hurt": 6
+      },
+      "impact_steps": {
+        "idle": [],
+        "walk": [],
+        "attack": [
+          4
+        ],
+        "hurt": []
+      },
+      "attack_x": [
+        120,
+        88,
+        54,
+        55,
+        52,
+        51,
+        50,
+        49,
+        88,
+        120
+      ],
+      "attack_basis": "target",
+      "cast_mapping": null
+    }
+  }
+}

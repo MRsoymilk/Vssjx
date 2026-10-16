@@ -87,7 +87,7 @@ static func actor(key: String) -> AnimatedSprite2D:
 			var animation := "source_%d" % i
 			frames.add_animation(animation)
 			frames.set_animation_speed(animation, 10.0)
-			for step in sequences[i]:
+			for step in source_steps(info, i):
 				frames.add_frame(animation, regions[int(step[0])], maxf(1.0, float(step[1])))
 		var modes := ["idle", "walk", "attack"]
 		for optional in ["cast", "hurt"]:
@@ -99,7 +99,7 @@ static func actor(key: String) -> AnimatedSprite2D:
 			var seq_index := maxi(0, sequences.size() - 1)
 			if mode == "attack":
 				seq_index = maxi(0, sequences.size() - 6)
-			var steps: Array = info.get("playback", {}).get(mode, sequences[seq_index])
+			var steps: Array = info.get("playback", {}).get(mode, source_steps(info, seq_index))
 			if steps.is_empty():
 				steps = [[0, 1]]
 			for step in steps:
@@ -113,9 +113,17 @@ static func actor(key: String) -> AnimatedSprite2D:
 	sprite.play("idle")
 	return sprite
 
+static func source_steps(info: Dictionary, serialized_sequence: int) -> Array:
+	# Native 22d74 fills the frame pointer table from count-1 down to zero.
+	# Keep serialized evidence intact; resolve native frame references on use.
+	var count := int(info.get("native_battle", {}).get("source_frame_count", info.count))
+	var steps: Array = []
+	for step in info.sequences[serialized_sequence]: steps.append([count - 1 - int(step[0]), step[1]])
+	return steps
+
 static func effect(key: String, sequence: int = 0) -> AnimatedSprite2D:
 	var sprite := actor(key)
-	var animation := "source_%d" % sequence
+	var animation := "source_%d" % (actor_info(key).sequences.size() - 1 - sequence)
 	sprite.sprite_frames.set_animation_loop(animation, false)
 	sprite.animation_finished.connect(sprite.queue_free)
 	sprite.play(animation)

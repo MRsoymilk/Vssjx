@@ -4,63 +4,77 @@
     "monster/langw": {
       "width": 76,
       "height": 50,
+      "columns": 8,
       "origin": [
         -45,
         -47
       ],
+      "anchor_x": 0,
       "playback": {
         "idle": [
           [
-            0,
+            17,
             3
           ],
           [
-            1,
+            16,
             5
           ],
           [
-            0,
+            17,
             3
           ],
           [
-            21,
+            15,
             5
           ]
         ],
         "walk": [
           [
-            0,
-            2
+            17,
+            3
           ],
           [
-            1,
-            2
+            16,
+            5
           ],
           [
-            0,
-            2
+            17,
+            3
           ],
           [
-            21,
-            2
+            15,
+            5
           ]
         ],
         "attack": [
           [
-            18,
+            11,
             1
           ],
           [
-            19,
-            1
-          ],
-          [
-            20,
+            10,
             1
           ],
           [
             9,
             1
+          ],
+          [
+            8,
+            1
+          ],
+          [
+            7,
+            1
+          ],
+          [
+            6,
+            1
+          ],
+          [
+            5,
+            2
           ],
           [
             10,
@@ -69,87 +83,12 @@
           [
             11,
             1
-          ],
-          [
-            12,
-            2
-          ],
-          [
-            19,
-            1
-          ],
-          [
-            18,
-            1
           ]
         ],
         "hurt": [
           [
-            6,
+            4,
             1
-          ],
-          [
-            7,
-            1
-          ],
-          [
-            8,
-            1
-          ]
-        ]
-      },
-      "count": 22,
-      "derived_frames": [
-        {
-          "frame": 18,
-          "source_frame": 6,
-          "excluded_sources": [
-            "tx38"
-          ]
-        },
-        {
-          "frame": 19,
-          "source_frame": 7,
-          "excluded_sources": [
-            "tx38"
-          ]
-        },
-        {
-          "frame": 20,
-          "source_frame": 8,
-          "excluded_sources": [
-            "tx38"
-          ]
-        },
-        {
-          "frame": 21,
-          "source_frame": 2,
-          "excluded_sources": [
-            "tx69"
-          ]
-        }
-      ]
-    },
-    "monster/xt1": {
-      "width": 79,
-      "height": 69,
-      "origin": [
-        -53,
-        -65
-      ],
-      "playback": {
-        "idle": [
-          [
-            0,
-            5
-          ],
-          [
-            1,
-            3
-          ],
-          [
-            2,
-            2
           ],
           [
             3,
@@ -157,29 +96,73 @@
           ],
           [
             2,
-            2
+            1
           ],
           [
             1,
-            3
+            1
+          ],
+          [
+            0,
+            2
           ]
+        ]
+      },
+      "count": 18,
+      "native_battle": {
+        "indexing": "reverse_serialized_tables",
+        "source_frame_count": 18,
+        "sequence_ids": {
+          "idle": 4,
+          "walk": 4,
+          "attack": 5,
+          "hurt": 6
+        },
+        "impact_steps": {
+          "idle": [],
+          "walk": [],
+          "attack": [
+            3
+          ],
+          "hurt": []
+        },
+        "attack_x": [
+          126,
+          94,
+          50,
+          28,
+          27,
+          26,
+          25,
+          94,
+          126
         ],
-        "walk": [
+        "attack_basis": "target",
+        "cast_mapping": null
+      }
+    },
+    "monster/xt1": {
+      "width": 79,
+      "height": 69,
+      "columns": 8,
+      "origin": [
+        -53,
+        -65
+      ],
+      "anchor_x": 0,
+      "playback": {
+        "idle": [
           [
-            20,
-            1
+            27,
+            5
           ],
           [
-            21,
-            1
+            26,
+            3
           ],
           [
-            22,
-            1
-          ],
-          [
-            23,
-            1
+            25,
+            2
           ],
           [
             24,
@@ -187,170 +170,46 @@
           ],
           [
             25,
-            1
-          ],
-          [
-            26,
-            1
-          ],
-          [
-            27,
-            1
-          ]
-        ],
-        "attack": [
-          [
-            8,
-            1
-          ],
-          [
-            9,
-            1
-          ],
-          [
-            10,
-            1
-          ],
-          [
-            11,
             2
           ],
           [
-            12,
-            1
-          ],
-          [
-            13,
-            1
-          ],
-          [
-            14,
-            1
-          ],
-          [
-            15,
-            1
-          ],
-          [
-            9,
-            1
-          ],
-          [
-            8,
-            1
-          ]
-        ],
-        "hurt": [
-          [
-            28,
+            26,
             3
-          ]
-        ]
-      },
-      "count": 29,
-      "derived_frames": [
-        {
-          "frame": 28,
-          "source_frame": 0,
-          "excluded_sources": []
-        }
-      ]
-    },
-    "monster/hs1": {
-      "width": 74,
-      "height": 57,
-      "origin": [
-        -58,
-        -55
-      ],
-      "playback": {
-        "idle": [
-          [
-            0,
-            8
-          ],
-          [
-            36,
-            8
           ]
         ],
         "walk": [
           [
-            37,
+            27,
+            5
+          ],
+          [
+            26,
+            3
+          ],
+          [
+            25,
+            2
+          ],
+          [
+            24,
             1
           ],
           [
-            38,
-            1
+            25,
+            2
           ],
           [
-            39,
-            1
-          ],
-          [
-            40,
-            1
-          ],
-          [
-            41,
-            1
-          ],
-          [
-            42,
-            1
+            26,
+            3
           ]
         ],
         "attack": [
           [
-            4,
+            19,
             1
           ],
           [
-            5,
-            1
-          ],
-          [
-            6,
-            1
-          ],
-          [
-            7,
-            1
-          ],
-          [
-            8,
-            1
-          ],
-          [
-            9,
-            1
-          ],
-          [
-            10,
-            1
-          ],
-          [
-            11,
-            1
-          ],
-          [
-            12,
-            1
-          ],
-          [
-            13,
-            1
-          ],
-          [
-            14,
-            1
-          ],
-          [
-            15,
-            1
-          ],
-          [
-            16,
+            18,
             1
           ],
           [
@@ -358,150 +217,11 @@
             1
           ],
           [
-            5,
-            1
-          ],
-          [
-            4,
-            1
-          ]
-        ],
-        "hurt": [
-          [
-            43,
-            3
-          ]
-        ]
-      },
-      "count": 44,
-      "derived_frames": [
-        {
-          "frame": 36,
-          "source_frame": 1,
-          "excluded_sources": [
-            "tx38"
-          ]
-        },
-        {
-          "frame": 37,
-          "source_frame": 23,
-          "excluded_sources": [
-            "tx38"
-          ]
-        },
-        {
-          "frame": 38,
-          "source_frame": 24,
-          "excluded_sources": [
-            "tx38"
-          ]
-        },
-        {
-          "frame": 39,
-          "source_frame": 25,
-          "excluded_sources": [
-            "tx38"
-          ]
-        },
-        {
-          "frame": 40,
-          "source_frame": 26,
-          "excluded_sources": [
-            "tx38"
-          ]
-        },
-        {
-          "frame": 41,
-          "source_frame": 27,
-          "excluded_sources": [
-            "tx38"
-          ]
-        },
-        {
-          "frame": 42,
-          "source_frame": 28,
-          "excluded_sources": [
-            "tx38"
-          ]
-        },
-        {
-          "frame": 43,
-          "source_frame": 0,
-          "excluded_sources": []
-        }
-      ]
-    },
-    "monster/nt1": {
-      "width": 130,
-      "height": 58,
-      "origin": [
-        -75,
-        -56
-      ],
-      "playback": {
-        "idle": [
-          [
-            0,
-            5
-          ],
-          [
-            26,
-            3
-          ],
-          [
-            27,
-            5
-          ],
-          [
-            28,
-            3
-          ]
-        ],
-        "walk": [
-          [
-            21,
-            3
-          ],
-          [
-            22,
-            1
-          ],
-          [
-            23,
-            1
-          ],
-          [
-            24,
-            1
-          ],
-          [
-            25,
-            2
-          ]
-        ],
-        "attack": [
-          [
-            8,
-            1
-          ],
-          [
-            9,
-            1
-          ],
-          [
-            10,
+            16,
             2
           ],
           [
-            11,
-            1
-          ],
-          [
-            12,
-            1
-          ],
-          [
-            13,
+            15,
             1
           ],
           [
@@ -509,50 +229,377 @@
             1
           ],
           [
-            15,
+            13,
+            1
+          ],
+          [
+            12,
+            1
+          ],
+          [
+            18,
+            1
+          ],
+          [
+            19,
+            1
+          ]
+        ],
+        "hurt": [
+          [
+            11,
+            1
+          ],
+          [
+            10,
+            1
+          ],
+          [
+            9,
             1
           ],
           [
             8,
             1
           ]
+        ]
+      },
+      "count": 28,
+      "native_battle": {
+        "indexing": "reverse_serialized_tables",
+        "source_frame_count": 28,
+        "sequence_ids": {
+          "idle": 4,
+          "walk": 4,
+          "attack": 5,
+          "hurt": 6
+        },
+        "impact_steps": {
+          "idle": [],
+          "walk": [],
+          "attack": [
+            4
+          ],
+          "hurt": []
+        },
+        "attack_x": [
+          120,
+          88,
+          54,
+          55,
+          52,
+          51,
+          50,
+          49,
+          88,
+          120
+        ],
+        "attack_basis": "target",
+        "cast_mapping": null
+      }
+    },
+    "monster/hs1": {
+      "width": 74,
+      "height": 57,
+      "columns": 8,
+      "origin": [
+        -58,
+        -55
+      ],
+      "anchor_x": 0,
+      "playback": {
+        "idle": [
+          [
+            35,
+            8
+          ],
+          [
+            34,
+            8
+          ]
+        ],
+        "walk": [
+          [
+            35,
+            8
+          ],
+          [
+            34,
+            8
+          ]
+        ],
+        "attack": [
+          [
+            31,
+            1
+          ],
+          [
+            30,
+            1
+          ],
+          [
+            29,
+            1
+          ],
+          [
+            28,
+            1
+          ],
+          [
+            27,
+            1
+          ],
+          [
+            26,
+            1
+          ],
+          [
+            25,
+            1
+          ],
+          [
+            24,
+            1
+          ],
+          [
+            23,
+            1
+          ],
+          [
+            22,
+            1
+          ],
+          [
+            21,
+            1
+          ],
+          [
+            20,
+            1
+          ],
+          [
+            19,
+            1
+          ],
+          [
+            18,
+            1
+          ],
+          [
+            30,
+            1
+          ],
+          [
+            31,
+            1
+          ]
         ],
         "hurt": [
           [
-            29,
-            3
+            17,
+            1
+          ],
+          [
+            16,
+            1
+          ],
+          [
+            15,
+            1
+          ],
+          [
+            14,
+            1
+          ],
+          [
+            13,
+            2
           ]
         ]
       },
-      "count": 30,
-      "derived_frames": [
-        {
-          "frame": 26,
-          "source_frame": 1,
-          "excluded_sources": [
-            "tx1"
-          ]
+      "count": 36,
+      "native_battle": {
+        "indexing": "reverse_serialized_tables",
+        "source_frame_count": 36,
+        "sequence_ids": {
+          "idle": 4,
+          "walk": 4,
+          "attack": 5,
+          "hurt": 6
         },
-        {
-          "frame": 27,
-          "source_frame": 2,
-          "excluded_sources": [
-            "tx1"
-          ]
+        "impact_steps": {
+          "idle": [],
+          "walk": [],
+          "attack": [
+            2,
+            4,
+            6,
+            8,
+            10
+          ],
+          "hurt": []
         },
-        {
-          "frame": 28,
-          "source_frame": 3,
-          "excluded_sources": [
-            "tx1"
+        "attack_x": [
+          104,
+          72,
+          31,
+          32,
+          28,
+          29,
+          25,
+          26,
+          23,
+          24,
+          15,
+          14,
+          13,
+          12,
+          72,
+          104
+        ],
+        "attack_basis": "target",
+        "cast_mapping": null
+      }
+    },
+    "monster/nt1": {
+      "width": 130,
+      "height": 58,
+      "columns": 8,
+      "origin": [
+        -75,
+        -56
+      ],
+      "anchor_x": 0,
+      "playback": {
+        "idle": [
+          [
+            25,
+            5
+          ],
+          [
+            24,
+            3
+          ],
+          [
+            23,
+            5
+          ],
+          [
+            22,
+            3
           ]
+        ],
+        "walk": [
+          [
+            25,
+            5
+          ],
+          [
+            24,
+            3
+          ],
+          [
+            23,
+            5
+          ],
+          [
+            22,
+            3
+          ]
+        ],
+        "attack": [
+          [
+            17,
+            1
+          ],
+          [
+            16,
+            1
+          ],
+          [
+            15,
+            2
+          ],
+          [
+            14,
+            1
+          ],
+          [
+            13,
+            1
+          ],
+          [
+            12,
+            1
+          ],
+          [
+            11,
+            1
+          ],
+          [
+            10,
+            1
+          ],
+          [
+            17,
+            1
+          ]
+        ],
+        "hurt": [
+          [
+            9,
+            1
+          ],
+          [
+            8,
+            1
+          ],
+          [
+            7,
+            1
+          ],
+          [
+            6,
+            1
+          ],
+          [
+            5,
+            2
+          ]
+        ]
+      },
+      "count": 26,
+      "native_battle": {
+        "indexing": "reverse_serialized_tables",
+        "source_frame_count": 26,
+        "sequence_ids": {
+          "idle": 4,
+          "walk": 4,
+          "attack": 5,
+          "hurt": 6
         },
-        {
-          "frame": 29,
-          "source_frame": 0,
-          "excluded_sources": []
-        }
-      ]
+        "impact_steps": {
+          "idle": [],
+          "walk": [],
+          "attack": [
+            3
+          ],
+          "hurt": []
+        },
+        "attack_x": [
+          122,
+          90,
+          45,
+          40,
+          39,
+          37,
+          36,
+          88,
+          122
+        ],
+        "attack_basis": "target",
+        "cast_mapping": null
+      }
     }
   }
 }

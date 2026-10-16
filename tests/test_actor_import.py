@@ -66,7 +66,7 @@ class ActorImportTests(unittest.TestCase):
                 info = self.actors[key]
                 source = self.source['hero/' + name]
                 steps = info['playback']['idle']
-                self.assertEqual(steps, [[info['count'] - 14, 4], [info['count'] - 13, 4]], key)
+                self.assertEqual(steps, [[info['count'] - 13, 8], [info['count'] - 14, 8]], key)
                 atlas = Image.open(ROOT / info['texture'].removeprefix('res://')).convert('RGBA')
                 pixels = []
                 for index, _ in steps:
@@ -134,8 +134,8 @@ class ActorImportTests(unittest.TestCase):
         for key in ('hero/mfs', 'hero/wfs'):
             source = self.source[key]
             playback = self.actors[key]['playback']
-            self.assertEqual(playback['attack'], source['sequences'][4])
-            self.assertEqual(playback['cast'], source['sequences'][6])
+            self.assertEqual(playback['attack'], [[len(source['frames']) - 1 - frame, ticks] for frame, ticks in source['sequences'][7]])
+            self.assertEqual(playback['cast'], [[len(source['frames']) - 1 - frame, ticks] for frame, ticks in source['sequences'][4]])
             for mode in ('attack', 'cast'):
                 for index, _ in playback[mode]:
                     head = next(layer for layer in source['frames'][index]

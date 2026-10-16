@@ -100,7 +100,7 @@ func _ready() -> void:
 			chooser.item_selected.emit(index)
 			check(preview.sprite.animation == id, "Chinese labels still play the correct raw sequence: " + id)
 			check(browser.get_node("%AnimationHelp").text.contains(id), "Sequence evidence remains visible: " + id)
-			if source_index == (4 if entry.preview.art.ends_with("fs") else 17):
+			if source_index == (7 if entry.preview.art.ends_with("fs") else 12):
 				check(chooser.get_item_text(index).contains("普通攻击来源"), "An exact runtime attack mapping explains the source sequence")
 			if source_index == 0:
 				check(chooser.get_item_text(index).contains("用途未确认"), "Unverified original actions are not guessed")
@@ -125,7 +125,7 @@ func _ready() -> void:
 			if chooser.get_item_text(index).contains("普通攻击来源"):
 				attack_source = true
 				if entry.preview.art == "monster/langw":
-					check(chooser.get_popup().get_item_tooltip(index).contains("派生帧"), "Wolf original impact-bearing frames are distinguished from corrected attack")
+					check(chooser.get_popup().get_item_tooltip(index).contains("映射相同"), "Wolf uses native attack frames, not impact-stripped substitutes")
 		check(raw_count > 0 and attack_source, "Monster attacks remain traceable to original sequences")
 	var scenery := catalog.find("art", "map/m1")[0]
 	browser._show_entry(scenery)
@@ -269,7 +269,7 @@ func _ready() -> void:
 			browser.get_node("%RawAnimations").button_pressed = true
 			var chooser: OptionButton = browser.get_node("%Animations")
 			for index in chooser.item_count:
-				if chooser.get_item_metadata(index) == "source_17":
+				if chooser.get_item_metadata(index) == "source_12":
 					chooser.select(index)
 					chooser.item_selected.emit(index)
 			await get_tree().process_frame

@@ -116,7 +116,7 @@ func _load_original_monsters() -> void:
 			data["动画检查"] = {
 				"结构检查": "通过" if review.structural_errors.is_empty() else review.structural_errors,
 				"接入状态": "运行时已修正：循环动作清除战斗特效，攻击与受击使用独立帧" if review.runtime_status == "corrected" else "已检查原始资源；动作语义未确认，尚未接入游戏",
-				"受击方式": "原始受击姿势" if review.hurt_policy == "original_impact_poses" else ("独立中性姿势配合战斗命中特效（重建）" if review.runtime_status == "corrected" else "未指定"),
+				"受击方式": "原客户端状态6及对应原始受击序列（已按倒序表解释）" if review.runtime_status == "corrected" else "未指定",
 				"含星形层的原始帧": review.impact_layer_frames,
 				"含方向变化的原始序列": review.mixed_landmark_sequences,
 				"含横向位移的原始序列": review.root_travel_sequences,

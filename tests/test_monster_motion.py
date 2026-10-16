@@ -56,10 +56,10 @@ class MonsterMotionTests(unittest.TestCase):
             raw.pop('playback')
             self.assertEqual(json.loads(json.dumps(raw)), archived[name]['animation'])
             self.assertEqual([list(map(list, seq)) for seq in runtime['sequences']], archived[name]['animation']['sequences'])
-            for mode, index in art.MONSTER_PLAYBACK['monster/' + name].items():
+            for mode, native_index in art.MONSTER_PLAYBACK['monster/' + name].items():
                 derived = {row['frame']: row['source_frame'] for row in runtime.get('derived_frames', [])}
                 restored = [(derived.get(frame, frame), duration) for frame, duration in runtime['playback'][mode]]
-                self.assertEqual(restored, animation['sequences'][index])
+                self.assertEqual(restored, [(len(animation['frames']) - 1 - frame, ticks) for frame, ticks in animation['sequences'][len(animation['sequences']) - 1 - native_index]])
             texture = ROOT / 'client' / raw['texture'].removeprefix('res://')
             self.assertEqual(hashlib.sha256(texture.read_bytes()).hexdigest(), archived[name]['texture_sha256'])
 
@@ -74,49 +74,20 @@ class MonsterMotionTests(unittest.TestCase):
                     self.assertEqual(actual.size, expected.size)
                     self.assertEqual(actual.convert('RGBA').tobytes(), expected.convert('RGBA').tobytes())
 
-    def test_wolf_impact_pixels_belong_to_hurt_not_attack(self):
-        info = json.loads((ROOT / 'client/assets/data/actors/monster/langw.json').read_text('utf-8'))
-        with Image.open(ROOT / 'client/assets/actors/monster_langw.png') as image:
-            atlas = image.convert('RGBA')
-        def impact_pixels(frame):
-            x, y = frame % info['columns'] * info['width'], frame // info['columns'] * info['height']
-            pose = atlas.crop((x, y, x + info['width'], y + info['height']))
-            count = 0
-            for y in range(pose.height):
-                for x in range(pose.width):
-                    red, green, blue, alpha = pose.getpixel((x, y))
-                    if alpha and red > 235 and green > 180 and blue < 100:
-                        count += 1
-            return count
-        self.assertTrue(set(frame for frame, _ in info['playback']['attack']).isdisjoint(
-                        frame for frame, _ in info['playback']['hurt']))
-        self.assertTrue(all(impact_pixels(frame) == 0 for frame, _ in info['playback']['attack']))
-        self.assertTrue(all(impact_pixels(frame) >= 40 for frame, _ in info['playback']['hurt']))
-
-    def test_all_runtime_monsters_separate_hurt_and_keep_combat_effects_out_of_loops(self):
+    def test_attack_and_hurt_follow_native_state_ids_without_removing_effects(self):
         for key in art.MONSTER_PLAYBACK:
             animation = art.parse_ani(ROOT / 'analysis/unpacked/ssjx' / (key + '.ani'))
             info = json.loads((ROOT / 'client/assets/data/actors' / (key + '.json')).read_text('utf-8'))
-            derived = {row['frame']: row for row in info['derived_frames']}
-            with self.subTest(monster=key):
-                attack = {index for index, _ in info['playback']['attack']}
-                hurt = {index for index, _ in info['playback']['hurt']}
-                self.assertTrue(attack.isdisjoint(hurt))
-                for mode in ('idle', 'walk'):
-                    for index, _ in info['playback'][mode]:
-                        row = derived.get(index, {'source_frame': index, 'excluded_sources': []})
-                        effects = {layer['source'] for layer in animation['frames'][row['source_frame']]
-                                   if layer['source'].startswith('tx')}
-                        self.assertTrue(effects.issubset(row['excluded_sources']), (key, mode, index))
-                if key != 'monster/langw':
-                    # Outgoing slash/projectile effects are not incoming damage.
-                    self.assertEqual(info['playback']['attack'],
-                                     [list(step) for step in animation['sequences'][art.MONSTER_PLAYBACK[key]['attack']]])
-                    for frame in hurt:
-                        row = derived[frame]
-                        self.assertTrue(all(not layer['source'].startswith('tx')
-                                            or layer['source'] in row['excluded_sources']
-                                            for layer in animation['frames'][row['source_frame']]))
+            count = len(animation['frames'])
+            for action, native_id in [('idle', 4), ('attack', 5), ('hurt', 6)]:
+                expected = [[count - 1 - frame, ticks] for frame, ticks in animation['sequences'][len(animation['sequences']) - 1 - native_id]]
+                self.assertEqual(info['playback'][action], expected)
+            self.assertEqual(info['count'], count)
+            self.assertNotIn('derived_frames', info)
+            self.assertTrue(set(f for f, _ in info['playback']['attack']).isdisjoint(f for f, _ in info['playback']['hurt']))
+        wolf = json.loads((ROOT / 'client/assets/data/actors/monster/langw.json').read_text('utf-8'))
+        self.assertEqual(wolf['playback']['attack'], [[11,1],[10,1],[9,1],[8,1],[7,1],[6,1],[5,2],[10,1],[11,1]])
+        self.assertEqual(wolf['native_battle']['impact_steps']['attack'], [3])
 
 
 if __name__ == '__main__':

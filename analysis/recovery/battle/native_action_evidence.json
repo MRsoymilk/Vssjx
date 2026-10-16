@@ -1,0 +1,79 @@
+{
+  "format_version": 1,
+  "native_sha256": "e08f93bebe133b700f2305bfbedd994b05cc8d04a5a854262af9ced956afbc03",
+  "frame_table": "Serialized frame i is native frame count-1-i (22da6..22e0a).",
+  "sequence_table": "Serialized sequence i is native sequence count-1-i (22e26..22e3e).",
+  "layer_order": "The loader reverses layers; renderer 22c18/22c64 walks them backwards again. Serialized compositing order is retained.",
+  "state_slots": {
+    "walk": 0,
+    "ready": 4,
+    "normal_attack": 5,
+    "hurt": 6
+  },
+  "attack_target": "0x24636",
+  "attack_origin": "24636..24642 copies first target logical coordinates (+10) into attacker render coordinates (+18). ANI layer offsets then supply approach, strike and retreat.",
+  "hit_timing": "22b78 loads forward BE32 masks. 22aa8 tests native sequence mask bit at sequence step, only on tick zero. 39d0 delivers queued action events at those steps.",
+  "restore": "State 5 completion dispatches to 2c24, copies home (+10) to render (+18), then 2ea4 enters state 4 if alive.",
+  "limitations": [
+    "Native timer cadence has not been verified; Godot currently uses its existing 10 FPS attack clock.",
+    "Native masks can contain multiple hit events. Current reconstructed/server rules supply one damage result per action; do not invent extra damage.",
+    "Original skill IDs, target lists, effect payloads and full multiplayer turn ordering are not recovered by this evidence.",
+    "Mage skill pose uses visually reviewed native sequence 8; its binding to the reconstructed skill is not an original skill mapping."
+  ],
+  "evidence": [
+    {
+      "name": "reverse_ani_tables",
+      "start": "0x22d74",
+      "end_exclusive": "0x22e42",
+      "sha256": "e2581183a571e17378448d8ad0d1c74910a827374c65c56cc35c1475fe61dd35"
+    },
+    {
+      "name": "event_mask_loading",
+      "start": "0x22b78",
+      "end_exclusive": "0x22bd8",
+      "sha256": "49c68e308db6ee54dad4d4f46930b8b67d4165975d6eff6f245c7d581eeacf37"
+    },
+    {
+      "name": "event_mask_trigger",
+      "start": "0x22aa8",
+      "end_exclusive": "0x22b3c",
+      "sha256": "ef3a4552436bfe2ad1a0b69eb74828759af53b6755eecc44cedf75d85f51fa1f"
+    },
+    {
+      "name": "native_sequence_selection",
+      "start": "0x22fc8",
+      "end_exclusive": "0x2301c",
+      "sha256": "94b808cbbf6b0b8bc704b08f1717b39aea0acd02fa7975388a17a8fbc3ed872c"
+    },
+    {
+      "name": "state_dispatch_and_target_origin",
+      "start": "0x245c0",
+      "end_exclusive": "0x24694",
+      "sha256": "6cec9e476962797e6f662091b3bfc5068c6fb5df70ecd21f70cc70dbe508a204"
+    },
+    {
+      "name": "attack_event_delivery",
+      "start": "0x39d0",
+      "end_exclusive": "0x3a68",
+      "sha256": "78560059a6f48aceb8566b394f97f15d390a2c1c40b5e7424e7d17c30bcd8c76"
+    },
+    {
+      "name": "action_completion",
+      "start": "0x2be4",
+      "end_exclusive": "0x2c38",
+      "sha256": "40d520d803eac9697ed2c304901cbe6b7a1c5a28345de172200c1b6c59e51b0b"
+    },
+    {
+      "name": "restore_home_and_ready",
+      "start": "0x2ea4",
+      "end_exclusive": "0x2ed6",
+      "sha256": "ad417d6e8b16b8bd181feafa830753087e8c9c6d6d58ea67a7f8b9dbdab0fa3f"
+    },
+    {
+      "name": "copy_coordinates_source_to_destination",
+      "start": "0x2ee00",
+      "end_exclusive": "0x2ee0a",
+      "sha256": "8c0653c0ce4d3b80766248f0a82f2e464494a9e8067387b918cfe5bed0cdd298"
+    }
+  ]
+}

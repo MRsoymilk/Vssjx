@@ -68,7 +68,8 @@ def audit(root=art.ROOT):
                         width = height
                     landmarks[index] = (layer['x'] + width // 2, layer['transform'])
         sequence_rows = []
-        for index, steps in enumerate(animation['sequences']):
+        for index in range(len(animation['sequences'])):
+            steps = art.resolve_source_steps(animation, index)
             for frame, duration in steps:
                 if not 0 <= frame < len(animation['frames']) or not 0 <= duration <= 255:
                     entry_errors.append(f'Invalid sequence step in source_{index}')
@@ -125,13 +126,13 @@ def audit(root=art.ROOT):
             'root_travel_sequences': [row['sequence'] for row in sequence_rows
                                      if row['landmark_x_span'] is not None and row['landmark_x_span'] > 4],
             'runtime_status': 'corrected' if runtime else 'archive_only',
-            'hurt_policy': ('original_impact_poses' if name == 'langw' else 'neutral_hold_with_battle_impact')
-                           if runtime else 'unassigned',
+            'hurt_policy': 'native_sequence_6' if runtime else 'unassigned',
         })
         errors.extend(name + ': ' + message for message in entry_errors)
     return {
         'format_version': 1, 'source_package': 'ssjx/monster.mrp',
         'source_sha256': catalog['source_sha256'],
+        'playback_interpretation': 'native_reverse_tables',
         'scope': 'All ANI members; archive sequence semantics remain unassigned. '
                  'Layer effects, landmark transforms and travel are observations, not inferred actions.',
         'summary': {

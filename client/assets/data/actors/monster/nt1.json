@@ -7,34 +7,37 @@
   "anchor_x": 0,
   "playback": {
     "idle": [
-      [0, 5],
-      [26, 3],
-      [27, 5],
-      [28, 3]
+      [25, 5],
+      [24, 3],
+      [23, 5],
+      [22, 3]
     ],
     "walk": [
-      [21, 3],
-      [22, 1],
-      [23, 1],
-      [24, 1],
-      [25, 2]
+      [25, 5],
+      [24, 3],
+      [23, 5],
+      [22, 3]
     ],
     "attack": [
-      [8, 1],
-      [9, 1],
-      [10, 2],
-      [11, 1],
-      [12, 1],
-      [13, 1],
+      [17, 1],
+      [16, 1],
+      [15, 2],
       [14, 1],
-      [15, 1],
-      [8, 1]
+      [13, 1],
+      [12, 1],
+      [11, 1],
+      [10, 1],
+      [17, 1]
     ],
     "hurt": [
-      [29, 3]
+      [9, 1],
+      [8, 1],
+      [7, 1],
+      [6, 1],
+      [5, 2]
     ]
   },
-  "count": 30,
+  "count": 26,
   "sequences": [
     [
       [21, 3],
@@ -82,26 +85,18 @@
     [],
     []
   ],
-  "derived_frames": [
-    {
-      "frame": 26,
-      "source_frame": 1,
-      "excluded_sources": ["tx1"]
+  "native_battle": {
+    "indexing": "reverse_serialized_tables",
+    "source_frame_count": 26,
+    "sequence_ids": {"idle": 4, "walk": 4, "attack": 5, "hurt": 6},
+    "impact_steps": {
+      "idle": [],
+      "walk": [],
+      "attack": [3],
+      "hurt": []
     },
-    {
-      "frame": 27,
-      "source_frame": 2,
-      "excluded_sources": ["tx1"]
-    },
-    {
-      "frame": 28,
-      "source_frame": 3,
-      "excluded_sources": ["tx1"]
-    },
-    {
-      "frame": 29,
-      "source_frame": 0,
-      "excluded_sources": []
-    }
-  ]
+    "attack_x": [122, 90, 45, 40, 39, 37, 36, 88, 122],
+    "attack_basis": "target",
+    "cast_mapping": null
+  }
 }

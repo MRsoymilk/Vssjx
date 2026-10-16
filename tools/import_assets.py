@@ -10,6 +10,14 @@ import struct
 import copy
 import re
 from PIL import Image
+if __package__:
+    from .native_ani import actor_playback, source_steps as resolve_source_steps
+else:
+    _native_spec = importlib.util.spec_from_file_location('native_ani', Path(__file__).with_name('native_ani.py'))
+    _native = importlib.util.module_from_spec(_native_spec)
+    _native_spec.loader.exec_module(_native)
+    actor_playback = _native.actor_playback
+    resolve_source_steps = _native.source_steps
 
 ROOT = Path(__file__).resolve().parents[1]
 ANALYSIS = ROOT / 'analysis'
@@ -29,13 +37,11 @@ SELECTED = ['hero/mck', 'hero/mzs', 'hero/mfs', 'hero/wck', 'hero/wzs', 'hero/wf
             'map/m7', 'map/m9', 'map/m10', 'main/biaoti',
             'effect/flash', 'effect/t1', 'effect/t20', 'effect/t36', 'effect/t44', 'effect/t47', 'effect/t71']
 
-# Explicitly audited gameplay actors. Raw archive/admin atlases keep their
-# original displacement and facing; only these runtime sheets are corrected.
+# Native sequence IDs, not serialized sequence positions. Raw archive/admin
+# atlases retain source displacement/facing; gameplay sheets use stable anchors.
 MONSTER_PLAYBACK = {
-    'monster/langw': {'idle': 3, 'walk': 0, 'attack': 2},
-    'monster/xt1': {'idle': 3, 'walk': 0, 'attack': 2},
-    'monster/hs1': {'idle': 4, 'walk': 1, 'attack': 3},
-    'monster/nt1': {'idle': 3, 'walk': 0, 'attack': 2},
+    key: {'idle': 4, 'walk': 4, 'attack': 5, 'hurt': 6}
+    for key in ('monster/langw', 'monster/xt1', 'monster/hs1', 'monster/nt1')
 }
 
 
@@ -112,55 +118,6 @@ def bake(key, animation, output_key=None, write_texture=True, texture_dir=None,
     frames = []
     bounds = [0, 0, 1, 1]
     composites = list(animation['frames'])
-    derived_frames = []
-    runtime_monster = key in MONSTER_PLAYBACK and output_key is None
-    monster_playback = ({mode: list(animation['sequences'][index])
-                         for mode, index in MONSTER_PLAYBACK[key].items()}
-                        if runtime_monster else {})
-
-    def derive(source_frame, excluded_sources):
-        index = len(composites)
-        derived_frames.append({'frame': index, 'source_frame': source_frame,
-                               'excluded_sources': sorted(excluded_sources)})
-        composites.append([layer for layer in animation['frames'][source_frame]
-                           if layer['source'] not in excluded_sources])
-        return index
-
-    if key == 'monster/langw' and output_key is None:
-        # The original attack reuses impact-bearing poses. Retain those poses
-        # for hurt/source_N; gameplay attack uses copies without the tx38 star.
-        for source_frame in (6, 7, 8):
-            layers = animation['frames'][source_frame]
-            if not any(layer['source'] == 'tx38' for layer in layers):
-                raise ValueError('Wolf impact layer no longer matches audited frames')
-            derive(source_frame, {'tx38'})
-        replacements = {row['source_frame']: row['frame'] for row in derived_frames}
-        monster_playback['attack'] = [[replacements.get(index, index), duration]
-                                      for index, duration in monster_playback['attack']]
-        monster_playback['hurt'] = [[6, 1], [7, 1], [8, 1]]
-    if runtime_monster:
-        # A loop must not continuously emit attack/impact effects. Keep the
-        # complete source composites and outgoing attack effects untouched.
-        clean_frames = {}
-        for mode in ('idle', 'walk'):
-            clean = []
-            for index, duration in monster_playback[mode]:
-                excluded = {layer['source'] for layer in animation['frames'][index]
-                            if layer['source'].startswith('tx')}
-                if excluded:
-                    if index not in clean_frames:
-                        clean_frames[index] = derive(index, excluded)
-                    index = clean_frames[index]
-                clean.append([index, duration])
-            monster_playback[mode] = clean
-        if 'hurt' not in monster_playback:
-            # No native hurt sequence has been verified for these actors.
-            # Hold a separate neutral pose while the battle impact plays,
-            # rather than playing their outgoing attack on incoming damage.
-            source_frame = animation['sequences'][MONSTER_PLAYBACK[key]['idle']][0][0]
-            excluded = {layer['source'] for layer in animation['frames'][source_frame]
-                        if layer['source'].startswith('tx')}
-            monster_playback['hurt'] = [[derive(source_frame, excluded), 3]]
     for layers in composites:
         images = []
         head_center = None
@@ -197,41 +154,15 @@ def bake(key, animation, output_key=None, write_texture=True, texture_dir=None,
         atlas.save((Path(texture_dir) if texture_dir is not None else DEST / 'actors') / filename, optimize=True)
     sequences = animation['sequences']
     playback = {}
-    if folder == 'hero':
-        # The final twelve composites contain two complete six-frame gaits:
-        # mirrored first, native facing second. Source sequence 1 mixes both
-        # directions and standing poses; it is not a safe walk loop.
-        native_walk = list(range(len(animation['frames']) - 6, len(animation['frames'])))
-        for index in native_walk:
-            layers = animation['frames'][index]
-            head = next(layer for layer in layers if layer['source'] == animation['sources'][0] and layer['frame'] == 0)
-            assert head['transform'] == 0 and any(layer['source'].endswith('x') for layer in layers), key
-        standing = [index for index, layers in enumerate(animation['frames'])
-                    if index < native_walk[0]
-                    and any(layer['source'] == animation['sources'][0] and layer['frame'] == 0 and layer['transform'] == 0 for layer in layers)
-                    and not any(layer['source'].endswith('x') or layer['source'].startswith('tx') for layer in layers)]
-        # The last two native standing composites form a breathing pair.
-        # A single still frame gives the state an idle name but no animation.
-        # Composite IDs run opposite to the forward contact/swing cycle.
-        # In native left-facing art the planted foot must travel right relative
-        # to the body. Ascending IDs instead drag the planted foot left, making
-        # the actor backpedal. Reverse whole composites, keeping body bob, feet
-        # and weapons together; mirroring then also gives a forward right gait.
-        playback = {'idle': [[index, 4] for index in standing[-2:]],
-                    'walk': [[index, 1] for index in reversed(native_walk)], 'attack': sequences[-1]}
-        if key in ('hero/mfs', 'hero/wfs') and not (output_key or '').startswith('creation/'):
-            # The last sequence faces right. Battle heroes stand on the right
-            # and must keep the native left-facing staff motion instead.
-            playback['attack'] = sequences[4]
-            playback['cast'] = sequences[6]  # Original floating-staff flourish.
-    elif key in MONSTER_PLAYBACK and output_key is None:
-        playback = monster_playback
+    native_battle = None
+    if (folder == 'hero' and (output_key is None or output_key.startswith('creation/'))) or (key in MONSTER_PLAYBACK and output_key is None):
+        playback, native_battle = actor_playback(key, animation, source_dir)
     result = {'texture': texture_prefix + filename, 'width': width,
             'height': height, 'columns': columns, 'origin': [left, top],
             'anchor_x': 0, 'playback': playback,
             'count': len(frames), 'sequences': animation['sequences']}
-    if derived_frames:
-        result['derived_frames'] = derived_frames
+    if native_battle is not None:
+        result['native_battle'] = native_battle
     return result
 
 

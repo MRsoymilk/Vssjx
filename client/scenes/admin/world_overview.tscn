@@ -1,49 +1,60 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scripts/admin/data_preview.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/admin/world_overview.gd" id="2"]
 
-[node name="WorldOverview" type="Window"]
-title = "蜀山剑侠Online · 原版世界总图"
-size = Vector2i(820, 860)
-min_size = Vector2i(640, 640)
-content_scale_mode = 0
-
-[node name="Panel" type="PanelContainer" parent="."]
+[node name="WorldOverview" type="PanelContainer"]
+custom_minimum_size = Vector2(960, 540)
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("2")
 
-[node name="Margin" type="MarginContainer" parent="Panel"]
-theme_override_constants/margin_left = 16
-theme_override_constants/margin_top = 16
-theme_override_constants/margin_right = 16
-theme_override_constants/margin_bottom = 16
+[node name="Margin" type="MarginContainer" parent="."]
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
 
-[node name="Layout" type="VBoxContainer" parent="Panel/Margin"]
-theme_override_constants/separation = 10
+[node name="Layout" type="VBoxContainer" parent="Margin"]
+theme_override_constants/separation = 8
 
-[node name="Title" type="Label" parent="Panel/Margin/Layout"]
-text = "原版世界总图 · 79 个地点位置 / 78 条连线"
-theme_override_font_sizes/font_size = 24
-
-[node name="Selection" type="Label" parent="Panel/Margin/Layout"]
+[node name="Title" type="Label" parent="Margin/Layout"]
 unique_name_in_owner = true
+text = "原版世界总图 · 79 个地点位置 / 78 条连线"
+theme_override_font_sizes/font_size = 22
 autowrap_mode = 3
 
-[node name="WorldPreview" type="Control" parent="Panel/Margin/Layout"]
+[node name="Selection" type="Label" parent="Margin/Layout"]
 unique_name_in_owner = true
+theme_override_font_sizes/font_size = 14
+autowrap_mode = 3
+
+[node name="Body" type="HBoxContainer" parent="Margin/Layout"]
 size_flags_vertical = 3
-custom_minimum_size = Vector2(0, 400)
+theme_override_constants/separation = 12
+
+[node name="WorldPreview" type="Control" parent="Margin/Layout/Body"]
+unique_name_in_owner = true
+size_flags_horizontal = 3
+size_flags_vertical = 3
+custom_minimum_size = Vector2(256, 240)
 script = ExtResource("1")
 
-[node name="Legend" type="Label" parent="Panel/Margin/Layout"]
+[node name="Info" type="VBoxContainer" parent="Margin/Layout/Body"]
+custom_minimum_size = Vector2(220, 0)
+theme_override_constants/separation = 16
+
+[node name="Legend" type="Label" parent="Margin/Layout/Body/Info"]
 text = "原图标：野外 / 城市 / 门派　　金色圈：当前选择\n悬停查看名称、原包编号与等级；灰色小点保留原包未命名端点。"
+theme_override_font_sizes/font_size = 14
 autowrap_mode = 3
 
-[node name="Scope" type="Label" parent="Panel/Margin/Layout"]
+[node name="Scope" type="Label" parent="Margin/Layout/Body/Info"]
+unique_name_in_owner = true
 text = "来源：Online v48 worldmap.data 与原生绘制代码。\n此图是地点位置与连线，不是场景地形；135 条目录没有总图位置。\n原样保留异常线段，连线不作为完整通行或传送配置。"
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 13
 theme_override_colors/font_color = Color(0.85, 0.74, 0.49, 1)
 autowrap_mode = 3

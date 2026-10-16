@@ -27,6 +27,10 @@ Windows 也可运行 `./tools/open-data-browser.ps1 -GodotBin "你的Godot可执
 
 管理页提供武器、人物装备、物品、人物、任务、地图、怪物、素材/动画八类目录，可搜索名称、ID 和属性，按状态筛选，查看字段、JSON 数据和定义来源；人物支持动画预览，地图支持地形与阻挡预览。**只读浏览项目定义与原包资源**，不连接数据库或读取玩家存档。按 F5 刷新 JSON 与列表，修改脚本常量后需重新运行场景。
 
+`client/scenes/admin/data_browser.tscn`和`client/scenes/admin/world_overview.tscn`是**独立桌面开发工具，不是游戏内页面，也不随游戏导出**。两页及总图弹窗默认使用 **960×540桌面窗口和逻辑画布**，可放大到1280×720等尺寸，不沿用手机画幅；世界总图采用地图与说明左右布局。在编辑器中关闭 **Embed Game on Play / 嵌入游戏** 后按F6运行；或用上面的命令行直接打开独立窗口。世界总图也可单独运行：`godot --path client res://scenes/admin/world_overview.tscn`。工具不修改游戏的320×480基础视口。
+
+游戏导出使用`client/export_presets.cfg`中的`Game (Linux)`或`Game (Windows)`预设：明确排除`scenes/admin/`、`scripts/admin/`和`tests/`，保留游戏运行所需的JSON与共享资源。新增游戏预设时应保留同样的排除规则；完整可执行文件导出还需要对应Godot导出模板。导出边界验证见[tests/game_export.md](tests/game_export.md)。
+
 物品目录收录 `item.mrp` 已解码的全部 **208 张图标：56 张武器、81 张装备、71 张其他物品**，可选择“原包资源”单独浏览，列表支持图标缩略图。原始资源编号、来源成员、帧号、尺寸、校验值均可查看；尚未恢复的原版名称、物品ID映射、等级和数值显示“—”。青锋剑、回春散另列为当前已接入的本地规则，预留装备槽位另作标记。同一原包资源会同时出现在“物品”和对应的武器/装备分类中。
 
 重新导出物品索引与无损图标：`python tools/import_item_catalog.py`（使用 `analysis/image_manifest.json` 与已解码 PNG；修改原始解码结果后再运行）。

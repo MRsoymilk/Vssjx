@@ -2,7 +2,9 @@ extends Control
 ## Standalone project-data workbench. No editing, network calls or save loading.
 
 const CATALOG := preload("res://scripts/admin/data_catalog.gd")
-const OVERVIEW := preload("res://scenes/admin/world_overview.tscn")
+const OVERVIEW := preload("res://scenes/admin/world_overview_popup.tscn")
+const LAYOUT := preload("res://scripts/admin/admin_window_layout.gd")
+const DESKTOP_SIZE := Vector2i(960, 640)
 var catalog := CATALOG.new()
 var category := "weapons"
 var current: Dictionary = {}
@@ -11,14 +13,9 @@ var visible_entries: Array[Dictionary] = []
 
 func _ready() -> void:
 	if configure_window:
-		var window := get_window()
-		window.title = "蜀山剑侠 · 项目数据管理"
-		window.content_scale_mode = Window.CONTENT_SCALE_MODE_DISABLED
-		window.content_scale_size = Vector2i.ZERO
-		window.min_size = Vector2i(1060, 740)
-		window.size = Vector2i(1360, 900)
-		window.move_to_center()
+		LAYOUT.configure_scene(self, "蜀山剑侠 · 项目数据管理", DESKTOP_SIZE)
 	_apply_theme()
+	resized.connect(_update_preview_height)
 	%Fields.get_parent().set_tab_title(0, "字段详情")
 	%Raw.get_parent().set_tab_title(1, "原始数据")
 	%Texts.get_parent().set_tab_title(2, "文本摘录")
@@ -54,10 +51,9 @@ func open_world_overview() -> Window:
 	var window: Window = OVERVIEW.instantiate()
 	window.theme = theme
 	add_child(window)
-	window.get_node("%WorldPreview").display(current)
-	window.get_node("%Selection").text = "当前：%s · 原包编号 %d%s" % [current.name, int(current.preview.selected_map_id), "（原包未提供总图位置）" if current.data["世界总图坐标（列x、行y）"] == null else ""]
+	window.get_node("Overview").display(current)
 	window.close_requested.connect(window.queue_free)
-	window.popup_centered(Vector2i(820, 860))
+	window.popup_centered_clamped(LAYOUT.DESKTOP_SIZE, 0.95)
 	return window
 
 func _apply_theme() -> void:
@@ -65,7 +61,7 @@ func _apply_theme() -> void:
 	var font := SystemFont.new()
 	font.font_names = PackedStringArray(["Microsoft YaHei", "Noto Sans CJK SC", "sans-serif"])
 	design.default_font = font
-	design.default_font_size = 16
+	design.default_font_size = 14
 	for type in ["Label", "Button", "LineEdit", "Tree", "ItemList", "CheckBox", "CodeEdit", "TabContainer"]:
 		design.set_color("font_color", type, Color("dbe7ef"))
 		design.set_color("font_selected_color", type, Color("ffffff"))
@@ -84,8 +80,8 @@ func _apply_theme() -> void:
 	design.set_stylebox("selected_focus", "ItemList", _box("23483f", "4cbda3", 6))
 	design.set_stylebox("selected", "Tree", _box("254c61", "375d72", 4))
 	design.set_stylebox("selected_focus", "Tree", _box("254c61", "4cbda3", 4))
-	design.set_constant("v_separation", "Tree", 12)
-	design.set_constant("v_separation", "ItemList", 17)
+	design.set_constant("v_separation", "Tree", 6)
+	design.set_constant("v_separation", "ItemList", 9)
 	design.set_constant("h_separation", "ItemList", 12)
 	theme = design
 	add_theme_stylebox_override("panel", _box("15222e", "293b4a", 0))
@@ -98,10 +94,10 @@ func _box(fill: String, border: String, radius: int) -> StyleBoxFlat:
 	box.border_color = Color(border)
 	box.set_border_width_all(1)
 	box.set_corner_radius_all(radius)
-	box.content_margin_left = 12
-	box.content_margin_right = 12
-	box.content_margin_top = 9
-	box.content_margin_bottom = 9
+	box.content_margin_left = 8
+	box.content_margin_right = 8
+	box.content_margin_top = 6
+	box.content_margin_bottom = 6
 	return box
 
 func reload_data() -> void:
@@ -185,7 +181,7 @@ func _show_entry(entry: Dictionary) -> void:
 	%ExpandOverview.visible = preview_kind == "world_overview"
 	%PreviewMessage.visible = preview_kind == "unavailable"
 	%PreviewMessage.text = entry.get("preview", {}).get("message", "")
-	%Preview.custom_minimum_size.y = 160 if preview_kind == "unavailable" else 240
+	_update_preview_height()
 	var excerpts: Array = entry.get("data", {}).get("文本摘录", [])
 	var was_reading_text: bool = %Texts.get_parent().current_tab == 2
 	%Texts.get_parent().set_tab_hidden(2, excerpts.is_empty())
@@ -202,6 +198,10 @@ func _show_entry(entry: Dictionary) -> void:
 	for name in names:
 		%Animations.add_item(name)
 		if name == "idle": %Animations.select(%Animations.item_count - 1)
+
+func _update_preview_height() -> void:
+	var minimum := 120.0 if current.get("preview", {}).get("kind") == "unavailable" else 96.0
+	%Preview.custom_minimum_size.y = clampf(minimum + (get_viewport_rect().size.y - 540.0) * 0.35, minimum, 240.0)
 
 func _append_fields(parent: TreeItem, data: Dictionary) -> void:
 	for key in data:

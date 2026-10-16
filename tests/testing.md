@@ -14,6 +14,8 @@ PostgreSQL账号、密码、会话、注销与账号界面验证见[account_auth
 
 服务端结构化日志、只读Web监控、真实浏览器与数据库故障验证见[observability.md](observability.md)。
 
+项目数据管理与世界总图F6独立运行、小窗口及真实嵌入布局验证见[data_browser.md](data_browser.md#f6-独立运行与嵌入窗口布局)。
+
 同一游戏界面的多人角色、内嵌聊天与本地入口验证见[shared_interface.md](shared_interface.md)及[local_mode.md](local_mode.md)。
 
 底部内置表情面板、标记传输与双方贴图显示验证见[chat_emotes.md](chat_emotes.md)。

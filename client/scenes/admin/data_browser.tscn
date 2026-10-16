@@ -4,6 +4,7 @@
 [ext_resource type="Script" path="res://scripts/admin/data_preview.gd" id="2"]
 
 [node name="DataBrowser" type="PanelContainer"]
+custom_minimum_size = Vector2(960, 640)
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -12,27 +13,28 @@ grow_vertical = 2
 script = ExtResource("1")
 
 [node name="Margin" type="MarginContainer" parent="."]
-theme_override_constants/margin_left = 24
-theme_override_constants/margin_top = 18
-theme_override_constants/margin_right = 24
-theme_override_constants/margin_bottom = 14
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 10
 
 [node name="Layout" type="VBoxContainer" parent="Margin"]
-theme_override_constants/separation = 16
+theme_override_constants/separation = 10
 
 [node name="Header" type="HBoxContainer" parent="Margin/Layout"]
-theme_override_constants/separation = 18
+theme_override_constants/separation = 12
 
 [node name="Brand" type="VBoxContainer" parent="Margin/Layout/Header"]
 size_flags_horizontal = 3
 
 [node name="Title" type="Label" parent="Margin/Layout/Header/Brand"]
 theme_override_colors/font_color = Color(0.92, 0.97, 1, 1)
-theme_override_font_sizes/font_size = 27
+theme_override_font_sizes/font_size = 22
 text = "蜀山剑侠 / 项目数据管理"
 
 [node name="Total" type="Label" parent="Margin/Layout/Header/Brand"]
 unique_name_in_owner = true
+theme_override_font_sizes/font_size = 12
 theme_override_colors/font_color = Color(0.51, 0.65, 0.73, 1)
 text = "正在读取项目定义…"
 
@@ -42,21 +44,21 @@ text = "● 只读工作台"
 
 [node name="Refresh" type="Button" parent="Margin/Layout/Header"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(124, 42)
+custom_minimum_size = Vector2(100, 32)
 size_flags_vertical = 4
 tooltip_text = "重新读取定义（F5）；脚本常量变更需重新运行场景"
 text = "刷新  F5"
 
 [node name="Body" type="HBoxContainer" parent="Margin/Layout"]
 size_flags_vertical = 3
-theme_override_constants/separation = 18
+theme_override_constants/separation = 12
 
 [node name="NavPanel" type="PanelContainer" parent="Margin/Layout/Body"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(194, 0)
+custom_minimum_size = Vector2(156, 0)
 
 [node name="Nav" type="VBoxContainer" parent="Margin/Layout/Body/NavPanel"]
-theme_override_constants/separation = 14
+theme_override_constants/separation = 8
 
 [node name="Label" type="Label" parent="Margin/Layout/Body/NavPanel/Nav"]
 theme_override_colors/font_color = Color(0.51, 0.65, 0.73, 1)
@@ -69,7 +71,7 @@ auto_height = false
 
 [node name="Hint" type="Label" parent="Margin/Layout/Body/NavPanel/Nav"]
 theme_override_colors/font_color = Color(0.51, 0.65, 0.73, 1)
-theme_override_font_sizes/font_size = 13
+theme_override_font_sizes/font_size = 11
 text = "原包物品全部收录\n缺失名称 / 数值标为 —\n已接入数值属重建规则\n\nCtrl+F 搜索当前分类\nF5 刷新数据"
 
 [node name="Split" type="HSplitContainer" parent="Margin/Layout/Body"]
@@ -77,16 +79,16 @@ size_flags_horizontal = 3
 split_offset = -60
 
 [node name="Listing" type="VBoxContainer" parent="Margin/Layout/Body/Split"]
-custom_minimum_size = Vector2(310, 0)
+custom_minimum_size = Vector2(270, 0)
 size_flags_horizontal = 3
-theme_override_constants/separation = 12
+theme_override_constants/separation = 8
 
 [node name="Heading" type="HBoxContainer" parent="Margin/Layout/Body/Split/Listing"]
 
 [node name="Section" type="Label" parent="Margin/Layout/Body/Split/Listing/Heading"]
 unique_name_in_owner = true
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 23
+theme_override_font_sizes/font_size = 18
 text = "武器"
 
 [node name="Count" type="Label" parent="Margin/Layout/Body/Split/Listing/Heading"]
@@ -97,7 +99,7 @@ theme_override_colors/font_color = Color(0.51, 0.65, 0.73, 1)
 unique_name_in_owner = true
 visible = false
 theme_override_colors/font_color = Color(0.85, 0.74, 0.49, 1)
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 12
 autowrap_mode = 3
 
 [node name="SearchBar" type="HBoxContainer" parent="Margin/Layout/Body/Split/Listing"]
@@ -105,7 +107,7 @@ theme_override_constants/separation = 8
 
 [node name="Search" type="LineEdit" parent="Margin/Layout/Body/Split/Listing/SearchBar"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 42)
+custom_minimum_size = Vector2(0, 32)
 size_flags_horizontal = 3
 placeholder_text = "搜索名称、ID、属性…"
 clear_button_enabled = true
@@ -152,15 +154,15 @@ vertical_alignment = 1
 
 [node name="Inspector" type="PanelContainer" parent="Margin/Layout/Body/Split"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(410, 0)
+custom_minimum_size = Vector2(360, 0)
 size_flags_horizontal = 3
 
 [node name="Details" type="VBoxContainer" parent="Margin/Layout/Body/Split/Inspector"]
-theme_override_constants/separation = 10
+theme_override_constants/separation = 4
 
 [node name="DetailTitle" type="Label" parent="Margin/Layout/Body/Split/Inspector/Details"]
 unique_name_in_owner = true
-theme_override_font_sizes/font_size = 22
+theme_override_font_sizes/font_size = 18
 text = "未选择条目"
 text_overrun_behavior = 3
 
@@ -171,7 +173,7 @@ autowrap_mode = 3
 
 [node name="Preview" type="Control" parent="Margin/Layout/Body/Split/Inspector/Details"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 240)
+custom_minimum_size = Vector2(0, 96)
 mouse_filter = 2
 script = ExtResource("2")
 
@@ -240,6 +242,7 @@ selection_enabled = true
 bbcode_enabled = false
 
 [node name="SourceLabel" type="Label" parent="Margin/Layout/Body/Split/Inspector/Details"]
+visible = false
 theme_override_font_sizes/font_size = 13
 theme_override_colors/font_color = Color(0.51, 0.65, 0.73, 1)
 text = "定义来源"

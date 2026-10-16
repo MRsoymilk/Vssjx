@@ -101,7 +101,7 @@ func _ready() -> void:
 	check(not browser.get_node("%PreviewMessage").visible and not browser.get_node("%Collision").visible and browser.get_node("%ExpandOverview").visible, "World overview preview is separate from scene collision")
 	var overview_window: Window = browser.open_world_overview()
 	await get_tree().process_frame
-	var world_preview: Control = overview_window.get_node("%WorldPreview")
+	var world_preview: Control = overview_window.get_node("Overview").get_node("%WorldPreview")
 	var first_node: Dictionary = catalog.original_overview.nodes[0]
 	var position: Array = first_node.world_position
 	var point: Vector2 = world_preview.overview_transform() * Vector2(position[0], position[1])
@@ -138,9 +138,9 @@ func _ready() -> void:
 				check(preview.sprite.sprite_frames.get_animation_loop("attack") == attack_loop, "Preview leaves shared animation loop unchanged: " + entry.id)
 	browser.select_category("characters")
 	await get_tree().process_frame
-	check(browser.get_node("%Inspector").size.x >= 410, "Readable inspector width")
+	check(browser.get_node("%Inspector").size.x >= 360, "Readable desktop inspector width")
 	check(not browser.get_node("%Raw").editable and not browser.get_node("%Source").editable, "Read-only detail controls")
-	get_window().size = Vector2i(1060, 740)
+	get_window().size = Vector2i(960, 540)
 	await get_tree().process_frame
 	await get_tree().process_frame
 	var inspector: Control = browser.get_node("%Inspector")

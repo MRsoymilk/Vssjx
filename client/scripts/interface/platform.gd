@@ -23,8 +23,11 @@ func initialize(target: String = "") -> void:
 		add_child(context.lifecycle)
 		add_child(context.resource_loader)
 		add_child(context.system_actions)
-		state = State.READY
-		last_result = PlatformResult.success()
+		if context.target == "web":
+			last_result = await context.storage.initialize().wait()
+		else:
+			last_result = PlatformResult.success()
+		state = State.READY if last_result.ok else State.FAILED
 	initialization_finished.emit(last_result)
 
 func is_available() -> bool:

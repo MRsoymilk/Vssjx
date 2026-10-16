@@ -79,10 +79,18 @@ class PlatformBoundaryTests(unittest.TestCase):
         self.assertIn('"SAVE_UNCONFIRMED"', game)
         self.assertIn('"STORAGE_BUSY"', game)
 
-    def test_web_factory_remains_disabled_despite_storage_adapter(self):
+    def test_web_factory_selects_only_browser_ports_and_waits_for_storage(self):
         factory = (INTERFACE / 'platform_factory.gd').read_text('utf8')
-        self.assertIn('if OS.has_feature("web"): return null', factory)
-        self.assertTrue((INTERFACE / 'adapters/web/web_storage.gd').exists())
+        web_branch = factory.split('if OS.has_feature("web"):', 1)[1].split('if selected != "native"', 1)[0]
+        self.assertIn('if selected != "web": return null', web_branch)
+        self.assertNotIn('adapters/native/', web_branch)
+        for name in ['storage', 'runtime_config', 'display', 'lifecycle', 'resource_loader', 'system_actions']:
+            self.assertIn('adapters/web/web_' + name + '.gd', web_branch)
+        platform = (INTERFACE / 'platform.gd').read_text('utf8')
+        self.assertLess(platform.index('await context.storage.initialize().wait()'), platform.index('state = State.READY'))
+        capabilities = (INTERFACE / 'platform_context.gd').read_text('utf8')
+        for flag in ['native_file_storage', 'synchronous_storage', 'exit_application']:
+            self.assertIn('"' + flag + '": not web', capabilities)
 
     def test_web_storage_has_no_native_or_query_credentials_fallback(self):
         gd = (INTERFACE / 'adapters/web/web_storage.gd').read_text('utf8')
@@ -100,7 +108,13 @@ class PlatformBoundaryTests(unittest.TestCase):
         self.assertIn("durability: 'browser_sync'", js)
         self.assertIn("'vssjx-offline-v1'", js)
         presets = (CLIENT / 'export_presets.cfg').read_text('utf8')
-        self.assertEqual(presets.count('scripts/interface/adapters/web/*.js'), 2)
+        self.assertEqual(presets.count('scripts/interface/adapters/web/*.js'), 3)
+
+    def test_web_resources_do_not_require_threads_or_claim_interruptible_io(self):
+        loader = (INTERFACE / 'adapters/web/web_resource_loader.gd').read_text('utf8')
+        self.assertNotIn('load_threaded', loader)
+        self.assertIn('_expire_requests()', loader)
+        self.assertIn('not interruptible', loader)
 
     def test_game_canvas_and_existing_exports_are_preserved(self):
         config = (CLIENT / 'project.godot').read_text('utf8')

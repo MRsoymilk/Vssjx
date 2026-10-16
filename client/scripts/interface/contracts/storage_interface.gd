@@ -3,6 +3,9 @@ extends RefCounted
 ## Game save operations use requests, including immediate native completions.
 ## A write may succeed only after its declared persistence boundary completes.
 
+func initialize() -> PlatformStorageRequest:
+	return PlatformStorageRequest.resolved(PlatformResult.unsupported())
+
 func probe(_path: String) -> PlatformStorageRequest:
 	return PlatformStorageRequest.resolved(PlatformResult.unsupported())
 

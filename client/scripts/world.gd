@@ -168,7 +168,7 @@ func _name_tag(sprite: Node2D, value: String, color: Color) -> void:
 	label.size = Vector2(130, 16)
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.add_theme_font_size_override("font_size", 10)
-	var font := SystemFont.new()
+	var font := preload("res://scripts/interface/adapters/common/cjk_system_font.gd").new()
 	font.font_names = PackedStringArray(["SimHei", "Microsoft YaHei", "Noto Sans CJK SC", "sans-serif"])
 	font.antialiasing = TextServer.FONT_ANTIALIASING_NONE
 	label.add_theme_font_override("font", font)
@@ -288,6 +288,7 @@ func _interact_pending() -> void:
 
 func _process(delta: float) -> void:
 	if not enabled or hero == null: return
+	if OS.has_feature("web") and (not Platform.context.lifecycle.focused or Platform.context.lifecycle.suspended): return
 	if _keyboard_direction() != Vector2i.ZERO:
 		move_target.clear()
 		path.clear()

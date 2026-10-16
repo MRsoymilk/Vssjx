@@ -1,4 +1,6 @@
 [gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/interface/adapters/common/cjk_system_font.gd" id="BundledCjk"]
 [ext_resource type="Script" path="res://scripts/character_selection.gd" id="Script"]
 [ext_resource type="Script" path="res://scripts/online_selection_flow.gd" id="OnlineFlow"]
 [ext_resource type="Texture2D" path="res://assets/ui/create_header_end.png" id="End"]
@@ -7,6 +9,7 @@
 [ext_resource type="Texture2D" path="res://assets/ui/create_arrow.png" id="Arrow"]
 [ext_resource type="PackedScene" path="res://scenes/actors/original_actor.tscn" id="Actor"]
 [sub_resource type="SystemFont" id="Font"]
+script = ExtResource("BundledCjk")
 font_names = PackedStringArray("SimHei", "Microsoft YaHei", "sans-serif")
 antialiasing = 0
 [sub_resource type="StyleBoxFlat" id="Header"]

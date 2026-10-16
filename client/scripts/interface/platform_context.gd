@@ -42,6 +42,7 @@ func _init(kind: String, storage_port: PlatformStorageInterface, config_port: Pl
 	_system_actions = system_port
 
 func capabilities() -> Dictionary:
-	return {"native_file_storage": true, "synchronous_storage": true, "awaitable_storage": true,
+	var web := _target == "web"
+	return {"native_file_storage": not web, "synchronous_storage": not web, "awaitable_storage": true,
 		"display_coordinates": true, "lifecycle_events": true, "resource_preparation": true,
-		"godot_text_input": true, "exit_application": true, "web_runtime": false}
+		"godot_text_input": true, "exit_application": not web, "web_runtime": web}

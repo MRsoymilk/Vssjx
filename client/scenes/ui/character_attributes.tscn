@@ -1,5 +1,7 @@
 [gd_scene format=3]
 
+[ext_resource type="Script" path="res://scripts/interface/adapters/common/cjk_system_font.gd" id="BundledCjk"]
+
 [ext_resource type="Script" path="res://scripts/character_attributes.gd" id="1_bfqdg"]
 [ext_resource type="Texture2D" path="res://assets/ui/create_header_end.png" id="2_wkwbb"]
 [ext_resource type="Texture2D" path="res://assets/ui/attribute_spiral.png" id="3_w65p8"]
@@ -7,6 +9,7 @@
 [ext_resource type="Texture2D" path="res://assets/ui/create_cursor.png" id="5_iq6js"]
 
 [sub_resource type="SystemFont" id="SystemFont_1n3pw"]
+script = ExtResource("BundledCjk")
 font_names = PackedStringArray("SimHei", "Microsoft YaHei", "Noto Sans CJK SC", "sans-serif")
 antialiasing = 0
 

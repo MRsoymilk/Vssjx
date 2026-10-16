@@ -1,11 +1,14 @@
 [gd_scene format=3]
 
+[ext_resource type="Script" path="res://scripts/interface/adapters/common/cjk_system_font.gd" id="BundledCjk"]
+
 [ext_resource type="Script" path="res://scripts/original_cover.gd" id="Script"]
 [ext_resource type="Texture2D" path="res://assets/ui/original_cover.png" id="Artwork"]
 [ext_resource type="Texture2D" path="res://assets/ui/select_3.png" id="Left"]
 [ext_resource type="Texture2D" path="res://assets/ui/select_2.png" id="Right"]
 
 [sub_resource type="SystemFont" id="Font"]
+script = ExtResource("BundledCjk")
 font_names = PackedStringArray("SimSun", "Noto Serif CJK SC", "serif")
 antialiasing = 0
 

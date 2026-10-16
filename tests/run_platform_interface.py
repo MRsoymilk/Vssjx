@@ -54,7 +54,7 @@ def main():
     run('import', [godot, '--headless', '--editor', '--path', str(project), '--import'])
     run('resource-loader-parse', [godot, '--headless', '--path', str(project), '--check-only', '--script',
                                 'res://scripts/interface/adapters/native/native_resource_loader.gd'])
-    suites = ['web_storage_native_test', 'platform_storage_async_test', 'platform_web_security_test', 'platform_input_actions_test', 'resource_loader_test', 'platform_interface_test', 'test_runner', 'server_connection_test',
+    suites = ['web_resource_loader_test', 'web_storage_native_test', 'platform_storage_async_test', 'platform_web_security_test', 'platform_input_actions_test', 'resource_loader_test', 'platform_interface_test', 'test_runner', 'server_connection_test',
               'world_delta_test', 'public_chat_test', 'shared_interface_test', 'chat_emotes_test',
               'expanded_chat_test', 'online_attributes_test', 'online_allocation_test',
               'local_mode_test', 'login_ui_test', 'character_selection_test',

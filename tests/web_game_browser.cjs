@@ -67,6 +67,10 @@ async function enterLocal() {
         check(await saved() === null, 'Fresh browser has no offline character');
         await shot('01-cover');
         await enterLocal();
+        await shot('02-empty-local-selection');
+        await click(26, 466); // selection menu
+        await click(54, 370); // create local character
+        await page.waitForTimeout(500);
         await shot('02-creation');
         await click(160, 278);
         // Real key events; CDP insertText is not a desktop/mobile IME test.
@@ -76,7 +80,8 @@ async function enterLocal() {
         const initial = await waitSaved(value => value?.name === 'WebHero');
         check(initial.version === 1 && initial.gold === 30, 'UI creates and commits unchanged v1 offline character');
         await shot('03-first-entry');
-        await click(160, 325); // initial hint -> world
+        await click(160, 464); // created character -> explicit Enter
+        await page.waitForTimeout(700);
         await page.keyboard.press('e');
         await page.waitForTimeout(1200);
         await shot('04-quest-dialog');

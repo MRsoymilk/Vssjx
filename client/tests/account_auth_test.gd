@@ -16,7 +16,7 @@ func form(app: Control) -> ServerLogin:
 	var page := app.modal.find_child("ServerLogin", true, false) as ServerLogin
 	# Isolate auth/session checks here; registration_flow_test covers navigation.
 	page.characters_requested.disconnect(Callable(app, "_online_characters"))
-	page.registration_requested.disconnect(Callable(app, "_online_creation"))
+	page.registration_requested.disconnect(Callable(app, "_online_characters"))
 	return page
 
 func capture(name_value: String) -> void:

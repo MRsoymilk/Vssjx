@@ -38,6 +38,7 @@ func _capture() -> void:
 	app.creation.select_variant(2)
 	app._select_job(1)
 	app._begin_new("青衫客")
+	app.character_selection.enter_button.pressed.emit()
 	app._close_modal()
 	await save_frame("03_world")
 	app._npc()

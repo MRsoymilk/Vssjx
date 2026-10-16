@@ -36,12 +36,17 @@ func _run() -> void:
 	add_child(app)
 	if phase != "read":
 		enter_local()
-		check(app.mode == "create" and app.creation != null, "First local entry creates a local character")
+		check(app.mode == "local_select" and app.world == null and app.character_selection.characters.is_empty(), "First local entry stops on empty character selection")
+		check(app.character_selection.get_node("GameMode").text == "本地模式" and app.character_selection.enter_button.disabled, "Local mode is identified before creation")
+		app.character_selection.get_node("Options/Create").pressed.emit()
+		check(app.mode == "create" and app.creation != null, "Empty local slot offers character creation")
 		app.creation.select_variant(5)
 		app.selected_school = 1
 		app.nickname.text = "本地青衫"
 		app.creation.create_requested.emit()
 		app._close_modal()
+		check(app.mode == "local_select" and app.world == null and app.character_selection.characters.size() == 1, "Created character returns to selection instead of bypassing it")
+		app.character_selection.enter_button.pressed.emit()
 		check(app.mode == "world" and app.world != null and FileAccess.file_exists(path), "Local character enters the normal game world and is saved")
 		Game.player.hp = 51
 		Game.player.mp = 23

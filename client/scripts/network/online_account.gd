@@ -6,6 +6,7 @@ var account: Dictionary = {}
 var server_address := ""
 var login_session_id := ""
 var busy := false
+var network_suspended := false
 var _access_token := ""
 var _refresh_token := ""
 var _expires_at := 0.0
@@ -30,6 +31,7 @@ func is_logged_in() -> bool:
 func suspend_network() -> void:
 	# Keep the memory-only account separate, but do no background network work
 	# while the player has explicitly selected the local service.
+	network_suspended = true
 	_generation += 1
 	if _request != null and is_instance_valid(_request):
 		_request.cancel_request()
@@ -40,6 +42,10 @@ func suspend_network() -> void:
 	_target = ""
 	_after_refresh = {}
 	set_process(false)
+
+func resume_network() -> void:
+	network_suspended = false
+	set_process(true)
 
 func clear() -> void:
 	_generation += 1
@@ -98,6 +104,7 @@ func logout() -> void:
 	clear()
 
 func _send(action: String, address: String, payload: Dictionary, bearer: bool = false) -> void:
+	if network_suspended: return
 	if busy: return
 	if not Platform.is_available():
 		var result := {"ok": false, "code": "PLATFORM_NOT_READY"}

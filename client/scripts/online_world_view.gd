@@ -46,7 +46,7 @@ var _closed_battle := ""
 
 func _ready() -> void:
 	if OS.has_feature("web"): Platform.context.lifecycle.changed.connect(_web_lifecycle)
-	map_data = JSON.parse_string(FileAccess.get_file_as_string(OnlineWorldClient.MAP_PATH))
+	map_data = SharedWorldMap.load_data()
 	_build_map()
 	image.texture = viewport.get_texture()
 	image.gui_input.connect(_map_input)
@@ -173,28 +173,8 @@ func _status_changed(text_value: String) -> void:
 	_chat_changed()
 
 func _build_map() -> void:
-	_motion_grid.region = Rect2i(0, 0, 32, 32)
-	_motion_grid.diagonal_mode = AStarGrid2D.DIAGONAL_MODE_NEVER
-	_motion_grid.default_compute_heuristic = AStarGrid2D.HEURISTIC_MANHATTAN
-	_motion_grid.default_estimate_heuristic = AStarGrid2D.HEURISTIC_MANHATTAN
-	_motion_grid.update()
-	for index in map_data.blocked.size(): _motion_grid.set_point_solid(Vector2i(index % 32, index / 32), map_data.blocked[index])
-	var terrain: TileMapLayer = $Viewport/Scene/Terrain
-	var tiles := TileSet.new()
-	tiles.tile_size = Vector2i(16, 16)
-	var atlas := TileSetAtlasSource.new()
-	atlas.texture = load("res://assets/tiles/original_tiles.png")
-	atlas.texture_region_size = Vector2i(16, 16)
-	for index in 756: atlas.create_tile(Vector2i(index % 32, index / 32))
-	tiles.add_source(atlas)
-	terrain.tile_set = tiles
-	for index in map_data.tiles.size():
-		var tile := int(map_data.tiles[index])
-		terrain.set_cell(Vector2i(index % 32, index / 32), 0, Vector2i(tile % 32, tile / 32))
-	for prop in map_data.scenery:
-		var actor := OriginalArt.actor(prop.art)
-		actor.position = Vector2(prop.x, prop.y)
-		actor_layer.add_child(actor)
+	SharedWorldMap.build($Viewport/Scene/Terrain, _motion_grid, map_data)
+	SharedWorldMap.add_scenery(actor_layer, map_data)
 
 func _population(values: Dictionary) -> void:
 	var visible_values := values.duplicate()

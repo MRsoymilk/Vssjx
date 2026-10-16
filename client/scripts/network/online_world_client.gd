@@ -4,7 +4,7 @@ extends Node
 signal changed(entities: Dictionary)
 signal status_changed(text: String)
 signal movement_cancelled
-const MAP_PATH := "res://assets/data/qingyun-v1.json"
+const MAP_PATH := SharedWorldMap.MAP_PATH
 var world_ready := false
 var character_id := ""
 var entities: Dictionary = {}
@@ -108,6 +108,7 @@ func _failed(code: String, retry: bool = false) -> void:
 	else: _state = "failed"
 
 func _on_ticket(result: Dictionary) -> void:
+	if OnlineAccount.network_suspended: return
 	if _state != "ticket": return
 	if not result.ok:
 		_failed(String(result.get("code", "TICKET_FAILED")), result.get("code") in ["NETWORK_ERROR", "SERVER_BUSY", "RATE_LIMITED", "DATABASE_UNAVAILABLE"])
@@ -136,6 +137,9 @@ func _on_ticket(result: Dictionary) -> void:
 	status_changed.emit("正在连接共享地图……")
 
 func _process(_delta: float) -> void:
+	if OnlineAccount.network_suspended:
+		if _state != "idle": leave()
+		return
 	if _state == "idle": return
 	if not OnlineAccount.is_logged_in() or OnlineAccount.server_address != server or OnlineAccount.login_session_id != login_session:
 		_failed("SESSION_REVOKED")

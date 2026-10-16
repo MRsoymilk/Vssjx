@@ -15,6 +15,7 @@ var previews: Array[AnimatedSprite2D] = []
 @onready var status: Label = $Status
 
 func _ready() -> void:
+	$GameMode.text = "联机模式" if online_mode else "本地模式"
 	for i in 3:
 		previews.append(get_node("Slot%d/Preview" % i))
 		get_node("Slot%d/Choose" % i).pressed.connect(select_index.bind(i - 1))

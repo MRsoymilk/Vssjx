@@ -50,16 +50,12 @@ func _draw() -> void:
 		for x in 32:
 			var point := Vector2i(x, y)
 			var fill := Color("626653")
-			if not local:
+			if not local or world.zone == 0:
 				var index := y * 32 + x
-				var tile := int(shared_map.tiles[index])
+				var data: Dictionary = world.map_data if local else shared_map
+				var tile := int(data.tiles[index])
 				fill = Color("426969") if tile == 123 else (Color("919279") if tile == 138 or tile in [18, 20, 21, 22, 30, 32, 40, 41, 42] else Color("666e58"))
-				if shared_map.blocked[index]: fill = fill.darkened(0.35)
-			elif world.zone == 0:
-				match world.ground_at(point):
-					ShushanWorld.Ground.GRASS: fill = Color("666e58")
-					ShushanWorld.Ground.DIRT, ShushanWorld.Ground.BRIDGE: fill = Color("919279")
-					ShushanWorld.Ground.WATER: fill = Color("426969")
+				if not local and data.blocked[index]: fill = fill.darkened(0.35)
 			else: fill = Color("666374")
 			if local and world.astar.is_point_solid(point): fill = fill.darkened(0.35)
 			draw_rect(Rect2(origin + Vector2(point) * scale_value, Vector2.ONE * scale_value), fill)

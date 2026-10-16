@@ -6,6 +6,7 @@ const PAPER := Color("eee6cc")
 const GOLD := Color("e9c67c")
 const TEAL := Color("7cc7bd")
 var mode := "home"
+var _local_messages: Array[Dictionary] = []
 @onready var ui: Control = $UI
 @onready var announcement_banner: AnnouncementBanner = $Announcements/Banner
 var world_view: TextureRect
@@ -147,6 +148,7 @@ func _process(delta: float) -> void:
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	if Game.storage_busy or _closing: return
+	if get_viewport().gui_get_focus_owner() is LineEdit: return
 	if not event is InputEventKey or not event.pressed or event.echo: return
 	if mode == "battle_loading":
 		get_viewport().set_input_as_handled()
@@ -296,6 +298,7 @@ func _dispose_world() -> void:
 		world_view = null
 
 func _home() -> void:
+	_local_messages.clear()
 	mode = "home"
 	_clear_ui()
 	_dispose_world()
@@ -334,11 +337,12 @@ func _server_login() -> void:
 	modal.add_child(login)
 	login.close_requested.connect(_close_modal)
 	login.characters_requested.connect(_online_characters, CONNECT_DEFERRED)
-	login.registration_requested.connect(_online_creation, CONNECT_DEFERRED)
+	login.registration_requested.connect(_online_characters, CONNECT_DEFERRED)
 	login.local_requested.connect(_enter_local_game)
 
 func _enter_local_game() -> void:
 	if Game.storage_busy or _closing: return
+	if mode == "online_world": _home()
 	OnlineAccount.suspend_network()
 	var epoch := _ui_epoch
 	var probe := await Game.probe_save()
@@ -350,9 +354,10 @@ func _enter_local_game() -> void:
 		if epoch != _ui_epoch or result.status == PlatformResult.Status.CANCELLED or _closing: return
 		if result.ok: _local_character_selection()
 		else: _message("无法读取", result.message)
-	else: _create()
+	else: _local_character_selection(false)
 
 func _online_characters(_character_id: String = "") -> void:
+	OnlineAccount.resume_network()
 	mode = "online_select"
 	_clear_ui()
 	_dispose_world()
@@ -371,16 +376,17 @@ func _enter_selected_online(character_id: String) -> void:
 			_enter_online_world(character_id)
 			return
 
-func _local_character_selection() -> void:
+func _local_character_selection(has_character: bool = true) -> void:
 	mode = "local_select"
 	_clear_ui()
 	_dispose_world()
 	character_selection = preload("res://scenes/ui/character_selection.tscn").instantiate()
 	ui.add_child(character_selection)
-	character_selection.display_characters([Game.player])
-	character_selection.set_controls(false, false)
-	character_selection.status.text = "请选择角色后进入游戏"
+	character_selection.display_characters([Game.player] if has_character else [])
+	character_selection.set_controls(false, true)
+	character_selection.status.text = "请选择角色后进入游戏" if has_character else "尚无本地角色，请从菜单创建角色"
 	character_selection.enter_requested.connect(func(_id: String) -> void: _continue())
+	character_selection.create_requested.connect(_create)
 	character_selection.back_requested.connect(_return_to_server_login)
 
 func _online_creation() -> void:
@@ -462,13 +468,13 @@ func _start_new() -> void:
 func _begin_new(name_value: String) -> void:
 	if Game.storage_busy or _closing: return
 	Game.new_player(name_value, selected_job, selected_school, selected_gender)
+	_local_messages.clear()
 	var result := await _save_current()
 	if result.status == PlatformResult.Status.CANCELLED or _closing: return
 	if not result.ok:
 		_message("创建存档失败", result.message + "\n尚未进入地图，请重试。")
 		return
-	_enter_world()
-	_message("山门初见", "蜀山山道妖气渐浓。\n先去石桥旁找清微道人，接取试炼。\n\n点击人物或怪物，会自动走近并交互。\nWASD / 方向键移动，E 键交互。")
+	_local_character_selection()
 
 func _continue() -> void:
 	if Game.storage_busy or _closing: return
@@ -479,6 +485,9 @@ func _continue() -> void:
 		if int(Game.player.hp) == 0: Game.restore()
 		_enter_world()
 	else:
+		if mode == "local_select" and is_instance_valid(character_selection):
+			character_selection._entering = false
+			character_selection.set_controls(false, true)
 		_message("无法读取", result.message if result.code != "NOT_FOUND" else "尚无本地存档。")
 
 func _enter_world() -> void:
@@ -496,13 +505,19 @@ func _enter_world() -> void:
 	world_view.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	world_view.gui_input.connect(func(event: InputEvent) -> void:
 		if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+			_release_local_chat_input()
 			world.click(event.position)
 		elif event is InputEventScreenTouch and event.pressed:
+			_release_local_chat_input()
 			world.click(event.position)
 	)
 	add_child(world_view)
 	move_child(ui, get_child_count() - 1)
 	_world_ui()
+
+func _release_local_chat_input() -> void:
+	for child in ui.get_children():
+		if child is GameWorldScreen and child.local_chat != null: child.local_chat.release_input()
 
 func _world_ui() -> void:
 	mode = "world"
@@ -510,9 +525,11 @@ func _world_ui() -> void:
 	world_view.show()
 	world.enabled = true
 	var screen: GameWorldScreen = preload("res://scenes/ui/game_world_screen.tscn").instantiate()
+	screen.local_messages = _local_messages
 	ui.add_child(screen)
 	chrome = screen.chrome
 	screen.action_requested.connect(_scene_action)
+	screen.movement_pause_requested.connect(world.pause_moving)
 	ui.theme = chrome.theme
 	var hud: Control = screen.hud
 	minimap = hud.get_node("Minimap")

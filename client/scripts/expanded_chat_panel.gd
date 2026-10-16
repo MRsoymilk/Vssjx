@@ -16,6 +16,7 @@ var _scroll_pending := false
 var _pending_scroll := 0.0
 var _pending_follow := true
 const LIMIT := 100
+var public_caption := "世界"
 
 func _ready() -> void:
 	$Panel/Return.pressed.connect(dismiss)
@@ -100,7 +101,7 @@ func _render(follow: bool = false) -> void:
 		if count > 0: history.add_text("\n")
 		count += 1
 		history.push_color(Color("9470a6") if entry.channel == "public" else Color("af6a47"))
-		history.add_text("[世界] " if entry.channel == "public" else "[系统] ")
+		history.add_text("[%s] " % public_caption if entry.channel == "public" else "[系统] ")
 		history.pop()
 		if entry.channel == "public":
 			history.push_color(Color("597e7d"))
@@ -108,7 +109,7 @@ func _render(follow: bool = false) -> void:
 			history.pop()
 		ChatEmotePicker.CATALOG.append_body(history, entry.text)
 	$Panel/Empty.visible = count == 0
-	$Panel/Empty.text = {"all":"暂时没有消息", "public":"暂时没有世界消息", "system":"暂时没有系统消息"}[selected_filter]
+	$Panel/Empty.text = {"all":"暂时没有消息", "public":"暂时没有%s消息" % public_caption, "system":"暂时没有系统消息"}[selected_filter]
 	_render_generation += 1
 	_restore_scroll.call_deferred(_render_generation, previous, at_bottom)
 

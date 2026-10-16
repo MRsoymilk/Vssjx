@@ -74,7 +74,10 @@ func _run() -> void:
 	form.password_input.text = "registration-password-1234"
 	form.switch_button.pressed.emit()
 	check(form.password_input.text.is_empty() and form.auth_button.disabled, "Registration clears visible password and locks duplicate requests")
-	if not await until(creating, "Registration authenticates and opens character creation"): get_tree().quit(1); return
+	if not await until(selecting, "Registration authenticates and opens empty character selection"): get_tree().quit(1); return
+	check(app.character_selection.get_node("GameMode").text == "联机模式" and app.world == null, "First online entry identifies its mode before creation")
+	app.character_selection.get_node("Options/Create").pressed.emit()
+	if not await until(creating, "Empty online selection opens character creation"): get_tree().quit(1); return
 	check(OnlineAccount.is_logged_in() and OnlineAccount.account.username == "registration_ui", "Registered account is the authenticated owner")
 	var remembered := RememberedLogin.new()
 	check(remembered.load_saved(backend) == {"username": "registration_ui", "password": "registration-password-1234"}, "Successful registration and auto-login remember the account when selected")

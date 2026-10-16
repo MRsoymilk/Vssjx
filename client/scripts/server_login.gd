@@ -99,7 +99,7 @@ func _login() -> void:
 		password_input.clear()
 		local_requested.emit()
 		return
-	OnlineAccount.set_process(true)
+	OnlineAccount.resume_network()
 	if OnlineAccount.is_logged_in():
 		if not save_draft(): return
 		if ServerConnectionSettings.normalize(address_input.text).address != OnlineAccount.server_address:
@@ -112,7 +112,7 @@ func _login() -> void:
 
 func _register() -> void:
 	if switch_button.disabled: return
-	OnlineAccount.set_process(true)
+	OnlineAccount.resume_network()
 	register_mode = true
 	_submit_account()
 

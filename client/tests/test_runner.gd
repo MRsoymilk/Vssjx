@@ -204,6 +204,8 @@ func _run() -> void:
 	app.nickname.release_focus()
 	app.creation.select_variant(5)
 	app._begin_new(sample_name)
+	check(app.mode == "local_select" and app.world == null, "New character requires explicit selection before entering")
+	app.character_selection.enter_button.pressed.emit()
 	app._close_modal()
 	check(int(Game.player.gender) == 1 and int(Game.player.job) == 2 and Game.player.name == sample_name, "Creation selection reaches persisted player state")
 	check(app.world.hero.sprite_frames == OriginalArt.cached["hero/wfs"], "Created female avatar is used in the game world")
@@ -211,6 +213,7 @@ func _run() -> void:
 	app._create()
 	app.creation.select_variant(0)
 	app._begin_new("界面验证")
+	app.character_selection.enter_button.pressed.emit()
 	app._close_modal()
 	await get_tree().process_frame
 	check(app.mode == "world" and app.world.available_enemies().size() == 4, "World scene and original enemies load")

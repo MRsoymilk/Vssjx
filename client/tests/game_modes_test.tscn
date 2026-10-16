@@ -1,0 +1,6 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://tests/game_modes_test.gd" id="Script"]
+
+[node name="GameModesTest" type="Node"]
+script = ExtResource("Script")

@@ -219,10 +219,28 @@ func _account_result(action: String, result: Dictionary) -> void:
 			"TARGET_NOT_ALLOWED": "网页仅可连接本站配置的游戏服务。", "WEB_CONFIG_INVALID": "网页服务配置不可用，请从受信任的HTTPS入口打开。",
 		}
 		status.text = String(errors.get(result.get("code", ""), "账号请求失败，请检查服务器与客户端版本。"))
+		if result.get("code") == "NETWORK_ERROR" and result.has("transport_result"):
+			status.text = "网络传输未完成（错误码%d），请将错误码反馈给服主。" % int(result.transport_result)
+		if result.get("code") == "NETWORK_ERROR" and result.has("request_error"):
+			status.text = "网络请求无法启动（错误码%d），请重启游戏或检查网络后重试。" % int(result.request_error)
 		if result.get("code") == "NETWORK_ERROR" and result.get("transport_error") == "TLS_HANDSHAKE_ERROR":
 			status.text = "HTTPS握手失败，请检查地址协议、端口和证书；HTTP服务不能填写成HTTPS。"
 		if result.get("code") == "NETWORK_ERROR" and result.get("transport_error") == "DNS_ERROR":
 			status.text = "服务器域名解析失败，请检查域名拼写和DNS记录是否已生效。"
+		var transport_messages := {
+			"TIMEOUT": "连接超时（30秒），尚未收到完整响应。请稍后重试或换网络测试；注册可能已完成，可先尝试登陆。",
+			"CANT_CONNECT": "无法连接服务器，请检查当前网络及公网地址是否可达。",
+			"CONNECTION_ERROR": "连接在传输中断开，请重试；若持续发生，请联系服主检查隧道链路。",
+			"NO_RESPONSE": "服务器未返回HTTP响应，请联系服主检查公网网关及隧道。",
+			"RESPONSE_TOO_LARGE": "服务器返回内容过大，可能返回了网关验证页面，请联系服主检查。",
+		}
+		if result.get("code") == "NETWORK_ERROR" and transport_messages.has(result.get("transport_error", "")):
+			status.text = transport_messages[result.transport_error]
+		var http_status := int(result.get("http_status", 0))
+		if http_status == 403:
+			status.text = "公网网关拒绝请求（HTTP 403），请联系服主检查Cloudflare或其他网关的拦截记录。"
+		elif http_status >= 500:
+			status.text = "公网网关或服务器异常（HTTP %d），请联系服主检查服务和隧道。" % http_status
 		if _registered_login: status.text = "注册成功，请使用刚才的账号密码登陆。\n" + status.text
 		_registered_login = false
 		if action == "logout": status.text = "本地已退出，服务器注销未确认。"

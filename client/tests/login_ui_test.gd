@@ -78,6 +78,16 @@ func _run() -> void:
 	OnlineAccount._on_response(HTTPRequest.RESULT_CANT_RESOLVE, 0, PackedStringArray(), PackedByteArray(), OnlineAccount._generation)
 	check(transport_results.size() == 2 and transport_results[1].code == "NETWORK_ERROR" and transport_results[1].transport_error == "DNS_ERROR", "DNS failures retain the retry contract with a specific safe transport category")
 	check(login.status.text.contains("域名解析失败") and login.status.text.contains("DNS") and not login.status.text.contains("网络请求未确认"), "Unresolved tunnel hostname identifies the missing DNS route instead of a generic credential error")
+	for pair in [[HTTPRequest.RESULT_TIMEOUT, "30秒"], [HTTPRequest.RESULT_CANT_CONNECT, "无法连接"], [HTTPRequest.RESULT_CONNECTION_ERROR, "传输中断开"], [HTTPRequest.RESULT_NO_RESPONSE, "未返回HTTP响应"]]:
+		OnlineAccount._action = "login"
+		OnlineAccount._on_response(pair[0], 0, PackedStringArray(), PackedByteArray(), OnlineAccount._generation)
+		check(login.status.text.contains(pair[1]), "Transport failure explains the actual stage without blaming credentials")
+	OnlineAccount._action = "login"
+	OnlineAccount._on_response(HTTPRequest.RESULT_BODY_SIZE_LIMIT_EXCEEDED, 403, PackedStringArray(), PackedByteArray(), OnlineAccount._generation)
+	check(login.status.text.contains("HTTP 403") and login.status.text.contains("网关"), "Oversized blocked responses retain safe HTTP status without exposing response bodies")
+	OnlineAccount._action = "login"
+	OnlineAccount._on_response(HTTPRequest.RESULT_SUCCESS, 502, PackedStringArray(), "<html>gateway failure</html>".to_utf8_buffer(), OnlineAccount._generation)
+	check(login.status.text.contains("HTTP 502"), "Non-JSON gateway failures distinguish gateway status from network failure")
 	login.address_input.text = "https://game.example.com/ssjx"
 	login.get_node("Back").pressed.emit()
 	check(app.modal == null and cover.active, "Return restores title input")

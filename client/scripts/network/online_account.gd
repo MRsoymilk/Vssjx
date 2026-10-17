@@ -1,5 +1,6 @@
 extends Node
 const MAX_CHARACTERS := 5
+const REQUEST_TIMEOUT := 30.0
 ## Online identity stays separate from Game.player and offline saves.
 signal completed(action: String, result: Dictionary)
 signal world_ticket_received(result: Dictionary)
@@ -142,7 +143,7 @@ func _send(action: String, address: String, payload: Dictionary, bearer: bool = 
 	_target = normalized.address
 	busy = true
 	_request = HTTPRequest.new()
-	_request.timeout = 8.0
+	_request.timeout = REQUEST_TIMEOUT
 	_request.body_size_limit = 32768
 	_request.max_redirects = 0
 	add_child(_request)
@@ -153,16 +154,25 @@ func _send(action: String, address: String, payload: Dictionary, bearer: bool = 
 	if action in ["characters", "character_create"]: route = "/api/v1/characters"
 	if action == "world_ticket": route = "/api/v1/world/ticket"
 	var error := _request.request(_target + route, headers, method, body)
-	if error != OK: _finish({"ok": false, "code": "NETWORK_ERROR"})
+	if error != OK: _finish({"ok": false, "code": "NETWORK_ERROR", "request_error": int(error)})
 
 func _on_response(result: int, code: int, _headers: PackedStringArray, body: PackedByteArray, expected_generation: int) -> void:
 	if expected_generation != _generation and _action != "logout":
 		_finish({"ok": false, "code": "UNAUTHORIZED"})
 		return
 	if result != HTTPRequest.RESULT_SUCCESS:
-		var failure := {"ok": false, "code": "NETWORK_ERROR"}
-		if result == HTTPRequest.RESULT_TLS_HANDSHAKE_ERROR: failure["transport_error"] = "TLS_HANDSHAKE_ERROR"
-		if result == HTTPRequest.RESULT_CANT_RESOLVE: failure["transport_error"] = "DNS_ERROR"
+		var failure := {"ok": false, "code": "NETWORK_ERROR", "transport_result": result}
+		var categories := {
+			HTTPRequest.RESULT_TLS_HANDSHAKE_ERROR: "TLS_HANDSHAKE_ERROR",
+			HTTPRequest.RESULT_CANT_RESOLVE: "DNS_ERROR",
+			HTTPRequest.RESULT_TIMEOUT: "TIMEOUT",
+			HTTPRequest.RESULT_CANT_CONNECT: "CANT_CONNECT",
+			HTTPRequest.RESULT_CONNECTION_ERROR: "CONNECTION_ERROR",
+			HTTPRequest.RESULT_NO_RESPONSE: "NO_RESPONSE",
+			HTTPRequest.RESULT_BODY_SIZE_LIMIT_EXCEEDED: "RESPONSE_TOO_LARGE",
+		}
+		failure["transport_error"] = categories.get(result, "TRANSPORT_ERROR")
+		if code >= 400 and code <= 599: failure["http_status"] = code
 		_finish(failure)
 		return
 	if code == 204 and _action == "logout":
@@ -170,7 +180,9 @@ func _on_response(result: int, code: int, _headers: PackedStringArray, body: Pac
 		return
 	var parser := JSON.new()
 	if parser.parse(body.get_string_from_utf8()) != OK or not parser.data is Dictionary:
-		_finish({"ok": false, "code": "INVALID_RESPONSE"})
+		var failure := {"ok": false, "code": "INVALID_RESPONSE"}
+		if code >= 400 and code <= 599: failure["http_status"] = code
+		_finish(failure)
 		return
 	var data: Dictionary = parser.data
 	if _action == "world_ticket" and code == 200:

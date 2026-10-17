@@ -25,6 +25,8 @@ var auto_time := 0.0
 var selected_enemy := false
 var choice_action := ""
 var buttons: Array[Button] = []
+@onready var _hero_level_home: Vector2 = $Hud/Level.position
+@onready var _enemy_level_home: Vector2 = $EnemyLevel.position
 const ACTIONS := ["attack", "skill", "guard", "potion", "inspect", "flee"]
 
 func _ready() -> void:
@@ -168,8 +170,21 @@ func _action_duration(actor: AnimatedSprite2D, action: StringName) -> float:
 		duration += frames.get_frame_duration(action, index) / frames.get_animation_speed(action)
 	return duration
 
+func _follow_level(label: Control, actor: Node2D, station: Node2D, home: Vector2) -> void:
+	if not is_instance_valid(actor): return
+	# Keep the authored station offset, but follow the ANI actor's actual travel.
+	# Convert into the label parent's space: HUD offsets/scaling and mirrored
+	# monster sprites must not move, resize or reverse the text independently.
+	var parent_canvas := label.get_parent() as CanvasItem
+	var to_parent := parent_canvas.get_global_transform_with_canvas().affine_inverse()
+	var current := to_parent * actor.get_global_transform_with_canvas().origin
+	var resting := to_parent * station.get_global_transform_with_canvas().origin
+	label.position = home + current - resting
+
 func refresh() -> void:
 	if model == null or not model.state.get("battle") is Dictionary: return
+	_follow_level($Hud/Level, hero, $Hero, _hero_level_home)
+	_follow_level($EnemyLevel, enemy, $Enemy, _enemy_level_home)
 	if model.ready and animation_time <= 0:
 		_shown_hero_hp = int(model.state.battle.hp)
 		_shown_enemy_hp = int(model.state.battle.enemy_hp)

@@ -23,6 +23,17 @@ func state(art_key: String) -> Dictionary:
 		"battle":{"id":"first","revision":"1","outcome":"active","enemy_hp":62,"hp":100,"mp":40,
 		"enemy":{"art":art_key,"name":"Wolf","level":1,"hp":62,"attack":13,"defense":3}}}
 
+func level_offsets(view: OnlineBattleView) -> Array[Vector2]:
+	return [view.get_node("Hud/Level").get_global_transform_with_canvas().origin - view.hero.get_global_transform_with_canvas().origin,
+		view.get_node("EnemyLevel").get_global_transform_with_canvas().origin - view.enemy.get_global_transform_with_canvas().origin]
+
+func check_levels(view: OnlineBattleView, offsets: Array[Vector2], stage: String) -> void:
+	var current := level_offsets(view)
+	check(current[0].distance_to(offsets[0]) < 0.01, "Player level follows actor: " + stage)
+	check(current[1].distance_to(offsets[1]) < 0.01, "Monster level follows actor: " + stage)
+	check(view.get_node("EnemyLevel").scale == Vector2.ONE and view.get_node("Hud/Level").scale == Vector2.ONE,
+		"Level text keeps its size and does not inherit the mirrored monster transform: " + stage)
+
 func check_reactions(art_key: String) -> void:
 	var model := OnlinePve.new()
 	model.state = state(art_key)
@@ -30,8 +41,12 @@ func check_reactions(art_key: String) -> void:
 	model.ready = true
 	var view := VIEW.instantiate()
 	add_child(view)
+	if art_key != "monster/langw":
+		view.position += Vector2(11, 7)
+		view.scale = Vector2(1.15, 0.9)
 	view.set_process(false)
 	view.present(model)
+	var offsets := level_offsets(view)
 	check(view.enemy.animation == "idle", "Entering battle does not fake a hit")
 	model.last_action = "attack"
 	model.state.battle.revision = "2"
@@ -39,16 +54,20 @@ func check_reactions(art_key: String) -> void:
 	model.state.battle.hp = 96
 	view.present(model)
 	check(view.enemy.animation == "idle" and view.hero.animation == "attack" and view.hero.position != Vector2.ZERO, "Approach begins before native impact; target is not hit early")
+	check_levels(view, offsets, "player approach / " + art_key)
 	check(view._enemy_attack_delay > 0 and not view.get_node("Hud/ActionMenu").visible, "Counterattack is queued while impact plays")
 	view._process(view._hero_motion.impact_time - 0.01)
 	check(view.enemy.animation == "idle", "Target stays idle until native hit step")
 	view._process(0.02)
+	check_levels(view, offsets, "player impact / " + art_key)
 	check(view.enemy.animation == "hurt", "Native hit step triggers the independent hurt sequence")
 	check(view.get_node("Hero").get_index() > view.get_node("Enemy").get_index(), "Native acting team puts the player attack in front")
 	if art_key == "monster/langw": await capture("-online-monster-hurt")
 	view._process(view._enemy_attack_delay + 0.01)
+	check_levels(view, offsets, "monster approach / " + art_key)
 	check(view.enemy.animation == "attack" and view.animation_time > 0 and view.hero.position == Vector2.ZERO, "Counterattack follows complete player return")
 	view._process(view._enemy_motion.impact_time + 0.001)
+	check_levels(view, offsets, "monster impact / " + art_key)
 	check(view.get_node("Enemy").get_index() > view.get_node("Hero").get_index(), "Native acting team puts the monster retaliation in front")
 	check(view.hero.animation == "hurt", "Defender displays the genuine hurt sequence")
 	view.hero.set_frame_and_progress(2, 0.0)
@@ -57,12 +76,14 @@ func check_reactions(art_key: String) -> void:
 	if art_key == "monster/langw": await capture("-online-hero-hurt")
 	view._process(view._enemy_motion.remaining() + 0.01)
 	check(view.enemy.position == Vector2.ZERO and view.enemy.animation == "idle", "Counterattack also returns to its original station")
+	check_levels(view, offsets, "return to stations / " + art_key)
 	check(view.get_node("Hero").get_index() < view.get_node("Enemy").get_index(), "Online counterattack restores the original station order")
 	model.state.battle.revision = "3"
 	model.state.battle.enemy_hp = 38
 	view.present(model)
 	model.ready = false
 	view._process(10)
+	check_levels(view, offsets, "disconnect cancels player approach / " + art_key)
 	check(view._enemy_attack_delay == 0 and view.enemy.animation != "attack", "Disconnection cancels queued retaliation")
 	check(view.get_node("Hero").get_index() < view.get_node("Enemy").get_index(), "Disconnection restores drawing order")
 	model.ready = true
@@ -108,6 +129,21 @@ func check_reactions(art_key: String) -> void:
 	check(view.enemy.animation == "attack" and not view.get_node("Result").visible, "Guard reflection victory includes the original enemy strike")
 	view._process(view._enemy_motion.remaining() + 0.001)
 	check(view.enemy.position == Vector2.ZERO and view.get_node("Result").visible, "Reflected victory settles after the enemy returns")
+	# Sample a whole native attack, including each approach/strike/return frame.
+	model.state = state(art_key)
+	model.state.battle.id = "level_tracking"
+	view.present(model)
+	check_levels(view, offsets, "replacement battle / " + art_key)
+	model.state.battle.revision = "2"
+	view.present(model)
+	while view.animation_time > 0:
+		view._process(0.025)
+		check_levels(view, offsets, "native step / " + art_key)
+	model.state.battle.revision = "3"
+	view.present(model)
+	model.ready = false
+	view._process(0.01)
+	check_levels(view, offsets, "disconnect cancels monster approach / " + art_key)
 	view.queue_free()
 	await get_tree().process_frame
 

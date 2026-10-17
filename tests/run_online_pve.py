@@ -58,7 +58,8 @@ class Player:
         while time.monotonic()<deadline:
             own=self.ws.entities[self.id]; resident=self.population[target]
             cell=own['cell']; dest=resident['cell']
-            if abs(cell[0]-dest[0])+abs(cell[1]-dest[1])<=2 and own['next_cell'] is None: return
+            # Keep a one-cell margin for a monster stepping before the command arrives.
+            if abs(cell[0]-dest[0])+abs(cell[1]-dest[1])<=1 and own['next_cell'] is None: return
             if own['next_cell'] is None:
                 # All population cells are walkable, so follow their current authoritative cell.
                 self.move(dest)
@@ -149,6 +150,7 @@ def main():
                 a.command('',request=challenge)
                 a.close();time.sleep(.2);a=Player(base,session,char);sockets.append(a)
                 assert a.state['battle'] is None and a.state['character']['gold']==reward
+                a.approach(target)
                 v,_=a.command('challenge',target,ok=False);assert v['code']=='MONSTER_RESPAWNING'
                 if index==0 and os.environ.get('SSJX_TEST_PVE_RESPAWN')=='1':
                     # Exercise the production 30s interval, including a process restart.

@@ -8,7 +8,6 @@ const MAP_SIZE := 32
 const WALK_SPEED := 72.0
 const WALK_CYCLE_DISTANCE := 32.0 # One full left/right stride, in map pixels.
 enum Ground { GRASS, DIRT, WATER, BRIDGE }
-const PATROL_OFFSETS := [Vector2i(2, 0), Vector2i(2, 1), Vector2i(0, 1), Vector2i(-2, 1), Vector2i(-2, 0), Vector2i.ZERO]
 static var ENEMIES: Array = _enemy_definitions()
 
 static func _enemy_definitions() -> Array:
@@ -163,8 +162,10 @@ func _sync_enemies() -> void:
 		_name_tag(sprite, String(enemy.name), Color("ffb29a"))
 		if not enabled: sprite.pause()
 		if enemy.kind == "wolf":
+			var rng := RandomNumberGenerator.new()
+			rng.randomize()
 			patrols[enemy.id] = {"home": home, "cell": home, "next": Vector2i(-1, -1),
-				"path": [], "waypoint": 0, "wait": 0.7 + patrols.size() * 0.25}
+				"path": [], "rng": rng, "wait": rng.randf_range(0.2, 2.5)}
 
 func available_enemies() -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
@@ -374,9 +375,16 @@ func _update_patrols(delta: float) -> void:
 			sprite.play("idle")
 			continue
 		if state.next.x < 0 and state.path.is_empty():
-			for attempt in PATROL_OFFSETS.size():
-				var destination: Vector2i = state.home + PATROL_OFFSETS[int(state.waypoint)]
-				state.waypoint = (int(state.waypoint) + 1) % PATROL_OFFSETS.size()
+			var targets: Array[Vector2i] = []
+			for y in range(-2, 3):
+				for x in range(-2, 3): targets.append(state.home + Vector2i(x, y))
+			# Shuffle with this monster's stream; global RNG calls cannot synchronize patrols.
+			for i in range(targets.size() - 1, 0, -1):
+				var other: int = state.rng.randi_range(0, i)
+				var swap := targets[i]
+				targets[i] = targets[other]
+				targets[other] = swap
+			for destination in targets:
 				if not astar.region.has_point(destination) or astar.is_point_solid(destination): continue
 				var route: Array[Vector2i] = astar.get_id_path(state.cell, destination)
 				var local_route := true
@@ -388,7 +396,7 @@ func _update_patrols(delta: float) -> void:
 				break
 		if state.next.x < 0 and not state.path.is_empty(): state.next = state.path.pop_front()
 		if state.next.x < 0:
-			state.wait = 0.5
+			state.wait = state.rng.randf_range(0.5, 2.0)
 			continue
 		var destination := cell_center(state.next)
 		if destination.distance_to(hero.position) < 24.0:
@@ -401,7 +409,7 @@ func _update_patrols(delta: float) -> void:
 			state.cell = state.next
 			state.next = Vector2i(-1, -1)
 			if state.path.is_empty():
-				state.wait = 0.6
+				state.wait = state.rng.randf_range(0.5, 2.0)
 				sprite.play("idle")
 
 func _save_position() -> void:

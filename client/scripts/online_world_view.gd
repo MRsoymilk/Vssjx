@@ -568,7 +568,9 @@ func _advance_approach() -> void:
 	var cell := Vector2i(own.cell[0], own.cell[1])
 	var resident: Dictionary = SharedWorldMap.portal(String(map_data.map_id)) if transfer else network.population.entities[_approach.target]
 	var target := Vector2i(resident.cell[0], resident.cell[1])
-	if absi(cell.x - target.x) + absi(cell.y - target.y) <= 2:
+	# Moving wolves can cross a cell while the challenge is in flight.
+	var reach := 1 if resident.get("kind") == "wolf" else 2
+	if absi(cell.x - target.x) + absi(cell.y - target.y) <= reach:
 		if not _approach.stopped:
 			_approach.stopped = true
 			network.stop_moving()

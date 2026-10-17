@@ -7,6 +7,7 @@ const SAVE_VERSION := 1
 const MAX_LOCAL_CHARACTERS := 5
 const START_CELL := Vector2i(10, 16)
 const ENEMY_RESPAWN_SECONDS := 30.0 # Offline rule; not a recovered original server value.
+const ATTRIBUTE_RULES = preload("res://scripts/character_attribute_rules.gd")
 var save_path := "user://shushan_save.json"
 var player: Dictionary = {}
 var last_save_error := ""
@@ -141,7 +142,8 @@ func new_player(nickname: String, job: int, school: int, gender: int = 0) -> voi
 		"hp": 0, "mp": 0, "quest": 0, "kills": 0,
 		"equipped": false, "zone": 0, "cell": [START_CELL.x, START_CELL.y],
 		"defeated": [], "enemy_respawns": {}, "signature": "", "title": "",
-		"ingots": 0, "guild_contribution": 0, "essence": 0
+		"ingots": 0, "guild_contribution": 0, "essence": 0,
+		"allocated_attributes": [0,0,0,0,0]
 	}
 	if String(player.name).is_empty():
 		player.name = "青衫客"
@@ -176,14 +178,33 @@ func actor_key() -> String:
 	return "hero/" + keys[int(player.get("job", 0))]
 
 func stats() -> Dictionary:
-	var level := int(player.get("level", 1))
-	var job := int(player.get("job", 1))
-	return {
-		"hp": [120, 95, 85][job] + (level - 1) * 18,
-		"mp": [35, 45, 65][job] + (level - 1) * 8,
-		"attack": [18, 23, 21][job] + (level - 1) * 4 + (5 if player.get("equipped", false) else 0),
-		"defense": [7, 4, 3][job] + (level - 1) * 2
-	}
+	return ATTRIBUTE_RULES.stats(int(player.get("job",1)),int(player.get("level",1)),bool(player.get("equipped",false)),allocated_attributes())
+
+func allocated_attributes() -> Array:
+	var points: Array = player.get("allocated_attributes", [0,0,0,0,0]).duplicate()
+	for i in points.size(): points[i] = int(points[i])
+	return points
+
+func attribute_profile() -> Dictionary:
+	return ATTRIBUTE_RULES.profile(int(player.get("job",1)),int(player.get("level",1)),bool(player.get("equipped",false)),allocated_attributes())
+
+func allocate_attributes(points: Array) -> PlatformResult:
+	if storage_busy or _local_roster_busy: return PlatformResult.new(PlatformResult.Status.TEMPORARY_FAILURE,"STORAGE_BUSY","正在保存，请稍候")
+	if player.is_empty() or not ATTRIBUTE_RULES.valid_points(points,int(player.get("level",1)),allocated_attributes()):
+		return PlatformResult.new(PlatformResult.Status.INVALID_DATA,"INVALID_ATTRIBUTES","属性点格式或剩余点数无效，已保存的点数不能减少。")
+	if points == allocated_attributes(): return PlatformResult.new(PlatformResult.Status.INVALID_DATA,"NO_ATTRIBUTE_CHANGE","请先分配属性点。")
+	var before := player.duplicate(true)
+	var previous_stats := stats()
+	var generation := _player_generation
+	var path := save_path
+	player.allocated_attributes = points.duplicate()
+	for i in 5: player.allocated_attributes[i] = int(player.allocated_attributes[i])
+	var next_stats := stats()
+	player.hp = int(player.hp) + int(next_stats.hp) - int(previous_stats.hp)
+	player.mp = int(player.mp) + int(next_stats.mp) - int(previous_stats.mp)
+	var result := await save_game()
+	if not result.ok and generation == _player_generation and path == save_path: player = before
+	return result
 
 func restore() -> void:
 	var values := stats()
@@ -362,6 +383,7 @@ func valid_save(data: Variant) -> bool:
 	if int(data.job) > 2 or int(data.school) > 2 or int(data.zone) > 1: return false
 	if int(data.quest) > 4 or int(data.kills) > 3: return false
 	if int(data.level) < 1 or int(data.level) > 50: return false
+	if not ATTRIBUTE_RULES.valid_points(data.get("allocated_attributes",[0,0,0,0,0]),int(data.level)): return false
 	if not data.cell is Array or data.cell.size() != 2: return false
 	for value in data.cell:
 		if not (value is float or value is int) or not is_finite(float(value)): return false

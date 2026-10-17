@@ -3,6 +3,30 @@ use vssjx_server::{
     pve_rules::{self, Action, Battle, Command},
 };
 #[test]
+fn offline_ui_vectors_match_the_authoritative_attribute_contract() {
+    let cases: serde_json::Value = serde_json::from_str(include_str!(
+        "../../client/tests/fixtures/attribute_vectors.json"
+    ))
+    .unwrap();
+    for c in cases.as_array().unwrap() {
+        let a: [i32; 5] = serde_json::from_value(c["allocated"].clone()).unwrap();
+        let job = c["job"].as_i64().unwrap() as i16;
+        let level = c["level"].as_i64().unwrap() as i32;
+        let equipped = c["equipped"].as_bool().unwrap();
+        assert_eq!(
+            serde_json::to_value(attributes::stats(job, level, equipped, a)).unwrap(),
+            c["stats"]
+        );
+        let p = attributes::profile(job, level, equipped, a);
+        for key in ["available", "recommended"] {
+            assert_eq!(p[key], c[key]);
+        }
+        for key in ["physical_attack", "magic_attack"] {
+            assert_eq!(p["combat"][key], c[key]);
+        }
+    }
+}
+#[test]
 fn points_and_recommendations_are_level_bounded() {
     for job in 0..3 {
         for level in 1..=50 {

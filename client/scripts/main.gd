@@ -783,12 +783,26 @@ func _school() -> void:
 	_button(panel, "返回", Rect2(18, 172, 248, 30), _close_modal)
 
 func _attributes() -> void:
+	if Game.storage_busy or _closing: return
 	world.pause_moving()
 	mode = "attributes"
 	_clear_ui()
 	attributes = load("res://scenes/ui/character_attributes.tscn").instantiate()
 	ui.add_child(attributes)
 	attributes.back_requested.connect(_return_from_attributes)
+	attributes.allocation_requested.connect(_allocate_local_attributes)
+
+func _allocate_local_attributes(points: Array) -> void:
+	if mode != "attributes" or Game.storage_busy or _closing: return
+	if not Platform.context.text_input.check_submission([attributes.signature]).ok: return
+	var page := attributes
+	var epoch := _ui_epoch
+	page.set_allocation_enabled(false, "正在保存，请稍候")
+	var result := await Game.allocate_attributes(points)
+	if not is_inside_tree() or epoch != _ui_epoch or _closing or not is_instance_valid(page): return
+	if result.status == PlatformResult.Status.CANCELLED: return
+	page.display_local()
+	if not result.ok and page.selected_tab == 1: page.content.get_node("Status").text = "保存未确认，请重试：" + result.message
 
 func _return_from_attributes() -> void:
 	if Game.storage_busy or _closing: return

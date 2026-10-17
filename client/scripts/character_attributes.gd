@@ -7,7 +7,7 @@ signal allocation_requested(points: Array)
 @export var online_mode := false
 var _online_character: Dictionary = {}
 var _online_stats: Dictionary = {}
-var _online_profile: Dictionary = {}
+var _attribute_profile: Dictionary = {}
 var allocation_draft: Array = []
 var allocation_enabled := false
 var allocation_hint := "停稳后可加点"
@@ -15,7 +15,7 @@ const ONLINE_EXTENDED = preload("res://scenes/ui/attributes_online_extended.tscn
 const BROWN := Color("654518")
 const PAGES := [
 	preload("res://scenes/ui/attributes_regular.tscn"),
-	preload("res://scenes/ui/attributes_extended.tscn"),
+	ONLINE_EXTENDED,
 	preload("res://scenes/ui/attributes_skills.tscn"),
 	preload("res://scenes/ui/attributes_inner.tscn")
 ]
@@ -37,6 +37,10 @@ func _ready() -> void:
 		var button: Button = get_node("TabButtons%d" % i)
 		button.pressed.connect(select_tab.bind(i))
 		tab_buttons.append(button)
+	if not online_mode:
+		_attribute_profile = Game.attribute_profile()
+		allocation_draft = _attribute_profile.allocated.duplicate()
+		allocation_enabled = not Game.storage_busy
 	_configure_signature()
 	signature.text_changed.connect(func(value: String) -> void:
 		if not online_mode: Game.player.signature = value
@@ -59,7 +63,7 @@ func select_tab(index: int) -> void:
 	for child in $Pages.get_children():
 		$Pages.remove_child(child)
 		child.queue_free()
-	content = (ONLINE_EXTENDED if online_mode and selected_tab == 1 else PAGES[selected_tab]).instantiate()
+	content = PAGES[selected_tab].instantiate()
 	$Pages.add_child(content)
 	preview = null
 	bars.clear()
@@ -71,14 +75,25 @@ func select_tab(index: int) -> void:
 	move_child(cursor, get_child_count() - 1)
 
 func display_online(character: Dictionary, stats: Dictionary, profile: Dictionary = {}) -> void:
-	var unchanged := online_mode and _online_character == character and _online_stats == stats and _online_profile == profile
-	if _online_character.get("id") != character.get("id") or _online_character.get("state_revision") != character.get("state_revision") or _online_profile != profile:
+	var unchanged := online_mode and _online_character == character and _online_stats == stats and _attribute_profile == profile
+	if _online_character.get("id") != character.get("id") or _online_character.get("state_revision") != character.get("state_revision") or _attribute_profile != profile:
 		allocation_draft = profile.get("allocated", []).duplicate()
 	online_mode = true
 	_online_character = character.duplicate(true)
 	_online_stats = stats.duplicate(true)
-	_online_profile = profile.duplicate(true)
+	_attribute_profile = profile.duplicate(true)
 	if is_node_ready() and not unchanged:
+		_configure_signature()
+		select_tab(selected_tab)
+
+func display_local() -> void:
+	var profile := Game.attribute_profile()
+	if online_mode or _attribute_profile != profile:
+		allocation_draft = profile.allocated.duplicate()
+	online_mode = false
+	_attribute_profile = profile
+	allocation_enabled = not Game.storage_busy
+	if is_node_ready():
 		_configure_signature()
 		select_tab(selected_tab)
 
@@ -133,25 +148,12 @@ func _regular() -> void:
 		numbers[key] = number
 
 func _extended() -> void:
-	if online_mode:
-		_online_extended()
-		return
-	var player := _player_data()
-	var stats := _stats_data()
-	for i in 16:
-		var value := "—"
-		if i == 5 and int(player.get("job", 0)) != 2 and stats.has("attack"): value = str(int(stats.attack))
-		if i == 6 and int(player.get("job", 0)) == 2 and stats.has("attack"): value = str(int(stats.attack))
-		if i == 11 and stats.has("defense"): value = str(int(stats.defense))
-		content.get_node("StatValue%d" % i).text = value
-
-func _online_extended() -> void:
-	var combat: Dictionary = _online_profile.get("combat", {})
+	var combat: Dictionary = _attribute_profile.get("combat", {})
 	for key in ["hp", "mp", "physical_attack", "magic_attack", "physical_defense", "magic_defense", "physical_crit", "magic_crit", "physical_hit", "magic_hit", "physical_evasion", "magic_evasion", "damage_reduction"]:
 		var value: Variant = combat.get(key)
-		if value == null and key in ["hp", "mp"]: value = _online_stats.get(key)
-		if value == null and key in ["physical_defense", "magic_defense"]: value = _online_stats.get("defense")
-		if value == null and key == ("magic_attack" if int(_online_character.get("job", 0)) == 2 else "physical_attack"): value = _online_stats.get("attack")
+		if value == null and key in ["hp", "mp"]: value = _stats_data().get(key)
+		if value == null and key in ["physical_defense", "magic_defense"]: value = _stats_data().get("defense")
+		if value == null and key == ("magic_attack" if int(_player_data().get("job", 0)) == 2 else "physical_attack"): value = _stats_data().get("attack")
 		var number: OriginalNumber = content.get_node("Value_" + key)
 		number.value = "" if value == null else str(int(value))
 		number.queue_redraw()
@@ -170,39 +172,39 @@ func set_allocation_enabled(enabled: bool, hint: String = "停稳后可加点") 
 	_refresh_allocation()
 
 func _draft_remaining() -> int:
-	var remaining := int(_online_profile.get("available", 0))
-	var allocated: Array = _online_profile.get("allocated", [])
+	var remaining := int(_attribute_profile.get("available", 0))
+	var allocated: Array = _attribute_profile.get("allocated", [])
 	for i in allocation_draft.size(): remaining -= int(allocation_draft[i]) - int(allocated[i])
 	return remaining
 
 func _refresh_allocation() -> void:
-	if not online_mode or selected_tab != 1 or content == null: return
-	var available: bool = allocation_draft.size() == 5 and _online_profile.get("allocated", []).size() == 5
+	if selected_tab != 1 or content == null: return
+	var available: bool = allocation_draft.size() == 5 and _attribute_profile.get("allocated", []).size() == 5
 	var enabled: bool = available and allocation_enabled
-	var allocated: Array = _online_profile.get("allocated", [])
+	var allocated: Array = _attribute_profile.get("allocated", [])
 	for i in 5:
 		content.get_node("Points%d" % i).text = str(int(allocation_draft[i])) if available else "—"
 		content.get_node("Minus%d" % i).disabled = not enabled or int(allocation_draft[i]) <= int(allocated[i]) if available else true
 		content.get_node("Plus%d" % i).disabled = not enabled or _draft_remaining() <= 0
 	content.get_node("Remaining").text = str(_draft_remaining()) if available else "—"
-	content.get_node("Recommend").disabled = not enabled or int(_online_profile.get("available", 0)) <= 0
+	content.get_node("Recommend").disabled = not enabled or int(_attribute_profile.get("available", 0)) <= 0
 	content.get_node("Confirm").disabled = not enabled or allocation_draft == allocated
-	content.get_node("Status").text = "同步中，请稍候" if not available else (allocation_hint if not allocation_enabled else ("确认后保存到服务端" if allocation_draft != allocated else "每级获得5点属性点"))
+	content.get_node("Status").text = "同步中，请稍候" if not available else (allocation_hint if not allocation_enabled else (("确认后保存到服务端" if online_mode else "确认后保存到本地") if allocation_draft != allocated else "每级获得5点属性点"))
 
 func _adjust_allocation(index: int, delta: int) -> void:
 	if not allocation_enabled or allocation_draft.size() != 5: return
 	if delta > 0 and _draft_remaining() <= 0: return
-	if delta < 0 and int(allocation_draft[index]) <= int(_online_profile.allocated[index]): return
+	if delta < 0 and int(allocation_draft[index]) <= int(_attribute_profile.allocated[index]): return
 	allocation_draft[index] = int(allocation_draft[index]) + delta
 	_refresh_allocation()
 
 func _recommend_allocation() -> void:
-	if not allocation_enabled or not _online_profile.has("recommended"): return
-	allocation_draft = _online_profile.recommended.duplicate()
+	if not allocation_enabled or not _attribute_profile.has("recommended"): return
+	allocation_draft = _attribute_profile.recommended.duplicate()
 	_refresh_allocation()
 
 func _confirm_allocation() -> void:
-	if not allocation_enabled or allocation_draft.is_empty() or allocation_draft == _online_profile.get("allocated", []): return
+	if not allocation_enabled or allocation_draft.is_empty() or allocation_draft == _attribute_profile.get("allocated", []): return
 	allocation_requested.emit(allocation_draft.duplicate())
 
 func _skills() -> void:

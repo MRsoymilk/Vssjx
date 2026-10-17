@@ -16,7 +16,7 @@ func _run() -> void:
 	var scenes := {
 		"original_cover": ["Original320x480Artwork", "Rows0", "Rows1"],
 		"server_login": ["ServerAddress", "Username", "Password", "Discovery"],
-		"online_characters": ["OnlineNickname", "Job", "Gender", "School"],
+		"character_selection": ["Online", "Slot0/Preview", "Slot1/Preview", "Slot2/Preview", "Details/Name", "Options/Create", "Options/Refresh", "Enter", "Back"],
 		"character_creation": ["Nickname", "Slots0/PortraitButtons0", "Create", "Online", "OnlineControls/School", "OnlineControls/Status", "OnlineControls/Back"],
 		"character_attributes": ["Pages", "Signature", "Back"],
 		"attributes_regular": ["NameValue", "BarsHp", "NumbersLevel"],
@@ -49,8 +49,8 @@ func _run() -> void:
 		if scene_name == "inventory":
 			check(page.get_node("EquipmentLevel").value == "1" and page.get_node("EquipmentLevel").color_set == "green", "Bitmap number settings survive scene serialization")
 		if scene_name == "battle_chrome": check(page.in_battle, "Battle chrome mode is saved in the scene")
-		if scene_name == "online_characters":
-			check(page.get_node("Job").item_count == 3 and page.get_node("Gender").item_count == 2 and page.get_node("School").item_count == 3, "Lobby choices are available without runtime construction")
+		if scene_name == "character_selection":
+			check(page.get_node("Online") is OnlineSelectionFlow and page.has_node("Dot4"), "Unified selection contains the current online flow and five character indicators")
 		page.free()
 	var actor_scene: PackedScene = load("res://scenes/actors/original_actor.tscn")
 	var actor := actor_scene.instantiate()

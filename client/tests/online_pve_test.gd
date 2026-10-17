@@ -197,7 +197,8 @@ func _run() -> void:
 	next_battle.battle.id = EPOCH
 	var art := String(next_battle.battle.enemy.art)
 	var texture: String = OriginalArt.catalog[art].texture
-	OriginalArt.catalog[art].texture = "res://assets/actors/missing-online-test.png"
+	# Construct the intentional failure fixture at runtime, like other resource failure tests.
+	OriginalArt.catalog[art].texture = "res://assets/actors/%s.png" % "missing-online-test"
 	var count_before_load := sent.size()
 	model.receive({"type":"pve.state","state":next_battle})
 	check(await wait_until(func() -> bool: return view._battle_load_failed), "Missing resources produce a recoverable load failure")

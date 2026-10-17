@@ -11,12 +11,16 @@ var realm := ""
 var sent_at := 0.0
 var last_action := ""
 var last_code := ""
+var _server_clock_ms := 0
+var _server_clock_tick := 0
 
 func bind_character(id: String, address: String) -> void:
 	character_id = id
 	realm = address
 	state = {}
 	ready = false
+	_server_clock_ms = 0
+	_server_clock_tick = 0
 	var pending: Dictionary = OnlineAccount.pending_pve
 	if not pending.is_empty() and (pending.character != id or pending.realm != address): OnlineAccount.pending_pve = {}
 
@@ -58,6 +62,11 @@ func valid(value: Variant) -> bool:
 		seen[id] = true
 		if id != "spirit": kills += 1
 	if kills != int(progress.kills): return false
+	if progress.has("respawns") or value.has("server_time_ms"):
+		if not integer(value.get("server_time_ms"), 1, 253402300799999): return false
+		if not progress.get("respawns") is Dictionary or progress.respawns.size() > 4: return false
+		for id in progress.respawns:
+			if not seen.has(id) or not integer(progress.respawns[id], 0, mini(253402300799999, int(value.server_time_ms) + 30000)): return false
 	if not value.has("battle"): return false
 	var battle: Variant = value.battle
 	if battle == null: return true
@@ -81,7 +90,17 @@ func receive(packet: Dictionary) -> bool:
 		if not packet.ok and not packet.get("code") is String: return false
 	# An old receipt can acknowledge the outbox, but cannot roll back current state.
 	if state.is_empty() or int(packet.state.character.state_revision) >= int(state.character.state_revision):
+		# A pre-upgrade receipt at the same revision cannot erase fresh cooldowns.
+		var previous_progress: Dictionary = state.get("progress", {})
+		var keep_respawns: bool = state.has("server_time_ms") and not packet.state.has("server_time_ms") and packet.state.character.state_revision == state.character.state_revision
+		var previous_time: int = int(state.get("server_time_ms", 0))
 		state = packet.state.duplicate(true)
+		if keep_respawns:
+			state.server_time_ms = previous_time
+			state.progress.respawns = previous_progress.respawns.duplicate(true)
+		if state.has("server_time_ms"):
+			_server_clock_ms = maxi(server_time_ms(), int(state.server_time_ms))
+			_server_clock_tick = Time.get_ticks_msec()
 		# JSON numbers arrive as floats; typed Rust point arrays require integer JSON.
 		if state.has("attributes"):
 			state.attributes.allocated = normalized_points(state.attributes.allocated)
@@ -98,6 +117,18 @@ func receive(packet: Dictionary) -> bool:
 	changed.emit()
 	if kind == "pve.state" and pending(): retry()
 	return true
+
+func server_time_ms() -> int:
+	return _server_clock_ms + maxi(0, Time.get_ticks_msec() - _server_clock_tick) if _server_clock_ms > 0 else 0
+
+func unavailable_monsters() -> Array:
+	var progress: Dictionary = state.get("progress", {})
+	# Compatibility with a server that has not yet applied the respawn migration.
+	if not progress.has("respawns"): return progress.get("defeated", []).duplicate()
+	var hidden: Array = []
+	for id in progress.respawns:
+		if int(progress.respawns[id]) > server_time_ms(): hidden.append(id)
+	return hidden
 
 func submit(action: String, target: String = "", points: Array = []) -> bool:
 	if not ready or pending(): return false
@@ -141,6 +172,7 @@ func quest_text() -> String:
 	return "山林试炼 · 已完成\n清微道人仍可为你恢复生命与灵力。"
 
 static func error_text(code: String) -> String:
+	if code == "MONSTER_RESPAWNING": return "怪物正在刷新，请稍候再来。"
 	var attributes := {"STALE_ATTRIBUTES":"属性已更新，请重新加点。", "ATTRIBUTE_RESPEC_FORBIDDEN":"已保存的属性点不能减少。", "ATTRIBUTE_POINTS_EXCEEDED":"剩余属性点不足。", "NO_ATTRIBUTE_CHANGE":"请先分配属性点。", "INVALID_ATTRIBUTES":"属性点格式无效。"}
 	if attributes.has(code): return attributes[code]
 	return {"PLAYER_MOVING":"请停稳后再交互。", "RESIDENT_TOO_FAR":"距离过远，请靠近后再试。", "QUEST_REQUIRED":"请先向清微道人接取山林试炼。", "QUEST_NOT_READY":"试炼尚未完成或奖励已经领取。", "QUEST_ALREADY_ACCEPTED":"已经领受过此试炼。", "MONSTER_DEFEATED":"你已经击败过这只怪物。", "STALE_BATTLE":"回合已经更新，请重新选择行动。", "MP_INSUFFICIENT":"灵力不足，可凝神防御恢复灵力。", "NO_POTION":"回春散已经用完。", "HP_FULL":"当前生命已满。", "BATTLE_ACTIVE":"请先完成当前战斗。"}.get(code,"操作未完成：" + code)

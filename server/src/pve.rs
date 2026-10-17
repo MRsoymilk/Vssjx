@@ -10,7 +10,19 @@ use rand::Rng;
 use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
 use sqlx::{FromRow, Postgres, Row, Transaction, types::Json};
+use std::{
+    collections::BTreeMap,
+    time::{SystemTime, UNIX_EPOCH},
+};
 use uuid::Uuid;
+
+pub const MONSTER_RESPAWN_MS: i64 = 30_000;
+fn unix_ms() -> i64 {
+    SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap_or_default()
+        .as_millis() as i64
+}
 
 pub struct Context {
     pub character: Uuid,
@@ -24,6 +36,7 @@ pub struct Context {
 struct Loaded {
     character: Character,
     defeated: i32,
+    respawns: BTreeMap<String, i64>,
     battle: Option<Battle>,
     potions: i32,
     equipped: bool,
@@ -41,13 +54,24 @@ async fn load(tx: &mut Transaction<'_, Postgres>, context: &Context) -> Result<L
     let account: Option<Uuid> = sqlx::query_scalar("SELECT s.account_id FROM sessions s JOIN accounts a ON a.id=s.account_id WHERE s.id=$1 AND NOT a.disabled AND s.revoked_at IS NULL AND s.access_expires_at>clock_timestamp() AND s.refresh_expires_at>clock_timestamp() FOR SHARE OF s,a")
         .bind(context.session).fetch_optional(&mut **tx).await.map_err(database)?;
     let account = account.ok_or(AuthError(StatusCode::UNAUTHORIZED, "SESSION_REVOKED"))?;
-    let row=sqlx::query(&format!("SELECT {CHARACTER_COLUMNS},defeated_mask,active_battle_id,owner_epoch,allocated_attributes FROM characters WHERE id=$1 AND account_id=$2 FOR UPDATE"))
+    let row=sqlx::query(&format!("SELECT {CHARACTER_COLUMNS},defeated_mask,monster_respawns,active_battle_id,owner_epoch,allocated_attributes FROM characters WHERE id=$1 AND account_id=$2 FOR UPDATE"))
         .bind(context.character).bind(account).fetch_optional(&mut **tx).await.map_err(database)?
         .ok_or(AuthError(StatusCode::FORBIDDEN,"FORBIDDEN"))?;
     if row.get::<i64, _>("owner_epoch") != context.owner {
         return Err(AuthError(StatusCode::CONFLICT, "SESSION_REPLACED"));
     }
     let character = Character::from_row(&row).map_err(database)?;
+    let Json(respawns) = row.get::<Json<Value>, _>("monster_respawns");
+    let respawns: BTreeMap<String, i64> =
+        serde_json::from_value(respawns).map_err(|_| unavailable())?;
+    if respawns.len() > 4
+        || respawns.iter().any(|(id, deadline)| {
+            pve_rules::mask(id).is_none_or(|mask| row.get::<i32, _>("defeated_mask") & mask == 0)
+                || !(0..=253_402_300_799_999).contains(deadline)
+        })
+    {
+        return Err(unavailable());
+    }
     let active: Option<Uuid> = row.get("active_battle_id");
     let battle = if let Some(id) = active {
         let row=sqlx::query("SELECT state,rules_version FROM pve_battles WHERE id=$1 AND character_id=$2 AND active FOR UPDATE")
@@ -67,6 +91,7 @@ async fn load(tx: &mut Transaction<'_, Postgres>, context: &Context) -> Result<L
     Ok(Loaded {
         character,
         defeated: row.get("defeated_mask"),
+        respawns,
         battle,
         potions,
         equipped,
@@ -94,7 +119,8 @@ impl Loaded {
         json!({"rules_version":pve_rules::RULES,"character":self.character,"potions":self.potions,
             "stats":self.stats(),
             "attributes":crate::attributes::profile(self.character.job,self.character.level,self.equipped,self.allocated),
-            "progress":{"kills":(self.defeated&7).count_ones(),"defeated":defeated},"battle":self.battle.as_ref().map(Battle::view)})
+            "server_time_ms":unix_ms(),
+            "progress":{"kills":(self.defeated&7).count_ones(),"defeated":defeated,"respawns":self.respawns},"battle":self.battle.as_ref().map(Battle::view)})
     }
     fn rewards(&mut self, gold: i32, xp: i32) -> Result<(), &'static str> {
         self.character.gold = self
@@ -180,9 +206,12 @@ impl Loaded {
                         .into_iter()
                         .find(|d| Some(&d.id) == command.target.as_ref() && d.kind != "npc")
                         .ok_or("INVALID_RESIDENT")?;
-                    let mask = pve_rules::mask(&definition.id).ok_or("INVALID_RESIDENT")?;
-                    if self.defeated & mask != 0 {
-                        return Err("MONSTER_DEFEATED");
+                    if self
+                        .respawns
+                        .get(&definition.id)
+                        .is_some_and(|deadline| *deadline > unix_ms())
+                    {
+                        return Err("MONSTER_RESPAWNING");
                     }
                     if self.character.quest_stage == 0 {
                         return Err("QUEST_REQUIRED");
@@ -257,6 +286,8 @@ impl Loaded {
                     let gold = battle.enemy.gold;
                     let xp = battle.enemy.xp;
                     self.defeated |= pve_rules::mask(&battle.enemy.id).ok_or("INVALID_RESIDENT")?;
+                    self.respawns
+                        .insert(battle.enemy.id.clone(), unix_ms() + MONSTER_RESPAWN_MS);
                     if self.character.quest_stage == 1 && self.defeated & 7 == 7 {
                         self.character.quest_stage = 2;
                         lines.push("三只山狼已清除，请返回清微道人处领取奖励。".into());
@@ -322,8 +353,8 @@ pub async fn execute(
         }
         let character_id = loaded.character.id;
         let c = &loaded.character;
-        let revision:i64=sqlx::query_scalar("UPDATE characters SET level=$2,xp=$3,gold=$4,hp=$5,mp=$6,quest_stage=$7,defeated_mask=$8,active_battle_id=$9,allocated_attributes=$10,state_revision=state_revision+1 WHERE id=$1 RETURNING state_revision")
-            .bind(c.id).bind(c.level).bind(c.xp).bind(c.gold).bind(c.hp).bind(c.mp).bind(c.quest_stage).bind(loaded.defeated).bind(active).bind(loaded.allocated.to_vec())
+        let revision:i64=sqlx::query_scalar("UPDATE characters SET level=$2,xp=$3,gold=$4,hp=$5,mp=$6,quest_stage=$7,defeated_mask=$8,active_battle_id=$9,allocated_attributes=$10,monster_respawns=$11,state_revision=state_revision+1 WHERE id=$1 RETURNING state_revision")
+            .bind(c.id).bind(c.level).bind(c.xp).bind(c.gold).bind(c.hp).bind(c.mp).bind(c.quest_stage).bind(loaded.defeated).bind(active).bind(loaded.allocated.to_vec()).bind(Json(&loaded.respawns))
             .fetch_one(&mut *tx).await.map_err(database)?;
         loaded.character.state_revision = revision.to_string();
         if loaded.potions == 0 {

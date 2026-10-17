@@ -48,6 +48,7 @@ var _loading_battle := ""
 var _battle_load_epoch := 0
 var _battle_resource_request: PlatformResourceRequest
 var _battle_load_failed := false
+var _hidden_residents: Array = []
 
 func _ready() -> void:
 	if OS.has_feature("web"): Platform.context.lifecycle.changed.connect(_web_lifecycle)
@@ -186,7 +187,8 @@ func _build_map() -> void:
 
 func _population(values: Dictionary) -> void:
 	var visible_values := values.duplicate()
-	for id in network.pve.state.get("progress", {}).get("defeated", []): visible_values.erase(id)
+	_hidden_residents = network.pve.unavailable_monsters()
+	for id in _hidden_residents: visible_values.erase(id)
 	for id in residents.keys():
 		if not visible_values.has(id):
 			residents[id].queue_free()
@@ -321,6 +323,8 @@ func _process(delta: float) -> void:
 	_update_chat_controls()
 	_update_allocation_controls()
 	if network == null or not network.world_ready: return
+	if network.pve.ready and network.pve.unavailable_monsters() != _hidden_residents:
+		_population(network.population.entities)
 	for resident in residents.values(): resident.advance(delta)
 	for id in actors:
 		var actor: Dictionary = actors[id]

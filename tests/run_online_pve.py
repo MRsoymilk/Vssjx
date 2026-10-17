@@ -88,7 +88,7 @@ def main():
         process,base=start(); sockets=[]
         def run_client():
             godot_env=dict(os.environ,SSJX_PVE_BASE=base,SSJX_PVE_USER='pve_second',SSJX_PVE_PASSWORD='owned-pve-test-password')
-            result=subprocess.run([os.environ['GODOT_BIN'],'--headless','--path',str(ROOT/'client'),'res://tests/online_pve_live_test.tscn'],env=godot_env,capture_output=True,text=True,encoding='utf-8',timeout=70)
+            result=subprocess.run([os.environ['GODOT_BIN'],'--headless','--path',str(ROOT/'client'),'res://tests/online_pve_live_test.tscn'],env=godot_env,capture_output=True,text=True,encoding='utf-8',timeout=110 if os.environ.get('SSJX_TEST_PVE_RESPAWN')=='1' else 70)
             print(result.stdout);print(result.stderr)
             assert result.returncode==0 and '0 failures' in result.stdout and 'SCRIPT ERROR' not in result.stderr
         try:
@@ -112,6 +112,7 @@ def main():
             conflict=dict(accept,action='claim');v,_=a.command('',request=conflict,ok=False);assert v['code']=='PVE_ID_CONFLICT'
             v,_=a.command('claim','qingwei',ok=False);assert v['code']=='QUEST_NOT_READY'
             v,_=a.command('challenge','wolf_a',ok=False);assert v['code']=='RESIDENT_TOO_FAR'
+            extra_gold=0
             for index,target in enumerate(('wolf_a','wolf_b','wolf_c')):
                 a.approach(target)
                 v,challenge=a.command('challenge',target);assert v['state']['battle']['outcome']=='active'
@@ -138,28 +139,82 @@ def main():
                     process,base=start();a=Player(base,session,char);sockets.append(a)
                     assert a.state['battle']==battle and a.state['potions']==5
                 while a.state['battle']['outcome']=='active':
-                    v,_=a.command('skill' if a.state['battle']['mp']>=9 else 'attack')
+                    v,winning_turn=a.command('skill' if a.state['battle']['mp']>=9 else 'attack')
                     time.sleep(.06)
                 assert a.state['battle']['outcome']=='victory',a.state
                 assert a.state['progress']['kills']==index+1
                 reward=a.state['character']['gold']
+                first_victory=a.state
                 # Replaying opening operation after victory cannot recreate battle in memory or DB.
                 a.command('',request=challenge)
                 a.close();time.sleep(.2);a=Player(base,session,char);sockets.append(a)
                 assert a.state['battle'] is None and a.state['character']['gold']==reward
-                v,_=a.command('challenge',target,ok=False);assert v['code']=='MONSTER_DEFEATED'
+                v,_=a.command('challenge',target,ok=False);assert v['code']=='MONSTER_RESPAWNING'
+                if index==0 and os.environ.get('SSJX_TEST_PVE_RESPAWN')=='1':
+                    # Exercise the production 30s interval, including a process restart.
+                    deadline=first_victory['progress']['respawns'][target]
+                    assert 29900 <= deadline-first_victory['server_time_ms'] <= 30000
+                    a.close();stop(process)
+                    process,base=start();a=Player(base,session,char);sockets.append(a)
+                    assert a.state['progress']['respawns'][target]==deadline
+                    assert a.state['character']['gold']==reward
+                    print('Respawn: waiting for durable 30-second cooldown...',flush=True)
+                    next_ping=time.monotonic()
+                    while int(time.time()*1000)<=deadline:
+                        if time.monotonic()>=next_ping:
+                            a.ws.send({'type':'ping'});next_ping=time.monotonic()+5
+                        a.until('world.delta')
+                    a.approach(target)
+                    respawned,_=a.command('challenge',target)
+                    assert respawned['state']['battle']['enemy_hp']==first_victory['battle']['enemy']['hp']
+                    assert respawned['state']['battle']['id']!=first_victory['battle']['id']
+                    while a.state['battle']['outcome']=='active':
+                        a.command('skill' if a.state['battle']['mp']>=9 else 'attack')
+                        time.sleep(.06)
+                    assert a.state['battle']['outcome']=='victory'
+                    assert a.state['progress']['kills']==1 and a.state['character']['quest_stage']==1
+                    extra_gold=first_victory['battle']['enemy']['gold']
+                    assert a.state['character']['gold']==reward+extra_gold
+                    new_deadline=a.state['progress']['respawns'][target]
+                    assert new_deadline>deadline
+                    a.command('',request=winning_turn)
+                    assert db.query(f"SELECT monster_respawns->>'{target}' FROM characters WHERE id='{char}'")==str(new_deadline)
+                    assert db.query(f"SELECT gold FROM characters WHERE id='{char}'")==str(reward+extra_gold)
+                    a.close();time.sleep(.2);a=Player(base,session,char);sockets.append(a)
+                    print('Respawn: full-health rematch, unique task credit and replay protection PASS',flush=True)
                 a.approach('qingwei');a.command('restore','qingwei')
             assert a.state['character']['quest_stage']==2
             claimed,request=a.command('claim','qingwei');assert claimed['state']['character']['quest_stage']==3
-            assert claimed['state']['character']['gold']==30+12+14+16+60
+            assert claimed['state']['character']['gold']==30+12+14+16+60+extra_gold
             a.command('',request=request)
             value,_=a.command('claim','qingwei',ok=False);assert value['code']=='QUEST_NOT_READY'
-            assert db.query(f"SELECT defeated_mask||':'||quest_stage||':'||gold FROM characters WHERE id='{char}'")=='7:3:132'
+            assert db.query(f"SELECT defeated_mask||':'||quest_stage||':'||gold FROM characters WHERE id='{char}'")==f'7:3:{132+extra_gold}'
             assert db.query(f"SELECT COUNT(*) FROM pve_battles WHERE character_id='{char}' AND active")=='0'
             assert db.query(f"SELECT quest_stage||':'||gold FROM characters WHERE id='{other_id}'")=='0:30'
+            if os.environ.get('SSJX_TEST_PVE_RESPAWN')=='1':
+                # Simulate a legacy character: history remains, no cooldown map.
+                db.query(f"UPDATE characters SET monster_respawns='{{}}'::jsonb WHERE id='{char}'")
+                a.close();time.sleep(.2);a=Player(base,session,char);sockets.append(a)
+                assert a.state['progress']['respawns']=={} and a.state['progress']['kills']==3
+                a.approach('wolf_a');a.command('challenge','wolf_a');a.command('flee')
+                assert a.state['battle']['outcome']=='fled' and a.state['progress']['respawns']=={}
+                db.query(f"UPDATE characters SET hp=1 WHERE id='{char}'")
+                a.command('challenge','wolf_a');a.command('guard')
+                assert a.state['battle']['outcome']=='defeat' and a.state['progress']['respawns']=={}
+                # Spirit uses the same independent refresh timer as all three wolves.
+                a.approach('spirit');a.command('challenge','spirit')
+                while a.state['battle']['outcome']=='active':
+                    a.command('skill' if a.state['battle']['mp']>=9 else 'attack')
+                    time.sleep(.06)
+                assert a.state['battle']['outcome']=='victory' and a.state['progress']['kills']==3
+                assert set(a.state['progress']['respawns'])=={'spirit'}
+                a.command('challenge','spirit',ok=False)
+                assert a.state['progress']['respawns']['spirit']>a.state['server_time_ms']
+                print('Respawn: legacy recovery, fleeing, defeat and spirit cooldown PASS',flush=True)
             # Second player's independent progress and shared population remain untouched.
             b=Player(base,other,other_id);sockets.append(b)
             assert b.state['progress']['kills']==0 and len(b.population)==5
+            assert b.state['progress']['respawns']=={}
             # Same-session socket replacement fences the prior owner.
             replacement=Player(base,session,char);sockets.append(replacement)
             assert replacement.state['character']['quest_stage']==3

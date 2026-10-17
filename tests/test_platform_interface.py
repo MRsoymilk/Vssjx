@@ -108,7 +108,7 @@ class PlatformBoundaryTests(unittest.TestCase):
         self.assertIn("durability: 'browser_sync'", js)
         self.assertIn("'vssjx-offline-v1'", js)
         presets = (CLIENT / 'export_presets.cfg').read_text('utf8')
-        self.assertEqual(presets.count('scripts/interface/adapters/web/*.js'), 3)
+        self.assertEqual(presets.count('scripts/interface/adapters/web/*.js'), 4)
 
     def test_web_resources_do_not_require_threads_or_claim_interruptible_io(self):
         loader = (INTERFACE / 'adapters/web/web_resource_loader.gd').read_text('utf8')

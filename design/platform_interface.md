@@ -1,5 +1,9 @@
 # 多平台接口层与移动浏览器导出方案
 
+2026-10-17发布推进调整：优先交付Android原生APK和Windows x64 EXE预览包；现有Web代码保留。原生预览的构建、签名、隔离和未完成设备验收边界见[原生包记录](../tests/native_packages.md)，不能把打包/静态审计等同于正式发布通过。
+
+后续增加Linux x86_64内嵌PCK的release便携包；使用隔离构建与独立实际进程验收，不覆盖APK/EXE或共享Git分支，见[Linux发布记录](../tests/linux_packages.md)。
+
 设计修订：2026-10-16。状态：P1七类接口已分步接入原生基础实现；P2a精确Origin白名单、P2b配置/凭据隔离及P2c可等待存档/IndexedDB已落地。现新增主游戏Web预设、外壳及浏览器端口，见[主游戏Web导出](../tests/web_game.md)。Windows实际运行、完整线上浏览器闭环、手机真机及P2整体～P4仍待验收；能导出不代表公网发布通过。早期实现记录见[平台基础](../tests/platform_interface.md)、[资源准备](../tests/platform_resources.md)、[输入与系统动作](../tests/platform_input_actions.md)。
 
 P2b已增加Web凭据隔离、构建控制的同域配置及HTTP/发现/WebSocket调用方的目标校验，见[配置与凭据安全前置](../tests/web_security.md)。该阶段使用原生Godot注入Web策略；当前工厂已在真实Web运行时接入浏览器端口，不允许原生回退。

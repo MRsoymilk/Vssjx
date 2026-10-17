@@ -59,3 +59,17 @@ Windows模板固定SHA-256为`d34d36f3be1a6c49c56525ae86469b92e4f417ddf0b43cf00d
 - Python全量124项，121通过、2失败、1错误：actor catalog的既有摘要不一致、monster再生成缺`animation_audit.json`、既有在线PVE夹具引用不存在的测试PNG。三项均在不含本单元改动的`05ed199`归档快照复现，证据`/tmp/opencode/vssjx-native-upstream-baseline-ac3ff6f4d2004612afdfd70db1938920/`。未更改并行资源/夹具来掩盖这些结果。
 
 预提交的实际二进制及审计日志位于`/tmp/opencode/vssjx-native-preview-third/`；该报告明确标记工作树有本单元未提交改动。最终交付从本地功能提交再次构建，不能把上游基线提交当作全部改动的来源。
+
+## 最终本地交付
+
+从干净的本地功能提交`e202e1e`重新构建，完整构建/签名/包内资源审计通过；记录和日志位于`/tmp/opencode/vssjx-native-preview-e202e1e/`。交付副本在原项目忽略目录`work/builds/native-preview-20261017/`，未将二进制或私钥加入Git，也未修改共享工作区源码或共享分支。
+
+| 文件（相对交付目录） | 字节 | SHA-256 |
+|---|---:|---|
+| `vssjx-android-preview.apk` | 68,541,681 | `860e36b47899de0f14dc8674f5982dca833c98b85237f32e1d1191ee1e7a38f1` |
+| `windows-x64/vssjx.exe` | 125,607,080 | `683c3b60a688d29494096394ba0cc2cb272d6ce0ff6bb61564f758bda6c44e30` |
+| `vssjx-windows-x64-preview.zip` | 53,404,250 | `94b644fdf9a75af91e3045b99f56fee35f7dd28ef6af23496fa313ea3a5fe993` |
+
+交付副本逐文件对照最终构建报告核验摘要，检查Windows ZIP内容与单文件EXE相同，并对复制后的APK再次验证签名。旁置`native-preview-20261017.build-report.json`；交付目录内有`SHA256SUMS.txt`、使用说明及许可。APK的`.idsig`是可选增量安装侧文件，普通手动安装只需要APK。
+
+这仍是待真实Windows/Android设备验收的内部预览，不是正式对外发行或已完成AGPL对应源码公开提供的声明。

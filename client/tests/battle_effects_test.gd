@@ -46,7 +46,7 @@ func _run()->void:
 		if app.battle_effects.get_child_count()>0:
 			fx=app.battle_effects.get_child(0)
 			var subject:AnimatedSprite2D=app.battle_enemy if job==1 else app.battle_hero
-			check(fx.get_meta("subject_id")==subject.get_instance_id() and fx.get_meta("art_key")==BattleEffects.SKILL_ART[job],"Damage targets enemy; support follows caster with correct fallback art")
+			check(fx.get_meta("subject_id")==subject.get_instance_id() and fx.get_meta("art_key")==BattleEffects.binding(id).layers[0].art,"Damage targets enemy; support follows caster with the individually mapped art")
 			var previous:Vector2=subject.position;subject.position+=Vector2(16,3);app.battle_effects._process(0)
 			check(aligned(fx,subject),"Local effect stays attached when target moves")
 			subject.position=previous;app.battle_effects._process(0)

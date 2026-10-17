@@ -663,7 +663,8 @@ func _prepare_battle(snapshot: Dictionary) -> void:
 	if not _battle_preparation_current(epoch, id): return
 	var c: Dictionary = network.pve.state.character
 	var key: String = (["mzs", "mck", "mfs"] if int(c.gender) == 0 else ["wzs", "wck", "wfs"])[int(c.job)]
-	var keys: Array[String] = [ShopRules.actor_key(int(c.job),int(c.gender),ShopRules.appearance(network.pve.state.shop)) if network.pve.state.has("shop") else "hero/" + key, String(snapshot.enemy.art), "effect/flash", BattleDeathPlayback.ART_KEY, ["effect/t71", "effect/t36", "effect/t47"][int(c.job)]]
+	var keys: Array[String] = [ShopRules.actor_key(int(c.job),int(c.gender),ShopRules.appearance(network.pve.state.shop)) if network.pve.state.has("shop") else "hero/" + key, String(snapshot.enemy.art), "effect/flash", BattleDeathPlayback.ART_KEY]
+	keys.append_array(BattleEffects.preload_keys(int(c.job),int(c.school),int(c.level),not network.pve.state.has("skills")))
 	var paths: Array[String] = ["res://assets/tiles/original_tiles.png"]
 	for actor_key in keys:
 		var info := OriginalArt.actor_info(actor_key)

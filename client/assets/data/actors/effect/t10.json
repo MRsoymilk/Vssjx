@@ -1,0 +1,26 @@
+{
+  "texture": "res://assets/actors/effect_t10.png",
+  "width": 39,
+  "height": 45,
+  "columns": 8,
+  "origin": [-21, -41],
+  "anchor_x": 0,
+  "playback": {},
+  "count": 9,
+  "sequences": [
+    [
+      [0, 1],
+      [1, 1],
+      [2, 1],
+      [3, 1],
+      [4, 1],
+      [4, 1],
+      [5, 1],
+      [4, 1],
+      [5, 1],
+      [6, 1],
+      [7, 1],
+      [8, 1]
+    ]
+  ]
+}

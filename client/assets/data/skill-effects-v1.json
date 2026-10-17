@@ -1,0 +1,678 @@
+{
+  "version": "skill-effects-v1",
+  "basis": "用户要求按技能含义人工设计；原版ANI素材，非已恢复的原服技能对应表",
+  "original_binding_recovered": false,
+  "bindings": {
+    "sheet_003": {
+      "name": "仙人指路",
+      "basis": "authored_semantic_mapping",
+      "trigger": "cast_impact",
+      "reason": "青色飞剑直落，表现指路剑击",
+      "layers": [
+        {
+          "art": "effect/t88",
+          "anchor": "enemy",
+          "sequence": 0,
+          "canvas_offset": [
+            0,
+            0
+          ],
+          "source_member": "ssjx/effect.mrp/t88.ani",
+          "source_sha256": "b839b2e02c7617dce95ef599e844a4f12e2fca5b2ec9a03a6b21a3e1ecc9d8f2"
+        }
+      ]
+    },
+    "sheet_004": {
+      "name": "沧海明月",
+      "basis": "authored_semantic_mapping",
+      "trigger": "cast_impact",
+      "reason": "多道月牙剑气，表现沧海明月",
+      "layers": [
+        {
+          "art": "effect/t87",
+          "anchor": "enemy",
+          "sequence": 0,
+          "canvas_offset": [
+            0,
+            0
+          ],
+          "source_member": "ssjx/effect.mrp/t87.ani",
+          "source_sha256": "dc58697ef1edef07ea95c75b96f4386bc61895888768bbd108dcac87e2bf36fc"
+        }
+      ]
+    },
+    "sheet_005": {
+      "name": "剑飞惊天",
+      "basis": "authored_semantic_mapping",
+      "trigger": "cast_impact",
+      "reason": "银白飞剑连续掠过，表现剑飞惊天",
+      "layers": [
+        {
+          "art": "effect/t85",
+          "anchor": "enemy",
+          "sequence": 0,
+          "canvas_offset": [
+            0,
+            0
+          ],
+          "source_member": "ssjx/effect.mrp/t85.ani",
+          "source_sha256": "de03f437e5c8fa05054cd7b3a516c74d91ed055d02f6907d66a45995c64b5181"
+        }
+      ]
+    },
+    "sheet_006": {
+      "name": "三环套月",
+      "basis": "authored_semantic_mapping",
+      "trigger": "cast_impact",
+      "reason": "蓝色环形剑气与星光，表现套月",
+      "layers": [
+        {
+          "art": "effect/t94",
+          "anchor": "enemy",
+          "sequence": 0,
+          "canvas_offset": [
+            0,
+            0
+          ],
+          "source_member": "ssjx/effect.mrp/t94.ani",
+          "source_sha256": "e411ed0e2e65ed1bdf30f06e1df74b42070828db9e8bc2a5e793cdee7bed9931"
+        }
+      ]
+    },
+    "sheet_007": {
+      "name": "天罡战甲",
+      "basis": "authored_semantic_mapping",
+      "trigger": "cast_impact",
+      "reason": "金色真气上升并亮起攻击增益符号",
+      "layers": [
+        {
+          "art": "effect/t21",
+          "anchor": "hero",
+          "sequence": 0,
+          "canvas_offset": [
+            0,
+            0
+          ],
+          "source_member": "ssjx/effect.mrp/t21.ani",
+          "source_sha256": "d98e802c00ff1f2463973b5779bc8259b10b899139b4c3e52fed1894662cd904"
+        },
+        {
+          "art": "effect/t10",
+          "anchor": "hero",
+          "sequence": 0,
+          "canvas_offset": [
+            0,
+            0
+          ],
+          "source_member": "ssjx/effect.mrp/t10.ani",
+          "source_sha256": "fc77122314439392d74aa8f5b5b2fdee625983c9646dc122f557e9472b0d43dd"
+        }
+      ]
+    },
+    "sheet_008": {
+      "name": "万剑归宗",
+      "basis": "authored_semantic_mapping",
+      "trigger": "cast_impact",
+      "reason": "大范围飞剑齐射，表现万剑归宗",
+      "layers": [
+        {
+          "art": "effect/t78",
+          "anchor": "enemy",
+          "sequence": 0,
+          "canvas_offset": [
+            0,
+            0
+          ],
+          "source_member": "ssjx/effect.mrp/t78.ani",
+          "source_sha256": "9e81bfa84a354a696b44125d9b073723526ad5a61d3bfd9abf3bd6559722a7e1"
+        }
+      ]
+    },
+    "sheet_010": {
+      "name": "雷霆一击",
+      "basis": "authored_semantic_mapping",
+      "trigger": "cast_impact",
+      "reason": "青蓝雷电裂纹，表现雷霆重击",
+      "layers": [
+        {
+          "art": "effect/t92",
+          "anchor": "enemy",
+          "sequence": 0,
+          "canvas_offset": [
+            0,
+            0
+          ],
+          "source_member": "ssjx/effect.mrp/t92.ani",
+          "source_sha256": "cbf5113f72f436b29fe7f26de03b621ad7066082d26db93886749a29e7f9fbd8"
+        }
+      ]
+    },
+    "sheet_011": {
+      "name": "破釜沉舟",
+      "basis": "authored_semantic_mapping",
+      "trigger": "cast_impact",
+      "reason": "蓝色回转屏障，表现物理反伤",
+      "layers": [
+        {
+          "art": "effect/t93",
+          "anchor": "hero",
+          "sequence": 0,
+          "canvas_offset": [
+            0,
+            0
+          ],
+          "source_member": "ssjx/effect.mrp/t93.ani",
+          "source_sha256": "5e909df4490438c35d1e15d3dedff47f4b8e9066e6de040fa920b9759c1bceb2"
+        }
+      ]
+    },
+    "sheet_012": {
+      "name": "固若金汤",
+      "basis": "authored_semantic_mapping",
+      "trigger": "cast_impact",
+      "reason": "晶体护罩，表现坚固防御",
+      "layers": [
+        {
+          "art": "effect/t30",
+          "anchor": "hero",
+          "sequence": 0,
+          "canvas_offset": [
+            0,
+            0
+          ],
+          "source_member": "ssjx/effect.mrp/t30.ani",
+          "source_sha256": "863a64c7ed25bd536cfe4cee22207341ceb4fe8e3542780dafadf7bb8b3392e5"
+        }
+      ]
+    },
+    "sheet_013": {
+      "name": "血战八方",
+      "basis": "authored_semantic_mapping",
+      "trigger": "cast_impact",
+      "reason": "八向血色斩痕，表现血战八方",
+      "layers": [
+        {
+          "art": "effect/t126",
+          "anchor": "enemy",
+          "sequence": 0,
+          "canvas_offset": [
+            0,
+            0
+          ],
+          "source_member": "ssjx/effect.mrp/t126.ani",
+          "source_sha256": "85f772c4e20bcafd2497278985301aa5c578020a6c5a760aaba47631d9fde0d5"
+        }
+      ]
+    },
+    "sheet_014": {
+      "name": "霸王卸甲",
+      "basis": "authored_semantic_mapping",
+      "trigger": "physical_reflect",
+      "reason": "带星光的护体圆环，反伤时触发",
+      "layers": [
+        {
+          "art": "effect/t12",
+          "anchor": "hero",
+          "sequence": 0,
+          "canvas_offset": [
+            0,
+            -60
+          ],
+          "source_member": "ssjx/effect.mrp/t12.ani",
+          "source_sha256": "786b1199230fd1a72d39df04a517971c693ed8ba40064f8288015da1601b31df"
+        }
+      ]
+    },
+    "sheet_015": {
+      "name": "斗转星移",
+      "basis": "authored_semantic_mapping",
+      "trigger": "cast_impact",
+      "reason": "星芒与青色旋风，表现斗转星移",
+      "layers": [
+        {
+          "art": "effect/t99",
+          "anchor": "enemy",
+          "sequence": 0,
+          "canvas_offset": [
+            0,
+            0
+          ],
+          "source_member": "ssjx/effect.mrp/t99.ani",
+          "source_sha256": "2ce4c1dd0d481aa39d4af91efcefcc484e3da70745721cd57e11dd09275ee0ef"
+        }
+      ]
+    },
+    "sheet_017": {
+      "name": "连天绝壁",
+      "basis": "authored_semantic_mapping",
+      "trigger": "cast_impact",
+      "reason": "拔地而起的岩柱，表现连天绝壁",
+      "layers": [
+        {
+          "art": "effect/t81",
+          "anchor": "enemy",
+          "sequence": 0,
+          "canvas_offset": [
+            0,
+            0
+          ],
+          "source_member": "ssjx/effect.mrp/t81.ani",
+          "source_sha256": "f9cca222298d47f5c47dcfc5b572c35c0ba33d645cc00d96dac44d38348ad0fa"
+        }
+      ]
+    },
+    "sheet_018": {
+      "name": "星火燎原",
+      "basis": "authored_semantic_mapping",
+      "trigger": "cast_impact",
+      "reason": "星火坠落并燃起火柱",
+      "layers": [
+        {
+          "art": "effect/t47",
+          "anchor": "enemy",
+          "sequence": 0,
+          "canvas_offset": [
+            0,
+            0
+          ],
+          "source_member": "ssjx/effect.mrp/t47.ani",
+          "source_sha256": "73ff3e4739cefebc34c52bc9dc468c3d0fa417d108579713b22e080b1ceae87c"
+        }
+      ]
+    },
+    "sheet_019": {
+      "name": "焚天疾火",
+      "basis": "authored_semantic_mapping",
+      "trigger": "cast_impact",
+      "reason": "成片火球与烈焰，表现焚天疾火",
+      "layers": [
+        {
+          "art": "effect/t60",
+          "anchor": "enemy",
+          "sequence": 0,
+          "canvas_offset": [
+            0,
+            0
+          ],
+          "source_member": "ssjx/effect.mrp/t60.ani",
+          "source_sha256": "9572b466d5fc80629c67bf1f5a6e464d35f723360d3d432d4e99a0570335ad88"
+        }
+      ]
+    },
+    "sheet_021": {
+      "name": "劫焰燎原",
+      "basis": "authored_semantic_mapping",
+      "trigger": "cast_impact",
+      "reason": "盘旋升腾的劫火，表现劫焰燎原",
+      "layers": [
+        {
+          "art": "effect/t62",
+          "anchor": "enemy",
+          "sequence": 0,
+          "canvas_offset": [
+            0,
+            0
+          ],
+          "source_member": "ssjx/effect.mrp/t62.ani",
+          "source_sha256": "135ed680424daefbcb51b3bc61ace8cb433f122f93ba2eb2bc0db7b962b5568e"
+        }
+      ]
+    },
+    "sheet_025": {
+      "name": "推窗望月",
+      "basis": "authored_semantic_mapping",
+      "trigger": "cast_impact",
+      "reason": "蓝白月牙冲击，表现望月劈击",
+      "layers": [
+        {
+          "art": "effect/t35",
+          "anchor": "enemy",
+          "sequence": 0,
+          "canvas_offset": [
+            0,
+            0
+          ],
+          "source_member": "ssjx/effect.mrp/t35.ani",
+          "source_sha256": "293bce0bfe00a0bb88eb9f73ffd10ea2ebcc97de233557db060e043b31ba90e9"
+        }
+      ]
+    },
+    "sheet_027": {
+      "name": "猛虎下山",
+      "basis": "authored_semantic_mapping",
+      "trigger": "cast_impact",
+      "reason": "金色猛兽扑击，表现猛虎下山",
+      "layers": [
+        {
+          "art": "effect/t37",
+          "anchor": "enemy",
+          "sequence": 0,
+          "canvas_offset": [
+            0,
+            0
+          ],
+          "source_member": "ssjx/effect.mrp/t37.ani",
+          "source_sha256": "e2e0a139e29be9f50d2a64a579e847cebab20d430ea1f0e443502d9d0a38976b"
+        }
+      ]
+    },
+    "sheet_033": {
+      "name": "移花接木",
+      "basis": "authored_semantic_mapping",
+      "trigger": "cast_impact",
+      "reason": "紫色法印屏障，表现法术反伤",
+      "layers": [
+        {
+          "art": "effect/t1",
+          "anchor": "hero",
+          "sequence": 0,
+          "canvas_offset": [
+            0,
+            0
+          ],
+          "source_member": "ssjx/effect.mrp/t1.ani",
+          "source_sha256": "a221493b3c2112f216547dea942c46b70617edbe24b70da85a3f74a8ade66dbe"
+        }
+      ]
+    },
+    "sheet_034": {
+      "name": "以逸待劳",
+      "basis": "authored_semantic_mapping",
+      "trigger": "cast_impact",
+      "reason": "防御提升符号，表现以逸待劳",
+      "layers": [
+        {
+          "art": "effect/t11",
+          "anchor": "hero",
+          "sequence": 0,
+          "canvas_offset": [
+            0,
+            0
+          ],
+          "source_member": "ssjx/effect.mrp/t11.ani",
+          "source_sha256": "ec8e64a342bc67a2a02a057dc4eee586f5b81a2e43c9a3ee83b62aeb937c78a8"
+        }
+      ]
+    },
+    "sheet_035": {
+      "name": "狂风骤电",
+      "basis": "authored_semantic_mapping",
+      "trigger": "cast_impact",
+      "reason": "青色龙卷叠加雷电，表现狂风骤电",
+      "layers": [
+        {
+          "art": "effect/t119",
+          "anchor": "enemy",
+          "sequence": 0,
+          "canvas_offset": [
+            0,
+            0
+          ],
+          "source_member": "ssjx/effect.mrp/t119.ani",
+          "source_sha256": "96467c07b59fc638f8002fe4505f2b3b882a073c622f6c67e35fa9d5770c640c"
+        },
+        {
+          "art": "effect/t173",
+          "anchor": "enemy",
+          "sequence": 0,
+          "canvas_offset": [
+            0,
+            0
+          ],
+          "source_member": "ssjx/effect.mrp/t173.ani",
+          "source_sha256": "7bf58746180b2ba36b8b09acb168c6fccc889a9fd4fdd0c4a3a2628197da638d"
+        }
+      ]
+    },
+    "sheet_036": {
+      "name": "穿衣破甲",
+      "basis": "authored_semantic_mapping",
+      "trigger": "magic_reflect",
+      "reason": "青蓝法力环震，法术反伤时触发",
+      "layers": [
+        {
+          "art": "effect/t112",
+          "anchor": "hero",
+          "sequence": 0,
+          "canvas_offset": [
+            0,
+            0
+          ],
+          "source_member": "ssjx/effect.mrp/t112.ani",
+          "source_sha256": "9375b32b4e086037ead0ad461220f117e7fb2f8f0878c5a57316456851839207"
+        }
+      ]
+    },
+    "sheet_037": {
+      "name": "雪满天山",
+      "basis": "authored_semantic_mapping",
+      "trigger": "cast_impact",
+      "reason": "连续冰锥与碎冰，表现雪满天山",
+      "layers": [
+        {
+          "art": "effect/t75",
+          "anchor": "enemy",
+          "sequence": 0,
+          "canvas_offset": [
+            0,
+            0
+          ],
+          "source_member": "ssjx/effect.mrp/t75.ani",
+          "source_sha256": "0ef6413f4de0cd6fd31177e2e07a81db482b9d8f72f7e55d7a8285bc75b9c630"
+        }
+      ]
+    },
+    "sheet_039": {
+      "name": "起死回生",
+      "basis": "authored_semantic_mapping",
+      "trigger": "cast_impact",
+      "reason": "绿色生命上升光效，表现起死回生",
+      "layers": [
+        {
+          "art": "effect/t18",
+          "anchor": "hero",
+          "sequence": 0,
+          "canvas_offset": [
+            0,
+            0
+          ],
+          "source_member": "ssjx/effect.mrp/t18.ani",
+          "source_sha256": "32d84a88186470bf5ae998b3e31d41cc60b6623684d1213e0d54387a27de922f"
+        }
+      ]
+    },
+    "sheet_041": {
+      "name": "救死扶伤",
+      "basis": "authored_semantic_mapping",
+      "trigger": "cast_impact",
+      "reason": "宽幅绿色回春光效，表现救死扶伤",
+      "layers": [
+        {
+          "art": "effect/t96",
+          "anchor": "hero",
+          "sequence": 0,
+          "canvas_offset": [
+            0,
+            0
+          ],
+          "source_member": "ssjx/effect.mrp/t96.ani",
+          "source_sha256": "51570ed6e148be7090dc90277520de316e28d89c9f11747cf8fb43d1e2f215f9"
+        }
+      ]
+    },
+    "sheet_042": {
+      "name": "冰雪封天",
+      "basis": "authored_semantic_mapping",
+      "trigger": "cast_impact",
+      "reason": "多列冰墙与冰锥，表现冰雪封天",
+      "layers": [
+        {
+          "art": "effect/t145",
+          "anchor": "enemy",
+          "sequence": 0,
+          "canvas_offset": [
+            0,
+            0
+          ],
+          "source_member": "ssjx/effect.mrp/t145.ani",
+          "source_sha256": "c9f00011bdead2fc8a25b78b8807d40ed6feea827030a74217114e47dd78efa1"
+        }
+      ]
+    },
+    "sheet_045": {
+      "name": "排山倒海",
+      "basis": "authored_semantic_mapping",
+      "trigger": "cast_impact",
+      "reason": "多重岩柱震起，表现排山倒海",
+      "layers": [
+        {
+          "art": "effect/t140",
+          "anchor": "enemy",
+          "sequence": 0,
+          "canvas_offset": [
+            0,
+            0
+          ],
+          "source_member": "ssjx/effect.mrp/t140.ani",
+          "source_sha256": "c4236a934e0905da70b9f08f2b75c7bbf82892e7af7bb52e8d7b42ac5dae6897"
+        }
+      ]
+    },
+    "sheet_047": {
+      "name": "偷天换日",
+      "basis": "authored_semantic_mapping",
+      "trigger": "cast_impact",
+      "reason": "目标灵力被紫环束缚，施法者获得星光",
+      "layers": [
+        {
+          "art": "effect/t147",
+          "anchor": "enemy",
+          "sequence": 0,
+          "canvas_offset": [
+            0,
+            0
+          ],
+          "source_member": "ssjx/effect.mrp/t147.ani",
+          "source_sha256": "063d99d4682e48a86cc1847ba75931f1f56df5abf7531cc0c499bc3ff8b5d813"
+        },
+        {
+          "art": "effect/t09",
+          "anchor": "hero",
+          "sequence": 0,
+          "canvas_offset": [
+            0,
+            0
+          ],
+          "source_member": "ssjx/effect.mrp/t09.ani",
+          "source_sha256": "30a2e1aaa797760395cfabbbd23acdd5e189aa3a8a26709613cfe331d7293522"
+        }
+      ]
+    },
+    "sheet_051": {
+      "name": "醉生梦死",
+      "basis": "authored_semantic_mapping",
+      "trigger": "cast_impact",
+      "reason": "紫色催眠环，表现醉生梦死",
+      "layers": [
+        {
+          "art": "effect/t16",
+          "anchor": "enemy",
+          "sequence": 0,
+          "canvas_offset": [
+            0,
+            -78
+          ],
+          "source_member": "ssjx/effect.mrp/t16.ani",
+          "source_sha256": "3e716d54817b74f3b2deee8d109a614c4445854ad0d0f5bccc81afc6c1861c01"
+        }
+      ]
+    },
+    "sheet_052": {
+      "name": "混元入蛊",
+      "basis": "authored_semantic_mapping",
+      "trigger": "cast_impact",
+      "reason": "绿色毒泡与紫雾，表现混元入蛊",
+      "layers": [
+        {
+          "art": "effect/t25",
+          "anchor": "enemy",
+          "sequence": 0,
+          "canvas_offset": [
+            0,
+            0
+          ],
+          "source_member": "ssjx/effect.mrp/t25.ani",
+          "source_sha256": "453798e6a15e42b5467d85552c8d6a8f87c1ecc204ac1bf8ed81655c4831d278"
+        }
+      ]
+    },
+    "legacy_0": {
+      "name": "破山诀",
+      "basis": "authored_semantic_mapping",
+      "trigger": "cast_impact",
+      "reason": "落石与地裂，表现破山诀",
+      "layers": [
+        {
+          "art": "effect/t32",
+          "anchor": "enemy",
+          "sequence": 0,
+          "canvas_offset": [
+            0,
+            0
+          ],
+          "source_member": "ssjx/effect.mrp/t32.ani",
+          "source_sha256": "1cb628c6e3cd61e256bdcdacc27ef6364f41dbe5b521d8d37da99ddfed988e17"
+        }
+      ]
+    },
+    "legacy_1": {
+      "name": "御剑诀",
+      "basis": "authored_semantic_mapping",
+      "trigger": "cast_impact",
+      "reason": "飞剑直击，表现御剑诀",
+      "layers": [
+        {
+          "art": "effect/t40",
+          "anchor": "enemy",
+          "sequence": 0,
+          "canvas_offset": [
+            0,
+            0
+          ],
+          "source_member": "ssjx/effect.mrp/t40.ani",
+          "source_sha256": "f2c6e6dd6c094801ea94a73cde490d6a3c42f654f47e85e1b52dd36c5c54af9a"
+        }
+      ]
+    },
+    "legacy_2": {
+      "name": "摄灵诀",
+      "basis": "authored_semantic_mapping",
+      "trigger": "cast_impact",
+      "reason": "绿色摄灵粒子与自身灵光，表现摄灵诀",
+      "layers": [
+        {
+          "art": "effect/t107",
+          "anchor": "enemy",
+          "sequence": 0,
+          "canvas_offset": [
+            0,
+            0
+          ],
+          "source_member": "ssjx/effect.mrp/t107.ani",
+          "source_sha256": "395cec6ec681321d048889c538a6e1f0a2159fae7e6fd6aa2bbda0ccb24499ac"
+        },
+        {
+          "art": "effect/t01",
+          "anchor": "hero",
+          "sequence": 0,
+          "canvas_offset": [
+            0,
+            0
+          ],
+          "source_member": "ssjx/effect.mrp/t01.ani",
+          "source_sha256": "fcf085a85349bbd091ff71f752c263cdf2b7aa9140563e36d35b999a3af527b6"
+        }
+      ]
+    }
+  }
+}

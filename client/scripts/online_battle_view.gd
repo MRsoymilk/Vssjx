@@ -171,6 +171,8 @@ func _start_enemy_motion() -> void:
 		var took_damage := int(model.state.battle.hp) < _shown_hero_hp
 		_shown_hero_hp = int(model.state.battle.hp)
 		_shown_enemy_hp = int(model.state.battle.enemy_hp)
+		var character:Dictionary=model.state.character
+		effects.play_reflection(int(character.job),int(character.school),int(character.level),model.state.battle.get("skills",{}),false,hero,enemy)
 		if took_damage and hero.sprite_frames.has_animation("hurt"): hero.play("hurt")
 		$Hud/BattleHeroHp.value = _shown_hero_hp
 		$Hud/BattleEnemyHp.value = _shown_enemy_hp

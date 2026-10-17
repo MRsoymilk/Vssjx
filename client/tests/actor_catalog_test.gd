@@ -16,8 +16,10 @@ func _ready() -> void:
 	var info := OriginalArt.actor_info("hero/mfs")
 	var cold_us := Time.get_ticks_usec() - cold_started
 	var first := OriginalArt.metadata_stats()
-	check(first.indexed_actors == 34 and first.loaded_actors == 1 and first.json_files_read == 2, "First lookup reads only index and requested actor")
-	check(first.json_bytes_read < 5000 and first.json_bytes_read < 50026, "First lookup avoids parsing the full legacy catalog")
+	var expected_count:int=JSON.parse_string(FileAccess.get_file_as_string("res://assets/data/actors.json")).actors.size()
+	check(first.indexed_actors == expected_count and first.loaded_actors == 1 and first.json_files_read == 2, "First lookup reads only index and requested actor")
+	var expected_bytes:=FileAccess.get_file_as_bytes("res://assets/data/actors.json").size()+FileAccess.get_file_as_bytes("res://assets/data/actors/hero/mfs.json").size()
+	check(first.json_bytes_read == expected_bytes and first.json_bytes_read < 50026, "First lookup reads only manifest and requested shard, below the full legacy catalog")
 	check(not OriginalArt.catalog.has("hero/wfs") and not OriginalArt.catalog.has("creation/mfs") and not OriginalArt.catalog.has("effect/t47"), "Unrequested categories remain unloaded")
 	check(info.playback.has("cast") and not info.sequences.is_empty() and OriginalArt.cached.is_empty(), "Metadata lookup retains all sequences without building SpriteFrames")
 	var warm_started := Time.get_ticks_usec()
@@ -38,7 +40,7 @@ func _ready() -> void:
 	check(not effect.sprite_frames.get_animation_loop(effect.animation), "Native sequence zero effect remains a one-shot")
 	for key in OriginalArt._index:
 		check(not OriginalArt.actor_info(key).is_empty(), "Every indexed shard passes validation: " + key)
-	check(OriginalArt.catalog.size() == 34 and OriginalArt.cached.size() == 2, "Enumerating metadata does not allocate all actor textures/frames")
+	check(OriginalArt.catalog.size() == expected_count and OriginalArt.cached.size() == 2, "Enumerating metadata does not allocate all actor textures/frames")
 	check(not FileAccess.file_exists("res://assets/data/%s.json" % "original_animations"), "Original ANI archive is no longer a runtime resource")
 	check(Game.player == offline, "Asset metadata never mutates offline state")
 	var all_stats := OriginalArt.metadata_stats()

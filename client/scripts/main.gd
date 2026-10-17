@@ -870,7 +870,8 @@ func _encounter_battle(enemy: Dictionary) -> void:
 	# A short readable warning, followed by actual texture/cache work.
 	await get_tree().create_timer(0.20).timeout
 	if not _encounter_current(epoch, world_id): return
-	var keys: Array[String] = [Game.appearance_key(), String(enemy.get("art", "")), "effect/flash", BattleDeathPlayback.ART_KEY, ["effect/t71", "effect/t36", "effect/t47"][int(Game.player.job)]]
+	var keys: Array[String] = [Game.appearance_key(), String(enemy.get("art", "")), "effect/flash", BattleDeathPlayback.ART_KEY]
+	keys.append_array(BattleEffects.preload_keys(int(Game.player.job),int(Game.player.school),int(Game.player.level)))
 	var paths: Array[String] = ["res://assets/tiles/original_tiles.png"]
 	for key in keys:
 		var info := OriginalArt.actor_info(key)
@@ -1064,6 +1065,7 @@ func _battle_turn(command: String, skill_id:String="") -> void:
 		if int(response.incoming) > 0 and battle_hero.sprite_frames.has_animation("hurt"): battle_hero.play("hurt")
 		_damage_number(int(response.incoming), battle_hero.position + Vector2(-10, -53))
 		if int(response.reflected) > 0:
+			battle_effects.play_reflection(int(Game.player.job),int(Game.player.school),int(Game.player.level),battle.skills,false,battle_hero,battle_enemy)
 			_damage_number(int(response.reflected), battle_enemy.position + Vector2(-3, -53))
 		_refresh_battle()
 		await enemy_motion.completed

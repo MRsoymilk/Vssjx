@@ -1,0 +1,21 @@
+{
+  "texture": "res://assets/actors/effect_t37.png",
+  "width": 150,
+  "height": 44,
+  "columns": 7,
+  "origin": [-14, -43],
+  "anchor_x": 0,
+  "playback": {},
+  "count": 7,
+  "sequences": [
+    [
+      [0, 1],
+      [1, 1],
+      [2, 1],
+      [3, 1],
+      [4, 1],
+      [5, 1],
+      [6, 1]
+    ]
+  ]
+}

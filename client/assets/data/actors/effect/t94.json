@@ -1,0 +1,19 @@
+{
+  "texture": "res://assets/actors/effect_t94.png",
+  "width": 60,
+  "height": 58,
+  "columns": 5,
+  "origin": [-29, -44],
+  "anchor_x": 0,
+  "playback": {},
+  "count": 5,
+  "sequences": [
+    [
+      [0, 1],
+      [1, 1],
+      [2, 1],
+      [3, 1],
+      [4, 1]
+    ]
+  ]
+}

@@ -186,7 +186,17 @@ def read_animations():
 
 
 def build_actor_catalog(parsed, write_textures=True):
-    baked = {key: bake(key, parsed[key], write_texture=write_textures) for key in SELECTED if key in parsed}
+    selected = list(SELECTED)
+    mapping_path = DEST / 'data/skill-effects-v1.json'
+    if mapping_path.exists():
+        mapping = json.loads(mapping_path.read_text('utf8'))
+        for binding in mapping['bindings'].values():
+            for layer in binding['layers']:
+                key = layer['art']
+                if not re.fullmatch(r'effect/[A-Za-z0-9_]+', key) or key not in parsed:
+                    raise ValueError('Invalid mapped effect: ' + key)
+                if key not in selected: selected.append(key)
+    baked = {key: bake(key, parsed[key], write_texture=write_textures) for key in selected if key in parsed}
     for stem in ['mzs', 'wzs', 'mck', 'wck', 'mfs', 'wfs']:
         key, preview_key = 'hero/' + stem, 'creation/' + stem
         preview = copy.deepcopy(parsed[key])

@@ -1121,7 +1121,7 @@ func _request_exit() -> void:
 		_message("无法退出", result.message)
 
 func _notification(what: int) -> void:
-	if what == NOTIFICATION_WM_CLOSE_REQUEST:
+	if what == NOTIFICATION_WM_CLOSE_REQUEST or (OS.has_feature("android") and what == NOTIFICATION_WM_GO_BACK_REQUEST):
 		_close_requested()
 
 func _close_requested() -> void:

@@ -1,5 +1,6 @@
 extends SystemFont
-## Keep native system-font metrics/priority unchanged; Web has no system fonts.
+## Desktop fonts keep priority; shipped Windows/Android builds also need CJK
+## when the operating system has no usable Chinese system font installed.
 func _init() -> void:
-	if OS.has_feature("web"):
+	if OS.has_feature("web") or OS.has_feature("android") or OS.has_feature("windows"):
 		fallbacks = [load("res://assets/fonts/cjk_fallback.tres")]

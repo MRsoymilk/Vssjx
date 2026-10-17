@@ -1,0 +1,104 @@
+[gd_scene format=3]
+[ext_resource type="Script" path="res://scripts/skill_book.gd" id="Script"]
+[sub_resource type="StyleBoxFlat" id="List"]
+bg_color = Color(1, 0.9647, 0.7373, 1)
+border_color = Color(0.9176, 0.3373, 0.2745, 1)
+border_width_left = 2
+border_width_right = 2
+border_width_top = 2
+border_width_bottom = 2
+[sub_resource type="StyleBoxFlat" id="Description"]
+bg_color = Color(0.9608, 0.8745, 0.6078, 1)
+border_color = Color(0.9176, 0.3373, 0.2745, 1)
+border_width_left = 2
+border_width_right = 2
+border_width_top = 2
+border_width_bottom = 2
+[sub_resource type="StyleBoxFlat" id="Disabled"]
+bg_color = Color(0.86, 0.67, 0.40, 1)
+border_color = Color(0.65, 0.40, 0.15, 1)
+border_width_left = 1
+border_width_right = 1
+border_width_top = 1
+border_width_bottom = 1
+[node name="SkillBook" type="Control"]
+script = ExtResource("Script")
+[node name="ListPaper" type="Panel" parent="."]
+offset_left = 12.0
+offset_top = 89.0
+offset_right = 308.0
+offset_bottom = 291.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("List")
+[node name="SkillCatalog" type="ScrollContainer" parent="."]
+offset_left = 17.0
+offset_top = 92.0
+offset_right = 303.0
+offset_bottom = 288.0
+horizontal_scroll_mode = 0
+[node name="Rows" type="VBoxContainer" parent="SkillCatalog"]
+size_flags_horizontal = 3
+theme_override_constants/separation = 0
+[node name="DetailPaper" type="Panel" parent="."]
+offset_left = 12.0
+offset_top = 302.0
+offset_right = 308.0
+offset_bottom = 407.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("Description")
+[node name="Description" type="Label" parent="."]
+offset_left = 22.0
+offset_top = 311.0
+offset_right = 296.0
+offset_bottom = 398.0
+theme_override_colors/font_color = Color(0.251, 0.153, 0.094, 1)
+theme_override_font_sizes/font_size = 14
+autowrap_mode = 3
+[node name="SkillName" type="Label" parent="."]
+visible = false
+[node name="Label0" type="Label" parent="."]
+offset_left = 22.0
+offset_top = 123.0
+offset_right = 296.0
+offset_bottom = 180.0
+theme_override_colors/font_color = Color(0.251, 0.153, 0.094, 1)
+theme_override_font_sizes/font_size = 13
+text = "暂无此门派的具名心法资料"
+horizontal_alignment = 1
+[node name="Points" type="Label" parent="."]
+offset_left = 20.0
+offset_top = 414.0
+offset_right = 121.0
+offset_bottom = 436.0
+theme_override_colors/font_color = Color(0.251, 0.153, 0.094, 1)
+theme_override_font_sizes/font_size = 14
+text = "技能点：—"
+[node name="Provenance" type="Label" parent="."]
+offset_left = 126.0
+offset_top = 416.0
+offset_right = 302.0
+offset_bottom = 436.0
+theme_override_colors/font_color = Color(0.396, 0.271, 0.094, 1)
+theme_override_font_sizes/font_size = 10
+[node name="Upgrade" type="Button" parent="."]
+offset_left = 12.0
+offset_top = 446.0
+offset_right = 116.0
+offset_bottom = 476.0
+disabled = true
+text = "升级技能"
+tooltip_text = "技能成长尚未开放"
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_disabled_color = Color(0.45, 0.34, 0.19, 1)
+theme_override_styles/disabled = SubResource("Disabled")
+[node name="NextInfo" type="Button" parent="."]
+offset_left = 128.0
+offset_top = 446.0
+offset_right = 232.0
+offset_bottom = 476.0
+disabled = true
+text = "下级信息"
+tooltip_text = "暂无下一阶技能资料"
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_disabled_color = Color(0.45, 0.34, 0.19, 1)
+theme_override_styles/disabled = SubResource("Disabled")

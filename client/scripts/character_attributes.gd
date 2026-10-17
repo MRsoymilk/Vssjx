@@ -54,6 +54,8 @@ func _ready() -> void:
 
 func select_tab(index: int) -> void:
 	selected_tab = posmod(index, 4)
+	$Label5.text="人物技能" if selected_tab>=2 else "人物属性"
+	for node in [$Label14,$Signature,$CreateEdit16,$EditSignature]:node.visible=selected_tab<2
 	for i in 4:
 		var fill: Color = Color("bef38b") if i == selected_tab else palette.main
 		for state in ["normal", "hover", "pressed"]:
@@ -210,21 +212,8 @@ func _confirm_allocation() -> void:
 func _skills() -> void:
 	var player := _player_data()
 	for child in content.get_children():child.hide()
-	var scroll:=ScrollContainer.new();scroll.name="SkillCatalog";scroll.position=Vector2(20,99);scroll.size=Vector2(278,263);scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED;content.add_child(scroll)
-	var rows:=VBoxContainer.new();rows.size_flags_horizontal=Control.SIZE_EXPAND_FILL;rows.add_theme_constant_override("separation",10);scroll.add_child(rows)
-	var skills:=SkillRules.list_for(int(player.get("job",0)),int(player.get("school",0)),int(player.get("level",1)),true)
-	var count:=0
-	for skill in skills:
-		if bool(skill.active)!=(selected_tab==2):continue
-		count+=1
-		var label:=Label.new();label.custom_minimum_size.x=255;label.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;label.add_theme_font_size_override("font_size",13);label.add_theme_color_override("font_color",BROWN)
-		var unlocked:=int(player.level)>=int(skill.unlock_level)
-		label.text="%s　%s\n%s\n%s"%[skill.name,"%d灵力"%int(skill.mp_cost) if skill.active else "自动生效",skill.description,"已解锁" if unlocked else "%d级解锁"%int(skill.unlock_level)]
-		if not unlocked:label.modulate.a=0.55
-		rows.add_child(label)
-	if count==0:
-		var empty:=Label.new();empty.text="当前职业、门派暂无具名心法资料。";empty.add_theme_font_size_override("font_size",12);empty.add_theme_color_override("font_color",BROWN);rows.add_child(empty)
-	var note:=Label.new();note.position=Vector2(20,372);note.size=Vector2(278,38);note.add_theme_font_size_override("font_size",11);note.add_theme_color_override("font_color",BROWN);note.text="按角色等级自动解锁；技能点：—\n名称效果据玩家资料，战斗数值暂为重建。";content.add_child(note)
+	var book:SkillBook=preload("res://scenes/ui/skill_book.tscn").instantiate()
+	content.add_child(book);book.present(player,selected_tab==2)
 
 func _style(fill: Color, border: Color, width: int = 1) -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()

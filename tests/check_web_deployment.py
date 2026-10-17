@@ -3,11 +3,13 @@
 No accounts, characters, database rows or server configuration are changed.
 """
 import argparse
+import gzip
 import hashlib
 import json
+import re
 from pathlib import Path
 from urllib.error import HTTPError
-from urllib.request import ProxyHandler, build_opener
+from urllib.request import ProxyHandler, Request, build_opener
 
 from ws_fixture import WebSocket
 
@@ -39,6 +41,25 @@ def main():
         info = json.load(response)
         check(info.get('service') == 'vssjx' and 'account_auth' in info.get('capabilities', []),
               'Same-origin API reaches the running account service')
+        check('public' not in response.headers.get('Cache-Control', ''), 'Account API is never given the static asset cache policy')
+    html = (args.public / 'index.html').read_text(encoding='utf8')
+    config = json.loads(re.search(r'const config = (\{[^\n]+\});', html).group(1))
+    executable = config.get('executable', '')
+    if executable.startswith('assets/'):
+        for extension in ['wasm', 'pck']:
+            name = executable + '.' + extension
+            request = Request(args.base + '/' + name, headers={'Accept-Encoding': 'gzip'})
+            with opener.open(request, timeout=10) as response:
+                compressed = response.read()
+                check(response.headers.get('Content-Encoding') == 'gzip' and 'Accept-Encoding' in response.headers.get('Vary', ''), 'Versioned ' + extension + ' negotiates gzip correctly')
+                check('immutable' in response.headers.get('Cache-Control', ''), 'Only versioned ' + extension + ' receives long-term caching')
+                check(hashlib.sha256(gzip.decompress(compressed)).digest() == hashlib.sha256((args.public / name).read_bytes()).digest(), 'Compressed ' + extension + ' decodes to the actual export')
+        try:
+            opener.open(args.base + '/' + executable.rsplit('/', 1)[0] + '/missing.wasm', timeout=5)
+        except HTTPError as error:
+            check(error.code == 404 and 'immutable' not in error.headers.get('Cache-Control', ''), 'Missing versioned files are not cached as immutable')
+        else:
+            raise AssertionError('Missing versioned file was served')
     for path, expected in [('/api/v1/auth/me', 401), ('/.env', 404), ('/api/status', 404),
                            ('/api/announcements', 404), ('/scripts/admin/data_browser.gd', 404),
                            ('/missing.wasm', 404)]:

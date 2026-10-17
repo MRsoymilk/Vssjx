@@ -25,7 +25,14 @@ server {
         proxy_cache off;
     }
     location ~ /\. { return 404; }
-    location / { try_files $uri $uri/ =404; }
+    location ~ "^/assets/[a-f0-9]{16}/" {
+        gzip_static on;
+        gzip_vary on;
+        add_header Cache-Control "public, max-age=31536000, immutable";
+        add_header X-Content-Type-Options nosniff always;
+        try_files $uri =404;
+    }
+    location / { gzip_static on; gzip_vary on; try_files $uri $uri/ =404; }
 }
 
 # This HTTP listener only distributes public certificates and setup instructions.

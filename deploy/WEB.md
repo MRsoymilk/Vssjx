@@ -90,3 +90,19 @@ Import-Certificate -FilePath work/web-deploy/lan-cert/public/vssjx-lan-ca.cer -C
 这里只部署单个游戏进程的网页入口，不构成集群或并发容量验收。
 
 WebSocket 配置依据 [Nginx 官方代理说明](https://nginx.org/en/docs/http/websocket.html)，缺失文件处理依据 [try_files 文档](https://nginx.org/en/docs/http/ngx_http_core_module.html#try_files)。本机检查记录见 `tests/web_deployment.md`。
+
+## 网页加载与静态资源缓存
+
+`export_web.py` 为引擎与资源生成 `assets/<内容版本>/` URL，入口 HTML 保持重新验证；只有内容版本目录使用一年 immutable 缓存。新引擎或资源会生成新版本，避免浏览器混用旧资源。根目录文件保留为旧链接兼容入口，不赋予长期缓存。滚动升级时应保留仍被访问的旧版本静态目录，不能清理玩家浏览器存档来更新游戏。
+
+导出同时生成 `.wasm`、`.pck`、JavaScript 的预压缩 `.gz` 副本。两份 Nginx 模板协商 `Accept-Encoding` 后发送 gzip，正确保留 MIME、Vary 与解压后的文件内容；不支持 gzip 的客户端仍能获取原文件。API 与账号响应不采用静态缓存策略，缺失版本文件不会被缓存一年。
+
+Cloudflare 默认缓存扩展名不包含 `.wasm`、`.pck`，仅发送 Cache-Control 不能证明 CDN 已命中缓存。需在域名的 **缓存 → 缓存规则** 创建仅针对游戏静态目录的规则，例如：
+
+```text
+(http.host eq "ssjx.soymilk.xin" and starts_with(http.request.uri.path, "/assets/"))
+```
+
+设置缓存资格为“符合缓存条件”，遵循源站 Cache-Control。不要将 `/api/v1/`、账号或 WebSocket 纳入此规则。通过响应 `CF-Cache-Status: HIT` 验证，不以本机测试代替公网命中结果。官方依据：[默认缓存扩展名](https://developers.cloudflare.com/cache/concepts/default-cache-behavior/)、[缓存规则](https://developers.cloudflare.com/cache/how-to/cache-rules/)。
+
+加载页显示已加载 MB、资源总大小及下载／初始化阶段。20 秒没有新增进度时显示网络停顿说明与手动重新加载按钮；不会自动同时启动多个引擎或清除存档。MB 代表引擎报告的已加载资源字节，不作为压缩网络吞吐测速。

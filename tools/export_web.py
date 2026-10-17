@@ -4,6 +4,7 @@ Only output/public is deployable. Source copies, logs and reports stay outside i
 No server, admin source, tests, environment files or player saves are copied.
 """
 import argparse
+import gzip
 import hashlib
 import json
 import os
@@ -18,6 +19,44 @@ TEMPLATES = {
     'debug': '08962aefef811b603541d7951ac67ef00413aad2d978855183c28adee98f626a',
     'release': 'd3ee2f08cef0cf3cf6678a6355a92a8db48ccdd35cbd2e8bfd5f0e8a0b4032a0',
 }
+
+
+def prepare_static_assets(public):
+    """Version the engine/data together; only versioned URLs may cache immutably."""
+    artifacts = sorted(file for file in public.iterdir() if file.suffix in ['.js', '.wasm', '.pck', '.png'])
+    digest = hashlib.sha256()
+    for file in artifacts:
+        digest.update(file.name.encode())
+        digest.update(hashlib.sha256(file.read_bytes()).digest())
+    version = digest.hexdigest()[:16]
+    relative = 'assets/' + version + '/'
+    versioned = public / relative
+    versioned.mkdir(parents=True)
+    transfers = {}
+    for file in artifacts:
+        shutil.copy2(file, versioned / file.name)
+        if file.suffix in ['.js', '.wasm', '.pck']:
+            data = file.read_bytes()
+            compressed = gzip.compress(data, compresslevel=9, mtime=0)
+            if len(compressed) < len(data):
+                for target in [file, versioned / file.name]:
+                    target.with_name(target.name + '.gz').write_bytes(compressed)
+                    os.utime(target.with_name(target.name + '.gz'), ns=(target.stat().st_atime_ns, target.stat().st_mtime_ns))
+                transfers[file.name] = {'raw_bytes': len(data), 'gzip_bytes': len(compressed)}
+    entry = public / 'index.html'
+    html = entry.read_text(encoding='utf8')
+    match = re.search(r'const config = (\{[^\n]+\});', html)
+    if not match:
+        raise RuntimeError('Missing exported engine config')
+    config = json.loads(match.group(1))
+    main_pack = config.get('mainPack', config['executable'] + '.pck')
+    config['executable'] = relative + config['executable']
+    config['mainPack'] = relative + main_pack
+    config['fileSizes'] = {relative + name: size for name, size in config['fileSizes'].items()}
+    html = html[:match.start(1)] + json.dumps(config, separators=(',', ':')) + html[match.end(1):]
+    html = html.replace('src="index.js"', 'src="' + relative + 'index.js"')
+    entry.write_text(html, encoding='utf8')
+    return {'version': version, 'prefix': relative, 'transfers': transfers}
 
 
 def build(output, template=None, debug=False, loopback=False):
@@ -70,12 +109,14 @@ def build(output, template=None, debug=False, loopback=False):
     for suffix in ['html', 'js', 'wasm', 'pck']:
         if not (public / ('index.' + suffix)).is_file():
             raise RuntimeError('Missing Web artifact: ' + suffix)
+    static_assets = prepare_static_assets(public)
     report = {'editor': version, 'mode': mode, 'loopback_development': loopback,
               'single_threaded': True, 'pwa': False, 'template_sha256': TEMPLATES[mode] if template else 'installed template; not pinned by this tool',
               'git_head': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
               'git_working_tree_dirty': bool(subprocess.check_output(['git', 'status', '--porcelain'], cwd=ROOT, text=True).strip()),
               'source_sha256': hashlib.sha256(json.dumps(source_hashes, sort_keys=True).encode()).hexdigest(),
-              'files': {file.name: {'bytes': file.stat().st_size, 'sha256': hashlib.sha256(file.read_bytes()).hexdigest()} for file in public.iterdir() if file.is_file()}}
+              'static_assets': static_assets,
+              'files': {file.relative_to(public).as_posix(): {'bytes': file.stat().st_size, 'sha256': hashlib.sha256(file.read_bytes()).hexdigest()} for file in public.rglob('*') if file.is_file()}}
     (output / 'build-report.json').write_text(json.dumps(report, indent=2))
     (output / 'source-manifest.json').write_text(json.dumps(source_hashes, indent=2, sort_keys=True))
     print('Web package: ' + str(public), flush=True)

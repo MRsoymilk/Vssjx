@@ -29,11 +29,13 @@ var choice_action := ""
 var buttons: Array[Button] = []
 var skill_picker:SkillPicker
 var move_callout:BattleMoveCallout
+var effects:BattleEffects
 @onready var _hero_level_home: Vector2 = $Hud/Level.position
 @onready var _enemy_level_home: Vector2 = $EnemyLevel.position
 const ACTIONS := ["attack", "skill", "guard", "potion", "inspect", "flee"]
 
 func _ready() -> void:
+	effects=BattleEffects.new();$Hud/EffectsLayer.add_child(effects)
 	skill_picker=SkillPicker.new();add_child(skill_picker);skill_picker.hide()
 	skill_picker.dismissed.connect(_open_menu)
 	skill_picker.chosen.connect(func(id:String)->void:
@@ -136,6 +138,7 @@ func present(pve: OnlinePve) -> void:
 	refresh()
 
 func _cancel_motion() -> void:
+	if is_instance_valid(effects):effects.clear()
 	if is_instance_valid(move_callout):move_callout.clear()
 	if _hero_death != null: _hero_death.cancel()
 	_hero_death = null
@@ -150,6 +153,7 @@ func _cancel_motion() -> void:
 
 func _hero_impact() -> void:
 	if _hero_motion == null or _hero_motion.cancelled: return
+	effects.play_action(model.last_action,int(model.state.character.job),String(model.state.battle.get("skills",{}).get("last_skill","")),hero,enemy)
 	_shown_enemy_hp = int(model.state.battle.enemy_hp)+int(model.state.battle.get("skills",{}).get("last_reflected",0))
 	if _enemy_took_damage and enemy.sprite_frames.has_animation("hurt"): enemy.play("hurt")
 	$Hud/BattleEnemyHp.value = _shown_enemy_hp

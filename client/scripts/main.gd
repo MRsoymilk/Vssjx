@@ -57,6 +57,7 @@ var battle_death: BattleDeathPlayback
 var battle_ring: Node2D
 var clock_timer := 0.0
 var effects_layer: Control
+var battle_effects:BattleEffects
 var world_identity: Label
 var backpack: OriginalInventory
 var minimap: OriginalWorldMinimap
@@ -70,6 +71,7 @@ var _closing := false
 
 func _exit_tree() -> void:
 	_ui_epoch += 1
+	if is_instance_valid(battle_effects):battle_effects.clear()
 	if battle_death != null: battle_death.cancel()
 	battle_death = null
 	if battle_playback != null: battle_playback.cancel()
@@ -257,6 +259,8 @@ func _button(parent: Node, text_value: String, rect: Rect2, callback: Callable, 
 	return button
 
 func _clear_ui() -> void:
+	if is_instance_valid(battle_effects):battle_effects.clear()
+	battle_effects=null
 	_ui_epoch += 1
 	if battle_death != null: battle_death.cancel()
 	battle_death = null
@@ -943,6 +947,8 @@ func _start_battle(enemy: Dictionary) -> void:
 	auto_button = hud.get_node("AutoButton")
 	auto_button.pressed.connect(_toggle_auto)
 	effects_layer = hud.get_node("EffectsLayer")
+	battle_effects=BattleEffects.new()
+	effects_layer.add_child(battle_effects)
 	action_menu = hud.get_node("ActionMenu")
 	var commands := ["attack", "skill", "guard", "potion", "inspect", "flee"]
 	for i in commands.size():
@@ -1032,10 +1038,7 @@ func _battle_turn(command: String, skill_id:String="") -> void:
 	if command in ["attack", "skill"]:
 		if int(result.damage) > 0 and battle_enemy.sprite_frames.has_animation("hurt"):
 			battle_enemy.play("hurt")
-		var effect_key: String = "effect/flash" if command == "attack" else ["effect/t71", "effect/t36", "effect/t47"][int(Game.player.job)]
-		var effect := OriginalArt.effect(effect_key)
-		effect.position = (battle_hero.position if support else battle_enemy.position) - effects_layer.position
-		effects_layer.add_child(effect)
+		battle_effects.play_action(command,int(Game.player.job),skill_id,battle_hero,battle_enemy)
 		if int(result.damage)>0:_damage_number(int(result.damage), battle_enemy.position + Vector2(-3, -53))
 	_refresh_battle()
 	if player_motion != null:

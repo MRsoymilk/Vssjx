@@ -1,0 +1,4068 @@
+[
+  {
+    "source_row": 3,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 0,
+    "name_raw": "灵空台",
+    "npc_raw": "蜀山仙灵(接引之人)-白眉道长(传道之人)-丹辰子(考验之人)",
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 0,
+    "native_map_id": 1,
+    "native_name": "灵空台"
+  },
+  {
+    "source_row": 4,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 1,
+    "name_raw": "百花谷",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 1,
+    "native_map_id": 2,
+    "native_name": "百花谷"
+  },
+  {
+    "source_row": 5,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 2,
+    "name_raw": "黑刀峡",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 2,
+    "native_map_id": 3,
+    "native_name": "黑刀峡"
+  },
+  {
+    "source_row": 6,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 3,
+    "name_raw": "峨眉派",
+    "npc_raw": "妙一真人(门派日常)-大师兄(地图传送)-齐灵云(门派商店)",
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 3,
+    "native_map_id": 4,
+    "native_name": "峨眉派"
+  },
+  {
+    "source_row": 7,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 4,
+    "name_raw": "凝碧崖",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 4,
+    "native_map_id": 5,
+    "native_name": "凝碧崖"
+  },
+  {
+    "source_row": 8,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 5,
+    "name_raw": "峨眉山",
+    "npc_raw": "赵云龙-九尾猫(商店)-李什么-什么老",
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 5,
+    "native_map_id": 6,
+    "native_name": "峨眉山"
+  },
+  {
+    "source_row": 9,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 6,
+    "name_raw": "天化村",
+    "npc_raw": "齐霞儿(商店)",
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 6,
+    "native_map_id": 7,
+    "native_name": "天化村"
+  },
+  {
+    "source_row": 10,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 7,
+    "name_raw": "乱坟岗",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 7,
+    "native_map_id": 8,
+    "native_name": "乱坟岗"
+  },
+  {
+    "source_row": 11,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 8,
+    "name_raw": "野猪岭",
+    "npc_raw": "11级叛徒",
+    "monsters_raw": [
+      "11级野猪王",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 8,
+    "native_map_id": 9,
+    "native_name": "野猪岭"
+  },
+  {
+    "source_row": 12,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 9,
+    "name_raw": "瘟疫猪巢",
+    "npc_raw": null,
+    "monsters_raw": [
+      "15级瘟疫野猪",
+      "15级血魔之眼",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 9,
+    "native_map_id": 10,
+    "native_name": "瘟疫猪巢"
+  },
+  {
+    "source_row": 13,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 10,
+    "name_raw": "平雁谷",
+    "npc_raw": "柳木",
+    "monsters_raw": [
+      "12级魔人",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 10,
+    "native_map_id": 11,
+    "native_name": "平雁谷"
+  },
+  {
+    "source_row": 14,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 11,
+    "name_raw": "失落沼泽",
+    "npc_raw": null,
+    "monsters_raw": [
+      "18级吸血花妖",
+      "18级石头巨人",
+      "19级石头巨人头领(精英)",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 11,
+    "native_map_id": 12,
+    "native_name": "失落沼泽"
+  },
+  {
+    "source_row": 15,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 12,
+    "name_raw": "卧云镇",
+    "npc_raw": "余英男(竞技活动)-铁匠(商店)-车夫(地图传送)-镇长(仓库管理)-玩家ID(斗剑冠军)",
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 12,
+    "native_map_id": 13,
+    "native_name": "卧云镇"
+  },
+  {
+    "source_row": 16,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 13,
+    "name_raw": "卧云镇北",
+    "npc_raw": "寒光道人(帮会管理)-猎户(帮会商店)-醉道人(副本传送)-",
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 13,
+    "native_map_id": 14,
+    "native_name": "卧云镇北"
+  },
+  {
+    "source_row": 17,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 14,
+    "name_raw": "跃阳湖",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 14,
+    "native_map_id": 15,
+    "native_name": "跃阳湖"
+  },
+  {
+    "source_row": 18,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 15,
+    "name_raw": "莽苍山",
+    "npc_raw": null,
+    "monsters_raw": [
+      "23级妖道xx",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 15,
+    "native_map_id": 16,
+    "native_name": "莽苍山"
+  },
+  {
+    "source_row": 19,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 16,
+    "name_raw": "金石峡",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 16,
+    "native_map_id": 17,
+    "native_name": "金石峡"
+  },
+  {
+    "source_row": 20,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 17,
+    "name_raw": "金水潭",
+    "npc_raw": null,
+    "monsters_raw": [
+      "有个马面怪物",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 17,
+    "native_map_id": 18,
+    "native_name": "金水潭"
+  },
+  {
+    "source_row": 21,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 18,
+    "name_raw": "天外神山",
+    "npc_raw": "易鼎(商店)-甄良-甄兑",
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 18,
+    "native_map_id": 19,
+    "native_name": "天外神山"
+  },
+  {
+    "source_row": 22,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 19,
+    "name_raw": "封印祠",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 19,
+    "native_map_id": 20,
+    "native_name": "封印祠"
+  },
+  {
+    "source_row": 23,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 20,
+    "name_raw": "花涧派",
+    "npc_raw": "火修罗(地图传送)-五毒天王(门派商店)-孔灵子(日常活动)-哈哈老祖(门派日常)",
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 20,
+    "native_map_id": 21,
+    "native_name": "花涧派"
+  },
+  {
+    "source_row": 24,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 21,
+    "name_raw": "秋兰竹亭",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 21,
+    "native_map_id": 22,
+    "native_name": "秋兰竹亭"
+  },
+  {
+    "source_row": 25,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 22,
+    "name_raw": "幻波池",
+    "npc_raw": "周轻云",
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 22,
+    "native_map_id": 23,
+    "native_name": "幻波池"
+  },
+  {
+    "source_row": 26,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 23,
+    "name_raw": "蛊苗村",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 23,
+    "native_map_id": 24,
+    "native_name": "蛊苗村"
+  },
+  {
+    "source_row": 27,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 24,
+    "name_raw": "牵牛潭",
+    "npc_raw": null,
+    "monsters_raw": [
+      "13级瘟疫僵尸",
+      "14级魔教丧尸",
+      "15级丧尸王",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 24,
+    "native_map_id": 25,
+    "native_name": "牵牛潭"
+  },
+  {
+    "source_row": 28,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 25,
+    "name_raw": "云灵山",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 25,
+    "native_map_id": 26,
+    "native_name": "云灵山"
+  },
+  {
+    "source_row": 29,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 26,
+    "name_raw": "云灵山顶",
+    "npc_raw": "有个未知NPC",
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 26,
+    "native_map_id": 27,
+    "native_name": "云灵山顶"
+  },
+  {
+    "source_row": 30,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 27,
+    "name_raw": "慈云寺北",
+    "npc_raw": "诸有功(帮会管理)-红发老祖(帮会商店)-博浪沙火鹤(副本传送)",
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 27,
+    "native_map_id": 28,
+    "native_name": "慈云寺北"
+  },
+  {
+    "source_row": 31,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 28,
+    "name_raw": "慈云寺",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 28,
+    "native_map_id": 29,
+    "native_name": "慈云寺"
+  },
+  {
+    "source_row": 32,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 29,
+    "name_raw": "慈云寺外围",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 29,
+    "native_map_id": 30,
+    "native_name": "慈云寺外围"
+  },
+  {
+    "source_row": 33,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 30,
+    "name_raw": "慈云寺密道",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 30,
+    "native_map_id": 31,
+    "native_name": "慈云寺密道"
+  },
+  {
+    "source_row": 34,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 31,
+    "name_raw": "昆仑派",
+    "npc_raw": "一元祖师(门派日常)-隐名剑仙(门派商店)-天池上人(地图传送)-钟馗道人（日常活动）",
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 31,
+    "native_map_id": 32,
+    "native_name": "昆仑派"
+  },
+  {
+    "source_row": 35,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 32,
+    "name_raw": "玄冰谷",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 32,
+    "native_map_id": 33,
+    "native_name": "玄冰谷"
+  },
+  {
+    "source_row": 36,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 33,
+    "name_raw": "玉泉关",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 33,
+    "native_map_id": 34,
+    "native_name": "玉泉关"
+  },
+  {
+    "source_row": 37,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 34,
+    "name_raw": "辟邪村",
+    "npc_raw": "左清虚",
+    "monsters_raw": [
+      "1级叛徒",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 34,
+    "native_map_id": 35,
+    "native_name": "辟邪村"
+  },
+  {
+    "source_row": 38,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 35,
+    "name_raw": "梯田",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 35,
+    "native_map_id": 36,
+    "native_name": "梯田"
+  },
+  {
+    "source_row": 39,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 36,
+    "name_raw": "风云宫",
+    "npc_raw": "九天魔女",
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 36,
+    "native_map_id": 37,
+    "native_name": "风云宫"
+  },
+  {
+    "source_row": 40,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 37,
+    "name_raw": "凌雪池",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 37,
+    "native_map_id": 38,
+    "native_name": "凌雪池"
+  },
+  {
+    "source_row": 41,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 38,
+    "name_raw": "幽林",
+    "npc_raw": "两个未知NPC",
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 38,
+    "native_map_id": 39,
+    "native_name": "幽林"
+  },
+  {
+    "source_row": 42,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 39,
+    "name_raw": "卧龙潭",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 39,
+    "native_map_id": 40,
+    "native_name": "卧龙潭"
+  },
+  {
+    "source_row": 43,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 40,
+    "name_raw": "八旗镇",
+    "npc_raw": "石齐(竞技活动)-车夫(地图传送)-杂货店老板(商店)-玩家ID(斗剑冠军)",
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 40,
+    "native_map_id": 41,
+    "native_name": "八旗镇"
+  },
+  {
+    "source_row": 44,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 41,
+    "name_raw": "八旗镇西",
+    "npc_raw": "仙鹤(帮会商店)-郑颠仙(帮会管理)",
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 41,
+    "native_map_id": 42,
+    "native_name": "八旗镇西"
+  },
+  {
+    "source_row": 45,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 42,
+    "name_raw": "沙丘",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 42,
+    "native_map_id": 43,
+    "native_name": "沙丘"
+  },
+  {
+    "source_row": 46,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 43,
+    "name_raw": "金山绿水",
+    "npc_raw": "什么仙(商店)",
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 43,
+    "native_map_id": 44,
+    "native_name": "金山绿水"
+  },
+  {
+    "source_row": 47,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 44,
+    "name_raw": "沙漠荒野",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 44,
+    "native_map_id": 45,
+    "native_name": "沙漠荒野"
+  },
+  {
+    "source_row": 48,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 45,
+    "name_raw": "流沙平原",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 45,
+    "native_map_id": 46,
+    "native_name": "流沙平原"
+  },
+  {
+    "source_row": 49,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 46,
+    "name_raw": "火云窟",
+    "npc_raw": "两个未知NPC",
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 46,
+    "native_map_id": 47,
+    "native_name": "火云窟"
+  },
+  {
+    "source_row": 50,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 47,
+    "name_raw": "铸剑池",
+    "npc_raw": null,
+    "monsters_raw": [
+      "28级铸剑弟子",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 47,
+    "native_map_id": 48,
+    "native_name": "铸剑池"
+  },
+  {
+    "source_row": 51,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 48,
+    "name_raw": "神剑峰",
+    "npc_raw": null,
+    "monsters_raw": [
+      "31级魔教死士",
+      "还有个拿枪的魔教XX",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 48,
+    "native_map_id": 49,
+    "native_name": "神剑峰"
+  },
+  {
+    "source_row": 52,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 49,
+    "name_raw": "神剑湖",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 49,
+    "native_map_id": 50,
+    "native_name": "神剑湖"
+  },
+  {
+    "source_row": 53,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 50,
+    "name_raw": "雷崖",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 50,
+    "native_map_id": 51,
+    "native_name": "雷崖"
+  },
+  {
+    "source_row": 54,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 51,
+    "name_raw": "古道",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 51,
+    "native_map_id": 52,
+    "native_name": "古道"
+  },
+  {
+    "source_row": 55,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 52,
+    "name_raw": "仪凤窟",
+    "npc_raw": "柳木",
+    "monsters_raw": [
+      "36级变异僵尸",
+      "36级长枪鬼士",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 52,
+    "native_map_id": 53,
+    "native_name": "仪凤窟"
+  },
+  {
+    "source_row": 56,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 53,
+    "name_raw": "青螺峪",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 53,
+    "native_map_id": 54,
+    "native_name": "青螺峪"
+  },
+  {
+    "source_row": 57,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 54,
+    "name_raw": "陷空岛",
+    "npc_raw": null,
+    "monsters_raw": [
+      "40级雪葬僵尸",
+      "40级空气之魂",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 54,
+    "native_map_id": 55,
+    "native_name": "陷空岛"
+  },
+  {
+    "source_row": 58,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 55,
+    "name_raw": "白骨之谷",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 55,
+    "native_map_id": 56,
+    "native_name": "白骨之谷"
+  },
+  {
+    "source_row": 59,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 56,
+    "name_raw": "紫云宫",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 56,
+    "native_map_id": 57,
+    "native_name": "紫云宫"
+  },
+  {
+    "source_row": 60,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 57,
+    "name_raw": "神碑禅经",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 57,
+    "native_map_id": 58,
+    "native_name": "神碑禅经"
+  },
+  {
+    "source_row": 61,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 58,
+    "name_raw": "戴家场",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 58,
+    "native_map_id": 59,
+    "native_name": "戴家场"
+  },
+  {
+    "source_row": 62,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 59,
+    "name_raw": "化血池",
+    "npc_raw": "精铁矿",
+    "monsters_raw": [
+      "45级鲜血之魂",
+      "45级血眼蛮士",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 59,
+    "native_map_id": 60,
+    "native_name": "化血池"
+  },
+  {
+    "source_row": 63,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 60,
+    "name_raw": "屠龙谷",
+    "npc_raw": null,
+    "monsters_raw": [
+      "47级鬼府马面",
+      "49级无面者",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 60,
+    "native_map_id": 61,
+    "native_name": "屠龙谷"
+  },
+  {
+    "source_row": 64,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 61,
+    "name_raw": "群雄大殿",
+    "npc_raw": "枯竹老人(帮会管理)-XX子(帮会商店)小霸王(副本传送)-",
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 61,
+    "native_map_id": 62,
+    "native_name": "群雄大殿"
+  },
+  {
+    "source_row": 65,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 62,
+    "name_raw": "西方太乙",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 62,
+    "native_map_id": 63,
+    "native_name": "西方太乙"
+  },
+  {
+    "source_row": 66,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 63,
+    "name_raw": "金钟岛",
+    "npc_raw": null,
+    "monsters_raw": [
+      "41级熊",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 63,
+    "native_map_id": 64,
+    "native_name": "金钟岛"
+  },
+  {
+    "source_row": 67,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 64,
+    "name_raw": "修罗关",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 64,
+    "native_map_id": 65,
+    "native_name": "修罗关"
+  },
+  {
+    "source_row": 68,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 65,
+    "name_raw": "妖尸谷",
+    "npc_raw": "当归",
+    "monsters_raw": [
+      "52级厉鬼",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 65,
+    "native_map_id": 66,
+    "native_name": "妖尸谷"
+  },
+  {
+    "source_row": 69,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 66,
+    "name_raw": "乌金障",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 66,
+    "native_map_id": 67,
+    "native_name": "乌金障"
+  },
+  {
+    "source_row": 70,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 67,
+    "name_raw": "行刑场",
+    "npc_raw": null,
+    "monsters_raw": [
+      "未知级食人花",
+      "未知级刽子手",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 67,
+    "native_map_id": 68,
+    "native_name": "行刑场"
+  },
+  {
+    "source_row": 71,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 68,
+    "name_raw": "碎心崖",
+    "npc_raw": "猎户",
+    "monsters_raw": [
+      "55级云滴泪",
+      "56级鬼府枪兵",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 68,
+    "native_map_id": 69,
+    "native_name": "碎心崖"
+  },
+  {
+    "source_row": 72,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 69,
+    "name_raw": "如意山",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 69,
+    "native_map_id": 70,
+    "native_name": "如意山"
+  },
+  {
+    "source_row": 73,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 70,
+    "name_raw": "玉京潭",
+    "npc_raw": "蝶妖碧落-茯苓",
+    "monsters_raw": [
+      "55级苦行僧",
+      "56级绿棕熊",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 70,
+    "native_map_id": 71,
+    "native_name": "玉京潭"
+  },
+  {
+    "source_row": 74,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 71,
+    "name_raw": "大河山川",
+    "npc_raw": "黑衣道姑-珍金矿",
+    "monsters_raw": [
+      "56级蛮荒野人",
+      "56级雨林巨人",
+      "57级雨林巨人首领(精英)",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 71,
+    "native_map_id": 72,
+    "native_name": "大河山川"
+  },
+  {
+    "source_row": 75,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 72,
+    "name_raw": "迁流峭壁",
+    "npc_raw": null,
+    "monsters_raw": [
+      "XX级深渊软泥",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 72,
+    "native_map_id": 73,
+    "native_name": "迁流峭壁"
+  },
+  {
+    "source_row": 76,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 73,
+    "name_raw": "山顶洞",
+    "npc_raw": "珍铜矿",
+    "monsters_raw": [
+      "58级恐怖行尸",
+      "58级千年毒妖",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 73,
+    "native_map_id": 74,
+    "native_name": "山顶洞"
+  },
+  {
+    "source_row": 77,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 74,
+    "name_raw": "万马阵",
+    "npc_raw": null,
+    "monsters_raw": [
+      "三目童子",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 74,
+    "native_map_id": 75,
+    "native_name": "万马阵"
+  },
+  {
+    "source_row": 78,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 75,
+    "name_raw": "九宫阁",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 75,
+    "native_map_id": 76,
+    "native_name": "九宫阁"
+  },
+  {
+    "source_row": 79,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 76,
+    "name_raw": "正派营地",
+    "npc_raw": "白脸鬼何小山",
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 76,
+    "native_map_id": 77,
+    "native_name": "正派营地"
+  },
+  {
+    "source_row": 80,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 77,
+    "name_raw": "天下武场",
+    "npc_raw": "珍金矿",
+    "monsters_raw": [
+      "59级霸天大将(精英)",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 77,
+    "native_map_id": 78,
+    "native_name": "天下武场"
+  },
+  {
+    "source_row": 81,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 78,
+    "name_raw": "火礁祭坛",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 78,
+    "native_map_id": 79,
+    "native_name": "火礁祭坛"
+  },
+  {
+    "source_row": 82,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 79,
+    "name_raw": "地狱",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 79,
+    "native_map_id": 80,
+    "native_name": "地狱"
+  },
+  {
+    "source_row": 83,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 80,
+    "name_raw": "擂台",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 80,
+    "native_map_id": 81,
+    "native_name": "擂台"
+  },
+  {
+    "source_row": 84,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 81,
+    "name_raw": "流放之地",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 81,
+    "native_map_id": 82,
+    "native_name": "流放之地"
+  },
+  {
+    "source_row": 85,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 82,
+    "name_raw": "莫言山",
+    "npc_raw": null,
+    "monsters_raw": [
+      "20级恐怖食人花",
+      "20级森林幽狼",
+      "20级血染熊王boss",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 82,
+    "native_map_id": 83,
+    "native_name": "莫言山"
+  },
+  {
+    "source_row": 86,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 83,
+    "name_raw": "赤岩峡",
+    "npc_raw": null,
+    "monsters_raw": [
+      "20级焱精",
+      "20级森林幽狼",
+      "20级岩浆巨人boss",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 83,
+    "native_map_id": 84,
+    "native_name": "赤岩峡"
+  },
+  {
+    "source_row": 87,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 84,
+    "name_raw": "潭溪山",
+    "npc_raw": null,
+    "monsters_raw": [
+      "20级森林幽狼",
+      "20级恐怖食人花",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 84,
+    "native_map_id": 85,
+    "native_name": "潭溪山"
+  },
+  {
+    "source_row": 88,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 85,
+    "name_raw": "莫言谷",
+    "npc_raw": null,
+    "monsters_raw": [
+      "20级森林之王boss",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 85,
+    "native_map_id": 86,
+    "native_name": "莫言谷"
+  },
+  {
+    "source_row": 89,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 86,
+    "name_raw": "地宫大殿",
+    "npc_raw": "博浪沙火鹤(副本使者)",
+    "monsters_raw": [
+      "35级慈云寺淫僧",
+      "35级黑魁罗汉",
+      "35级狂傲武僧",
+      "35级酒肉方丈悟信"
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 86,
+    "native_map_id": 87,
+    "native_name": "地宫大殿"
+  },
+  {
+    "source_row": 90,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 87,
+    "name_raw": "枉死路",
+    "npc_raw": null,
+    "monsters_raw": [
+      "35级震棺僵尸",
+      "35级殉葬怨灵",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 87,
+    "native_map_id": 88,
+    "native_name": "枉死路"
+  },
+  {
+    "source_row": 91,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 88,
+    "name_raw": "墓道法阵",
+    "npc_raw": null,
+    "monsters_raw": [
+      "35级地宫骷髅",
+      "35级震棺僵尸",
+      "35级殉葬怨灵",
+      "35级冥府将军boss"
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 88,
+    "native_map_id": 89,
+    "native_name": "墓道法阵"
+  },
+  {
+    "source_row": 92,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 89,
+    "name_raw": "将军冢",
+    "npc_raw": null,
+    "monsters_raw": [
+      "35级兵俑大帝",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 89,
+    "native_map_id": 90,
+    "native_name": "将军冢"
+  },
+  {
+    "source_row": 93,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 90,
+    "name_raw": "落雪池",
+    "npc_raw": "钱莱(副本使者)",
+    "monsters_raw": [
+      "50级勾魂姹女",
+      "50级拜蛇教魔女",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 90,
+    "native_map_id": 91,
+    "native_name": "落雪池"
+  },
+  {
+    "source_row": 94,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 91,
+    "name_raw": "隐龙窟",
+    "npc_raw": null,
+    "monsters_raw": [
+      "50级勾魂姹女",
+      "50级拜蛇教魔女",
+      "50级千年蛇妖boss",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 91,
+    "native_map_id": 92,
+    "native_name": "隐龙窟"
+  },
+  {
+    "source_row": 95,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 92,
+    "name_raw": "浴血崖",
+    "npc_raw": null,
+    "monsters_raw": [
+      "50级血魔魂媒",
+      "50级赤火神倪",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 92,
+    "native_map_id": 93,
+    "native_name": "浴血崖"
+  },
+  {
+    "source_row": 96,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 93,
+    "name_raw": "阴阳道",
+    "npc_raw": null,
+    "monsters_raw": [
+      "50级冥府三头犬boss",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 93,
+    "native_map_id": 94,
+    "native_name": "阴阳道"
+  },
+  {
+    "source_row": 97,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 94,
+    "name_raw": "映波谷",
+    "npc_raw": null,
+    "monsters_raw": [
+      "50级麻头鬼王",
+      "50级炽焰冷魂",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 94,
+    "native_map_id": 95,
+    "native_name": "映波谷"
+  },
+  {
+    "source_row": 98,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 95,
+    "name_raw": "祈星台",
+    "npc_raw": null,
+    "monsters_raw": [
+      "50级血魔化身boss",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 95,
+    "native_map_id": 96,
+    "native_name": "祈星台"
+  },
+  {
+    "source_row": 99,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 96,
+    "name_raw": "莫言山",
+    "npc_raw": null,
+    "monsters_raw": [
+      "30级恐怖食人花",
+      "30级森林幽狼",
+      "30级血染熊王boss",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 96,
+    "native_map_id": 97,
+    "native_name": "莫言山"
+  },
+  {
+    "source_row": 100,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 97,
+    "name_raw": "赤岩峡",
+    "npc_raw": null,
+    "monsters_raw": [
+      "30级焱精",
+      "30级森林幽狼",
+      "30级岩浆巨人boss",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 97,
+    "native_map_id": 98,
+    "native_name": "赤岩峡"
+  },
+  {
+    "source_row": 101,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 98,
+    "name_raw": "潭溪山",
+    "npc_raw": null,
+    "monsters_raw": [
+      "30级森林幽狼",
+      "30级恐怖食人花",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 98,
+    "native_map_id": 99,
+    "native_name": "潭溪山"
+  },
+  {
+    "source_row": 102,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 99,
+    "name_raw": "莫言谷",
+    "npc_raw": null,
+    "monsters_raw": [
+      "30级森林之王boss",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 99,
+    "native_map_id": 100,
+    "native_name": "莫言谷"
+  },
+  {
+    "source_row": 103,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 100,
+    "name_raw": "地宫大殿",
+    "npc_raw": null,
+    "monsters_raw": [
+      "45级慈云寺淫僧",
+      "45级黑魁罗汉",
+      "45级狂傲武僧",
+      "45级酒肉方丈悟信"
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 100,
+    "native_map_id": 101,
+    "native_name": "地宫大殿"
+  },
+  {
+    "source_row": 104,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 101,
+    "name_raw": "枉死路",
+    "npc_raw": null,
+    "monsters_raw": [
+      "45级震棺僵尸",
+      "45级殉葬怨灵",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 101,
+    "native_map_id": 102,
+    "native_name": "枉死路"
+  },
+  {
+    "source_row": 105,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 102,
+    "name_raw": "墓道法阵",
+    "npc_raw": null,
+    "monsters_raw": [
+      "45级地宫骷髅",
+      "45级震棺僵尸",
+      "45级殉葬怨灵",
+      "45级冥府将军boss"
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 102,
+    "native_map_id": 103,
+    "native_name": "墓道法阵"
+  },
+  {
+    "source_row": 106,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 103,
+    "name_raw": "将军冢",
+    "npc_raw": null,
+    "monsters_raw": [
+      "45级兵俑大帝",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 103,
+    "native_map_id": 104,
+    "native_name": "将军冢"
+  },
+  {
+    "source_row": 107,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 104,
+    "name_raw": "莫言山",
+    "npc_raw": null,
+    "monsters_raw": [
+      "40级恐怖食人花",
+      "40级森林幽狼",
+      "40级血染熊王boss",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 104,
+    "native_map_id": 105,
+    "native_name": "莫言山"
+  },
+  {
+    "source_row": 108,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 105,
+    "name_raw": "赤岩峡",
+    "npc_raw": null,
+    "monsters_raw": [
+      "40级焱精",
+      "40级森林幽狼",
+      "40级岩浆巨人boss",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 105,
+    "native_map_id": 106,
+    "native_name": "赤岩峡"
+  },
+  {
+    "source_row": 109,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 106,
+    "name_raw": "潭溪山",
+    "npc_raw": null,
+    "monsters_raw": [
+      "40级森林幽狼",
+      "40级恐怖食人花",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 106,
+    "native_map_id": 107,
+    "native_name": "潭溪山"
+  },
+  {
+    "source_row": 110,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 107,
+    "name_raw": "莫言谷",
+    "npc_raw": null,
+    "monsters_raw": [
+      "40级森林之王boss",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 107,
+    "native_map_id": 108,
+    "native_name": "莫言谷"
+  },
+  {
+    "source_row": 111,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 108,
+    "name_raw": "地宫大殿",
+    "npc_raw": null,
+    "monsters_raw": [
+      "55级慈云寺淫僧",
+      "55级黑魁罗汉",
+      "55级狂傲武僧",
+      "55级酒肉方丈悟信"
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 108,
+    "native_map_id": 109,
+    "native_name": "地宫大殿"
+  },
+  {
+    "source_row": 112,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 109,
+    "name_raw": "枉死路",
+    "npc_raw": null,
+    "monsters_raw": [
+      "55级震棺僵尸",
+      "55级殉葬怨灵",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 109,
+    "native_map_id": 110,
+    "native_name": "枉死路"
+  },
+  {
+    "source_row": 113,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 110,
+    "name_raw": "墓道法阵",
+    "npc_raw": null,
+    "monsters_raw": [
+      "55级地宫骷髅",
+      "55级震棺僵尸",
+      "55级殉葬怨灵",
+      "55级冥府将军boss"
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 110,
+    "native_map_id": 111,
+    "native_name": "墓道法阵"
+  },
+  {
+    "source_row": 114,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 111,
+    "name_raw": "将军冢",
+    "npc_raw": null,
+    "monsters_raw": [
+      "55级兵俑大帝",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 111,
+    "native_map_id": 112,
+    "native_name": "将军冢"
+  },
+  {
+    "source_row": 115,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 112,
+    "name_raw": "莫言山",
+    "npc_raw": null,
+    "monsters_raw": [
+      "50级恐怖食人花",
+      "50级森林幽狼",
+      "50级血染熊王boss",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 112,
+    "native_map_id": 113,
+    "native_name": "莫言山"
+  },
+  {
+    "source_row": 116,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 113,
+    "name_raw": "赤岩峡",
+    "npc_raw": null,
+    "monsters_raw": [
+      "50级焱精",
+      "50级森林幽狼",
+      "50级岩浆巨人boss",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 113,
+    "native_map_id": 114,
+    "native_name": "赤岩峡"
+  },
+  {
+    "source_row": 117,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 114,
+    "name_raw": "潭溪山",
+    "npc_raw": null,
+    "monsters_raw": [
+      "50级森林幽狼",
+      "50级恐怖食人花",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 114,
+    "native_map_id": 115,
+    "native_name": "潭溪山"
+  },
+  {
+    "source_row": 118,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 115,
+    "name_raw": "莫言谷",
+    "npc_raw": null,
+    "monsters_raw": [
+      "50级森林之王boss",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 115,
+    "native_map_id": 116,
+    "native_name": "莫言谷"
+  },
+  {
+    "source_row": 119,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 116,
+    "name_raw": "落雪池",
+    "npc_raw": "钱莱(副本使者)",
+    "monsters_raw": [
+      "55级勾魂姹女",
+      "55级拜蛇教魔女",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 116,
+    "native_map_id": 117,
+    "native_name": "落雪池"
+  },
+  {
+    "source_row": 120,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 117,
+    "name_raw": "隐龙窟",
+    "npc_raw": null,
+    "monsters_raw": [
+      "55级勾魂姹女",
+      "55级拜蛇教魔女",
+      "55级千年蛇妖boss",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 117,
+    "native_map_id": 118,
+    "native_name": "隐龙窟"
+  },
+  {
+    "source_row": 121,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 118,
+    "name_raw": "浴血崖",
+    "npc_raw": null,
+    "monsters_raw": [
+      "55级血魔魂媒",
+      "55级赤火神倪",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 118,
+    "native_map_id": 119,
+    "native_name": "浴血崖"
+  },
+  {
+    "source_row": 122,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 119,
+    "name_raw": "阴阳道",
+    "npc_raw": null,
+    "monsters_raw": [
+      "55级冥府三头犬boss",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 119,
+    "native_map_id": 120,
+    "native_name": "阴阳道"
+  },
+  {
+    "source_row": 123,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 120,
+    "name_raw": "映波谷",
+    "npc_raw": null,
+    "monsters_raw": [
+      "55级麻头鬼王",
+      "55级炽焰冷魂",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 120,
+    "native_map_id": 121,
+    "native_name": "映波谷"
+  },
+  {
+    "source_row": 124,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 121,
+    "name_raw": "祈星台",
+    "npc_raw": null,
+    "monsters_raw": [
+      "55级血魔化身boss",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 121,
+    "native_map_id": 122,
+    "native_name": "祈星台"
+  },
+  {
+    "source_row": 125,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 122,
+    "name_raw": "落雪池",
+    "npc_raw": "钱莱(副本使者)",
+    "monsters_raw": [
+      "60级勾魂姹女",
+      "60级拜蛇教魔女",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 122,
+    "native_map_id": 123,
+    "native_name": "落雪池"
+  },
+  {
+    "source_row": 126,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 123,
+    "name_raw": "隐龙窟",
+    "npc_raw": null,
+    "monsters_raw": [
+      "60级勾魂姹女",
+      "60级拜蛇教魔女",
+      "60级千年蛇妖boss",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 123,
+    "native_map_id": 124,
+    "native_name": "隐龙窟"
+  },
+  {
+    "source_row": 127,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 124,
+    "name_raw": "浴血崖",
+    "npc_raw": null,
+    "monsters_raw": [
+      "60级血魔魂媒",
+      "60级赤火神倪",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 124,
+    "native_map_id": 125,
+    "native_name": "浴血崖"
+  },
+  {
+    "source_row": 128,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 125,
+    "name_raw": "阴阳道",
+    "npc_raw": null,
+    "monsters_raw": [
+      "60级冥府三头犬boss",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 125,
+    "native_map_id": 126,
+    "native_name": "阴阳道"
+  },
+  {
+    "source_row": 129,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 126,
+    "name_raw": "映波谷",
+    "npc_raw": null,
+    "monsters_raw": [
+      "60级麻头鬼王",
+      "60级炽焰冷魂",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 126,
+    "native_map_id": 127,
+    "native_name": "映波谷"
+  },
+  {
+    "source_row": 130,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 127,
+    "name_raw": "祈星台",
+    "npc_raw": null,
+    "monsters_raw": [
+      "60级血魔化身boss",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 127,
+    "native_map_id": 128,
+    "native_name": "祈星台"
+  },
+  {
+    "source_row": 131,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 128,
+    "name_raw": "百花谷",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 128,
+    "native_map_id": 129,
+    "native_name": "百花谷"
+  },
+  {
+    "source_row": 132,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 129,
+    "name_raw": "魔界一层上(20-30级)",
+    "npc_raw": "正派将领(日常活动)",
+    "monsters_raw": [
+      "27级吞噬怪(魔)",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "removed_trailing_level_annotation",
+    "native_name_index": 129,
+    "native_map_id": 130,
+    "native_name": "魔界一层上"
+  },
+  {
+    "source_row": 133,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 130,
+    "name_raw": "魔界一层中",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 130,
+    "native_map_id": 131,
+    "native_name": "魔界一层中"
+  },
+  {
+    "source_row": 134,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 131,
+    "name_raw": "魔界一层下",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 131,
+    "native_map_id": 132,
+    "native_name": "魔界一层下"
+  },
+  {
+    "source_row": 135,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 132,
+    "name_raw": "魔界二层上",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 132,
+    "native_map_id": 133,
+    "native_name": "魔界二层上"
+  },
+  {
+    "source_row": 136,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 133,
+    "name_raw": "魔界二层中",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 133,
+    "native_map_id": 134,
+    "native_name": "魔界二层中"
+  },
+  {
+    "source_row": 137,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 134,
+    "name_raw": "魔界二层下",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 134,
+    "native_map_id": 135,
+    "native_name": "魔界二层下"
+  },
+  {
+    "source_row": 138,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 135,
+    "name_raw": "魔界三层上",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 135,
+    "native_map_id": 136,
+    "native_name": "魔界三层上"
+  },
+  {
+    "source_row": 139,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 136,
+    "name_raw": "魔界三层中",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 136,
+    "native_map_id": 137,
+    "native_name": "魔界三层中"
+  },
+  {
+    "source_row": 140,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 137,
+    "name_raw": "魔界三层下",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 137,
+    "native_map_id": 138,
+    "native_name": "魔界三层下"
+  },
+  {
+    "source_row": 141,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 138,
+    "name_raw": "魔界四层上(51-60级)",
+    "npc_raw": null,
+    "monsters_raw": [
+      "54级血眼战士(魔)",
+      "54级血之怨灵(魔)",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "removed_trailing_level_annotation",
+    "native_name_index": 138,
+    "native_map_id": 139,
+    "native_name": "魔界四层上"
+  },
+  {
+    "source_row": 142,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 139,
+    "name_raw": "魔界四层中(51-60级)",
+    "npc_raw": null,
+    "monsters_raw": [
+      "54级剧毒吞噬怪(魔)",
+      "54级沥血元魂(魔)",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "removed_trailing_level_annotation",
+    "native_name_index": 139,
+    "native_map_id": 140,
+    "native_name": "魔界四层中"
+  },
+  {
+    "source_row": 143,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 140,
+    "name_raw": "魔界四层下",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 140,
+    "native_map_id": 141,
+    "native_name": "魔界四层下"
+  },
+  {
+    "source_row": 144,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 141,
+    "name_raw": "旧卧云镇",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 141,
+    "native_map_id": 142,
+    "native_name": "旧卧云镇"
+  },
+  {
+    "source_row": 145,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 142,
+    "name_raw": "旧卧云镇北",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 142,
+    "native_map_id": 143,
+    "native_name": "旧卧云镇北"
+  },
+  {
+    "source_row": 146,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 143,
+    "name_raw": "旧八旗镇",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 143,
+    "native_map_id": 144,
+    "native_name": "旧八旗镇"
+  },
+  {
+    "source_row": 147,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 144,
+    "name_raw": "旧八旗镇西",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 144,
+    "native_map_id": 145,
+    "native_name": "旧八旗镇西"
+  },
+  {
+    "source_row": 148,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 145,
+    "name_raw": "旧慈云寺北",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 145,
+    "native_map_id": 146,
+    "native_name": "旧慈云寺北"
+  },
+  {
+    "source_row": 149,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 146,
+    "name_raw": "旧慈云寺",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 146,
+    "native_map_id": 147,
+    "native_name": "旧慈云寺"
+  },
+  {
+    "source_row": 150,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 147,
+    "name_raw": "旧戴家场",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 147,
+    "native_map_id": 148,
+    "native_name": "旧戴家场"
+  },
+  {
+    "source_row": 151,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 148,
+    "name_raw": "旧群雄大殿",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 148,
+    "native_map_id": 149,
+    "native_name": "旧群雄大殿"
+  },
+  {
+    "source_row": 152,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 149,
+    "name_raw": "群英会主会场",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 149,
+    "native_map_id": 150,
+    "native_name": "群英会主会场"
+  },
+  {
+    "source_row": 153,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 150,
+    "name_raw": "群英会分会场",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 150,
+    "native_map_id": 151,
+    "native_name": "群英会分会场"
+  },
+  {
+    "source_row": 154,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 151,
+    "name_raw": "无尽之路",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 151,
+    "native_map_id": 152,
+    "native_name": "无尽之路"
+  },
+  {
+    "source_row": 155,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 152,
+    "name_raw": "流云山顶",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 152,
+    "native_map_id": 153,
+    "native_name": "流云山顶"
+  },
+  {
+    "source_row": 156,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 153,
+    "name_raw": "乾坤道",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 153,
+    "native_map_id": 154,
+    "native_name": "乾坤道"
+  },
+  {
+    "source_row": 157,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 154,
+    "name_raw": "迷流河",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 154,
+    "native_map_id": 155,
+    "native_name": "迷流河"
+  },
+  {
+    "source_row": 158,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 155,
+    "name_raw": "帮会擂台",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 155,
+    "native_map_id": 156,
+    "native_name": "帮会擂台"
+  },
+  {
+    "source_row": 159,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 156,
+    "name_raw": "红岭村",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 156,
+    "native_map_id": 157,
+    "native_name": "红岭村"
+  },
+  {
+    "source_row": 160,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 157,
+    "name_raw": "神秘仙境",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 157,
+    "native_map_id": 158,
+    "native_name": "神秘仙境"
+  },
+  {
+    "source_row": 161,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 158,
+    "name_raw": "帮会战斗一",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 158,
+    "native_map_id": 159,
+    "native_name": "帮会战斗一"
+  },
+  {
+    "source_row": 162,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 159,
+    "name_raw": "帮会战斗二",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 159,
+    "native_map_id": 160,
+    "native_name": "帮会战斗二"
+  },
+  {
+    "source_row": 163,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 160,
+    "name_raw": "帮会战斗三",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 160,
+    "native_map_id": 161,
+    "native_name": "帮会战斗三"
+  },
+  {
+    "source_row": 164,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 161,
+    "name_raw": "帮会领奖一",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 161,
+    "native_map_id": 162,
+    "native_name": "帮会领奖一"
+  },
+  {
+    "source_row": 165,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 162,
+    "name_raw": "帮会领奖二",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 162,
+    "native_map_id": 163,
+    "native_name": "帮会领奖二"
+  },
+  {
+    "source_row": 166,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 163,
+    "name_raw": "帮会领奖三",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 163,
+    "native_map_id": 164,
+    "native_name": "帮会领奖三"
+  },
+  {
+    "source_row": 167,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 164,
+    "name_raw": "帮会战斗一",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 164,
+    "native_map_id": 165,
+    "native_name": "帮会战斗一"
+  },
+  {
+    "source_row": 168,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 165,
+    "name_raw": "帮会领奖一",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 165,
+    "native_map_id": 166,
+    "native_name": "帮会领奖一"
+  },
+  {
+    "source_row": 169,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 166,
+    "name_raw": "帮会战斗二",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 166,
+    "native_map_id": 167,
+    "native_name": "帮会战斗二"
+  },
+  {
+    "source_row": 170,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 167,
+    "name_raw": "帮会领奖二",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 167,
+    "native_map_id": 168,
+    "native_name": "帮会领奖二"
+  },
+  {
+    "source_row": 171,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 168,
+    "name_raw": "帮会战斗三",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 168,
+    "native_map_id": 169,
+    "native_name": "帮会战斗三"
+  },
+  {
+    "source_row": 172,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 169,
+    "name_raw": "帮会领奖三",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 169,
+    "native_map_id": 170,
+    "native_name": "帮会领奖三"
+  },
+  {
+    "source_row": 173,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 170,
+    "name_raw": "帮会战斗一",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 170,
+    "native_map_id": 171,
+    "native_name": "帮会战斗一"
+  },
+  {
+    "source_row": 174,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 171,
+    "name_raw": "帮会领奖一",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 171,
+    "native_map_id": 172,
+    "native_name": "帮会领奖一"
+  },
+  {
+    "source_row": 175,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 172,
+    "name_raw": "帮会战斗二",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 172,
+    "native_map_id": 173,
+    "native_name": "帮会战斗二"
+  },
+  {
+    "source_row": 176,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 173,
+    "name_raw": "帮会领奖二",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 173,
+    "native_map_id": 174,
+    "native_name": "帮会领奖二"
+  },
+  {
+    "source_row": 177,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 174,
+    "name_raw": "帮会战斗三",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 174,
+    "native_map_id": 175,
+    "native_name": "帮会战斗三"
+  },
+  {
+    "source_row": 178,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 175,
+    "name_raw": "帮会领奖三",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 175,
+    "native_map_id": 176,
+    "native_name": "帮会领奖三"
+  },
+  {
+    "source_row": 179,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 176,
+    "name_raw": "备战区",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 176,
+    "native_map_id": 177,
+    "native_name": "备战区"
+  },
+  {
+    "source_row": 180,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 177,
+    "name_raw": "仙派营地",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 177,
+    "native_map_id": 178,
+    "native_name": "仙派营地"
+  },
+  {
+    "source_row": 181,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 178,
+    "name_raw": "侠派营地",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 178,
+    "native_map_id": 179,
+    "native_name": "侠派营地"
+  },
+  {
+    "source_row": 182,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 179,
+    "name_raw": "资源战场",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 179,
+    "native_map_id": 180,
+    "native_name": "资源战场"
+  },
+  {
+    "source_row": 183,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 180,
+    "name_raw": "备战区",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 180,
+    "native_map_id": 181,
+    "native_name": "备战区"
+  },
+  {
+    "source_row": 184,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 181,
+    "name_raw": "仙派营地",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 181,
+    "native_map_id": 182,
+    "native_name": "仙派营地"
+  },
+  {
+    "source_row": 185,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 182,
+    "name_raw": "侠派营地",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 182,
+    "native_map_id": 183,
+    "native_name": "侠派营地"
+  },
+  {
+    "source_row": 186,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 183,
+    "name_raw": "资源战场",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 183,
+    "native_map_id": 184,
+    "native_name": "资源战场"
+  },
+  {
+    "source_row": 187,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 184,
+    "name_raw": "备战区",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 184,
+    "native_map_id": 185,
+    "native_name": "备战区"
+  },
+  {
+    "source_row": 188,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 185,
+    "name_raw": "仙派营地",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 185,
+    "native_map_id": 186,
+    "native_name": "仙派营地"
+  },
+  {
+    "source_row": 189,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 186,
+    "name_raw": "侠派营地",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 186,
+    "native_map_id": 187,
+    "native_name": "侠派营地"
+  },
+  {
+    "source_row": 190,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 187,
+    "name_raw": "资源战场",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 187,
+    "native_map_id": 188,
+    "native_name": "资源战场"
+  },
+  {
+    "source_row": 191,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 188,
+    "name_raw": "备战区",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 188,
+    "native_map_id": 189,
+    "native_name": "备战区"
+  },
+  {
+    "source_row": 192,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 189,
+    "name_raw": "仙派营地",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 189,
+    "native_map_id": 190,
+    "native_name": "仙派营地"
+  },
+  {
+    "source_row": 193,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 190,
+    "name_raw": "侠派营地",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 190,
+    "native_map_id": 191,
+    "native_name": "侠派营地"
+  },
+  {
+    "source_row": 194,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 191,
+    "name_raw": "资源战场",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 191,
+    "native_map_id": 192,
+    "native_name": "资源战场"
+  },
+  {
+    "source_row": 195,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 192,
+    "name_raw": "普通礼堂",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 192,
+    "native_map_id": 193,
+    "native_name": "普通礼堂"
+  },
+  {
+    "source_row": 196,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 193,
+    "name_raw": "漂亮礼堂",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 193,
+    "native_map_id": 194,
+    "native_name": "漂亮礼堂"
+  },
+  {
+    "source_row": 197,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 194,
+    "name_raw": "华丽礼堂",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 194,
+    "native_map_id": 195,
+    "native_name": "华丽礼堂"
+  },
+  {
+    "source_row": 198,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 195,
+    "name_raw": "奢侈礼堂",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 195,
+    "native_map_id": 196,
+    "native_name": "奢侈礼堂"
+  },
+  {
+    "source_row": 199,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 196,
+    "name_raw": "攻方基地",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 196,
+    "native_map_id": 197,
+    "native_name": "攻方基地"
+  },
+  {
+    "source_row": 200,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 197,
+    "name_raw": "进攻区日",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 197,
+    "native_map_id": 198,
+    "native_name": "进攻区日"
+  },
+  {
+    "source_row": 201,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 198,
+    "name_raw": "进攻区月",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 198,
+    "native_map_id": 199,
+    "native_name": "进攻区月"
+  },
+  {
+    "source_row": 202,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 199,
+    "name_raw": "进攻区星",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 199,
+    "native_map_id": 200,
+    "native_name": "进攻区星"
+  },
+  {
+    "source_row": 203,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 200,
+    "name_raw": "进攻区天",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 200,
+    "native_map_id": 201,
+    "native_name": "进攻区天"
+  },
+  {
+    "source_row": 204,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 201,
+    "name_raw": "进攻区地",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 201,
+    "native_map_id": 202,
+    "native_name": "进攻区地"
+  },
+  {
+    "source_row": 205,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 202,
+    "name_raw": "精华源日",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 202,
+    "native_map_id": 203,
+    "native_name": "精华源日"
+  },
+  {
+    "source_row": 206,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 203,
+    "name_raw": "精华源月",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 203,
+    "native_map_id": 204,
+    "native_name": "精华源月"
+  },
+  {
+    "source_row": 207,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 204,
+    "name_raw": "精华源星",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 204,
+    "native_map_id": 205,
+    "native_name": "精华源星"
+  },
+  {
+    "source_row": 208,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 205,
+    "name_raw": "精华源天",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 205,
+    "native_map_id": 206,
+    "native_name": "精华源天"
+  },
+  {
+    "source_row": 209,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 206,
+    "name_raw": "精华源地",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 206,
+    "native_map_id": 207,
+    "native_name": "精华源地"
+  },
+  {
+    "source_row": 210,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 207,
+    "name_raw": "防守区日",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 207,
+    "native_map_id": 208,
+    "native_name": "防守区日"
+  },
+  {
+    "source_row": 211,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 208,
+    "name_raw": "防守区月",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 208,
+    "native_map_id": 209,
+    "native_name": "防守区月"
+  },
+  {
+    "source_row": 212,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 209,
+    "name_raw": "防守区星",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 209,
+    "native_map_id": 210,
+    "native_name": "防守区星"
+  },
+  {
+    "source_row": 213,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 210,
+    "name_raw": "防守区天",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 210,
+    "native_map_id": 211,
+    "native_name": "防守区天"
+  },
+  {
+    "source_row": 214,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 211,
+    "name_raw": "防守区地",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 211,
+    "native_map_id": 212,
+    "native_name": "防守区地"
+  },
+  {
+    "source_row": 215,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 212,
+    "name_raw": "守方基地",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 212,
+    "native_map_id": 213,
+    "native_name": "守方基地"
+  },
+  {
+    "source_row": 216,
+    "source_columns": "A:F",
+    "verification": "user_provided_unverified",
+    "csv_index": 213,
+    "name_raw": "仙灵幻界",
+    "npc_raw": null,
+    "monsters_raw": [
+      "",
+      "",
+      "",
+      ""
+    ],
+    "native_name_match": true,
+    "match_method": "exact",
+    "native_name_index": 213,
+    "native_map_id": 214,
+    "native_name": "仙灵幻界"
+  }
+]

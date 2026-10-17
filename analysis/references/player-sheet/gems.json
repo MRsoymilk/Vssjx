@@ -1,0 +1,389 @@
+[
+  {
+    "source_row": 2,
+    "source_columns": "U:V",
+    "verification": "user_provided_unverified",
+    "name": "一级敏捷石",
+    "attribute_raw": "8-",
+    "numeric_attribute": null,
+    "original_item_id": null
+  },
+  {
+    "source_row": 3,
+    "source_columns": "U:V",
+    "verification": "user_provided_unverified",
+    "name": "二级敏捷石",
+    "attribute_raw": "16-",
+    "numeric_attribute": null,
+    "original_item_id": null
+  },
+  {
+    "source_row": 4,
+    "source_columns": "U:V",
+    "verification": "user_provided_unverified",
+    "name": "三级敏捷石",
+    "attribute_raw": "32-",
+    "numeric_attribute": null,
+    "original_item_id": null
+  },
+  {
+    "source_row": 5,
+    "source_columns": "U:V",
+    "verification": "user_provided_unverified",
+    "name": "四级敏捷石",
+    "attribute_raw": "40-",
+    "numeric_attribute": null,
+    "original_item_id": null
+  },
+  {
+    "source_row": 6,
+    "source_columns": "U:V",
+    "verification": "user_provided_unverified",
+    "name": "一级体质石",
+    "attribute_raw": "8-",
+    "numeric_attribute": null,
+    "original_item_id": null
+  },
+  {
+    "source_row": 7,
+    "source_columns": "U:V",
+    "verification": "user_provided_unverified",
+    "name": "二级体质石",
+    "attribute_raw": "16-",
+    "numeric_attribute": null,
+    "original_item_id": null
+  },
+  {
+    "source_row": 8,
+    "source_columns": "U:V",
+    "verification": "user_provided_unverified",
+    "name": "三级体质石",
+    "attribute_raw": "32-",
+    "numeric_attribute": null,
+    "original_item_id": null
+  },
+  {
+    "source_row": 9,
+    "source_columns": "U:V",
+    "verification": "user_provided_unverified",
+    "name": "四级体质石",
+    "attribute_raw": "40-",
+    "numeric_attribute": null,
+    "original_item_id": null
+  },
+  {
+    "source_row": 10,
+    "source_columns": "U:V",
+    "verification": "user_provided_unverified",
+    "name": "一级力量石",
+    "attribute_raw": "8-",
+    "numeric_attribute": null,
+    "original_item_id": null
+  },
+  {
+    "source_row": 11,
+    "source_columns": "U:V",
+    "verification": "user_provided_unverified",
+    "name": "二级力量石",
+    "attribute_raw": "16-",
+    "numeric_attribute": null,
+    "original_item_id": null
+  },
+  {
+    "source_row": 12,
+    "source_columns": "U:V",
+    "verification": "user_provided_unverified",
+    "name": "三级力量石",
+    "attribute_raw": "32-",
+    "numeric_attribute": null,
+    "original_item_id": null
+  },
+  {
+    "source_row": 13,
+    "source_columns": "U:V",
+    "verification": "user_provided_unverified",
+    "name": "四级力量石",
+    "attribute_raw": "40-",
+    "numeric_attribute": null,
+    "original_item_id": null
+  },
+  {
+    "source_row": 14,
+    "source_columns": "U:V",
+    "verification": "user_provided_unverified",
+    "name": "一级物攻石",
+    "attribute_raw": null,
+    "numeric_attribute": null,
+    "original_item_id": null
+  },
+  {
+    "source_row": 15,
+    "source_columns": "U:V",
+    "verification": "user_provided_unverified",
+    "name": "二级物攻石",
+    "attribute_raw": null,
+    "numeric_attribute": null,
+    "original_item_id": null
+  },
+  {
+    "source_row": 16,
+    "source_columns": "U:V",
+    "verification": "user_provided_unverified",
+    "name": "三级物攻石",
+    "attribute_raw": null,
+    "numeric_attribute": null,
+    "original_item_id": null
+  },
+  {
+    "source_row": 17,
+    "source_columns": "U:V",
+    "verification": "user_provided_unverified",
+    "name": "四级物攻石",
+    "attribute_raw": null,
+    "numeric_attribute": null,
+    "original_item_id": null
+  },
+  {
+    "source_row": 18,
+    "source_columns": "U:V",
+    "verification": "user_provided_unverified",
+    "name": "一级灵力石",
+    "attribute_raw": null,
+    "numeric_attribute": null,
+    "original_item_id": null
+  },
+  {
+    "source_row": 19,
+    "source_columns": "U:V",
+    "verification": "user_provided_unverified",
+    "name": "二级灵力石",
+    "attribute_raw": null,
+    "numeric_attribute": null,
+    "original_item_id": null
+  },
+  {
+    "source_row": 20,
+    "source_columns": "U:V",
+    "verification": "user_provided_unverified",
+    "name": "三级灵力石",
+    "attribute_raw": null,
+    "numeric_attribute": null,
+    "original_item_id": null
+  },
+  {
+    "source_row": 21,
+    "source_columns": "U:V",
+    "verification": "user_provided_unverified",
+    "name": "四级灵力石",
+    "attribute_raw": null,
+    "numeric_attribute": null,
+    "original_item_id": null
+  },
+  {
+    "source_row": 22,
+    "source_columns": "U:V",
+    "verification": "user_provided_unverified",
+    "name": "一级法攻石",
+    "attribute_raw": null,
+    "numeric_attribute": null,
+    "original_item_id": null
+  },
+  {
+    "source_row": 23,
+    "source_columns": "U:V",
+    "verification": "user_provided_unverified",
+    "name": "二级法攻石",
+    "attribute_raw": null,
+    "numeric_attribute": null,
+    "original_item_id": null
+  },
+  {
+    "source_row": 24,
+    "source_columns": "U:V",
+    "verification": "user_provided_unverified",
+    "name": "三级法攻石",
+    "attribute_raw": null,
+    "numeric_attribute": null,
+    "original_item_id": null
+  },
+  {
+    "source_row": 25,
+    "source_columns": "U:V",
+    "verification": "user_provided_unverified",
+    "name": "四级法攻石",
+    "attribute_raw": null,
+    "numeric_attribute": null,
+    "original_item_id": null
+  },
+  {
+    "source_row": 26,
+    "source_columns": "U:V",
+    "verification": "user_provided_unverified",
+    "name": "一级法防石",
+    "attribute_raw": "11-",
+    "numeric_attribute": null,
+    "original_item_id": null
+  },
+  {
+    "source_row": 27,
+    "source_columns": "U:V",
+    "verification": "user_provided_unverified",
+    "name": "二级法防石",
+    "attribute_raw": null,
+    "numeric_attribute": null,
+    "original_item_id": null
+  },
+  {
+    "source_row": 28,
+    "source_columns": "U:V",
+    "verification": "user_provided_unverified",
+    "name": "三级法防石",
+    "attribute_raw": null,
+    "numeric_attribute": null,
+    "original_item_id": null
+  },
+  {
+    "source_row": 29,
+    "source_columns": "U:V",
+    "verification": "user_provided_unverified",
+    "name": "四级法防石",
+    "attribute_raw": null,
+    "numeric_attribute": null,
+    "original_item_id": null
+  },
+  {
+    "source_row": 30,
+    "source_columns": "U:V",
+    "verification": "user_provided_unverified",
+    "name": "一级物防石",
+    "attribute_raw": "11-",
+    "numeric_attribute": null,
+    "original_item_id": null
+  },
+  {
+    "source_row": 31,
+    "source_columns": "U:V",
+    "verification": "user_provided_unverified",
+    "name": "二级物防石",
+    "attribute_raw": null,
+    "numeric_attribute": null,
+    "original_item_id": null
+  },
+  {
+    "source_row": 32,
+    "source_columns": "U:V",
+    "verification": "user_provided_unverified",
+    "name": "三级物防石",
+    "attribute_raw": null,
+    "numeric_attribute": null,
+    "original_item_id": null
+  },
+  {
+    "source_row": 33,
+    "source_columns": "U:V",
+    "verification": "user_provided_unverified",
+    "name": "四级物防石",
+    "attribute_raw": null,
+    "numeric_attribute": null,
+    "original_item_id": null
+  },
+  {
+    "source_row": 34,
+    "source_columns": "U:V",
+    "verification": "user_provided_unverified",
+    "name": "一级气血石",
+    "attribute_raw": null,
+    "numeric_attribute": null,
+    "original_item_id": null
+  },
+  {
+    "source_row": 35,
+    "source_columns": "U:V",
+    "verification": "user_provided_unverified",
+    "name": "二级气血石",
+    "attribute_raw": null,
+    "numeric_attribute": null,
+    "original_item_id": null
+  },
+  {
+    "source_row": 36,
+    "source_columns": "U:V",
+    "verification": "user_provided_unverified",
+    "name": "三级气血石",
+    "attribute_raw": null,
+    "numeric_attribute": null,
+    "original_item_id": null
+  },
+  {
+    "source_row": 37,
+    "source_columns": "U:V",
+    "verification": "user_provided_unverified",
+    "name": "四级气血石",
+    "attribute_raw": null,
+    "numeric_attribute": null,
+    "original_item_id": null
+  },
+  {
+    "source_row": 38,
+    "source_columns": "U:V",
+    "verification": "user_provided_unverified",
+    "name": "1-4级减伤石",
+    "attribute_raw": null,
+    "numeric_attribute": null,
+    "original_item_id": null
+  },
+  {
+    "source_row": 39,
+    "source_columns": "U:V",
+    "verification": "user_provided_unverified",
+    "name": "1-4级法命石",
+    "attribute_raw": null,
+    "numeric_attribute": null,
+    "original_item_id": null
+  },
+  {
+    "source_row": 40,
+    "source_columns": "U:V",
+    "verification": "user_provided_unverified",
+    "name": "1-4级闪避石",
+    "attribute_raw": null,
+    "numeric_attribute": null,
+    "original_item_id": null
+  },
+  {
+    "source_row": 41,
+    "source_columns": "U:V",
+    "verification": "user_provided_unverified",
+    "name": "1-4级物命石",
+    "attribute_raw": null,
+    "numeric_attribute": null,
+    "original_item_id": null
+  },
+  {
+    "source_row": 42,
+    "source_columns": "U:V",
+    "verification": "user_provided_unverified",
+    "name": "1-4级物爆石",
+    "attribute_raw": null,
+    "numeric_attribute": null,
+    "original_item_id": null
+  },
+  {
+    "source_row": 43,
+    "source_columns": "U:V",
+    "verification": "user_provided_unverified",
+    "name": "1-4级法暴石",
+    "attribute_raw": null,
+    "numeric_attribute": null,
+    "original_item_id": null
+  },
+  {
+    "source_row": 44,
+    "source_columns": "U:V",
+    "verification": "user_provided_unverified",
+    "name": "1-4级法闪石",
+    "attribute_raw": null,
+    "numeric_attribute": null,
+    "original_item_id": null
+  }
+]

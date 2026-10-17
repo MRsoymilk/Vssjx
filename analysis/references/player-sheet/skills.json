@@ -1,0 +1,962 @@
+[
+  {
+    "source_row": 3,
+    "source_columns": "K:P",
+    "verification": "user_provided_unverified",
+    "record_id": "reference/skill/row-003",
+    "role_raw": "侠客",
+    "name": "仙人指路",
+    "level_column_raw": "5",
+    "level_column_meaning": "unconfirmed",
+    "description_raw": "单体攻击",
+    "notes_raw": [
+      "",
+      ""
+    ],
+    "original_skill_id": null,
+    "mp_cost": null,
+    "max_rank": null,
+    "damage_formula": null,
+    "effect_animation": null
+  },
+  {
+    "source_row": 4,
+    "source_columns": "K:P",
+    "verification": "user_provided_unverified",
+    "record_id": "reference/skill/row-004",
+    "role_raw": "昆仑派侠客",
+    "name": "沧海明月",
+    "level_column_raw": "15",
+    "level_column_meaning": "unconfirmed",
+    "description_raw": "群体攻击",
+    "notes_raw": [
+      "",
+      ""
+    ],
+    "original_skill_id": null,
+    "mp_cost": null,
+    "max_rank": null,
+    "damage_formula": null,
+    "effect_animation": null
+  },
+  {
+    "source_row": 5,
+    "source_columns": "K:P",
+    "verification": "user_provided_unverified",
+    "record_id": "reference/skill/row-005",
+    "role_raw": "昆仑派侠客",
+    "name": "剑飞惊天",
+    "level_column_raw": "25",
+    "level_column_meaning": "unconfirmed",
+    "description_raw": "群体攻击",
+    "notes_raw": [
+      "",
+      ""
+    ],
+    "original_skill_id": null,
+    "mp_cost": null,
+    "max_rank": null,
+    "damage_formula": null,
+    "effect_animation": null
+  },
+  {
+    "source_row": 6,
+    "source_columns": "K:P",
+    "verification": "user_provided_unverified",
+    "record_id": "reference/skill/row-006",
+    "role_raw": "昆仑派侠客",
+    "name": "三环套月",
+    "level_column_raw": "35",
+    "level_column_meaning": "unconfirmed",
+    "description_raw": "单体攻击",
+    "notes_raw": [
+      "",
+      ""
+    ],
+    "original_skill_id": null,
+    "mp_cost": null,
+    "max_rank": null,
+    "damage_formula": null,
+    "effect_animation": null
+  },
+  {
+    "source_row": 7,
+    "source_columns": "K:P",
+    "verification": "user_provided_unverified",
+    "record_id": "reference/skill/row-007",
+    "role_raw": "昆仑派侠客",
+    "name": "天罡战甲",
+    "level_column_raw": "45",
+    "level_column_meaning": "unconfirmed",
+    "description_raw": "暴击加成",
+    "notes_raw": [
+      "",
+      ""
+    ],
+    "original_skill_id": null,
+    "mp_cost": null,
+    "max_rank": null,
+    "damage_formula": null,
+    "effect_animation": null
+  },
+  {
+    "source_row": 8,
+    "source_columns": "K:P",
+    "verification": "user_provided_unverified",
+    "record_id": "reference/skill/row-008",
+    "role_raw": "昆仑派侠客",
+    "name": "万剑归宗",
+    "level_column_raw": "55",
+    "level_column_meaning": "unconfirmed",
+    "description_raw": "群体攻击",
+    "notes_raw": [
+      "",
+      ""
+    ],
+    "original_skill_id": null,
+    "mp_cost": null,
+    "max_rank": null,
+    "damage_formula": null,
+    "effect_animation": null
+  },
+  {
+    "source_row": 10,
+    "source_columns": "K:P",
+    "verification": "user_provided_unverified",
+    "record_id": "reference/skill/row-010",
+    "role_raw": "力士",
+    "name": "雷霆一击",
+    "level_column_raw": "5",
+    "level_column_meaning": "unconfirmed",
+    "description_raw": "单体攻击",
+    "notes_raw": [
+      "",
+      ""
+    ],
+    "original_skill_id": null,
+    "mp_cost": null,
+    "max_rank": null,
+    "damage_formula": null,
+    "effect_animation": null
+  },
+  {
+    "source_row": 11,
+    "source_columns": "K:P",
+    "verification": "user_provided_unverified",
+    "record_id": "reference/skill/row-011",
+    "role_raw": "昆仑派力士",
+    "name": "破釜沉舟",
+    "level_column_raw": "15",
+    "level_column_meaning": "unconfirmed",
+    "description_raw": "物理反伤2回合",
+    "notes_raw": [
+      "",
+      ""
+    ],
+    "original_skill_id": null,
+    "mp_cost": null,
+    "max_rank": null,
+    "damage_formula": null,
+    "effect_animation": null
+  },
+  {
+    "source_row": 12,
+    "source_columns": "K:P",
+    "verification": "user_provided_unverified",
+    "record_id": "reference/skill/row-012",
+    "role_raw": "昆仑派力士",
+    "name": "固若金汤",
+    "level_column_raw": "25",
+    "level_column_meaning": "unconfirmed",
+    "description_raw": "防御加成",
+    "notes_raw": [
+      "",
+      ""
+    ],
+    "original_skill_id": null,
+    "mp_cost": null,
+    "max_rank": null,
+    "damage_formula": null,
+    "effect_animation": null
+  },
+  {
+    "source_row": 13,
+    "source_columns": "K:P",
+    "verification": "user_provided_unverified",
+    "record_id": "reference/skill/row-013",
+    "role_raw": "昆仑派力士",
+    "name": "血战八方",
+    "level_column_raw": "35",
+    "level_column_meaning": "unconfirmed",
+    "description_raw": "单体攻击",
+    "notes_raw": [
+      "",
+      ""
+    ],
+    "original_skill_id": null,
+    "mp_cost": null,
+    "max_rank": null,
+    "damage_formula": null,
+    "effect_animation": null
+  },
+  {
+    "source_row": 14,
+    "source_columns": "K:P",
+    "verification": "user_provided_unverified",
+    "record_id": "reference/skill/row-014",
+    "role_raw": "昆仑派力士",
+    "name": "霸王卸甲",
+    "level_column_raw": "45",
+    "level_column_meaning": "unconfirmed",
+    "description_raw": "物理反伤",
+    "notes_raw": [
+      "自动反弹",
+      ""
+    ],
+    "original_skill_id": null,
+    "mp_cost": null,
+    "max_rank": null,
+    "damage_formula": null,
+    "effect_animation": null
+  },
+  {
+    "source_row": 15,
+    "source_columns": "K:P",
+    "verification": "user_provided_unverified",
+    "record_id": "reference/skill/row-015",
+    "role_raw": "昆仑派力士",
+    "name": "斗转星移",
+    "level_column_raw": "55",
+    "level_column_meaning": "unconfirmed",
+    "description_raw": "单体攻击",
+    "notes_raw": [
+      "",
+      ""
+    ],
+    "original_skill_id": null,
+    "mp_cost": null,
+    "max_rank": null,
+    "damage_formula": null,
+    "effect_animation": null
+  },
+  {
+    "source_row": 17,
+    "source_columns": "K:P",
+    "verification": "user_provided_unverified",
+    "record_id": "reference/skill/row-017",
+    "role_raw": "隐者",
+    "name": "连天绝壁",
+    "level_column_raw": "5",
+    "level_column_meaning": "unconfirmed",
+    "description_raw": "单体攻击",
+    "notes_raw": [
+      "",
+      ""
+    ],
+    "original_skill_id": null,
+    "mp_cost": null,
+    "max_rank": null,
+    "damage_formula": null,
+    "effect_animation": null
+  },
+  {
+    "source_row": 18,
+    "source_columns": "K:P",
+    "verification": "user_provided_unverified",
+    "record_id": "reference/skill/row-018",
+    "role_raw": "峨眉派隐者",
+    "name": "星火燎原",
+    "level_column_raw": "15",
+    "level_column_meaning": "unconfirmed",
+    "description_raw": "单体攻击",
+    "notes_raw": [
+      "一回合流血状态",
+      ""
+    ],
+    "original_skill_id": null,
+    "mp_cost": null,
+    "max_rank": null,
+    "damage_formula": null,
+    "effect_animation": null
+  },
+  {
+    "source_row": 19,
+    "source_columns": "K:P",
+    "verification": "user_provided_unverified",
+    "record_id": "reference/skill/row-019",
+    "role_raw": "峨眉派隐者",
+    "name": "焚天疾火",
+    "level_column_raw": "25",
+    "level_column_meaning": "unconfirmed",
+    "description_raw": "群体攻击",
+    "notes_raw": [
+      "两回合流血状态",
+      ""
+    ],
+    "original_skill_id": null,
+    "mp_cost": null,
+    "max_rank": null,
+    "damage_formula": null,
+    "effect_animation": null
+  },
+  {
+    "source_row": 20,
+    "source_columns": "K:P",
+    "verification": "user_provided_unverified",
+    "record_id": "reference/skill/row-020",
+    "role_raw": "峨眉派隐者",
+    "name": null,
+    "level_column_raw": "35",
+    "level_column_meaning": "unconfirmed",
+    "description_raw": null,
+    "notes_raw": [
+      "",
+      ""
+    ],
+    "original_skill_id": null,
+    "mp_cost": null,
+    "max_rank": null,
+    "damage_formula": null,
+    "effect_animation": null
+  },
+  {
+    "source_row": 21,
+    "source_columns": "K:P",
+    "verification": "user_provided_unverified",
+    "record_id": "reference/skill/row-021",
+    "role_raw": "峨眉派隐者",
+    "name": "劫焰燎原",
+    "level_column_raw": "45",
+    "level_column_meaning": "unconfirmed",
+    "description_raw": "单体攻击",
+    "notes_raw": [
+      "15%几率沉默",
+      ""
+    ],
+    "original_skill_id": null,
+    "mp_cost": null,
+    "max_rank": null,
+    "damage_formula": null,
+    "effect_animation": null
+  },
+  {
+    "source_row": 22,
+    "source_columns": "K:P",
+    "verification": "user_provided_unverified",
+    "record_id": "reference/skill/row-022",
+    "role_raw": "峨眉派隐者",
+    "name": null,
+    "level_column_raw": "55",
+    "level_column_meaning": "unconfirmed",
+    "description_raw": "群体攻击",
+    "notes_raw": [
+      "5%几率沉默",
+      ""
+    ],
+    "original_skill_id": null,
+    "mp_cost": null,
+    "max_rank": null,
+    "damage_formula": null,
+    "effect_animation": null
+  },
+  {
+    "source_row": 25,
+    "source_columns": "K:P",
+    "verification": "user_provided_unverified",
+    "record_id": "reference/skill/row-025",
+    "role_raw": "峨眉派力士",
+    "name": "推窗望月",
+    "level_column_raw": "15",
+    "level_column_meaning": "unconfirmed",
+    "description_raw": "单体攻击",
+    "notes_raw": [
+      "两回合流血状态",
+      ""
+    ],
+    "original_skill_id": null,
+    "mp_cost": null,
+    "max_rank": null,
+    "damage_formula": null,
+    "effect_animation": null
+  },
+  {
+    "source_row": 26,
+    "source_columns": "K:P",
+    "verification": "user_provided_unverified",
+    "record_id": "reference/skill/row-026",
+    "role_raw": "峨眉派力士",
+    "name": null,
+    "level_column_raw": "25",
+    "level_column_meaning": "unconfirmed",
+    "description_raw": null,
+    "notes_raw": [
+      "",
+      ""
+    ],
+    "original_skill_id": null,
+    "mp_cost": null,
+    "max_rank": null,
+    "damage_formula": null,
+    "effect_animation": null
+  },
+  {
+    "source_row": 27,
+    "source_columns": "K:P",
+    "verification": "user_provided_unverified",
+    "record_id": "reference/skill/row-027",
+    "role_raw": "峨眉派力士",
+    "name": "猛虎下山",
+    "level_column_raw": "35",
+    "level_column_meaning": "unconfirmed",
+    "description_raw": "单体攻击",
+    "notes_raw": [
+      "",
+      ""
+    ],
+    "original_skill_id": null,
+    "mp_cost": null,
+    "max_rank": null,
+    "damage_formula": null,
+    "effect_animation": null
+  },
+  {
+    "source_row": 28,
+    "source_columns": "K:P",
+    "verification": "user_provided_unverified",
+    "record_id": "reference/skill/row-028",
+    "role_raw": "峨眉派力士",
+    "name": null,
+    "level_column_raw": "45",
+    "level_column_meaning": "unconfirmed",
+    "description_raw": "群体攻击",
+    "notes_raw": [
+      "",
+      ""
+    ],
+    "original_skill_id": null,
+    "mp_cost": null,
+    "max_rank": null,
+    "damage_formula": null,
+    "effect_animation": null
+  },
+  {
+    "source_row": 29,
+    "source_columns": "K:P",
+    "verification": "user_provided_unverified",
+    "record_id": "reference/skill/row-029",
+    "role_raw": "峨眉派力士",
+    "name": null,
+    "level_column_raw": "55",
+    "level_column_meaning": "unconfirmed",
+    "description_raw": null,
+    "notes_raw": [
+      "",
+      ""
+    ],
+    "original_skill_id": null,
+    "mp_cost": null,
+    "max_rank": null,
+    "damage_formula": null,
+    "effect_animation": null
+  },
+  {
+    "source_row": 33,
+    "source_columns": "K:P",
+    "verification": "user_provided_unverified",
+    "record_id": "reference/skill/row-033",
+    "role_raw": "花间派力士",
+    "name": "移花接木",
+    "level_column_raw": "15",
+    "level_column_meaning": "unconfirmed",
+    "description_raw": "法术反伤2回合",
+    "notes_raw": [
+      "",
+      ""
+    ],
+    "original_skill_id": null,
+    "mp_cost": null,
+    "max_rank": null,
+    "damage_formula": null,
+    "effect_animation": null
+  },
+  {
+    "source_row": 34,
+    "source_columns": "K:P",
+    "verification": "user_provided_unverified",
+    "record_id": "reference/skill/row-034",
+    "role_raw": "花间派力士",
+    "name": "以逸待劳",
+    "level_column_raw": "25",
+    "level_column_meaning": "unconfirmed",
+    "description_raw": "防御加成",
+    "notes_raw": [
+      "",
+      ""
+    ],
+    "original_skill_id": null,
+    "mp_cost": null,
+    "max_rank": null,
+    "damage_formula": null,
+    "effect_animation": null
+  },
+  {
+    "source_row": 35,
+    "source_columns": "K:P",
+    "verification": "user_provided_unverified",
+    "record_id": "reference/skill/row-035",
+    "role_raw": "花间派力士",
+    "name": "狂风骤电",
+    "level_column_raw": "35",
+    "level_column_meaning": "unconfirmed",
+    "description_raw": "单体攻击",
+    "notes_raw": [
+      "",
+      ""
+    ],
+    "original_skill_id": null,
+    "mp_cost": null,
+    "max_rank": null,
+    "damage_formula": null,
+    "effect_animation": null
+  },
+  {
+    "source_row": 36,
+    "source_columns": "K:P",
+    "verification": "user_provided_unverified",
+    "record_id": "reference/skill/row-036",
+    "role_raw": "花间派力士",
+    "name": "穿衣破甲",
+    "level_column_raw": "45",
+    "level_column_meaning": "unconfirmed",
+    "description_raw": "法术反伤",
+    "notes_raw": [
+      "自动反弹",
+      ""
+    ],
+    "original_skill_id": null,
+    "mp_cost": null,
+    "max_rank": null,
+    "damage_formula": null,
+    "effect_animation": null
+  },
+  {
+    "source_row": 37,
+    "source_columns": "K:P",
+    "verification": "user_provided_unverified",
+    "record_id": "reference/skill/row-037",
+    "role_raw": "花间派力士",
+    "name": "雪满天山",
+    "level_column_raw": "55",
+    "level_column_meaning": "unconfirmed",
+    "description_raw": "单体攻击",
+    "notes_raw": [
+      "",
+      ""
+    ],
+    "original_skill_id": null,
+    "mp_cost": null,
+    "max_rank": null,
+    "damage_formula": null,
+    "effect_animation": null
+  },
+  {
+    "source_row": 39,
+    "source_columns": "K:P",
+    "verification": "user_provided_unverified",
+    "record_id": "reference/skill/row-039",
+    "role_raw": "花间派隐者",
+    "name": "起死回生",
+    "level_column_raw": "15",
+    "level_column_meaning": "unconfirmed",
+    "description_raw": "单体增益",
+    "notes_raw": [
+      "2回合回复生命值",
+      ""
+    ],
+    "original_skill_id": null,
+    "mp_cost": null,
+    "max_rank": null,
+    "damage_formula": null,
+    "effect_animation": null
+  },
+  {
+    "source_row": 40,
+    "source_columns": "K:P",
+    "verification": "user_provided_unverified",
+    "record_id": "reference/skill/row-040",
+    "role_raw": "花间派隐者",
+    "name": null,
+    "level_column_raw": "25",
+    "level_column_meaning": "unconfirmed",
+    "description_raw": null,
+    "notes_raw": [
+      "",
+      ""
+    ],
+    "original_skill_id": null,
+    "mp_cost": null,
+    "max_rank": null,
+    "damage_formula": null,
+    "effect_animation": null
+  },
+  {
+    "source_row": 41,
+    "source_columns": "K:P",
+    "verification": "user_provided_unverified",
+    "record_id": "reference/skill/row-041",
+    "role_raw": "花间派隐者",
+    "name": "救死扶伤",
+    "level_column_raw": "35",
+    "level_column_meaning": "unconfirmed",
+    "description_raw": "群体增益",
+    "notes_raw": [
+      "2回合生命值回复",
+      ""
+    ],
+    "original_skill_id": null,
+    "mp_cost": null,
+    "max_rank": null,
+    "damage_formula": null,
+    "effect_animation": null
+  },
+  {
+    "source_row": 42,
+    "source_columns": "K:P",
+    "verification": "user_provided_unverified",
+    "record_id": "reference/skill/row-042",
+    "role_raw": "花间派隐者",
+    "name": "冰雪封天",
+    "level_column_raw": "45",
+    "level_column_meaning": "unconfirmed",
+    "description_raw": "单体攻击",
+    "notes_raw": [
+      "",
+      ""
+    ],
+    "original_skill_id": null,
+    "mp_cost": null,
+    "max_rank": null,
+    "damage_formula": null,
+    "effect_animation": null
+  },
+  {
+    "source_row": 43,
+    "source_columns": "K:P",
+    "verification": "user_provided_unverified",
+    "record_id": "reference/skill/row-043",
+    "role_raw": "花间派隐者",
+    "name": null,
+    "level_column_raw": "55",
+    "level_column_meaning": "unconfirmed",
+    "description_raw": null,
+    "notes_raw": [
+      "",
+      ""
+    ],
+    "original_skill_id": null,
+    "mp_cost": null,
+    "max_rank": null,
+    "damage_formula": null,
+    "effect_animation": null
+  },
+  {
+    "source_row": 45,
+    "source_columns": "K:P",
+    "verification": "user_provided_unverified",
+    "record_id": "reference/skill/row-045",
+    "role_raw": "昆仑派隐者",
+    "name": "排山倒海",
+    "level_column_raw": "15",
+    "level_column_meaning": "unconfirmed",
+    "description_raw": "单体攻击",
+    "notes_raw": [
+      "",
+      ""
+    ],
+    "original_skill_id": null,
+    "mp_cost": null,
+    "max_rank": null,
+    "damage_formula": null,
+    "effect_animation": null
+  },
+  {
+    "source_row": 46,
+    "source_columns": "K:P",
+    "verification": "user_provided_unverified",
+    "record_id": "reference/skill/row-046",
+    "role_raw": "昆仑派隐者",
+    "name": null,
+    "level_column_raw": "25",
+    "level_column_meaning": "unconfirmed",
+    "description_raw": null,
+    "notes_raw": [
+      "",
+      ""
+    ],
+    "original_skill_id": null,
+    "mp_cost": null,
+    "max_rank": null,
+    "damage_formula": null,
+    "effect_animation": null
+  },
+  {
+    "source_row": 47,
+    "source_columns": "K:P",
+    "verification": "user_provided_unverified",
+    "record_id": "reference/skill/row-047",
+    "role_raw": "昆仑派隐者",
+    "name": "偷天换日",
+    "level_column_raw": "35",
+    "level_column_meaning": "unconfirmed",
+    "description_raw": "单体攻击",
+    "notes_raw": [
+      "偷取敌方灵力值",
+      ""
+    ],
+    "original_skill_id": null,
+    "mp_cost": null,
+    "max_rank": null,
+    "damage_formula": null,
+    "effect_animation": null
+  },
+  {
+    "source_row": 48,
+    "source_columns": "K:P",
+    "verification": "user_provided_unverified",
+    "record_id": "reference/skill/row-048",
+    "role_raw": "昆仑派隐者",
+    "name": null,
+    "level_column_raw": "45",
+    "level_column_meaning": "unconfirmed",
+    "description_raw": null,
+    "notes_raw": [
+      "",
+      ""
+    ],
+    "original_skill_id": null,
+    "mp_cost": null,
+    "max_rank": null,
+    "damage_formula": null,
+    "effect_animation": null
+  },
+  {
+    "source_row": 49,
+    "source_columns": "K:P",
+    "verification": "user_provided_unverified",
+    "record_id": "reference/skill/row-049",
+    "role_raw": "昆仑派隐者",
+    "name": null,
+    "level_column_raw": "55",
+    "level_column_meaning": "unconfirmed",
+    "description_raw": null,
+    "notes_raw": [
+      "",
+      ""
+    ],
+    "original_skill_id": null,
+    "mp_cost": null,
+    "max_rank": null,
+    "damage_formula": null,
+    "effect_animation": null
+  },
+  {
+    "source_row": 51,
+    "source_columns": "K:P",
+    "verification": "user_provided_unverified",
+    "record_id": "reference/skill/row-051",
+    "role_raw": "花间派侠客",
+    "name": "醉生梦死",
+    "level_column_raw": "15",
+    "level_column_meaning": "unconfirmed",
+    "description_raw": "单体攻击",
+    "notes_raw": [
+      "有几率进入睡眠状态无法行动2回合",
+      ""
+    ],
+    "original_skill_id": null,
+    "mp_cost": null,
+    "max_rank": null,
+    "damage_formula": null,
+    "effect_animation": null
+  },
+  {
+    "source_row": 52,
+    "source_columns": "K:P",
+    "verification": "user_provided_unverified",
+    "record_id": "reference/skill/row-052",
+    "role_raw": "花间派侠客",
+    "name": "混元入蛊",
+    "level_column_raw": "25",
+    "level_column_meaning": "unconfirmed",
+    "description_raw": "单体攻击",
+    "notes_raw": [
+      "使敌人进入中毒状态2回合",
+      ""
+    ],
+    "original_skill_id": null,
+    "mp_cost": null,
+    "max_rank": null,
+    "damage_formula": null,
+    "effect_animation": null
+  },
+  {
+    "source_row": 53,
+    "source_columns": "K:P",
+    "verification": "user_provided_unverified",
+    "record_id": "reference/skill/row-053",
+    "role_raw": "花间派侠客",
+    "name": null,
+    "level_column_raw": "35",
+    "level_column_meaning": "unconfirmed",
+    "description_raw": null,
+    "notes_raw": [
+      "",
+      ""
+    ],
+    "original_skill_id": null,
+    "mp_cost": null,
+    "max_rank": null,
+    "damage_formula": null,
+    "effect_animation": null
+  },
+  {
+    "source_row": 54,
+    "source_columns": "K:P",
+    "verification": "user_provided_unverified",
+    "record_id": "reference/skill/row-054",
+    "role_raw": "花间派侠客",
+    "name": null,
+    "level_column_raw": "45",
+    "level_column_meaning": "unconfirmed",
+    "description_raw": null,
+    "notes_raw": [
+      "",
+      ""
+    ],
+    "original_skill_id": null,
+    "mp_cost": null,
+    "max_rank": null,
+    "damage_formula": null,
+    "effect_animation": null
+  },
+  {
+    "source_row": 55,
+    "source_columns": "K:P",
+    "verification": "user_provided_unverified",
+    "record_id": "reference/skill/row-055",
+    "role_raw": "花间派侠客",
+    "name": null,
+    "level_column_raw": "55",
+    "level_column_meaning": "unconfirmed",
+    "description_raw": null,
+    "notes_raw": [
+      "",
+      ""
+    ],
+    "original_skill_id": null,
+    "mp_cost": null,
+    "max_rank": null,
+    "damage_formula": null,
+    "effect_animation": null
+  },
+  {
+    "source_row": 57,
+    "source_columns": "K:P",
+    "verification": "user_provided_unverified",
+    "record_id": "reference/skill/row-057",
+    "role_raw": "峨眉派侠客",
+    "name": null,
+    "level_column_raw": "15",
+    "level_column_meaning": "unconfirmed",
+    "description_raw": null,
+    "notes_raw": [
+      "",
+      ""
+    ],
+    "original_skill_id": null,
+    "mp_cost": null,
+    "max_rank": null,
+    "damage_formula": null,
+    "effect_animation": null
+  },
+  {
+    "source_row": 58,
+    "source_columns": "K:P",
+    "verification": "user_provided_unverified",
+    "record_id": "reference/skill/row-058",
+    "role_raw": "峨眉派侠客",
+    "name": null,
+    "level_column_raw": "25",
+    "level_column_meaning": "unconfirmed",
+    "description_raw": null,
+    "notes_raw": [
+      "",
+      ""
+    ],
+    "original_skill_id": null,
+    "mp_cost": null,
+    "max_rank": null,
+    "damage_formula": null,
+    "effect_animation": null
+  },
+  {
+    "source_row": 59,
+    "source_columns": "K:P",
+    "verification": "user_provided_unverified",
+    "record_id": "reference/skill/row-059",
+    "role_raw": "峨眉派侠客",
+    "name": null,
+    "level_column_raw": "35",
+    "level_column_meaning": "unconfirmed",
+    "description_raw": null,
+    "notes_raw": [
+      "",
+      ""
+    ],
+    "original_skill_id": null,
+    "mp_cost": null,
+    "max_rank": null,
+    "damage_formula": null,
+    "effect_animation": null
+  },
+  {
+    "source_row": 60,
+    "source_columns": "K:P",
+    "verification": "user_provided_unverified",
+    "record_id": "reference/skill/row-060",
+    "role_raw": "峨眉派侠客",
+    "name": null,
+    "level_column_raw": "45",
+    "level_column_meaning": "unconfirmed",
+    "description_raw": null,
+    "notes_raw": [
+      "",
+      ""
+    ],
+    "original_skill_id": null,
+    "mp_cost": null,
+    "max_rank": null,
+    "damage_formula": null,
+    "effect_animation": null
+  },
+  {
+    "source_row": 61,
+    "source_columns": "K:P",
+    "verification": "user_provided_unverified",
+    "record_id": "reference/skill/row-061",
+    "role_raw": "峨眉派侠客",
+    "name": null,
+    "level_column_raw": "55",
+    "level_column_meaning": "unconfirmed",
+    "description_raw": null,
+    "notes_raw": [
+      "",
+      ""
+    ],
+    "original_skill_id": null,
+    "mp_cost": null,
+    "max_rank": null,
+    "damage_formula": null,
+    "effect_animation": null
+  }
+]

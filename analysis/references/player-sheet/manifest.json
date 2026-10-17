@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "source": {
+    "file": "source.csv",
+    "original_filename": "蜀山剑侠怪物数据-工作表1.csv",
+    "sha256": "62ef3dc3de0e2f7aa5738615eaa35ee16701dd4b61d0274fb12509550d5ba6a6",
+    "bytes": 19315,
+    "encoding": "utf-8-sig",
+    "rows_including_headers": 216,
+    "columns": 27,
+    "provided_by": "user",
+    "original_author": null,
+    "original_version": null,
+    "original_server_payload": false
+  },
+  "scope": "analysis_only",
+  "counts": {
+    "map_records": 214,
+    "map_name_matches": 214,
+    "npc_nonempty_cells": 36,
+    "monster_cells": 147,
+    "skill_rows": 48,
+    "named_skills": 30,
+    "unnamed_skill_rows": 18,
+    "items": 50,
+    "materials": 21,
+    "gems": 43,
+    "equipment": 40
+  },
+  "map_comparison_source": "analysis/catalogs/online_world.json",
+  "map_comparison_scope": "只核对同序地图名称，不证明怪物、NPC或其他表字段正确；CSV序号不是原服地图ID",
+  "gem_notes_raw": [
+    {
+      "source_row": 1,
+      "text": "每五个升级100%"
+    },
+    {
+      "source_row": 2,
+      "text": "每一个升级几率20%"
+    }
+  ],
+  "issues": [
+    "各分区是横向并排的独立表，技能、道具、材料、装备不能与同一行地图关联。",
+    "技能等级列的5、15、25等值未确认是学习等级还是其他含义，不当作技能阶数。",
+    "花间派按表保留；与当前重建角色的花涧命名差异待核对。",
+    "8-、16-等宝石属性保留原文，不自动转换成已确认数值。",
+    "xx、什么、有个等模糊文字保留，不补写成确定名称。",
+    "原始技能ID、灵力消耗、完整公式、图标及动画映射尚缺；不直接生成正式游戏定义。"
+  ]
+}

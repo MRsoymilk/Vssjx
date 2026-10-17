@@ -24,3 +24,17 @@ node tests/web_deploy_browser.cjs http://127.0.0.1:8000 work/web-deploy/browser
 - 浏览器检查没有验证真实账号登录后的多人游戏；既有联机角色与战斗验收见 `tests/online_pve.md`。本轮不创建测试账号或角色到已有用户数据库。
 
 日志、截图和本机参数仅保留在忽略的 `work/web-deploy/` 及 `work/web-deploy.local.env`。`nginx -t`、Compose 参数解析和容器健康检查通过；PostgreSQL 原容器持续运行。
+
+## 更换公网域名后的共享地图断线修正（2026-10-17）
+
+用户更换公网域名后，WebSocket 的新 Origin 未登记，已通过本机代理复现 `403 ORIGIN_NOT_ALLOWED`，旧域名仍为 101。私有 `.env` 已合并新域名并保留原有来源，重启游戏服务应用配置；配置备份及步骤日志在忽略目录 `work/tunnel-origin-20261017/`。没有修改账号、数据库或客户端包。
+
+同时发现 Docker Desktop 的 `host.docker.internal` 返回 IPv4 与 IPv6，而代理日志持续出现向不可达 IPv6 上游连接的 `Network unreachable`。本机与局域网 Nginx 模板改用容器 DNS 动态解析，并仅解析 IPv4。通过叠加的两个 Compose 配置重启网页容器应用修复，没有重建数据库容器或替换网页资源。
+
+- `nginx -t`、Compose 参数解析通过。
+- 连续 40 次本机代理账号服务请求全部为 HTTP 200。
+- 经本机代理使用新域名、旧域名及 localhost Origin，WebSocket 握手分别为 101；未知 Origin 仍为 403。
+- `check_web_deployment.py`：14 项通过，旧网页资源哈希保持一致。
+- `check_lan_deployment.py`：19 项通过，保留 CA 验证的局域网 HTTPS/WSS 及私有路径保护。
+
+本轮未执行带真实玩家凭据的公网联机测试。诊断客户端从公网域名读取 API 时被 Cloudflare 返回 403 / 1010；这与已复现并修正的后端 Origin 拒绝是两个环节，不据此判断正常浏览器也被拦截。用户浏览器需要刷新并重新进入游戏确认完整公网链路。

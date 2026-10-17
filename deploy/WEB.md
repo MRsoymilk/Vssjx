@@ -81,6 +81,10 @@ Import-Certificate -FilePath work/web-deploy/lan-cert/public/vssjx-lan-ca.cer -C
 
 正式导出省略 `--allow-loopback-http`。对外入口使用有效证书的 HTTPS，将网页及 `/api/v1/` 放在同一来源，并转发 WebSocket 升级。在 Rust 私有配置的 `SSJX_WEB_ALLOWED_ORIGINS` 中登记准确的 HTTPS 来源，生产关闭开发来源。代理必须原样保留 Origin，不能通过删除或伪造它绕过检查。
 
+更换公网域名后，也必须更新该精确来源并重启 Rust 服务。这里登记的是网站来源，不是每位访客的 IP 或账号；同一个网址供多人使用只需登记一次。网页能打开、账号能登陆，但共享地图反复断线时，检查 `/api/v1/world/ws` 是否返回 `403 ORIGIN_NOT_ALLOWED`；正常升级应返回 `101`。隧道将完整域名转发到本机网页入口 `http://127.0.0.1:8000` 即可，网页、API 与 WebSocket 共用这个入口，不需要额外公开游戏或数据库端口。
+
+两份 Docker Nginx 模板通过容器 DNS `127.0.0.11` 动态解析上游，并设置 `ipv6=off`。这是为避免 Docker Desktop 同时返回不可达的宿主 IPv6 地址而间歇性代理失败；不会关闭 HTTPS、浏览器来源检查或宿主机 IPv6。机制见 [Nginx resolver 文档](https://nginx.org/en/docs/http/ngx_http_core_module.html#resolver)。修改模板后重启网页容器，使入口脚本重新生成配置。
+
 默认 Compose 仅发布本机 8000；局域网叠加配置不自动配置公网域名、路由器映射或 Windows 防火墙。公网手机访问仍需要可到达且证书受信任的 HTTPS 地址。Linux 的 `host-gateway` 通常不能访问仅绑定宿主回环的服务，应把上游设置为受控容器网络内的服务地址，或配置专用私有监听；不要因此公开数据库或监控端口。
 
 这里只部署单个游戏进程的网页入口，不构成集群或并发容量验收。

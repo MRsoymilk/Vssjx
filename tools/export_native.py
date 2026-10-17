@@ -4,6 +4,7 @@ Only output/dist is distributable. No global Godot settings, shared Git refs,
 server configuration, player data, admin pages, or tests are modified/copied.
 """
 import argparse
+import csv
 import hashlib
 import json
 import os
@@ -88,21 +89,29 @@ def development_signing(folder, run, env):
     if folder.is_relative_to(ROOT):
         raise ValueError('Development signing material must remain outside the repository')
     folder.mkdir(parents=True, exist_ok=True, mode=0o700)
-    if folder.stat().st_mode & 0o077:
-        raise ValueError('Signing directory must have mode 0700')
     record = folder / 'development-signing.json'
     key = folder / 'development.keystore'
     if record.exists():
-        if record.stat().st_mode & 0o077:
-            raise ValueError('Signing metadata must have mode 0600')
         identity = json.loads(record.read_text())
         if identity.get('purpose') != 'vssjx-install-test-only' or not key.is_file():
             raise ValueError('Invalid owned development signing directory')
-        if key.stat().st_mode & 0o077:
+    elif any(folder.iterdir()):
+        raise ValueError('Refusing to replace unrelated signing files')
+    if os.name == 'nt':
+        # chmod does not restrict Windows readers. Protect the private directory
+        # with an inheritable ACL instead; signing material never enters dist.
+        identity_csv = subprocess.check_output(['whoami', '/user', '/fo', 'csv', '/nh'], text=True)
+        sid = next(csv.reader(identity_csv.splitlines()))[1]
+        subprocess.run(['icacls', str(folder), '/inheritance:r', '/grant:r', '*' + sid + ':(OI)(CI)F'],
+                       check=True, capture_output=True)
+    elif folder.stat().st_mode & 0o077:
+        raise ValueError('Signing directory must have mode 0700')
+    if record.exists():
+        if os.name != 'nt' and record.stat().st_mode & 0o077:
+            raise ValueError('Signing metadata must have mode 0600')
+        if os.name != 'nt' and key.stat().st_mode & 0o077:
             raise ValueError('Development private key must have mode 0600')
     else:
-        if any(folder.iterdir()):
-            raise ValueError('Refusing to replace unrelated signing files')
         identity = {'purpose': 'vssjx-install-test-only', 'alias': 'vssjx-preview', 'password': secrets.token_hex(24)}
         env['VSSJX_DEV_KEY_PASSWORD'] = identity['password']
         run('create-development-key', ['keytool', '-genkeypair', '-noprompt', '-storetype', 'PKCS12',
@@ -131,6 +140,8 @@ def build(args):
         shutil.copytree(ROOT / 'client' / name, project / name, ignore=public_ignore)
     env = {key: value for key, value in os.environ.items() if not key.startswith('SSJX_')}
     env.update(XDG_DATA_HOME=str(output / 'userdata'), XDG_CONFIG_HOME=str(output / 'config'), XDG_CACHE_HOME=str(output / 'cache'))
+    if os.name == 'nt':
+        env.update(APPDATA=str(output / 'config'), LOCALAPPDATA=str(output / 'cache'))
     godot = env.get('GODOT_BIN', 'godot')
     version = subprocess.check_output([godot, '--version'], text=True).strip()
     if not version.startswith('4.7.2.'):
@@ -276,13 +287,14 @@ def build(args):
         apk = dist / ('vssjx-android-preview.apk' if args.development_signing else 'vssjx-android.apk')
         run('android-export', [godot, '--headless', '--path', str(project), '--export-release', 'Game (Android)', str(apk)])
         tools = args.android_sdk.resolve() / 'build-tools' / args.build_tools
-        signature = run('android-signature', [str(tools / 'apksigner'), 'verify', '--verbose', '--print-certs', str(apk)])
+        signature = run('android-signature', [str(tools / ('apksigner.bat' if os.name == 'nt' else 'apksigner')), 'verify', '--verbose', '--print-certs', str(apk)])
         certificate = re.search(r'Signer #1 certificate SHA-256 digest: ([0-9a-f]{64})', signature)
         assert certificate, 'APK signing certificate digest missing'
         certificate_sha256 = certificate.group(1)
-        run('android-alignment', [str(tools / 'zipalign'), '-c', '-P', '16', '-v', '4', str(apk)])
-        badging = run('android-package', [str(tools / 'aapt'), 'dump', 'badging', str(apk)])
-        manifest = run('android-manifest', [str(tools / 'aapt'), 'dump', 'xmltree', str(apk), 'AndroidManifest.xml'])
+        run('android-alignment', [str(tools / ('zipalign.exe' if os.name == 'nt' else 'zipalign')), '-c', '-P', '16', '-v', '4', str(apk)])
+        aapt = str(tools / ('aapt.exe' if os.name == 'nt' else 'aapt'))
+        badging = run('android-package', [aapt, 'dump', 'badging', str(apk)])
+        manifest = run('android-manifest', [aapt, 'dump', 'xmltree', str(apk), 'AndroidManifest.xml'])
         if 'application-debuggable' in badging or 'android:debuggable(0x0101000f)=(type 0x12)0xffffffff' in manifest:
             raise RuntimeError('Unexpected debuggable release APK')
         package = 'com.mrsoymilk.vssjx.preview' if args.development_signing else 'com.mrsoymilk.vssjx'

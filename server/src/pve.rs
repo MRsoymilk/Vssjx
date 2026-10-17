@@ -365,6 +365,22 @@ pub async fn execute(
         Sha256::digest(serde_json::to_vec(&(pve_rules::RULES, command)).expect("PVE request"))
             .to_vec();
     let mut tx = auth.pool().begin().await.map_err(database)?;
+    let account: Uuid = sqlx::query_scalar("SELECT s.account_id FROM sessions s JOIN accounts a ON a.id=s.account_id WHERE s.id=$1 AND NOT a.disabled AND s.revoked_at IS NULL AND s.access_expires_at>clock_timestamp() AND s.refresh_expires_at>clock_timestamp()")
+        .bind(context.session).fetch_optional(&mut *tx).await.map_err(database)?.ok_or(AuthError(StatusCode::UNAUTHORIZED,"SESSION_REVOKED"))?;
+    // Before locking the character, serialize this account's budget across characters,
+    // connections and processes. A fixed minute is an abuse budget, not a turn timer.
+    let admitted: bool = sqlx::query_scalar("INSERT INTO gameplay_budgets(account_id,window_start,requests) VALUES($1,clock_timestamp(),1) ON CONFLICT(account_id) DO UPDATE SET requests=CASE WHEN gameplay_budgets.window_start<=clock_timestamp()-interval '60 seconds' THEN 1 ELSE LEAST(gameplay_budgets.requests+1,181) END, window_start=CASE WHEN gameplay_budgets.window_start<=clock_timestamp()-interval '60 seconds' THEN clock_timestamp() ELSE gameplay_budgets.window_start END RETURNING requests<=180")
+        .bind(account).fetch_one(&mut *tx).await.map_err(database)?;
+    let action = format!("pve.{}",serde_json::to_value(command.action).expect("typed action").as_str().expect("action string"));
+    let target = command.target.as_deref().map(|v| if ["sword","qingwei","wolf_a","wolf_b","wolf_c","spirit","guardian","boss","ruins","trail_gate"].contains(&v) { v } else { "[invalid]" });
+    if !admitted {
+        // One bounded audit event per exhausted window, not one per flood packet.
+        let logged = sqlx::query("SELECT 1 FROM security_audit WHERE account_id=$1 AND code='GAMEPLAY_RATE_LIMITED' AND created_at>clock_timestamp()-interval '60 seconds' LIMIT 1")
+            .bind(account).fetch_optional(&mut *tx).await.map_err(database)?.is_some();
+        if !logged { crate::security::append(&mut *tx, crate::security::Event {account:Some(account),character:Some(context.character),session:Some(context.session),operation:Some(command.operation_id),action:"pve.rate_limit",outcome:"rejected",code:"GAMEPLAY_RATE_LIMITED",details:json!({"limit":180,"window_seconds":60})}).await.map_err(database)?; }
+        tx.commit().await.map_err(database)?;
+        return Err(AuthError(StatusCode::TOO_MANY_REQUESTS,"GAMEPLAY_RATE_LIMITED"));
+    }
     let mut loaded = load(&mut tx, context).await?;
     let previous=sqlx::query("SELECT request_digest,result FROM pve_operation_receipts WHERE character_id=$1 AND operation_id=$2")
         .bind(context.character).bind(command.operation_id).fetch_optional(&mut *tx).await.map_err(database)?;
@@ -375,11 +391,13 @@ pub async fn execute(
             json!({"type":"pve.result","operation_id":command.operation_id,"ok":false,"code":"PVE_ID_CONFLICT","lines":[],"state":loaded.state()})
         };
         result["replayed"] = json!(true);
+        crate::security::append(&mut *tx, crate::security::Event{account:Some(account),character:Some(context.character),session:Some(context.session),operation:Some(command.operation_id),action:&action,outcome:if result["code"]=="PVE_ID_CONFLICT" {"rejected"} else {"replayed"},code:result["code"].as_str().unwrap_or("OK"),details:json!({"target":target,"changed":false})}).await.map_err(database)?;
         tx.commit().await.map_err(database)?;
         return Ok(result);
     }
     let was_equipped = loaded.equipped;
     let original = loaded.clone();
+    let before = crate::security::state_summary(&original.state());
     let applied = loaded.apply(command, context);
     if applied.is_err() {
         loaded = original;
@@ -432,6 +450,7 @@ pub async fn execute(
     };
     sqlx::query("INSERT INTO pve_operation_receipts(character_id,operation_id,request_digest,result) VALUES($1,$2,$3,$4)")
         .bind(context.character).bind(command.operation_id).bind(digest).bind(Json(result.clone())).execute(&mut *tx).await.map_err(database)?;
+    crate::security::append(&mut *tx, crate::security::Event{account:Some(account),character:Some(context.character),session:Some(context.session),operation:Some(command.operation_id),action:&action,outcome:if result["ok"]==true {"accepted"} else {"rejected"},code:result["code"].as_str().unwrap_or("OK"),details:json!({"target":target,"before":before,"after":crate::security::state_summary(&loaded.state())})}).await.map_err(database)?;
     tx.commit().await.map_err(database)?;
     Ok(result)
 }

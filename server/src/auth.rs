@@ -276,6 +276,11 @@ impl AuthService {
         }
     }
 
+    pub(crate) fn admit_http_audit(&self, account: Option<Uuid>) -> bool {
+        let (key, limit) = account.map_or(("security-audit:global".to_owned(), 120), |id|(format!("security-audit:{id}"),20));
+        self.limiter.lock().is_ok_and(|mut limiter|limiter.admit_keys(vec![(key,limit)]))
+    }
+
     async fn hash(&self, password: String) -> Result<String, AuthError> {
         let permit = self
             .hash_slots
@@ -314,15 +319,18 @@ impl AuthService {
         validate_password(&credentials.password)?;
         let hash = self.hash(credentials.password).await?;
         let id = Uuid::new_v4();
+        let mut tx = self.pool.begin().await.map_err(database_unavailable)?;
         let inserted = sqlx::query("INSERT INTO accounts (id, username, password_hash) VALUES ($1, $2, $3) ON CONFLICT (username) DO NOTHING")
-            .bind(id).bind(&username).bind(hash).execute(&self.pool).await.map_err(database_unavailable)?;
+            .bind(id).bind(&username).bind(hash).execute(&mut *tx).await.map_err(database_unavailable)?;
         if inserted.rows_affected() == 0 {
             return Err(AuthError(StatusCode::CONFLICT, "ACCOUNT_EXISTS"));
         }
+        crate::security::append(&mut *tx, crate::security::Event{account:Some(id),character:None,session:None,operation:None,action:"auth.register",outcome:"accepted",code:"OK",details:serde_json::json!({})}).await.map_err(database_unavailable)?;
+        tx.commit().await.map_err(database_unavailable)?;
         Ok(Account { id, username })
     }
 
-    async fn login(&self, credentials: Credentials) -> Result<SessionResponse, AuthError> {
+    async fn login(&self, credentials: Credentials, ip: IpAddr) -> Result<SessionResponse, AuthError> {
         let username = canonical_username(&credentials.username)?;
         if validate_password(&credentials.password).is_err() {
             return Err(unauthorized());
@@ -383,6 +391,7 @@ impl AuthService {
         sqlx::query("INSERT INTO session_access_history (access_digest, session_id, expires_at) VALUES ($1, $2, NOW() + $3 * INTERVAL '1 second')")
             .bind(token_digest(&response.access_token)?).bind(response.session_id).bind(response.expires_in)
             .execute(&mut *transaction).await.map_err(database_unavailable)?;
+        crate::security::append(&mut *transaction, crate::security::Event{account:Some(account_id),character:None,session:Some(response.session_id),operation:None,action:"auth.login",outcome:"accepted",code:"OK",details:serde_json::json!({"transport_peer":ip.to_string()})}).await.map_err(database_unavailable)?;
         transaction.commit().await.map_err(database_unavailable)?;
         Ok(response)
     }
@@ -418,6 +427,7 @@ impl AuthService {
         sqlx::query("INSERT INTO session_access_history (access_digest, session_id, expires_at) VALUES ($1, $2, NOW() + $3 * INTERVAL '1 second')")
             .bind(token_digest(&response.access_token)?).bind(response.session_id).bind(response.expires_in)
             .execute(&mut *transaction).await.map_err(database_unavailable)?;
+        crate::security::append(&mut *transaction, crate::security::Event{account:Some(response.account.id),character:None,session:Some(response.session_id),operation:None,action:"auth.refresh",outcome:"accepted",code:"OK",details:serde_json::json!({})}).await.map_err(database_unavailable)?;
         transaction.commit().await.map_err(database_unavailable)?;
         Ok(response)
     }
@@ -458,13 +468,18 @@ impl AuthService {
         })
     }
     async fn logout(&self, bearer: &str) -> Result<(), AuthError> {
-        sqlx::query(
-            "UPDATE sessions SET revoked_at=NOW() WHERE revoked_at IS NULL AND (access_digest=$1 OR id IN (SELECT session_id FROM session_access_history WHERE access_digest=$1 AND expires_at>NOW()))",
+        let mut tx = self.pool.begin().await.map_err(database_unavailable)?;
+        let rows = sqlx::query(
+            "UPDATE sessions SET revoked_at=NOW() WHERE revoked_at IS NULL AND (access_digest=$1 OR id IN (SELECT session_id FROM session_access_history WHERE access_digest=$1 AND expires_at>NOW())) RETURNING account_id,id",
         )
         .bind(token_digest(bearer)?)
-        .execute(&self.pool)
+        .fetch_all(&mut *tx)
         .await
         .map_err(database_unavailable)?;
+        for row in rows {
+            crate::security::append(&mut *tx, crate::security::Event{account:Some(row.get("account_id")),character:None,session:Some(row.get("id")),operation:None,action:"auth.logout",outcome:"accepted",code:"OK",details:serde_json::json!({})}).await.map_err(database_unavailable)?;
+        }
+        tx.commit().await.map_err(database_unavailable)?;
         Ok(())
     }
 }
@@ -527,8 +542,16 @@ pub(crate) async fn login(
     let auth = service(&state)?;
     let payload = credentials(payload)?;
     let name = canonical_username(&payload.username)?;
-    auth.admit(peer_ip(peer), Some(&name))?;
-    Ok(Json(auth.login(payload).await?))
+    let ip = peer_ip(peer);
+    auth.admit(ip, Some(&name))?;
+    match auth.login(payload, ip).await {
+        Ok(value) => Ok(Json(value)),
+        Err(error) => {
+            let account = sqlx::query_scalar::<_,Uuid>("SELECT id FROM accounts WHERE username=$1").bind(&name).fetch_optional(auth.pool()).await.ok().flatten();
+            crate::security::observe(auth, crate::security::Event{account,character:None,session:None,operation:None,action:"auth.login",outcome:"rejected",code:error.1,details:serde_json::json!({"transport_peer":ip.to_string()})}).await;
+            Err(error)
+        }
+    }
 }
 pub(crate) async fn refresh(
     State(state): State<Arc<AppState>>,

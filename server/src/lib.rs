@@ -6,6 +6,8 @@ pub mod chat;
 pub mod config;
 pub mod logging;
 mod monitor;
+mod security;
+mod user_admin;
 pub mod observability;
 pub mod population;
 pub mod pve_rules;
@@ -58,6 +60,7 @@ pub(crate) struct AppState {
     world: Option<Arc<world::WorldHub>>,
     metrics: Arc<observability::Observability>,
     announcements: Arc<announcements::Announcements>,
+    operator_token: uuid::Uuid,
 }
 
 pub fn app(config: config::Config) -> Router {
@@ -90,6 +93,7 @@ pub fn apps(
         world,
         metrics: metrics.clone(),
         announcements: Arc::new(announcements::Announcements::default()),
+        operator_token: uuid::Uuid::new_v4(),
     });
     monitor::sample_database(&state);
     let router = Router::new()
@@ -114,6 +118,7 @@ pub fn apps(
         .fallback(|| async { (StatusCode::NOT_FOUND, Json(ApiError { code: "NOT_FOUND" })) })
         .layer(DefaultBodyLimit::max(4096))
         .layer(middleware::map_response(no_store))
+        .layer(middleware::from_fn_with_state(state.clone(), security::http_rejections))
         .layer(middleware::from_fn_with_state(
             metrics,
             observability::request,

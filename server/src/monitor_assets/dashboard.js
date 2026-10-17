@@ -39,7 +39,7 @@ async function refresh() {
         for (const count of history) { const bar = node("span", ""); bar.style.height = `${Math.max(4, count / max * 100)}%`; bar.title = `在线 ${count}`; $("trend").append(bar); }
         const seconds = previous ? (data.sample_time_ms - previous.sample_time_ms) / 1000 : 0;
         $("rates").textContent = seconds > 0 ? `在线人数趋势 · 最近采样下行 ${number(Math.max(0, data.websocket.sent_application_bytes - previous.websocket.sent_application_bytes) / seconds / 1048576, 2)} MiB/s（应用数据，不含 TCP/TLS）` : "等待下一次采样计算下行速率";
-        $("footer").textContent = `v${data.version} · PID ${data.process.pid} · boot ${data.boot_id} · 计数重启清零；无玩家列表、聊天内容或配置密钥。`;
+        $("footer").textContent = `v${data.version} · PID ${data.process.pid} · boot ${data.boot_id} · 运行计数重启清零，操作审计持久保存；不展示密码、令牌或聊天正文。`;
         previous = data;
     } catch (error) {
         $("health").textContent = "连接中断"; $("health").className = "badge bad";

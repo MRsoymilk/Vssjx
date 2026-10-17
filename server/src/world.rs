@@ -849,6 +849,11 @@ async fn connection(socket: WebSocket, auth: AuthService, hub: Arc<WorldHub>, an
     let mut window = Instant::now();
     let mut messages = 0;
     let mut leave = false;
+    crate::security::connection_event(&auth,owner.session,owner.id,"world.join","OK",json!({"map_id":owner.map_id,"connection_id":id})).await;
+    let mut audit_since = Instant::now();
+    let mut move_accepted = 0_u32;
+    let mut move_rejected = 0_u32;
+    let mut last_move_code = "OK";
     loop {
         tokio::select! {
             publication=updates.recv()=>{
@@ -859,9 +864,9 @@ async fn connection(socket: WebSocket, auth: AuthService, hub: Arc<WorldHub>, an
             message=socket.recv()=>{
                 let Some(Ok(Message::Text(text)))=message else{break};
                 if window.elapsed()>=Duration::from_secs(1){window=Instant::now();messages=0;}
-                messages+=1;if messages>20{fail(&mut socket,"RATE_LIMITED").await;break;}
+                messages+=1;if messages>20{crate::security::connection_event(&auth,owner.session,owner.id,"world.protocol","RATE_LIMITED",json!({"connection_id":id})).await;fail(&mut socket,"RATE_LIMITED").await;break;}
                 heard=Instant::now();
-                let input=match serde_json::from_str::<ClientMessage>(&text){Ok(v)=>v,Err(_)=>{fail(&mut socket,"INVALID_MESSAGE").await;break}};
+                let input=match serde_json::from_str::<ClientMessage>(&text){Ok(v)=>v,Err(_)=>{crate::security::connection_event(&auth,owner.session,owner.id,"world.protocol","INVALID_MESSAGE",json!({"connection_id":id})).await;fail(&mut socket,"INVALID_MESSAGE").await;break}};
                 if !hub.current(&owner){fail(&mut socket,"SESSION_REPLACED").await;break;}
                 if matches!(input,ClientMessage::Leave {}){leave=true;break;}
                 match auth.live_session(owner.session).await {Ok(true)=>{},Ok(false)=>{fail(&mut socket,"SESSION_REVOKED").await;leave=true;break},Err(_)=>{fail(&mut socket,"DATABASE_UNAVAILABLE").await;break}}
@@ -887,7 +892,7 @@ async fn connection(socket: WebSocket, auth: AuthService, hub: Arc<WorldHub>, an
                             if send(&mut socket,value).await.is_err(){break;}
                             if !hub.current(&owner) { break; }
                         },
-                        Err(e)=>{fail(&mut socket,e.1).await;break;}
+                        Err(e)=>{if e.1!="GAMEPLAY_RATE_LIMITED" {crate::security::connection_event(&auth,owner.session,owner.id,"pve.refused",e.1,json!({"connection_id":id})).await;}fail(&mut socket,e.1).await;break;}
                     }
                 }
                 else if let ClientMessage::ChatSend{client_message_id,channel,text}=&input {
@@ -900,7 +905,7 @@ async fn connection(socket: WebSocket, auth: AuthService, hub: Arc<WorldHub>, an
                         Err(e)=>{fail(&mut socket,e.1).await;break;}
                     }
                 }
-                else if let Err(e)=hub.command(&owner,&input){fail(&mut socket,e.1).await;}
+                else {match hub.command(&owner,&input) { Ok(())=>{move_accepted+=1;},Err(e)=>{move_rejected+=1;last_move_code=e.1;fail(&mut socket,e.1).await;} }}
             },
             _=pulse.tick()=>{
                 if !hub.current(&owner){fail(&mut socket,"SESSION_REPLACED").await;break;}
@@ -920,6 +925,10 @@ async fn connection(socket: WebSocket, auth: AuthService, hub: Arc<WorldHub>, an
                 if checked.elapsed()>=Duration::from_secs(1){
                     match auth.live_session(owner.session).await{Ok(true)=>{},Ok(false)=>{fail(&mut socket,"SESSION_REVOKED").await;leave=true;break},Err(_)=>{fail(&mut socket,"DATABASE_UNAVAILABLE").await;break}}
                     checked=Instant::now();
+                }
+                if audit_since.elapsed()>=Duration::from_secs(10) {
+                    if move_accepted+move_rejected>0 {crate::security::connection_event(&auth,owner.session,owner.id,"world.movement","OK",json!({"accepted":move_accepted,"rejected":move_rejected,"last_rejection":last_move_code,"window_seconds":audit_since.elapsed().as_secs(),"map_id":owner.map_id})).await;}
+                    move_accepted=0;move_rejected=0;last_move_code="OK";audit_since=Instant::now();
                 }
                 if saved.elapsed()>=Duration::from_secs(hub.config.save_seconds){
                     if let Some(p)=hub.save_snapshot(&owner) && WorldHub::persist(&auth,p).await.is_err(){fail(&mut socket,"DATABASE_UNAVAILABLE").await;break;}
@@ -946,6 +955,7 @@ async fn connection(socket: WebSocket, auth: AuthService, hub: Arc<WorldHub>, an
         }
     }
     tracing::info!(leave, "world session ending");
+    crate::security::connection_event(&auth,owner.session,owner.id,"world.leave","OK",json!({"explicit_leave":leave,"movement_accepted":move_accepted,"movement_rejected":move_rejected,"last_rejection":last_move_code,"map_id":owner.map_id})).await;
     hub.disconnect(&auth, &owner, leave).await;
     let _ = tokio::time::timeout(Duration::from_secs(1), socket.send(Message::Close(None))).await;
 }

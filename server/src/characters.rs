@@ -179,7 +179,10 @@ pub(crate) async fn create(
     auth.authorize_in(&mut tx, bearer).await?;
     if let Some(row) = sqlx::query("SELECT request_digest, http_status, result FROM account_operation_receipts WHERE account_id=$1 AND operation_id=$2")
         .bind(account.id).bind(payload.operation_id).fetch_optional(&mut *tx).await.map_err(database_error)? {
-        if row.get::<Vec<u8>, _>("request_digest") != digest { return Err(AuthError(StatusCode::CONFLICT, "IDEMPOTENCY_CONFLICT")); }
+        let conflict = row.get::<Vec<u8>, _>("request_digest") != digest;
+        crate::security::append(&mut *tx, crate::security::Event{account:Some(account.id),character:None,session:None,operation:Some(payload.operation_id),action:"character.create",outcome:if conflict {"rejected"} else {"replayed"},code:if conflict {"IDEMPOTENCY_CONFLICT"} else {"OK"},details:json!({"changed":false})}).await.map_err(database_error)?;
+        tx.commit().await.map_err(database_error)?;
+        if conflict { return Err(AuthError(StatusCode::CONFLICT, "IDEMPOTENCY_CONFLICT")); }
         return Ok(receipt_response(row.get("http_status"), row.get::<DbJson<Value>, _>("result").0, true));
     }
     let slot: Option<i32> =
@@ -230,6 +233,7 @@ pub(crate) async fn create(
     result["operation_id"] = json!(payload.operation_id);
     sqlx::query("INSERT INTO account_operation_receipts (account_id, operation_id, operation_type, request_digest, http_status, result) VALUES ($1,$2,'character.create',$3,$4,$5)")
         .bind(account.id).bind(payload.operation_id).bind(digest).bind(status).bind(DbJson(&result)).execute(&mut *tx).await.map_err(database_error)?;
+    crate::security::append(&mut *tx, crate::security::Event{account:Some(account.id),character:result["character"]["id"].as_str().and_then(|v|Uuid::parse_str(v).ok()),session:None,operation:Some(payload.operation_id),action:"character.create",outcome:if status==201 {"accepted"} else {"rejected"},code:result["code"].as_str().unwrap_or("OK"),details:json!({"character":result.get("character")})}).await.map_err(database_error)?;
     tx.commit().await.map_err(database_error)?;
     Ok(receipt_response(status, result, false))
 }

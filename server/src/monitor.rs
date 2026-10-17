@@ -39,6 +39,11 @@ pub(crate) fn router(state: Arc<AppState>) -> Router {
             }),
         )
         .route("/api/status", get(status))
+        .route("/users.js", get(|| async { ([(header::CONTENT_TYPE,"text/javascript; charset=utf-8")], include_str!("monitor_assets/users.js")) }))
+        .route("/api/users", get(crate::user_admin::users))
+        .route("/api/users/{id}", get(crate::user_admin::detail))
+        .route("/api/users/{id}/actions", axum::routing::post(crate::user_admin::act))
+        .route("/api/audit", get(crate::user_admin::audit))
         .route(
             "/announcements.js",
             get(|| async {

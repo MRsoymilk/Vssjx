@@ -797,7 +797,7 @@ func _open_world_map() -> void:
 	battle_view.set_process_unhandled_key_input(false)
 
 func _open_shop() -> void:
-	if network.pve.state.get("shop",{}).get("version") != "shop-v1" or network.pve.active():
+	if network.pve.state.get("shop",{}).get("version") not in ["shop-v1","shop-v2"] or network.pve.active():
 		$Menu/Panel/Title.text = "商城"
 		$Menu/Panel/Body.text = "当前服务器尚未开放商店，或正在战斗中。"
 		details.show()

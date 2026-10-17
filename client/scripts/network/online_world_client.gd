@@ -145,7 +145,7 @@ func _on_ticket(result: Dictionary) -> void:
 	_announcement_version = 1 if result.get("announcement_version") == 1 else 0
 	_pve_version = 1 if result.get("pve_version") == 1 else 0
 	_maps_version = 1 if result.get("maps_version") == 1 else 0
-	_shop_version = 1 if result.get("shop_version") == 1 else 0
+	_shop_version = int(result.get("shop_version")) if result.get("shop_version") in [1,2] else 0
 	appearances = {}
 	_population_version = 1 if result.get("population_version") == 1 else 0
 	socket = WebSocketPeer.new()
@@ -229,7 +229,7 @@ func _exchange_packet() -> Dictionary:
 	if _population_version == 1: packet.population_version = 1
 	if _pve_version == 1: packet.pve_version = 1
 	if _maps_version == 1: packet.maps_version = 1
-	if _shop_version == 1: packet.shop_version = 1
+	if _shop_version in [1,2]: packet.shop_version = _shop_version
 	return packet
 
 static func _decimal(value: Variant) -> bool:
@@ -268,11 +268,13 @@ func _receive(data: Dictionary, raw: PackedByteArray) -> void:
 		return
 	if kind == "pong": return
 	if kind == "world.appearance":
-		if not world_ready or _shop_version != 1 or data.get("map_id") != map_id or not data.get("looks") is Dictionary or data.looks.size() > 1000:
+		if not world_ready or not _shop_version in [1,2] or data.get("map_id") != map_id or not data.get("looks") is Dictionary or data.looks.size() > 1000:
 			_failed("INVALID_APPEARANCE"); return
 		for id in data.looks:
 			var look: Variant = data.looks[id]
-			if not _uuid(id) or not look is Array or look.size() != 2 or not _integer(look[0],0,3) or not _integer(look[1],0,2):
+			if not _uuid(id) or not look is Array or look.size() != (3 if _shop_version==2 else 2) or not _integer(look[0],0,27 if _shop_version==2 else 3) or not _integer(look[1],0,11 if _shop_version==2 else 2):
+				_failed("INVALID_APPEARANCE"); return
+			if _shop_version==2 and not _integer(look[2],0,9):
 				_failed("INVALID_APPEARANCE"); return
 		var removed: Variant = data.get("removed",[])
 		if not removed is Array or removed.size()>1000:

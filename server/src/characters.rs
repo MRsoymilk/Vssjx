@@ -104,7 +104,9 @@ pub(crate) async fn list(
         let character = Character::from_row(row).map_err(database_error)?;
         let gear = row.get::<DbJson<std::collections::BTreeMap<String,bool>>,_>("gear").0;
         let mut value = json!(character);
-        value["appearance"] = json!(crate::shop::appearance(&gear));
+        let look=crate::shop::appearance(&gear);
+        value["appearance"] = json!([if look[0]<=3{look[0]}else{1},if look[1]<=2{look[1]}else{0}]);
+        value["appearance_v2"]=json!(look);
         Ok(value)
     }).collect::<Result<_,AuthError>>()?;
     Ok(Json(

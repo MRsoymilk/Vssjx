@@ -20,6 +20,8 @@ var selected_index := 0
 var selected_equipment := false
 var selected_slot := "weapon"
 var armor_icon: TextureRect
+var slot_icons: Dictionary = {}
+var slot_levels: Dictionary = {}
 var items: Array[Dictionary] = []
 @onready var description: Label = $Description
 @onready var tooltip: Panel = $Tooltip
@@ -49,13 +51,22 @@ func _ready() -> void:
 	$Menu.pressed.connect(open_menu)
 	$Back.pressed.connect(func() -> void: back_requested.emit())
 	if online_model != null: online_model.changed.connect(_online_changed)
-	armor_icon = TextureRect.new()
-	armor_icon.position = Vector2(183,120)
-	armor_icon.size = Vector2(29,29)
-	armor_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	armor_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	armor_icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(armor_icon)
+	for i in range(1,10):
+		var button: Button = get_node("Equipment%d"%i)
+		var icon := TextureRect.new()
+		icon.position = button.position+Vector2(2,2)
+		icon.size = button.size-Vector2(4,4)
+		icon.expand_mode=TextureRect.EXPAND_IGNORE_SIZE
+		icon.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		icon.mouse_filter=Control.MOUSE_FILTER_IGNORE
+		add_child(icon)
+		slot_icons[ShopRules.SLOTS[i]]=icon
+		var number := OriginalNumber.new()
+		number.position=button.position
+		number.value="1";number.color_set="green"
+		add_child(number)
+		slot_levels[ShopRules.SLOTS[i]]=number
+	armor_icon=slot_icons.armor
 	refresh()
 
 func _gear() -> Dictionary:
@@ -79,10 +90,18 @@ func _display_items() -> Array[Dictionary]:
 	var player := _display_player()
 	var result: Array[Dictionary] = []
 	if int(player.potions) > 0:
-		result.append({"id": "potion", "name": "回春散", "count": int(player.potions), "level": 1, "icon": "res://assets/ui/bag_potion.png"})
+		var dose:=ShopRules.bag_item("potion")
+		dose.count=int(player.potions)
+		result.append(dose)
 	var gear := _gear()
 	for id in gear.get("owned",[]):
-		if gear.get("weapon") != id and gear.get("armor") != id: result.append(ShopRules.bag_item(id,int(player.job)))
+		var on := false
+		for slot in ShopRules.SLOTS:
+			if ShopRules.equipped_id(gear,slot)==id: on=true
+		if not on:
+			var entry := ShopRules.bag_item(id,int(player.job))
+			entry.count=ShopRules.quantity(gear,id)
+			result.append(entry)
 	if _online_sorted: result.reverse()
 	return result
 
@@ -114,12 +133,14 @@ func refresh() -> void:
 	var gear := _gear()
 	OriginalArt.apply_appearance(preview,ShopRules.actor_key(int(player.job),int(player.get("gender",0)),ShopRules.appearance(gear)))
 	if gear.get("weapon") != null: equipment_icon.texture = load(ShopRules.bag_item(gear.weapon,int(player.job)).icon)
-	if armor_icon != null:
-		armor_icon.visible = gear.get("armor") != null
-		if armor_icon.visible: armor_icon.texture = load(ShopRules.bag_item(gear.armor,int(player.job)).icon)
+	for slot in slot_icons:
+		var id: Variant = ShopRules.equipped_id(gear,slot)
+		slot_icons[slot].visible=id!=null
+		slot_levels[slot].visible=id!=null
+		if id!=null: slot_icons[slot].texture=load(ShopRules.bag_item(id,int(player.job)).icon)
 	equipment_icon.visible = bool(player.equipped)
 	equipment_level.visible = bool(player.equipped)
-	if gear.get(selected_slot) == null: selected_equipment = false
+	if ShopRules.equipped_id(gear,selected_slot) == null: selected_equipment = false
 	scrollbar.max_value = maxi(60, items.size())
 	_render_grid()
 	_description()
@@ -178,9 +199,9 @@ func select_item(index: int, hover: bool = false) -> void:
 	else: tooltip.hide()
 
 func _select_equipment(index: int) -> void:
-	if not index in [0,2]: return
-	selected_slot = "weapon" if index == 0 else "armor"
-	if _gear().get(selected_slot) == null: return
+	if index<0 or index>=10: return
+	selected_slot=ShopRules.SLOTS[index]
+	if ShopRules.equipped_id(_gear(),selected_slot)==null: return
 	selected_equipment = true
 	cursor.hide()
 	tooltip.hide()
@@ -188,8 +209,8 @@ func _select_equipment(index: int) -> void:
 	open_menu()
 
 func _selected() -> Dictionary:
-	if selected_equipment and _gear().get(selected_slot) != null:
-		return ShopRules.bag_item(_gear()[selected_slot],int(_display_player().job))
+	if selected_equipment and ShopRules.equipped_id(_gear(),selected_slot)!=null:
+		return ShopRules.bag_item(ShopRules.equipped_id(_gear(),selected_slot),int(_display_player().job))
 	if selected_index >= 0 and selected_index < items.size(): return items[selected_index]
 	return {}
 
@@ -206,18 +227,22 @@ func open_menu() -> void:
 	var actions: Array[Dictionary] = []
 	if not item.is_empty():
 		actions.append({"name": "查看", "call": show_item})
-		if item.id == "potion":
-			if online_model == null: actions.append({"name": "使用", "call": use_item})
-		else: actions.append({"name": "卸下" if selected_equipment else "装备", "call": equip_item})
-		if online_model == null and item.id in ["potion","sword"]: actions.append({"name": "丢弃", "call": confirm_discard})
+		if item.slot=="consumable":
+			if online_model==null or online_model.state.get("shop",{}).get("version")=="shop-v2": actions.append({"name":"使用","call":use_item})
+		elif ShopRules.is_equipment(item): actions.append({"name":"卸下" if selected_equipment else "装备","call":equip_item})
+		if online_model==null or online_model.state.get("shop",{}).get("version")=="shop-v2": actions.append({"name":"丢弃","call":confirm_discard})
 	actions.append({"name": "整理背包", "call": sort_items})
 	if online_model == null: actions.append({"name": "购药 · 8 铜钱", "call": buy_potion})
 	for i in actions.size():
 		var button := _button(String(actions[i].name), Rect2(3, 3 + i * 26, 144, 25), false, item_menu)
 		button.add_theme_color_override("font_color", Color("705321"))
 		button.pressed.connect(actions[i].call)
-		if online_model != null and button.text in ["装备", "卸下"]: button.disabled = not online_model.ready or online_model.pending() or online_model.active()
-		if button.text == "使用": button.disabled = int(Game.player.hp) >= int(Game.stats().hp)
+		if online_model != null and button.text in ["装备", "卸下", "使用", "丢弃"]: button.disabled = not online_model.ready or online_model.pending() or online_model.active()
+		if button.text=="使用":
+			var stats := _display_stats()
+			var player := _display_player()
+			button.disabled=button.disabled or ((int(item.restore_hp)==0 or int(player.hp)>=int(stats.hp)) and (int(item.restore_mp)==0 or int(player.mp)>=int(stats.mp)))
+		if button.text=="装备" and int(item.get("job",-1))>=0 and int(item.job)!=int(_display_player().job): button.disabled=true
 		if button.text.begins_with("购药"): button.disabled = int(Game.player.gold) < 8
 	item_menu.size.y = 6 + actions.size() * 26
 
@@ -237,16 +262,24 @@ func show_item() -> void:
 	move_child(tooltip, get_child_count() - 1)
 
 func use_item() -> void:
-	if online_model != null: return
+	var item := _selected()
+	if item.is_empty() or item.get("slot")!="consumable": return
+	var stats := _display_stats()
+	var player := _display_player()
+	if (int(item.restore_hp)==0 or int(player.hp)>=int(stats.hp)) and (int(item.restore_mp)==0 or int(player.mp)>=int(stats.mp)): return
+	if online_model!=null:
+		if online_model.state.get("shop",{}).get("version")=="shop-v2": online_model.submit("use",item.id)
+		return
 	if Game.storage_busy: return
-	if _selected().get("id", "") != "potion" or int(Game.player.potions) < 1 or int(Game.player.hp) >= int(Game.stats().hp): return
-	Game.player.potions = int(Game.player.potions) - 1
-	Game.player.hp = mini(int(Game.stats().hp), int(Game.player.hp) + 45)
-	await _save_refresh()
+	var result := await Game.shop_command("use",item.id)
+	if not is_inside_tree(): return
+	close_menu();refresh()
+	if not result.ok: description.text=result.message
+	changed.emit()
 
 func equip_item() -> void:
 	var item := _selected()
-	if item.is_empty() or item.id == "potion": return
+	if item.is_empty() or not ShopRules.is_equipment(item): return
 	var action := "unequip" if selected_equipment else "equip"
 	if online_model != null:
 		online_model.submit(action,item.id)
@@ -282,24 +315,26 @@ func sort_items() -> void:
 	if await _save_refresh(): description.text = "整理完毕"
 
 func confirm_discard() -> void:
-	if online_model != null: return
+	if online_model!=null and online_model.state.get("shop",{}).get("version")!="shop-v2": return
 	var item := _selected().duplicate()
-	if item.is_empty() or not item.id in ["potion","sword"]: return
+	if item.is_empty(): return
 	close_menu()
-	item_menu = _box(Rect2(65, 264, 191, 89), Color("fff2af"), Color("765322"), 1)
-	item_menu.mouse_filter = Control.MOUSE_FILTER_STOP
-	_text("确定丢弃“%s”？" % item.name, Rect2(8, 7, 178, 37), 12, Color("705321"), false, item_menu).autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	var yes := _button("确定", Rect2(17, 57, 57, 23), true, item_menu)
+	item_menu=_box(Rect2(65,264,191,89),Color("fff2af"),Color("765322"),1)
+	item_menu.mouse_filter=Control.MOUSE_FILTER_STOP
+	_text("确定丢弃“%s”？"%item.name,Rect2(8,7,178,37),12,Color("705321"),false,item_menu).autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+	var yes:=_button("确定",Rect2(17,57,57,23),true,item_menu)
 	yes.pressed.connect(func() -> void:
-		if Game.storage_busy: return
-		if item.id == "potion": Game.player.potions = maxi(0, int(Game.player.potions) - int(item.count))
-		else:
-			if _gear().get("weapon") == "sword": Game.player.equipped = false; Game.player.shop_weapon = null
-			Game.player.weapon_owned = false
-		selected_equipment = false
-		await _save_refresh()
+		if online_model!=null:
+			online_model.submit("discard",item.id,[],int(item.count))
+			return
+		if Game.storage_busy:return
+		var result:=await Game.shop_command("discard",item.id,int(item.count))
+		if not is_inside_tree():return
+		selected_equipment=false;close_menu();refresh()
+		if not result.ok:description.text=result.message
+		changed.emit()
 	)
-	_button("取消", Rect2(113, 57, 57, 23), true, item_menu).pressed.connect(close_menu)
+	_button("取消",Rect2(113,57,57,23),true,item_menu).pressed.connect(close_menu)
 
 func _save_refresh() -> bool:
 	if online_model != null: return false

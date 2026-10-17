@@ -3,6 +3,7 @@
 Never reads the live database or replaces a running game service.
 """
 import os
+import hashlib
 from pathlib import Path
 import subprocess
 import threading
@@ -65,7 +66,8 @@ def main():
             a=join(session,cid)
             b=join(second,cid2)
             check(a.state['shop']['owned'] == ['sword'])
-            check(len(a.state['shop']['catalog']) == 6)
+            catalog = ROOT/'client/assets/data/shop-v2.json'
+            check(a.state['shop']['version'] == 'shop-v2' and a.state['shop']['catalog_sha256'] == hashlib.sha256(catalog.read_text(encoding='utf-8').encode()).hexdigest())
             v,_=command(a,'buy','weapon_2',False)
             check(v['code']=='GOLD_INSUFFICIENT' and a.state['character']['gold']==30)
             v,_=command(a,'equip','weapon_2',False)

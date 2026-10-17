@@ -52,7 +52,7 @@ func _run() -> void:
 	var app = load("res://scenes/main.tscn").instantiate()
 	add_child(app);app._enter_world();app._scene_action("shop")
 	var page: ShopPanel = app.modal.get_child(1)
-	check(page is ShopPanel and page.rows.size()==6,"Game menu opens shared shop")
+	check(page is ShopPanel and page.rows.size()==ShopRules.catalog.items.size(),"Game menu opens the complete shared shop")
 	page.selected="armor_3";page.refresh()
 	check(page.preview.get_meta("art_key")=="hero/mck_w2_c2" and Game.appearance_key()=="hero/mck_w2_c1","Shop preview does not change equipped gear")
 	await capture("local_shop")

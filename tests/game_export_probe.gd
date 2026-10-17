@@ -24,6 +24,18 @@ func _verify() -> void:
 	for path in manifest.actors.values():
 		check(FileAccess.file_exists(path), "Dynamically loaded actor JSON is included: " + path)
 	var shop_rules = load("res://scripts/shop_rules.gd")
+	check(shop_rules.catalog.items.size()==214,"All recovered goods are in the packed catalog")
+	for item in shop_rules.catalog.items:
+		check(ResourceLoader.exists(item.icon),"Packed product icon: "+item.id)
+	var parts:Dictionary=JSON.parse_string(FileAccess.get_file_as_string("res://assets/data/hero-parts.json"))
+	check(parts.parts.size()==299,"All original appearance parts are packaged")
+	for part in parts.parts.values():check(ResourceLoader.exists(part.texture),"Packed original part: "+part.texture)
+	var art=load("res://scripts/art.gd")
+	for stem in ["mzs","wzs","mck","wck","mfs","wfs"]:
+		var key:String="hero/%s_w19_c11_h9"%stem
+		var actor=art.actor(key)
+		check(actor.sprite_frames!=null and actor.get_meta("art_key","")==key,"Packed dynamic head/body/weapon: "+stem)
+		actor.free()
 	for gender in 2:
 		for job in 3:
 			for weapon in 4:

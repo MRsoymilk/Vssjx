@@ -3,6 +3,8 @@ extends RefCounted
 
 static var catalog: Dictionary = {}
 static var cached: Dictionary = {}
+static var _dynamic_weak: Dictionary = {}
+static var _dynamic_order: Array[String] = []
 static var _index: Dictionary = {}
 static var _index_loaded := false
 static var _metadata_reads := 0
@@ -20,6 +22,7 @@ static func _read_metadata(path: String) -> Dictionary:
 	return parser.data
 
 static func has_actor(key: String) -> bool:
+	if HeroAppearance.is_key(key): return true
 	if not _index_loaded:
 		var manifest := _read_metadata(INDEX_PATH)
 		if manifest.get("format_version") != 2 or not manifest.get("actors") is Dictionary: return false
@@ -31,6 +34,12 @@ static func actor_info(key: String) -> Dictionary:
 	# Metadata and SpriteFrames are separate caches: battle preparation may read
 	# only the requested metadata before loading its texture asynchronously.
 	if catalog.has(key): return catalog[key]
+	if HeroAppearance.is_key(key):
+		var base := actor_info("hero/"+key.trim_prefix("hero/").get_slice("_",0))
+		var prepared := HeroAppearance.build(key,base)
+		if prepared.is_empty(): return {}
+		catalog[key] = prepared.info
+		return prepared.info
 	if not has_actor(key): return {}
 	var path: Variant = _index[key]
 	if not path is String or path != "res://assets/data/actors/" + key + ".json": return {}
@@ -72,15 +81,23 @@ static func actor(key: String) -> AnimatedSprite2D:
 	if info.is_empty():
 		push_error("Missing original actor: " + key)
 		return sprite
+	if not cached.has(key) and _dynamic_weak.has(key):
+		var previous: SpriteFrames = _dynamic_weak[key].get_ref()
+		if previous != null: cached[key] = previous
 	if not cached.has(key):
 		var frames := SpriteFrames.new()
 		frames.remove_animation("default")
-		var texture: Texture2D = load(info.texture)
+		var prepared: Dictionary = HeroAppearance.build(key,actor_info("hero/"+key.trim_prefix("hero/").get_slice("_",0))) if HeroAppearance.is_key(key) else {}
+		var texture: Texture2D = prepared.texture if not prepared.is_empty() else load(info.texture)
 		var regions: Array[AtlasTexture] = []
 		for i in int(info.count):
 			var region := AtlasTexture.new()
 			region.atlas = texture
-			region.region = Rect2((i % int(info.columns)) * int(info.width), (i / int(info.columns)) * int(info.height), info.width, info.height)
+			if info.has("frame_regions"):
+				var r: Array = info.frame_regions[i]
+				region.region = Rect2(r[0],r[1],r[2],r[3])
+				region.margin = Rect2(r[4],r[5],int(info.width)-int(r[2]),int(info.height)-int(r[3]))
+			else: region.region = Rect2((i % int(info.columns)) * int(info.width), (i / int(info.columns)) * int(info.height), info.width, info.height)
 			regions.append(region)
 		var sequences: Array = info.sequences
 		for i in sequences.size():
@@ -105,6 +122,10 @@ static func actor(key: String) -> AnimatedSprite2D:
 			for step in steps:
 				frames.add_frame(mode, regions[int(step[0])], maxf(1.0, float(step[1])))
 		cached[key] = frames
+	if HeroAppearance.is_key(key):
+		_dynamic_weak[key] = weakref(cached[key])
+		_dynamic_order.erase(key);_dynamic_order.append(key)
+		while _dynamic_order.size()>6: cached.erase(_dynamic_order.pop_front())
 	sprite.set_meta("art_key",key)
 	sprite.sprite_frames = cached[key]
 	sprite.offset = Vector2(info.origin[0] - info.get("anchor_x", 0), info.origin[1])

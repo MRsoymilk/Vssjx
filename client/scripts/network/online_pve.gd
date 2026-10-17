@@ -53,7 +53,9 @@ func valid(value: Variant) -> bool:
 		if not integer(value.stats.get(key), 1, 10000): return false
 	if value.character.hp > value.stats.hp or value.character.mp > value.stats.mp: return false
 	if value.has("attributes") and not valid_attributes(value.attributes, value): return false
-	if value.has("shop") and not ShopRules.valid_gear(value.shop): return false
+	if value.has("shop"):
+		if not ShopRules.valid_gear(value.shop): return false
+		if value.shop.version=="shop-v2" and value.shop.get("catalog_sha256")!=ShopRules.catalog_hash: return false
 	if value.has("equipment"):
 		var gear: Variant = value.equipment
 		if not gear is Dictionary or gear.get("version") != "equipment-v1" or not gear.get("weapon_owned") is bool: return false
@@ -118,7 +120,7 @@ func receive(packet: Dictionary) -> bool:
 			state.attributes.allocated = normalized_points(state.attributes.allocated)
 			state.attributes.recommended = normalized_points(state.attributes.recommended)
 		var character: Dictionary = state.character.duplicate(true)
-		if state.has("shop"): character.appearance = ShopRules.appearance(state.shop)
+		if state.has("shop"): character.appearance_v2 = ShopRules.appearance(state.shop)
 		var found := false
 		for i in OnlineAccount.characters.size():
 			if OnlineAccount.characters[i].id == character.id:
@@ -149,11 +151,13 @@ func unavailable_monsters() -> Array:
 		if int(progress.respawns[id]) > server_time_ms(): hidden.append(id)
 	return hidden
 
-func submit(action: String, target: String = "", points: Array = []) -> bool:
+func submit(action: String, target: String = "", points: Array = [], count: int=1) -> bool:
 	if not ready or pending(): return false
-	if action in ["buy", "equip", "unequip"] and state.has("shop"):
+	if action in ["buy", "equip", "unequip", "use", "discard"] and state.has("shop"):
 		if active() or ShopRules.item(target).is_empty(): return false
-		if action != "buy" and not state.shop.owned.has(target): return false
+		if action != "buy" and ShopRules.quantity(state.shop,target)<count: return false
+		if action in ["use","discard"] and state.shop.version!="shop-v2": return false
+		if count<1 or count>99: return false
 	elif action in ["equip", "unequip"]:
 		if active() or not state.has("equipment") or not state.equipment.weapon_owned or target != "sword": return false
 		if (state.equipment.weapon == "sword") == (action == "equip"): return false
@@ -174,8 +178,9 @@ func submit(action: String, target: String = "", points: Array = []) -> bool:
 	if action == "allocate":
 		command.attributes = normalized_points(points)
 		command.expected_revision = state.character.state_revision
-	elif action in ["buy", "equip", "unequip"]:
+	elif action in ["buy", "equip", "unequip", "use", "discard"]:
 		command.target = target
+		if count!=1: command.quantity=count
 		command.expected_revision = state.character.state_revision
 	elif not target.is_empty(): command.target = target
 	elif active():
@@ -201,7 +206,7 @@ func quest_text() -> String:
 	return "古剑遗迹 · 已完成\n妖气已散，可返回青云山道恢复元气，或继续探索遗迹。"
 
 static func error_text(code: String) -> String:
-	var equipment := {"GOLD_INSUFFICIENT":"铜钱不足。", "ITEM_ALREADY_OWNED":"已经拥有这件装备。", "BAG_FULL":"背包或补给已满。","INVALID_EQUIPMENT":"此装备尚未开放。", "STALE_EQUIPMENT":"装备状态已更新，请重新选择。", "WEAPON_NOT_OWNED":"背包中没有这件装备。", "EQUIPMENT_UNCHANGED":"当前已是该装备状态。"}
+	var equipment := {"WRONG_JOB":"此兵器不适合当前职业。", "INVALID_QUANTITY":"数量无效。", "ITEM_NOT_USABLE":"此物品不能直接使用。","GOLD_INSUFFICIENT":"铜钱不足。", "ITEM_ALREADY_OWNED":"已经拥有这件装备。", "BAG_FULL":"背包或补给已满。","INVALID_EQUIPMENT":"此装备尚未开放。", "STALE_EQUIPMENT":"装备状态已更新，请重新选择。", "WEAPON_NOT_OWNED":"背包中没有这件装备。", "EQUIPMENT_UNCHANGED":"当前已是该装备状态。"}
 	if equipment.has(code): return equipment[code]
 	if code == "PORTAL_LOCKED": return "灵门未开，请完成山狼试炼并向清微道人复命。"
 	if code == "PORTAL_TOO_FAR": return "请走近灵门后再传送。"

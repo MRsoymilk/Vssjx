@@ -159,12 +159,21 @@ func bag_items() -> Array[Dictionary]:
 		if id == "potion":
 			var left := int(player.potions)
 			while left > 0:
-				items.append({"id": "potion", "name": "回春散", "count": mini(99, left), "level": 1, "icon": "res://assets/ui/bag_potion.png"})
+				var dose := ShopRules.bag_item("potion")
+				dose.count=mini(99,left)
+				items.append(dose)
 				left -= 99
 		elif id == "sword" and gear.owned.has("sword") and gear.weapon != "sword":
-			items.append({"id": "sword", "name": "青锋剑", "count": 1, "level": 1, "icon": "res://assets/ui/bag_sword.png"})
+			items.append(ShopRules.bag_item("sword"))
 	for id in gear.owned:
-		if id != "sword" and gear.weapon != id and gear.armor != id: items.append(ShopRules.bag_item(id,int(player.job)))
+		if id=="sword": continue
+		var on := false
+		for slot in ShopRules.SLOTS:
+			if ShopRules.equipped_id(gear,slot)==id: on=true
+		if not on:
+			var entry := ShopRules.bag_item(id,int(player.job))
+			entry.count=ShopRules.quantity(gear,id)
+			items.append(entry)
 	return items
 
 func bag_buy_potion() -> bool:
@@ -203,12 +212,12 @@ func attribute_profile() -> Dictionary:
 func appearance_key() -> String:
 	return ShopRules.actor_key(int(player.get("job",0)),int(player.get("gender",0)),ShopRules.appearance(ShopRules.local_state(player)))
 
-func shop_command(action: String, id: String) -> PlatformResult:
+func shop_command(action: String, id: String, count: int=1) -> PlatformResult:
 	if storage_busy or _local_roster_busy: return PlatformResult.new(PlatformResult.Status.TEMPORARY_FAILURE,"STORAGE_BUSY","正在保存，请稍候")
 	var before := player.duplicate(true)
 	var generation := _player_generation
 	var path := save_path
-	var code := ShopRules.apply_local(player,action,id)
+	var code := ShopRules.apply_local(player,action,id,count,stats())
 	if not code.is_empty(): return PlatformResult.new(PlatformResult.Status.INVALID_DATA,code,OnlinePve.error_text(code))
 	var result := await save_game()
 	if not result.ok and generation == _player_generation and path == save_path: player = before
@@ -393,10 +402,18 @@ func valid_save(data: Variant) -> bool:
 	if not data.equipped is bool: return false
 	if not data.get("weapon_owned", true) is bool: return false
 	if data.equipped and not data.get("weapon_owned", true) and not data.has("shop_weapon"): return false
-	if not data.get("shop_owned",[]) is Array: return false
+	if not data.get("shop_owned",[]) is Array or not data.get("shop_slots",{}) is Dictionary or not data.get("shop_quantities",{}) is Dictionary: return false
 	if not ShopRules.valid_gear(ShopRules.local_state(data)): return false
 	if data.has("shop_owned") and (not data.shop_owned is Array or data.shop_owned.has("sword")): return false
 	if data.has("shop_weapon") and bool(data.equipped) != (data.shop_weapon != null): return false
+	var local_gear := ShopRules.local_state(data)
+	for slot in ["weapon","armor"]:
+		if data.get("shop_slots",{}).has(slot) and data.shop_slots[slot]!=local_gear[slot]: return false
+	for id in data.get("shop_quantities",{}):
+		if not local_gear.owned.has(id) or not ShopRules._integer(data.shop_quantities[id],1,1 if ShopRules.is_equipment(ShopRules.item(id)) else 99): return false
+	for slot in ShopRules.SLOTS:
+		var id: Variant = ShopRules.equipped_id(local_gear,slot)
+		if id!=null and int(ShopRules.item(id).job)>=0 and int(ShopRules.item(id).job)!=int(data.job): return false
 	var order: Variant = data.get("bag_order", ["potion", "sword"])
 	if not order is Array or order.size() != 2 or not order.has("potion") or not order.has("sword"): return false
 	for key in ["signature", "title"]:

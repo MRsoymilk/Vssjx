@@ -9,6 +9,8 @@ pub const RULES: &str = "qingyun-pve-v1";
 #[serde(rename_all = "snake_case")]
 pub enum Action {
     Buy,
+    Use,
+    Discard,
     Equip,
     Unequip,
     Transfer,
@@ -33,6 +35,8 @@ pub struct Command {
     pub expected_revision: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub attributes: Option<[i32; 5]>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub quantity: Option<i32>,
 }
 #[derive(Clone, Copy, Debug, Serialize)]
 pub struct Stats {

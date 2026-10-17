@@ -45,6 +45,7 @@ struct Loaded {
     weapon_owned: bool,
     allocated: [i32; 5],
     gear: BTreeMap<String,bool>,
+    quantities: BTreeMap<String,i32>,
 }
 fn database(error: sqlx::Error) -> AuthError {
     crate::observability::database_error(&error, "online_pve");
@@ -92,10 +93,12 @@ async fn load(tx: &mut Transaction<'_, Postgres>, context: &Context) -> Result<L
         .bind(context.character).fetch_one(&mut **tx).await.map_err(database)?;
     let equipped:Option<bool>=sqlx::query_scalar("SELECT equipped FROM inventory_items WHERE character_id=$1 AND definition_id='sword'")
         .bind(context.character).fetch_optional(&mut **tx).await.map_err(database)?;
-    let rows=sqlx::query("SELECT definition_id,equipped FROM inventory_items WHERE character_id=$1 AND definition_id<>'potion'").bind(context.character).fetch_all(&mut **tx).await.map_err(database)?;
+    let rows=sqlx::query("SELECT definition_id,equipped,quantity FROM inventory_items WHERE character_id=$1 AND definition_id<>'potion'").bind(context.character).fetch_all(&mut **tx).await.map_err(database)?;
+    let quantities=rows.iter().map(|r|(r.get("definition_id"),r.get("quantity"))).collect();
     let gear = rows.into_iter().map(|r|(r.get("definition_id"),r.get("equipped"))).collect();
     Ok(Loaded {
         gear,
+        quantities,
         character,
         defeated: row.get("defeated_mask"),
         respawns,
@@ -136,7 +139,7 @@ impl Loaded {
         json!({"rules_version":pve_rules::RULES,"character":self.character,"potions":self.potions,
             "equipment":{"version":"equipment-v1","weapon_owned":self.weapon_owned,"weapon":if self.equipped {Some("sword")} else {None}},
             "stats":self.stats(),
-            "attributes":profile,"shop":crate::shop::view(&self.gear),
+            "attributes":profile,"shop":crate::shop::view(&self.gear,&self.quantities,self.potions),
             "server_time_ms":unix_ms(),
             "progress":{"kills":(self.defeated&7).count_ones(),"defeated":defeated,"respawns":self.respawns},"battle":self.battle.as_ref().map(Battle::view)})
     }
@@ -170,32 +173,49 @@ impl Loaded {
         if context.moving {
             return Err("PLAYER_MOVING");
         }
-        if matches!(command.action, Action::Buy | Action::Equip | Action::Unequip) {
-            if self.battle.is_some() { return Err("BATTLE_ACTIVE"); }
-            if command.battle_id.is_some() || command.attributes.is_some() { return Err("INVALID_EQUIPMENT"); }
-            let id = command.target.as_deref().ok_or("INVALID_EQUIPMENT")?;
-            let item = crate::shop::item(id).ok_or("INVALID_EQUIPMENT")?;
-            if command.expected_revision.as_deref() != Some(&self.character.state_revision) { return Err("STALE_EQUIPMENT"); }
-            if command.action == Action::Buy {
-                if id != "potion" && self.gear.contains_key(id) { return Err("ITEM_ALREADY_OWNED"); }
-                if id == "potion" && self.potions >= 99 { return Err("BAG_FULL"); }
-                if self.character.gold < item.price { return Err("GOLD_INSUFFICIENT"); }
-                self.character.gold -= item.price;
-                if id == "potion" {self.potions += 1;} else {self.gear.insert(id.into(),false);}
-                self.weapon_owned = self.gear.contains_key("sword");
-                return Ok(vec![format!("购得{}，花费{}铜钱。",item.name,item.price)]);
+        if matches!(command.action,Action::Buy|Action::Equip|Action::Unequip|Action::Use|Action::Discard) {
+            if self.battle.is_some(){return Err("BATTLE_ACTIVE");}
+            if command.battle_id.is_some()||command.attributes.is_some(){return Err("INVALID_EQUIPMENT");}
+            let id=command.target.as_deref().ok_or("INVALID_EQUIPMENT")?;
+            let item=crate::shop::item(id).ok_or("INVALID_EQUIPMENT")?;
+            let count=command.quantity.unwrap_or(1);
+            if !(1..=99).contains(&count)||(item.equipment()&&count!=1)||(!matches!(command.action,Action::Buy|Action::Discard)&&count!=1){return Err("INVALID_QUANTITY");}
+            if command.expected_revision.as_deref()!=Some(&self.character.state_revision){return Err("STALE_EQUIPMENT");}
+            let current=if id=="potion"{self.potions}else{*self.quantities.get(id).unwrap_or(&0)};
+            let bag_count=self.gear.values().filter(|on|!**on).count()+usize::from(self.potions>0);
+            if command.action==Action::Buy {
+                if item.equipment()&&current>0{return Err("ITEM_ALREADY_OWNED");}
+                if current+count>99||(current==0&&bag_count>=60){return Err("BAG_FULL");}
+                let price=item.price.checked_mul(count).ok_or("INVALID_QUANTITY")?;
+                if self.character.gold<price{return Err("GOLD_INSUFFICIENT");}
+                self.character.gold-=price;
+                if id=="potion"{self.potions+=count;}else{self.quantities.insert(id.into(),current+count);self.gear.entry(id.into()).or_insert(false);}
+                self.weapon_owned=self.gear.contains_key("sword");
+                return Ok(vec![format!("购得{}×{}，花费{}铜钱。",item.name,count,price)]);
             }
-            if item.slot == "consumable" { return Err("INVALID_EQUIPMENT"); }
-            let current = *self.gear.get(id).ok_or("WEAPON_NOT_OWNED")?;
-            let on = command.action == Action::Equip;
-            if current == on { return Err("EQUIPMENT_UNCHANGED"); }
-            if on {
-                for (other,value) in &mut self.gear { if crate::shop::item(other).is_some_and(|i|i.slot == item.slot) { *value=false; } }
+            if current<count{return Err("WEAPON_NOT_OWNED");}
+            if matches!(command.action,Action::Use|Action::Discard) {
+                if command.action==Action::Use {
+                    if item.slot!="consumable"{return Err("ITEM_NOT_USABLE");}
+                    let limits=self.stats();
+                    if (item.restore_hp==0||self.character.hp>=limits.hp)&&(item.restore_mp==0||self.character.mp>=limits.mp){return Err("HP_FULL");}
+                    self.character.hp=(self.character.hp+item.restore_hp).min(limits.hp);
+                    self.character.mp=(self.character.mp+item.restore_mp).min(limits.mp);
+                }
+                if id=="potion"{self.potions-=count;}else if current==count{self.quantities.remove(id);self.gear.remove(id);}else{self.quantities.insert(id.into(),current-count);}
+                self.equipped=self.gear.get("sword")==Some(&true);self.weapon_owned=self.gear.contains_key("sword");
+                return Ok(vec![format!("已{}{}×{}。",if command.action==Action::Use{"使用"}else{"丢弃"},item.name,count)]);
             }
-            self.gear.insert(id.into(),on);
-            self.equipped = self.gear.get("sword")==Some(&true);
-            return Ok(vec![format!("已{}{}。",if on {"装备"} else {"卸下"},item.name)]);
+            if !item.equipment(){return Err("INVALID_EQUIPMENT");}
+            if command.action==Action::Equip&&item.job>=0&&item.job!=self.character.job{return Err("WRONG_JOB");}
+            let on=command.action==Action::Equip;
+            if self.gear.get(id)==Some(&on){return Err("EQUIPMENT_UNCHANGED");}
+            if !on&&bag_count>=60{return Err("BAG_FULL");}
+            if on{for (other,value) in &mut self.gear{if crate::shop::item(other).is_some_and(|i|i.slot==item.slot){*value=false;}}}
+            self.gear.insert(id.into(),on);self.equipped=self.gear.get("sword")==Some(&true);
+            return Ok(vec![format!("已{}{}。",if on{"装备"}else{"卸下"},item.name)]);
         }
+        if command.quantity.is_some(){return Err("INVALID_PVE_COMMAND");}
         if command.action == Action::Transfer {
             if self.battle.is_some() { return Err("BATTLE_ACTIVE"); }
             if command.battle_id.is_some() || command.expected_revision.is_some() || command.attributes.is_some() {
@@ -420,6 +440,7 @@ pub async fn execute(
         return Ok(result);
     }
     let previous_gear = loaded.gear.clone();
+    let previous_quantities=loaded.quantities.clone();
     let original = loaded.clone();
     let before = crate::security::state_summary(&original.state());
     let applied = loaded.apply(command, context);
@@ -427,12 +448,16 @@ pub async fn execute(
         loaded = original;
     }
     if applied.is_ok() {
-        if loaded.gear != previous_gear {
-            // Clear the old slot before setting its replacement (unique partial indexes).
+        if loaded.gear!=previous_gear||loaded.quantities!=previous_quantities {
             sqlx::query("UPDATE inventory_items SET equipped=FALSE WHERE character_id=$1 AND definition_id<>'potion'").bind(context.character).execute(&mut *tx).await.map_err(database)?;
-            for (id,on) in &loaded.gear {
-                sqlx::query("INSERT INTO inventory_items(id,character_id,definition_id,quantity,equipped) VALUES($1,$2,$3,1,$4) ON CONFLICT(character_id,definition_id) DO UPDATE SET equipped=EXCLUDED.equipped")
-                    .bind(Uuid::new_v4()).bind(context.character).bind(id).bind(on).execute(&mut *tx).await.map_err(database)?;
+            let ids:Vec<_>=loaded.gear.keys().cloned().collect();
+            sqlx::query("DELETE FROM inventory_items WHERE character_id=$1 AND definition_id<>'potion' AND NOT(definition_id=ANY($2))").bind(context.character).bind(&ids).execute(&mut *tx).await.map_err(database)?;
+            if !ids.is_empty(){
+                let uuids:Vec<_>=ids.iter().map(|_|Uuid::new_v4()).collect();
+                let counts:Vec<_>=ids.iter().map(|id|loaded.quantities[id]).collect();
+                let flags:Vec<_>=ids.iter().map(|id|loaded.gear[id]).collect();
+                sqlx::query("INSERT INTO inventory_items(id,character_id,definition_id,quantity,equipped) SELECT u,$1,d,q,e FROM unnest($2::uuid[],$3::text[],$4::int[],$5::bool[]) AS items(u,d,q,e) ON CONFLICT(character_id,definition_id) DO UPDATE SET quantity=EXCLUDED.quantity,equipped=EXCLUDED.equipped")
+                    .bind(context.character).bind(uuids).bind(&ids).bind(counts).bind(flags).execute(&mut *tx).await.map_err(database)?;
             }
         }
         if loaded.character.map_id != context.map_id {

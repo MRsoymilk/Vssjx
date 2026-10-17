@@ -17,6 +17,8 @@
 
 已生成所需 Godot 素材，离线试玩不依赖Python或联网；Godot首次打开客户端时导入素材。本项目采用OpenGL Compatibility渲染器。
 
+商城已覆盖全部 208 个已恢复原包物品图标，并保留六个兼容物品；按原包两列结构、四页签及物品类别浏览，支持十个装备槽和不同药品。显示名、售价、属性及部分换装对应仍属重建规则，原始证据与实现边界见[商城与物品说明](design/shop_catalog.md)。
+
 ## 项目数据管理
 
 使用 Godot 4.7 打开 `client/scenes/admin/data_browser.tscn`，按 **F6** 单独运行；或在仓库根目录运行：

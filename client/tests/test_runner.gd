@@ -451,7 +451,7 @@ func _run() -> void:
 	old_file.store_string(JSON.stringify(old_properties))
 	old_file.close()
 	check((await Game.load_game()).ok and Game.player.signature == "" and Game.player.ingots == 0, "Load migrates legacy properties fields")
-	for key in ["shop_owned","shop_weapon","shop_armor"]: Game.player.erase(key) # Legacy fixture has only the original equipped flag.
+	for key in ["shop_owned","shop_weapon","shop_armor","shop_slots","shop_quantities"]: Game.player.erase(key) # Legacy fixture has only the original equipped flag.
 	Game.player.potions = 201
 	Game.player.equipped = false
 	Game.player.weapon_owned = true

@@ -1,95 +1,160 @@
 class_name ShopRules
 extends RefCounted
-## Catalog values are reconstruction rules; visual parts come only from ssjx/hero.
-static var catalog: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://assets/data/shop-v1.json"))
+## All original icons, with explicitly reconstructed names, classifications and rules.
+static var catalog: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://assets/data/shop-v2.json"))
+static var catalog_hash: String = FileAccess.get_file_as_string("res://assets/data/shop-v2.json").replace("\r\n","\n").sha256_text()
+static var _index: Dictionary = {}
+const SLOTS := ["weapon","pendant","armor","wrist","belt","pants","boots","ring","necklace","hat"]
 
 static func item(id: String) -> Dictionary:
-	for entry in catalog.items:
-		if entry.id == id: return entry.duplicate(true)
-	return {}
+	if _index.is_empty():
+		for entry in catalog.items: _index[entry.id] = entry
+	return _index.get(id,{}).duplicate(true)
+
+static func is_equipment(entry: Dictionary) -> bool:
+	return entry.get("slot") in SLOTS
+
+static func equipped_id(gear: Dictionary, slot: String) -> Variant:
+	return gear.get(slot) if slot in ["weapon","armor"] else gear.get("slots",{}).get(slot)
 
 static func local_state(player: Dictionary) -> Dictionary:
 	var owned: Array = player.get("shop_owned", []).duplicate()
 	if player.get("weapon_owned", true) and not owned.has("sword"): owned.append("sword")
-	return {"version":"shop-v1", "catalog":catalog.items, "owned":owned,
-		"weapon":player.get("shop_weapon", "sword" if player.get("equipped",false) else null), "armor":player.get("shop_armor")}
+	var slots: Dictionary = player.get("shop_slots",{}).duplicate(true)
+	for slot in SLOTS:
+		if not slots.has(slot): slots[slot] = null
+	slots.weapon = player.get("shop_weapon", "sword" if player.get("equipped",false) else null)
+	slots.armor = player.get("shop_armor")
+	var quantities := {"potion":int(player.get("potions",0))}
+	for id in owned: quantities[id] = player.get("shop_quantities",{}).get(id,1)
+	return {"version":"shop-v2","owned":owned,"quantities":quantities,"slots":slots,"weapon":slots.weapon,"armor":slots.armor}
+
+static func _integer(value: Variant, low: int, high: int) -> bool:
+	return (value is int or value is float) and is_finite(float(value)) and floor(float(value))==float(value) and value>=low and value<=high
 
 static func valid_gear(gear: Variant) -> bool:
-	if not gear is Dictionary or gear.get("version") != "shop-v1" or not gear.get("owned") is Array or gear.owned.size() > 5: return false
+	if not gear is Dictionary or not gear.get("version") in ["shop-v1","shop-v2"] or not gear.get("owned") is Array or gear.owned.size()>214: return false
 	var seen := {}
 	for id in gear.owned:
-		if not id is String or item(id).is_empty() or id == "potion" or seen.has(id): return false
+		if not id is String or item(id).is_empty() or id=="potion" or seen.has(id): return false
 		seen[id] = true
-	for slot in ["weapon","armor"]:
-		if not gear.has(slot): return false
-		if gear[slot] != null and (not gear[slot] is String or not seen.has(gear[slot]) or item(gear[slot]).get("slot") != slot): return false
+	if gear.get("version")=="shop-v2":
+		if not gear.get("slots") is Dictionary or not gear.get("quantities") is Dictionary: return false
+		if gear.slots.size()!=10 or gear.quantities.size()>215: return false
+		for id in gear.quantities:
+			if id=="potion":
+				if not _integer(gear.quantities[id],0,1000000): return false
+			elif not seen.has(id) or not _integer(gear.quantities[id],1,1 if is_equipment(item(id)) else 99): return false
+		for id in seen:
+			if not gear.quantities.has(id): return false
+	for slot in SLOTS:
+		if gear.get("version")=="shop-v2" and not gear.slots.has(slot): return false
+		var id: Variant = equipped_id(gear,slot)
+		if id!=null and (not id is String or not seen.has(id) or item(id).get("slot")!=slot): return false
+	if not gear.has("weapon") or not gear.has("armor"): return false
+	if gear.get("version")=="shop-v2" and (gear.slots.weapon!=gear.weapon or gear.slots.armor!=gear.armor): return false
 	return true
 
 static func bonus(gear: Dictionary) -> Vector2i:
 	var result := Vector2i.ZERO
-	for slot in ["weapon","armor"]:
-		var entry := item(String(gear[slot])) if gear.get(slot) != null else {}
+	for slot in SLOTS:
+		var id: Variant = equipped_id(gear,slot)
+		var entry := item(String(id)) if id!=null else {}
 		result += Vector2i(int(entry.get("attack",0)),int(entry.get("defense",0)))
 	return result
 
 static func appearance(gear: Dictionary) -> Array:
-	var result := [0,0]
-	for i in 2:
-		var id: Variant = gear.get(["weapon","armor"][i])
-		if id != null: result[i] = int(item(String(id)).get("visual",0))
+	var result := [0,0,0]
+	for i in 3:
+		var id: Variant = equipped_id(gear,["weapon","armor","hat"][i])
+		if id!=null: result[i] = int(item(String(id)).get("head_visual" if i==2 else "visual",0))
 	return result
 
 static func actor_key(job: int, gender: int, look: Array) -> String:
-	var stem: String = (["mzs","mck","mfs"] if gender == 0 else ["wzs","wck","wfs"])[clampi(job,0,2)]
-	if int(look[0]) == 1 and int(look[1]) == 0: return "hero/"+stem
-	return "hero/%s_w%d_c%d" % [stem,int(look[0]),int(look[1])]
+	var stem: String = (["mzs","mck","mfs"] if gender==0 else ["wzs","wck","wfs"])[clampi(job,0,2)]
+	var head := int(look[2]) if look.size()>2 else 0
+	if int(look[0])==1 and int(look[1])==0 and head==0: return "hero/"+stem
+	if int(look[0])<=3 and int(look[1])<=2 and head==0: return "hero/%s_w%d_c%d"%[stem,int(look[0]),int(look[1])]
+	return "hero/%s_w%d_c%d_h%d"%[stem,int(look[0]),int(look[1]),head]
 
-static func bag_item(id: String, job: int = 1) -> Dictionary:
+static func bag_item(id: String, job: int=1) -> Dictionary:
 	var entry := item(id)
 	if entry.is_empty(): return {}
-	entry.count = 1
-	entry.level = 1
-	if id.begins_with("weapon_"):
-		entry.icon = "res://assets/ui/shop_%s%d.png" % [["ezs","eck","efs"][clampi(job,0,2)],int(entry.visual)]
+	entry.count=1
+	if id.begins_with("weapon_"): entry.icon="res://assets/ui/shop_%s%d.png"%[["ezs","eck","efs"][clampi(job,0,2)],int(entry.visual)]
 	return entry
 
 static func description(id: String) -> String:
 	var entry := item(id)
 	if entry.is_empty(): return ""
-	if id == "potion": return "恢复45点气血"
-	return "攻击 +%d" % int(entry.attack) if entry.slot == "weapon" else "防御 +%d" % int(entry.defense)
+	if is_equipment(entry): return ("攻击 +%d"%int(entry.attack)) if entry.slot=="weapon" else ("防御 +%d"%int(entry.defense))
+	if entry.slot=="consumable":
+		var parts: Array[String] = []
+		if int(entry.restore_hp)>0: parts.append("恢复%d点气血"%int(entry.restore_hp))
+		if int(entry.restore_mp)>0: parts.append("恢复%d点灵力"%int(entry.restore_mp))
+		return " / ".join(parts)
+	return "%s，可购买并存入背包"%entry.category
+
+static func quantity(gear: Dictionary, id: String) -> int:
+	return int(gear.get("quantities",{}).get(id,1 if gear.get("owned",[]).has(id) else 0))
 
 static func bag_slots(gear: Dictionary, potions: int) -> int:
-	var count := ceili(potions / 99.0)
+	var count := ceili(potions/99.0)
 	for id in gear.owned:
-		if gear.weapon != id and gear.armor != id: count += 1
+		var on := false
+		for slot in SLOTS:
+			if equipped_id(gear,slot)==id: on=true
+		if not on: count+=1
 	return count
 
-static func apply_local(player: Dictionary, action: String, id: String) -> String:
+static func _store(player: Dictionary, gear: Dictionary) -> void:
+	player.shop_owned=gear.owned.filter(func(id: String) -> bool: return id!="sword")
+	player.weapon_owned=gear.owned.has("sword")
+	player.shop_quantities=gear.quantities.duplicate(true)
+	player.shop_quantities.erase("potion")
+	player.shop_quantities.erase("sword")
+	player.shop_slots=gear.slots.duplicate(true)
+	player.shop_weapon=gear.slots.weapon;player.shop_armor=gear.slots.armor
+	player.equipped=gear.slots.weapon!=null
+
+static func apply_local(player: Dictionary, action: String, id: String, count: int=1, limits: Dictionary={}) -> String:
 	var gear := local_state(player)
 	var entry := item(id)
 	if entry.is_empty(): return "INVALID_EQUIPMENT"
-	if action == "buy":
-		if id != "potion" and gear.owned.has(id): return "ITEM_ALREADY_OWNED"
-		if id == "potion" and int(player.potions) >= 99: return "BAG_FULL"
-		if int(player.gold) < int(entry.price): return "GOLD_INSUFFICIENT"
-		if id != "potion" and bag_slots(gear,int(player.potions)) >= 60: return "BAG_FULL"
-		player.gold = int(player.gold) - int(entry.price)
-		if id == "potion": player.potions = int(player.potions) + 1
-		elif id == "sword": player.weapon_owned = true
+	if count<1 or count>99 or (is_equipment(entry) and count!=1): return "INVALID_QUANTITY"
+	if action=="buy":
+		if is_equipment(entry) and gear.owned.has(id): return "ITEM_ALREADY_OWNED"
+		if quantity(gear,id)+count>99: return "BAG_FULL"
+		if int(player.gold)<int(entry.price)*count: return "GOLD_INSUFFICIENT"
+		if quantity(gear,id)==0 and bag_slots(gear,int(player.potions))>=60: return "BAG_FULL"
+		player.gold=int(player.gold)-int(entry.price)*count
+		if id=="potion": player.potions=int(player.potions)+count
 		else:
-			var owned: Array = player.get("shop_owned",[]).duplicate()
-			owned.append(id)
-			player.shop_owned = owned
+			gear.quantities[id]=quantity(gear,id)+count
+			if not gear.owned.has(id): gear.owned.append(id)
+		_store(player,gear)
 		return ""
-	if not action in ["equip","unequip"] or entry.slot == "consumable": return "INVALID_EQUIPMENT"
-	if not gear.owned.has(id): return "WEAPON_NOT_OWNED"
-	var on: bool = action == "equip"
-	if (gear[entry.slot] == id) == on: return "EQUIPMENT_UNCHANGED"
-	if not on and bag_slots(gear,int(player.potions)) >= 60: return "BAG_FULL"
-	var value: Variant = id if on else null
-	if entry.slot == "weapon":
-		player.shop_weapon = value
-		player.equipped = value != null
-	else: player.shop_armor = value
+	if quantity(gear,id)<count: return "WEAPON_NOT_OWNED"
+	if action=="use":
+		if entry.slot!="consumable" or count!=1 or limits.is_empty(): return "ITEM_NOT_USABLE"
+		if (int(entry.restore_hp)==0 or int(player.hp)>=int(limits.hp)) and (int(entry.restore_mp)==0 or int(player.mp)>=int(limits.mp)): return "HP_FULL"
+		player.hp=mini(int(limits.hp),int(player.hp)+int(entry.restore_hp))
+		player.mp=mini(int(limits.mp),int(player.mp)+int(entry.restore_mp))
+	if action in ["use","discard"]:
+		if id=="potion": player.potions=int(player.potions)-count
+		else:
+			gear.quantities[id]=quantity(gear,id)-count
+			if gear.quantities[id]==0:
+				gear.quantities.erase(id);gear.owned.erase(id)
+				for slot in SLOTS:
+					if gear.slots[slot]==id: gear.slots[slot]=null
+		_store(player,gear)
+		return ""
+	if not action in ["equip","unequip"] or not is_equipment(entry) or count!=1: return "INVALID_EQUIPMENT"
+	if action=="equip" and int(entry.job)>=0 and int(entry.job)!=int(player.job): return "WRONG_JOB"
+	var on: bool = action=="equip"
+	if (gear.slots[entry.slot]==id)==on: return "EQUIPMENT_UNCHANGED"
+	if not on and bag_slots(gear,int(player.potions))>=60: return "BAG_FULL"
+	gear.slots[entry.slot]=id if on else null
+	_store(player,gear)
 	return ""

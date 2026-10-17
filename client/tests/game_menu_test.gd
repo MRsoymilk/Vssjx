@@ -60,7 +60,11 @@ func _run() -> void:
 	check(app.modal.find_child("Title", true, false).text == "蜀山初行", "Task entry opens the real local quest")
 	app._close_modal()
 	var before := Game.player.duplicate(true)
-	for index in [0, 2, 5, 6, 7]:
+	app._menu()
+	app.modal.rows[0].pressed.emit()
+	check(app.modal.get_child(1) is ShopPanel and Game.player == before,"Shop menu opens purchase page without mutating assets")
+	app._close_modal()
+	for index in [2, 5, 6, 7]:
 		app._menu()
 		popup = app.modal
 		popup.rows[index].pressed.emit()

@@ -53,6 +53,7 @@ func valid(value: Variant) -> bool:
 		if not integer(value.stats.get(key), 1, 10000): return false
 	if value.character.hp > value.stats.hp or value.character.mp > value.stats.mp: return false
 	if value.has("attributes") and not valid_attributes(value.attributes, value): return false
+	if value.has("shop") and not ShopRules.valid_gear(value.shop): return false
 	if value.has("equipment"):
 		var gear: Variant = value.equipment
 		if not gear is Dictionary or gear.get("version") != "equipment-v1" or not gear.get("weapon_owned") is bool: return false
@@ -97,11 +98,14 @@ func receive(packet: Dictionary) -> bool:
 	if state.is_empty() or int(packet.state.character.state_revision) >= int(state.character.state_revision):
 		# A pre-upgrade receipt at the same revision cannot erase fresh cooldowns.
 		var previous_progress: Dictionary = state.get("progress", {})
+		var previous_shop: Dictionary = state.get("shop", {})
+		var keep_shop: bool = state.has("shop") and not packet.state.has("shop") and packet.state.character.state_revision == state.character.state_revision
 		var previous_equipment: Dictionary = state.get("equipment", {})
 		var keep_equipment: bool = state.has("equipment") and not packet.state.has("equipment") and packet.state.character.state_revision == state.character.state_revision
 		var keep_respawns: bool = state.has("server_time_ms") and not packet.state.has("server_time_ms") and packet.state.character.state_revision == state.character.state_revision
 		var previous_time: int = int(state.get("server_time_ms", 0))
 		state = packet.state.duplicate(true)
+		if keep_shop: state.shop = previous_shop.duplicate(true)
 		if keep_equipment: state.equipment = previous_equipment.duplicate(true)
 		if keep_respawns:
 			state.server_time_ms = previous_time
@@ -113,7 +117,14 @@ func receive(packet: Dictionary) -> bool:
 		if state.has("attributes"):
 			state.attributes.allocated = normalized_points(state.attributes.allocated)
 			state.attributes.recommended = normalized_points(state.attributes.recommended)
-		OnlineAccount.characters = [state.character.duplicate(true)]
+		var character: Dictionary = state.character.duplicate(true)
+		if state.has("shop"): character.appearance = ShopRules.appearance(state.shop)
+		var found := false
+		for i in OnlineAccount.characters.size():
+			if OnlineAccount.characters[i].id == character.id:
+				OnlineAccount.characters[i] = character
+				found = true
+		if not found: OnlineAccount.characters.append(character)
 	ready = true
 	if kind == "pve.result":
 		if pending() and OnlineAccount.pending_pve.command.operation_id == packet.operation_id:
@@ -140,7 +151,10 @@ func unavailable_monsters() -> Array:
 
 func submit(action: String, target: String = "", points: Array = []) -> bool:
 	if not ready or pending(): return false
-	if action in ["equip", "unequip"]:
+	if action in ["buy", "equip", "unequip"] and state.has("shop"):
+		if active() or ShopRules.item(target).is_empty(): return false
+		if action != "buy" and not state.shop.owned.has(target): return false
+	elif action in ["equip", "unequip"]:
 		if active() or not state.has("equipment") or not state.equipment.weapon_owned or target != "sword": return false
 		if (state.equipment.weapon == "sword") == (action == "equip"): return false
 	if action == "allocate":
@@ -160,7 +174,7 @@ func submit(action: String, target: String = "", points: Array = []) -> bool:
 	if action == "allocate":
 		command.attributes = normalized_points(points)
 		command.expected_revision = state.character.state_revision
-	elif action in ["equip", "unequip"]:
+	elif action in ["buy", "equip", "unequip"]:
 		command.target = target
 		command.expected_revision = state.character.state_revision
 	elif not target.is_empty(): command.target = target
@@ -187,7 +201,7 @@ func quest_text() -> String:
 	return "古剑遗迹 · 已完成\n妖气已散，可返回青云山道恢复元气，或继续探索遗迹。"
 
 static func error_text(code: String) -> String:
-	var equipment := {"INVALID_EQUIPMENT":"此装备尚未开放。", "STALE_EQUIPMENT":"装备状态已更新，请重新选择。", "WEAPON_NOT_OWNED":"背包中没有这件装备。", "EQUIPMENT_UNCHANGED":"当前已是该装备状态。"}
+	var equipment := {"GOLD_INSUFFICIENT":"铜钱不足。", "ITEM_ALREADY_OWNED":"已经拥有这件装备。", "BAG_FULL":"背包或补给已满。","INVALID_EQUIPMENT":"此装备尚未开放。", "STALE_EQUIPMENT":"装备状态已更新，请重新选择。", "WEAPON_NOT_OWNED":"背包中没有这件装备。", "EQUIPMENT_UNCHANGED":"当前已是该装备状态。"}
 	if equipment.has(code): return equipment[code]
 	if code == "PORTAL_LOCKED": return "灵门未开，请完成山狼试炼并向清微道人复命。"
 	if code == "PORTAL_TOO_FAR": return "请走近灵门后再传送。"

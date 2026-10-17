@@ -82,11 +82,12 @@ class NativeBattleAniTests(unittest.TestCase):
         blob = (ROOT / 'analysis/unpacked/ssjx/gameonline.ext').read_bytes()
         self.assertEqual(struct.unpack_from('<I', blob, 0x2e5b8)[0], 0xa38)
 
-    def test_all_16_runtime_actor_variants_match_native_tables_and_masks(self):
+    def test_all_runtime_actor_variants_match_native_tables_and_masks(self):
         for folder in ('hero', 'creation', 'monster'):
             for path in (ROOT / 'client/assets/data/actors' / folder).glob('*.json'):
                 info = json.loads(path.read_text('utf-8'))
-                source = json.loads((ROOT / 'analysis/animations' / ('hero' if folder == 'creation' else folder) / path.name).read_text('utf-8'))
+                source_name = path.stem.split('_w')[0] + '.json' if folder == 'hero' else path.name
+                source = json.loads((ROOT / 'analysis/animations' / ('hero' if folder == 'creation' else folder) / source_name).read_text('utf-8'))
                 for mode, native_id in info['native_battle']['sequence_ids'].items():
                     self.assertEqual(info['playback'][mode], native_steps(source, native_id))
                 self.assertTrue(info['native_battle']['impact_steps']['attack'])

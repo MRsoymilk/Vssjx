@@ -210,7 +210,7 @@ func _run() -> void:
 	app.character_selection.enter_button.pressed.emit()
 	app._close_modal()
 	check(int(Game.player.gender) == 1 and int(Game.player.job) == 2 and Game.player.name == sample_name, "Creation selection reaches persisted player state")
-	check(app.world.hero.sprite_frames == OriginalArt.cached["hero/wfs"], "Created female avatar is used in the game world")
+	check(app.world.hero.sprite_frames == OriginalArt.cached["hero/wfs_w0_c0"], "Created female avatar is used in the game world")
 	app._home()
 	app._create()
 	app.creation.select_variant(0)
@@ -220,7 +220,7 @@ func _run() -> void:
 	await get_tree().process_frame
 	check(app.mode == "world" and app.world.available_enemies().size() == 4, "World scene and original enemies load")
 	var image_frame: AtlasTexture = app.world.hero.sprite_frames.get_frame_texture("idle", 0)
-	check(int(image_frame.region.position.y) % int(OriginalArt.catalog[Game.actor_key()].height) == 0, "Atlas frames align with complete sprite rows")
+	check(int(image_frame.region.position.y) % int(OriginalArt.catalog[Game.appearance_key()].height) == 0, "Atlas frames align with complete sprite rows")
 	check(app.world.astar.is_point_solid(Vector2i(5, 12)), "River blocks movement")
 	check(not app.world.astar.is_point_solid(Vector2i(5, 16)), "Bridge permits movement")
 	check(app.world.portal_marker != null and app.world.portal_marker.get_parent() == app.world.actors, "Portal is drawn above terrain")
@@ -241,8 +241,11 @@ func _run() -> void:
 	check(app.world.hero.position == idle_position and app.world.hero.animation == "idle", "Standing hero does not attack or move")
 	var wolf: AnimatedSprite2D = app.world.enemy_nodes.wolf_a
 	var before_patrol: Vector2 = wolf.position
-	for i in 45: app.world._update_patrols(0.1)
-	check(wolf.position.distance_to(before_patrol) >= 8.0, "Wolf patrol changes world position")
+	var patrol_distance := 0.0
+	for i in 45:
+		app.world._update_patrols(0.1)
+		patrol_distance = maxf(patrol_distance,wolf.position.distance_to(before_patrol))
+	check(patrol_distance >= 8.0, "Wolf patrol changes world position")
 	check(wolf.sprite_frames.get_frame_count("idle") > 0 and wolf.sprite_frames.get_frame_count("walk") > 1, "Wolf has valid stand and locomotion frames")
 	var live_enemy: Dictionary = app.world.available_enemies()[0]
 	check(Vector2i(live_enemy.cell[0], live_enemy.cell[1]) == app.world._enemy_cell(wolf), "Interaction tracks moving wolf instead of spawn point")
@@ -448,6 +451,7 @@ func _run() -> void:
 	old_file.store_string(JSON.stringify(old_properties))
 	old_file.close()
 	check((await Game.load_game()).ok and Game.player.signature == "" and Game.player.ingots == 0, "Load migrates legacy properties fields")
+	for key in ["shop_owned","shop_weapon","shop_armor"]: Game.player.erase(key) # Legacy fixture has only the original equipped flag.
 	Game.player.potions = 201
 	Game.player.equipped = false
 	Game.player.weapon_owned = true

@@ -29,7 +29,7 @@ func _run() -> void:
 	assert(viewport.size.is_equal_approx(Vector2(expected_size)), "Admin uses a desktop canvas, not the mobile viewport")
 	assert(viewport.encloses(scene.get_global_rect()))
 	if path.ends_with("data_browser.tscn"):
-		assert(scene.visible_entries.size() == 57)
+		assert(scene.visible_entries.size() == 59)
 		assert(viewport.encloses(scene.get_node("%Copy").get_global_rect()))
 		assert(viewport.encloses(scene.get_node("%Inspector").get_global_rect()))
 	else:

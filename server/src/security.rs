@@ -109,5 +109,5 @@ pub(crate) async fn connection_event(
 
 pub(crate) fn state_summary(state: &Value) -> Value {
     json!({"character":state["character"],"potions":state["potions"],
-        "equipment":state["equipment"],"battle":state["battle"],"attributes":state["attributes"]["allocated"]})
+        "equipment":state["equipment"],"shop":state["shop"].as_object().map(|s|json!({"owned":s.get("owned"),"weapon":s.get("weapon"),"armor":s.get("armor")})),"battle":state["battle"],"attributes":state["attributes"]["allocated"]})
 }

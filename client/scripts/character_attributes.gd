@@ -121,7 +121,7 @@ func _regular() -> void:
 	if stats.has("mp"): snapshot.max_mp = stats.mp
 	snapshot.next_xp = int(player.get("level", 1)) * 40
 	var keys := ["mzs", "mck", "mfs"] if int(player.get("gender", 0)) == 0 else ["wzs", "wck", "wfs"]
-	preview = OriginalArt.actor("hero/" + keys[int(player.get("job", 0))])
+	preview = OriginalArt.actor(ShopRules.actor_key(int(player.get("job",0)),int(player.get("gender",0)),player.get("appearance",[1,0])) if online_mode else Game.appearance_key())
 	preview.position = Vector2(76, 193)
 	preview.scale = Vector2(1.8, 1.8)
 	content.add_child(preview)

@@ -27,6 +27,8 @@ var population := OnlinePopulation.new()
 var pve := OnlinePve.new()
 var _pve_version := 0
 var _maps_version := 0
+var _shop_version := 0
+var appearances: Dictionary = {}
 var _ticket := ""
 var _announcement_version := 0
 var _population_version := 0
@@ -143,6 +145,8 @@ func _on_ticket(result: Dictionary) -> void:
 	_announcement_version = 1 if result.get("announcement_version") == 1 else 0
 	_pve_version = 1 if result.get("pve_version") == 1 else 0
 	_maps_version = 1 if result.get("maps_version") == 1 else 0
+	_shop_version = 1 if result.get("shop_version") == 1 else 0
+	appearances = {}
 	_population_version = 1 if result.get("population_version") == 1 else 0
 	socket = WebSocketPeer.new()
 	socket.inbound_buffer_size = 2097152
@@ -199,13 +203,15 @@ func _process(_delta: float) -> void:
 		if not socket.was_string_packet():
 			if not _receive_delta(raw): _failed("INVALID_WORLD_DELTA", true)
 			continue
-		if raw.size() > 32768:
+		if raw.size() > 131072:
 			_failed("INVALID_PACKET")
 			return
 		var data: Variant = JSON.parse_string(raw.get_string_from_utf8())
 		if not data is Dictionary:
 			_failed("INVALID_PACKET")
 			return
+		if raw.size() > 32768 and data.get("type") != "world.appearance":
+			_failed("INVALID_PACKET"); return
 		_receive(data, raw)
 	if socket != null and now - _heartbeat >= 3.0:
 		socket.send_text(JSON.stringify({"type": "ping"}))
@@ -223,6 +229,7 @@ func _exchange_packet() -> Dictionary:
 	if _population_version == 1: packet.population_version = 1
 	if _pve_version == 1: packet.pve_version = 1
 	if _maps_version == 1: packet.maps_version = 1
+	if _shop_version == 1: packet.shop_version = 1
 	return packet
 
 static func _decimal(value: Variant) -> bool:
@@ -260,6 +267,23 @@ func _receive(data: Dictionary, raw: PackedByteArray) -> void:
 		else: _failed(code, code in ["DATABASE_UNAVAILABLE", "SERVER_BUSY", "WORLD_STREAM_LAGGED"])
 		return
 	if kind == "pong": return
+	if kind == "world.appearance":
+		if not world_ready or _shop_version != 1 or data.get("map_id") != map_id or not data.get("looks") is Dictionary or data.looks.size() > 1000:
+			_failed("INVALID_APPEARANCE"); return
+		for id in data.looks:
+			var look: Variant = data.looks[id]
+			if not _uuid(id) or not look is Array or look.size() != 2 or not _integer(look[0],0,3) or not _integer(look[1],0,2):
+				_failed("INVALID_APPEARANCE"); return
+		var removed: Variant = data.get("removed",[])
+		if not removed is Array or removed.size()>1000:
+			_failed("INVALID_APPEARANCE"); return
+		for id in removed:
+			if not _uuid(id):
+				_failed("INVALID_APPEARANCE"); return
+		for id in removed: appearances.erase(id)
+		appearances.merge(data.looks,true)
+		changed.emit(entities)
+		return
 	if kind in ["pve.state", "pve.result"]:
 		if not world_ready or _pve_version != 1 or not pve.receive(data):
 			_failed("INVALID_PVE")

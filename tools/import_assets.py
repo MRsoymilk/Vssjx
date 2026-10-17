@@ -243,6 +243,8 @@ def main():
         if errors: raise RuntimeError(f'Animation parse errors: {errors}')
         baked = build_actor_catalog(parsed, write_textures=False)
         write_metadata(baked, parsed)
+        from import_shop_assets import build as build_shop
+        build_shop(write_textures=False)
         print(f'Metadata only: {len(baked)} actor shards; {len(parsed)} original ANI shards; textures unchanged')
         return
     manifest_path = ANALYSIS / 'image_manifest.json'
@@ -323,6 +325,8 @@ def main():
                               'chat_corner': 'neverpic_frame030.png', 'scene_reward': 'sceneui_frame011.png'}.items():
         Image.open(ANALYSIS / 'decoded_png/ssjx' / source_name).save(DEST / 'ui' / (name + '.png'))
     write_metadata(baked, parsed)
+    from import_shop_assets import build as build_shop
+    build_shop()
     (DEST / 'data' / 'import_report.json').write_text(json.dumps({'decoded_png': 3300, 'tiles': len(tiles), 'parsed_animations': len(parsed), 'baked': list(baked), 'errors': errors}, ensure_ascii=False, indent=2), 'utf-8')
     # Copy a small set of original inventory/UI graphics; no redraws.
     for source in ['ssjx/item/yao1_frame000.png', 'ssjx/item/yao2_frame000.png']:

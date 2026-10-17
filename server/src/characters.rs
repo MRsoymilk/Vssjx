@@ -97,13 +97,16 @@ pub(crate) async fn list(
     auth.admit(auth::peer_ip(peer), None)?;
     let account = auth.me(auth::bearer(&headers)?).await?;
     // Single query: no mixed-version attributes/inventory snapshot.
-    let characters = sqlx::query_as::<_, Character>(&format!(
-        "SELECT {CHARACTER_COLUMNS} FROM characters WHERE account_id=$1 ORDER BY slot,id"
-    ))
-    .bind(account.id)
-    .fetch_all(auth.pool())
-    .await
-    .map_err(database_error)?;
+    let rows = sqlx::query(&format!(
+        "SELECT {CHARACTER_COLUMNS},COALESCE((SELECT jsonb_object_agg(definition_id,equipped) FROM inventory_items WHERE character_id=characters.id AND definition_id<>'potion'),'{{}}'::jsonb) AS gear FROM characters WHERE account_id=$1 ORDER BY slot,id"
+    )).bind(account.id).fetch_all(auth.pool()).await.map_err(database_error)?;
+    let characters: Vec<Value> = rows.iter().map(|row| {
+        let character = Character::from_row(row).map_err(database_error)?;
+        let gear = row.get::<DbJson<std::collections::BTreeMap<String,bool>>,_>("gear").0;
+        let mut value = json!(character);
+        value["appearance"] = json!(crate::shop::appearance(&gear));
+        Ok(value)
+    }).collect::<Result<_,AuthError>>()?;
     Ok(Json(
         json!({"characters": characters, "rules_version": RULES_VERSION, "name_rules_version": NAME_RULES_VERSION, "max_characters": MAX_CHARACTERS}),
     ))

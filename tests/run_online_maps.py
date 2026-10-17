@@ -36,7 +36,7 @@ class MapPlayer(Player):
     def flush(self):
         self.ws.send(dict(type="ping"))
         self.until("pong")
-    def __init__(self, base, session, character, maps_version=1):
+    def __init__(self, base, session, character, maps_version=1, shop_version=0):
         self.base, self.session, self.id = base, session, character
         status, ticket = api(base, '/api/v1/world/ticket', dict(
             character_id=character, protocol_version=1, config_hash=HASH), session['access_token'])
@@ -44,7 +44,7 @@ class MapPlayer(Player):
         self.ws = WebSocket(base.replace('http://', 'ws://') + '/api/v1/world/ws')
         self.ws.send(dict(type='auth.exchange', ticket=ticket['ticket'], protocol_version=1,
                           config_hash=HASH, world_sync_version=2, population_version=1,
-                          pve_version=1, maps_version=maps_version))
+                          pve_version=1, maps_version=maps_version, shop_version=shop_version))
         self.population, self.state, self.seq = {}, {}, 0
         self.closed, self.keepalive = False, time.monotonic()
         self.instances.append(self)

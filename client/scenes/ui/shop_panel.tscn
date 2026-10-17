@@ -1,0 +1,8 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/shop_panel.gd" id="1"]
+
+[node name="Shop" type="Control"]
+offset_right = 320.0
+offset_bottom = 480.0
+script = ExtResource("1")

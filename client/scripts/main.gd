@@ -546,7 +546,8 @@ func _scene_action(action: String) -> void:
 		"mail": _message("邮件", "暂无邮件。")
 		"social": _message("社交", "尚未结交好友。")
 		"system": _system_menu()
-		"shop", "craft", "team", "guild", "trade":
+		"shop": _shop()
+		"craft", "team", "guild", "trade":
 			var titles := {"shop": "商城", "craft": "炼制", "team": "队伍", "guild": "帮会", "trade": "交易"}
 			_message(titles[action], titles[action] + "暂未开放。")
 		"reward":
@@ -557,6 +558,7 @@ func _scene_action(action: String) -> void:
 func _refresh_hud() -> void:
 	if mode != "world" or hud_name == null or not is_instance_valid(hud_name): return
 	hud_name.text = "%s  Lv.%d  ·  %s%s" % [Game.player.name, int(Game.player.level), Game.SCHOOLS[int(Game.player.school)], Game.JOBS[int(Game.player.job)]]
+	world.refresh_appearance()
 	var values := Game.stats()
 	hud_stats.text = ""
 	world_identity.text = "等级 %d\n%s派" % [int(Game.player.level), Game.SCHOOLS[int(Game.player.school)]]
@@ -690,6 +692,18 @@ func _rest() -> void:
 	, true)
 	button.disabled = int(Game.player.gold) < 5
 	_button(panel, "返回", Rect2(176, 184, 88, 32), _close_modal)
+
+func _shop() -> void:
+	if mode != "world": return
+	_close_modal()
+	world.pause_moving()
+	world.enabled = false
+	modal = preload("res://scenes/ui/modal_overlay.tscn").instantiate()
+	ui.add_child(modal)
+	var page: ShopPanel = preload("res://scenes/ui/shop_panel.tscn").instantiate()
+	modal.add_child(page)
+	page.back_requested.connect(_close_modal)
+	page.changed.connect(_refresh_hud)
 
 func _bag() -> void:
 	_close_modal()
@@ -852,7 +866,7 @@ func _encounter_battle(enemy: Dictionary) -> void:
 	# A short readable warning, followed by actual texture/cache work.
 	await get_tree().create_timer(0.20).timeout
 	if not _encounter_current(epoch, world_id): return
-	var keys: Array[String] = [Game.actor_key(), String(enemy.get("art", "")), "effect/flash", BattleDeathPlayback.ART_KEY, ["effect/t71", "effect/t36", "effect/t47"][int(Game.player.job)]]
+	var keys: Array[String] = [Game.appearance_key(), String(enemy.get("art", "")), "effect/flash", BattleDeathPlayback.ART_KEY, ["effect/t71", "effect/t36", "effect/t47"][int(Game.player.job)]]
 	var paths: Array[String] = ["res://assets/tiles/original_tiles.png"]
 	for key in keys:
 		var info := OriginalArt.actor_info(key)
@@ -902,7 +916,7 @@ func _start_battle(enemy: Dictionary) -> void:
 	battle_enemy.position = Vector2(58, 282)
 	battle_enemy.scale = Vector2(-1.1, 1.1)
 	ui.add_child(battle_enemy)
-	battle_hero = OriginalArt.battle_actor(Game.actor_key())
+	battle_hero = OriginalArt.battle_actor(Game.appearance_key())
 	battle_hero.position = Vector2(256, 282)
 	battle_hero.scale = Vector2(1.2, 1.2)
 	ui.add_child(battle_hero)
@@ -995,7 +1009,7 @@ func _battle_turn(command: String) -> void:
 	if command in ["attack", "skill"]:
 		player_motion = BattleActionPlayback.new()
 		battle_playback = player_motion
-		player_motion.start(battle_hero, OriginalArt.actor_info(Game.actor_key()), battle_enemy.global_position, animation, battle_enemy)
+		player_motion.start(battle_hero, OriginalArt.actor_info(Game.appearance_key()), battle_enemy.global_position, animation, battle_enemy)
 		_refresh_battle()
 		await player_motion.impact
 		if epoch != _ui_epoch or player_motion.cancelled or mode != "battle" or battle != active_battle: return

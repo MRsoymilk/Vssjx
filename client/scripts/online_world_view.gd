@@ -17,6 +17,7 @@ var actors: Dictionary = {}
 var residents: Dictionary = {}
 var map_data: Dictionary
 var portal_marker: Node2D
+var shop: ShopPanel
 var backpack: OriginalInventory
 var bag_overlay: Control
 var _motion_grid := AStarGrid2D.new()
@@ -167,6 +168,9 @@ func _scene_action(action: String) -> void:
 	if action == "map":
 		_open_world_map()
 		return
+	if action == "shop":
+		_open_shop()
+		return
 	if action == "bag":
 		_open_inventory()
 		return
@@ -266,6 +270,8 @@ func _snapshot(values: Dictionary) -> void:
 			label.add_theme_constant_override("outline_size", 1)
 			label.add_theme_color_override("font_outline_color", Color("1e343b"))
 			actors[id] = {"root": root, "sprite": sprite, "target": point, "distance": 0.0, "motion": OnlineActorMotion.new()}
+		var look: Array = network.appearances.get(id,[1,0])
+		OriginalArt.apply_appearance(actors[id].sprite,ShopRules.actor_key(int(entity.job),int(entity.gender),look))
 		actors[id].target = point
 		actors[id].motion.receive(entity, _motion_grid)
 		actors[id].root.position = actors[id].motion.position
@@ -392,7 +398,7 @@ func _process(delta: float) -> void:
 	_update_move_target(delta)
 	if OS.has_feature("web") and (not Platform.context.lifecycle.focused or Platform.context.lifecycle.suspended): return
 	_advance_approach()
-	if backpack != null or chat_input.has_focus() or menu.visible or details.visible or npc_dialog.visible or emote_picker.visible or encounter.visible or battle_view.visible or expanded_chat.visible or attributes.visible or world_map.visible or network.pve.pending() or network.pve.active():
+	if bag_overlay != null or chat_input.has_focus() or menu.visible or details.visible or npc_dialog.visible or emote_picker.visible or encounter.visible or battle_view.visible or expanded_chat.visible or attributes.visible or world_map.visible or network.pve.pending() or network.pve.active():
 		_was_keyboard = false
 		return
 	_key_timer -= delta
@@ -416,7 +422,7 @@ func _map_input(event: InputEvent) -> void:
 	if _battle_load_failed:
 		if (event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed) or (event is InputEventScreenTouch and event.pressed): _pve_changed()
 		return
-	if backpack != null or not network.world_ready or menu.visible or details.visible or npc_dialog.visible or encounter.visible or battle_view.visible or expanded_chat.visible or attributes.visible or world_map.visible or network.pve.pending() or network.pve.active(): return
+	if bag_overlay != null or not network.world_ready or menu.visible or details.visible or npc_dialog.visible or encounter.visible or battle_view.visible or expanded_chat.visible or attributes.visible or world_map.visible or network.pve.pending() or network.pve.active(): return
 	var point := Vector2.ZERO
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed: point = event.position
 	elif event is InputEventScreenTouch and event.pressed: point = event.position
@@ -446,6 +452,11 @@ func _map_input(event: InputEvent) -> void:
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	if not event is InputEventKey or not event.pressed: return
+	if shop != null:
+		if event.keycode == KEY_ESCAPE:
+			_close_inventory()
+			get_viewport().set_input_as_handled()
+		return
 	if backpack != null:
 		if event.keycode == KEY_ESCAPE and backpack.item_menu == null:
 			_close_inventory()
@@ -500,6 +511,7 @@ func _pve_changed() -> void:
 		_cancel_battle_preparation()
 	if not model.state.is_empty():
 		_character = model.state.character.duplicate(true)
+		_character.appearance = ShopRules.appearance(model.state.shop) if model.state.has("shop") else [1,0]
 		_character.max_hp = model.state.stats.hp
 		_character.max_mp = model.state.stats.mp
 		_character.next_xp = int(_character.level) * 40
@@ -650,7 +662,7 @@ func _prepare_battle(snapshot: Dictionary) -> void:
 	if not _battle_preparation_current(epoch, id): return
 	var c: Dictionary = network.pve.state.character
 	var key: String = (["mzs", "mck", "mfs"] if int(c.gender) == 0 else ["wzs", "wck", "wfs"])[int(c.job)]
-	var keys: Array[String] = ["hero/" + key, String(snapshot.enemy.art), "effect/flash", BattleDeathPlayback.ART_KEY, ["effect/t71", "effect/t36", "effect/t47"][int(c.job)]]
+	var keys: Array[String] = [ShopRules.actor_key(int(c.job),int(c.gender),ShopRules.appearance(network.pve.state.shop)) if network.pve.state.has("shop") else "hero/" + key, String(snapshot.enemy.art), "effect/flash", BattleDeathPlayback.ART_KEY, ["effect/t71", "effect/t36", "effect/t47"][int(c.job)]]
 	var paths: Array[String] = ["res://assets/tiles/original_tiles.png"]
 	for actor_key in keys:
 		var info := OriginalArt.actor_info(actor_key)
@@ -784,6 +796,21 @@ func _open_world_map() -> void:
 	world_map.present()
 	battle_view.set_process_unhandled_key_input(false)
 
+func _open_shop() -> void:
+	if network.pve.state.get("shop",{}).get("version") != "shop-v1" or network.pve.active():
+		$Menu/Panel/Title.text = "商城"
+		$Menu/Panel/Body.text = "当前服务器尚未开放商店，或正在战斗中。"
+		details.show()
+		return
+	bag_overlay = preload("res://scenes/ui/modal_overlay.tscn").instantiate()
+	bag_overlay.z_index = 16
+	add_child(bag_overlay)
+	shop = preload("res://scenes/ui/shop_panel.tscn").instantiate()
+	shop.online_model = network.pve
+	bag_overlay.add_child(shop)
+	shop.back_requested.connect(_close_inventory)
+	battle_view.set_process_unhandled_key_input(false)
+
 func _open_inventory() -> void:
 	if network.pve.state.is_empty() or network.pve.active():
 		chat_status.text = "请等待角色数据同步，战斗中请使用战斗道具菜单。"
@@ -806,6 +833,7 @@ func _close_inventory() -> void:
 		battle_view.set_process_unhandled_key_input(true)
 	bag_overlay = null
 	backpack = null
+	shop = null
 
 func _close_world_map() -> void:
 	if not world_map.visible: return

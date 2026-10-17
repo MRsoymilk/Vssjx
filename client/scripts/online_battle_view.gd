@@ -73,7 +73,7 @@ func present(pve: OnlinePve) -> void:
 		if hero != null: hero.queue_free()
 		if enemy != null: enemy.queue_free()
 		var key: String = (["mzs", "mck", "mfs"] if int(c.gender) == 0 else ["wzs", "wck", "wfs"])[int(c.job)]
-		_hero_key = "hero/" + key
+		_hero_key = ShopRules.actor_key(int(c.job),int(c.gender),ShopRules.appearance(model.state.shop)) if model.state.has("shop") else "hero/" + key
 		hero = OriginalArt.battle_actor(_hero_key)
 		$Hero.add_child(hero)
 		enemy = OriginalArt.battle_actor(b.enemy.art)

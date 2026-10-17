@@ -67,6 +67,7 @@ pub struct Entity {
 struct CharacterActor {
     business: Arc<AsyncMutex<()>>,
     in_battle: bool,
+    appearance: [i32;2],
     map_id: String,
     net_id: u32,
     id: Uuid,
@@ -106,6 +107,7 @@ struct StateData {
     revision: u64,
     chat: ChatHub,
     next_net_id: u32,
+    appearance_revision: u64,
     population: crate::population::Population,
     ruins_population: crate::population::Population,
 }
@@ -152,6 +154,7 @@ impl WorldHub {
                 revision: 0,
                 chat: ChatHub::new(config.chat),
                 next_net_id: 1,
+                appearance_revision: 1,
                 population: crate::population::Population::new(&WorldMap::default()),
                 ruins_population: crate::population::Population::new(&WorldMap::load("ancient_ruins").expect("ruins")),
             }),
@@ -363,6 +366,7 @@ impl WorldHub {
             epoch: 1,
             owner: owner.owner,
             display_name: row.get("display_name"),
+            appearance: [1,0],
             job: row.get("job"),
             gender: row.get("gender"),
             motion: Motion::new(cell),
@@ -372,6 +376,7 @@ impl WorldHub {
             disconnected_at: None,
         };
         state.actors.insert(id, actor);
+        state.appearance_revision += 1;
         state.revision += 1;
         Ok(Ownership {
             joined_revision: state.revision,
@@ -470,6 +475,7 @@ impl WorldHub {
     }
     fn pve_applied(&self, owner: &Ownership, result: &Value) {
         let mut state = self.data.lock().expect("world state");
+        let mut appearance_changed = false;
         if let Some(actor)=state.actors.get_mut(&owner.id).filter(|a|Self::owned(a,owner)) {
             let character = &result["state"]["character"];
             if let Some(map_id) = character["map_id"].as_str() && actor.map_id != map_id {
@@ -481,11 +487,22 @@ impl WorldHub {
                 actor.connected = false;
                 actor.disconnected_at = Some(Instant::now());
                 state.revision += 1;
+                state.appearance_revision += 1;
                 return;
+            }
+            if let Some(shop) = result["state"].get("shop") {
+                let gear: std::collections::BTreeMap<String,bool> = shop["owned"].as_array().expect("owned").iter().map(|id| {
+                    let id = id.as_str().expect("item");
+                    (id.to_owned(),shop["weapon"] == id || shop["armor"] == id)
+                }).collect();
+                let look = crate::shop::appearance(&gear);
+                appearance_changed = actor.appearance != look;
+                actor.appearance = look;
             }
             actor.in_battle = result["state"]["battle"]["outcome"] == "active";
             if actor.in_battle { actor.motion.stop(); }
         }
+        if appearance_changed { state.appearance_revision += 1; }
     }
     async fn disconnect(&self, auth: &AuthService, owner: &Ownership, leave: bool) {
         let _gate = self.admissions.lock().await;
@@ -505,6 +522,7 @@ impl WorldHub {
             actor.motion.progress = 0.0;
             let p = Self::position(actor);
             state.revision += 1;
+            state.appearance_revision += 1;
             p
         };
         if Self::persist(auth, position).await.is_ok() && leave {
@@ -577,7 +595,7 @@ pub(crate) async fn ticket(
         .bind(auth::token_digest(&raw)?).bind(session).bind(request.character_id).execute(&mut *tx).await.map_err(db_error)?;
     tx.commit().await.map_err(db_error)?;
     Ok(Json(
-        json!({"ticket":raw,"expires_in":20,"character_id":request.character_id,"config_hash":config_hash(),"announcement_version":1,"population_version":1,"pve_version":1,"maps_version":1}),
+        json!({"ticket":raw,"expires_in":20,"character_id":request.character_id,"config_hash":config_hash(),"announcement_version":1,"population_version":1,"pve_version":1,"maps_version":1,"shop_version":1}),
     ))
 }
 #[derive(Deserialize)]
@@ -598,6 +616,8 @@ pub enum ClientMessage {
         pve_version: u32,
         #[serde(default)]
         maps_version: u32,
+        #[serde(default)]
+        shop_version: u32,
     },
     #[serde(rename = "world.move_to")]
     MoveTo {
@@ -742,6 +762,7 @@ async fn connection(socket: WebSocket, auth: AuthService, hub: Arc<WorldHub>, an
         population_version,
         pve_version,
         maps_version,
+        shop_version,
     }) = serde_json::from_str::<ClientMessage>(&text)
     else {
         fail(&mut socket, "INVALID_HANDSHAKE").await;
@@ -841,6 +862,8 @@ async fn connection(socket: WebSocket, auth: AuthService, hub: Arc<WorldHub>, an
     let mut chat_pending: Option<Uuid> = None;
     let mut announcement_revision = None;
     let mut population_revision = None;
+    let mut appearance_state: std::collections::BTreeMap<String,[i32;2]> = Default::default();
+    let mut appearance_revision = 0;
     let mut pulse = tokio::time::interval(Duration::from_millis(100));
     pulse.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Skip);
     let mut checked = Instant::now();
@@ -908,6 +931,22 @@ async fn connection(socket: WebSocket, auth: AuthService, hub: Arc<WorldHub>, an
                 else {match hub.command(&owner,&input) { Ok(())=>{move_accepted+=1;},Err(e)=>{move_rejected+=1;last_move_code=e.1;fail(&mut socket,e.1).await;} }}
             },
             _=pulse.tick()=>{
+                if shop_version == 1 {
+                    let update = {
+                        let state = hub.data.lock().expect("world state");
+                        (state.appearance_revision != appearance_revision).then(|| {
+                            let current: std::collections::BTreeMap<String,[i32;2]> = state.actors.values().filter(|a| a.connected && a.map_id == owner.map_id).map(|a|(a.id.to_string(),a.appearance)).collect();
+                            (state.appearance_revision,current)
+                        })
+                    };
+                    if let Some((revision,current)) = update {
+                        let changed: std::collections::BTreeMap<_,_> = current.iter().filter(|(id,look)|appearance_state.get(*id)!=Some(*look)).collect();
+                        let removed: Vec<_> = appearance_state.keys().filter(|id|!current.contains_key(*id)).collect();
+                        if (!changed.is_empty() || !removed.is_empty()) && send(&mut socket,json!({"type":"world.appearance","map_id":owner.map_id,"looks":changed,"removed":removed})).await.is_err(){break;}
+                        appearance_state = current;
+                        appearance_revision = revision;
+                    }
+                }
                 if !hub.current(&owner){fail(&mut socket,"SESSION_REPLACED").await;break;}
                 if population_version == 1 {
                     let packet = { let state = hub.data.lock().expect("world state");

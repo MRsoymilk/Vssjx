@@ -59,7 +59,7 @@ func _ready() -> void:
 	actors.add_child(portal_marker)
 	_name_tag(portal_marker, "古剑遗迹 · 灵门" if zone == 0 else "返回山道", Color("c2f7f4"))
 	portal_marker.get_child(0).position.y = -50
-	var art: String = Game.actor_key()
+	var art: String = Game.appearance_key()
 	hero = OriginalArt.actor(art)
 	hero.position = cell_center(cell)
 	actors.add_child(hero)
@@ -87,6 +87,10 @@ func _ready() -> void:
 		hero.position = cell_center(cell)
 		_save_position()
 	queue_redraw()
+
+func refresh_appearance() -> void:
+	if not is_instance_valid(hero): return
+	OriginalArt.apply_appearance(hero,Game.appearance_key())
 
 func refresh_quest_marker() -> void:
 	if is_instance_valid(quest_marker): quest_marker.set_stage(int(Game.player.get("quest", -1)))

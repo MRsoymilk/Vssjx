@@ -45,11 +45,21 @@ func reload() -> void:
 		_add("items", item.id, item.name, data["类型"], "已接入", "res://scripts/game_state.gd", data, {"kind": "icon", "path": item.icon})
 		if item.id == "sword":
 			_add("weapons", item.id, item.name, "攻击 +%s" % data["攻击加成"], "已接入", "res://scripts/game_state.gd", data, {"kind": "icon", "path": item.icon})
+	for entry in ShopRules.catalog.items:
+		if entry.id in ["potion","sword"]: continue
+		var category: String = "weapons" if entry.slot == "weapon" else "equipment"
+		var record: Dictionary = entry.duplicate(true)
+		record["规则来源"] = ShopRules.catalog.provenance
+		record["部件说明"] = "武器按职业替换 e{zs,ck,fs} 部件；衣服按性别职业替换身体及前后层。"
+		var icon := {"kind":"icon","path":entry.icon}
+		_add("items",entry.id,entry.name,ShopRules.description(entry.id),"重建商店","res://assets/data/shop-v1.json",record,icon)
+		_add(category,entry.id,entry.name,ShopRules.description(entry.id),"重建商店","res://assets/data/shop-v1.json",record,icon)
 	_load_original_items()
 	for index in INVENTORY.EQUIPMENT.size():
 		var slot: String = INVENTORY.EQUIPMENT[index]
-		var data := {"槽位序号": index, "槽位": slot, "可装备物品": ["sword"] if index == 0 else [], "说明": "已实现青锋剑的装备与卸下" if index == 0 else "界面预留槽位，尚无物品及属性规则"}
-		_add("equipment", "slot_%d" % index, slot, "青锋剑" if index == 0 else "尚无装备定义", "已接入" if index == 0 else "预留", "res://scripts/inventory.gd", data, {"kind": "icon", "path": "res://assets/ui/bag_sword.png"} if index == 0 else {})
+		var ids: Array = ["sword","weapon_2","weapon_3"] if index == 0 else (["armor_2","armor_3"] if index == 2 else [])
+		var data := {"槽位序号":index,"槽位":slot,"可装备物品":ids,"说明":"购买后可装备并改变外观；属性为重建规则" if not ids.is_empty() else "界面预留槽位，尚无物品及属性规则"}
+		_add("equipment","slot_%d" % index,slot," / ".join(PackedStringArray(ids)) if not ids.is_empty() else "尚无装备定义","已接入" if not ids.is_empty() else "预留","res://scripts/inventory.gd",data)
 	var hero_keys := [["mzs", "mck", "mfs"], ["wzs", "wck", "wfs"]]
 	for gender in 2:
 		for job in STATE.JOBS.size():

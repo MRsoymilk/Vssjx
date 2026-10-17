@@ -105,6 +105,7 @@ static func actor(key: String) -> AnimatedSprite2D:
 			for step in steps:
 				frames.add_frame(mode, regions[int(step[0])], maxf(1.0, float(step[1])))
 		cached[key] = frames
+	sprite.set_meta("art_key",key)
 	sprite.sprite_frames = cached[key]
 	sprite.offset = Vector2(info.origin[0] - info.get("anchor_x", 0), info.origin[1])
 	if key.begins_with("hero/"):
@@ -148,3 +149,16 @@ static func effect(key: String, sequence: int = 0) -> AnimatedSprite2D:
 	sprite.animation_finished.connect(sprite.queue_free)
 	sprite.play(animation)
 	return sprite
+
+static func apply_appearance(sprite: AnimatedSprite2D, key: String) -> void:
+	if sprite.get_meta("art_key", "") == key: return
+	var replacement := actor(key)
+	var animation := sprite.animation
+	var frame := sprite.frame
+	sprite.sprite_frames = replacement.sprite_frames
+	sprite.offset = replacement.offset
+	sprite.set_meta("art_key",key)
+	sprite.set_meta("ground_pose_x",replacement.get_meta("ground_pose_x",{}))
+	sprite.play(animation if sprite.sprite_frames.has_animation(animation) else &"idle")
+	sprite.frame = mini(frame,sprite.sprite_frames.get_frame_count(sprite.animation)-1)
+	replacement.free()

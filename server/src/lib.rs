@@ -1,3 +1,4 @@
+pub mod shop;
 pub mod auth;
 pub mod attributes;
 pub mod announcements;

@@ -1,0 +1,12 @@
+{
+  "version": "shop-v1",
+  "provenance": "原包 ssjx/hero 部件；名称、售价和属性为暂定重建规则，非原版物品对应表。",
+  "items": [
+    {"id":"potion","name":"回春散","slot":"consumable","price":8,"attack":0,"defense":0,"visual":0,"icon":"res://assets/ui/bag_potion.png"},
+    {"id":"sword","name":"青锋剑","slot":"weapon","price":20,"attack":5,"defense":0,"visual":1,"icon":"res://assets/ui/bag_sword.png"},
+    {"id":"weapon_2","name":"二式兵器","slot":"weapon","price":40,"attack":8,"defense":0,"visual":2,"icon":"res://assets/ui/shop_eck2.png"},
+    {"id":"weapon_3","name":"三式兵器","slot":"weapon","price":90,"attack":12,"defense":0,"visual":3,"icon":"res://assets/ui/shop_eck3.png"},
+    {"id":"armor_2","name":"二式衣装","slot":"armor","price":35,"attack":0,"defense":3,"visual":1,"icon":"res://assets/ui/shop_mck2.png"},
+    {"id":"armor_3","name":"三式衣装","slot":"armor","price":80,"attack":0,"defense":6,"visual":2,"icon":"res://assets/ui/shop_mck3.png"}
+  ]
+}

@@ -30,6 +30,28 @@ static func check(id:String,job:int,school:int,level:int)->String:
 	if not skill.active:return "PASSIVE_SKILL"
 	return ""
 
+static func valid_view(view:Variant,character:Dictionary)->bool:
+	if not view is Dictionary or view.get("version")!="skills-v1" or view.get("catalog_sha256")!=catalog_hash or not view.get("available") is Array:return false
+	var expected:Array=list_for(int(character.job),int(character.school),int(character.level)).map(func(s:Dictionary)->String:return s.id)
+	if expected.size()!=view.available.size():return false
+	var seen:={}
+	for id in view.available:
+		if not id is String or not id in expected or seen.has(id):return false
+		seen[id]=true
+	return true
+
+static func valid_state(state:Variant)->bool:
+	if not state is Dictionary or not state.get("last_skill") is String or not state.get("last_enemy_acted") is bool:return false
+	if not state.last_skill.is_empty() and (item(state.last_skill).is_empty() or not item(state.last_skill).active):return false
+	var expected:=new_state(0,0,1)
+	for key in expected:
+		if key in ["last_skill","last_enemy_acted"]:continue
+		var value:Variant=state.get(key)
+		if not OnlinePve.integer(value,0,1000000):return false
+	for key in TIMERS+["enemy_bleed","enemy_poison","regen"]:
+		if int(state[key])>2:return false
+	return true
+
 static func new_state(job:int,school:int,level:int,enemy_level:int=1)->Dictionary:
 	var state:Dictionary={"last_skill":"","last_enemy_acted":false,"enemy_mp":30+enemy_level*2}
 	for key in ["enemy_bleed","bleed_damage","enemy_poison","poison_damage","enemy_sleep","enemy_silence","regen","regen_amount","defense","defense_percent","crit","crit_chance","reflect_physical","physical_percent","reflect_magic","magic_percent","passive_physical","passive_magic","last_damage","last_incoming","last_reflected","last_healed"]:state[key]=0

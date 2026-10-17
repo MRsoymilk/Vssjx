@@ -1,0 +1,67 @@
+extends "res://tests/online_pve_test.gd"
+
+func _run()->void:
+	output=OS.get_environment("SSJX_SKILL_CAPTURE_PATH")
+	var old:=Game.player.duplicate(true)
+	var old_path:=Game.save_path
+	Game.save_path="user://skill_battle_%d.json"%OS.get_process_id()
+	for skill in SkillRules.catalog.items:
+		Game.new_player("技能验证",int(skill.job),maxi(0,int(skill.school)))
+		Game.player.level=60;Game.player.hp=100;Game.player.mp=200
+		var opponent:Dictionary=ShushanWorld.ENEMIES[0].duplicate(true);opponent.hp=10000;opponent.attack=1
+		var battle:=ShushanBattle.new(opponent)
+		var start:=battle.begin_action("skill",skill.id)
+		check(start.ok==bool(skill.active),"Active/passive local eligibility "+skill.id)
+		if not start.ok:
+			check(battle.round_number==0 and battle.mp==200,"Passive rejection never consumes a turn")
+			continue
+		battle.resolve_player()
+		if battle.phase=="enemy":battle.resolve_enemy()
+		battle.finish_round()
+		check(battle.pending_skill==skill.id and battle.skills.last_skill==skill.id,"Named skill resolves in local encounter "+skill.id)
+		check(battle.round_number==1 and battle.phase=="select" and battle.mp>=0,"Exactly one bounded local turn "+skill.id)
+	Game.new_player("菜单验证",0,2)
+	Game.player.level=60;Game.player.hp=100;Game.player.mp=200
+	check(Game.valid_save(Game.player),"Level 60 local save accepted")
+	var app:Control=load("res://scenes/main.tscn").instantiate();add_child(app);app._enter_world()
+	var opponent:Dictionary=ShushanWorld.ENEMIES[0].duplicate(true);opponent.hp=10000;opponent.attack=1
+	app._start_battle(opponent)
+	app._battle_skills()
+	var picker:SkillPicker=app.modal.get_child(app.modal.get_child_count()-1)
+	check(picker.choices.size()==6,"Local picker includes five active reference skills plus compatibility skill")
+	await capture("local-skills")
+	picker._select("sheet_011");picker.use_button.pressed.emit()
+	var home:Vector2=app.battle_hero.position
+	await get_tree().create_timer(0.4).timeout
+	check(app.battle_hero.position==home,"Reflection skill casts in place without approaching enemy")
+	var deadline:=Time.get_ticks_msec()+6000
+	while app.battle.phase!="select" and Time.get_ticks_msec()<deadline:await get_tree().process_frame
+	check(app.battle.skills.last_skill=="sheet_011" and app.battle.skills.reflect_physical==1,"Selected support skill applies two-turn reflection")
+	var attributes:OriginalCharacterAttributes=load("res://scenes/ui/character_attributes.tscn").instantiate();app.ui.add_child(attributes);attributes.select_tab(2)
+	await capture("skill-attributes")
+	attributes.queue_free()
+	app._home();app.queue_free();await get_tree().process_frame
+	var model:=OnlinePve.new();model.bind_character(SELF,"http://127.0.0.1:9999")
+	var state:=pve_state();state.character.job=1;state.character.school=1;state.character.level=60
+	state.skills={"version":"skills-v1","catalog_sha256":SkillRules.catalog_hash,"available":SkillRules.list_for(1,1,60).map(func(s:Dictionary)->String:return s.id)}
+	state.battle={"id":PEER,"revision":"1","round":0,"outcome":"active","hp":95,"mp":45,"potions":6,"enemy_hp":1000,"enemy":{"id":"wolf_a","name":"山狼","art":"monster/langw","level":1,"hp":1000,"attack":13,"defense":3}}
+	check(model.receive({"type":"pve.state","state":state}),"Skill capability snapshot accepted at level 60")
+	var forged:=state.duplicate(true);forged.skills.available.append("sheet_011")
+	check(not model.valid(forged),"Foreign skill in available list rejected")
+	forged=state.duplicate(true);forged.skills.catalog_sha256="bad"
+	check(not model.valid(forged),"Mismatched numeric catalog fails validation")
+	var view:OnlineBattleView=load("res://scenes/ui/online_battle_view.tscn").instantiate();add_child(view)
+	var packets:Array=[];model.send_requested.connect(func(packet:Dictionary)->void:packets.append(packet))
+	view.skill_requested.connect(func(id:String)->void:model.submit("skill",id))
+	view.present(model);view.choose("skill")
+	check(view.skill_picker.visible and not view.get_node("Choice").visible,"Online named skill selection replaces old single-skill confirmation")
+	await capture("online-skills")
+	view.skill_picker._select("sheet_051");view.skill_picker.use_button.pressed.emit()
+	check(packets.size()==1 and packets[0].command.target=="sheet_051" and packets[0].command.battle_id==PEER and packets[0].command.expected_revision=="1","Chosen skill carries battle ID, revision and skill ID")
+	OnlineAccount.pending_pve={}
+	var sleeping:=state.duplicate(true);sleeping.character.state_revision="2";sleeping.battle.revision="2";sleeping.battle.skill_rules_version=1;sleeping.battle.skills=SkillRules.new_state(1,1,60);sleeping.battle.skills.last_skill="sheet_051";sleeping.battle.skills.last_damage=30;sleeping.battle.skills.enemy_sleep=1;sleeping.battle.enemy_hp=970
+	model.last_action="skill";model.state=sleeping;view.present(model)
+	check(not view._should_enemy_act(),"Sleeping enemy cannot play an attack animation")
+	view._cancel_motion();view.queue_free();Game.player=old;Game.save_path=old_path
+	print("SKILL BATTLE: %d checks, %d failures"%[checks,failures])
+	get_tree().quit(1 if failures else 0)

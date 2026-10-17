@@ -12,6 +12,9 @@ var round_number := 0
 ## select -> player -> enemy -> settlement -> select/finished.
 var phase := "select"
 var pending_command := ""
+var pending_skill := ""
+var selected_skill := ""
+var skills:Dictionary={}
 var guarding := false
 var finished := false
 var victory := false
@@ -20,8 +23,8 @@ var committed := false
 var save_result: PlatformResult
 var rng := RandomNumberGenerator.new()
 
-static func action_name(command: String, job: int) -> String:
-	if command == "skill": return SKILL_NAMES[clampi(job, 0, 2)]
+static func action_name(command: String, job: int, skill_id:String="") -> String:
+	if command == "skill": return String(SkillRules.item(skill_id).name) if not skill_id.is_empty() and not SkillRules.item(skill_id).is_empty() else SKILL_NAMES[clampi(job, 0, 2)]
 	if command == "attack": return ["锤击", "剑击", "杖击"][clampi(job, 0, 2)]
 	return String({"guard": "凝神防御", "potion": "回春散", "flee": "撤退"}.get(command, ""))
 
@@ -31,23 +34,30 @@ func _init(opponent: Dictionary) -> void:
 	hp = int(Game.player.hp)
 	mp = int(Game.player.mp)
 	potions = int(Game.player.potions)
+	skills=SkillRules.new_state(int(Game.player.job),int(Game.player.school),int(Game.player.level),int(enemy.get("level",1)))
+	selected_skill=SkillRules.default_id(int(Game.player.job),int(Game.player.school),int(Game.player.level))
 	rng.randomize()
 
-func begin_action(command: String) -> Dictionary:
+func begin_action(command: String, skill_id:String="") -> Dictionary:
 	if finished:
 		return {"ok": false, "lines": ["战斗已经结束"]}
 	if phase != "select":
 		return {"ok": false, "lines": ["本回合正在结算，请等待。"]}
 	if command not in ["attack", "skill", "potion", "guard", "flee"]:
 		return {"ok": false, "lines": ["未知行动"]}
-	if command == "skill" and mp < 9:
-		return {"ok": false, "lines": ["灵力不足，需要 9 点灵力。"]}
+	if command=="skill":
+		if skill_id.is_empty():skill_id="legacy_%d"%int(Game.player.job)
+		var code:=SkillRules.check(skill_id,int(Game.player.job),int(Game.player.school),int(Game.player.level))
+		if not code.is_empty():return {"ok":false,"lines":[OnlinePve.error_text(code)]}
+		if mp<int(SkillRules.item(skill_id).mp_cost):return {"ok":false,"lines":["灵力不足，需要 %d 点灵力。"%int(SkillRules.item(skill_id).mp_cost)]}
 	if command == "potion":
 		if potions <= 0:
 			return {"ok": false, "lines": ["背包里没有回春散了。"]}
 		if hp >= int(Game.stats().hp):
 			return {"ok": false, "lines": ["生命已满，无需用药。"]}
 	pending_command = command
+	pending_skill=skill_id if command=="skill" else ""
+	SkillRules.reset_turn(skills)
 	guarding = false
 	round_number += 1
 	phase = "player"
@@ -61,14 +71,13 @@ func resolve_player() -> Dictionary:
 	match pending_command:
 		"attack":
 			damage = maxi(1, int(values.attack) - int(enemy.defense) + rng.randi_range(-2, 2))
+			damage=SkillRules.critical(skills,damage,rng.randi_range(0,99))
+			skills.enemy_sleep=0
 			lines.append("你%s出击，造成 %d 点伤害。" % [["挥锤", "挥剑", "挥杖"][int(Game.player.job)], damage])
 		"skill":
-			mp -= 9
-			damage = maxi(1, int(float(values.attack) * 1.8) - int(enemy.defense))
-			lines.append("你施展%s，造成 %d 点伤害。" % [action_name("skill", int(Game.player.job)), damage])
-			if int(Game.player.job) == 2:
-				hp = mini(int(values.hp), hp + 16)
-				lines.append("摄灵恢复了 16 点生命。")
+			var cast:=SkillRules.cast(SkillRules.item(pending_skill),skills,values,hp,mp,int(enemy.defense),rng.randi_range(0,99))
+			hp=int(cast.hp);mp=int(cast.mp);damage=SkillRules.critical(skills,int(cast.damage),rng.randi_range(0,99))
+			lines.append("你施展%s%s"%[action_name("skill",int(Game.player.job),pending_skill),"，造成 %d 点伤害。"%damage if damage>0 else "。"])
 		"potion":
 			potions -= 1
 			var healed := mini(45, int(values.hp) - hp)
@@ -83,6 +92,12 @@ func resolve_player() -> Dictionary:
 			escaped = true
 			phase = "settlement"
 			return {"ok": true, "lines": ["你撤回了安全地带。"], "damage": 0}
+	var after:=SkillRules.after_player(skills,hp,int(values.hp))
+	hp=int(after.hp)
+	if int(after.damage)>0:lines.append("持续效果造成 %d 点伤害。"%int(after.damage))
+	if int(skills.last_healed)>0:lines.append("恢复 %d 点气血。"%int(skills.last_healed))
+	damage+=int(after.damage)
+	skills.last_damage=mini(enemy_hp,damage)
 	enemy_hp = maxi(0, enemy_hp - damage)
 	if enemy_hp == 0:
 		finished = true
@@ -95,15 +110,21 @@ func resolve_enemy() -> Dictionary:
 	if phase != "enemy": return {"ok": false, "lines": []}
 	var values := Game.stats()
 	var lines: Array[String] = []
+	if int(skills.enemy_sleep)>0:
+		phase="settlement"
+		return {"ok":true,"lines":["%s处于睡眠，无法行动。"%enemy.name],"incoming":0,"reflected":0}
 	var incoming := maxi(1, int(enemy.attack) - int(values.defense) + rng.randi_range(-2, 2))
 	if guarding: incoming = maxi(1, incoming / 2)
+	var hit:=SkillRules.enemy_hit(skills,incoming)
+	incoming=hit.x;skills.last_enemy_acted=true
 	hp = maxi(0, hp - incoming)
 	lines.append("%s行动，你受到 %d 点伤害。" % [enemy.name, incoming])
-	var reflected := 0
+	var reflected := hit.y
 	if int(Game.player.job) == 0 and guarding:
-		reflected = mini(6, enemy_hp)
-		enemy_hp = maxi(0, enemy_hp - reflected)
-		lines.append("力士反震，造成 %d 点伤害。" % reflected)
+		reflected+=6
+	reflected=mini(enemy_hp,reflected);enemy_hp=maxi(0,enemy_hp-reflected)
+	skills.last_incoming=incoming;skills.last_reflected=reflected
+	if reflected>0:lines.append("反伤造成 %d 点伤害。"%reflected)
 	if hp == 0:
 		finished = true
 		lines.append("你力竭倒下，被道人送回山门。")
@@ -122,6 +143,7 @@ func finish_round() -> Dictionary:
 		escaped = true
 		lines.append("三十回合已过，战斗结束。")
 	phase = "finished" if finished else "select"
+	SkillRules.end_turn(skills)
 	pending_command = ""
 	guarding = false
 	return {"ok": true, "lines": lines}

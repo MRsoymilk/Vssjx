@@ -208,12 +208,23 @@ func _confirm_allocation() -> void:
 	allocation_requested.emit(allocation_draft.duplicate())
 
 func _skills() -> void:
-	if selected_tab == 3: return
 	var player := _player_data()
-	var names := ["破山诀", "御剑诀", "摄灵诀"]
-	var descriptions := ["重击敌人，并造成额外伤害。", "剑气攻击敌人，并造成额外伤害。", "攻击敌人，同时恢复自身气血。"]
-	content.get_node("SkillName").text = names[int(player.get("job", 0))]
-	content.get_node("Description").text = descriptions[int(player.get("job", 0))]
+	for child in content.get_children():child.hide()
+	var scroll:=ScrollContainer.new();scroll.name="SkillCatalog";scroll.position=Vector2(20,99);scroll.size=Vector2(278,263);scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED;content.add_child(scroll)
+	var rows:=VBoxContainer.new();rows.size_flags_horizontal=Control.SIZE_EXPAND_FILL;rows.add_theme_constant_override("separation",10);scroll.add_child(rows)
+	var skills:=SkillRules.list_for(int(player.get("job",0)),int(player.get("school",0)),int(player.get("level",1)),true)
+	var count:=0
+	for skill in skills:
+		if bool(skill.active)!=(selected_tab==2):continue
+		count+=1
+		var label:=Label.new();label.custom_minimum_size.x=255;label.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;label.add_theme_font_size_override("font_size",13);label.add_theme_color_override("font_color",BROWN)
+		var unlocked:=int(player.level)>=int(skill.unlock_level)
+		label.text="%s　%s\n%s\n%s"%[skill.name,"%d灵力"%int(skill.mp_cost) if skill.active else "自动生效",skill.description,"已解锁" if unlocked else "%d级解锁"%int(skill.unlock_level)]
+		if not unlocked:label.modulate.a=0.55
+		rows.add_child(label)
+	if count==0:
+		var empty:=Label.new();empty.text="当前职业、门派暂无具名心法资料。";empty.add_theme_font_size_override("font_size",12);empty.add_theme_color_override("font_color",BROWN);rows.add_child(empty)
+	var note:=Label.new();note.position=Vector2(20,372);note.size=Vector2(278,38);note.add_theme_font_size_override("font_size",11);note.add_theme_color_override("font_color",BROWN);note.text="按角色等级自动解锁；技能点：—\n名称效果据玩家资料，战斗数值暂为重建。";content.add_child(note)
 
 func _style(fill: Color, border: Color, width: int = 1) -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()

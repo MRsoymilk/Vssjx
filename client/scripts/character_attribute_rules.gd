@@ -4,12 +4,12 @@ extends RefCounted
 ## Online values always come from the server; this never computes online rewards.
 
 static func valid_points(value: Variant, level: int, minimum: Array = []) -> bool:
-	if not value is Array or value.size() != 5 or level < 1 or level > 50: return false
+	if not value is Array or value.size() != 5 or level < 1 or level > 60: return false
 	var spent := 0
 	for i in 5:
 		var n: Variant = value[i]
 		if not (n is int or n is float) or not is_finite(float(n)): return false
-		if float(n) != floor(float(n)) or n < 0 or n > 250: return false
+		if float(n) != floor(float(n)) or n < 0 or n > 300: return false
 		if not minimum.is_empty() and (minimum.size() != 5 or int(n) < int(minimum[i])): return false
 		spent += int(n)
 	return spent <= level * 5

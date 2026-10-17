@@ -76,6 +76,10 @@ pub struct Battle {
     pub round: u32,
     pub revision: u64,
     pub outcome: String,
+    #[serde(default)]
+    pub skills: crate::skills::State,
+    #[serde(default)]
+    pub skill_rules_version: u8,
 }
 impl Battle {
     pub fn new(enemy: ResidentDefinition, hp: i32, mp: i32, potions: i32) -> Self {
@@ -89,6 +93,8 @@ impl Battle {
             round: 0,
             revision: 0,
             outcome: "active".into(),
+            skills: Default::default(),
+            skill_rules_version: 0,
         }
     }
     pub fn view(&self) -> Value {
@@ -104,6 +110,21 @@ impl Battle {
         player_roll: i32,
         enemy_roll: i32,
     ) -> Result<Vec<String>, &'static str> {
+        self.turn_selected(action, job, 0, 1, stats, player_roll, enemy_roll, None, 99)
+    }
+    #[allow(clippy::too_many_arguments)]
+    pub fn turn_selected(
+        &mut self,
+        action: Action,
+        job: i16,
+        school: i16,
+        level: i32,
+        stats: Stats,
+        player_roll: i32,
+        enemy_roll: i32,
+        skill_id: Option<&str>,
+        effect_roll: i32,
+    ) -> Result<Vec<String>, &'static str> {
         if self.outcome != "active" {
             return Err("BATTLE_FINISHED");
         }
@@ -113,7 +134,20 @@ impl Battle {
         ) {
             return Err("INVALID_BATTLE_ACTION");
         }
-        if action == Action::Skill && self.mp < 9 {
+        let selected = if action == Action::Skill {
+            Some(crate::skills::check(
+                skill_id.unwrap_or(&format!("legacy_{job}")),
+                job,
+                school,
+                level,
+            )?)
+        } else {
+            None
+        };
+        if action != Action::Skill && skill_id.is_some() {
+            return Err("INVALID_PVE_COMMAND");
+        }
+        if selected.is_some_and(|s| self.mp < s.mp_cost) {
             return Err("MP_INSUFFICIENT");
         }
         if action == Action::Potion && self.potions < 1 {
@@ -122,17 +156,34 @@ impl Battle {
         if action == Action::Potion && self.hp >= stats.hp {
             return Err("HP_FULL");
         }
+        if self.skill_rules_version == 0 {
+            self.skills = crate::skills::State::new(job, school, level, self.enemy.level);
+            self.skill_rules_version = 1;
+        }
+        self.skills.reset_turn();
         self.round += 1;
         self.revision += 1;
         let mut lines = vec![format!("第{}回合", self.round)];
-        let damage = match action {
-            Action::Attack => (stats.attack - self.enemy.defense + player_roll.clamp(-2, 2)).max(1),
+        let mut damage = match action {
+            Action::Attack => {
+                self.skills.enemy_sleep = 0;
+                self.skills.critical(
+                    (stats.attack - self.enemy.defense + player_roll.clamp(-2, 2)).max(1),
+                    effect_roll,
+                )
+            }
             Action::Skill => {
-                self.mp -= 9;
-                if job == 2 {
-                    self.hp = (self.hp + 16).min(stats.hp);
-                }
-                (stats.attack * 18 / 10 - self.enemy.defense).max(1)
+                let skill = selected.expect("selected skill");
+                lines.push(format!("你施展{}。", skill.name));
+                let damage = self.skills.cast(
+                    skill,
+                    stats,
+                    &mut self.hp,
+                    &mut self.mp,
+                    self.enemy.defense,
+                    effect_roll,
+                );
+                self.skills.critical(damage, effect_roll)
             }
             Action::Guard => {
                 self.mp = (self.mp + 5).min(stats.mp);
@@ -152,6 +203,15 @@ impl Battle {
             }
             _ => unreachable!(),
         };
+        let dot = self.skills.after_player(&mut self.hp, stats.hp);
+        damage += dot;
+        if dot > 0 {
+            lines.push(format!("持续效果造成{dot}点伤害。"));
+        }
+        if self.skills.last_healed > 0 {
+            lines.push(format!("恢复{}点气血。", self.skills.last_healed));
+        }
+        self.skills.last_damage = damage.min(self.enemy_hp);
         if damage > 0 {
             self.enemy_hp = (self.enemy_hp - damage).max(0);
             lines.push(format!("你造成{damage}点伤害。"));
@@ -159,18 +219,32 @@ impl Battle {
         if self.enemy_hp == 0 {
             self.outcome = "victory".into();
             lines.push(format!("{}被击败！", self.enemy.name));
+            self.skills.end_turn();
             return Ok(lines);
         }
-        let mut incoming = (self.enemy.attack - stats.defense + enemy_roll.clamp(-2, 2)).max(1);
-        if action == Action::Guard {
-            incoming = (incoming / 2).max(1);
+        if self.skills.enemy_sleep > 0 {
+            lines.push(format!("{}处于睡眠，无法行动。", self.enemy.name));
+        } else {
+            let mut incoming = (self.enemy.attack - stats.defense + enemy_roll.clamp(-2, 2)).max(1);
+            if action == Action::Guard {
+                incoming = (incoming / 2).max(1);
+            }
+            let (incoming, mut reflected) = self.skills.enemy_hit(incoming, false);
+            self.skills.last_enemy_acted = true;
+            self.skills.last_incoming = incoming;
+            self.hp = (self.hp - incoming).max(0);
+            lines.push(format!("{}出击，你受到{incoming}点伤害。", self.enemy.name));
+            if job == 0 && action == Action::Guard {
+                reflected += 6;
+            }
+            reflected = reflected.min(self.enemy_hp);
+            self.enemy_hp = (self.enemy_hp - reflected).max(0);
+            self.skills.last_reflected = reflected;
+            if reflected > 0 {
+                lines.push(format!("反伤造成{reflected}点伤害。"));
+            }
         }
-        self.hp = (self.hp - incoming).max(0);
-        lines.push(format!("{}出击，你受到{incoming}点伤害。", self.enemy.name));
-        if job == 0 && action == Action::Guard {
-            self.enemy_hp = (self.enemy_hp - 6).max(0);
-            lines.push("力士反震造成6点伤害。".into());
-        }
+        self.skills.end_turn();
         if self.hp == 0 {
             self.outcome = "defeat".into();
             lines.push("道人护持，你恢复元气，试炼进度保留。".into());

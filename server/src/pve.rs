@@ -140,6 +140,7 @@ impl Loaded {
             "equipment":{"version":"equipment-v1","weapon_owned":self.weapon_owned,"weapon":if self.equipped {Some("sword")} else {None}},
             "stats":self.stats(),
             "attributes":profile,"shop":crate::shop::view(&self.gear,&self.quantities,self.potions),
+            "skills":crate::skills::view(self.character.job,self.character.school,self.character.level),
             "server_time_ms":unix_ms(),
             "progress":{"kills":(self.defeated&7).count_ones(),"defeated":defeated,"respawns":self.respawns},"battle":self.battle.as_ref().map(Battle::view)})
     }
@@ -151,7 +152,7 @@ impl Loaded {
             .ok_or("REWARD_LIMIT")?;
         self.character.xp = self.character.xp.checked_add(xp).ok_or("REWARD_LIMIT")?;
         let mut leveled = false;
-        while self.character.level < 50 && self.character.xp >= self.character.level * 40 {
+        while self.character.level < 60 && self.character.xp >= self.character.level * 40 {
             self.character.xp -= self.character.level * 40;
             self.character.level += 1;
             leveled = true;
@@ -242,7 +243,7 @@ impl Loaded {
                 return Err("STALE_ATTRIBUTES");
             }
             let points = command.attributes.ok_or("INVALID_ATTRIBUTES")?;
-            if points.iter().any(|v| !(0..=250).contains(v)) {
+            if points.iter().any(|v| !(0..=300).contains(v)) {
                 return Err("INVALID_ATTRIBUTES");
             }
             if points
@@ -340,7 +341,7 @@ impl Loaded {
                 }
             }
             action => {
-                if command.target.is_some() {
+                if command.target.is_some() && action!=Action::Skill {
                     return Err("INVALID_PVE_COMMAND");
                 }
                 let stats = self.stats();
@@ -354,12 +355,16 @@ impl Loaded {
                     return Err("STALE_BATTLE");
                 }
                 let mut rng = rand::thread_rng();
-                let mut lines = battle.turn(
+                let mut lines = battle.turn_selected(
                     action,
                     self.character.job,
+                    self.character.school,
+                    self.character.level,
                     stats,
                     rng.gen_range(-2..=2),
                     rng.gen_range(-2..=2),
+                    command.target.as_deref(),
+                    rng.gen_range(0..100),
                 )?;
                 self.character.hp = battle.hp.max(1);
                 self.character.mp = battle.mp;
@@ -416,7 +421,7 @@ pub async fn execute(
     let admitted: bool = sqlx::query_scalar("INSERT INTO gameplay_budgets(account_id,window_start,requests) VALUES($1,clock_timestamp(),1) ON CONFLICT(account_id) DO UPDATE SET requests=CASE WHEN gameplay_budgets.window_start<=clock_timestamp()-interval '60 seconds' THEN 1 ELSE LEAST(gameplay_budgets.requests+1,181) END, window_start=CASE WHEN gameplay_budgets.window_start<=clock_timestamp()-interval '60 seconds' THEN clock_timestamp() ELSE gameplay_budgets.window_start END RETURNING requests<=180")
         .bind(account).fetch_one(&mut *tx).await.map_err(database)?;
     let action = format!("pve.{}",serde_json::to_value(command.action).expect("typed action").as_str().expect("action string"));
-    let target = command.target.as_deref().map(|v| if crate::shop::item(v).is_some() || ["sword","qingwei","wolf_a","wolf_b","wolf_c","spirit","guardian","boss","ruins","trail_gate"].contains(&v) { v } else { "[invalid]" });
+    let target = command.target.as_deref().map(|v| if crate::shop::item(v).is_some() || crate::skills::item(v).is_some() || ["sword","qingwei","wolf_a","wolf_b","wolf_c","spirit","guardian","boss","ruins","trail_gate"].contains(&v) { v } else { "[invalid]" });
     if !admitted {
         // One bounded audit event per exhausted window, not one per flood packet.
         let logged = sqlx::query("SELECT 1 FROM security_audit WHERE account_id=$1 AND code='GAMEPLAY_RATE_LIMITED' AND created_at>clock_timestamp()-interval '60 seconds' LIMIT 1")

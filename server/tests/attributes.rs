@@ -29,11 +29,11 @@ fn offline_ui_vectors_match_the_authoritative_attribute_contract() {
 #[test]
 fn points_and_recommendations_are_level_bounded() {
     for job in 0..3 {
-        for level in 1..=50 {
+        for level in 1..=60 {
             let a = [0; 5];
             let r = attributes::recommended(job, level, a);
             assert_eq!(attributes::available(level, r), 0);
-            assert!(r.iter().all(|v| *v >= 0 && *v <= 250));
+            assert!(r.iter().all(|v| *v >= 0 && *v <= 300));
             let b = pve_rules::stats(job, level, false);
             let old = attributes::stats(job, level, false, a);
             assert_eq!(

@@ -52,6 +52,7 @@ func valid(value: Variant) -> bool:
 	for key in ["hp", "mp", "attack", "defense"]:
 		if not integer(value.stats.get(key), 1, 10000): return false
 	if value.character.hp > value.stats.hp or value.character.mp > value.stats.mp: return false
+	if value.has("skills") and not SkillRules.valid_view(value.skills,value.character):return false
 	if value.has("attributes") and not valid_attributes(value.attributes, value): return false
 	if value.has("shop"):
 		if not ShopRules.valid_gear(value.shop): return false
@@ -79,6 +80,9 @@ func valid(value: Variant) -> bool:
 	var battle: Variant = value.battle
 	if battle == null: return true
 	if not battle is Dictionary or not uuid(battle.get("id")) or not decimal(battle.get("revision")): return false
+	if battle.has("skill_rules_version"):
+		if not integer(battle.skill_rules_version,0,1):return false
+		if int(battle.skill_rules_version)==1 and not SkillRules.valid_state(battle.get("skills")):return false
 	if not battle.get("outcome") in ["active", "victory", "defeat", "fled"] or not integer(battle.get("round"), 0, 30): return false
 	if not battle.get("enemy") is Dictionary: return false
 	var enemy: Dictionary = battle.enemy
@@ -101,12 +105,15 @@ func receive(packet: Dictionary) -> bool:
 		# A pre-upgrade receipt at the same revision cannot erase fresh cooldowns.
 		var previous_progress: Dictionary = state.get("progress", {})
 		var previous_shop: Dictionary = state.get("shop", {})
+		var previous_skills:Dictionary=state.get("skills",{})
+		var keep_skills:bool=state.has("skills") and not packet.state.has("skills") and packet.state.character.state_revision==state.character.state_revision
 		var keep_shop: bool = state.has("shop") and not packet.state.has("shop") and packet.state.character.state_revision == state.character.state_revision
 		var previous_equipment: Dictionary = state.get("equipment", {})
 		var keep_equipment: bool = state.has("equipment") and not packet.state.has("equipment") and packet.state.character.state_revision == state.character.state_revision
 		var keep_respawns: bool = state.has("server_time_ms") and not packet.state.has("server_time_ms") and packet.state.character.state_revision == state.character.state_revision
 		var previous_time: int = int(state.get("server_time_ms", 0))
 		state = packet.state.duplicate(true)
+		if keep_skills:state.skills=previous_skills.duplicate(true)
 		if keep_shop: state.shop = previous_shop.duplicate(true)
 		if keep_equipment: state.equipment = previous_equipment.duplicate(true)
 		if keep_respawns:
@@ -153,6 +160,9 @@ func unavailable_monsters() -> Array:
 
 func submit(action: String, target: String = "", points: Array = [], count: int=1) -> bool:
 	if not ready or pending(): return false
+	if action=="skill" and not target.is_empty():
+		if not active() or not state.has("skills") or not target in state.skills.available:return false
+		if not SkillRules.check(target,int(state.character.job),int(state.character.school),int(state.character.level)).is_empty():return false
 	if action in ["buy", "equip", "unequip", "use", "discard"] and state.has("shop"):
 		if active() or ShopRules.item(target).is_empty(): return false
 		if action != "buy" and ShopRules.quantity(state.shop,target)<count: return false
@@ -182,6 +192,10 @@ func submit(action: String, target: String = "", points: Array = [], count: int=
 		command.target = target
 		if count!=1: command.quantity=count
 		command.expected_revision = state.character.state_revision
+	elif action=="skill" and active():
+		if not target.is_empty():command.target=target
+		command.battle_id=state.battle.id
+		command.expected_revision=state.battle.revision
 	elif not target.is_empty(): command.target = target
 	elif active():
 		command.battle_id = state.battle.id
@@ -206,6 +220,8 @@ func quest_text() -> String:
 	return "古剑遗迹 · 已完成\n妖气已散，可返回青云山道恢复元气，或继续探索遗迹。"
 
 static func error_text(code: String) -> String:
+	var skills:={"INVALID_SKILL":"未知技能，请更新客户端。","SKILL_ROLE_MISMATCH":"此技能不属于当前职业或门派。","SKILL_LEVEL_REQUIRED":"角色等级尚未达到技能要求。","PASSIVE_SKILL":"此心法自动生效，无需施展。"}
+	if skills.has(code):return skills[code]
 	var equipment := {"WRONG_JOB":"此兵器不适合当前职业。", "INVALID_QUANTITY":"数量无效。", "ITEM_NOT_USABLE":"此物品不能直接使用。","GOLD_INSUFFICIENT":"铜钱不足。", "ITEM_ALREADY_OWNED":"已经拥有这件装备。", "BAG_FULL":"背包或补给已满。","INVALID_EQUIPMENT":"此装备尚未开放。", "STALE_EQUIPMENT":"装备状态已更新，请重新选择。", "WEAPON_NOT_OWNED":"背包中没有这件装备。", "EQUIPMENT_UNCHANGED":"当前已是该装备状态。"}
 	if equipment.has(code): return equipment[code]
 	if code == "PORTAL_LOCKED": return "灵门未开，请完成山狼试炼并向清微道人复命。"
@@ -219,7 +235,7 @@ static func error_text(code: String) -> String:
 static func valid_points(value: Variant) -> bool:
 	if not value is Array or value.size() != 5: return false
 	for point in value:
-		if not integer(point, 0, 250): return false
+		if not integer(point, 0, 300): return false
 	return true
 
 static func normalized_points(points: Array) -> Array:
@@ -235,7 +251,7 @@ static func valid_attributes(profile: Variant, value: Dictionary) -> bool:
 		recommended += int(profile.recommended[i])
 		if profile.recommended[i] < profile.allocated[i]: return false
 	var budget := int(value.character.level) * 5
-	if not integer(profile.get("available"), 0, 250) or int(profile.available) != budget - spent or recommended != budget: return false
+	if not integer(profile.get("available"), 0, 300) or int(profile.available) != budget - spent or recommended != budget: return false
 	if not profile.get("combat") is Dictionary: return false
 	for key in ["hp", "mp", "physical_attack", "magic_attack", "physical_defense", "magic_defense", "physical_crit", "magic_crit", "physical_hit", "magic_hit", "physical_evasion", "magic_evasion", "damage_reduction"]:
 		if not integer(profile.combat.get(key), 0, 10000): return false

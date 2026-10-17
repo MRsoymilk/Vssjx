@@ -2,6 +2,7 @@ class_name OnlineBattleView
 extends Control
 ## Reference battle HUD; all outcomes and inventory come from OnlinePve.
 signal action_requested(action: String)
+signal skill_requested(id:String)
 signal dismissed
 signal settings_requested
 var model: OnlinePve
@@ -26,11 +27,22 @@ var auto_time := 0.0
 var selected_enemy := false
 var choice_action := ""
 var buttons: Array[Button] = []
+var skill_picker:SkillPicker
+var move_callout:BattleMoveCallout
 @onready var _hero_level_home: Vector2 = $Hud/Level.position
 @onready var _enemy_level_home: Vector2 = $EnemyLevel.position
 const ACTIONS := ["attack", "skill", "guard", "potion", "inspect", "flee"]
 
 func _ready() -> void:
+	skill_picker=SkillPicker.new();add_child(skill_picker);skill_picker.hide()
+	skill_picker.dismissed.connect(_open_menu)
+	skill_picker.chosen.connect(func(id:String)->void:
+		if model==null or not model.ready or model.pending() or animation_time>0:return
+		skill_picker.hide();$Hud/ActionMenu.hide()
+		if model.state.has("skills"):skill_requested.emit(id)
+		else:action_requested.emit("skill")
+	)
+	move_callout=preload("res://scenes/ui/battle_move_callout.tscn").instantiate();add_child(move_callout)
 	for index in 6:
 		var button: Button = get_node("Hud/ActionMenu/BattleButtons%d" % index)
 		buttons.append(button)
@@ -67,6 +79,7 @@ func present(pve: OnlinePve) -> void:
 		automatic = false
 		countdown = 30.0
 		$Choice.hide()
+		skill_picker.hide()
 		$Inspect.hide()
 		$Result.hide()
 		$Hud/ActionMenu.show()
@@ -86,13 +99,20 @@ func present(pve: OnlinePve) -> void:
 		if not revision.is_empty() and model.last_code.is_empty():
 			_cancel_motion()
 			_enemy_took_damage = _previous_enemy_hp > int(b.enemy_hp)
+			if int(b.get("skill_rules_version",0))==1:_enemy_took_damage=int(b.skills.last_damage)>0
 			if model.last_action in ["attack", "skill"]:
+				var used_id:String=b.get("skills",{}).get("last_skill","")
+				var used:=SkillRules.item(used_id)
+				var support:=not used.is_empty() and int(used.damage_percent)==0
+				var animation:StringName=&"cast" if model.last_action=="skill" and hero.sprite_frames.has_animation("cast") else &"attack"
+				if support:animation=&"cast" if hero.sprite_frames.has_animation("cast") else &"idle"
 				_hero_motion = BattleActionPlayback.new()
 				_hero_motion.impact.connect(_hero_impact)
 				_hero_motion.completed.connect(func() -> void:
 					if not _hero_motion.cancelled: _start_enemy_motion()
 				)
-				_hero_motion.start(hero, OriginalArt.actor_info(_hero_key), enemy.global_position, &"cast" if model.last_action == "skill" and hero.sprite_frames.has_animation("cast") else &"attack", enemy)
+				_hero_motion.start(hero, OriginalArt.actor_info(_hero_key), hero.global_position if support else enemy.global_position, animation, hero if support else enemy)
+				move_callout.present_for(ShushanBattle.action_name(model.last_action,int(c.job),used_id),hero,_hero_motion.duration)
 				_enemy_attack_delay = _hero_motion.duration if _should_enemy_act() else 0.0
 				animation_time = _hero_motion.duration + (_action_duration(enemy, &"attack") if _should_enemy_act() else 0.0)
 			elif _should_enemy_act():
@@ -116,6 +136,7 @@ func present(pve: OnlinePve) -> void:
 	refresh()
 
 func _cancel_motion() -> void:
+	if is_instance_valid(move_callout):move_callout.clear()
 	if _hero_death != null: _hero_death.cancel()
 	_hero_death = null
 	if _enemy_death != null: _enemy_death.cancel()
@@ -129,7 +150,7 @@ func _cancel_motion() -> void:
 
 func _hero_impact() -> void:
 	if _hero_motion == null or _hero_motion.cancelled: return
-	_shown_enemy_hp = int(model.state.battle.enemy_hp)
+	_shown_enemy_hp = int(model.state.battle.enemy_hp)+int(model.state.battle.get("skills",{}).get("last_reflected",0))
 	if _enemy_took_damage and enemy.sprite_frames.has_animation("hurt"): enemy.play("hurt")
 	$Hud/BattleEnemyHp.value = _shown_enemy_hp
 
@@ -167,6 +188,7 @@ func _start_death() -> void:
 
 func _should_enemy_act() -> bool:
 	if model == null or not model.ready or not model.state.get("battle") is Dictionary: return false
+	if int(model.state.battle.get("skill_rules_version",0))==1:return model.state.battle.skills.last_enemy_acted
 	var outcome: String = model.state.battle.outcome
 	return outcome in ["active", "defeat"] or (outcome == "victory" and model.last_action == "guard") or (outcome == "fled" and model.last_action != "flee")
 
@@ -223,7 +245,7 @@ func refresh() -> void:
 		var outcome: String = model.state.battle.outcome
 		$Result/Title.text = {"victory":"战 斗 胜 利", "defeat":"重整旗鼓", "fled":"撤离山林"}.get(outcome,"战斗结束")
 		$Result/Body.text = "奖励已入账" if outcome == "victory" else ("元气已经恢复" if outcome == "defeat" else "试炼进度保留")
-	else: $Hint.text = ""
+	else: $Hint.text = SkillRules.status_text(model.state.battle.get("skills",{}))
 	var hero_attacking := _hero_motion != null and _hero_motion.active and _hero_motion.action == &"attack"
 	$Hud/BattleHeroHp.visible = not hero_attacking and _hero_death == null
 	$Hud/BattleHeroMp.visible = not hero_attacking and _hero_death == null
@@ -237,6 +259,11 @@ func refresh() -> void:
 
 func choose(action: String) -> void:
 	if model == null or not model.ready or not model.active() or model.pending() or animation_time > 0: return
+	if action=="skill" and model.state.has("skills"):
+		$Hud/ActionMenu.hide();$Inspect.hide();$Choice.hide()
+		var c:Dictionary=model.state.character
+		skill_picker.present(int(c.job),int(c.school),int(c.level),int(model.state.battle.mp),model.state.skills.available)
+		return
 	if action in ["skill", "potion"]:
 		choice_action = action
 		$Hud/ActionMenu.hide()
@@ -265,6 +292,7 @@ func _send(action: String) -> void:
 
 func _open_menu() -> void:
 	if model == null or not model.active(): return
+	skill_picker.hide()
 	$Choice.hide()
 	$Inspect.hide()
 	$Hud/ActionMenu.show()
@@ -275,6 +303,7 @@ func toggle_auto() -> void:
 	auto_time = 0.0
 	$Hud/ActionMenu.visible = not automatic
 	$Choice.hide()
+	skill_picker.hide()
 	$Inspect.hide()
 	refresh()
 
@@ -285,6 +314,7 @@ func return_to_map() -> void:
 	dismissed.emit()
 
 func _process(delta: float) -> void:
+	if is_instance_valid(move_callout):move_callout.update_anchor()
 	var was_animating := animation_time > 0
 	if not visible or model == null: return
 	if not model.ready:
@@ -325,7 +355,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 				if event.keycode == KEY_1: _send(choice_action)
 			else: choose(ACTIONS[event.keycode - KEY_1])
 		KEY_ESCAPE:
-			if $Inspect.visible or $Choice.visible: _open_menu()
+			if $Inspect.visible or $Choice.visible or skill_picker.visible: _open_menu()
 			elif not model.active(): return_to_map()
 			else: settings_requested.emit()
 		_: return

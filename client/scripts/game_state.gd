@@ -251,7 +251,7 @@ func add_rewards(gold: int, xp: int) -> bool:
 	player.gold = int(player.gold) + gold
 	player.xp = int(player.xp) + xp
 	var leveled := false
-	while int(player.xp) >= int(player.level) * 40 and int(player.level) < 50:
+	while int(player.xp) >= int(player.level) * 40 and int(player.level) < 60:
 		player.xp = int(player.xp) - int(player.level) * 40
 		player.level = int(player.level) + 1
 		leveled = true
@@ -430,7 +430,7 @@ func valid_save(data: Variant) -> bool:
 	if int(data.version) != SAVE_VERSION: return false
 	if int(data.job) > 2 or int(data.school) > 2 or int(data.zone) > 1: return false
 	if int(data.quest) > 4 or int(data.kills) > 3: return false
-	if int(data.level) < 1 or int(data.level) > 50: return false
+	if int(data.level) < 1 or int(data.level) > 60: return false
 	if not ATTRIBUTE_RULES.valid_points(data.get("allocated_attributes",[0,0,0,0,0]),int(data.level)): return false
 	if not data.cell is Array or data.cell.size() != 2: return false
 	for value in data.cell:

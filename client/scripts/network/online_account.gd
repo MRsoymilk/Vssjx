@@ -300,7 +300,7 @@ static func _valid_character(value: Variant) -> bool:
 	if value.state_revision.length() == 19 and value.state_revision > "9223372036854775807": return false
 	for key in ["job", "gender", "school", "level", "gold", "hp", "mp", "xp", "quest_stage", "cell_x", "cell_y"]:
 		var number: Variant = value.get(key)
-		var maximum := 1 if key == "gender" else (2 if key in ["job", "school"] else (31 if key in ["cell_x", "cell_y"] else (50 if key == "level" else 2147483647)))
+		var maximum := 1 if key == "gender" else (2 if key in ["job", "school"] else (31 if key in ["cell_x", "cell_y"] else (60 if key == "level" else 2147483647)))
 		if not (number is int or number is float) or not is_finite(float(number)) or number < 0 or number > maximum or float(number) != floor(float(number)): return false
 	if value.has("appearance_v2"):
 		var look_v2: Variant = value.appearance_v2

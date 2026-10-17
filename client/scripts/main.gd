@@ -141,9 +141,9 @@ func _process(delta: float) -> void:
 			var command := "attack"
 			if battle.hp < int(Game.stats().hp) / 3 and battle.potions > 0:
 				command = "potion"
-			elif battle.mp >= 9:
+			elif battle.mp >= int(SkillRules.item(battle.selected_skill).mp_cost):
 				command = "skill"
-			_battle_turn(command)
+			_battle_turn(command,SkillRules.default_id(int(Game.player.job),int(Game.player.school),int(Game.player.level)) if command=="skill" else "")
 	if mode == "world":
 		autosave_timer += delta
 		if autosave_timer >= 10.0:
@@ -177,7 +177,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 	elif mode == "battle" and modal == null:
 		match event.keycode:
 			KEY_1: _battle_turn("attack")
-			KEY_2: _battle_turn("skill")
+			KEY_2: _battle_skills()
 			KEY_3: _battle_turn("guard")
 			KEY_4: _battle_turn("potion")
 			KEY_5: _battle_inspect()
@@ -948,6 +948,7 @@ func _start_battle(enemy: Dictionary) -> void:
 	for i in commands.size():
 		var button: Button = action_menu.get_node("BattleButtons%d" % i)
 		if commands[i] == "inspect": button.pressed.connect(_battle_inspect)
+		elif commands[i]=="skill":button.pressed.connect(_battle_skills)
 		else: button.pressed.connect(_battle_turn.bind(commands[i]))
 		battle_buttons.append(button)
 	battle_move_callout = load("res://scenes/ui/battle_move_callout.tscn").instantiate()
@@ -989,11 +990,22 @@ func _battle_inspect() -> void:
 	panel.get_node("Secondary").text = "攻击：%d" % int(battle.enemy.attack) if enemy else "灵力：%d/%d" % [battle.mp, int(values.mp)]
 	panel.get_node("Tertiary").text = "防御：%d" % int(battle.enemy.defense) if enemy else "门派：" + Game.SCHOOLS[int(Game.player.school)] + "派"
 
-func _battle_turn(command: String) -> void:
+func _battle_skills()->void:
+	if battle.phase!="select" or modal!=null:return
+	if action_menu!=null:action_menu.hide()
+	modal=preload("res://scenes/ui/modal_overlay.tscn").instantiate()
+	ui.add_child(modal)
+	var picker:=SkillPicker.new();modal.add_child(picker)
+	picker.dismissed.connect(_close_modal)
+	picker.chosen.connect(func(id:String)->void:_close_modal();battle.selected_skill=id;_battle_turn("skill",id))
+	picker.present(int(Game.player.job),int(Game.player.school),int(Game.player.level),battle.mp)
+
+func _battle_turn(command: String, skill_id:String="") -> void:
 	if mode != "battle" or battle.phase != "select" or modal != null: return
 	var active_battle := battle
 	var epoch := _ui_epoch
-	var start := battle.begin_action(command)
+	if command=="skill" and skill_id.is_empty():skill_id=battle.selected_skill
+	var start := battle.begin_action(command,skill_id)
 	_battle_lines(start.lines)
 	if not start.ok:
 		_refresh_battle()
@@ -1001,7 +1013,9 @@ func _battle_turn(command: String) -> void:
 	if action_menu != null: action_menu.hide()
 	battle_stage = "player"
 	var animation: StringName = &"cast" if command == "skill" and battle_hero.sprite_frames.has_animation("cast") else &"attack"
-	battle_move_callout.present_for(ShushanBattle.action_name(command, int(Game.player.job)), battle_hero, _battle_action_duration(battle_hero, animation) + 0.15 if command in ["attack", "skill"] else 0.75)
+	var support:=command=="skill" and int(SkillRules.item(skill_id).damage_percent)==0
+	if support:animation=&"cast" if battle_hero.sprite_frames.has_animation("cast") else &"idle"
+	battle_move_callout.present_for(ShushanBattle.action_name(command, int(Game.player.job),skill_id), battle_hero, _battle_action_duration(battle_hero, animation) + 0.15 if command in ["attack", "skill"] else 0.75)
 	_refresh_battle()
 	await get_tree().create_timer(0.15).timeout
 	if epoch != _ui_epoch or mode != "battle" or battle != active_battle: return
@@ -1009,7 +1023,7 @@ func _battle_turn(command: String) -> void:
 	if command in ["attack", "skill"]:
 		player_motion = BattleActionPlayback.new()
 		battle_playback = player_motion
-		player_motion.start(battle_hero, OriginalArt.actor_info(Game.appearance_key()), battle_enemy.global_position, animation, battle_enemy)
+		player_motion.start(battle_hero, OriginalArt.actor_info(Game.appearance_key()), battle_hero.global_position if support else battle_enemy.global_position, animation, battle_hero if support else battle_enemy)
 		_refresh_battle()
 		await player_motion.impact
 		if epoch != _ui_epoch or player_motion.cancelled or mode != "battle" or battle != active_battle: return
@@ -1020,9 +1034,9 @@ func _battle_turn(command: String) -> void:
 			battle_enemy.play("hurt")
 		var effect_key: String = "effect/flash" if command == "attack" else ["effect/t71", "effect/t36", "effect/t47"][int(Game.player.job)]
 		var effect := OriginalArt.effect(effect_key)
-		effect.position = battle_enemy.position - effects_layer.position
+		effect.position = (battle_hero.position if support else battle_enemy.position) - effects_layer.position
 		effects_layer.add_child(effect)
-		_damage_number(int(result.damage), battle_enemy.position + Vector2(-3, -53))
+		if int(result.damage)>0:_damage_number(int(result.damage), battle_enemy.position + Vector2(-3, -53))
 	_refresh_battle()
 	if player_motion != null:
 		await player_motion.completed
@@ -1032,7 +1046,9 @@ func _battle_turn(command: String) -> void:
 	if epoch != _ui_epoch or mode != "battle" or battle != active_battle: return
 	battle_playback = null
 	battle_move_callout.clear()
-	if battle.phase == "enemy":
+	if battle.phase=="enemy" and int(battle.skills.enemy_sleep)>0:
+		_battle_lines(battle.resolve_enemy().lines)
+	elif battle.phase == "enemy":
 		battle_stage = "enemy"
 		var enemy_motion := BattleActionPlayback.new()
 		battle_playback = enemy_motion
@@ -1102,6 +1118,8 @@ func _refresh_battle() -> void:
 	chrome.update_header(battle.hp, battle.mp, battle.round_number)
 	var stages := {"select": "请选择本回合指令", "player": "我方行动", "enemy": "敌方行动", "settlement": "回合结算", "finished": "战斗结束"}
 	battle_status.text = String(stages[battle_stage]) if battle_stage == "select" else "第 %d 回合 · %s" % [battle.round_number, stages[battle_stage]]
+	var statuses:=SkillRules.status_text(battle.skills)
+	if not statuses.is_empty():battle_status.text+=" · "+statuses
 	auto_button.text = "0键手动战斗" if battle_auto else "0键自动战斗"
 	battle_hero_status.text = "行动" if battle_stage == "player" else ("就绪" if battle_stage == "select" else "等待")
 	battle_enemy_status.text = "行动" if battle_stage == "enemy" else ("就绪" if battle_stage == "select" else "等待")

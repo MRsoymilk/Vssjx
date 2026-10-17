@@ -101,6 +101,7 @@ func _ready() -> void:
 	npc_dialog.dismissed.connect(_cancel_approach)
 	battle_view.settings_requested.connect(func() -> void: _scene_action("system"))
 	battle_view.action_requested.connect(func(action: String) -> void: network.pve.submit(action))
+	battle_view.skill_requested.connect(func(id:String)->void:network.pve.submit("skill",id))
 	battle_view.dismissed.connect(func() -> void:
 		_closed_battle = battle_view.battle_id
 		screen.hud.show()

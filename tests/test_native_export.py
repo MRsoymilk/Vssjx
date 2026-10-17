@@ -2,6 +2,7 @@
 import configparser
 import importlib.util
 import json
+import re
 from pathlib import Path
 import struct
 import tarfile
@@ -16,6 +17,13 @@ spec.loader.exec_module(export)
 
 
 class NativeExportTests(unittest.TestCase):
+    def test_pack_audit_completion_allows_catalog_growth_but_never_failures(self):
+        for count in [70, 71, 100]:
+            self.assertIsNotNone(re.search(export.EXPORT_AUDIT_MARKER, f'GAME EXPORT: {count} checks, 0 failures', re.M))
+        for text in ['GAME EXPORT: 71 checks, 1 failures', 'GAME EXPORT: 0 checks, 0 failures',
+                     'GAME EXPORT: 71 checks, 0 failures trailing', 'incomplete']:
+            self.assertIsNone(re.search(export.EXPORT_AUDIT_MARKER, text, re.M))
+
     def presets(self):
         config = configparser.ConfigParser(interpolation=None)
         config.read(ROOT / 'client/export_presets.cfg', encoding='utf8')

@@ -20,7 +20,7 @@ func _verify() -> void:
 	for path in ["res://scenes/admin", "res://scripts/admin", "res://assets/admin", "res://tests"]:
 		check(not DirAccess.dir_exists_absolute(path), "Developer directory is absent: " + path)
 	var manifest: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://assets/data/actors.json"))
-	check(manifest.get("actors", {}).size() == 33, "Actor index is included")
+	check(manifest.get("actors", {}).size() == 34 and manifest.actors.has("main/death"), "Actor index includes the reviewed death animation")
 	for path in manifest.actors.values():
 		check(FileAccess.file_exists(path), "Dynamically loaded actor JSON is included: " + path)
 	check(FileAccess.file_exists("res://assets/data/original_world.json"), "Shared game world data is still included")

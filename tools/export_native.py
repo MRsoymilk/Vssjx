@@ -20,6 +20,7 @@ from zipfile import ZipFile, ZIP_DEFLATED
 ROOT = Path(__file__).resolve().parents[1]
 WINDOWS_SHA256 = 'd34d36f3be1a6c49c56525ae86469b92e4f417ddf0b43cf00dd80c385c4b0562'
 LINUX_SHA256 = 'd9f79ab89b5ae369aeed11c6052d402e8218cd503bf85b4a235f9c30c46a7c63'
+EXPORT_AUDIT_MARKER = r'^GAME EXPORT: [1-9]\d* checks, 0 failures$'
 
 
 def sha(path):
@@ -141,7 +142,7 @@ def build(args):
         (output / (name + '.log')).write_text(text, encoding='utf8')
         if result.returncode or re.search(r'(^ERROR:|SCRIPT ERROR|Parse Error)', text, re.M):
             raise RuntimeError(name + ': see ' + str(output / (name + '.log')))
-        if expected and expected not in text:
+        if expected and not re.search(expected, text, re.M):
             raise RuntimeError(name + ': completion marker missing')
         print(name + ': PASS', flush=True)
         return text
@@ -231,7 +232,7 @@ def build(args):
         check_linux_binary(executable)
         if list(folder.glob('*.pck')):
             raise RuntimeError('Linux executable must have its PCK embedded')
-        run('linux-embedded-pack-audit', [godot, '--headless', '--main-pack', str(executable), '--script', str(ROOT / 'tests/game_export_probe.gd')], 'GAME EXPORT: 70 checks, 0 failures')
+        run('linux-embedded-pack-audit', [godot, '--headless', '--main-pack', str(executable), '--script', str(ROOT / 'tests/game_export_probe.gd')], EXPORT_AUDIT_MARKER)
         linux_runtime = run('linux-release-version', [str(executable), '--version']).strip()
         if not linux_runtime.startswith('4.7.2.stable.official'):
             raise RuntimeError('Unexpected Linux release runtime version')
@@ -260,7 +261,7 @@ def build(args):
         check_pe(exe)
         if list(folder.glob('*.pck')):
             raise RuntimeError('Windows EXE must have its PCK embedded')
-        run('windows-embedded-pack-audit', [godot, '--headless', '--main-pack', str(exe), '--script', str(ROOT / 'tests/game_export_probe.gd')], 'GAME EXPORT: 70 checks, 0 failures')
+        run('windows-embedded-pack-audit', [godot, '--headless', '--main-pack', str(exe), '--script', str(ROOT / 'tests/game_export_probe.gd')], EXPORT_AUDIT_MARKER)
         shutil.copy2(ROOT / 'client/assets/fonts/OFL.txt', folder / 'FONT-LICENSE.txt')
         for name in ['PROJECT-LICENSE.txt', 'GODOT-NOTICES.txt', 'SOURCE.txt']:
             shutil.copy2(dist / name, folder / name)
@@ -309,7 +310,7 @@ def build(args):
             with ZipFile(probes / 'android-assets.zip', 'w', ZIP_DEFLATED) as pack:
                 for name in assets:
                     pack.writestr(name.removeprefix('assets/'), archive.read(name))
-        run('android-assets-native-audit', [godot, '--headless', '--main-pack', str(probes / 'android-assets.zip'), '--script', str(ROOT / 'tests/game_export_probe.gd')], 'GAME EXPORT: 70 checks, 0 failures')
+        run('android-assets-native-audit', [godot, '--headless', '--main-pack', str(probes / 'android-assets.zip'), '--script', str(ROOT / 'tests/game_export_probe.gd')], EXPORT_AUDIT_MARKER)
         shutil.copy2(ROOT / 'client/assets/fonts/OFL.txt', dist / 'FONT-LICENSE.txt')
     files = {str(file.relative_to(dist)): {'bytes': file.stat().st_size, 'sha256': sha(file)}
              for file in sorted(dist.rglob('*')) if file.is_file()}

@@ -75,3 +75,15 @@ Windows模板固定SHA-256为`d34d36f3be1a6c49c56525ae86469b92e4f417ddf0b43cf00d
 交付副本逐文件对照最终构建报告核验摘要，检查Windows ZIP内容与单文件EXE相同，并对复制后的APK再次验证签名。旁置`native-preview-20261017.build-report.json`；交付目录内有`SHA256SUMS.txt`、使用说明及许可。APK的`.idsig`是可选增量安装侧文件，普通手动安装只需要APK。
 
 这仍是待真实Windows/Android设备验收的内部预览，不是正式对外发行或已完成AGPL对应源码公开提供的声明。
+
+## 后续 dev 合并验证
+
+用户随后明确授权合并并推送共享`dev`。集成以`6694d69`为共享基线，保留其死亡动画更新的全部16个文件；其中`main.gd`仅叠加原生分支的Android返回键条件，未重写动画、图集或协议。
+
+新增`main/death`使索引变为34项，包内审计为71项；同步更新审计资源预期，并让构建器接受非零检查数且零失败的完整完成标记，不再写死70。
+
+- 合并后原生回归含Rust服务发现：29步骤通过，`/tmp/opencode/vssjx-native-dev-merge-regression/`。
+- Linux/Windows/APK实际导出和各71项资源审计、APK签名/权限/对齐：通过，`/tmp/opencode/vssjx-native-dev-merge-export/`；这些仅为集成验证，不覆盖之前交付文件。
+- 打包、导出规则和平台边界单元：14+4+15项通过。
+- 死亡专项：headless 23项、真实OpenGL离屏渲染26项及3张截图通过，`/tmp/opencode/vssjx-native-dev-merge-death/`。
+- `test_actor_catalog.py`中死亡PNG字节重生成断言在本机仍失败，已在纯`6694d69`归档快照复现；重生成PNG与已提交素材的RGBA尺寸、像素完全一致，但编码字节不同。保留原素材和原测试，不将此项记为通过。证据`/tmp/opencode/vssjx-native-death-merge-baseline-6d79a5711b804056ad79352a39603889/`。

@@ -182,6 +182,9 @@ def build(args):
         config = config.replace('[preset.1.options]', '[preset.1.options]\ncustom_template/release=' + json.dumps(str(template)))
     if android:
         android_abis = ['arm64-v8a', 'armeabi-v7a']
+        if args.android_arm64_only:
+            android_abis = ['arm64-v8a']
+            config = config.replace('architectures/armeabi-v7a=true', 'architectures/armeabi-v7a=false')
         if args.android_emulator:
             android_abis += ['x86', 'x86_64']
             config = config.replace('architectures/x86=false', 'architectures/x86=true')
@@ -229,7 +232,8 @@ def build(args):
         'and verify original artwork permissions. Private signing keys are not distributed.\n', encoding='utf8')
     instructions = ['蜀山剑侠 · 归来：原生预览测试包\n']
     if android:
-        apk_name = ('vssjx-android-preview' if args.development_signing else 'vssjx-android') + ('-universal' if args.android_emulator else '') + '.apk'
+        abi_suffix = '-arm64' if args.android_arm64_only else ('-universal' if args.android_emulator else '')
+        apk_name = ('vssjx-android-preview' if args.development_signing else 'vssjx-android') + abi_suffix + '.apk'
         instructions.append('Android：安装 ' + apk_name + ('（开发测试签名）' if args.development_signing else '（外部提供的签名）') + '。尚未完成设备运行验收。')
     if windows:
         instructions.append('Windows：解压 vssjx-windows-x64-preview.zip，运行 vssjx.exe；资源内嵌。EXE未签名且未在Windows运行验收。')
@@ -361,7 +365,9 @@ def main():
     parser.add_argument('--java-sdk', type=Path, default=Path(os.environ.get('JAVA_HOME', '/usr/lib/jvm/java-17-openjdk')))
     parser.add_argument('--build-tools', default='36.0.0')
     parser.add_argument('--development-signing', action='store_true', help='Explicit install-test signing; never a production signing key')
-    parser.add_argument('--android-emulator', action='store_true', help='Include x86/x86_64 alongside ARM for native emulator execution')
+    android_arch = parser.add_mutually_exclusive_group()
+    android_arch.add_argument('--android-emulator', action='store_true', help='Include x86/x86_64 alongside ARM for native emulator execution')
+    android_arch.add_argument('--android-arm64-only', action='store_true', help='Build only arm64-v8a for 64-bit Android phones')
     parser.add_argument('--development-key-dir', type=Path, default=Path('/tmp/opencode/vssjx-native-toolchain/development-signing'))
     build(parser.parse_args())
 

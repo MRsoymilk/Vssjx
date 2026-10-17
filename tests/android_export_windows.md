@@ -40,3 +40,11 @@ python -X utf8 tools/export_native.py --target android --output work/builds/andr
 - 未修改蓝叠图形配置或重启模拟器；未进行账号登陆、联机、战斗或 ARM 真机运行验证。
 
 日志与截图在忽略目录 `work/android-emulator/`。模拟器执行结果独立记在构建目录的 `emulator-verification.json`；`build-report.json` 中的 `actual_android_execution=false` 仍表示导出器本身不执行设备测试。
+
+## ARM64 网络诊断包
+
+按用户要求新增互斥的 `--android-arm64-only` 参数，只在隔离导出副本关闭 ARM32，APK 内仅保留 `arm64-v8a`。它不能与 `--android-emulator` 同时使用；CLI 冲突检查通过。没有修改共享导出预设的默认架构。
+
+游戏源码 `673915f` 包含 30 秒账号请求及具体传输错误提示，详见 `tests/account_network_diagnostics.md`。构建沿用上面的工具链与开发签名，使用 `--android-arm64-only --output work/builds/android-arm64-network-20261017`，其余参数相同。
+
+产物 `dist/vssjx-android-preview-arm64.apk`：42,656,525 字节，SHA-256 `31d693d807b20fdda5e37ec85131dfc8adc0404f0be62099a90e8edce3f28666`。确认唯一 ABI 为 ARM64，签名、16 KB 对齐、权限与打包资源检查通过；实际 APK assets 的桌面运行审计 71 项通过。复用原有包名及签名，未在 ARM64 真机上安装运行，也未更新网页部署。

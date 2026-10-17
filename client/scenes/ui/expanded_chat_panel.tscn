@@ -5,7 +5,6 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/chat_emote_picker.tscn" id="Emotes"]
 [ext_resource type="Texture2D" path="res://assets/ui/chat_scroll_up.svg" id="Up"]
 [ext_resource type="Texture2D" path="res://assets/ui/chat_scroll_down.svg" id="Down"]
-[ext_resource type="Texture2D" path="res://assets/ui/chat_wood_button.svg" id="WoodButton"]
 [ext_resource type="Texture2D" path="res://assets/ui/chat_corner.png" id="Corner"]
 [sub_resource type="SystemFont" id="Font"]
 script = ExtResource("BundledCjk")
@@ -58,23 +57,6 @@ content_margin_left = 2.0
 content_margin_right = 2.0
 content_margin_top = 1.0
 content_margin_bottom = 1.0
-[sub_resource type="StyleBoxTexture" id="Wood"]
-texture = ExtResource("WoodButton")
-texture_margin_left = 4.0
-texture_margin_top = 4.0
-texture_margin_right = 4.0
-texture_margin_bottom = 4.0
-content_margin_left = 6.0
-content_margin_right = 6.0
-content_margin_top = 3.0
-content_margin_bottom = 3.0
-[sub_resource type="StyleBoxFlat" id="WoodPressed"]
-bg_color = Color(0.63, 0.38, 0.12, 1)
-border_color = Color(1, 0.87, 0.51, 1)
-border_width_left = 2
-border_width_right = 2
-border_width_top = 2
-border_width_bottom = 2
 [sub_resource type="StyleBoxEmpty" id="Focus"]
 [sub_resource type="StyleBoxFlat" id="Track"]
 bg_color = Color(0.38, 0.28, 0.12, 1)
@@ -256,26 +238,10 @@ horizontal_alignment = 0
 theme_override_font_sizes/font_size = 10
 theme_override_colors/font_color = Color(0.55, 0.40, 0.18, 1)
 text = "暂时没有世界消息"
-[node name="Emotes" type="Button" parent="Panel"]
-offset_left = 18.0
-offset_top = 343.0
-offset_right = 61.0
-offset_bottom = 364.0
-focus_mode = 0
-theme_override_styles/normal = SubResource("Wood")
-theme_override_styles/hover = SubResource("Wood")
-theme_override_styles/pressed = SubResource("WoodPressed")
-theme_override_styles/disabled = SubResource("Wood")
-theme_override_colors/font_color = Color(1, 0.97, 0.80, 1)
-theme_override_colors/font_hover_color = Color(1, 1, 0.90, 1)
-theme_override_colors/font_pressed_color = Color(1, 0.97, 0.80, 1)
-theme_override_colors/font_outline_color = Color(0.30, 0.23, 0.12, 1)
-theme_override_constants/outline_size = 1
-text = "表情"
 [node name="Status" type="Label" parent="Panel"]
-offset_left = 65.0
+offset_left = 18.0
 offset_top = 344.0
-offset_right = 249.0
+offset_right = 296.0
 offset_bottom = 364.0
 horizontal_alignment = 1
 theme_override_font_sizes/font_size = 9
@@ -283,21 +249,6 @@ theme_override_colors/font_color = Color(1, 0.89, 0.50, 1)
 text = "世界频道 · 最多120字"
 clip_text = true
 text_overrun_behavior = 3
-[node name="Return" type="Button" parent="Panel"]
-offset_left = 253.0
-offset_top = 343.0
-offset_right = 296.0
-offset_bottom = 364.0
-focus_mode = 0
-theme_override_styles/normal = SubResource("Wood")
-theme_override_styles/hover = SubResource("Wood")
-theme_override_styles/pressed = SubResource("WoodPressed")
-theme_override_colors/font_color = Color(1, 0.97, 0.80, 1)
-theme_override_colors/font_hover_color = Color(1, 1, 0.90, 1)
-theme_override_colors/font_pressed_color = Color(1, 0.97, 0.80, 1)
-theme_override_colors/font_outline_color = Color(0.30, 0.23, 0.12, 1)
-theme_override_constants/outline_size = 1
-text = "返回"
 [node name="TopLeft" type="TextureRect" parent="Panel"]
 offset_right = 17.0
 offset_bottom = 13.0

@@ -13,14 +13,14 @@ func _run() -> void:
 	var expand_button: Button = view.get_node("Screen/Chat/Expand")
 	check(not expanded.visible and view.get_node("Screen/Chat/Expand").icon.resource_path == "res://assets/ui/chat_expand.svg", "Collapsed chat uses the supplied themed upward arrow")
 	check(expanded.scene_file_path == "res://scenes/ui/expanded_chat_panel.tscn", "Expanded window is an authored scene")
+	check(not expanded.has_node("Panel/Emotes") and not expanded.has_node("Panel/Return"), "Popup footer contains neither duplicate button; the shared arrow handles opening and closing")
 	for corner_name in ["TopLeft", "TopRight", "BottomLeft", "BottomRight"]:
 		var corner: TextureRect = expanded.get_node("Panel/" + corner_name)
 		check(corner.texture.resource_path == "res://assets/ui/chat_corner.png" and corner.mouse_filter == Control.MOUSE_FILTER_IGNORE,
 			"Original pixel corner is decorative and cannot intercept input: " + corner_name)
 		check(not corner.get_global_rect().intersects(expanded.get_node("Panel/Tabs").get_global_rect()) and
-			not corner.get_global_rect().intersects(expanded.get_node("Panel/Emotes").get_global_rect()) and
-			not corner.get_global_rect().intersects(expanded.get_node("Panel/Return").get_global_rect()),
-			"Original scroll ornament does not cover tabs or footer buttons: " + corner_name)
+			not corner.get_global_rect().intersects(expanded.get_node("Panel/Status").get_global_rect()),
+			"Original scroll ornament does not cover tabs or footer text: " + corner_name)
 	expand_button.pressed.emit()
 	await settle()
 	check(expand_button.icon.resource_path == "res://assets/ui/chat_collapse.svg" and expand_button.tooltip_text == "收起聊天", "Opening points the same arrow down and explains collapse")
@@ -69,7 +69,7 @@ func _run() -> void:
 	click.position = Vector2(180,200)
 	view._map_input(click)
 	check(not view.chat_input.text.is_empty() and expanded.visible, "Map handlers cannot move through expanded chat")
-	expanded.get_node("Panel/Emotes").pressed.emit()
+	view.emote_button.pressed.emit()
 	await settle()
 	check(expanded.picker.visible and view.chat_input.has_focus() and Rect2(0,0,320,480).encloses(expanded.picker.get_global_rect()), "Expanded emotes open above the paper panel and use the existing draft")
 	expanded.picker.get_node("Content/Grid/Smile").pressed.emit()
@@ -78,16 +78,16 @@ func _run() -> void:
 	view.chat_send.pressed.emit()
 	view._process(0.0)
 	check(sent.size() == 1 and sent[0].channel == "public" and not view.chat_input.text.is_empty(), "Expanded window sends once through the existing reliable channel")
-	check(expanded.get_node("Panel/Emotes").disabled and not expanded.picker.visible, "Pending send locks both emote controls")
+	check(view.emote_button.disabled and not expanded.picker.visible, "Pending send locks the existing emote entry and closes the picker")
 	check(view.network.chat.receive({"type":"chat.result","result":{"client_message_id":sent[0].client_message_id,"status":"SENT","message_id":"30000000-0000-4000-8000-000000000040"}}), "Delivery acknowledgement resolves expanded send")
 	view._process(0.0)
 	check(view.chat_input.text.is_empty() and expanded.visible, "Acknowledgement clears draft while history remains expanded")
 	expanded.get_node("Panel/Tabs/World").pressed.emit()
 	await settle()
 	await capture("expanded_chat")
-	expanded.get_node("Panel/Return").pressed.emit()
-	check(not expanded.visible and not view.chat_input.has_focus() and view.chat_panel.visible, "Return collapses into the original inline chat")
-	check(expand_button.icon.resource_path == "res://assets/ui/chat_expand.svg", "Return restores the upward arrow")
+	expand_button.pressed.emit()
+	check(not expanded.visible and not view.chat_input.has_focus() and view.chat_panel.visible, "The downward arrow collapses into the original inline chat")
+	check(expand_button.icon.resource_path == "res://assets/ui/chat_expand.svg", "Collapsing restores the upward arrow")
 	await capture("collapsed_chat")
 	view.get_node("Screen/Chat/Expand").pressed.emit()
 	view._set_battle_layout(true)

@@ -71,7 +71,6 @@ func _ready() -> void:
 	$Menu/Panel/Chat.pressed.connect(_focus_chat)
 	screen.chat_expand_requested.connect(_open_expanded_chat)
 	expanded_chat.dismissed.connect(_expanded_chat_dismissed)
-	expanded_chat.emotes_requested.connect(_toggle_emotes)
 	expanded_chat.emote_chosen.connect(_insert_emote)
 	expanded_chat.focus_requested.connect(func() -> void: Platform.context.text_input.request_focus(chat_input))
 	expanded_chat.add_system(_system_text)

@@ -25,7 +25,6 @@ func _ready() -> void:
 	screen.chat_expand_requested.connect(func() -> void: picker.hide(); expanded.open())
 	picker.chosen.connect(_insert_emote)
 	picker.dismissed.connect(_focus)
-	expanded.emotes_requested.connect(_toggle_emotes)
 	expanded.emote_chosen.connect(_insert_emote)
 	expanded.focus_requested.connect(_focus)
 	expanded.dismissed.connect(_focus)

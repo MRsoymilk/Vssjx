@@ -2,7 +2,6 @@ class_name ExpandedChatPanel
 extends Control
 ## Authored paper chat window over the map, backed by this session's existing cache.
 signal dismissed
-signal emotes_requested
 signal emote_chosen(token: String)
 signal focus_requested
 @onready var history: RichTextLabel = $Panel/History
@@ -19,8 +18,6 @@ const LIMIT := 100
 var public_caption := "世界"
 
 func _ready() -> void:
-	$Panel/Return.pressed.connect(dismiss)
-	$Panel/Emotes.pressed.connect(func() -> void: emotes_requested.emit())
 	picker.chosen.connect(func(token: String) -> void: emote_chosen.emit(token))
 	picker.dismissed.connect(func() -> void: focus_requested.emit())
 	$Shade.gui_input.connect(func(event: InputEvent) -> void:
@@ -74,7 +71,6 @@ func _trim() -> void:
 
 func set_emotes_enabled(enabled: bool) -> void:
 	_emotes_enabled = enabled
-	$Panel/Emotes.disabled = not enabled
 	if not enabled: picker.hide()
 
 func toggle_emotes() -> void:

@@ -1,4 +1,4 @@
-"""Build isolated Windows EXE / signed Android APK preview artifacts.
+"""Build isolated Linux executable / Windows EXE / signed Android APK previews.
 
 Only output/dist is distributable. No global Godot settings, shared Git refs,
 server configuration, player data, admin pages, or tests are modified/copied.
@@ -13,11 +13,13 @@ import secrets
 import shutil
 import struct
 import subprocess
+import tarfile
 from uuid import uuid4
 from zipfile import ZipFile, ZIP_DEFLATED
 
 ROOT = Path(__file__).resolve().parents[1]
 WINDOWS_SHA256 = 'd34d36f3be1a6c49c56525ae86469b92e4f417ddf0b43cf00dd80c385c4b0562'
+LINUX_SHA256 = 'd9f79ab89b5ae369aeed11c6052d402e8218cd503bf85b4a235f9c30c46a7c63'
 
 
 def sha(path):
@@ -38,6 +40,28 @@ def check_pe(path):
     assert struct.unpack_from('<H', data, offset + 24)[0] == 0x20b, 'Expected PE32+'
     # Authenticode directory (index 4); preview EXE is explicitly unsigned.
     assert struct.unpack_from('<II', data, offset + 24 + 112 + 4 * 8) == (0, 0)
+
+
+def check_linux_binary(path):
+    with path.open('rb') as stream:
+        data = stream.read(64)
+    assert len(data) == 64 and data[:6] == b'\x7fELF\x02\x01', 'Expected ELF64 little-endian executable'
+    assert struct.unpack_from('<H', data, 16)[0] in [2, 3], 'Expected ELF executable or PIE'
+    assert struct.unpack_from('<H', data, 18)[0] == 62, 'Expected Linux x86_64'
+    assert path.stat().st_mode & 0o111, 'Linux executable bit is missing'
+
+
+def write_linux_archive(folder, archive):
+    with tarfile.open(archive, 'w:gz') as pack:
+        for file in sorted(folder.iterdir()):
+            if not file.is_file() or file.is_symlink():
+                raise ValueError('Only regular release files may enter the Linux archive')
+            info = pack.gettarinfo(str(file), 'vssjx-linux-x64/' + file.name)
+            info.uid = info.gid = 0
+            info.uname = info.gname = ''
+            info.mode = 0o755 if file.name == 'vssjx.x86_64' else 0o644
+            with file.open('rb') as stream:
+                pack.addfile(info, stream)
 
 
 def check_android_library(name, data):
@@ -128,6 +152,15 @@ def build(args):
     certificate_sha256 = None
     android = args.target in ['all', 'android']
     windows = args.target in ['all', 'windows']
+    linux = args.target in ['all', 'linux']
+    linux_runtime = None
+    linux_glibc = None
+    if linux:
+        template = args.linux_template.resolve()
+        if sha(template) != LINUX_SHA256:
+            raise ValueError('Expected pinned official Godot 4.7.2 Linux x86_64 release template')
+        template_hashes['linux_release.x86_64'] = sha(template)
+        config = config.replace('[preset.0.options]', '[preset.0.options]\ncustom_template/release=' + json.dumps(str(template)))
     if windows:
         template = args.windows_template.resolve()
         if sha(template) != WINDOWS_SHA256:
@@ -176,15 +209,49 @@ def build(args):
         'in the local Git checkout at commit ' + source_commit + '. See build-report.json outside dist for dirty/source hashes.\n'
         'No changes are automatically published. Before redistribution, arrange AGPL corresponding-source availability\n'
         'and verify original artwork permissions. Private signing keys are not distributed.\n', encoding='utf8')
-    (dist / 'README.txt').write_text('蜀山剑侠 · 归来：原生预览测试包\n\n'
-        'Android：安装 vssjx-android-preview.apk（专用开发签名，不是正式商店发布）。\n'
-        'Windows：解压 vssjx-windows-x64-preview.zip，运行其中的 vssjx.exe；资源已内嵌。\n'
-        '两个平台均未在本机实际设备运行验收。Windows EXE未签名，可能显示未知发布者提示。\n'
+    instructions = ['蜀山剑侠 · 归来：原生预览测试包\n']
+    if android:
+        instructions.append('Android：安装 ' + ('vssjx-android-preview.apk（开发测试签名）' if args.development_signing else 'vssjx-android.apk（外部提供的签名）') + '。尚未完成设备运行验收。')
+    if windows:
+        instructions.append('Windows：解压 vssjx-windows-x64-preview.zip，运行 vssjx.exe；资源内嵌。EXE未签名且未在Windows运行验收。')
+    if linux:
+        instructions.append('Linux x86_64：解压 vssjx-linux-x64-preview.tar.gz，进入目录运行 ./vssjx.x86_64；资源内嵌。需要glibc及OpenGL 3.3图形环境，不是AppImage。')
+    (dist / 'README.txt').write_text('\n'.join(instructions) + '\n'
         '离线：封面登陆游戏后，在服务器地址填写 local 再登陆；联机填写合法HTTPS服务地址。\n'
         '存档在应用用户目录；Android卸载或清数据会删除离线存档，换签名之前请先确认备份。\n'
         '请勿把本预览测试包当作完成设备/资源授权/AGPL源码交付/生产签名审核的正式发行版。\n', encoding='utf8')
     probes = output / 'probes'
     probes.mkdir(exist_ok=True)
+    if linux:
+        folder = dist / 'linux-x64'
+        folder.mkdir()
+        executable = folder / 'vssjx.x86_64'
+        run('linux-export', [godot, '--headless', '--path', str(project), '--export-release', 'Game (Linux)', str(executable)])
+        executable.chmod(0o755)
+        check_linux_binary(executable)
+        if list(folder.glob('*.pck')):
+            raise RuntimeError('Linux executable must have its PCK embedded')
+        run('linux-embedded-pack-audit', [godot, '--headless', '--main-pack', str(executable), '--script', str(ROOT / 'tests/game_export_probe.gd')], 'GAME EXPORT: 70 checks, 0 failures')
+        linux_runtime = run('linux-release-version', [str(executable), '--version']).strip()
+        if not linux_runtime.startswith('4.7.2.stable.official'):
+            raise RuntimeError('Unexpected Linux release runtime version')
+        run('linux-release-startup', [str(executable), '--headless', '--quit-after', '60'])
+        version_info = run('linux-elf-versions', ['readelf', '--version-info', str(executable)])
+        versions = re.findall(r'\bGLIBC_(\d+\.\d+(?:\.\d+)?)\b', version_info)
+        if not versions:
+            raise RuntimeError('Unable to determine Linux glibc symbol requirements')
+        linux_glibc = max(versions, key=lambda value: tuple(map(int, value.split('.'))))
+        for name in ['PROJECT-LICENSE.txt', 'GODOT-NOTICES.txt', 'SOURCE.txt']:
+            shutil.copy2(dist / name, folder / name)
+        shutil.copy2(ROOT / 'client/assets/fonts/OFL.txt', folder / 'FONT-LICENSE.txt')
+        (folder / 'README.txt').write_text('Linux x86_64 preview. Extract the archive and run ./vssjx.x86_64.\n'
+            'Game resources are embedded; no Godot installation, separate PCK or root installation is required.\n'
+            'Requires glibc ' + linux_glibc + '+ and an OpenGL 3.3 desktop/driver. Not AppImage, not musl/Alpine.\n'
+            'If executable permissions were lost during transfer, run: chmod +x vssjx.x86_64\n'
+            'Offline: login screen server address = local. Online: enter your HTTPS game server URL.\n'
+            'Saves use XDG_DATA_HOME (default ~/.local/share), not the extracted program folder.\n'
+            'Only this host startup has been checked by the builder; consult separate GUI acceptance results.\n', encoding='utf8')
+        write_linux_archive(folder, dist / 'vssjx-linux-x64-preview.tar.gz')
     if windows:
         folder = dist / 'windows-x64'
         folder.mkdir()
@@ -253,7 +320,9 @@ def build(args):
               'source_sha256': hashlib.sha256(json.dumps(sources, sort_keys=True).encode()).hexdigest(),
               'android_signing': ('development-preview-only' if args.development_signing else 'external-release-key') if android else 'not-built',
               'android_certificate_sha256': certificate_sha256,
-              'windows_signing': 'unsigned', 'actual_windows_execution': False, 'actual_android_execution': False,
+              'windows_signing': 'unsigned' if windows else 'not-built', 'actual_windows_execution': False, 'actual_android_execution': False,
+              'actual_linux_execution': linux, 'linux_runtime': linux_runtime, 'linux_glibc_required': linux_glibc,
+              'linux_rendered_gameplay': 'not-tested-by-builder',
               'files': files}
     (output / 'build-report.json').write_text(json.dumps(report, indent=2))
     print('Native artifacts: ' + str(dist), flush=True)
@@ -263,7 +332,8 @@ def build(args):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, required=True)
-    parser.add_argument('--target', choices=['all', 'windows', 'android'], default='all')
+    parser.add_argument('--target', choices=['all', 'linux', 'windows', 'android'], default='all')
+    parser.add_argument('--linux-template', type=Path, default=Path('/tmp/opencode/vssjx-native-toolchain/linux_release.x86_64'))
     parser.add_argument('--windows-template', type=Path, default=Path('/tmp/opencode/vssjx-native-toolchain/windows_release_x86_64.exe'))
     parser.add_argument('--templates', type=Path, default=Path.home() / '.local/share/godot/export_templates/4.7.2.stable')
     parser.add_argument('--android-sdk', type=Path, default=Path(os.environ.get('ANDROID_HOME', '/opt/android-sdk')))

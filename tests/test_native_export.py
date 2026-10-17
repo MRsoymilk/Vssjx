@@ -4,6 +4,7 @@ import importlib.util
 import json
 from pathlib import Path
 import struct
+import tarfile
 from tempfile import TemporaryDirectory
 import unittest
 from types import SimpleNamespace
@@ -25,6 +26,14 @@ class NativeExportTests(unittest.TestCase):
         self.assertEqual(json.loads(config['preset.1']['platform']), 'Windows Desktop')
         self.assertEqual(config['preset.1.options']['binary_format/embed_pck'], 'true')
         self.assertEqual(config['preset.1.options']['codesign/enable'], 'false')
+
+    def test_linux_has_embedded_pack_and_opt_in_shipped_cjk_font(self):
+        config = self.presets()
+        self.assertEqual(json.loads(config['preset.0']['platform']), 'Linux')
+        self.assertEqual(config['preset.0.options']['binary_format/embed_pck'], 'true')
+        self.assertEqual(json.loads(config['preset.0.options']['binary_format/architecture']), 'x86_64')
+        self.assertEqual(json.loads(config['preset.0']['custom_features']), 'bundled_cjk')
+        self.assertIn('assets/licenses/*.txt', config['preset.0']['include_filter'])
 
     def test_android_is_signed_arm_apk_with_minimal_permissions(self):
         config = self.presets()
@@ -56,6 +65,7 @@ class NativeExportTests(unittest.TestCase):
         for feature in ['web', 'android', 'windows']:
             self.assertIn('OS.has_feature("' + feature + '")', text)
         self.assertNotIn('OS.has_feature("linux")', text)
+        self.assertIn('OS.has_feature("bundled_cjk")', text)
 
     def test_copy_filter_excludes_private_material_and_admin(self):
         names = ['admin', 'tests', 'android', '.env', '.godot', 'key.keystore', 'key.jks', 'cert.pem', 'secret.key', 'signing.pfx', 'file.import', 'main.gd']
@@ -93,6 +103,44 @@ class NativeExportTests(unittest.TestCase):
             file.write_bytes(data)
             with self.assertRaises(AssertionError):
                 export.check_pe(file)
+
+    def test_linux_binary_requires_elf64_x86_64_and_execute_permission(self):
+        with TemporaryDirectory(prefix='vssjx-elf-', dir='/tmp/opencode') as folder:
+            path = Path(folder) / 'vssjx.x86_64'
+            data = bytearray(64)
+            data[:6] = b'\x7fELF\x02\x01'
+            struct.pack_into('<HH', data, 16, 3, 62)
+            path.write_bytes(data)
+            path.chmod(0o755)
+            export.check_linux_binary(path)
+            path.chmod(0o644)
+            with self.assertRaises(AssertionError):
+                export.check_linux_binary(path)
+            path.chmod(0o755)
+            struct.pack_into('<H', data, 18, 183)
+            path.write_bytes(data)
+            with self.assertRaises(AssertionError):
+                export.check_linux_binary(path)
+
+    def test_linux_tar_preserves_executable_and_removes_host_owner(self):
+        with TemporaryDirectory(prefix='vssjx-tar-', dir='/tmp/opencode') as directory:
+            folder = Path(directory) / 'linux-x64'
+            folder.mkdir()
+            executable = folder / 'vssjx.x86_64'
+            executable.write_bytes(b'test binary')
+            (folder / 'README.txt').write_text('test instructions')
+            archive = Path(directory) / 'game.tar.gz'
+            export.write_linux_archive(folder, archive)
+            with tarfile.open(archive) as pack:
+                members = {member.name: member for member in pack.getmembers()}
+                self.assertEqual(set(members), {'vssjx-linux-x64/vssjx.x86_64', 'vssjx-linux-x64/README.txt'})
+                self.assertEqual(members['vssjx-linux-x64/vssjx.x86_64'].mode, 0o755)
+                self.assertEqual(members['vssjx-linux-x64/README.txt'].mode, 0o644)
+                for member in members.values():
+                    self.assertEqual((member.uid, member.gid, member.uname, member.gname), (0, 0, '', ''))
+            (folder / 'private-link').symlink_to(executable)
+            with self.assertRaises(ValueError):
+                export.write_linux_archive(folder, Path(directory) / 'bad.tar.gz')
 
     def test_signing_does_not_overwrite_unrelated_private_files(self):
         with TemporaryDirectory(prefix='vssjx-signing-safety-', dir='/tmp/opencode') as folder:

@@ -1,5 +1,7 @@
 # Android APK / Windows EXE 原生预览包
 
+后续新增Linux x86_64 release便携包，构建方式及实际执行验证见[Linux发布记录](linux_packages.md)。本文APK/EXE的交付摘要保持其原始含义，不覆盖旧包。
+
 2026-10-17：发布推进优先转为Android原生APK和Windows x64 EXE；保留既有Web实现，不删除或回退共享分支的更新。本单元在独立worktree、本地`feature/native-apk-exe`分支开发，起点`05ed199`。不合并、不推送、不重写共享`dev`。
 
 ## 包的定位

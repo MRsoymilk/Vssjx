@@ -21,6 +21,7 @@
     "hero/wfs": "res://assets/data/actors/hero/wfs.json",
     "hero/wzs": "res://assets/data/actors/hero/wzs.json",
     "main/biaoti": "res://assets/data/actors/main/biaoti.json",
+    "main/death": "res://assets/data/actors/main/death.json",
     "map/m1": "res://assets/data/actors/map/m1.json",
     "map/m10": "res://assets/data/actors/map/m10.json",
     "map/m2": "res://assets/data/actors/map/m2.json",

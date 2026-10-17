@@ -14,6 +14,7 @@ var _previous_enemy_hp := -1
 var _enemy_attack_delay := 0.0
 var _hero_motion: BattleActionPlayback
 var _enemy_motion: BattleActionPlayback
+var _hero_death: BattleDeathPlayback
 var _hero_key := ""
 var _shown_hero_hp := 0
 var _shown_enemy_hp := 0
@@ -95,6 +96,7 @@ func present(pve: OnlinePve) -> void:
 				_start_enemy_motion()
 			$Hud/ActionMenu.hide()
 	revision = b.revision
+	if b.outcome == "defeat" and animation_time <= 0: _start_hero_death()
 	_previous_enemy_hp = int(b.enemy_hp)
 	if model.ready and not model.pending() and not model.last_code.is_empty() and model.active(): _open_menu()
 	$Hud/Level.text = str(int(c.level))
@@ -111,6 +113,8 @@ func present(pve: OnlinePve) -> void:
 	refresh()
 
 func _cancel_motion() -> void:
+	if _hero_death != null: _hero_death.cancel()
+	_hero_death = null
 	if _hero_motion != null: _hero_motion.cancel()
 	if _enemy_motion != null: _enemy_motion.cancel()
 	_hero_motion = null
@@ -128,6 +132,8 @@ func _start_enemy_motion() -> void:
 	_enemy_attack_delay = 0.0
 	if not _should_enemy_act(): return
 	_enemy_motion = BattleActionPlayback.new()
+	_enemy_motion.completed.connect(func() -> void:
+		if not _enemy_motion.cancelled: _start_hero_death())
 	_enemy_motion.impact.connect(func() -> void:
 		if _enemy_motion.cancelled: return
 		var took_damage := int(model.state.battle.hp) < _shown_hero_hp
@@ -139,6 +145,13 @@ func _start_enemy_motion() -> void:
 	)
 	_enemy_motion.start(enemy, OriginalArt.actor_info(model.state.battle.enemy.art), hero.global_position, &"attack", hero)
 	animation_time = _enemy_motion.duration
+
+func _start_hero_death() -> void:
+	if _hero_death != null or model == null or not model.ready or not model.state.get("battle") is Dictionary: return
+	if model.state.battle.outcome != "defeat" or int(model.state.battle.hp) != 0: return
+	_hero_death = BattleDeathPlayback.new()
+	_hero_death.start(hero)
+	animation_time += _hero_death.remaining()
 
 func _should_enemy_act() -> bool:
 	if model == null or not model.ready or not model.state.get("battle") is Dictionary: return false
@@ -187,9 +200,10 @@ func refresh() -> void:
 		$Result/Body.text = "奖励已入账" if outcome == "victory" else ("元气已经恢复" if outcome == "defeat" else "试炼进度保留")
 	else: $Hint.text = ""
 	var hero_attacking := _hero_motion != null and _hero_motion.active and _hero_motion.action == &"attack"
-	$Hud/BattleHeroHp.visible = not hero_attacking
-	$Hud/BattleHeroMp.visible = not hero_attacking
-	$Hero/Ring.visible = not hero_attacking
+	$Hud/BattleHeroHp.visible = not hero_attacking and _hero_death == null
+	$Hud/BattleHeroMp.visible = not hero_attacking and _hero_death == null
+	$Hud/Level.visible = _hero_death == null
+	$Hero/Ring.visible = not hero_attacking and _hero_death == null
 	$Hud/BattleEnemyHp.visible = _enemy_motion == null or not _enemy_motion.active
 	$Countdown.visible = model.active()
 	$Countdown.value = str(maxi(0, ceili(countdown)))
@@ -239,7 +253,7 @@ func toggle_auto() -> void:
 	refresh()
 
 func return_to_map() -> void:
-	if model == null or model.active() or model.pending() or not model.ready: return
+	if model == null or model.active() or model.pending() or not model.ready or animation_time > 0: return
 	_cancel_motion()
 	hide()
 	dismissed.emit()
@@ -257,9 +271,14 @@ func _process(delta: float) -> void:
 			remaining_delta -= player_delta
 		if _enemy_motion != null and _enemy_motion.active:
 			if not _should_enemy_act(): _enemy_motion.cancel()
-			else: _enemy_motion.advance(remaining_delta)
+			else:
+				var enemy_delta := minf(remaining_delta, _enemy_motion.remaining())
+				_enemy_motion.advance(enemy_delta)
+				remaining_delta -= enemy_delta
+		if _hero_death != null: _hero_death.advance(remaining_delta)
 		_enemy_attack_delay = _hero_motion.remaining() if _hero_motion != null and _should_enemy_act() else 0.0
 		animation_time = (_hero_motion.remaining() if _hero_motion != null else 0.0) + (_enemy_motion.remaining() if _enemy_motion != null else 0.0)
+		if _hero_death != null: animation_time += _hero_death.remaining()
 	if was_animating and animation_time == 0 and model.active() and not automatic: _open_menu()
 	if model.ready and model.active() and not model.pending() and animation_time == 0:
 		countdown = maxf(0.0, countdown - delta)

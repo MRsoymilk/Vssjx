@@ -34,7 +34,7 @@ TRANSFORMS = {
 SELECTED = ['hero/mck', 'hero/mzs', 'hero/mfs', 'hero/wck', 'hero/wzs', 'hero/wfs',
             'monster/langw', 'monster/xt1', 'monster/hs1', 'monster/nt1',
             'map/m1', 'map/m2', 'map/m3', 'map/m4', 'map/m5', 'map/m6',
-            'map/m7', 'map/m9', 'map/m10', 'main/biaoti',
+            'map/m7', 'map/m9', 'map/m10', 'main/biaoti', 'main/death',
             'effect/flash', 'effect/t1', 'effect/t20', 'effect/t36', 'effect/t44', 'effect/t47', 'effect/t71']
 
 # Native sequence IDs, not serialized sequence positions. Raw archive/admin

@@ -94,7 +94,9 @@ func check_reactions(art_key: String) -> void:
 	view._process(view._hero_motion.remaining() + 0.001)
 	check(view.enemy.animation == "attack" and not view.get_node("Result").visible, "A lethal counterattack still plays before defeat is shown")
 	view._process(view._enemy_motion.remaining() + 0.001)
-	check(view.enemy.position == Vector2.ZERO and view.get_node("Result").visible and view.get_node("Hud/BattleHeroHp").value == 0, "Lethal counterattack returns before defeat settlement")
+	check(view.enemy.position == Vector2.ZERO and not view.get_node("Result").visible and view._hero_death != null and view.get_node("Hud/BattleHeroHp").value == 0, "Lethal counterattack returns before original death animation")
+	view._process(view._hero_death.remaining() + 0.001)
+	check(view.get_node("Result").visible and not view.hero.visible, "Defeat settlement waits for death animation and retains its tombstone")
 	model.state = state(art_key)
 	model.state.battle.id = "guard_reflection"
 	view.present(model)

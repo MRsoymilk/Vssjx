@@ -27,7 +27,7 @@ class ActorCatalogTests(unittest.TestCase):
         spec.loader.exec_module(cls.importer)
 
     def test_runtime_records_only_change_audited_playback_and_alignment(self):
-        self.assertEqual(len(self.actors), self.expected['runtime_records'])
+        self.assertEqual(len(self.actors), self.expected['runtime_records'] + 1)  # Reviewed main/death added below.
         path = ROOT.parent / 'tests/fixtures/actors_v1.json.zlib.b64'
         expected = json.loads(zlib.decompress(base64.b64decode(path.read_text())))
         for key, info in expected.items():
@@ -38,7 +38,12 @@ class ActorCatalogTests(unittest.TestCase):
                 info.update(self.monster_alignment['runtime_overrides'][key])
         native = json.loads((ROOT.parent / 'tests/fixtures/native_battle_playback.json').read_text('utf-8'))
         for key, overrides in native.items(): expected[key].update(overrides)
-        self.assertEqual(canonical(self.actors), canonical(expected))
+        # Ground-ring integration added audited walking anchors after this legacy fixture.
+        walk_centers = {'mck': -2, 'mzs': 3, 'mfs': 1, 'wck': 2, 'wzs': 1, 'wfs': 2}
+        for key, info in expected.items():
+            if key.startswith(('hero/', 'creation/')):
+                info['native_battle']['pose_x']['walk'] = [walk_centers[key.split('/')[1]]] * 6
+        self.assertEqual(canonical({key: value for key, value in self.actors.items() if key != 'main/death'}), canonical(expected))
 
     def test_benchmark_fixture_is_the_exact_legacy_catalog_size_and_content(self):
         path = ROOT.parent / 'tests/fixtures/actors_v1.json.zlib.b64'
@@ -56,9 +61,20 @@ class ActorCatalogTests(unittest.TestCase):
     def test_atlas_bytes_outside_monster_alignment_are_unchanged(self):
         digest = hashlib.sha256()
         for texture in sorted({info['texture'] for key, info in self.actors.items()
-                               if key not in self.monster_alignment['runtime_overrides']}):
+                               if key not in self.monster_alignment['runtime_overrides'] and key != 'main/death'}):
             digest.update(texture.encode() + b'\0' + (ROOT / texture.removeprefix('res://')).read_bytes())
         self.assertEqual(digest.hexdigest(), self.monster_alignment['unchanged_texture_set_sha256'])
+
+    def test_death_uses_exact_original_composites_and_rebuilds_deterministically(self):
+        original = self.importer.parse_ani(ROOT.parent / 'analysis/unpacked/ssjx/death.ani')
+        self.assertEqual(original['sources'], ['txms', 'txy01'])
+        self.assertEqual(len(original['frames']), 10)
+        self.assertEqual(original['sequences'], [[(i, 1) for i in range(10)]])
+        self.assertEqual(canonical(original), canonical(self.source['main/death']))
+        with tempfile.TemporaryDirectory(prefix='vssjx-death-') as folder:
+            info = self.importer.bake('main/death', original, texture_dir=folder)
+            self.assertEqual(canonical(info), canonical(self.actors['main/death']))
+            self.assertEqual((Path(folder) / 'main_death.png').read_bytes(), (ROOT / 'assets/actors/main_death.png').read_bytes())
 
     def test_runtime_index_is_small_and_references_one_shard_per_actor(self):
         path = ROOT / 'assets/data/actors.json'

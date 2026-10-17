@@ -1,0 +1,24 @@
+{
+  "texture": "res://assets/actors/main_death.png",
+  "width": 42,
+  "height": 64,
+  "columns": 8,
+  "origin": [-6, -53],
+  "anchor_x": 0,
+  "playback": {},
+  "count": 10,
+  "sequences": [
+    [
+      [0, 1],
+      [1, 1],
+      [2, 1],
+      [3, 1],
+      [4, 1],
+      [5, 1],
+      [6, 1],
+      [7, 1],
+      [8, 1],
+      [9, 1]
+    ]
+  ]
+}

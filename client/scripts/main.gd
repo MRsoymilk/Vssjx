@@ -53,6 +53,7 @@ var battle_transition: BattleEncounterTransition
 var battle_transition_epoch := 0
 var battle_resource_request: PlatformResourceRequest
 var battle_playback: BattleActionPlayback
+var battle_death: BattleDeathPlayback
 var battle_ring: Node2D
 var clock_timer := 0.0
 var effects_layer: Control
@@ -69,6 +70,8 @@ var _closing := false
 
 func _exit_tree() -> void:
 	_ui_epoch += 1
+	if battle_death != null: battle_death.cancel()
+	battle_death = null
 	if battle_playback != null: battle_playback.cancel()
 	battle_playback = null
 	Game.invalidate_load()
@@ -125,6 +128,7 @@ func _process(delta: float) -> void:
 	if Game.storage_busy or _closing: return
 	if OS.has_feature("web") and (not Platform.context.lifecycle.focused or Platform.context.lifecycle.suspended): return
 	if battle_playback != null: battle_playback.advance(delta)
+	if battle_death != null: battle_death.advance(delta)
 	clock_timer += delta
 	if clock_timer >= 1.0 and chrome != null and is_instance_valid(chrome):
 		clock_timer = 0.0
@@ -254,6 +258,8 @@ func _button(parent: Node, text_value: String, rect: Rect2, callback: Callable, 
 
 func _clear_ui() -> void:
 	_ui_epoch += 1
+	if battle_death != null: battle_death.cancel()
+	battle_death = null
 	if is_instance_valid(battle_move_callout): battle_move_callout.clear()
 	battle_move_callout = null
 	if battle_playback != null: battle_playback.cancel()
@@ -842,7 +848,7 @@ func _encounter_battle(enemy: Dictionary) -> void:
 	# A short readable warning, followed by actual texture/cache work.
 	await get_tree().create_timer(0.20).timeout
 	if not _encounter_current(epoch, world_id): return
-	var keys: Array[String] = [Game.actor_key(), String(enemy.get("art", "")), "effect/flash", ["effect/t71", "effect/t36", "effect/t47"][int(Game.player.job)]]
+	var keys: Array[String] = [Game.actor_key(), String(enemy.get("art", "")), "effect/flash", BattleDeathPlayback.ART_KEY, ["effect/t71", "effect/t36", "effect/t47"][int(Game.player.job)]]
 	var paths: Array[String] = ["res://assets/tiles/original_tiles.png"]
 	for key in keys:
 		var info := OriginalArt.actor_info(key)
@@ -1026,6 +1032,13 @@ func _battle_turn(command: String) -> void:
 		await enemy_motion.completed
 		if epoch != _ui_epoch or enemy_motion.cancelled or mode != "battle" or battle != active_battle: return
 		battle_playback = null
+	if battle.hp == 0:
+		battle_stage = "settlement"
+		battle_death = BattleDeathPlayback.new()
+		battle_death.start(battle_hero)
+		_refresh_battle()
+		await battle_death.completed
+		if epoch != _ui_epoch or mode != "battle" or battle != active_battle or battle_death == null or battle_death.cancelled: return
 	battle_stage = "settlement"
 	_refresh_battle()
 	await get_tree().create_timer(0.35).timeout
@@ -1082,10 +1095,11 @@ func _refresh_battle() -> void:
 	battle_enemy_hp.value = battle.enemy_hp
 	var moving_hero := battle_playback != null and battle_playback.active and battle_playback.actor == battle_hero and battle_playback.action == &"attack"
 	var moving_enemy := battle_playback != null and battle_playback.active and battle_playback.actor == battle_enemy
-	battle_hero_hp.visible = not moving_hero
-	battle_hero_mp.visible = not moving_hero
-	battle_hero_status.visible = not moving_hero
-	if is_instance_valid(battle_ring): battle_ring.visible = not moving_hero
+	var dead_hero := battle_death != null
+	battle_hero_hp.visible = not moving_hero and not dead_hero
+	battle_hero_mp.visible = not moving_hero and not dead_hero
+	battle_hero_status.visible = not moving_hero and not dead_hero
+	if is_instance_valid(battle_ring): battle_ring.visible = not moving_hero and not dead_hero
 	battle_enemy_hp.visible = not moving_enemy
 	battle_enemy_status.visible = not moving_enemy
 	if battle_buttons.size() == 6:

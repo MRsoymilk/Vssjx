@@ -33,3 +33,13 @@
 上线需要同时更新服务端和客户端，并由新服务自动应用迁移。当前运行中的旧服务不会仅因源码改动而支持商店。
 
 项目资源路径检查有一项既有失败：用户工作区未跟踪的 `client/scenes/ui/online_characters.tscn` 仍引用已删除的旧脚本。本次不改动此文件，也不将其加入提交。
+
+## 2026-10-17 打包与本机部署
+
+- 已按用户请求更新服务与网页，游戏源码为 `f692f09`。隔离构建输入只复制已跟踪公开文件，包含工作区已有的两项界面主题调整，排除未跟踪的旧角色场景；保留源码副本和来源摘要，未提交这些界面调整。
+- Godot 4.7.2 与匹配模板导出 Web release。实际部署目录为 `work/builds/web-shop-local-20261017/public/`，静态版本 `ad6e76b2dbf8f4bb`，保留旧版不可变资源路径以兼容正在加载的玩家。沿用本机回环 HTTP 例外，局域网及公网使用 HTTPS。严格 HTTPS 的独立导出也保留在 `work/builds/web-shop-20261017/`。
+- Web 浏览器六项验证及部署后的 22 项文件／压缩／API／WebSocket 检查通过。本机 `127.0.0.1:8000`、局域网 `192.168.1.6:8443` 保持原端口。公网 `https://ssjx.soymilk.xin` 的引擎配置与新版一致、WASM 可用、API 返回 vssjx，WSS 升级为 101。Cloudflare 会插入分析脚本，故公网 HTML 核对引擎配置，本机产物逐文件核对摘要。
+- 服务使用已验证的版本化可执行文件 `work/shop-deploy/f692f09-20261017/server-f692f09.exe`，不覆盖被 Windows 锁定的旧映像。停服前执行并验证 PostgreSQL dump，保存于同目录 `database-20261017-211121.dump`；升级后迁移 12、就绪检查及私有管理接口正常。未重建数据库卷。
+- ARM64 APK：`work/builds/android-shop-arm64-20261017/dist/vssjx-android-preview-arm64.apk`，44,481,281 字节；复用之前的开发签名和包名。签名、16 KB 对齐、权限／架构检查及实际包内资源的桌面审计 286 项通过。未声称完成 ARM64 真机运行验收。
+- `tests/game_export_probe.gd` 更新为检查 100 个动画索引、全部 72 种组合、商店场景及真实持久化购买／装备／重载。开发管理页面、测试、配置和私钥不进入分发包。
+- 本机重启脚本 `work/security-deploy/restart-approved.ps1` 已指向新版，网页 Compose 参数保存于忽略的 `work/web-deploy.active.env`；旧服务映像、旧网页与数据库备份均保留，未推送远程 Git。

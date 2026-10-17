@@ -20,9 +20,19 @@ func _verify() -> void:
 	for path in ["res://scenes/admin", "res://scripts/admin", "res://assets/admin", "res://tests"]:
 		check(not DirAccess.dir_exists_absolute(path), "Developer directory is absent: " + path)
 	var manifest: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://assets/data/actors.json"))
-	check(manifest.get("actors", {}).size() == 34 and manifest.actors.has("main/death"), "Actor index includes the reviewed death animation")
+	check(manifest.get("actors", {}).size() == 100 and manifest.actors.has("main/death"), "Actor index includes reviewed death and equipment variants")
 	for path in manifest.actors.values():
 		check(FileAccess.file_exists(path), "Dynamically loaded actor JSON is included: " + path)
+	var shop_rules = load("res://scripts/shop_rules.gd")
+	for gender in 2:
+		for job in 3:
+			for weapon in 4:
+				for armor in 3:
+					var key: String = shop_rules.actor_key(job,gender,[weapon,armor])
+					check(manifest.actors.has(key), "Packed appearance metadata: " + key)
+					var info: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(manifest.actors[key]))
+					check(ResourceLoader.exists(info.texture), "Packed appearance texture: " + key)
+	check(ResourceLoader.exists("res://scenes/ui/shop_panel.tscn"), "Shop interface is included")
 	check(FileAccess.file_exists("res://assets/data/original_world.json"), "Shared game world data is still included")
 	check(ResourceLoader.exists("res://scenes/main.tscn"), "Game main scene is included")
 	var bundled_font = load("res://assets/fonts/cjk_fallback.tres")
@@ -48,6 +58,11 @@ func _verify() -> void:
 	game.player.gold = 0
 	var restored = await game.load_game()
 	check(restored.ok and game.player.gold == 30 and game.player.version == 1, "Packed async read preserves v1 save compatibility")
+	game.player.gold = 200
+	check((await game.shop_command("buy","weapon_2")).ok and (await game.shop_command("buy","armor_2")).ok, "Packed shop purchases use actual persistent storage")
+	check((await game.shop_command("equip","weapon_2")).ok and (await game.shop_command("equip","armor_2")).ok, "Packed equipment can be equipped")
+	check(game.appearance_key() == "hero/mck_w2_c1" and game.stats().attack == 31 and game.stats().defense == 7, "Packed gear changes appearance and combat stats")
+	check((await game.load_game()).ok and game.player.gold == 125 and game.appearance_key() == "hero/mck_w2_c1", "Packed purchase and appearance survive reload")
 	check(DirAccess.remove_absolute(game.save_path) == OK, "Remove only the owned export save fixture")
 	game.save_path = original_path
 	game.player = original_player

@@ -23,3 +23,20 @@ python -X utf8 tools/export_native.py --target android --output work/builds/andr
 - Android 配置、私有文件排除、ARM64 对齐拒绝错误输入、导出器不修改 Git 的 4 项 Python 检查通过。
 
 日志、源码哈希和签名证书摘要保留在同级 `build-report.json` 与各步骤日志。构建时仅打包工具存在未提交的 Windows 兼容修改，游戏目录与上述提交一致；没有推送远端或更新网页部署。
+
+## 蓝叠 x86 启动修正
+
+原 ARM 包在本机 BlueStacks Nougat32（Android 7.1.1，ABI `x86,armeabi-v7a,armeabi`）上选择了 `armeabi-v7a`，在进入 Godot 主循环之前报 `java.lang.UnsatisfiedLinkError: undefined symbol: _ZN8AObbInfoD2Ev`，重复崩溃并停留在启动图。该符号不在四套 Godot 模板原生库的符号字符串中；不据此判断 ARM 真机也会失败。
+
+新增 `--android-emulator`，在隔离导出配置里同时加入 x86 / x86_64，保留 ARM32 / ARM64；默认手机导出配置不变。原生库校验增加两种 x86 ELF class / machine 检查，继续验证 64 位库的 16 KB 对齐。复用相同开发签名及包名，可覆盖安装。
+
+在上述构建命令追加 `--android-emulator`，改输出为 `work/builds/android-universal-20261017-1a1e29c`。产物 `dist/vssjx-android-preview-universal.apk`，121,042,128 字节；签名、四种 ABI、ZIP CRC、16 KB 对齐、权限及包内资源 71 项检查通过。相关 Python 检查增加至 5 项。
+
+本机模拟器实际验证：
+
+- 使用 `adb install -r` 覆盖安装，未卸载或清除数据，安装结果 Success。
+- 系统选择 `primaryCpuAbi=x86`；Godot 原生层初始化、OpenGL ES 3.0 与主循环启动成功。
+- 实际截图确认进入游戏封面，并点击进入登陆游戏页；进程保持存活，没有原生链接错误、FATAL EXCEPTION 或 SCRIPT ERROR。
+- 未修改蓝叠图形配置或重启模拟器；未进行账号登陆、联机、战斗或 ARM 真机运行验证。
+
+日志与截图在忽略目录 `work/android-emulator/`。模拟器执行结果独立记在构建目录的 `emulator-verification.json`；`build-report.json` 中的 `actual_android_execution=false` 仍表示导出器本身不执行设备测试。

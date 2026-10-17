@@ -68,9 +68,10 @@ def write_linux_archive(folder, archive):
 
 def check_android_library(name, data):
     assert data[:4] == b'\x7fELF' and data[5] == 1, name
-    is64 = data[4] == 2
-    assert struct.unpack_from('<H', data, 18)[0] == (183 if 'arm64-v8a/' in name else 40), name
-    assert is64 == ('arm64-v8a/' in name), name
+    abi = name.split('/')[1]
+    elf_class, machine = {'arm64-v8a': (2, 183), 'armeabi-v7a': (1, 40), 'x86': (1, 3), 'x86_64': (2, 62)}[abi]
+    is64 = elf_class == 2
+    assert data[4] == elf_class and struct.unpack_from('<H', data, 18)[0] == machine, name
     offset = struct.unpack_from('<Q' if is64 else '<I', data, 32 if is64 else 28)[0]
     size, count = struct.unpack_from('<HH', data, 54 if is64 else 42)
     loads = 0
@@ -180,6 +181,11 @@ def build(args):
         template_hashes['windows_release_x86_64.exe'] = sha(template)
         config = config.replace('[preset.1.options]', '[preset.1.options]\ncustom_template/release=' + json.dumps(str(template)))
     if android:
+        android_abis = ['arm64-v8a', 'armeabi-v7a']
+        if args.android_emulator:
+            android_abis += ['x86', 'x86_64']
+            config = config.replace('architectures/x86=false', 'architectures/x86=true')
+            config = config.replace('architectures/x86_64=false', 'architectures/x86_64=true')
         if (args.templates / 'version.txt').read_text().strip() != '4.7.2.stable':
             raise ValueError('Expected matching installed Android templates version 4.7.2.stable')
         for mode in ['debug', 'release']:
@@ -223,7 +229,8 @@ def build(args):
         'and verify original artwork permissions. Private signing keys are not distributed.\n', encoding='utf8')
     instructions = ['蜀山剑侠 · 归来：原生预览测试包\n']
     if android:
-        instructions.append('Android：安装 ' + ('vssjx-android-preview.apk（开发测试签名）' if args.development_signing else 'vssjx-android.apk（外部提供的签名）') + '。尚未完成设备运行验收。')
+        apk_name = ('vssjx-android-preview' if args.development_signing else 'vssjx-android') + ('-universal' if args.android_emulator else '') + '.apk'
+        instructions.append('Android：安装 ' + apk_name + ('（开发测试签名）' if args.development_signing else '（外部提供的签名）') + '。尚未完成设备运行验收。')
     if windows:
         instructions.append('Windows：解压 vssjx-windows-x64-preview.zip，运行 vssjx.exe；资源内嵌。EXE未签名且未在Windows运行验收。')
     if linux:
@@ -284,7 +291,7 @@ def build(args):
             for file in sorted(folder.iterdir()):
                 archive.write(file, 'vssjx-windows-x64/' + file.name)
     if android:
-        apk = dist / ('vssjx-android-preview.apk' if args.development_signing else 'vssjx-android.apk')
+        apk = dist / apk_name
         run('android-export', [godot, '--headless', '--path', str(project), '--export-release', 'Game (Android)', str(apk)])
         tools = args.android_sdk.resolve() / 'build-tools' / args.build_tools
         signature = run('android-signature', [str(tools / ('apksigner.bat' if os.name == 'nt' else 'apksigner')), 'verify', '--verbose', '--print-certs', str(apk)])
@@ -299,7 +306,7 @@ def build(args):
             raise RuntimeError('Unexpected debuggable release APK')
         package = 'com.mrsoymilk.vssjx.preview' if args.development_signing else 'com.mrsoymilk.vssjx'
         assert "name='" + package + "'" in badging
-        assert "native-code: 'arm64-v8a' 'armeabi-v7a'" in badging
+        assert "native-code: " + ' '.join("'" + abi + "'" for abi in android_abis) in badging
         assert "sdkVersion:'24'" in badging and "targetSdkVersion:'36'" in badging
         permissions = re.findall(r"uses-permission: name='([^']+)'", badging)
         assert permissions == ['android.permission.INTERNET'], permissions
@@ -310,7 +317,7 @@ def build(args):
             libraries = [name for name in names if name.startswith('lib/') and name.endswith('.so')]
             assert libraries, 'Missing Android native libraries'
             for name in libraries:
-                assert name.startswith(('lib/arm64-v8a/', 'lib/armeabi-v7a/')), name
+                assert name.split('/')[1] in android_abis, name
                 check_android_library(name, archive.read(name))
             assets = [name for name in names if name.startswith('assets/') and not name.endswith('/')]
             assert assets and 'assets/project.binary' in assets
@@ -333,6 +340,7 @@ def build(args):
               'source_sha256': hashlib.sha256(json.dumps(sources, sort_keys=True).encode()).hexdigest(),
               'android_signing': ('development-preview-only' if args.development_signing else 'external-release-key') if android else 'not-built',
               'android_certificate_sha256': certificate_sha256,
+              'android_abis': android_abis if android else [],
               'windows_signing': 'unsigned' if windows else 'not-built', 'actual_windows_execution': False, 'actual_android_execution': False,
               'actual_linux_execution': linux, 'linux_runtime': linux_runtime, 'linux_glibc_required': linux_glibc,
               'linux_rendered_gameplay': 'not-tested-by-builder',
@@ -353,6 +361,7 @@ def main():
     parser.add_argument('--java-sdk', type=Path, default=Path(os.environ.get('JAVA_HOME', '/usr/lib/jvm/java-17-openjdk')))
     parser.add_argument('--build-tools', default='36.0.0')
     parser.add_argument('--development-signing', action='store_true', help='Explicit install-test signing; never a production signing key')
+    parser.add_argument('--android-emulator', action='store_true', help='Include x86/x86_64 alongside ARM for native emulator execution')
     parser.add_argument('--development-key-dir', type=Path, default=Path('/tmp/opencode/vssjx-native-toolchain/development-signing'))
     build(parser.parse_args())
 

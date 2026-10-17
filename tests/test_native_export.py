@@ -171,6 +171,22 @@ class NativeExportTests(unittest.TestCase):
         with self.assertRaises(AssertionError):
             export.check_android_library('lib/arm64-v8a/test.so', data)
 
+    def test_android_emulator_libraries_require_matching_elf_architecture(self):
+        for abi, elf_class, machine in [('x86', 1, 3), ('x86_64', 2, 62)]:
+            with self.subTest(abi=abi):
+                data = bytearray(128)
+                data[:6] = b'\x7fELF' + bytes([elf_class, 1])
+                struct.pack_into('<H', data, 18, machine)
+                struct.pack_into('<Q' if elf_class == 2 else '<I', data, 32 if elf_class == 2 else 28, 64)
+                struct.pack_into('<HH', data, 54 if elf_class == 2 else 42, 56 if elf_class == 2 else 32, 1)
+                struct.pack_into('<I', data, 64, 1)
+                struct.pack_into('<Q' if elf_class == 2 else '<I', data, 112 if elf_class == 2 else 92, 16384)
+                name = 'lib/' + abi + '/test.so'
+                export.check_android_library(name, data)
+                struct.pack_into('<H', data, 18, 40)
+                with self.assertRaises(AssertionError):
+                    export.check_android_library(name, data)
+
     def test_exporter_has_no_git_mutation_commands(self):
         text = (ROOT / 'tools/export_native.py').read_text(encoding='utf8')
         for operation in ['push', 'merge', 'switch', 'checkout', 'reset', 'commit']:

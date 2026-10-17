@@ -73,6 +73,11 @@ func _run() -> void:
 	OnlineAccount._on_response(HTTPRequest.RESULT_TLS_HANDSHAKE_ERROR, 0, PackedStringArray(), PackedByteArray(), OnlineAccount._generation)
 	check(transport_results.size() == 1 and transport_results[0].code == "NETWORK_ERROR" and transport_results[0].transport_error == "TLS_HANDSHAKE_ERROR", "TLS failures retain the retry contract and expose only a transport category")
 	check(login.status.text.contains("HTTPS握手失败") and login.status.text.contains("端口") and not login.status.text.contains("网络请求未确认"), "Account page distinguishes TLS protocol/certificate failures from unknown request outcomes")
+	OnlineAccount.completed.connect(func(_action: String, result: Dictionary) -> void: transport_results.append(result), CONNECT_ONE_SHOT)
+	OnlineAccount._action = "login"
+	OnlineAccount._on_response(HTTPRequest.RESULT_CANT_RESOLVE, 0, PackedStringArray(), PackedByteArray(), OnlineAccount._generation)
+	check(transport_results.size() == 2 and transport_results[1].code == "NETWORK_ERROR" and transport_results[1].transport_error == "DNS_ERROR", "DNS failures retain the retry contract with a specific safe transport category")
+	check(login.status.text.contains("域名解析失败") and login.status.text.contains("DNS") and not login.status.text.contains("网络请求未确认"), "Unresolved tunnel hostname identifies the missing DNS route instead of a generic credential error")
 	login.address_input.text = "https://game.example.com/ssjx"
 	login.get_node("Back").pressed.emit()
 	check(app.modal == null and cover.active, "Return restores title input")

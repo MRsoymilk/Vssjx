@@ -1,5 +1,13 @@
 # 记住账号与登录页
 
+## 2026-10-17 隧道域名解析失败提示
+
+原生 Godot 对当前隧道域名执行不带凭据的 `GET /api/v1/server-info`，得到 `RESULT_CANT_RESOLVE`、HTTP 状态 0；同进程请求本机 `http://127.0.0.1:8000` 得到 200。系统和指定公共 DNS 的查询未返回该主机名的 A/AAAA 记录。登录失败发生在连接账号接口之前，不能据此判断密码错误；本次没有读取密码、发出测试登录、修改账号或改动用户保存的公网地址。
+
+`OnlineAccount` 为该结果增加安全分类 `transport_error=DNS_ERROR`，保留 `code=NETWORK_ERROR` 的重试契约。账号页显示“服务器域名解析失败，请检查域名拼写和DNS记录是否已生效。”已处理的 TLS 分类继续生效，其他未知网络结果仍保留原来的注册/刷新结果不确定说明。不自动回退 HTTP、关闭证书检查或绕过 DNS。
+
+登录 UI 53 项通过，包含 DNS 分类与明确提示的断言；隔离 PostgreSQL/Rust 账号认证联调及 Godot 账号 UI 19 项通过。真实原生请求诊断放在忽略目录 `work/tunnel-login-diagnostic`，公网 DNS/隧道路由仍需在域名管理方修正后才能验收。本次未重新打包网页。
+
 ## 2026-10-17 HTTPS 协议错误提示
 
 账号 HTTPRequest 的 TLS 握手失败仍保留 `NETWORK_ERROR` 重试契约，并增加不含凭据的 `transport_error=TLS_HANDSHAKE_ERROR` 分类。登录页明确提示检查协议、端口和证书，HTTP 服务不能填写为 HTTPS。不关闭证书验证、不自动回退 HTTP。

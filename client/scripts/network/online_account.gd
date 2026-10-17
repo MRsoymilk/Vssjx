@@ -162,6 +162,7 @@ func _on_response(result: int, code: int, _headers: PackedStringArray, body: Pac
 	if result != HTTPRequest.RESULT_SUCCESS:
 		var failure := {"ok": false, "code": "NETWORK_ERROR"}
 		if result == HTTPRequest.RESULT_TLS_HANDSHAKE_ERROR: failure["transport_error"] = "TLS_HANDSHAKE_ERROR"
+		if result == HTTPRequest.RESULT_CANT_RESOLVE: failure["transport_error"] = "DNS_ERROR"
 		_finish(failure)
 		return
 	if code == 204 and _action == "logout":

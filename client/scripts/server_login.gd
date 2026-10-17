@@ -221,6 +221,8 @@ func _account_result(action: String, result: Dictionary) -> void:
 		status.text = String(errors.get(result.get("code", ""), "账号请求失败，请检查服务器与客户端版本。"))
 		if result.get("code") == "NETWORK_ERROR" and result.get("transport_error") == "TLS_HANDSHAKE_ERROR":
 			status.text = "HTTPS握手失败，请检查地址协议、端口和证书；HTTP服务不能填写成HTTPS。"
+		if result.get("code") == "NETWORK_ERROR" and result.get("transport_error") == "DNS_ERROR":
+			status.text = "服务器域名解析失败，请检查域名拼写和DNS记录是否已生效。"
 		if _registered_login: status.text = "注册成功，请使用刚才的账号密码登陆。\n" + status.text
 		_registered_login = false
 		if action == "logout": status.text = "本地已退出，服务器注销未确认。"

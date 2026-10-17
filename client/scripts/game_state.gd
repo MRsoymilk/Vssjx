@@ -4,6 +4,7 @@ extends Node
 const JOBS := ["力士", "侠客", "隐者"]
 const SCHOOLS := ["峨眉", "花涧", "昆仑"]
 const SAVE_VERSION := 1
+const MAX_LOCAL_CHARACTERS := 5
 const START_CELL := Vector2i(10, 16)
 const ENEMY_RESPAWN_SECONDS := 30.0 # Offline rule; not a recovered original server value.
 var save_path := "user://shushan_save.json"
@@ -17,6 +18,99 @@ var _player_generation := 0
 var _load_epoch := 0
 var _operation_path := ""
 var _storage_announced := false
+var _local_roster_busy := false
+
+func _local_snapshot() -> Dictionary:
+	var snapshot := player.duplicate(true)
+	snapshot.erase("local_characters")
+	return snapshot
+
+func local_character_entries() -> Array:
+	if player.is_empty(): return []
+	var entries: Array = player.get("local_characters", {}).get("characters", [{"id": "legacy", "data": _local_snapshot()}]).duplicate(true)
+	for entry in entries:
+		if entry.id == active_local_character_id(): entry.data = _local_snapshot()
+	return entries
+
+func active_local_character_id() -> String:
+	return String(player.get("local_characters", {}).get("active_id", "legacy"))
+
+func local_characters() -> Array:
+	var characters: Array = []
+	for entry in local_character_entries():
+		var character: Dictionary = entry.data.duplicate(true)
+		character.id = entry.id
+		characters.append(character)
+	return characters
+
+func _save_payload() -> Dictionary:
+	var data := player.duplicate(true)
+	if data.has("local_characters"): data.local_characters.characters = local_character_entries()
+	return data
+
+func create_local_character(nickname: String, job: int, school: int, gender: int) -> PlatformResult:
+	if _local_roster_busy or storage_busy: return PlatformResult.new(PlatformResult.Status.TEMPORARY_FAILURE, "STORAGE_BUSY", "正在处理存档，请稍候。")
+	_local_roster_busy = true
+	var before := player.duplicate(true)
+	var path := save_path
+	var probe := await probe_save()
+	var result: PlatformResult = probe
+	var entries: Array = []
+	if probe.ok and probe.value:
+		result = await load_game()
+		if result.ok: entries = local_character_entries()
+	if not result.ok:
+		_local_roster_busy = false
+		return result
+	if entries.size() >= MAX_LOCAL_CHARACTERS:
+		_local_roster_busy = false
+		return PlatformResult.new(PlatformResult.Status.INVALID_DATA, "CHARACTER_LIMIT_REACHED", "本地角色已满（5/5）。")
+	for entry in entries:
+		if String(entry.data.name) == nickname.strip_edges().left(24):
+			_local_roster_busy = false
+			return PlatformResult.new(PlatformResult.Status.INVALID_DATA, "NAME_TAKEN", "已有同名本地角色，请修改昵称或返回选择。")
+	var id := Crypto.new().generate_random_bytes(16).hex_encode()
+	new_player(nickname, job, school, gender)
+	entries.append({"id": id, "data": _local_snapshot()})
+	player.local_characters = {"version": 1, "active_id": id, "characters": entries}
+	var generation := _player_generation
+	result = await save_game()
+	if not result.ok and generation == _player_generation and path == save_path:
+		player = before
+		_player_generation += 1
+	_local_roster_busy = false
+	return result
+
+func select_local_character(id: String) -> PlatformResult:
+	if _local_roster_busy or storage_busy: return PlatformResult.new(PlatformResult.Status.TEMPORARY_FAILURE, "STORAGE_BUSY", "正在处理存档，请稍候。")
+	_local_roster_busy = true
+	var result := await load_game()
+	if not result.ok:
+		_local_roster_busy = false
+		return result
+	if id == active_local_character_id():
+		_local_roster_busy = false
+		return result
+	var before := player.duplicate(true)
+	var entries := local_character_entries()
+	var found := false
+	for entry in entries:
+		if entry.id == id:
+			player = entry.data.duplicate(true)
+			found = true
+	if not found:
+		_local_roster_busy = false
+		return PlatformResult.new(PlatformResult.Status.INVALID_DATA, "CHARACTER_NOT_FOUND", "角色不存在，请重新读取存档。")
+	player.local_characters = {"version": 1, "active_id": id, "characters": entries}
+	_player_generation += 1
+	var generation := _player_generation
+	var path := save_path
+	result = await save_game()
+	if not result.ok and generation == _player_generation and path == save_path:
+		player = before
+		_player_generation += 1
+	_local_roster_busy = false
+	return result
 
 func invalidate_load() -> void:
 	_load_epoch += 1
@@ -184,11 +278,14 @@ func save_game() -> PlatformResult:
 	if player.is_empty():
 		return _finish_storage(PlatformResult.new(PlatformResult.Status.INVALID_DATA, "EMPTY_PLAYER", "没有可保存的离线角色。"), generation)
 	# Serialize now: delayed IO must not observe subsequent dictionary mutations.
-	var result := await _await_storage(Platform.context.storage.write(_operation_path, JSON.stringify(player, "\t")))
+	var payload := _save_payload()
+	var result := await _await_storage(Platform.context.storage.write(_operation_path, JSON.stringify(payload, "\t")))
 	if result.ok:
 		if not result.value is Dictionary or result.value.get("written") != true or result.value.get("durability") not in ["native_file", "browser_sync"]:
 			result = PlatformResult.new(PlatformResult.Status.TEMPORARY_FAILURE, "SAVE_UNCONFIRMED", "存档持久化未确认，请重试；当前进度仍在内存中。")
-		elif generation == _player_generation and _operation_path == save_path: last_save_receipt = result.value.duplicate(true)
+		elif generation == _player_generation and _operation_path == save_path:
+			last_save_receipt = result.value.duplicate(true)
+			if payload.has("local_characters"): player.local_characters = payload.local_characters
 	return _finish_storage(result, generation)
 
 func probe_save() -> PlatformResult:
@@ -238,6 +335,7 @@ func _invalid_save() -> PlatformResult:
 func valid_save(data: Variant) -> bool:
 	if not data is Dictionary:
 		return false
+	if data.has("local_characters") and not _valid_local_roster(data): return false
 	for key in ["version", "name", "job", "school", "level", "xp", "gold", "potions", "hp", "mp", "quest", "kills", "equipped", "zone", "cell", "defeated"]:
 		if not data.has(key): return false
 	if not data.name is String or data.name.length() > 24 or data.name.is_empty(): return false
@@ -283,3 +381,21 @@ func valid_save(data: Variant) -> bool:
 	var values := stats()
 	player = old
 	return int(data.hp) <= int(values.hp) and int(data.mp) <= int(values.mp)
+
+func _valid_local_roster(data: Dictionary) -> bool:
+	var roster: Variant = data.local_characters
+	if not roster is Dictionary or roster.get("version") != 1 or not roster.get("active_id") is String or not roster.get("characters") is Array: return false
+	if roster.characters.is_empty() or roster.characters.size() > MAX_LOCAL_CHARACTERS: return false
+	var ids := {}
+	var active_found := false
+	var current := data.duplicate(true)
+	current.erase("local_characters")
+	for entry in roster.characters:
+		if not entry is Dictionary or not entry.get("id") is String or not entry.get("data") is Dictionary: return false
+		if entry.id != "legacy" and RegEx.create_from_string("^[0-9a-f]{32}\\z").search(entry.id) == null: return false
+		if ids.has(entry.id) or entry.data.has("local_characters") or not valid_save(entry.data): return false
+		ids[entry.id] = true
+		if entry.id == roster.active_id:
+			if entry.data != current: return false
+			active_found = true
+	return active_found

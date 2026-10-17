@@ -15,7 +15,7 @@ offset_left = 18.0
 offset_right = 266.0
 offset_bottom = 23.0
 theme_override_font_sizes/font_size = 12
-text = "线上角色 · 每账号限一个"
+text = "线上角色 · 每账号最多五个"
 autowrap_mode = 3
 
 [node name="Label1" type="Label" parent="."]

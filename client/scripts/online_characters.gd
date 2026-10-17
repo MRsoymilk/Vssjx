@@ -39,10 +39,11 @@ func _restore_pending() -> void:
 func _update_controls() -> void:
 	var locked := OnlineAccount.busy or not OnlineAccount.is_logged_in()
 	var exists := not OnlineAccount.characters.is_empty()
+	var full := OnlineAccount.characters.size() >= OnlineAccount.MAX_CHARACTERS
 	var pending := not OnlineAccount.pending_creation.is_empty()
-	nickname.editable = not locked and not exists and not pending
-	for choice in [job, gender, school]: choice.disabled = locked or exists or pending
-	create_button.disabled = locked or exists or not _loaded
+	nickname.editable = not locked and not full and not pending
+	for choice in [job, gender, school]: choice.disabled = locked or full or pending
+	create_button.disabled = locked or (full and not pending) or not _loaded
 	create_button.text = "重试原创建请求" if pending else "创建角色"
 	refresh_button.disabled = locked
 	enter_button.disabled = locked or not exists or not _loaded
@@ -69,7 +70,7 @@ func _result(action: String, result: Dictionary) -> void:
 		return
 	if action not in ["characters", "character_create", "expired", "refresh"]: return
 	if not result.ok:
-		var errors := {"NAME_TAKEN": "昵称已被占用，请修改昵称后重新创建。", "CHARACTER_LIMIT_REACHED": "账号已有角色，请刷新查看。", "INVALID_NAME": "昵称不符合规则，请修改。", "UNAUTHORIZED": "登录已失效，请返回账号重新登录。", "RULES_UNSUPPORTED": "创建规则不兼容，请更新客户端。", "RATE_LIMITED": "请求过于频繁，请稍后重试。", "DATABASE_UNAVAILABLE": "数据库暂不可用，请稍后重试。"}
+		var errors := {"NAME_TAKEN": "昵称已被占用，请修改昵称后重新创建。", "CHARACTER_LIMIT_REACHED": "角色已满（5/5），请刷新查看。", "INVALID_NAME": "昵称不符合规则，请修改。", "UNAUTHORIZED": "登录已失效，请返回账号重新登录。", "RULES_UNSUPPORTED": "创建规则不兼容，请更新客户端。", "RATE_LIMITED": "请求过于频繁，请稍后重试。", "DATABASE_UNAVAILABLE": "数据库暂不可用，请稍后重试。"}
 		status.text = String(errors.get(result.get("code", ""), "请求未确认，请稍后重试。"))
 		if not OnlineAccount.pending_creation.is_empty(): status.text += "\n结果未知，保留原操作；重试不会重复发放资产。"
 	else:

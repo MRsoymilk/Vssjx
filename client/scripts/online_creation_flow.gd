@@ -41,11 +41,12 @@ func _process(_delta: float) -> void:
 func _update_controls() -> void:
 	var locked := OnlineAccount.busy or not OnlineAccount.is_logged_in() or _entering
 	var pending := not OnlineAccount.pending_creation.is_empty()
-	page.active = not locked and _loaded and not pending
+	var full := _loaded and OnlineAccount.characters.size() >= OnlineAccount.MAX_CHARACTERS
+	page.active = not locked and _loaded and not pending and not full
 	for button in page.portrait_buttons: button.disabled = not page.active
 	for path in ["Previous", "Next", "Edit", "Rename", "Random"]: page.get_node(path).disabled = not page.active
 	school.disabled = not page.active
-	$"../Create".disabled = locked
+	$"../Create".disabled = locked or (full and not pending)
 	$"../Create".text = "重试" if pending or not _loaded else "创建"
 
 func _refresh() -> void:
@@ -77,21 +78,22 @@ func _result(action: String, result: Dictionary) -> void:
 		return
 	if action not in ["characters", "character_create", "expired", "refresh"]: return
 	if not result.ok:
-		var errors := {"NAME_TAKEN": "昵称已被占用，请修改后创建。", "CHARACTER_LIMIT_REACHED": "账号已有角色，请重试读取。", "INVALID_NAME": "昵称不符合规则，请修改。", "UNAUTHORIZED": "登陆已失效，请返回重新登陆。", "RULES_UNSUPPORTED": "创建规则不兼容，请更新客户端。", "RATE_LIMITED": "请求过于频繁，请稍后重试。", "DATABASE_UNAVAILABLE": "数据库暂不可用，请稍后重试。"}
+		var errors := {"NAME_TAKEN": "昵称已被占用，请修改后创建。", "CHARACTER_LIMIT_REACHED": "角色已满（5/5），请返回选择已有角色。", "INVALID_NAME": "昵称不符合规则，请修改。", "UNAUTHORIZED": "登陆已失效，请返回重新登陆。", "RULES_UNSUPPORTED": "创建规则不兼容，请更新客户端。", "RATE_LIMITED": "请求过于频繁，请稍后重试。", "DATABASE_UNAVAILABLE": "数据库暂不可用，请稍后重试。"}
 		status.text = String(errors.get(result.get("code", ""), "请求未确认，请重试。"))
 		if result.get("code") == "CHARACTER_LIMIT_REACHED": _loaded = false
 		if not OnlineAccount.pending_creation.is_empty():
 			_restore_pending()
 			status.text += "\n保留原创建请求，重试不会重复创建。"
-	elif OnlineAccount.characters.is_empty():
+	elif action == "characters":
 		_loaded = true
-		status.text = "选择角色并创建，以后使用此账号登陆。"
+		status.text = "选择角色并创建（%d/5）。" % OnlineAccount.characters.size()
+		if OnlineAccount.characters.size() >= OnlineAccount.MAX_CHARACTERS: status.text = "角色已满（5/5），请返回选择已有角色。"
 		if not OnlineAccount.pending_creation.is_empty(): status.text = "原创建尚未确认，请重试原请求。"
 	else:
 		_loaded = true
 		_entering = true
 		status.text = "正在打开角色选择面板……"
-		enter_requested.emit(String(OnlineAccount.characters[0].id))
+		enter_requested.emit(String(result.get("character_id", "")))
 	_update_controls()
 
 func _unhandled_key_input(event: InputEvent) -> void:

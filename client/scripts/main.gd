@@ -354,13 +354,14 @@ func _enter_local_game() -> void:
 		else: _message("无法读取", result.message)
 	else: _local_character_selection(false)
 
-func _online_characters(_character_id: String = "") -> void:
+func _online_characters(character_id: String = "") -> void:
 	OnlineAccount.resume_network()
 	mode = "online_select"
 	_clear_ui()
 	_dispose_world()
 	character_selection = preload("res://scenes/ui/character_selection.tscn").instantiate()
 	character_selection.online_mode = true
+	character_selection.preferred_id = character_id
 	var flow: OnlineSelectionFlow = character_selection.get_node("Online")
 	flow.enter_requested.connect(_enter_selected_online, CONNECT_DEFERRED)
 	flow.create_requested.connect(_online_creation, CONNECT_DEFERRED)
@@ -379,11 +380,12 @@ func _local_character_selection(has_character: bool = true) -> void:
 	_clear_ui()
 	_dispose_world()
 	character_selection = preload("res://scenes/ui/character_selection.tscn").instantiate()
+	character_selection.preferred_id = Game.active_local_character_id()
 	ui.add_child(character_selection)
-	character_selection.display_characters([Game.player] if has_character else [])
-	character_selection.set_controls(false, true)
+	character_selection.display_characters(Game.local_characters() if has_character else [])
+	character_selection.set_controls(false, not has_character or Game.local_characters().size() < Game.MAX_LOCAL_CHARACTERS)
 	character_selection.status.text = "请选择角色后进入游戏" if has_character else "尚无本地角色，请从菜单创建角色"
-	character_selection.enter_requested.connect(func(_id: String) -> void: _continue())
+	character_selection.enter_requested.connect(_continue)
 	character_selection.create_requested.connect(_create)
 	character_selection.back_requested.connect(_return_to_server_login)
 
@@ -395,7 +397,7 @@ func _online_creation() -> void:
 	creation.online_mode = true
 	var flow: OnlineCreationFlow = creation.get_node("Online")
 	flow.enter_requested.connect(_online_characters, CONNECT_DEFERRED)
-	flow.close_requested.connect(_return_to_server_login, CONNECT_DEFERRED)
+	flow.close_requested.connect(_online_characters, CONNECT_DEFERRED)
 	ui.add_child(creation)
 	ui.theme = creation.theme
 
@@ -449,35 +451,23 @@ func _start_new() -> void:
 	if name_value.is_empty():
 		_message("请输入昵称", "请先输入昵称。")
 		return
-	var epoch := _ui_epoch
-	var probe := await Game.probe_save()
-	if epoch != _ui_epoch or probe.status == PlatformResult.Status.CANCELLED or _closing: return
-	if not probe.ok:
-		_message("无法确认存档", probe.message)
-		return
-	if probe.value:
-		var panel := _modal_panel("开启新的修行")
-		_label(panel, "当前只有一个本地存档槽。\n入山后将覆盖已有角色存档。", Rect2(18, 56, 248, 70), 13)
-		_button(panel, "确认入山", Rect2(18, 180, 148, 32), _begin_new.bind(name_value), true)
-		_button(panel, "返回", Rect2(176, 180, 88, 32), _close_modal)
-	else:
-		await _begin_new(name_value)
+	await _begin_new(name_value)
 
 func _begin_new(name_value: String) -> void:
 	if Game.storage_busy or _closing: return
-	Game.new_player(name_value, selected_job, selected_school, selected_gender)
-	_local_messages.clear()
-	var result := await _save_current()
-	if result.status == PlatformResult.Status.CANCELLED or _closing: return
+	var epoch := _ui_epoch
+	var result := await Game.create_local_character(name_value, selected_job, selected_school, selected_gender)
+	if epoch != _ui_epoch or result.status == PlatformResult.Status.CANCELLED or _closing: return
 	if not result.ok:
 		_message("创建存档失败", result.message + "\n尚未进入地图，请重试。")
 		return
+	_local_messages.clear()
 	_local_character_selection()
 
-func _continue() -> void:
+func _continue(character_id: String = "") -> void:
 	if Game.storage_busy or _closing: return
 	var epoch := _ui_epoch
-	var result := await Game.load_game()
+	var result := await Game.load_game() if character_id.is_empty() else await Game.select_local_character(character_id)
 	if epoch != _ui_epoch or result.status == PlatformResult.Status.CANCELLED or _closing: return
 	if result.ok:
 		if int(Game.player.hp) == 0: Game.restore()

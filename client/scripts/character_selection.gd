@@ -7,6 +7,7 @@ signal back_requested
 @export var online_mode := false
 var characters: Array = []
 var selected_index := 0
+var preferred_id := ""
 var locked := true
 var can_create := false
 var _entering := false
@@ -31,6 +32,8 @@ func _ready() -> void:
 
 func display_characters(values: Array) -> void:
 	var selected := String(characters[selected_index].get("id", "")) if not characters.is_empty() else ""
+	if not preferred_id.is_empty(): selected = preferred_id
+	preferred_id = ""
 	characters = values.duplicate(true)
 	selected_index = clampi(selected_index, 0, maxi(0, characters.size() - 1))
 	for i in characters.size():

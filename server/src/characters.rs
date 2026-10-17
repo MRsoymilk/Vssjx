@@ -18,6 +18,7 @@ use uuid::Uuid;
 
 pub const RULES_VERSION: &str = "creation-v1";
 pub const NAME_RULES_VERSION: &str = "nickname-v1";
+pub const MAX_CHARACTERS: i32 = 5;
 
 /// Deliberate fixed whitelist, not deployment-dependent Unicode case folding.
 pub fn canonical_name(raw: &str) -> Result<(String, String), AuthError> {
@@ -97,14 +98,14 @@ pub(crate) async fn list(
     let account = auth.me(auth::bearer(&headers)?).await?;
     // Single query: no mixed-version attributes/inventory snapshot.
     let characters = sqlx::query_as::<_, Character>(&format!(
-        "SELECT {CHARACTER_COLUMNS} FROM characters WHERE account_id=$1"
+        "SELECT {CHARACTER_COLUMNS} FROM characters WHERE account_id=$1 ORDER BY slot,id"
     ))
     .bind(account.id)
     .fetch_all(auth.pool())
     .await
     .map_err(database_error)?;
     Ok(Json(
-        json!({"characters": characters, "rules_version": RULES_VERSION, "name_rules_version": NAME_RULES_VERSION}),
+        json!({"characters": characters, "rules_version": RULES_VERSION, "name_rules_version": NAME_RULES_VERSION, "max_characters": MAX_CHARACTERS}),
     ))
 }
 
@@ -181,14 +182,15 @@ pub(crate) async fn create(
         if row.get::<Vec<u8>, _>("request_digest") != digest { return Err(AuthError(StatusCode::CONFLICT, "IDEMPOTENCY_CONFLICT")); }
         return Ok(receipt_response(row.get("http_status"), row.get::<DbJson<Value>, _>("result").0, true));
     }
-    let has_character: bool =
-        sqlx::query_scalar("SELECT EXISTS(SELECT 1 FROM characters WHERE account_id=$1)")
+    let slot: Option<i32> =
+        sqlx::query_scalar("SELECT candidate FROM generate_series(0,$2-1) AS candidate WHERE NOT EXISTS(SELECT 1 FROM characters WHERE account_id=$1 AND slot=candidate) ORDER BY candidate LIMIT 1")
             .bind(account.id)
-            .fetch_one(&mut *tx)
+            .bind(MAX_CHARACTERS)
+            .fetch_optional(&mut *tx)
             .await
             .map_err(database_error)?;
     let name = canonical_name(&payload.display_name);
-    let refusal = if has_character {
+    let refusal = if slot.is_none() {
         Some((409_i16, "CHARACTER_LIMIT_REACHED"))
     } else if payload.rules_version != RULES_VERSION {
         Some((422, "RULES_UNSUPPORTED"))
@@ -204,10 +206,11 @@ pub(crate) async fn create(
     } else {
         let (display, key) = name.expect("validated name");
         let id = Uuid::new_v4();
-        let inserted = sqlx::query("INSERT INTO characters (id, account_id, display_name, name_key, name_rules_version, rules_version, job, gender, school, hp, mp) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) ON CONFLICT DO NOTHING")
+        let inserted = sqlx::query("INSERT INTO characters (id, account_id, display_name, name_key, name_rules_version, rules_version, job, gender, school, hp, mp, slot) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12) ON CONFLICT DO NOTHING")
             .bind(id).bind(account.id).bind(display).bind(key).bind(NAME_RULES_VERSION).bind(RULES_VERSION)
             .bind(i16::from(payload.job)).bind(i16::from(payload.gender)).bind(i16::from(payload.school))
             .bind([120_i32,95,85][payload.job as usize]).bind([35_i32,45,65][payload.job as usize])
+            .bind(slot.expect("validated free slot") as i16)
             .execute(&mut *tx).await.map_err(database_error)?;
         if inserted.rows_affected() == 0 {
             (409, json!({"code": "NAME_TAKEN"}))

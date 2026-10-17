@@ -116,6 +116,27 @@ func _run() -> void:
 	app._online_characters()
 	await until(selecting, "Relogin with automatic refresh stops on existing character selection")
 	check(OnlineAccount.characters.size() == 1 and OnlineAccount.characters[0].id == character.id and app.creation == null, "Recovered character is reused without creating again")
+	check(not app.character_selection.get_node("Options/Create").disabled, "An account with an existing character can create another")
+	for extra in 4:
+		await open_creation()
+		page = app.creation
+		flow = page.get_node("Online")
+		check(page.active and not page.get_node("Create").disabled, "Existing roster no longer redirects creation back to selection")
+		page.nickname.text = "界面次角%d" % extra
+		page.select_variant(extra)
+		flow._create()
+		await idle_account()
+		if not OnlineAccount.pending_creation.is_empty():
+			page.get_node("Create").pressed.emit()
+		await until(selecting, "Additional creation returns to selection with the complete roster")
+		check(OnlineAccount.characters.size() == extra + 2 and app.character_selection.get_node("Details/Name").text == "界面次角%d" % extra, "New character is selected without losing previous characters")
+	check(app.character_selection.get_node("Options/Create").disabled and app.character_selection.characters.size() == 5, "Five characters fill the carousel and disable additional creation")
+	await capture("04_five_characters")
+	app.character_selection.step(1)
+	check(app.character_selection.characters[app.character_selection.selected_index].id == character.id, "Carousel wraps from the fifth character back to the original")
+	app.character_selection.enter_button.pressed.emit()
+	await until(func() -> bool: return app.mode == "online_world", "Original character remains playable after four more creations")
+	check(app.ui.get_node("OnlineWorld").character_id == character.id and Game.player == before, "Entering a selected character uses its own ID and never overwrites offline state")
 	app._home()
 	await idle_account()
 	OnlineAccount.logout()

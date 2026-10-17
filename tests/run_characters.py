@@ -25,7 +25,10 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--render', action='store_true')
     args = parser.parse_args()
-    subprocess.run(['cargo', 'build', '--locked', '--manifest-path', str(ROOT / 'server/Cargo.toml')], check=True)
+    binary = os.environ.get('SSJX_TEST_SERVER_BIN')
+    if not binary:
+        subprocess.run(['cargo', 'build', '--locked', '--manifest-path', str(ROOT / 'server/Cargo.toml')], check=True)
+        binary = str(ROOT / 'server/target/debug/vssjx-server')
     with PostgresFixture() as db:
         env = {k: v for k, v in os.environ.items() if not k.startswith('SSJX_')}
         env.update(SSJX_ENV_FILE='', SSJX_DATABASE_URL=db.url, SSJX_BIND_ADDR='127.0.0.1:0', RUST_LOG='info', SSJX_MONITOR_BIND_ADDR='', SSJX_LOG_DIR='',
@@ -33,7 +36,7 @@ def main():
         logs = []
 
         def start():
-            process = subprocess.Popen([str(ROOT / 'server/target/debug/vssjx-server')], env=env,
+            process = subprocess.Popen([binary], env=env,
                                        stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
             try:
                 return process, wait_for_server(process)
@@ -87,13 +90,21 @@ def main():
             normalized = json.dumps(['character.create:v1', '青衫Ab_1', 1, 0, 2, 'creation-v1'], ensure_ascii=False, separators=(',', ':')).encode()
             assert db.query(f"SELECT encode(request_digest,'hex') FROM account_operation_receipts WHERE account_id='{first['account']['id']}' AND operation_id='{original['operation_id']}';") == hashlib.sha256(normalized).hexdigest()
             assert db.query(f"SELECT string_agg(definition_id || ':' || quantity, ',' ORDER BY definition_id) FROM inventory_items WHERE character_id='{character['id']}';") == 'potion:6,sword:1'
+            # Reconstruct the old one-character constraint inside a rolled-back transaction,
+            # then apply the additive migration with an existing character/inventory row.
+            migration = (ROOT / 'server/migrations/0008_multiple_characters.sql').read_text()
+            upgrade = db.query("BEGIN; DROP INDEX characters_account_slot_key; ALTER TABLE characters DROP COLUMN slot; "
+                "ALTER TABLE characters ADD CONSTRAINT characters_account_id_key UNIQUE(account_id); " + migration +
+                f" SELECT 'preserved:'||slot||':'||gold FROM characters WHERE id='{character['id']}'; ROLLBACK;")
+            assert 'preserved:0:30' in upgrade
             equivalent = dict(original, display_name='青衫Ab_1')
             assert create(first, equivalent)[1]['character']['id'] == character['id']
             reordered = json.dumps(dict(reversed(list(original.items()))), ensure_ascii=False, indent=2).encode()
             assert api('/api/v1/characters', token=first['access_token'], raw=reordered)[1]['character']['id'] == character['id']
             for changes in ({'display_name': '新昵称'}, {'job': 2}, {'gender': 1}, {'school': 0}, {'rules_version': 'creation-future'}, {'display_name': '青衫ab_1'}):
                 assert create(first, dict(original, **changes)) == (409, {'code': 'IDEMPOTENCY_CONFLICT'})
-            assert create(first, request('新昵称'))[1]['code'] == 'CHARACTER_LIMIT_REACHED'
+            extra = create(first, request('新昵称'))
+            assert extra[0] == 201 and extra[1]['character']['id'] != character['id']
             receipt_path = '/api/v1/character-operations/' + original['operation_id']
             assert api(receipt_path, token=first['access_token'])[1]['character'] == character
             assert api(receipt_path, token=second['access_token'])[0] == 404
@@ -121,8 +132,20 @@ def main():
             assert create(third, stale)[1]['code'] == 'RULES_UNSUPPORTED'
             with ThreadPoolExecutor(max_workers=2) as executor:
                 competing = list(executor.map(lambda name: create(third, request(name)), ['同账号甲', '同账号乙']))
-            assert sorted(status for status, _ in competing) == [201, 409]
+            assert sorted(status for status, _ in competing) == [201, 201]
             assert create(third, stale)[1]['code'] == 'RULES_UNSUPPORTED'
+
+            # Five database-enforced slots; simultaneous requests cannot exceed the cap.
+            with ThreadPoolExecutor(max_workers=6) as executor:
+                filling = list(executor.map(lambda i: create(first, request(f'同账号新增{i}')), range(6)))
+            assert sum(status == 201 for status, _ in filling) == 3
+            assert all(data['code'] == 'CHARACTER_LIMIT_REACHED' for status, data in filling if status == 409)
+            code, listing = api('/api/v1/characters', token=first['access_token'])
+            assert code == 200 and len(listing['characters']) == listing['max_characters'] == 5
+            assert [c['id'] for c in listing['characters']][:2] == [character['id'], extra[1]['character']['id']]
+            assert db.query(f"SELECT string_agg(slot::text,',' ORDER BY slot) FROM characters WHERE account_id='{first['account']['id']}';") == '0,1,2,3,4'
+            assert create(first, original)[1]['character']['id'] == character['id']  # Replay still precedes capacity.
+            assert len(api('/api/v1/characters', token=second['access_token'])[1]['characters']) == 1
 
             # Force failure AFTER inserting the character to prove initial assets/receipt atomicity.
             db.query("CREATE FUNCTION reject_fixture_item() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RAISE EXCEPTION 'fixture failure'; END $$; CREATE TRIGGER fixture_item_failure BEFORE INSERT ON inventory_items FOR EACH ROW EXECUTE FUNCTION reject_fixture_item();")
@@ -178,7 +201,7 @@ def main():
             process, base = start()
             assert create(first, original)[1]['character'] == character
             assert create(second, occupied)[1]['code'] == 'NAME_TAKEN'
-            assert api('/api/v1/characters', token=first['access_token'])[1]['characters'] == [character]
+            assert api('/api/v1/characters', token=first['access_token'])[1]['characters'] == listing['characters']
             db.query(f"UPDATE characters SET gold=35,state_revision=2 WHERE id='{character['id']}';")
             current = api('/api/v1/characters', token=first['access_token'])[1]['characters'][0]
             assert current['gold'] == 35 and current['state_revision'] == '2'
@@ -232,7 +255,12 @@ def main():
                 if capture:
                     Path(capture).mkdir(parents=True, exist_ok=True)
                     ui_env['SSJX_CHARACTER_CAPTURE_PATH'] = capture
-                command = [sys.executable, str(ROOT / 'tests/run_offscreen.py'), '--rendering-driver', 'opengl3_es'] if args.render else [os.environ.get('GODOT_BIN', 'godot'), '--headless']
+                if args.render and os.name == 'nt':
+                    command = [os.environ.get('GODOT_BIN', 'godot'), '--position', '-10000,-10000', '--rendering-driver', 'opengl3']
+                elif args.render:
+                    command = [sys.executable, str(ROOT / 'tests/run_offscreen.py'), '--rendering-driver', 'opengl3_es']
+                else:
+                    command = [os.environ.get('GODOT_BIN', 'godot'), '--headless']
                 command += ['--path', str(ROOT / 'client'), 'res://tests/online_characters_test.tscn']
                 ui = subprocess.run(command, env=ui_env, capture_output=True, text=True, timeout=90)
                 print(ui.stdout, end='')

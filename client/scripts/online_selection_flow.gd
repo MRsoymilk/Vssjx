@@ -23,7 +23,7 @@ func _process(_delta: float) -> void: _update_controls()
 
 func _update_controls() -> void:
 	var locked := OnlineAccount.busy or not OnlineAccount.is_logged_in() or _entering
-	page.set_controls(locked or not _loaded, _loaded and OnlineAccount.characters.is_empty())
+	page.set_controls(locked or not _loaded, _loaded and (OnlineAccount.characters.size() < OnlineAccount.MAX_CHARACTERS or not OnlineAccount.pending_creation.is_empty()))
 	page.get_node("Options/Refresh").disabled = locked
 	page.get_node("Options/Create").text = "继续创建" if not OnlineAccount.pending_creation.is_empty() else "创建角色"
 
@@ -35,7 +35,8 @@ func _refresh() -> void:
 	OnlineAccount.list_characters()
 
 func _create() -> void:
-	if not _loaded or OnlineAccount.busy or not OnlineAccount.is_logged_in() or not OnlineAccount.characters.is_empty(): return
+	if not _loaded or OnlineAccount.busy or not OnlineAccount.is_logged_in(): return
+	if OnlineAccount.characters.size() >= OnlineAccount.MAX_CHARACTERS and OnlineAccount.pending_creation.is_empty(): return
 	create_requested.emit()
 
 func _enter(id: String) -> void:

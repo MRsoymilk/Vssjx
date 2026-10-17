@@ -1,4 +1,5 @@
 extends Node
+const MAX_CHARACTERS := 5
 ## Online identity stays separate from Game.player and offline saves.
 signal completed(action: String, result: Dictionary)
 signal world_ticket_received(result: Dictionary)
@@ -190,16 +191,31 @@ func _on_response(result: int, code: int, _headers: PackedStringArray, body: Pac
 			_finish({"ok": false, "code": "INVALID_RESPONSE"})
 			return
 		var values: Variant = data.get("characters") if _action == "characters" else [data.get("character")]
-		if not values is Array or values.size() > 1:
+		if not values is Array or values.size() > MAX_CHARACTERS:
 			_finish({"ok": false, "code": "INVALID_RESPONSE"})
 			return
+		var identities := {}
 		for value in values:
 			if not _valid_character(value):
 				_finish({"ok": false, "code": "INVALID_RESPONSE"})
 				return
-		characters = values.duplicate(true)
-		if _action == "character_create": pending_creation = {}
-		_finish({"ok": true, "characters": characters.duplicate(true)})
+			if identities.has(value.id):
+				_finish({"ok": false, "code": "INVALID_RESPONSE"})
+				return
+			identities[value.id] = true
+		if _action == "character_create":
+			# Creation receipts contain a single historical snapshot, not the roster.
+			var found := false
+			for index in characters.size():
+				if characters[index].id == values[0].id: found = true
+			if not found:
+				if characters.size() >= MAX_CHARACTERS:
+					_finish({"ok": false, "code": "INVALID_RESPONSE"})
+					return
+				characters.append(values[0].duplicate(true))
+			pending_creation = {}
+		else: characters = values.duplicate(true)
+		_finish({"ok": true, "characters": characters.duplicate(true), "character_id": values[0].id if _action == "character_create" else ""})
 		return
 	var identity: Variant = data.get("account")
 	if not identity is Dictionary or not identity.get("id") is String or not identity.get("username") is String:

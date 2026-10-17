@@ -23,7 +23,7 @@ func _ready() -> void:
 	var catalog := CATALOG.new()
 	catalog.reload()
 	check(catalog.errors.is_empty(), "All JSON sources load")
-	var counts := {"weapons": 57, "equipment": 91, "items": 210, "characters": 6, "quests": 16, "maps": 217, "enemies": 123, "effects": 159, "art": 33, "archive": 1917}
+	var counts := {"weapons": 115, "equipment": 174, "items": 422, "characters": 6, "quests": 16, "maps": 217, "enemies": 123, "effects": 159, "art": 100, "archive": 1917}
 	for category in counts:
 		check(catalog.find(category).size() == counts[category], "Expected current definitions for " + category)
 	var keys: Dictionary = {}
@@ -32,7 +32,8 @@ func _ready() -> void:
 		check(not keys.has(key), "Unique category/id: " + key)
 		keys[key] = true
 		check(FileAccess.file_exists(entry.source), "Source exists: " + key)
-	check(catalog.find("equipment", "", "预留").size() == 9, "Reserved equipment is explicitly distinguished")
+	check(catalog.find("equipment", "", "预留").is_empty(), "All ten equipment slots have actual definitions")
+	check(catalog.find("items", "", "重建商店").size()==212,"Full runtime rules remain separate from raw resource evidence")
 	check(catalog.find("items", "", "原包资源").size() == 208, "Every decoded item is included, regardless of gameplay integration")
 	check(catalog.find("weapons", "", "原包资源").size() == 56, "All 56 original weapon icons")
 	check(catalog.find("equipment", "", "原包资源").size() == 81, "All 81 original equipment icons")
@@ -40,7 +41,7 @@ func _ready() -> void:
 	for entry in catalog.find("items", "", "原包资源"):
 		check(entry.data["原版名称"] == null and entry.data["原版属性"] == null, "Unknown original names and stats remain unknown: " + entry.id)
 	check(catalog.find("items", "", "已接入").size() == 2, "Original icons are distinct from authored runtime rules")
-	check(catalog.find("items", "青锋").size() == 1, "Chinese item search")
+	check(catalog.find("items", "青锋", "已接入").size() == 1 and catalog.find("items", "青锋", "重建商店").size()>=1, "Chinese search distinguishes legacy and reconstructed names")
 	check(catalog.find("enemies", "WOLF_A").size() == 1, "Case-insensitive ID search")
 	check(catalog.find("enemies", "", "已接入").size() == 6, "Six authored enemy definitions remain separate")
 	check(catalog.find("enemies", "", "原包资源").size() == 117, "All original monster animations are included")
@@ -52,7 +53,7 @@ func _ready() -> void:
 	check(catalog.find("archive", "archive/ssjx.mrp/sfc.bin").size() == 1, "Unsupported binary is searchable by original archive path")
 	for entry in catalog.find("enemies", "", "原包资源"):
 		check(entry.data["原版名称"] == null and entry.data["原版属性"] == null and entry.data["原版等级"] == null and entry.data["原版怪物ID"] == null, "Unknown monster identity and rules remain unknown: " + entry.id)
-	check(catalog.find("weapons", "青锋 5").size() == 1, "Multiple words search across name and actual stat fields")
+	check(catalog.find("weapons", "青锋 5", "已接入").size() == 1, "Multiple words search across name and actual stat fields")
 	check(catalog.find("items", "不存在的道具").is_empty(), "No fabricated fallback items")
 	var sword: Dictionary = catalog.find("weapons")[0]
 	check(sword.data["攻击加成"] == 5 and sword.data.icon.ends_with("bag_sword.png"), "Weapon properties derive from runtime stats and bag definitions")
@@ -79,7 +80,7 @@ func _ready() -> void:
 	add_child(browser)
 	await get_tree().process_frame
 	await get_tree().process_frame
-	check(browser.catalog.errors.is_empty() and browser.visible_entries.size() == 57, "Standalone browser opens with all original weapons and local rule")
+	check(browser.catalog.errors.is_empty() and browser.visible_entries.size() == 115, "Standalone browser opens with all original weapons and runtime rules")
 	for entry in catalog.find("characters"):
 		browser._show_entry(entry)
 		var chooser: OptionButton = browser.get_node("%Animations")
@@ -140,7 +141,7 @@ func _ready() -> void:
 	browser.select_category("equipment")
 	browser.get_node("%StatusFilter").select(2)
 	browser._fill_list()
-	check(browser.visible_entries.size() == 9, "UI status filter")
+	check(browser.visible_entries.is_empty(), "No reserved equipment after connecting all ten slots")
 	browser.select_category("enemies")
 	check(browser.visible_entries.size() == 123 and browser.get_node("%Context").text.contains("117"), "Monster category explains definitions versus all original resources")
 	browser.get_node("%StatusFilter").select(4)
@@ -165,6 +166,7 @@ func _ready() -> void:
 	browser._fill_list()
 	check(browser.visible_entries.is_empty() and browser.get_node("%Empty").visible, "Failed-parse filter supports empty results without inventing failures")
 	browser.select_category("items")
+	browser.get_node("%StatusFilter").select(1)
 	browser.get_node("%Search").text = "回春"
 	browser._fill_list()
 	check(browser.visible_entries.size() == 1 and browser.current.id == "potion", "Search selects matching real item")

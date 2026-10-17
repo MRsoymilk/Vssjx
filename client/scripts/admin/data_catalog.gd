@@ -47,18 +47,19 @@ func reload() -> void:
 			_add("weapons", item.id, item.name, "攻击 +%s" % data["攻击加成"], "已接入", "res://scripts/game_state.gd", data, {"kind": "icon", "path": item.icon})
 	for entry in ShopRules.catalog.items:
 		if entry.id in ["potion","sword"]: continue
-		var category: String = "weapons" if entry.slot == "weapon" else "equipment"
+		var category: String = "weapons" if entry.slot == "weapon" else ("equipment" if ShopRules.is_equipment(entry) else "items")
 		var record: Dictionary = entry.duplicate(true)
 		record["规则来源"] = ShopRules.catalog.provenance
-		record["部件说明"] = "武器按职业替换 e{zs,ck,fs} 部件；衣服按性别职业替换身体及前后层。"
+		record["部件说明"] = entry.get("appearance_basis","武器按职业替换 e{zs,ck,fs} 部件；衣服与头饰对应为可调整重建规则。") if ShopRules.is_equipment(entry) else "非换装物品"
 		var icon := {"kind":"icon","path":entry.icon}
-		_add("items",entry.id,entry.name,ShopRules.description(entry.id),"重建商店","res://assets/data/shop-v1.json",record,icon)
-		_add(category,entry.id,entry.name,ShopRules.description(entry.id),"重建商店","res://assets/data/shop-v1.json",record,icon)
+		var record_id:String="shop/"+entry.id if String(entry.id).begins_with("original/") else entry.id
+		_add("items",record_id,entry.name,ShopRules.description(entry.id),"重建商店","res://assets/data/shop-v2.json",record,icon)
+		if category!="items":_add(category,record_id,entry.name,ShopRules.description(entry.id),"重建商店","res://assets/data/shop-v2.json",record,icon)
 	_load_original_items()
 	for index in INVENTORY.EQUIPMENT.size():
 		var slot: String = INVENTORY.EQUIPMENT[index]
-		var ids: Array = ["sword","weapon_2","weapon_3"] if index == 0 else (["armor_2","armor_3"] if index == 2 else [])
-		var data := {"槽位序号":index,"槽位":slot,"可装备物品":ids,"说明":"购买后可装备并改变外观；属性为重建规则" if not ids.is_empty() else "界面预留槽位，尚无物品及属性规则"}
+		var ids: Array = ShopRules.catalog.items.filter(func(item:Dictionary)->bool:return item.slot==ShopRules.SLOTS[index]).map(func(item:Dictionary)->String:return item.id)
+		var data := {"槽位序号":index,"槽位":slot,"可装备物品":ids,"说明":"各槽提供重建属性；武器、衣服、帽子参与换装，部分对应仍为重建规则" if not ids.is_empty() else "界面预留槽位，尚无物品及属性规则"}
 		_add("equipment","slot_%d" % index,slot," / ".join(PackedStringArray(ids)) if not ids.is_empty() else "尚无装备定义","已接入" if not ids.is_empty() else "预留","res://scripts/inventory.gd",data)
 	var hero_keys := [["mzs", "mck", "mfs"], ["wzs", "wck", "wfs"]]
 	for gender in 2:

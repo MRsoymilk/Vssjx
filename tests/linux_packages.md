@@ -57,3 +57,16 @@ python3 tests/run_linux_release.py \
 - 打包/安全单元测试 **13项通过**；平台边界 **15项通过**；导出排除/字体许可规则 **4项通过**。
 - `--target all`完整构建通过，Linux/Windows/APK实际资源分别 **70项审计通过**，APK签名/权限/ZIP与ARM64段对齐检查继续通过。回归产物仅在`/tmp/opencode/vssjx-linux-all-target-regression/`，不替换已交付的APK和EXE。
 - 之前已在基线复现的actor摘要、monster再生成及PVE测试PNG三项Python问题不在本单元修改范围，见[原生记录](native_packages.md)。未改动共享资源来隐藏它们。
+
+## 最终本地交付
+
+从干净提交`7dbfcde`重新构建，导出/实际release启动/70项包审计通过。构建报告、日志及源摘要在`/tmp/opencode/vssjx-linux-release-7dbfcde/`；交付副本位于原项目忽略目录`work/builds/native-linux-preview-20261017/`，与之前APK/EXE目录分开。
+
+| 文件（相对交付目录） | 字节 | SHA-256 |
+|---|---:|---|
+| `vssjx-linux-x64-preview.tar.gz` | 43,827,388 | `385847586404b7d201ec49bb4191f058aa74fbac11709d4621e0089011cef185` |
+| `linux-x64/vssjx.x86_64` | 89,858,056 | `c7d5bb3fa43f2ba84457559886f705da61c5f6b579716546d0c47197aafa61e4` |
+
+复制后逐文件核验构建报告；归档逐成员检查摘要、普通文件类型和匿名化所有者，实际解压确认执行位仍在。旁置`native-linux-preview-20261017.build-report.json`；交付目录有`SHA256SUMS.txt`和许可。此前交付APK/EXE的文件摘要再次核验一致，未覆盖旧包。
+
+最终交付归档实际解压出的ELF，再次通过相同的**22项真实图形/窗口关闭/进程重启闭环**。证据`/tmp/opencode/vssjx-linux-final-archive-gui/report.json`及同目录11张截图；执行文件摘要与交付目录一致，不以构建源工程运行替代最终包验收。

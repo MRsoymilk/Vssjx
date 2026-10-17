@@ -824,7 +824,7 @@ func _allocate_local_attributes(points: Array) -> void:
 
 func _return_from_attributes() -> void:
 	if Game.storage_busy or _closing: return
-	if not Platform.context.text_input.check_submission([attributes.signature]).ok: return
+	if attributes.signature.is_visible_in_tree() and not Platform.context.text_input.check_submission([attributes.signature]).ok: return
 	Game.player.signature = attributes.signature.text
 	var result := await _save_current()
 	if result.status == PlatformResult.Status.CANCELLED or _closing: return

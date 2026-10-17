@@ -22,7 +22,7 @@ func _ready() -> void:
 	input.text_submitted.connect(func(_text: String) -> void: send())
 	input.focus_entered.connect(func() -> void: screen.movement_pause_requested.emit())
 	screen.get_node("Chat/ChatEmotes").pressed.connect(_toggle_emotes)
-	screen.get_node("Chat/Expand").pressed.connect(func() -> void: picker.hide(); expanded.open())
+	screen.chat_expand_requested.connect(func() -> void: picker.hide(); expanded.open())
 	picker.chosen.connect(_insert_emote)
 	picker.dismissed.connect(_focus)
 	expanded.emotes_requested.connect(_toggle_emotes)

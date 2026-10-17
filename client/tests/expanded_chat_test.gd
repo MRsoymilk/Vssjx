@@ -4,13 +4,21 @@ func settle() -> void:
 	for _frame in 4: await get_tree().process_frame
 
 func _run() -> void:
+	output = OS.get_environment("SSJX_EXPANDED_CHAT_CAPTURE_PATH")
 	var before := Game.player.duplicate(true)
 	var before_characters := OnlineAccount.characters.duplicate(true)
 	OnlineAccount.characters = [{"id": SELF, "display_name":"昆仑客","job":1,"gender":0,"school":2,"level":1,"hp":95,"mp":45}]
 	var view := make_view(SELF)
 	var expanded := view.expanded_chat
+	var expand_button: Button = view.get_node("Screen/Chat/Expand")
 	check(not expanded.visible and view.get_node("Screen/Chat/Expand").icon.resource_path == "res://assets/ui/chat_expand.svg", "Collapsed chat uses the supplied themed upward arrow")
 	check(expanded.scene_file_path == "res://scenes/ui/expanded_chat_panel.tscn", "Expanded window is an authored scene")
+	expand_button.pressed.emit()
+	await settle()
+	check(expand_button.icon.resource_path == "res://assets/ui/chat_collapse.svg" and expand_button.tooltip_text == "收起聊天", "Opening points the same arrow down and explains collapse")
+	await capture("empty_chat")
+	expand_button.pressed.emit()
+	check(not expanded.visible and expand_button.icon.resource_path == "res://assets/ui/chat_expand.svg", "Clicking the down arrow collapses rather than reopening history")
 	for batch_index in 3:
 		var batch: Array = []
 		for i in 12:
@@ -66,12 +74,12 @@ func _run() -> void:
 	check(view.network.chat.receive({"type":"chat.result","result":{"client_message_id":sent[0].client_message_id,"status":"SENT","message_id":"30000000-0000-4000-8000-000000000040"}}), "Delivery acknowledgement resolves expanded send")
 	view._process(0.0)
 	check(view.chat_input.text.is_empty() and expanded.visible, "Acknowledgement clears draft while history remains expanded")
-	output = OS.get_environment("SSJX_EXPANDED_CHAT_CAPTURE_PATH")
 	expanded.get_node("Panel/Tabs/World").pressed.emit()
 	await settle()
 	await capture("expanded_chat")
 	expanded.get_node("Panel/Return").pressed.emit()
 	check(not expanded.visible and not view.chat_input.has_focus() and view.chat_panel.visible, "Return collapses into the original inline chat")
+	check(expand_button.icon.resource_path == "res://assets/ui/chat_expand.svg", "Return restores the upward arrow")
 	await capture("collapsed_chat")
 	view.get_node("Screen/Chat/Expand").pressed.emit()
 	view._set_battle_layout(true)
@@ -81,6 +89,19 @@ func _run() -> void:
 	escape.pressed = true
 	view._unhandled_key_input(escape)
 	check(not expanded.visible and view.battle_view.is_processing_unhandled_key_input(), "Escape collapses expanded history and restores battle keyboard handling")
+	check(expand_button.icon.resource_path == "res://assets/ui/chat_expand.svg", "Escape also resets the arrow")
+	expand_button.pressed.emit()
+	# Dispatch through the GUI, so the modal shade cannot silently cover the arrow.
+	var arrow_click := InputEventMouseButton.new()
+	arrow_click.position = get_viewport().get_final_transform() * expand_button.get_global_rect().get_center()
+	arrow_click.button_index = MOUSE_BUTTON_LEFT
+	arrow_click.pressed = true
+	Input.parse_input_event(arrow_click)
+	var arrow_release := arrow_click.duplicate()
+	arrow_release.pressed = false
+	Input.parse_input_event(arrow_release)
+	await settle()
+	check(not expanded.visible and view.battle_view.is_processing_unhandled_key_input(), "Down arrow collapse restores battle keyboard handling too")
 	view._set_battle_layout(false)
 	view.get_node("Screen/Chat/Expand").pressed.emit()
 	view._scene_action("menu")
@@ -100,6 +121,7 @@ func _run() -> void:
 	touch.position = Vector2(5, 200)
 	expanded.get_node("Shade").gui_input.emit(touch)
 	check(not expanded.visible, "Outside touch dismisses the expanded window")
+	check(expand_button.icon.resource_path == "res://assets/ui/chat_expand.svg", "Outside touch restores the upward arrow")
 	check(Game.player == before, "Expanded history does not change local character progress")
 	view.queue_free()
 	await get_tree().process_frame

@@ -68,7 +68,7 @@ func _ready() -> void:
 	$Menu/Panel/Continue.pressed.connect(func() -> void: details.hide())
 	$Menu/Panel/Leave.pressed.connect(_leave_world)
 	$Menu/Panel/Chat.pressed.connect(_focus_chat)
-	$Screen/Chat/Expand.pressed.connect(_open_expanded_chat)
+	screen.chat_expand_requested.connect(_open_expanded_chat)
 	expanded_chat.dismissed.connect(_expanded_chat_dismissed)
 	expanded_chat.emotes_requested.connect(_toggle_emotes)
 	expanded_chat.emote_chosen.connect(_insert_emote)

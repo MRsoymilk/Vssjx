@@ -50,6 +50,13 @@ func _run() -> void:
 	screen.get_node("Chat/ChatSend").pressed.emit()
 	check(chat.messages.size() == 1 and chat.input.text.is_empty() and chat.log.get_parsed_text().contains("[本地] 本地修士：仅我可见[b]原样[/b]"), "Local echo immediately renders literal text with no server receipt")
 	check(chat.expanded.entries.size() == 1 and chat.expanded.public_caption == "本地", "Expanded local history uses the same private cache and local label")
+	screen.get_node("Chat/Expand").pressed.emit()
+	check(chat.expanded.visible and screen.get_node("Chat/Expand").icon.resource_path == "res://assets/ui/chat_collapse.svg", "Local chat shares the downward expanded arrow")
+	screen.get_node("Chat/Expand").pressed.emit()
+	check(not chat.expanded.visible and screen.get_node("Chat/Expand").icon.resource_path == "res://assets/ui/chat_expand.svg", "Local downward arrow collapses private history")
+	chat.expanded.open()
+	chat.release_input()
+	check(screen.get_node("Chat/Expand").icon.resource_path == "res://assets/ui/chat_expand.svg", "Programmatic local history closure resets the arrow")
 	chat.input.text = " "
 	chat.send()
 	chat.input.text = "\u200b"

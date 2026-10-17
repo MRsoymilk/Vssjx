@@ -3,6 +3,23 @@ use vssjx_server::{
     world_map::{Motion, WorldMap},
 };
 #[test]
+fn ruins_portal_and_population_are_reachable_and_separate() {
+    let trail = WorldMap::default();
+    let ruins = WorldMap::load("ancient_ruins").unwrap();
+    assert_ne!(trail.hash(), ruins.hash());
+    assert!(WorldMap::load("unknown").is_none());
+    for map in [&trail, &ruins] {
+        let (_, gate, destination, spawn) = map.portal();
+        assert!(map.route(map.spawn, gate).is_some());
+        assert!(WorldMap::load(destination).unwrap().walkable(spawn));
+        for resident in vssjx_server::population::definitions_for(&map.map_id) {
+            assert!(map.route(map.spawn, resident.cell).is_some());
+        }
+    }
+    let residents = vssjx_server::population::definitions_for("ancient_ruins");
+    assert_eq!(residents.iter().map(|r|r.id.as_str()).collect::<Vec<_>>(), ["guardian", "boss"]);
+}
+#[test]
 fn map_export_includes_river_bridge_and_tree_blockers() {
     let map = WorldMap::default();
     assert!(!map.walkable([5, 10]));

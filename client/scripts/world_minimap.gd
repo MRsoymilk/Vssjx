@@ -50,7 +50,7 @@ func _draw() -> void:
 		for x in 32:
 			var point := Vector2i(x, y)
 			var fill := Color("626653")
-			if not local or world.zone == 0:
+			if (local and world.zone == 0) or (not local and shared_map.get("map_id") == "qingyun_trail"):
 				var index := y * 32 + x
 				var data: Dictionary = world.map_data if local else shared_map
 				var tile := int(data.tiles[index])

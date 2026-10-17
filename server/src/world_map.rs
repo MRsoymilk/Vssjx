@@ -3,6 +3,7 @@ use sha2::{Digest, Sha256};
 use std::collections::VecDeque;
 
 pub const MAP_BYTES: &str = include_str!("../../shared/data/qingyun-v1.json");
+pub const RUINS_BYTES: &str = include_str!("../../shared/data/ancient-ruins-v1.json");
 pub fn config_hash() -> String {
     format!("{:x}", Sha256::digest(MAP_BYTES.as_bytes()))
 }
@@ -19,15 +20,34 @@ pub struct WorldMap {
 }
 impl Default for WorldMap {
     fn default() -> Self {
-        let map: Self = serde_json::from_str(MAP_BYTES).expect("bundled map JSON");
+        Self::load("qingyun_trail").expect("default map")
+    }
+}
+impl WorldMap {
+    pub fn load(id: &str) -> Option<Self> {
+        let bytes = match id {
+            "qingyun_trail" => MAP_BYTES,
+            "ancient_ruins" => RUINS_BYTES,
+            _ => return None,
+        };
+        let map: Self = serde_json::from_str(bytes).expect("bundled map JSON");
         assert_eq!((map.width, map.height, map.cell_size), (32, 32, 16));
         assert_eq!(map.blocked.len(), 1024);
         assert_eq!(map.tiles.len(), 1024);
         assert!(map.walkable(map.spawn));
-        map
+        Some(map)
     }
-}
-impl WorldMap {
+    pub fn hash(&self) -> String {
+        let bytes = if self.map_id == "ancient_ruins" { RUINS_BYTES } else { MAP_BYTES };
+        format!("{:x}", Sha256::digest(bytes.as_bytes()))
+    }
+    pub fn portal(&self) -> (&'static str, [i32; 2], &'static str, [i32; 2]) {
+        if self.map_id == "ancient_ruins" {
+            ("trail_gate", [3, 16], "qingyun_trail", [10, 16])
+        } else {
+            ("ruins_gate", [28, 16], "ancient_ruins", [5, 16])
+        }
+    }
     pub fn walkable(&self, cell: [i32; 2]) -> bool {
         cell[0] >= 0
             && cell[1] >= 0

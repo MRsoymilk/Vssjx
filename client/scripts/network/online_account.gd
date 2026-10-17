@@ -189,7 +189,7 @@ func _on_response(result: int, code: int, _headers: PackedStringArray, body: Pac
 		if not data.get("ticket") is String or RegEx.create_from_string("^[0-9a-f]{64}\\z").search(data.ticket) == null:
 			_finish({"ok": false, "code": "INVALID_RESPONSE"})
 		else:
-			_finish({"ok": true, "ticket": data.ticket, "announcement_version": 1 if data.get("announcement_version") == 1 else 0, "population_version": 1 if data.get("population_version") == 1 else 0, "pve_version": 1 if data.get("pve_version") == 1 else 0})
+			_finish({"ok": true, "ticket": data.ticket, "announcement_version": 1 if data.get("announcement_version") == 1 else 0, "population_version": 1 if data.get("population_version") == 1 else 0, "pve_version": 1 if data.get("pve_version") == 1 else 0, "maps_version": 1 if data.get("maps_version") == 1 else 0})
 		return
 	if code not in [200, 201]:
 		if _action == "character_create" and code in [409, 422] and data.get("operation_id") == pending_creation.get("operation_id"): pending_creation = {}
@@ -302,7 +302,7 @@ static func _valid_character(value: Variant) -> bool:
 		var number: Variant = value.get(key)
 		var maximum := 1 if key == "gender" else (2 if key in ["job", "school"] else (31 if key in ["cell_x", "cell_y"] else (50 if key == "level" else 2147483647)))
 		if not (number is int or number is float) or not is_finite(float(number)) or number < 0 or number > maximum or float(number) != floor(float(number)): return false
-	if value.level < 1 or value.hp < 1 or value.get("map_id") != "qingyun_trail": return false
+	if value.level < 1 or value.hp < 1 or not SharedWorldMap.MAPS.has(value.get("map_id")): return false
 	return true
 
 func _process(_delta: float) -> void:

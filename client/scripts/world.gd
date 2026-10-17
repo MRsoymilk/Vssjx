@@ -13,10 +13,7 @@ static var ENEMIES: Array = _enemy_definitions()
 
 static func _enemy_definitions() -> Array:
 	var enemies := SharedWorldMap.population().filter(func(value: Dictionary) -> bool: return value.kind != "npc")
-	enemies.append_array([
-		{"id": "guardian", "name": "遗迹守卫", "kind": "spirit", "art": "monster/xt1", "cell": [17, 19], "hp": 100, "attack": 19, "defense": 6, "gold": 24, "xp": 30},
-		{"id": "boss", "name": "赤焰妖王", "kind": "boss", "art": "monster/nt1", "cell": [24, 12], "hp": 190, "attack": 23, "defense": 7, "gold": 120, "xp": 90}
-	])
+	enemies.append_array(SharedWorldMap.population("ancient_ruins"))
 	return enemies
 
 var map_data: Dictionary
@@ -105,24 +102,7 @@ func _build_map() -> void:
 	SharedWorldMap.build(terrain, astar, map_data)
 
 func _ruins_data() -> Dictionary:
-	# Preserve the existing local story extension through the same map builder.
-	var data := {"map_id": "ancient_ruins", "width": MAP_SIZE, "height": MAP_SIZE,
-		"cell_size": CELL, "tiles": [], "blocked": [], "scenery": []}
-	var random := RandomNumberGenerator.new()
-	random.seed = 403085
-	for y in MAP_SIZE:
-		for x in MAP_SIZE:
-			var tile := 258 if random.randf() > 0.025 else 222
-			var solid := x == 0 or y == 0 or x == 31 or y == 31
-			if y == 16 or y == 17: tile = 158 if y == 16 else 168
-			if solid: tile = 219
-			data.tiles.append(tile)
-			data.blocked.append(solid)
-	for place in [Vector2i(3, 8), Vector2i(8, 8), Vector2i(13, 7), Vector2i(27, 8), Vector2i(29, 24), Vector2i(8, 26), Vector2i(19, 28), Vector2i(2, 24)]:
-		var center := cell_center(place)
-		data.scenery.append({"art": "map/m9", "x": center.x, "y": center.y})
-		data.blocked[place.y * MAP_SIZE + place.x] = true
-	return data
+	return SharedWorldMap.load_data("ancient_ruins")
 
 func ground_at(point: Vector2i) -> int:
 	var road := point.y == 16 or point.y == 17

@@ -8,6 +8,7 @@ pub const RULES: &str = "qingyun-pve-v1";
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "snake_case")]
 pub enum Action {
+    Transfer,
     Allocate,
     Accept,
     Claim,
@@ -52,6 +53,8 @@ pub fn mask(id: &str) -> Option<i32> {
         "wolf_b" => Some(2),
         "wolf_c" => Some(4),
         "spirit" => Some(8),
+        "guardian" => Some(16),
+        "boss" => Some(32),
         _ => None,
     }
 }

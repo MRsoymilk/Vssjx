@@ -93,7 +93,7 @@ func _render() -> void:
 
 static func scene_name(character: Dictionary) -> String:
 	if character.has("zone"): return "青云山道" if int(character.zone) == 0 else "古剑遗迹"
-	return {"qingyun_trail":"青云山道"}.get(String(character.get("map_id", "")), "未知场景")
+	return {"qingyun_trail":"青云山道", "ancient_ruins":"古剑遗迹"}.get(String(character.get("map_id", "")), "未知场景")
 
 func _enter() -> void:
 	if enter_button.disabled or _entering or characters.is_empty(): return

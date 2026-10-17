@@ -3,8 +3,10 @@ extends Node
 ## Full initial baseline + bounded, authenticated world deltas. No Game dependency.
 signal changed(entities: Dictionary)
 signal status_changed(text: String)
+signal map_changed(map_id: String)
 signal movement_cancelled
 const MAP_PATH := SharedWorldMap.MAP_PATH
+var map_id := "qingyun_trail"
 var world_ready := false
 var character_id := ""
 var entities: Dictionary = {}
@@ -24,6 +26,7 @@ var announcements := OnlineAnnouncements.new()
 var population := OnlinePopulation.new()
 var pve := OnlinePve.new()
 var _pve_version := 0
+var _maps_version := 0
 var _ticket := ""
 var _announcement_version := 0
 var _population_version := 0
@@ -107,6 +110,22 @@ func _failed(code: String, retry: bool = false) -> void:
 		_state = "request"
 	else: _state = "failed"
 
+func _reconnect_map() -> void:
+	# Keep the account-owned outbox: a lost transfer receipt is replayed on the new map.
+	_pending_motion.clear()
+	world_ready = false
+	if socket != null: socket.close()
+	socket = null
+	population.clear()
+	pve.disconnect_channel()
+	chat.disconnect_channel()
+	entities = {}
+	changed.emit(entities)
+	_state = "request"
+	_attempts = 0
+	_retry_at = 0.0
+	status_changed.emit("正在切换地图……")
+
 func _on_ticket(result: Dictionary) -> void:
 	if OnlineAccount.network_suspended: return
 	if _state != "ticket": return
@@ -123,6 +142,7 @@ func _on_ticket(result: Dictionary) -> void:
 	_ticket = result.ticket
 	_announcement_version = 1 if result.get("announcement_version") == 1 else 0
 	_pve_version = 1 if result.get("pve_version") == 1 else 0
+	_maps_version = 1 if result.get("maps_version") == 1 else 0
 	_population_version = 1 if result.get("population_version") == 1 else 0
 	socket = WebSocketPeer.new()
 	socket.inbound_buffer_size = 2097152
@@ -202,6 +222,7 @@ func _exchange_packet() -> Dictionary:
 	if _announcement_version == 1: packet.announcement_version = 1
 	if _population_version == 1: packet.population_version = 1
 	if _pve_version == 1: packet.pve_version = 1
+	if _maps_version == 1: packet.maps_version = 1
 	return packet
 
 static func _decimal(value: Variant) -> bool:
@@ -240,7 +261,10 @@ func _receive(data: Dictionary, raw: PackedByteArray) -> void:
 		return
 	if kind == "pong": return
 	if kind in ["pve.state", "pve.result"]:
-		if not world_ready or _pve_version != 1 or not pve.receive(data): _failed("INVALID_PVE")
+		if not world_ready or _pve_version != 1 or not pve.receive(data):
+			_failed("INVALID_PVE")
+		elif pve.state.character.map_id != map_id:
+			_reconnect_map()
 		return
 	if kind == "population.state":
 		if stream.is_empty() or not population.receive(data): _failed("INVALID_POPULATION")
@@ -252,10 +276,16 @@ func _receive(data: Dictionary, raw: PackedByteArray) -> void:
 		if stream.is_empty() or not chat.receive(data): _failed("INVALID_CHAT")
 		return
 	if kind == "auth.ready":
-		if _state != "syncing" or not stream.is_empty() or data.get("character_id") != character_id or data.get("config_hash") != config_hash or data.get("map_id") != "qingyun_trail" or data.get("instance_id") != "main":
+		if _state != "syncing" or not stream.is_empty() or data.get("character_id") != character_id or data.get("config_hash") != config_hash or not SharedWorldMap.MAPS.has(data.get("map_id")) or data.get("instance_id") != "main":
 			_failed("INVALID_HANDSHAKE"); return
 		if not _uuid(data.get("game_session_id")) or not _uuid(data.get("stream_id")) or not _decimal(data.get("connection_epoch")) or not _decimal(data.get("world_epoch")) or not _uuid(data.get("world_stream_id")) or data.get("world_sync_version") != 2:
 			_failed("INVALID_HANDSHAKE"); return
+		if data.has("map_hash") and data.map_hash != FileAccess.get_sha256(SharedWorldMap.MAPS[data.map_id]):
+			_failed("CONFIG_MISMATCH"); return
+		if data.map_id != "qingyun_trail" and not data.has("map_hash"):
+			_failed("CONFIG_MISMATCH"); return
+		map_id = data.map_id
+		map_changed.emit(map_id)
 		game_session = data.game_session_id
 		connection_epoch = data.connection_epoch
 		world_epoch = data.world_epoch

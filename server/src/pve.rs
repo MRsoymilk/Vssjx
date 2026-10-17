@@ -31,6 +31,8 @@ pub struct Context {
     pub cell: [i32; 2],
     pub target_cell: Option<[i32; 2]>,
     pub moving: bool,
+    pub map_id: String,
+    pub position_revision: u64,
 }
 #[derive(Clone)]
 struct Loaded {
@@ -64,7 +66,7 @@ async fn load(tx: &mut Transaction<'_, Postgres>, context: &Context) -> Result<L
     let Json(respawns) = row.get::<Json<Value>, _>("monster_respawns");
     let respawns: BTreeMap<String, i64> =
         serde_json::from_value(respawns).map_err(|_| unavailable())?;
-    if respawns.len() > 4
+    if respawns.len() > 6
         || respawns.iter().any(|(id, deadline)| {
             pve_rules::mask(id).is_none_or(|mask| row.get::<i32, _>("defeated_mask") & mask == 0)
                 || !(0..=253_402_300_799_999).contains(deadline)
@@ -113,6 +115,7 @@ impl Loaded {
     fn state(&self) -> Value {
         let defeated: Vec<_> = population::definitions()
             .into_iter()
+            .chain(population::definitions_for("ancient_ruins"))
             .filter(|d| pve_rules::mask(&d.id).is_some_and(|mask| self.defeated & mask != 0))
             .map(|d| d.id)
             .collect();
@@ -146,8 +149,26 @@ impl Loaded {
         self.character.mp = stats.mp;
     }
     fn apply(&mut self, command: &Command, context: &Context) -> Result<Vec<String>, &'static str> {
+        if context.map_id != self.character.map_id {
+            return Err("MAP_CHANGED");
+        }
         if context.moving {
             return Err("PLAYER_MOVING");
+        }
+        if command.action == Action::Transfer {
+            if self.battle.is_some() { return Err("BATTLE_ACTIVE"); }
+            if command.battle_id.is_some() || command.expected_revision.is_some() || command.attributes.is_some() {
+                return Err("INVALID_PVE_COMMAND");
+            }
+            let map = crate::world_map::WorldMap::load(&context.map_id).ok_or("INVALID_MAP")?;
+            let (gate, cell, destination, spawn) = map.portal();
+            if command.target.as_deref() != Some(gate) { return Err("INVALID_PORTAL"); }
+            if (cell[0] - context.cell[0]).abs() + (cell[1] - context.cell[1]).abs() > 2 { return Err("PORTAL_TOO_FAR"); }
+            if destination == "ancient_ruins" && self.character.quest_stage < 3 { return Err("PORTAL_LOCKED"); }
+            self.character.map_id = destination.to_owned();
+            self.character.cell_x = spawn[0];
+            self.character.cell_y = spawn[1];
+            return Ok(vec![if destination == "ancient_ruins" { "已进入古剑遗迹。" } else { "已返回青云山道。" }.into()]);
         }
         if command.action == Action::Allocate {
             if self.battle.is_some() {
@@ -202,7 +223,7 @@ impl Loaded {
                     return Err("RESIDENT_TOO_FAR");
                 }
                 if command.action == Action::Challenge {
-                    let definition = population::definitions()
+                    let definition = population::definitions_for(&context.map_id)
                         .into_iter()
                         .find(|d| Some(&d.id) == command.target.as_ref() && d.kind != "npc")
                         .ok_or("INVALID_RESIDENT")?;
@@ -292,6 +313,10 @@ impl Loaded {
                         self.character.quest_stage = 2;
                         lines.push("三只山狼已清除，请返回清微道人处领取奖励。".into());
                     }
+                    if battle.enemy.id == "boss" && self.character.quest_stage == 3 {
+                        self.character.quest_stage = 4;
+                        lines.push("赤焰妖王已被击败，古剑遗迹的妖气消散了。".into());
+                    }
                     self.rewards(gold, xp)?;
                     lines.push(format!("获得{gold}铜钱、{xp}修为。"));
                 } else if battle.outcome == "defeat" {
@@ -342,6 +367,12 @@ pub async fn execute(
         loaded = original;
     }
     if applied.is_ok() {
+        if loaded.character.map_id != context.map_id {
+            sqlx::query("UPDATE characters SET map_id=$2,cell_x=$3,cell_y=$4,position_revision=$5 WHERE id=$1 AND owner_epoch=$6")
+                .bind(context.character).bind(&loaded.character.map_id).bind(loaded.character.cell_x).bind(loaded.character.cell_y)
+                .bind((context.position_revision + 1) as i64).bind(context.owner)
+                .execute(&mut *tx).await.map_err(database)?;
+        }
         let active = loaded
             .battle
             .as_ref()

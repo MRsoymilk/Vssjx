@@ -3,12 +3,20 @@ extends RefCounted
 ## Mode-independent terrain, collision and scenery. The server validates MAP_PATH's bytes.
 const MAP_PATH := "res://assets/data/qingyun-v1.json"
 const POPULATION_PATH := "res://assets/data/qingyun-population-v1.json"
+const MAPS := {"qingyun_trail": MAP_PATH, "ancient_ruins": "res://assets/data/ancient-ruins-v1.json"}
+const POPULATIONS := {"qingyun_trail": POPULATION_PATH, "ancient_ruins": "res://assets/data/ruins-population-v1.json"}
 
-static func load_data() -> Dictionary:
-	return JSON.parse_string(FileAccess.get_file_as_string(MAP_PATH))
+static func load_data(map_id: String = "qingyun_trail") -> Dictionary:
+	return JSON.parse_string(FileAccess.get_file_as_string(MAPS[map_id]))
 
-static func population() -> Array:
-	return JSON.parse_string(FileAccess.get_file_as_string(POPULATION_PATH))
+static func population(map_id: String = "qingyun_trail") -> Array:
+	return JSON.parse_string(FileAccess.get_file_as_string(POPULATIONS[map_id]))
+
+static func portal(map_id: String) -> Dictionary:
+	return {"id": "ruins_gate", "cell": [28, 16], "name": "古剑遗迹 · 灵门"} if map_id == "qingyun_trail" else {"id": "trail_gate", "cell": [3, 16], "name": "返回山道"}
+
+static func title(map_id: String) -> String:
+	return "青云山道" if map_id == "qingyun_trail" else "古剑遗迹"
 
 static func build(terrain: TileMapLayer, grid: AStarGrid2D, data: Dictionary) -> void:
 	var width := int(data.width)

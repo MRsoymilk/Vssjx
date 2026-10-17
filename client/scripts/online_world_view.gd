@@ -16,6 +16,7 @@ var character_id := ""
 var actors: Dictionary = {}
 var residents: Dictionary = {}
 var map_data: Dictionary
+var portal_marker: Node2D
 var _motion_grid := AStarGrid2D.new()
 var _key_timer := 0.0
 var _was_keyboard := false
@@ -113,6 +114,7 @@ func _ready() -> void:
 		if _loading_battle.is_empty(): encounter.hide()
 		if network.pve.last_code.is_empty() and network.pve.last_action in ["accept", "claim", "restore"]: npc_dialog.hide()
 	)
+	network.map_changed.connect(_map_changed)
 	network.changed.connect(_snapshot)
 	network.population.changed.connect(_population)
 	network.status_changed.connect(_status_changed)
@@ -183,6 +185,39 @@ func _status_changed(text_value: String) -> void:
 func _build_map() -> void:
 	SharedWorldMap.build($Viewport/Scene/Terrain, _motion_grid, map_data)
 	SharedWorldMap.add_scenery(actor_layer, map_data)
+	var gate := SharedWorldMap.portal(String(map_data.map_id))
+	portal_marker = Node2D.new()
+	portal_marker.set_script(preload("res://scripts/portal.gd"))
+	portal_marker.position = Vector2(gate.cell[0] * 16 + 8, gate.cell[1] * 16 + 8)
+	actor_layer.add_child(portal_marker)
+	var label := Label.new()
+	label.text = gate.name
+	label.position = Vector2(-65, -50)
+	label.size = Vector2(130, 16)
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.add_theme_font_size_override("font_size", 10)
+	label.add_theme_color_override("font_color", Color("c2f7f4"))
+	label.add_theme_color_override("font_outline_color", Color("182821"))
+	label.add_theme_constant_override("outline_size", 1)
+	portal_marker.add_child(label)
+
+func _map_changed(id: String) -> void:
+	_cancel_approach()
+	_cancel_battle_preparation()
+	npc_dialog.hide()
+	move_target.clear()
+	actors.clear()
+	residents.clear()
+	for child in actor_layer.get_children():
+		actor_layer.remove_child(child)
+		child.queue_free()
+	map_data = SharedWorldMap.load_data(id)
+	_build_map()
+	screen.hud.get_node("MapName").text = SharedWorldMap.title(id)
+	screen.hud.get_node("Minimap").set_shared_world(map_data, {}, character_id)
+	screen.hud.get_node("Minimap").set_shared_population({})
+	_was_keyboard = false
+
 
 func _population(values: Dictionary) -> void:
 	var visible_values := values.duplicate()
@@ -385,6 +420,10 @@ func _map_input(event: InputEvent) -> void:
 	Platform.context.text_input.release_focus(chat_input)
 	_was_keyboard = false
 	var world_point := camera.get_screen_center_position() + point - Vector2(viewport.size) / 2.0
+	if is_instance_valid(portal_marker) and Rect2(portal_marker.position + Vector2(-20, -45), Vector2(40, 60)).has_point(world_point):
+		_cancel_approach()
+		_resident_action("transfer", SharedWorldMap.portal(String(map_data.map_id)).id)
+		return
 	for id in residents:
 		if residents[id].hit(world_point):
 			resident_selected.emit(id)
@@ -506,13 +545,14 @@ func _advance_approach() -> void:
 		_cancel_approach()
 		chat_status.text = "未能抵达，请重新选择目标。"
 		return
-	if not network.population.entities.has(_approach.target) or not network.entities.has(character_id):
+	var transfer: bool = _approach.action == "transfer"
+	if (not transfer and not network.population.entities.has(_approach.target)) or not network.entities.has(character_id):
 		_cancel_approach()
 		return
 	var own: Dictionary = network.entities[character_id]
 	if own.next_cell != null or not network._pending_motion.is_empty() or int(own.last_input_seq) < network._input_seq: return
 	var cell := Vector2i(own.cell[0], own.cell[1])
-	var resident: Dictionary = network.population.entities[_approach.target]
+	var resident: Dictionary = SharedWorldMap.portal(String(map_data.map_id)) if transfer else network.population.entities[_approach.target]
 	var target := Vector2i(resident.cell[0], resident.cell[1])
 	if absi(cell.x - target.x) + absi(cell.y - target.y) <= 2:
 		if not _approach.stopped:

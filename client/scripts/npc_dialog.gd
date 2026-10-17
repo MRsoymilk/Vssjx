@@ -32,9 +32,9 @@ func present(id: String, resident: Dictionary, pve: OnlinePve) -> void:
 func refresh() -> void:
 	if model == null or model.state.is_empty(): return
 	var stage := int(model.state.character.quest_stage)
-	quest_button.text = ["! 山林试炼（接受）", "[已接] 山林试炼（%d/3）" % int(model.state.progress.kills), "! 山林试炼（完成）", "[完成] 山林试炼"][stage]
+	quest_button.text = ["! 山林试炼（接受）", "[已接] 山林试炼（%d/3）" % int(model.state.progress.kills), "! 山林试炼（完成）", "[完成] 山林试炼"][mini(stage, 3)]
 	var locked := not model.ready or model.pending() or model.active() or approaching
-	quest_button.disabled = locked or stage in [1, 3]
+	quest_button.disabled = locked or stage == 1 or stage >= 3
 	var full := int(model.state.character.hp) == int(model.state.stats.hp) and int(model.state.character.mp) == int(model.state.stats.mp)
 	restore_button.disabled = locked or full
 	hint.text = "点击任务项接受或完成任务。" if stage in [0, 2] else ("击败山狼后，回来完成试炼。" if stage == 1 else "试炼已完成。")

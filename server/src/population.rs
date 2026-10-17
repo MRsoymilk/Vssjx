@@ -20,7 +20,15 @@ pub struct ResidentDefinition {
     pub xp: i32,
 }
 pub fn definitions() -> Vec<ResidentDefinition> {
-    serde_json::from_str(include_str!("../../shared/data/qingyun-population-v1.json"))
+    definitions_for("qingyun_trail")
+}
+pub fn definitions_for(map_id: &str) -> Vec<ResidentDefinition> {
+    let bytes = match map_id {
+        "qingyun_trail" => include_str!("../../shared/data/qingyun-population-v1.json"),
+        "ancient_ruins" => include_str!("../../shared/data/ruins-population-v1.json"),
+        _ => return Vec::new(),
+    };
+    serde_json::from_str(bytes)
         .expect("resident definitions")
 }
 pub struct Resident {
@@ -37,7 +45,7 @@ pub struct Population {
 }
 impl Population {
     pub fn new(map: &WorldMap) -> Self {
-        let residents = definitions()
+        let residents = definitions_for(&map.map_id)
             .into_iter()
             .enumerate()
             .map(|(index, definition)| {

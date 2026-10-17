@@ -4,7 +4,7 @@ signal changed(entities: Dictionary)
 var entities: Dictionary = {}
 var epoch := ""
 var revision := -1
-const ARTS := {"npc": "hero/mfs", "wolf": "monster/langw", "spirit": "monster/hs1"}
+const ARTS := {"npc": "hero/mfs", "wolf": "monster/langw", "spirit": "monster/hs1", "guardian": "monster/xt1", "boss": "monster/nt1"}
 
 func clear() -> void:
 	entities = {}

@@ -46,7 +46,7 @@ static func decimal(value: Variant) -> bool:
 
 func valid(value: Variant) -> bool:
 	if not value is Dictionary or value.get("rules_version") != "qingyun-pve-v1": return false
-	if not OnlineAccount._valid_character(value.get("character")) or value.character.id != character_id or value.character.quest_stage > 3: return false
+	if not OnlineAccount._valid_character(value.get("character")) or value.character.id != character_id or value.character.quest_stage > 4: return false
 	if not integer(value.get("potions"), 0, 99): return false
 	if not value.get("stats") is Dictionary: return false
 	for key in ["hp", "mp", "attack", "defense"]:
@@ -54,17 +54,17 @@ func valid(value: Variant) -> bool:
 	if value.character.hp > value.stats.hp or value.character.mp > value.stats.mp: return false
 	if value.has("attributes") and not valid_attributes(value.attributes, value): return false
 	var progress: Variant = value.get("progress")
-	if not progress is Dictionary or not integer(progress.get("kills"), 0, 3) or not progress.get("defeated") is Array or progress.defeated.size() > 4: return false
+	if not progress is Dictionary or not integer(progress.get("kills"), 0, 3) or not progress.get("defeated") is Array or progress.defeated.size() > 6: return false
 	var seen: Dictionary = {}
 	var kills := 0
 	for id in progress.defeated:
-		if not id is String or not id in ["wolf_a", "wolf_b", "wolf_c", "spirit"] or seen.has(id): return false
+		if not id is String or not id in ["wolf_a", "wolf_b", "wolf_c", "spirit", "guardian", "boss"] or seen.has(id): return false
 		seen[id] = true
-		if id != "spirit": kills += 1
+		if id in ["wolf_a", "wolf_b", "wolf_c"]: kills += 1
 	if kills != int(progress.kills): return false
 	if progress.has("respawns") or value.has("server_time_ms"):
 		if not integer(value.get("server_time_ms"), 1, 253402300799999): return false
-		if not progress.get("respawns") is Dictionary or progress.respawns.size() > 4: return false
+		if not progress.get("respawns") is Dictionary or progress.respawns.size() > 6: return false
 		for id in progress.respawns:
 			if not seen.has(id) or not integer(progress.respawns[id], 0, mini(253402300799999, int(value.server_time_ms) + 30000)): return false
 	if not value.has("battle"): return false
@@ -74,8 +74,8 @@ func valid(value: Variant) -> bool:
 	if not battle.get("outcome") in ["active", "victory", "defeat", "fled"] or not integer(battle.get("round"), 0, 30): return false
 	if not battle.get("enemy") is Dictionary: return false
 	var enemy: Dictionary = battle.enemy
-	if not enemy.get("id") in ["wolf_a", "wolf_b", "wolf_c", "spirit"] or not enemy.get("name") is String or enemy.name.length() > 24: return false
-	if not enemy.get("art") in ["monster/langw", "monster/hs1"]: return false
+	if not enemy.get("id") in ["wolf_a", "wolf_b", "wolf_c", "spirit", "guardian", "boss"] or not enemy.get("name") is String or enemy.name.length() > 24: return false
+	if not enemy.get("art") in ["monster/langw", "monster/hs1", "monster/xt1", "monster/nt1"]: return false
 	if not integer(enemy.get("hp"), 1, 10000) or not integer(enemy.get("level"), 1, 50): return false
 	if not integer(battle.get("hp"), 0, int(value.stats.hp)) or not integer(battle.get("mp"), 0, int(value.stats.mp)) or not integer(battle.get("enemy_hp"), 0, int(enemy.hp)) or not integer(battle.get("potions"), 0, 99): return false
 	return true
@@ -169,9 +169,13 @@ func quest_text() -> String:
 	if stage == 0: return "山林试炼\n前往桥边拜访清微道人，领受试炼。"
 	if stage == 1: return "山林试炼\n击败山狼 %d / 3\n三只山狼各计一次，请留意小地图红点。" % int(state.progress.kills)
 	if stage == 2: return "山林试炼\n山狼已清除，返回清微道人处领取奖励。\n奖励：60铜钱、35修为。"
-	return "山林试炼 · 已完成\n清微道人仍可为你恢复生命与灵力。"
+	if stage == 3: return "山林试炼 · 已完成\n穿过东侧灵门进入古剑遗迹，击败赤焰妖王。"
+	return "古剑遗迹 · 已完成\n妖气已散，可返回青云山道恢复元气，或继续探索遗迹。"
 
 static func error_text(code: String) -> String:
+	if code == "PORTAL_LOCKED": return "灵门未开，请完成山狼试炼并向清微道人复命。"
+	if code == "PORTAL_TOO_FAR": return "请走近灵门后再传送。"
+	if code == "MAP_CHANGED": return "地图已切换，请等待同步完成。"
 	if code == "MONSTER_RESPAWNING": return "怪物正在刷新，请稍候再来。"
 	var attributes := {"STALE_ATTRIBUTES":"属性已更新，请重新加点。", "ATTRIBUTE_RESPEC_FORBIDDEN":"已保存的属性点不能减少。", "ATTRIBUTE_POINTS_EXCEEDED":"剩余属性点不足。", "NO_ATTRIBUTE_CHANGE":"请先分配属性点。", "INVALID_ATTRIBUTES":"属性点格式无效。"}
 	if attributes.has(code): return attributes[code]

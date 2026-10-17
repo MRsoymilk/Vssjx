@@ -26,6 +26,7 @@ var enabled := true:
 		enabled = value
 		if not value and move_target != null: move_target.clear()
 		if value and actors != null: _sync_enemies()
+		if value: refresh_quest_marker()
 		for sprite in enemy_nodes.values():
 			if not value: sprite.pause()
 			else: sprite.play()
@@ -44,6 +45,7 @@ var facing_left := true # Native stand and walk composites face left.
 var walk_distance := 0.0
 var portal_marker: Node2D
 var move_target: WorldMoveTarget
+var quest_marker: NpcQuestMarker
 
 func _ready() -> void:
 	zone = int(Game.player.zone)
@@ -72,7 +74,10 @@ func _ready() -> void:
 		var npc := OriginalArt.actor(definition.art)
 		npc.position = cell_center(Vector2i(definition.cell[0], definition.cell[1]))
 		actors.add_child(npc)
-		_name_tag(npc, String(definition.name) + " · 任务", Color("ffe095"))
+		_name_tag(npc, String(definition.name), Color("ffe095"))
+		quest_marker = preload("res://scenes/actors/npc_quest_marker.tscn").instantiate()
+		npc.add_child(quest_marker)
+		refresh_quest_marker()
 	_sync_enemies()
 	camera = Camera2D.new()
 	camera.position = hero.position
@@ -86,6 +91,9 @@ func _ready() -> void:
 		hero.position = cell_center(cell)
 		_save_position()
 	queue_redraw()
+
+func refresh_quest_marker() -> void:
+	if is_instance_valid(quest_marker): quest_marker.set_stage(int(Game.player.get("quest", -1)))
 
 func cell_center(value: Vector2i) -> Vector2:
 	return Vector2(value * CELL) + Vector2(8, 8)
@@ -287,6 +295,7 @@ func _interact_pending() -> void:
 	if not target.is_empty(): interaction.emit(target.kind, target.data)
 
 func _process(delta: float) -> void:
+	refresh_quest_marker()
 	if not enabled or hero == null: return
 	if OS.has_feature("web") and (not Platform.context.lifecycle.focused or Platform.context.lifecycle.suspended): return
 	_sync_enemies()

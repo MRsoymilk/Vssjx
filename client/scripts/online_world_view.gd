@@ -197,7 +197,7 @@ func _population(values: Dictionary) -> void:
 			actor_layer.add_child(resident)
 			residents[id] = resident
 		residents[id].receive(visible_values[id], _motion_grid)
-		residents[id].set_quest_available(network.pve.ready and int(network.pve.state.get("character", {}).get("quest_stage", -1)) == 0)
+		residents[id].set_quest_stage(int(network.pve.state.get("character", {}).get("quest_stage", -1)) if network.pve.ready else -1)
 	screen.hud.get_node("Minimap").set_shared_population(visible_values)
 
 func _snapshot(values: Dictionary) -> void:

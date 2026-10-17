@@ -5,14 +5,14 @@ var sprite: AnimatedSprite2D
 var motion := OnlineActorMotion.new()
 var distance := 0.0
 
-func set_quest_available(available: bool) -> void:
-	$QuestMarker.visible = available and data.get("kind") == "npc"
+func set_quest_stage(stage: int) -> void:
+	$QuestMarker.set_stage(stage if data.get("kind") == "npc" else -1)
 
 func receive(value: Dictionary, grid: AStarGrid2D) -> void:
 	if sprite == null:
 		sprite = OriginalArt.actor(value.art)
 		$Sprite.add_child(sprite)
-		$Name.text = value.name + (" · 任务" if value.kind == "npc" else "")
+		$Name.text = value.name
 		if value.kind != "npc": $Name.add_theme_color_override("font_color", Color("ffb29a"))
 		motion.speed = 28.0
 	data = value.duplicate(true)

@@ -26,7 +26,10 @@ func _run() -> void:
 	var population := residents_packet()
 	view.network.population.receive(population)
 	var model := view.network.pve
+	check(not view.residents.qingwei.get_node("QuestMarker").visible, "Unknown private quest state cannot invent an available task")
 	check(model.receive({"type":"pve.state","state":pve_state()}), "Validated private state accepted")
+	check(view.residents.qingwei.get_node("Name").text == "清微道人", "NPC name no longer carries a permanent task suffix")
+	await capture("quest_marker_available")
 	model.send_requested.connect(func(packet: Dictionary) -> void: sent.append(packet))
 	view.resident_selected.emit("qingwei")
 	check(not view.encounter.visible and not view.encounter.has_node("Panel"), "Selecting NPC never opens a confirmation dialog")
@@ -56,6 +59,7 @@ func _run() -> void:
 	var operation: String = sent[0].command.operation_id
 	check(not model.submit("accept", "qingwei"), "Pending command blocks double-clicks")
 	model.disconnect_channel()
+	check(not view.residents.qingwei.get_node("QuestMarker").visible, "Disconnected quest state hides the actionable marker")
 	check(model.pending() and not model.ready and view.npc_dialog.visible and view.npc_dialog.hint.text.contains("连接中断") and not view.encounter.visible, "Task reconnect remains inline in NPC dialogue without combat visuals")
 	check(model.receive({"type":"pve.state","state":pve_state(2,1)}) and sent.size() == 2 and sent[1] == sent[0], "Reconnect retries exact original operation and payload")
 	var result := {"type":"pve.result","operation_id":operation,"ok":true,"replayed":true,"lines":["已领受山林试炼"],"state":pve_state(2,1)}
@@ -158,6 +162,9 @@ func _run() -> void:
 	claim.character.quest_stage = 2
 	claim.progress = {"kills":3,"defeated":["wolf_a","wolf_b","wolf_c"]}
 	model.receive({"type":"pve.state","state":claim})
+	check(view.residents.qingwei.get_node("QuestMarker").visible and view.residents.qingwei.get_node("QuestMarker").quest_stage == 2, "Authoritative completed objectives restore the claimable NPC marker")
+	check(view.residents.values().all(func(resident: OnlineResident) -> bool: return resident.data.kind == "npc" or not resident.get_node("QuestMarker").visible), "Claimable quest state never marks monsters")
+	await capture("quest_marker_claimable")
 	view.resident_selected.emit("qingwei")
 	view.network._pending_motion = {}
 	view._advance_approach()
@@ -166,10 +173,13 @@ func _run() -> void:
 	view.network._pending_motion = {}
 	view._advance_approach()
 	check(sent[-1].command.action == "claim" and not view.encounter.visible, "Complete option submits a reward request without battle visuals")
-	OnlineAccount.pending_pve = {}
+	var claimed := claim.duplicate(true)
+	claimed.character.state_revision = "7"
+	claimed.character.quest_stage = 3
+	check(model.receive({"type":"pve.result", "operation_id":sent[-1].command.operation_id, "ok":true, "replayed":false, "lines":["试炼奖励已领取"], "state":claimed}) and not view.residents.qingwei.get_node("QuestMarker").visible, "Reward receipt removes the marker without changing local progress")
 	# Failed preparation remains a recoverable server battle, never a fake success.
 	var next_battle := state.duplicate(true)
-	next_battle.character.state_revision = "7"
+	next_battle.character.state_revision = "8"
 	next_battle.battle.id = EPOCH
 	var art := String(next_battle.battle.enemy.art)
 	var texture: String = OriginalArt.catalog[art].texture
@@ -186,7 +196,7 @@ func _run() -> void:
 	check(await wait_until(func() -> bool: return view.battle_view.battle_id == EPOCH), "Clicking map retries resource preparation in the same authoritative battle")
 	check(sent.size() == count_before_load, "Resource retry sends no extra game command")
 	# Disconnect during the warning invalidates the old preparation generation.
-	next_battle.character.state_revision = "8"
+	next_battle.character.state_revision = "9"
 	next_battle.battle.id = SELF
 	model.receive({"type":"pve.state","state":next_battle})
 	check(not view.battle_view.visible, "Old battle controls are hidden while the next encounter prepares")
@@ -195,12 +205,12 @@ func _run() -> void:
 	check(view._loading_battle.is_empty() and view.battle_view.battle_id == EPOCH, "Disconnected preparation cannot enter a stale battle")
 	model.receive({"type":"pve.state","state":next_battle})
 	check(await wait_until(func() -> bool: return view.battle_view.battle_id == SELF), "Reconnection prepares and restores the authoritative active battle")
-	next_battle.character.state_revision = "9"
+	next_battle.character.state_revision = "10"
 	next_battle.battle.id = PEER
 	model.receive({"type":"pve.state","state":next_battle})
 	check(await wait_until(func() -> bool: return view._battle_resource_request != null and view.encounter.progress > 0.0), "Cancellation fixture reaches real resource/cache work")
 	var preparing_epoch: int = view._battle_load_epoch
-	next_battle.character.state_revision = "10"
+	next_battle.character.state_revision = "11"
 	next_battle.battle.revision = "2"
 	next_battle.battle.round = 2
 	model.receive({"type":"pve.state","state":next_battle})

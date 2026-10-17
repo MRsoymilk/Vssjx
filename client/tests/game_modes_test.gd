@@ -24,6 +24,22 @@ func _run() -> void:
 	var grid := local.astar
 	var canonical := SharedWorldMap.load_data()
 	check(local.map_data == canonical, "Local map reads the exact online map data instead of regenerating terrain")
+	check(local.quest_marker is NpcQuestMarker and local.quest_marker.visible and local.quest_marker.texture.resource_path == "res://assets/ui/quest_available.svg", "Local available quest uses the shared yellow exclamation mark")
+	var npc_name: Label = local.quest_marker.get_parent().get_child(0)
+	check(npc_name.text == "清微道人" and local.quest_marker.get_rect().end.y <= npc_name.position.y, "Quest symbol sits above the real NPC name instead of appending task text")
+	await capture("00_local_quest_available")
+	for stage in [1, 2, 3, 4]:
+		Game.player.quest = stage
+		local.refresh_quest_marker()
+		check(local.quest_marker.visible == (stage == 2), "Local quest indicator reflects progress/reward state %d" % stage)
+	Game.player.quest = 0
+	local.enabled = false
+	Game.player.quest = 2
+	local.enabled = true
+	check(local.quest_marker.visible and local.quest_marker.quest_stage == 2, "Returning to the map refreshes a claimable quest immediately")
+	await capture("00_local_quest_claimable")
+	Game.player.quest = 0
+	local.refresh_quest_marker()
 	var screen: GameWorldScreen = app.ui.get_child(0)
 	check(screen.get_node("GameMode").text == "本地模式", "Local HUD identifies mode")
 	var chat: LocalWorldChat = screen.local_chat

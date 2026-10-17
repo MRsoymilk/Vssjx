@@ -1,4 +1,5 @@
 pub mod shop;
+pub mod skills;
 pub mod auth;
 pub mod attributes;
 pub mod announcements;

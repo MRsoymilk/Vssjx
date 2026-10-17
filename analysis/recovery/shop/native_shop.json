@@ -1,0 +1,58 @@
+{
+  "source": "analysis/unpacked/ssjx/gameonline.ext",
+  "sha256": "e08f93bebe133b700f2305bfbedd994b05cc8d04a5a854262af9ced956afbc03",
+  "constructor": "0x1a2f4",
+  "draw": "0x1a40c",
+  "tabs": [
+    "热卖",
+    "奇珍",
+    "炼制",
+    "仙丹"
+  ],
+  "tab_string_indices_zero_based": [
+    9,
+    10,
+    11,
+    12
+  ],
+  "title_string_index_zero_based": 13,
+  "layout": {
+    "columns": 2,
+    "column_stride": 112,
+    "row_stride": 38,
+    "cell_width": 112,
+    "cell_height": 38,
+    "icon_width": 28,
+    "icon_height": 32,
+    "visible_rows": 5
+  },
+  "anchors": {
+    "tab_indices_call": "0x1a33e",
+    "cell_columns_modulo_two": "0x1a464",
+    "cell_stride_x": "0x1a46c",
+    "cell_stride_y": "0x1a472",
+    "highlight_dimensions": "0x1a49c",
+    "icon_dimensions": "0x1a4f4"
+  },
+  "palette_table": "0x30f5c",
+  "shop_palette": [
+    "fff6bc",
+    "fe7d92",
+    "fff840",
+    "fff6bc",
+    "783426",
+    "8a653a",
+    "eb9e36",
+    "f5df9b",
+    "9c5719",
+    "d5b275",
+    "ffffff",
+    "734524",
+    "fff587",
+    "d96477"
+  ],
+  "limits": [
+    "Original server item definitions, names, prices, stats, and appearance links were not present in the recovered package.",
+    "Reconstructed display classifications and gameplay values must not be described as recovered original server rules."
+  ]
+}

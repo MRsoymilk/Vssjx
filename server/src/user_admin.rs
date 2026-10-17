@@ -43,10 +43,10 @@ pub(crate) async fn users(
         return Err(invalid());
     }
     // strpos treats '%' and '_' as ordinary text, not wildcard/SQL syntax.
-    let rows = sqlx::query("SELECT a.id,a.username,a.disabled,a.created_at::text AS created_at, (SELECT count(*) FROM characters c WHERE c.account_id=a.id) AS characters, (SELECT count(*) FROM sessions s WHERE s.account_id=a.id AND s.revoked_at IS NULL AND s.access_expires_at>clock_timestamp() AND s.refresh_expires_at>clock_timestamp() AND NOT a.disabled) AS sessions FROM accounts a WHERE $1='' OR strpos(a.username,lower($1))>0 OR a.id::text=$1 ORDER BY a.created_at DESC,a.id LIMIT 51 OFFSET $2")
+    let rows = sqlx::query("SELECT a.id,a.username,a.disabled,a.created_at::text AS created_at, (SELECT count(*) FROM characters c WHERE c.account_id=a.id) AS characters, COALESCE((SELECT jsonb_agg(jsonb_build_object('id',c.id,'display_name',c.display_name,'level',c.level) ORDER BY c.slot) FROM characters c WHERE c.account_id=a.id),'[]'::jsonb) AS character_summaries, (SELECT count(*) FROM sessions s WHERE s.account_id=a.id AND s.revoked_at IS NULL AND s.access_expires_at>clock_timestamp() AND s.refresh_expires_at>clock_timestamp() AND NOT a.disabled) AS sessions FROM accounts a WHERE $1='' OR strpos(a.username,lower($1))>0 OR a.id::text=$1 OR EXISTS(SELECT 1 FROM characters c WHERE c.account_id=a.id AND (strpos(c.name_key,lower($1))>0 OR c.id::text=$1)) ORDER BY a.created_at DESC,a.id LIMIT 51 OFFSET $2")
         .bind(search.q.trim()).bind(search.offset).fetch_all(pool(&state)?).await.map_err(database)?;
     let more = rows.len() > 50;
-    let users: Vec<_> = rows.iter().take(50).map(|r| json!({"id":r.get::<Uuid,_>("id"),"username":r.get::<String,_>("username"),"disabled":r.get::<bool,_>("disabled"),"created_at":r.get::<String,_>("created_at"),"characters":r.get::<i64,_>("characters"),"sessions":r.get::<i64,_>("sessions")})).collect();
+    let users: Vec<_> = rows.iter().take(50).map(|r| json!({"id":r.get::<Uuid,_>("id"),"username":r.get::<String,_>("username"),"disabled":r.get::<bool,_>("disabled"),"created_at":r.get::<String,_>("created_at"),"characters":r.get::<i64,_>("characters"),"character_summaries":r.get::<DbJson<Value>,_>("character_summaries").0,"sessions":r.get::<i64,_>("sessions")})).collect();
     Ok(Json(
         json!({"users":users,"more":more,"csrf_token":state.operator_token}),
     ))
@@ -111,6 +111,7 @@ pub(crate) struct OperatorAction {
     operation_id: Uuid,
     action: String,
     reason: String,
+    character_id: Option<Uuid>,
 }
 pub(crate) async fn act(
     State(state): State<Arc<AppState>>,
@@ -136,9 +137,11 @@ pub(crate) async fn act(
     {
         return Err(invalid());
     }
-    let digest =
-        Sha256::digest(serde_json::to_vec(&(id, &p.action, reason)).expect("operator intent"))
-            .to_vec();
+    // Preserve the existing receipt digest for account-only requests.
+    let intent = if let Some(character) = p.character_id {
+        serde_json::to_vec(&("operator.character-context-v1",id,character,&p.action,reason))
+    } else { serde_json::to_vec(&(id,&p.action,reason)) };
+    let digest = Sha256::digest(intent.expect("operator intent")).to_vec();
     let mut tx = pool(&state)?.begin().await.map_err(database)?;
     // Serialize the operation UUID globally, then account. No untrusted value is SQL.
     sqlx::query("SELECT pg_advisory_xact_lock(hashtextextended($1,17))")
@@ -171,6 +174,12 @@ pub(crate) async fn act(
         "enable" => false,
         _ => before,
     };
+    let selected_character = if let Some(character) = p.character_id {
+        let name: String = sqlx::query_scalar("SELECT display_name FROM characters WHERE id=$1 AND account_id=$2")
+            .bind(character).bind(id).fetch_optional(&mut *tx).await.map_err(database)?
+            .ok_or(AuthError(StatusCode::FORBIDDEN,"CHARACTER_NOT_OWNED"))?;
+        json!({"id":character,"display_name":name})
+    } else { Value::Null };
     sqlx::query("UPDATE accounts SET disabled=$2 WHERE id=$1")
         .bind(id)
         .bind(disabled)
@@ -184,7 +193,7 @@ pub(crate) async fn act(
         0
     };
     let result = json!({"operation_id":p.operation_id,"account_id":id,"action":p.action,"disabled":disabled,"revoked_sessions":revoked,"replayed":false});
-    security::append(&mut *tx, Event{account:Some(id),character:None,session:None,operation:Some(p.operation_id),action:&format!("operator.{}",p.action),outcome:"accepted",code:"OK",details:json!({"reason":reason,"disabled_before":before,"disabled_after":disabled,"revoked_sessions":revoked,"actor":"local_operator"})}).await.map_err(database)?;
+    security::append(&mut *tx, Event{account:Some(id),character:p.character_id,session:None,operation:Some(p.operation_id),action:&format!("operator.{}",p.action),outcome:"accepted",code:"OK",details:json!({"reason":reason,"disabled_before":before,"disabled_after":disabled,"revoked_sessions":revoked,"actor":"local_operator","scope":"account","selected_character":selected_character})}).await.map_err(database)?;
     sqlx::query(
         "INSERT INTO operator_receipts(operation_id,request_digest,result) VALUES($1,$2,$3)",
     )

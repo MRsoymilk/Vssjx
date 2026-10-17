@@ -1,27 +1,6 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Vssjx · 服务监控</title><link rel="stylesheet" href="/dashboard.css"><script src="/dashboard.js" defer></script><script src="/announcements.js" defer></script><script src="/users.js" defer></script></head>
-<body><header><div><p class="eyebrow">VSSJX · OPERATIONS</p><h1>服务监控</h1><p>本机运维 · 每 5 秒刷新 · 全局通知实时推送</p></div><div><span id="health" class="badge">连接中</span><button id="refresh" type="button">立即刷新</button></div></header>
-<main><p id="notice" role="status">正在获取状态…</p><section id="cards" class="cards" aria-label="服务概况"></section>
-<section class="panel users-panel" aria-labelledby="users-title"><h2 id="users-title">用户管理与操作审计 <small>仅本机运维入口 · 不提供金币、经验或物品编辑</small></h2>
-<p>联机状态由服务器计算；拒绝记录是排查线索，不代表已经作弊。有效会话数量不等于在线人数。</p>
-<form id="users-search" class="user-toolbar"><label for="users-q">用户名 / 完整账号 ID</label><input id="users-q" maxlength="64" autocomplete="off"><button type="submit">查询</button><button id="users-refresh" type="button">刷新</button></form>
-<p id="users-status" role="status">正在获取用户…</p>
-<div class="scroll"><table><thead><tr><th>用户名</th><th>状态</th><th>角色</th><th>有效会话</th><th>注册时间</th><th>详情</th></tr></thead><tbody id="users-list"></tbody></table></div>
-<div class="user-toolbar"><button id="users-prev" type="button" disabled>上一页</button><span id="users-page">第 1 页</span><button id="users-next" type="button" disabled>下一页</button></div>
-<section id="user-detail" hidden><h3 id="user-name"></h3><p id="user-id"></p><div id="user-characters"></div>
-<details><summary>最近会话（最多 20 条）</summary><pre id="user-sessions"></pre></details>
-<form id="user-action" class="user-toolbar"><label for="user-action-kind">管理操作</label><select id="user-action-kind"><option value="revoke_sessions">强制下线全部会话</option><option value="disable">封禁账号并下线</option><option value="enable">解封账号</option></select><label for="user-reason">原因</label><input id="user-reason" minlength="2" maxlength="240" required placeholder="填写原因，记录到审计日志"><button id="user-execute" type="submit" disabled>执行</button></form>
-<p id="user-action-status" role="status">封禁和下线会撤销登录凭据；解封后需重新登录。</p></section>
-<div class="user-toolbar"><h3>持久操作记录</h3><label for="audit-character">角色</label><select id="audit-character" disabled><option value="">全部角色 / 账号操作</option></select><label for="audit-outcome">结果</label><select id="audit-outcome"><option value="">全部</option><option value="rejected">拒绝 / 异常</option><option value="accepted">已执行</option><option value="replayed">重复请求</option><option value="observed">连接 / 移动汇总</option></select><button id="audit-all" type="button">查看所有用户</button><button id="audit-refresh" type="button">刷新记录</button></div>
-<p id="audit-scope"></p><p id="audit-status" role="status"></p><div class="scroll"><table><thead><tr><th>时间 / 账号</th><th>动作</th><th>结果</th><th>操作与变更详情</th></tr></thead><tbody id="audit-list"></tbody></table></div><button id="audit-more" type="button" disabled>加载更早记录</button>
-<p>只记录必要的安全信息，不记录密码、令牌或聊天正文。移动按时间窗口汇总，审计记录不会随服务重启清空。</p></section>
-<section class="panel announcement-panel" aria-labelledby="announcement-title"><h2 id="announcement-title">全局通知 <small>所有在线角色顶部滚动显示，有效期内新上线可见</small></h2>
-<div class="announcement-current"><span class="announcement-tag">当前通知</span><p id="announcement-current">正在获取…</p><small id="announcement-expiry"></small></div>
-<form id="announcement-form"><label for="announcement-text">通知内容</label><textarea id="announcement-text" maxlength="240" rows="3" placeholder="例如：服务器将于今晚 22:00 进行维护，请提前保存进度。" required></textarea>
-<div class="announcement-actions"><label for="announcement-minutes">有效期 <input id="announcement-minutes" type="number" min="1" max="1440" value="10" required> 分钟</label><span id="announcement-count">0 / 240</span><button id="announcement-publish" type="submit" disabled>发布通知</button><button id="announcement-cancel" type="button" disabled>撤下通知</button></div>
-<p id="announcement-result" role="status">发布后循环滚动，到期自动停止；新通知会替换当前通知。</p></form></section>
-<section class="panel"><h2>近期趋势 <small>仅当前浏览器保留最近 5 分钟</small></h2><div id="trend" class="trend" aria-label="在线人数趋势"></div><p id="rates"></p></section>
-<div class="columns"><section class="panel"><h2>同步与连接</h2><dl id="world"></dl></section><section class="panel"><h2>数据库与日志</h2><dl id="database"></dl></section></div>
-<section class="panel"><h2>HTTP 请求 <small>自进程启动累计；延迟不包含 WebSocket 生命周期</small></h2><div class="scroll"><table><thead><tr><th>接口</th><th>请求</th><th>4xx</th><th>5xx</th><th>平均 ms</th><th>p95 桶上界 ms</th><th>最大 ms</th></tr></thead><tbody id="http"></tbody></table></div></section>
-<section class="panel"><h2>最近异常 <small>最多 100 条，不含请求或聊天正文</small></h2><div class="scroll"><table><thead><tr><th>时间</th><th>类型</th><th>错误码</th><th>关联 ID</th></tr></thead><tbody id="events"></tbody></table></div></section>
-<footer id="footer"></footer></main></body></html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{{TITLE}} · Vssjx 管理中心</title><link rel="stylesheet" href="/dashboard.css">{{SCRIPTS}}</head>
+<body data-page="{{PAGE}}"><header><div><p class="eyebrow">VSSJX · OPERATIONS</p><h1>{{TITLE}}</h1><p>本机运维管理中心</p></div><div>{{HEALTH}}<button id="refresh" type="button">刷新页面数据</button></div></header>
+<div class="admin-layout"><nav class="section-nav" aria-label="主导航">{{NAV}}</nav>
+<main><nav class="breadcrumbs" aria-label="面包屑"><ol id="breadcrumbs">{{BREADCRUMBS}}</ol></nav>{{CONTENT}}
+<footer id="footer">仅本机运维入口 · 用户操作审计持久保存 · 不展示密码、玩家登录令牌或聊天正文</footer></main></div></body></html>

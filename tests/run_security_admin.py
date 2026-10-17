@@ -8,6 +8,7 @@ import subprocess
 import threading
 import time
 from urllib.error import HTTPError
+from urllib.parse import quote
 from urllib.request import Request, build_opener, ProxyHandler
 from uuid import uuid4
 from pg_fixture import PostgresFixture
@@ -81,7 +82,7 @@ def main():
             aid=session['account']['id']
             token=session['access_token']
             # Public routing does not expose operator reads OR writes.
-            for path in ('/api/users','/api/audit',f'/api/users/{aid}',f'/api/users/{aid}/actions','/users.js'):
+            for path in ('/api/users','/api/audit',f'/api/users/{aid}',f'/api/users/{aid}/actions','/users.js','/users',f'/users/{aid}','/audit','/announcements','/admin.js','/audit.js'):
                 check(request(base,path)[0]==404,'operator route isolated: '+path)
             check(request(base,f'/api/users/{aid}/actions',dict(action='disable'))[0]==404,'public operator POST absent')
             check(request(base,'/api/v1/characters',dict(gold=999999),token)[0]==400,'unknown creation fields rejected')
@@ -151,6 +152,15 @@ def main():
             check(a.until('error')['code']=='GAMEPLAY_RATE_LIMITED','reconnect cannot reset budget')
             code,alt=request(base,'/api/v1/characters',dict(operation_id=str(uuid4()),display_name='audit_alt',job=0,gender=0,school=0,rules_version='creation-v1'),token)
             check(code==201,'same account can own another legitimate character')
+            by_role=request(private,'/api/users?q=audit_alt')[1]['users']
+            check(len(by_role)==1 and by_role[0]['id']==aid,'role name finds its owning account')
+            check(any(c['display_name']=='audit_alt' for c in by_role[0]['character_summaries']),'search returns useful role summaries')
+            check(request(private,'/api/users?q=AUDIT_ALT')[1]['users'][0]['id']==aid,'ASCII role search is case insensitive')
+            check(request(private,'/api/users?q='+alt['character']['id'])[1]['users'][0]['id']==aid,'character UUID search finds account')
+            code,chinese=request(base,'/api/v1/characters',dict(operation_id=str(uuid4()),display_name='霜华剑客',job=0,gender=0,school=0,rules_version='creation-v1'),token)
+            check(code==201,'create an owned Chinese role fixture')
+            chinese_hits=request(private,'/api/users?q='+quote('霜华'))[1]['users']
+            check(len(chinese_hits)==1 and chinese_hits[0]['id']==aid,'partial Chinese role name finds owning account')
             alternate=join(session,alt['character']['id'])
             alternate.ws.send(dict(type='pve.command',command=dict(operation_id=str(uuid4()),action='equip',target='sword',expected_revision=alternate.state['character']['state_revision'])))
             check(alternate.until('error')['code']=='GAMEPLAY_RATE_LIMITED','different character cannot bypass account budget')
@@ -164,6 +174,7 @@ def main():
             check(request(private,path,op,headers={'X-Operator-Token':csrf})[0]==403,'Origin required on mutations')
             check(request(private,path,dict(op,gold=10000),headers=h)[0]==400,'operator cannot inject asset edits')
             check(request(private,path,dict(op,reason=''),headers=h)[0]==400,'operator reason mandatory')
+            check(request(private,path,dict(op,character_id=other_id),headers=h)[0]==403,'selected character must belong to target account')
             db.query("CREATE FUNCTION owned_reject_operator_audit() RETURNS trigger LANGUAGE plpgsql AS $$BEGIN IF NEW.action='operator.disable' THEN RAISE EXCEPTION 'owned operator audit probe'; END IF; RETURN NEW; END$$; CREATE TRIGGER owned_reject_operator_audit BEFORE INSERT ON security_audit FOR EACH ROW EXECUTE FUNCTION owned_reject_operator_audit();")
             check(request(private,path,op,headers=h)[0]==503,'operator audit failure refuses change')
             check(db.query(f"SELECT disabled FROM accounts WHERE id='{aid}'")=='f' and request(base,'/api/v1/auth/me',token=token)[0]==200,'operator audit failure rolls back ban and session revocation')

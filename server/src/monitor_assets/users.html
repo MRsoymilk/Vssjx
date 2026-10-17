@@ -1,0 +1,5 @@
+<section class="panel users-panel"><h2 id="users-title">账号与角色</h2><p>输入角色名可查到所属账号，点击角色名进入角色详情；账号管理操作影响该账号的全部角色。</p><form id="users-search" class="user-toolbar"><label for="users-q">角色名 / 用户名 / 完整 ID</label><input id="users-q" maxlength="64" autocomplete="off" placeholder="输入角色名或账号"><button type="submit">查询</button><button id="users-refresh" type="button">刷新</button></form>
+<p id="users-status" role="status">正在获取用户…</p>
+<div class="scroll"><table><thead><tr><th>用户名</th><th>状态</th><th>角色</th><th>有效会话</th><th>注册时间</th><th>详情</th></tr></thead><tbody id="users-list"></tbody></table></div>
+<div class="user-toolbar"><button id="users-prev" type="button" disabled>上一页</button><span id="users-page">第 1 页</span><button id="users-next" type="button" disabled>下一页</button></div>
+</section>

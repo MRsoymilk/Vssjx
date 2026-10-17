@@ -6,6 +6,7 @@ pub mod chat;
 pub mod config;
 pub mod logging;
 mod monitor;
+mod monitor_pages;
 mod security;
 mod user_admin;
 pub mod observability;

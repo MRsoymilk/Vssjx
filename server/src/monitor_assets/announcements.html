@@ -1,0 +1,5 @@
+<section class="panel announcement-panel" aria-labelledby="announcement-title"><h2 id="announcement-title">全局通知 <small>所有在线角色顶部滚动显示，有效期内新上线可见</small></h2>
+<div class="announcement-current"><span class="announcement-tag">当前通知</span><p id="announcement-current">正在获取…</p><small id="announcement-expiry"></small></div>
+<form id="announcement-form"><label for="announcement-text">通知内容</label><textarea id="announcement-text" maxlength="240" rows="3" placeholder="例如：服务器将于今晚 22:00 进行维护，请提前保存进度。" required></textarea>
+<div class="announcement-actions"><label for="announcement-minutes">有效期 <input id="announcement-minutes" type="number" min="1" max="1440" value="10" required> 分钟</label><span id="announcement-count">0 / 240</span><button id="announcement-publish" type="submit" disabled>发布通知</button><button id="announcement-cancel" type="button" disabled>撤下通知</button></div>
+<p id="announcement-result" role="status">发布后循环滚动，到期自动停止；新通知会替换当前通知。</p></form></section>

@@ -11,7 +11,7 @@ const [base, output] = process.argv.slice(2);
         const page = await browser.newPage({viewport:{width:1280,height:1100}});
         const errors = [];
         page.on("pageerror", error=>errors.push(error.message));
-        await page.goto(base);
+        await page.goto(base + '/announcements');
         await page.waitForFunction(()=>!document.getElementById("announcement-publish").disabled);
         check((await page.locator("#announcement-current").innerText()).includes("暂无"));
         const text = "全服通知：今晚22:00进行维护，请诸位道友提前保存进度。";

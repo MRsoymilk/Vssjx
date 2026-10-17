@@ -1,0 +1,4 @@
+<p id="user-status" role="status">正在获取账号详情…</p><section class="panel users-panel" id="user-detail" hidden><h3 id="user-name"></h3><p id="user-id"></p><p id="user-selected-character"></p><p><a id="user-audit" class="button-link" href="/audit">查看此账号的操作审计</a></p><div id="user-characters"></div>
+<details><summary>最近会话（最多 20 条）</summary><pre id="user-sessions"></pre></details>
+<form id="user-action" class="user-toolbar"><label for="user-action-kind">管理操作</label><select id="user-action-kind"><option value="revoke_sessions">强制下线全部会话</option><option value="disable">封禁账号并下线</option><option value="enable">解封账号</option></select><label for="user-reason">原因</label><input id="user-reason" minlength="2" maxlength="240" required placeholder="填写原因，记录到审计日志"><button id="user-execute" type="submit" disabled>执行</button></form>
+<p>封禁、解封和强制下线作用于所属账号及其全部角色。封禁和下线撤销登录凭据，解封后需重新登录。</p><p id="user-action-status" role="status"></p></section>

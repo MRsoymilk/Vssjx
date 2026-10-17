@@ -8,6 +8,8 @@ const CELL_SCENE := preload("res://scenes/ui/inventory_cell.tscn")
 const EQUIPMENT := ["武器", "腰佩", "衣服", "手腕", "腰带", "裤子", "鞋子", "戒指", "项链", "帽子"]
 const WINDOW := Rect2(36, 63, 248, 353)
 var palette: Dictionary
+var online_model: OnlinePve
+var _online_sorted := false
 @onready var header: Label = $Header
 var preview: AnimatedSprite2D
 @onready var grid: Control = $Grid
@@ -30,8 +32,10 @@ var item_menu: Panel
 
 func _ready() -> void:
 	palette = OriginalUITheme.palette("bag")
-	$Level.text = "LV.%d" % int(Game.player.level)
-	preview = OriginalArt.actor(Game.actor_key())
+	var player := _display_player()
+	$Level.text = "LV.%d" % int(player.level)
+	var keys := ["mzs", "mck", "mfs"] if int(player.get("gender", 0)) == 0 else ["wzs", "wck", "wfs"]
+	preview = OriginalArt.actor("hero/" + keys[int(player.job)])
 	preview.position = Vector2(80, 185)
 	preview.scale = Vector2(1.3, 1.3)
 	add_child(preview)
@@ -42,7 +46,40 @@ func _ready() -> void:
 	$Sort.pressed.connect(sort_items)
 	$Menu.pressed.connect(open_menu)
 	$Back.pressed.connect(func() -> void: back_requested.emit())
+	if online_model != null: online_model.changed.connect(_online_changed)
 	refresh()
+
+func _display_player() -> Dictionary:
+	if online_model == null: return Game.player
+	var character: Dictionary = online_model.state.get("character", {})
+	var equipment: Dictionary = online_model.state.get("equipment", {})
+	return {"job": character.get("job", 0), "gender": character.get("gender", 0), "level": character.get("level", 1),
+		"gold": character.get("gold", 0), "hp": character.get("hp", 1), "mp": character.get("mp", 0),
+		"potions": online_model.state.get("potions", 0), "equipped": equipment.get("weapon") == "sword",
+		"weapon_owned": equipment.get("weapon_owned", false)}
+
+func _display_stats() -> Dictionary:
+	return Game.stats() if online_model == null else online_model.state.get("stats", {"hp": 1, "mp": 1})
+
+func _display_items() -> Array[Dictionary]:
+	if online_model == null: return Game.bag_items()
+	var player := _display_player()
+	var result: Array[Dictionary] = []
+	if int(player.potions) > 0:
+		result.append({"id": "potion", "name": "回春散", "count": int(player.potions), "level": 1, "icon": "res://assets/ui/bag_potion.png"})
+	if player.weapon_owned and not player.equipped:
+		result.append({"id": "sword", "name": "青锋剑", "count": 1, "level": 1, "icon": "res://assets/ui/bag_sword.png"})
+	if _online_sorted: result.reverse()
+	return result
+
+func _online_changed() -> void:
+	close_menu()
+	tooltip.hide()
+	refresh()
+	if not online_model.ready: description.text = "连接中断，正在同步装备……"
+	elif online_model.pending(): description.text = "正在确认装备操作……"
+	elif not online_model.state.has("equipment"): description.text = "当前服务器尚未开放装备功能"
+	elif online_model.last_action in ["equip", "unequip"] and not online_model.last_code.is_empty(): description.text = OnlinePve.error_text(online_model.last_code)
 
 func _grid_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.pressed and event.button_index in [MOUSE_BUTTON_WHEEL_UP, MOUSE_BUTTON_WHEEL_DOWN]:
@@ -50,17 +87,19 @@ func _grid_input(event: InputEvent) -> void:
 		grid.accept_event()
 
 func refresh() -> void:
-	items = Game.bag_items()
+	var player := _display_player()
+	items = _display_items()
 	header.text = "背包(%d/60)" % items.size()
-	money.value = str(int(Game.player.gold))
+	money.value = str(int(player.gold))
 	money.queue_redraw()
-	var values := Game.stats()
+	var values := _display_stats()
 	hp_bar.max_value = values.hp
-	hp_bar.value = int(Game.player.hp)
+	hp_bar.value = int(player.hp)
 	mp_bar.max_value = values.mp
-	mp_bar.value = int(Game.player.mp)
-	equipment_icon.visible = bool(Game.player.equipped)
-	equipment_level.visible = bool(Game.player.equipped)
+	mp_bar.value = int(player.mp)
+	equipment_icon.visible = bool(player.equipped)
+	equipment_level.visible = bool(player.equipped)
+	if not player.equipped: selected_equipment = false
 	scrollbar.max_value = maxi(60, items.size())
 	_render_grid()
 	_description()
@@ -119,7 +158,7 @@ func select_item(index: int, hover: bool = false) -> void:
 	else: tooltip.hide()
 
 func _select_equipment(index: int) -> void:
-	if index != 0 or not Game.player.equipped: return
+	if index != 0 or not _display_player().equipped: return
 	selected_equipment = true
 	cursor.hide()
 	tooltip.hide()
@@ -127,7 +166,7 @@ func _select_equipment(index: int) -> void:
 	open_menu()
 
 func _selected() -> Dictionary:
-	if selected_equipment and Game.player.equipped:
+	if selected_equipment and _display_player().equipped:
 		return {"id": "sword", "name": "青锋剑", "count": 1, "level": 1}
 	if selected_index >= 0 and selected_index < items.size(): return items[selected_index]
 	return {}
@@ -145,15 +184,17 @@ func open_menu() -> void:
 	var actions: Array[Dictionary] = []
 	if not item.is_empty():
 		actions.append({"name": "查看", "call": show_item})
-		if item.id == "potion": actions.append({"name": "使用", "call": use_item})
-		else: actions.append({"name": "卸下" if Game.player.equipped else "装备", "call": equip_item})
-		actions.append({"name": "丢弃", "call": confirm_discard})
+		if item.id == "potion":
+			if online_model == null: actions.append({"name": "使用", "call": use_item})
+		else: actions.append({"name": "卸下" if _display_player().equipped else "装备", "call": equip_item})
+		if online_model == null: actions.append({"name": "丢弃", "call": confirm_discard})
 	actions.append({"name": "整理背包", "call": sort_items})
-	actions.append({"name": "购药 · 8 铜钱", "call": buy_potion})
+	if online_model == null: actions.append({"name": "购药 · 8 铜钱", "call": buy_potion})
 	for i in actions.size():
 		var button := _button(String(actions[i].name), Rect2(3, 3 + i * 26, 144, 25), false, item_menu)
 		button.add_theme_color_override("font_color", Color("705321"))
 		button.pressed.connect(actions[i].call)
+		if online_model != null and button.text in ["装备", "卸下"]: button.disabled = not online_model.ready or online_model.pending() or online_model.active()
 		if button.text == "使用": button.disabled = int(Game.player.hp) >= int(Game.stats().hp)
 		if button.text.begins_with("购药"): button.disabled = int(Game.player.gold) < 8
 	item_menu.size.y = 6 + actions.size() * 26
@@ -174,6 +215,7 @@ func show_item() -> void:
 	move_child(tooltip, get_child_count() - 1)
 
 func use_item() -> void:
+	if online_model != null: return
 	if Game.storage_busy: return
 	if _selected().get("id", "") != "potion" or int(Game.player.potions) < 1 or int(Game.player.hp) >= int(Game.stats().hp): return
 	Game.player.potions = int(Game.player.potions) - 1
@@ -181,6 +223,10 @@ func use_item() -> void:
 	await _save_refresh()
 
 func equip_item() -> void:
+	if online_model != null:
+		if _selected().get("id", "") != "sword": return
+		online_model.submit("unequip" if _display_player().equipped else "equip", "sword")
+		return
 	if Game.storage_busy: return
 	if _selected().get("id", "") != "sword" or not Game.player.get("weapon_owned", true): return
 	if Game.player.equipped and items.size() >= 60:
@@ -192,11 +238,19 @@ func equip_item() -> void:
 	await _save_refresh()
 
 func buy_potion() -> void:
+	if online_model != null: return
 	if Game.storage_busy: return
 	if not Game.bag_buy_potion(): description.text = "铜币不足或背包已满"; close_menu(); return
 	await _save_refresh()
 
 func sort_items() -> void:
+	if online_model != null:
+		_online_sorted = true
+		selected_index = 0
+		scrollbar.value = 0
+		close_menu()
+		refresh()
+		return
 	if Game.storage_busy: return
 	Game.player.bag_order = ["sword", "potion"]
 	selected_equipment = false
@@ -205,6 +259,7 @@ func sort_items() -> void:
 	if await _save_refresh(): description.text = "整理完毕"
 
 func confirm_discard() -> void:
+	if online_model != null: return
 	var item := _selected().duplicate()
 	if item.is_empty(): return
 	close_menu()
@@ -222,6 +277,7 @@ func confirm_discard() -> void:
 	_button("取消", Rect2(113, 57, 57, 23), true, item_menu).pressed.connect(close_menu)
 
 func _save_refresh() -> bool:
+	if online_model != null: return false
 	close_menu()
 	tooltip.hide()
 	refresh()
@@ -232,6 +288,7 @@ func _save_refresh() -> bool:
 	return result.ok
 
 func _unhandled_key_input(event: InputEvent) -> void:
+	if not is_visible_in_tree(): return
 	if Game.storage_busy: return
 	if not event is InputEventKey or not event.pressed or event.echo: return
 	if event.keycode == KEY_ESCAPE and item_menu != null:

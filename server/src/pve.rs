@@ -42,6 +42,7 @@ struct Loaded {
     battle: Option<Battle>,
     potions: i32,
     equipped: bool,
+    weapon_owned: bool,
     allocated: [i32; 5],
 }
 fn database(error: sqlx::Error) -> AuthError {
@@ -88,15 +89,16 @@ async fn load(tx: &mut Transaction<'_, Postgres>, context: &Context) -> Result<L
     };
     let potions:i32=sqlx::query_scalar("SELECT COALESCE(SUM(quantity),0)::int FROM inventory_items WHERE character_id=$1 AND definition_id='potion'")
         .bind(context.character).fetch_one(&mut **tx).await.map_err(database)?;
-    let equipped:bool=sqlx::query_scalar("SELECT COALESCE(bool_or(equipped),FALSE) FROM inventory_items WHERE character_id=$1 AND definition_id='sword'")
-        .bind(context.character).fetch_one(&mut **tx).await.map_err(database)?;
+    let equipped:Option<bool>=sqlx::query_scalar("SELECT equipped FROM inventory_items WHERE character_id=$1 AND definition_id='sword'")
+        .bind(context.character).fetch_optional(&mut **tx).await.map_err(database)?;
     Ok(Loaded {
         character,
         defeated: row.get("defeated_mask"),
         respawns,
         battle,
         potions,
-        equipped,
+        equipped: equipped.unwrap_or(false),
+        weapon_owned: equipped.is_some(),
         allocated: row
             .get::<Vec<i32>, _>("allocated_attributes")
             .try_into()
@@ -120,6 +122,7 @@ impl Loaded {
             .map(|d| d.id)
             .collect();
         json!({"rules_version":pve_rules::RULES,"character":self.character,"potions":self.potions,
+            "equipment":{"version":"equipment-v1","weapon_owned":self.weapon_owned,"weapon":if self.equipped {Some("sword")} else {None}},
             "stats":self.stats(),
             "attributes":crate::attributes::profile(self.character.job,self.character.level,self.equipped,self.allocated),
             "server_time_ms":unix_ms(),
@@ -154,6 +157,20 @@ impl Loaded {
         }
         if context.moving {
             return Err("PLAYER_MOVING");
+        }
+        if matches!(command.action, Action::Equip | Action::Unequip) {
+            if self.battle.is_some() { return Err("BATTLE_ACTIVE"); }
+            if command.target.as_deref() != Some("sword") || command.battle_id.is_some() || command.attributes.is_some() {
+                return Err("INVALID_EQUIPMENT");
+            }
+            if command.expected_revision.as_deref() != Some(&self.character.state_revision) {
+                return Err("STALE_EQUIPMENT");
+            }
+            if !self.weapon_owned { return Err("WEAPON_NOT_OWNED"); }
+            let equipped = command.action == Action::Equip;
+            if self.equipped == equipped { return Err("EQUIPMENT_UNCHANGED"); }
+            self.equipped = equipped;
+            return Ok(vec![if equipped { "已装备青锋剑，攻击增加5点。" } else { "已卸下青锋剑。" }.into()]);
         }
         if command.action == Action::Transfer {
             if self.battle.is_some() { return Err("BATTLE_ACTIVE"); }
@@ -361,12 +378,17 @@ pub async fn execute(
         tx.commit().await.map_err(database)?;
         return Ok(result);
     }
+    let was_equipped = loaded.equipped;
     let original = loaded.clone();
     let applied = loaded.apply(command, context);
     if applied.is_err() {
         loaded = original;
     }
     if applied.is_ok() {
+        if loaded.equipped != was_equipped {
+            sqlx::query("UPDATE inventory_items SET equipped=$2 WHERE character_id=$1 AND definition_id='sword'")
+                .bind(context.character).bind(loaded.equipped).execute(&mut *tx).await.map_err(database)?;
+        }
         if loaded.character.map_id != context.map_id {
             sqlx::query("UPDATE characters SET map_id=$2,cell_x=$3,cell_y=$4,position_revision=$5 WHERE id=$1 AND owner_epoch=$6")
                 .bind(context.character).bind(&loaded.character.map_id).bind(loaded.character.cell_x).bind(loaded.character.cell_y)

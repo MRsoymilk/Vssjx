@@ -9,6 +9,20 @@ func wait_until(predicate: Callable, seconds: float = 5.0) -> bool:
 	return predicate.call()
 
 func _run() -> void:
+	var validator := OnlinePve.new()
+	validator.character_id = SELF
+	var gear_state := pve_state()
+	gear_state.equipment = {"version":"equipment-v1", "weapon_owned":true, "weapon":"sword"}
+	check(validator.valid(gear_state), "Known equipment snapshot is accepted")
+	check(validator.receive({"type":"pve.state", "state":gear_state}), "Equipment snapshot installs without an operation")
+	check(validator.receive({"type":"pve.result", "state":pve_state(), "ok":true, "replayed":true, "lines":[], "operation_id":SELF}) and validator.state.has("equipment"), "Pre-upgrade receipt at same revision cannot erase fresh equipment state")
+	gear_state.equipment.weapon_owned = false
+	check(not validator.valid(gear_state), "Equipped item must be owned")
+	gear_state.equipment.weapon_owned = true
+	gear_state.equipment.weapon = "unrecovered_icon"
+	check(not validator.valid(gear_state), "Unknown equipment cannot enter the playable inventory")
+	gear_state.equipment.erase("weapon")
+	check(not validator.valid(gear_state), "Incomplete equipment state is rejected")
 	output = OS.get_environment("SSJX_PVE_CAPTURE_PATH")
 	var old := Game.player.duplicate(true)
 	OnlineAccount.pending_pve = {}

@@ -50,8 +50,8 @@ def main():
             check(code == 201)
             return session,data['character']['id']
 
-        def join(session,cid):
-            a=MapPlayer(base,session,cid,shop_version=1)
+        def join(session,cid,version=2):
+            a=MapPlayer(base,session,cid,shop_version=version)
             sockets.append(a)
             return a
 
@@ -64,7 +64,8 @@ def main():
             session,cid=create('shop_first')
             second,cid2=create('shop_second',2,1)
             a=join(session,cid)
-            b=join(second,cid2)
+            b=join(second,cid2,version=1)
+            check(b.state['shop']['version']=='shop-v1' and len(b.state['shop']['catalog'])==6)
             check(a.state['shop']['owned'] == ['sword'])
             catalog = ROOT/'client/assets/data/shop-v2.json'
             check(a.state['shop']['version'] == 'shop-v2' and a.state['shop']['catalog_sha256'] == hashlib.sha256(catalog.read_text(encoding='utf-8').encode()).hexdigest())

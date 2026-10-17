@@ -855,7 +855,7 @@ async fn connection(socket: WebSocket, auth: AuthService, hub: Arc<WorldHub>, an
             }
         };
         match result {
-            Ok(value) => { if send(&mut socket,value).await.is_err(){ hub.disconnect(&auth,&owner,false).await;return; } },
+            Ok(value) => { if send(&mut socket,crate::shop::client_packet(value,shop_version)).await.is_err(){ hub.disconnect(&auth,&owner,false).await;return; } },
             Err(e) => { fail(&mut socket,e.1).await;hub.disconnect(&auth,&owner,false).await;return; }
         }
     }
@@ -912,7 +912,7 @@ async fn connection(socket: WebSocket, auth: AuthService, hub: Arc<WorldHub>, an
                     };
                     match result {
                         Ok(value)=>{
-                            if send(&mut socket,value).await.is_err(){break;}
+                            if send(&mut socket,crate::shop::client_packet(value,shop_version)).await.is_err(){break;}
                             if !hub.current(&owner) { break; }
                         },
                         Err(e)=>{if e.1!="GAMEPLAY_RATE_LIMITED" {crate::security::connection_event(&auth,owner.session,owner.id,"pve.refused",e.1,json!({"connection_id":id})).await;}fail(&mut socket,e.1).await;break;}

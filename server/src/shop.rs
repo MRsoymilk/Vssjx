@@ -13,6 +13,7 @@ pub struct Item {
 }
 impl Item { pub fn equipment(&self)->bool {SLOTS.contains(&self.slot.as_str())} }
 static CATALOG: LazyLock<Value> = LazyLock::new(||serde_json::from_str(DATA).expect("fixed catalog"));
+static LEGACY: LazyLock<Value> = LazyLock::new(||serde_json::from_str(include_str!("../../client/assets/data/shop-v1.json")).expect("legacy catalog"));
 pub static ITEMS: LazyLock<Vec<Item>> = LazyLock::new(||serde_json::from_value(CATALOG["items"].clone()).expect("typed catalog"));
 static HASH: LazyLock<String> = LazyLock::new(||format!("{:x}",Sha256::digest(DATA.replace("\r\n","\n").as_bytes())));
 pub fn item(id:&str)->Option<&'static Item>{ITEMS.iter().find(|i|i.id==id)}
@@ -27,4 +28,37 @@ pub fn appearance(gear:&BTreeMap<String,bool>)->[i32;3]{
     [equipped(gear,"weapon").and_then(item).map_or(0,|i|i.visual),
      equipped(gear,"armor").and_then(item).map_or(0,|i|i.visual),
      equipped(gear,"hat").and_then(item).map_or(0,|i|i.head_visual)]
+}
+
+/// Adapt only the wire response; stored receipts and authoritative state stay v2.
+/// Existing APKs know six IDs and reject unknown ownership or a v2 envelope.
+pub fn client_packet(mut packet:Value,version:u32)->Value {
+    if version>=2{return packet;}
+    if let Some(shop)=packet["state"].get_mut("shop") {
+        let legacy=&*LEGACY;
+        let known=|id:&Value|legacy["items"].as_array().expect("items").iter().any(|item|item["id"]==*id);
+        let owned:Vec<_>=shop["owned"].as_array().expect("owned").iter().filter(|id|known(id)).cloned().collect();
+        let weapon=if known(&shop["weapon"]){shop["weapon"].clone()}else{Value::Null};
+        let armor=if known(&shop["armor"]){shop["armor"].clone()}else{Value::Null};
+        *shop=json!({"version":"shop-v1","catalog":legacy["items"],"owned":owned,"weapon":weapon,"armor":armor});
+    }
+    packet
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn legacy_wire_response_never_rewrites_full_receipt_or_exposes_unknown_items(){
+        let gear:BTreeMap<String,bool>=BTreeMap::from([("sword".into(),false),("weapon_2".into(),true),("original/if1".into(),true)]);
+        let quantities=gear.keys().map(|id|(id.clone(),1)).collect();
+        let full=json!({"type":"pve.result","state":{"shop":view(&gear,&quantities,6)}});
+        let old=client_packet(full.clone(),1);
+        assert_eq!(old["state"]["shop"]["version"],"shop-v1");
+        assert_eq!(old["state"]["shop"]["catalog"].as_array().unwrap().len(),6);
+        assert_eq!(old["state"]["shop"]["owned"],json!(["sword","weapon_2"]));
+        assert_eq!(old["state"]["shop"]["weapon"],"weapon_2");
+        assert_eq!(client_packet(full.clone(),2),full);
+        assert!(full["state"]["shop"]["owned"].as_array().unwrap().contains(&json!("original/if1")));
+    }
 }

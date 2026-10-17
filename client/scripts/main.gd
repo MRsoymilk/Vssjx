@@ -1022,10 +1022,10 @@ func _battle_turn(command: String) -> void:
 		await enemy_motion.completed
 		if epoch != _ui_epoch or enemy_motion.cancelled or mode != "battle" or battle != active_battle: return
 		battle_playback = null
-	if battle.hp == 0:
+	if battle.hp == 0 or battle.victory:
 		battle_stage = "settlement"
 		battle_death = BattleDeathPlayback.new()
-		battle_death.start(battle_hero)
+		battle_death.start(battle_enemy if battle.victory else battle_hero)
 		_refresh_battle()
 		await battle_death.completed
 		if epoch != _ui_epoch or mode != "battle" or battle != active_battle or battle_death == null or battle_death.cancelled: return
@@ -1085,13 +1085,14 @@ func _refresh_battle() -> void:
 	battle_enemy_hp.value = battle.enemy_hp
 	var moving_hero := battle_playback != null and battle_playback.active and battle_playback.actor == battle_hero and battle_playback.action == &"attack"
 	var moving_enemy := battle_playback != null and battle_playback.active and battle_playback.actor == battle_enemy
-	var dead_hero := battle_death != null
+	var dead_hero := battle_death != null and battle_death.actor == battle_hero
+	var dead_enemy := battle_death != null and battle_death.actor == battle_enemy
 	battle_hero_hp.visible = not moving_hero and not dead_hero
 	battle_hero_mp.visible = not moving_hero and not dead_hero
 	battle_hero_status.visible = not moving_hero and not dead_hero
 	if is_instance_valid(battle_ring): battle_ring.visible = not moving_hero and not dead_hero
-	battle_enemy_hp.visible = not moving_enemy
-	battle_enemy_status.visible = not moving_enemy
+	battle_enemy_hp.visible = not moving_enemy and not dead_enemy
+	battle_enemy_status.visible = not moving_enemy and not dead_enemy
 	if battle_buttons.size() == 6:
 		for button in battle_buttons: button.disabled = battle.phase != "select"
 		battle_buttons[1].disabled = battle.phase != "select" or battle.mp < 9

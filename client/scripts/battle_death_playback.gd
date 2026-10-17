@@ -21,7 +21,7 @@ func start(subject: AnimatedSprite2D) -> void:
 	duration = 0.0
 	_durations.clear()
 	sprite = OriginalArt.actor(ART_KEY)
-	sprite.name = "HeroDeath"
+	sprite.name = "BattleDeath"
 	actor.get_parent().add_child(sprite)
 	actor.get_parent().move_child(sprite, actor.get_index() + 1)
 	sprite.transform = actor.transform

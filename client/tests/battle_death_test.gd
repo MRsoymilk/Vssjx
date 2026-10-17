@@ -22,6 +22,36 @@ func wait_for_enemy(app: Control) -> void:
 	var deadline := Time.get_ticks_msec() + 4000
 	while app.battle_playback == null and Time.get_ticks_msec() < deadline: await get_tree().process_frame
 
+func offline_monster(app: Control, opponent: Dictionary, command: String) -> void:
+	Game.new_player("墓碑检查", 0, 0, 0)
+	opponent = opponent.duplicate(true)
+	opponent.hp = 1
+	opponent.attack = 1
+	opponent.defense = 0
+	app._enter_world()
+	app._start_battle(opponent)
+	var home: Transform2D = app.battle_enemy.transform
+	app._battle_turn(command)
+	await wait_for_enemy(app)
+	var motion: BattleActionPlayback = app.battle_playback
+	check(motion != null, "Monster death round has a native action: " + command)
+	if motion == null: return
+	motion.advance(motion.impact_time + 0.001)
+	check(app.battle.enemy_hp == 0 and app.battle_enemy.visible and app.battle_death == null, "Lethal impact precedes monster death: " + opponent.art)
+	motion.advance(motion.remaining())
+	var death: BattleDeathPlayback = app.battle_death
+	check(death != null and death.actor == app.battle_enemy and death.active and not app.battle_enemy.visible, "Victory replaces the monster with original death ANI: " + opponent.art)
+	if death == null: return
+	check(death.sprite.transform == home and not app.battle_enemy_hp.visible and not app.battle_enemy_status.visible, "Monster dies at its own station without stale indicators")
+	check(app.battle_hero.visible and app.battle_ring.visible and app.battle_hero_hp.visible and app.modal == null and not app.battle_committed, "Monster death preserves the living hero and delays victory settlement")
+	death.advance(0.95)
+	if command == "attack" and opponent.art == "monster/langw": await capture("-offline-monster-tombstone")
+	death.advance(death.remaining())
+	await get_tree().create_timer(0.4).timeout
+	check(app.battle_committed and app.modal != null and death.sprite.frame == 9 and not death.active and not app.battle_enemy.visible, "Victory settles once and retains the monster tombstone")
+	app._enter_world()
+	check(death.cancelled and death.sprite == null and app.battle_death == null, "Returning to the map removes the monster tombstone")
+
 func _run() -> void:
 	for argument in OS.get_cmdline_user_args():
 		if argument.begins_with("--capture-death="): capture_prefix = argument.trim_prefix("--capture-death=")
@@ -77,6 +107,13 @@ func _run() -> void:
 	app._home()
 	await get_tree().create_timer(0.4).timeout
 	check(death.cancelled and not abandoned.committed and app.mode == "home", "Scene changes cancel death without stale settlement")
+	var tested := {}
+	for monster in ShushanWorld.ENEMIES:
+		if tested.has(monster.art): continue
+		tested[monster.art] = true
+		await offline_monster(app, monster, "attack")
+	check(tested.size() == 4, "Every runtime monster receives offline death presentation")
+	await offline_monster(app, ShushanWorld.ENEMIES[0], "guard")
 	app.free()
 	var model := OnlinePve.new()
 	model.ready = true
@@ -119,6 +156,38 @@ func _run() -> void:
 	model.ready = true
 	view.present(model)
 	check(view._hero_death != null and view._hero_death.active, "Reconnect rebuilds death from the same server snapshot")
+	# Victory can arrive as a restored snapshot, without replaying its attack.
+	for art_key in tested:
+		model.state.battle = {"id":"monster-death-" + art_key,"revision":"2","outcome":"victory","enemy_hp":0,"hp":100,"mp":40,
+			"enemy":{"art":art_key,"name":"墓碑检查","level":1,"hp":62,"attack":13,"defense":3}}
+		authoritative = model.state.duplicate(true)
+		view.present(model)
+		death = view._enemy_death
+		check(death != null and death.active and not view.enemy.visible and view.hero.visible and view._hero_death == null, "Restored victory creates death for the monster only: " + art_key)
+		check(not view.get_node("EnemyLevel").visible and not view.get_node("Hud/BattleEnemyHp").visible and view.get_node("Hero/Ring").visible, "Dead monster hides its own HUD and preserves the living hero ring")
+		view._process(0.45)
+		view.present(model)
+		check(view._enemy_death == death and is_equal_approx(death.elapsed, 0.45), "Repeated victory snapshots do not replay monster death")
+		view.return_to_map()
+		check(view.visible and view.get_node("Result/Return").disabled, "Return cannot skip monster death")
+		view._process(0.5)
+		if art_key == "monster/langw": await capture("-online-monster-tombstone")
+		view._process(death.remaining())
+		check(death.sprite.frame == 9 and not view.enemy.visible and view.get_node("Result").visible and model.state == authoritative, "Monster tombstone persists through settlement without changing server state")
+		view.return_to_map()
+		check(death.cancelled and death.sprite == null and view._enemy_death == null, "Dismissal cleans up the held monster tombstone")
+	view.present(model)
+	death = view._enemy_death
+	model.ready = false
+	view._process(0.1)
+	check(death.cancelled and view._enemy_death == null and view.enemy.visible, "Disconnect cancels monster death and releases its sprite")
+	model.ready = true
+	view.present(model)
+	check(view._enemy_death != null and view._enemy_death.active, "Reconnect rebuilds monster death from the same victory")
+	model.state.battle = {"id":"fled","revision":"1","outcome":"fled","enemy_hp":62,"hp":100,"mp":40,
+		"enemy":{"art":"monster/langw","name":"山狼","level":1,"hp":62,"attack":13,"defense":3}}
+	view.present(model)
+	check(view._enemy_death == null and view._hero_death == null and view.enemy.visible and view.get_node("EnemyLevel").visible, "A new fled encounter clears death and restores monster indicators")
 	view.free()
 	if FileAccess.file_exists(Game.save_path): DirAccess.remove_absolute(Game.save_path)
 	Game.save_path = old_path

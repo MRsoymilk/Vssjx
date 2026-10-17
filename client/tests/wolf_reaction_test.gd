@@ -103,7 +103,9 @@ func check_reactions(art_key: String) -> void:
 	view._process(view._hero_motion.impact_time + 0.01)
 	check(view.enemy.animation == "hurt" and view._enemy_attack_delay == 0, "Defeated monster cannot retaliate")
 	view._process(view._hero_motion.remaining() + 0.01)
-	check(view.hero.position == Vector2.ZERO and view.get_node("Result").visible, "Victory appears after the attacker returns")
+	check(view.hero.position == Vector2.ZERO and not view.get_node("Result").visible and view._enemy_death != null, "Attacker returns before monster death starts")
+	view._process(view._enemy_death.remaining())
+	check(view.get_node("Result").visible and not view.enemy.visible, "Victory waits for the monster tombstone")
 	model.state = state(art_key)
 	model.state.battle.id = "lethal_counter"
 	view.present(model)
@@ -128,7 +130,9 @@ func check_reactions(art_key: String) -> void:
 	view.present(model)
 	check(view.enemy.animation == "attack" and not view.get_node("Result").visible, "Guard reflection victory includes the original enemy strike")
 	view._process(view._enemy_motion.remaining() + 0.001)
-	check(view.enemy.position == Vector2.ZERO and view.get_node("Result").visible, "Reflected victory settles after the enemy returns")
+	check(view.enemy.position == Vector2.ZERO and not view.get_node("Result").visible and view._enemy_death != null, "Reflected monster returns before death starts")
+	view._process(view._enemy_death.remaining())
+	check(view.get_node("Result").visible and not view.enemy.visible, "Reflected victory settles after the monster tombstone")
 	# Sample a whole native attack, including each approach/strike/return frame.
 	model.state = state(art_key)
 	model.state.battle.id = "level_tracking"

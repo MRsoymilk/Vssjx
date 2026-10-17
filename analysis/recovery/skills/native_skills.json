@@ -1,0 +1,110 @@
+{
+  "version": 1,
+  "source": "analysis/unpacked/ssjx/gameonline.ext",
+  "source_sha256": "e08f93bebe133b700f2305bfbedd994b05cc8d04a5a854262af9ced956afbc03",
+  "recovered_skill_definitions": 0,
+  "skills": [],
+  "status": "客户端技能记录解析与界面流程已定位；尚无原服实际技能记录",
+  "known_fields": {
+    "0x00": "字符串 ID",
+    "0x04": "名称",
+    "0x08": "说明",
+    "0x0c": "灵力消耗（有符号16位）",
+    "0x0e": "等于1时进入战斗技能列表",
+    "0x0f": "0武功／1心法",
+    "0x10": "当前等级；255表示移除",
+    "0x11": "最高等级"
+  },
+  "wire": "三个带有符号BE16字节长度的UTF-16BE字符串，随后是等级及类型化参数。字符串长度和二进制数据不能直接套用UTF-8。",
+  "guide": {
+    "source": "analysis/unpacked/ssjx/teach6",
+    "sha256": "c1e2acd28a3c7c1fdf4bc54df0f7195eed1dc7370a0a0a790822aa557640a334",
+    "evidence": "原文区分战斗中选择的攻击性武功与提升人物属性的辅助心法；不含任何具体技能表。"
+  },
+  "limitations": [
+    "没有恢复原版技能ID、名称列表、各级数值或技能与特效的完整对应表。",
+    "现有破山诀、御剑诀、摄灵诀为重建规则，不能计入恢复出的原版技能。",
+    "未知参数只记录原结构偏移；不能据参数类型编号猜测流血、控制、吸血或伤害公式。",
+    "解析器只接受明确切出的技能记录／列表段；不猜测整包边界，也不连接旧服务器。"
+  ],
+  "ranges": [
+    {
+      "name": "skill_record_decoder",
+      "start": "0x2fe50",
+      "end_exclusive": "0x2ffae",
+      "sha256": "2a95f0a219135fd87bfe4e3c663601293f7845f9cf1a7f428f0bea89da466262"
+    },
+    {
+      "name": "skill_list_bootstrap",
+      "start": "0x2e50e",
+      "end_exclusive": "0x2e51e",
+      "sha256": "789051f930b82c6209b7d9349142ac608e5fd5269c847ead4e76d42e15780359"
+    },
+    {
+      "name": "skill_update",
+      "start": "0x2e5f0",
+      "end_exclusive": "0x2e70c",
+      "sha256": "1b1910fdf50c514c4e7f53649a6aaacf958b590e2168a2a04cbac347fb385538"
+    },
+    {
+      "name": "martial_inner_filter",
+      "start": "0xed38",
+      "end_exclusive": "0xed9e",
+      "sha256": "b33a1b7f705d5148b6da9eb0ecb29054c500d8a7c743704948b655f35be8b349"
+    },
+    {
+      "name": "skill_list_draw",
+      "start": "0xeba0",
+      "end_exclusive": "0xed16",
+      "sha256": "9765a4f776de7c0bf3d6f600e6f0bc785387fc3b078cde1e2cb0568aff43ddad"
+    },
+    {
+      "name": "upgrade_downgrade_request",
+      "start": "0xdf64",
+      "end_exclusive": "0xdfde",
+      "sha256": "26f8f5e5bd5068ffdb17f201340286d4405a9ecda04f32115cec7fb31d1f04b0"
+    },
+    {
+      "name": "battle_usable_filter",
+      "start": "0x2b30",
+      "end_exclusive": "0x2b76",
+      "sha256": "21b3b8e188ee93ff1a8a664d59ee5678eea1fb983c6e3299e250f9700b3916b8"
+    },
+    {
+      "name": "parameter_decoder",
+      "start": "0x2fdb0",
+      "end_exclusive": "0x2fe28",
+      "sha256": "6d9b17c27a28f9ff85e2a33cb4c7f1b1e19c0ee9a78b001f3fb830f028dd7f0c"
+    },
+    {
+      "name": "list_decoder",
+      "start": "0x20e04",
+      "end_exclusive": "0x20e48",
+      "sha256": "0e8af18053c53187184f6ac8d455a9daa6665e3360402f72962c4cc651267d59"
+    },
+    {
+      "name": "signed_byte_reader",
+      "start": "0x277b8",
+      "end_exclusive": "0x277ca",
+      "sha256": "e3a7a6d3a4320811f6202df40e33bb0d2cda8b87586fd2e924491355b7582465"
+    },
+    {
+      "name": "byte_reader",
+      "start": "0x277d0",
+      "end_exclusive": "0x277e2",
+      "sha256": "17a3765a9f0d2a69e140f72d851855fb8e50b7e5d8577d19c23ca92cecee28d6"
+    },
+    {
+      "name": "signed_short_reader",
+      "start": "0x278c4",
+      "end_exclusive": "0x278d6",
+      "sha256": "f917f57fb144c1460e3e05b158731027cb883e499d2120d0f07cdf7bdcd3cf01"
+    },
+    {
+      "name": "utf16_reader",
+      "start": "0x278f0",
+      "end_exclusive": "0x27938",
+      "sha256": "22e32893a8a527ebf64027f3faa6c444808a17214e7daef360b1e750adab0e51"
+    }
+  ]
+}

@@ -13,6 +13,14 @@ func _run() -> void:
 	var expand_button: Button = view.get_node("Screen/Chat/Expand")
 	check(not expanded.visible and view.get_node("Screen/Chat/Expand").icon.resource_path == "res://assets/ui/chat_expand.svg", "Collapsed chat uses the supplied themed upward arrow")
 	check(expanded.scene_file_path == "res://scenes/ui/expanded_chat_panel.tscn", "Expanded window is an authored scene")
+	for corner_name in ["TopLeft", "TopRight", "BottomLeft", "BottomRight"]:
+		var corner: TextureRect = expanded.get_node("Panel/" + corner_name)
+		check(corner.texture.resource_path == "res://assets/ui/chat_corner.png" and corner.mouse_filter == Control.MOUSE_FILTER_IGNORE,
+			"Original pixel corner is decorative and cannot intercept input: " + corner_name)
+		check(not corner.get_global_rect().intersects(expanded.get_node("Panel/Tabs").get_global_rect()) and
+			not corner.get_global_rect().intersects(expanded.get_node("Panel/Emotes").get_global_rect()) and
+			not corner.get_global_rect().intersects(expanded.get_node("Panel/Return").get_global_rect()),
+			"Original scroll ornament does not cover tabs or footer buttons: " + corner_name)
 	expand_button.pressed.emit()
 	await settle()
 	check(expand_button.icon.resource_path == "res://assets/ui/chat_collapse.svg" and expand_button.tooltip_text == "收起聊天", "Opening points the same arrow down and explains collapse")

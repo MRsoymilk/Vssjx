@@ -319,7 +319,8 @@ def main():
         Image.open(ANALYSIS / f'decoded_png/ssjx/sceneui_frame{i:03}.png').save(DEST / 'ui' / f'scene_icon_{i}.png')
     Image.open(ANALYSIS / 'decoded_png/ssjx/neverpic_frame024.png').save(DEST / 'ui' / 'scene_target.png')
     for name, source_name in {'bag_sword': 'item/iw28.png', 'bag_potion': 'item/ix28.png',
-                              'bag_corner': 'neverpic_frame019.png', 'scene_reward': 'sceneui_frame011.png'}.items():
+                              'bag_corner': 'neverpic_frame019.png',
+                              'chat_corner': 'neverpic_frame030.png', 'scene_reward': 'sceneui_frame011.png'}.items():
         Image.open(ANALYSIS / 'decoded_png/ssjx' / source_name).save(DEST / 'ui' / (name + '.png'))
     write_metadata(baked, parsed)
     (DEST / 'data' / 'import_report.json').write_text(json.dumps({'decoded_png': 3300, 'tiles': len(tiles), 'parsed_animations': len(parsed), 'baked': list(baked), 'errors': errors}, ensure_ascii=False, indent=2), 'utf-8')

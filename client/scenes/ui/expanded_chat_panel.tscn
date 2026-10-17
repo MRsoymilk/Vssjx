@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" path="res://assets/ui/chat_scroll_up.svg" id="Up"]
 [ext_resource type="Texture2D" path="res://assets/ui/chat_scroll_down.svg" id="Down"]
 [ext_resource type="Texture2D" path="res://assets/ui/chat_wood_button.svg" id="WoodButton"]
+[ext_resource type="Texture2D" path="res://assets/ui/chat_corner.png" id="Corner"]
 [sub_resource type="SystemFont" id="Font"]
 script = ExtResource("BundledCjk")
 font_names = PackedStringArray("SimHei", "Microsoft YaHei", "sans-serif")
@@ -19,7 +20,7 @@ border_width_top = 1
 border_width_bottom = 1
 [sub_resource type="StyleBoxFlat" id="Rim"]
 bg_color = Color(0.77, 0.48, 0.15, 1)
-border_color = Color(1, 0.88, 0.53, 1)
+border_color = Color(1, 0.94, 0.21, 1)
 border_width_left = 1
 border_width_right = 1
 border_width_top = 1
@@ -134,17 +135,17 @@ offset_bottom = 369.0
 mouse_filter = 2
 theme_override_styles/panel = SubResource("Rim")
 [node name="Paper" type="Panel" parent="Panel"]
-offset_left = 3.0
-offset_top = 31.0
-offset_right = 311.0
-offset_bottom = 339.0
+offset_left = 8.0
+offset_top = 34.0
+offset_right = 306.0
+offset_bottom = 338.0
 mouse_filter = 2
 theme_override_styles/panel = SubResource("Paper")
 [node name="Tabs" type="HBoxContainer" parent="Panel"]
-offset_left = 3.0
-offset_top = 3.0
-offset_right = 311.0
-offset_bottom = 31.0
+offset_left = 18.0
+offset_top = 8.0
+offset_right = 296.0
+offset_bottom = 34.0
 theme_override_constants/separation = 0
 [node name="All" type="Button" parent="Panel/Tabs"]
 layout_mode = 2
@@ -235,10 +236,10 @@ theme_override_colors/font_disabled_color = Color(0.98, 0.82, 0.88, 1)
 text = "系统"
 metadata/channel = "system"
 [node name="History" type="RichTextLabel" parent="Panel"]
-offset_left = 7.0
-offset_top = 35.0
-offset_right = 308.0
-offset_bottom = 336.0
+offset_left = 13.0
+offset_top = 39.0
+offset_right = 302.0
+offset_bottom = 334.0
 theme_override_colors/default_color = Color(0.27, 0.22, 0.10, 1)
 theme_override_font_sizes/normal_font_size = 11
 theme_override_constants/line_separation = 2
@@ -246,8 +247,8 @@ bbcode_enabled = false
 scroll_following = false
 selection_enabled = true
 [node name="Empty" type="Label" parent="Panel"]
-offset_left = 8.0
-offset_top = 37.0
+offset_left = 14.0
+offset_top = 41.0
 offset_right = 300.0
 offset_bottom = 55.0
 mouse_filter = 2
@@ -256,10 +257,10 @@ theme_override_font_sizes/font_size = 10
 theme_override_colors/font_color = Color(0.55, 0.40, 0.18, 1)
 text = "暂时没有世界消息"
 [node name="Emotes" type="Button" parent="Panel"]
-offset_left = 4.0
+offset_left = 18.0
 offset_top = 343.0
-offset_right = 47.0
-offset_bottom = 366.0
+offset_right = 61.0
+offset_bottom = 364.0
 focus_mode = 0
 theme_override_styles/normal = SubResource("Wood")
 theme_override_styles/hover = SubResource("Wood")
@@ -272,10 +273,10 @@ theme_override_colors/font_outline_color = Color(0.30, 0.23, 0.12, 1)
 theme_override_constants/outline_size = 1
 text = "表情"
 [node name="Status" type="Label" parent="Panel"]
-offset_left = 51.0
+offset_left = 65.0
 offset_top = 344.0
-offset_right = 263.0
-offset_bottom = 366.0
+offset_right = 249.0
+offset_bottom = 364.0
 horizontal_alignment = 1
 theme_override_font_sizes/font_size = 9
 theme_override_colors/font_color = Color(1, 0.89, 0.50, 1)
@@ -283,10 +284,10 @@ text = "世界频道 · 最多120字"
 clip_text = true
 text_overrun_behavior = 3
 [node name="Return" type="Button" parent="Panel"]
-offset_left = 267.0
+offset_left = 253.0
 offset_top = 343.0
-offset_right = 310.0
-offset_bottom = 366.0
+offset_right = 296.0
+offset_bottom = 364.0
 focus_mode = 0
 theme_override_styles/normal = SubResource("Wood")
 theme_override_styles/hover = SubResource("Wood")
@@ -297,6 +298,38 @@ theme_override_colors/font_pressed_color = Color(1, 0.97, 0.80, 1)
 theme_override_colors/font_outline_color = Color(0.30, 0.23, 0.12, 1)
 theme_override_constants/outline_size = 1
 text = "返回"
+[node name="TopLeft" type="TextureRect" parent="Panel"]
+offset_right = 17.0
+offset_bottom = 13.0
+mouse_filter = 2
+texture_filter = 1
+texture = ExtResource("Corner")
+flip_v = true
+[node name="TopRight" type="TextureRect" parent="Panel"]
+offset_left = 297.0
+offset_right = 314.0
+offset_bottom = 13.0
+mouse_filter = 2
+texture_filter = 1
+texture = ExtResource("Corner")
+flip_h = true
+flip_v = true
+[node name="BottomLeft" type="TextureRect" parent="Panel"]
+offset_top = 357.0
+offset_right = 17.0
+offset_bottom = 370.0
+mouse_filter = 2
+texture_filter = 1
+texture = ExtResource("Corner")
+[node name="BottomRight" type="TextureRect" parent="Panel"]
+offset_left = 297.0
+offset_top = 357.0
+offset_right = 314.0
+offset_bottom = 370.0
+mouse_filter = 2
+texture_filter = 1
+texture = ExtResource("Corner")
+flip_h = true
 [node name="EmotePicker" parent="." instance=ExtResource("Emotes")]
 offset_left = 38.0
 offset_top = 264.0

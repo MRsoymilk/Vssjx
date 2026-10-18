@@ -44,7 +44,7 @@ pub struct Command {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub quantity: Option<i32>,
 }
-#[derive(Clone, Copy, Debug, Serialize)]
+#[derive(Clone, Copy, Debug, Serialize, Deserialize)]
 pub struct Stats {
     pub hp: i32,
     pub mp: i32,

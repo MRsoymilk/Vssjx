@@ -1,5 +1,7 @@
 pub mod shop;
 pub mod social;
+pub mod team_rules;
+pub mod teams;
 pub mod skills;
 pub mod auth;
 pub mod attributes;
@@ -115,6 +117,7 @@ pub fn apps(
         .route("/api/v1/world/ticket", post(world::ticket))
         .route("/api/v1/world/ws", get(world::upgrade))
         .route("/api/v1/social", post(social::command))
+        .route("/api/v1/teams", post(teams::command))
         .route(
             "/api/v1/characters",
             get(characters::list).post(characters::create),

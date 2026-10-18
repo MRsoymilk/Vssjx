@@ -77,7 +77,7 @@ impl WorldHub {
                 let a=state.actors.get(&owner.id).unwrap();let b=state.actors.get(&peer).ok_or(("DUEL_PLAYER_OFFLINE",0))?;
                 if !a.duel_enabled||!b.duel_enabled||!b.connected{return Err(("DUEL_PLAYER_OFFLINE",0));}
                 if a.map_id!=b.map_id{return Err(("DUEL_DIFFERENT_MAP",0));}
-                if a.in_battle||b.in_battle||state.duels.active(a.id)||state.duels.active(b.id){return Err(("DUEL_BUSY",0));}
+                if a.in_battle||b.in_battle||state.duels.active(a.id)||state.duels.active(b.id)||state.team_busy.contains(&a.id)||state.team_busy.contains(&b.id){return Err(("DUEL_BUSY",0));}
             }
             match c.action.as_str(){
                 "invite"=>{

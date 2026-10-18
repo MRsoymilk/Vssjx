@@ -106,6 +106,8 @@ impl CharacterActor {
     }
 }
 struct StateData {
+    team_busy: std::collections::HashSet<Uuid>,
+    team_dirty: std::collections::HashSet<Uuid>,
     duels: crate::duel::Arena,
     actors: HashMap<Uuid, CharacterActor>,
     revision: u64,
@@ -135,6 +137,11 @@ pub struct WorldHub {
     publications: Publisher,
     ruins_publications: Publisher,
 }
+pub(crate) struct TeamReservation { hub:Arc<WorldHub>, old:Vec<(Uuid,bool)>, committed:bool }
+impl TeamReservation {pub(crate) fn commit(mut self){self.committed=true;}}
+impl Drop for TeamReservation {
+    fn drop(&mut self){if !self.committed{let mut s=self.hub.data.lock().expect("world state");for (id,old) in &self.old{if *old{s.team_busy.insert(*id);}else{s.team_busy.remove(id);}}}}
+}
 #[derive(Clone)]
 struct Ownership {
     business: Arc<AsyncMutex<()>>,
@@ -156,6 +163,35 @@ struct SavedPosition {
     map_id: String,
 }
 impl WorldHub {
+    pub(crate) async fn team_guards(&self,ids:&[Uuid])->Vec<tokio::sync::OwnedMutexGuard<()>>{
+        let mut gates={let s=self.data.lock().expect("world state");ids.iter().filter_map(|id|s.actors.get(id).map(|a|(*id,a.business.clone()))).collect::<Vec<_>>()};
+        gates.sort_by_key(|(id,_)|*id);gates.dedup_by_key(|(id,_)|*id);
+        let mut held=Vec::new();for (_,g) in gates{held.push(g.lock_owned().await);}held
+    }
+    pub(crate) fn team_context(&self,id:Uuid)->Result<crate::pve::Context,AuthError>{
+        let s=self.data.lock().expect("world state");let a=s.actors.get(&id).filter(|a|a.connected).ok_or(error(409,"TEAM_PLAYER_OFFLINE"))?;
+        if a.in_battle||s.duels.active(id){return Err(error(409,"TEAM_BUSY"));}
+        Ok(crate::pve::Context{character:id,session:a.session,owner:a.owner,cell:a.motion.cell,moving:a.motion.next.is_some()||!a.motion.route.is_empty(),target_cell:None,map_id:a.map_id.clone(),position_revision:a.motion.revision,duel_active:false})
+    }
+    pub(crate) fn team_enemy(&self,id:Uuid,target:&str)->Result<crate::population::ResidentDefinition,AuthError>{
+        let s=self.data.lock().expect("world state");let a=s.actors.get(&id).ok_or(error(409,"TEAM_PLAYER_OFFLINE"))?;
+        let e=s.population_for(&a.map_id).get(target).filter(|e|e.definition.kind!="npc").ok_or(error(409,"INVALID_RESIDENT"))?;
+        if (e.motion.cell[0]-a.motion.cell[0]).abs()+(e.motion.cell[1]-a.motion.cell[1]).abs()>2{return Err(error(409,"RESIDENT_TOO_FAR"));}
+        Ok(e.definition.clone())
+    }
+    pub(crate) fn team_reserve(self:&Arc<Self>,ids:&[Uuid])->TeamReservation{
+        let mut s=self.data.lock().expect("world state");let old=ids.iter().map(|id|(*id,s.team_busy.contains(id))).collect();
+        for id in ids{s.team_busy.insert(*id);if let Some(a)=s.actors.get_mut(id){a.motion.stop();}}
+        TeamReservation{hub:self.clone(),old,committed:false}
+    }
+    pub(crate) fn team_sync(&self,ids:&[Uuid],battle:Option<&crate::team_rules::Battle>,dirty:bool){
+        let mut s=self.data.lock().expect("world state");
+        for id in ids{
+            if battle.is_some_and(|b|b.active()&&b.fighters.iter().any(|f|f.id==*id)){s.team_busy.insert(*id);if let Some(a)=s.actors.get_mut(id){a.motion.stop();}}
+            else{s.team_busy.remove(id);}
+            if dirty{s.team_dirty.insert(*id);}
+        }
+    }
     pub(crate) fn online_characters(&self) -> std::collections::HashSet<Uuid> {
         self.data.lock().expect("world state").actors.values().filter(|a|a.connected).map(|a|a.id).collect()
     }
@@ -186,6 +222,7 @@ impl WorldHub {
             moderation: AsyncMutex::new(()),
             metrics,
             data: Mutex::new(StateData {
+                team_busy:Default::default(),team_dirty:Default::default(),
                 duels: crate::duel::Arena::default(),
                 actors: HashMap::new(),
                 revision: 0,
@@ -219,14 +256,15 @@ impl WorldHub {
                 let (revision, mut entities, mut ruins_entities, ai_entities) = {
                     let mut state = hub.data.lock().expect("world state");
                     let now=Instant::now();
-                    let available=state.actors.iter().map(|(id,a)|(*id,(a.duel_enabled&&(a.connected||a.disconnected_at.is_some_and(|t|now.saturating_duration_since(t)<Duration::from_secs(15))),a.connected&&!a.in_battle))).collect();
+                    let available=state.actors.iter().map(|(id,a)|(*id,(a.duel_enabled&&(a.connected||a.disconnected_at.is_some_and(|t|now.saturating_duration_since(t)<Duration::from_secs(15))),a.connected&&!a.in_battle&&!state.team_busy.contains(id)))).collect();
                     let invalid:Vec<_>=state.duels.offers.values().filter(|o|state.actors.get(&o.from).zip(state.actors.get(&o.to)).is_none_or(|(a,b)|a.map_id!=b.map_id)).map(|o|o.id).collect();
                     for id in invalid{state.duels.remove_offer(id,"地图已变化，决斗邀请失效。");}
                     state.duels.tick(now,&available);
                     let dueling:std::collections::HashSet<_>=state.actors.keys().filter(|id|state.duels.active(**id)).copied().collect();
+                    let teaming=state.team_busy.clone();
                     let mut changed = false;
                     for actor in state.actors.values_mut() {
-                        if actor.connected && !actor.in_battle && !dueling.contains(&actor.id) {
+                        if actor.connected && !actor.in_battle && !dueling.contains(&actor.id) && !teaming.contains(&actor.id) {
                             changed |= actor.motion.advance(dt);
                         }
                     }
@@ -390,6 +428,7 @@ impl WorldHub {
         let row=sqlx::query("UPDATE characters c SET owner_epoch=owner_epoch+1,position_revision=0 WHERE c.id=$1 AND (map_id='qingyun_trail' OR ($3>=1 AND map_id='ancient_ruins') OR ($3>=2 AND map_id LIKE 'ai_%')) AND owner_epoch<9223372036854775807 AND EXISTS(SELECT 1 FROM sessions s JOIN accounts a ON a.id=s.account_id WHERE s.id=$2 AND s.account_id=c.account_id AND NOT a.disabled AND s.revoked_at IS NULL AND s.access_expires_at>clock_timestamp() AND s.refresh_expires_at>clock_timestamp()) RETURNING display_name,job,gender,cell_x,cell_y,owner_epoch,active_battle_id,map_id")
             .bind(id).bind(session).bind(maps_version as i32).fetch_optional(auth.pool()).await.map_err(db_error)?.ok_or(error(403,"WORLD_UNAVAILABLE"))?;
         let cell = [row.get("cell_x"), row.get("cell_y")];
+        let teaming:bool=sqlx::query_scalar("SELECT EXISTS(SELECT 1 FROM team_members m JOIN team_battles b ON b.team_id=m.team_id AND b.active WHERE m.character_id=$1)").bind(id).fetch_one(auth.pool()).await.map_err(db_error)?;
         let map_id: String = row.get("map_id");
         if !self.map_for(&map_id).walkable(cell) {
             return Err(error(409, "INVALID_SAVED_POSITION"));
@@ -433,6 +472,7 @@ impl WorldHub {
             disconnected_at: None,
         };
         state.actors.insert(id, actor);
+        if teaming{state.team_busy.insert(id);}
         state.appearance_revision += 1;
         state.revision += 1;
         Ok(Ownership {
@@ -443,6 +483,7 @@ impl WorldHub {
     fn command(&self, owner: &Ownership, input: &ClientMessage) -> Result<(), AuthError> {
         let mut state = self.data.lock().expect("world state");
         if state.duels.active(owner.id){return Err(error(409,"BATTLE_ACTIVE"));}
+        if state.team_busy.contains(&owner.id){return Err(error(409,"TEAM_BATTLE_ACTIVE"));}
         let actor = state
             .actors
             .get_mut(&owner.id)
@@ -1009,6 +1050,11 @@ async fn connection(socket: WebSocket, auth: AuthService, hub: Arc<WorldHub>, an
                 else {match hub.command(&owner,&input) { Ok(())=>{move_accepted+=1;},Err(e)=>{move_rejected+=1;last_move_code=e.1;fail(&mut socket,e.1).await;} }}
             },
             _=pulse.tick()=>{
+                let team_dirty=hub.data.lock().expect("world state").team_dirty.remove(&owner.id);
+                if team_dirty&&pve_version==1 {
+                    let value={let _business=owner.business.lock().await;match hub.pve_context(&owner,None){Ok(c)=>crate::pve::snapshot(&auth,&c).await,Err(e)=>Err(e)}};
+                    match value{Ok(value)=>{hub.pve_applied(&owner,&value);if send(&mut socket,crate::shop::client_packet(value,shop_version)).await.is_err(){break;}},Err(_)=>{hub.data.lock().expect("world state").team_dirty.insert(owner.id);}}
+                }
                 if duel_version==1 {
                     let packet=hub.data.lock().expect("world state").duels.packet(owner.id,duel_revision,Instant::now());
                     if let Some((revision,packet))=packet {if send(&mut socket,packet).await.is_err(){break;}duel_revision=Some(revision);}

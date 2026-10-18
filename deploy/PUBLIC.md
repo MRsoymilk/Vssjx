@@ -43,6 +43,8 @@ SSJX_WEB_DEV_ORIGINS=
 
 来源：[USTC Cargo配置](https://mirrors.ustc.edu.cn/help/crates.io-index.html)、[Docker缓存状态](https://mirrors.ustc.edu.cn/help/dockerhub.html)。
 
+如果Rust基础镜像下载也很慢，x86_64服务器可同时设置`SSJX_RUST_BUILDER_IMAGE=debian:bookworm-slim`和`SSJX_CARGO_REGISTRY_MIRROR=ustc`。构建阶段改为在Debian容器内从USTC安装最小Rust工具链；宿主机不安装Rust，最终运行镜像不携带编译器。APT包继续使用Debian签名验证，Rust和Cargo下载使用HTTPS。
+
 ```sh
 cd /opt/Vssjx
 docker compose --env-file .env \
@@ -128,6 +130,10 @@ docker compose --env-file .env \
 
 ## 7. 监控、更新与备份
 
+启用HTTPS后，可在仓库根目录使用`sh tools/public-compose.sh ps`、`sh tools/public-compose.sh logs --tail=100 game`和`sh tools/public-compose.sh up -d --build game`，脚本会自动保留网页覆盖文件。
+
+完整数据库备份可执行`sh tools/backup-public-database.sh`。默认写入仓库相邻的`vssjx-backups`目录，可用`SSJX_BACKUP_DIR`环境变量覆盖。脚本限制文件权限、验证备份目录清单并生成SHA-256文件；不读取或输出数据库密码，也不会自动删除已有备份。
+
 监控从本机SSH隧道访问：
 
 ```sh
@@ -162,6 +168,8 @@ docker compose --env-file .env \
 
 ## 验证与限制
 
+SQLx按原始字节校验迁移文件。历史Windows数据库使用的部分SQL含CRLF，项目通过`.gitattributes`禁止迁移文件自动换行转换，并在`migration-checksums.json`固定SHA-384。复制项目或打包时保留这些字节；不得为了启动而修改数据库的迁移校验记录。可运行`python tests/check_migration_bytes.py --container vssjx-postgres-1`进行只读核对。
+
 ```sh
 python tests/check_public_deployment.py
 python tests/check_public_deployment.py --nginx --context --openssl /usr/bin/openssl
@@ -169,4 +177,4 @@ python tests/check_public_deployment.py --nginx --context --openssl /usr/bin/ope
 
 检查仅使用独立临时配置、假数据库参数、测试证书与唯一名称的容器/镜像，不读取私有`.env`，不启动现有Compose服务、不请求公网证书、不修改系统信任。
 
-2026-10-18：19项检查通过，覆盖Compose合并与私有监听、两份真实Nginx配置解析、续期脚本语法，以及实际Docker构建上下文的白名单隔离。当前电脑访问Docker Hub授权接口超时，Rust/Debian基础镜像未能拉取，因此完整Rust镜像构建及Linux公网运行尚未验收；服务器需实际执行构建、健康检查、证书申请与续期测试后再开放玩家。
+2026-10-18：25项检查通过，覆盖Compose合并与私有监听、三份真实Nginx配置解析、续期脚本语法、USTC构建参数，以及实际Docker构建上下文的白名单隔离。已在Ubuntu 22.04 x86_64服务器使用Debian基础镜像和USTC工具链完成Rust构建、数据库迁移、公网HTTPS与WebSocket检查，并通过证书模拟续期。迁移校验及运行记录见`../tests/public_server_migration.md`。

@@ -54,7 +54,7 @@ func _ready() -> void:
 	check(not chat.receive(batch([entry(2)])), "Duplicate sequence rejected")
 	check(chat.receive(batch([entry(3), entry(4)])) and chat.messages.size() == 3 and chat.messages[0].seq == "2", "Client retains bounded history")
 	check(chat.receive({"type": "chat.gap", "channel_epoch": epoch, "oldest_seq": "8"}), "History gap explicitly advances cursor")
-	check(chat.receive(batch([entry(8)])) and chat.messages.size() == 3, "Channel continues after history gap")
+	check(chat.receive(batch([entry(8)])) and chat.messages.size() == 1 and chat.messages[0].seq == "8", "Channel continues after history gap and expires entries outside retained sequence window")
 	bad = batch([entry(9)])
 	bad.channel_epoch = sender
 	check(not chat.receive(bad), "Foreign channel epoch rejected")
@@ -77,5 +77,20 @@ func _ready() -> void:
 	check(chat.receive(ready_packet(3, 4, 5)) and chat.receive(batch([entry(4, "上线以后[微笑]"), entry(5, "断线期间")])) and chat.messages.size() == 2, "Reconnect replays only messages from the retained character admission")
 	chat.clear()
 	check(chat.receive(ready_packet(3, 6, 5)) and chat.messages.is_empty() and chat._cursor == 5, "Leaving and re-entering starts a new empty chat window")
+	check(chat.receive(batch([entry(6, "需要移除的原文")])), "Moderation fixture installs displayed message")
+	var notice := entry(7, "该角色已被管理员禁言30分钟。原因：刷屏")
+	notice.system = true
+	var removed_entry := entry(8, "该发言已被管理员删除")
+	removed_entry.deleted = true
+	var moderation := batch([notice, removed_entry])
+	moderation.removed_message_ids = [entry(6).message_id]
+	check(chat.receive(moderation) and chat.messages.size() == 1 and chat.messages[0].system and chat._cursor == 8, "Removal erases cached original and tombstone while keeping ordered system notice")
+	var invalid := batch([entry(9)])
+	invalid.removed_message_ids = ["invalid-id"]
+	check(not chat.receive(invalid) and chat.messages.size() == 1 and chat._cursor == 8, "Malformed removal list is atomic")
+	invalid = batch([entry(9)])
+	invalid.messages[0].system = "true"
+	check(not chat.receive(invalid) and chat._cursor == 8, "System marker must be a boolean")
+	check(chat.receive(batch([entry(9),entry(10),entry(11)])) and chat.messages.size() == 3 and chat.messages[0].seq == "9", "Deleted sequence slots do not retain older messages beyond the history window")
 	print("PUBLIC CHAT PROTOCOL: %d checks, %d failures" % [checks, failures])
 	get_tree().quit(0 if failures == 0 else 1)

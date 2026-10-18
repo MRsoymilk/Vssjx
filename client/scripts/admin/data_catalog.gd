@@ -5,6 +5,7 @@ const STATE := preload("res://scripts/game_state.gd")
 const WORLD := preload("res://scripts/world.gd")
 const INVENTORY := preload("res://scripts/inventory.gd")
 const ART := preload("res://scripts/art.gd")
+const APPEARANCE := preload("res://scripts/admin/equipment_appearance.gd")
 const ONLINE_MAP := "res://assets/data/qingyun-v1.json"
 const ORIGINAL_ITEMS := "res://assets/data/original_items.json"
 const ORIGINAL_WORLD := "res://assets/data/original_world.json"
@@ -13,7 +14,7 @@ const MONSTER_AUDIT := "res://assets/admin/monsters/animation_audit.json"
 const ORIGINAL_EFFECTS := "res://assets/admin/effects/catalog.json"
 const RESOURCE_ARCHIVE := "res://assets/admin/archive/catalog.json"
 const CATEGORIES := [
-	["weapons", "武器"], ["equipment", "人物装备"], ["items", "物品"],
+	["weapons", "武器"], ["equipment", "人物装备"], ["appearance", "装备外观"], ["items", "物品"],
 	["characters", "人物"], ["quests", "任务 / 线索"], ["maps", "地图"],
 	["enemies", "怪物"], ["effects", "特效"], ["art", "素材 / 动画"], ["archive", "原包归档"]
 ]
@@ -61,6 +62,14 @@ func reload() -> void:
 		var ids: Array = ShopRules.catalog.items.filter(func(item:Dictionary)->bool:return item.slot==ShopRules.SLOTS[index]).map(func(item:Dictionary)->String:return item.id)
 		var data := {"槽位序号":index,"槽位":slot,"可装备物品":ids,"说明":"各槽提供重建属性；武器、衣服、帽子参与换装，部分对应仍为重建规则" if not ids.is_empty() else "界面预留槽位，尚无物品及属性规则"}
 		_add("equipment","slot_%d" % index,slot," / ".join(PackedStringArray(ids)) if not ids.is_empty() else "尚无装备定义","已接入" if not ids.is_empty() else "预留","res://scripts/inventory.gd",data)
+	for entry in ShopRules.catalog.items:
+		if not ShopRules.is_equipment(entry): continue
+		var mapping := APPEARANCE.describe(entry)
+		_add("appearance", entry.id, entry.name, APPEARANCE.changes(entry), "已接入", "res://assets/data/shop-v2.json", mapping, {"kind":"icon", "path":entry.icon, "equipment_id":entry.id})
+		for record in entries:
+			if record.category in ["weapons", "equipment", "items"] and (record.id == entry.id or record.id == "shop/"+entry.id):
+				record.data["外观对应"] = mapping
+				record.preview["equipment_id"] = entry.id
 	var hero_keys := [["mzs", "mck", "mfs"], ["wzs", "wck", "wfs"]]
 	for gender in 2:
 		for job in STATE.JOBS.size():

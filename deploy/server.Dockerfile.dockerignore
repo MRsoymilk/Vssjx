@@ -1,0 +1,21 @@
+# The build needs only Rust sources, migrations and embedded JSON definitions.
+# In particular, never send .env, credentials, saves or the asset archives.
+*
+!server
+server/*
+!server/Cargo.toml
+!server/Cargo.lock
+!server/src
+!server/migrations
+!shared
+shared/*
+!shared/data
+shared/data/*
+!shared/data/*.json
+!client
+client/*
+!client/assets
+client/assets/*
+!client/assets/data
+client/assets/data/*
+!client/assets/data/*.json

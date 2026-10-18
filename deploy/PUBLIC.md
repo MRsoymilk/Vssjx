@@ -39,6 +39,10 @@ SSJX_WEB_DEV_ORIGINS=
 
 ## 3. 构建、启动数据库与HTTP验证入口
 
+低内存服务器默认使用一个Cargo编译任务。大陆网络可在`.env`中设置`SSJX_CARGO_REGISTRY_MIRROR=ustc`，Docker构建会使用USTC的HTTPS稀疏索引；依赖仍通过`Cargo.lock`锁定和校验。默认`crates-io`使用官方源。`SSJX_CARGO_BUILD_JOBS`可按内存情况调整。USTC的Docker Hub缓存已暂停，不能将其旧地址当作可用的Docker镜像加速器。
+
+来源：[USTC Cargo配置](https://mirrors.ustc.edu.cn/help/crates.io-index.html)、[Docker缓存状态](https://mirrors.ustc.edu.cn/help/dockerhub.html)。
+
 ```sh
 cd /opt/Vssjx
 docker compose --env-file .env \

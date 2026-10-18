@@ -1,4 +1,12 @@
 FROM rust:1-slim-bookworm AS builder
+ARG CARGO_BUILD_JOBS=1
+ARG CARGO_REGISTRY_MIRROR=crates-io
+ARG CARGO_HTTP_MULTIPLEXING=false
+RUN case "$CARGO_REGISTRY_MIRROR" in \
+      crates-io) ;; \
+      ustc) printf '[source.crates-io]\nreplace-with = "ustc"\n[source.ustc]\nregistry = "sparse+https://mirrors.ustc.edu.cn/crates.io-index/"\n' > /usr/local/cargo/config.toml ;; \
+      *) echo 'Unsupported CARGO_REGISTRY_MIRROR' >&2; exit 2 ;; \
+    esac
 WORKDIR /build
 COPY server/Cargo.toml server/Cargo.lock ./server/
 COPY server/src ./server/src

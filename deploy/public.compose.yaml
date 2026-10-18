@@ -15,6 +15,9 @@ services:
     build:
       context: ..
       dockerfile: deploy/server.Dockerfile
+      args:
+        CARGO_BUILD_JOBS: ${SSJX_CARGO_BUILD_JOBS:-1}
+        CARGO_REGISTRY_MIRROR: ${SSJX_CARGO_REGISTRY_MIRROR:-crates-io}
     image: vssjx-server:local
     network_mode: host
     restart: unless-stopped

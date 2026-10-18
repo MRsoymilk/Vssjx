@@ -56,6 +56,7 @@ def main():
         check(initial['name'] == 'vssjx' and initial['volumes']['postgres-data']['name'] == 'vssjx_postgres-data', 'Existing Compose project and database volume retained')
         check(services['postgres']['ports'][0]['host_ip'] == '127.0.0.1', 'PostgreSQL remains loopback-only')
         game = services['game']
+        check(str(game['build']['args']['CARGO_BUILD_JOBS']) == '1' and game['build']['args']['CARGO_REGISTRY_MIRROR'] == 'crates-io', 'Default image build limits memory and uses the official Cargo registry')
         check(game['network_mode'] == 'host' and game['environment']['SSJX_BIND_ADDR'] == '127.0.0.1:8080', 'Game shares Linux loopback and never binds public 8080')
         check(game['environment']['SSJX_MONITOR_BIND_ADDR'] == '127.0.0.1:9090', 'Monitor retains its required local peer and listener boundary')
         check(game['environment']['SSJX_ENV_FILE'] == '' and game['environment']['SSJX_DATABASE_URL'].endswith('@127.0.0.1:5432/vssjx'), 'Container uses explicit database environment without embedded .env')
@@ -67,6 +68,9 @@ def main():
         configs = [mount for mount in nginx_mounts if mount['target'] == '/etc/nginx/conf.d/default.conf']
         check(len(configs) == 1 and configs[0]['source'].endswith('public.https.nginx.conf'), 'TLS overlay replaces only bootstrap config and retains certificate volumes')
         check(initial['volumes'] == tls['volumes'], 'Enabling HTTPS never changes persistent volume identity')
+        with (base / '.env').open('a', encoding='utf-8') as fixture:
+            fixture.write('SSJX_CARGO_REGISTRY_MIRROR=ustc\n')
+        check(config()['services']['game']['build']['args']['CARGO_REGISTRY_MIRROR'] == 'ustc', 'USTC build selection is passed explicitly through Compose')
         web = config(['-f', 'deploy/public.tls.compose.yaml', '-f', 'deploy/public.web.compose.yaml'])
         mounts = web['services']['nginx']['volumes']
         check(len([m for m in mounts if m['target'] == '/etc/nginx/conf.d/default.conf']) == 1 and any(m['source'].endswith('public.web.https.nginx.conf') for m in mounts), 'Web overlay selects exactly one HTTPS configuration')

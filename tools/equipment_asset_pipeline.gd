@@ -1,0 +1,117 @@
+extends SceneTree
+## Repeatable native frame slicing, no animation or original-resource rewriting.
+const ROOT := "res://../"
+const REVIEW := ROOT + "work/ai-equipment-review-20261018-v3/"
+const WORK := ROOT + "work/boneglow-production/"
+const DATA := ROOT + "analysis/ai-generated/equipment/boneglow/"
+const SETS := [
+	["01_male_lishi", "mzs", "玄骸镇岳", 14, 2],
+	["02_female_lishi", "wzs", "赤翎破军", 14, 2],
+	["03_male_xiake", "mck", "紫冥斩魄", 1, 2],
+	["04_female_xiake", "wck", "霜骨流萤", 1, 2],
+	["05_male_yinzhe", "mfs", "幽篁摄灵", 2, 3],
+	["06_female_yinzhe", "wfs", "苍灵月骨", 2, 3]
+]
+
+func _init() -> void:
+	if "build" in OS.get_cmdline_user_args():
+		build_runtime()
+		return
+	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(WORK))
+	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(DATA))
+	var parts: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://assets/data/hero-parts.json"))
+	var manifest: Array = []
+	for definition in SETS:
+		var id: String = definition[0]
+		var stem: String = definition[1]
+		var recipe: Dictionary = parts.recipes[stem]
+		var sources := [stem+"t"+str(definition[4]), recipe.sources[1], recipe.sources[3], recipe.sources[4], "e"+stem.substr(1)+str(definition[3])]
+		var atlas := Image.create(1024, 1280, false, Image.FORMAT_RGBA8)
+		var cells: Array = []
+		for source in sources:
+			var info: Dictionary = parts.parts[source]
+			var image := Image.load_from_file(ProjectSettings.globalize_path(info.texture))
+			for frame in info.frames.size():
+				var r: Array = info.frames[frame]
+				var tile := image.get_region(Rect2i(r[0],r[1],r[2],r[3]))
+				tile.resize(tile.get_width()*3, tile.get_height()*3, Image.INTERPOLATE_NEAREST)
+				var index := cells.size()
+				var pos := Vector2i((index%4)*256+(256-tile.get_width())/2, (index/4)*256+(256-tile.get_height())/2)
+				atlas.blit_rect(tile, Rect2i(Vector2i.ZERO, tile.get_size()), pos)
+				cells.append({"source":source,"frame":frame,"original_region":r,"template_region":[pos.x,pos.y,tile.get_width(),tile.get_height()]})
+		atlas.save_png(WORK+id+"-parts-template.png")
+		manifest.append({"id":id,"stem":stem,"name":definition[2],"weapon_template":definition[3],"head_template":definition[4],"cells":cells})
+	var file := FileAccess.open(DATA+"native-frame-templates.json",FileAccess.WRITE)
+	file.store_string(JSON.stringify(manifest,"  ")+"\n")
+	print("Prepared six exact native part atlases: ", ProjectSettings.globalize_path(WORK))
+	quit()
+
+func clean_alpha(image: Image) -> void:
+	# Remove generated antialias fringes at import, preserving solid pixel art.
+	image.convert(Image.FORMAT_RGBA8)
+	for y in image.get_height():
+		for x in image.get_width():
+			var color := image.get_pixel(x,y)
+			color.a = 1.0 if color.a >= 0.5 else 0.0
+			image.set_pixel(x,y,color if color.a > 0 else Color.TRANSPARENT)
+
+func build_runtime() -> void:
+	var templates: Array = JSON.parse_string(FileAccess.get_file_as_string(DATA+"native-frame-templates.json"))
+	var original: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://assets/data/hero-parts.json"))
+	var report: Array = []
+	var slots := ["weapon","hat","armor","wrist","belt","pants","boots","pendant","ring","necklace"]
+	for entry in templates:
+		var output: String = "res://assets/generated/equipment/boneglow/"+entry.stem+"/"
+		for folder in ["parts","icons"]: DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(output+folder))
+		var paint_path: String = DATA+entry.id+"-parts-painted.png"
+		var painted := Image.load_from_file(ProjectSettings.globalize_path(paint_path))
+		var design := Image.load_from_file(ProjectSettings.globalize_path(DATA+entry.id+"-equipment-review.png"))
+		clean_alpha(painted)
+		clean_alpha(design)
+		var atlases := {}
+		for index in entry.cells.size():
+			var cell: Dictionary = entry.cells[index]
+			var info: Dictionary = original.parts[cell.source]
+			var native := Image.load_from_file(ProjectSettings.globalize_path(info.texture))
+			if not atlases.has(cell.source): atlases[cell.source] = Image.create(native.get_width(),native.get_height(),false,Image.FORMAT_RGBA8)
+			var r: Array = cell.original_region
+			var original_rect := Rect2i(r[0],r[1],r[2],r[3])
+			var used := native.get_region(original_rect).get_used_rect()
+			if used.size == Vector2i.ZERO: continue
+			var x := roundi(float(index%4)*painted.get_width()/4)
+			var y := roundi(float(index/4)*painted.get_height()/5)
+			var end_x := roundi(float(index%4+1)*painted.get_width()/4)
+			var end_y := roundi(float(index/4+1)*painted.get_height()/5)
+			var tile := painted.get_region(Rect2i(x,y,end_x-x,end_y-y))
+			var new_used := tile.get_used_rect()
+			if new_used.size == Vector2i.ZERO:
+				push_error("Missing painted frame: "+entry.id+" / "+cell.source+" / "+str(cell.frame))
+				quit(1)
+				return
+			var fitted := tile.get_region(new_used)
+			fitted.resize(used.size.x, used.size.y, Image.INTERPOLATE_NEAREST)
+			atlases[cell.source].blit_rect(fitted,Rect2i(Vector2i.ZERO,fitted.get_size()),original_rect.position+used.position)
+		for source in atlases:
+			var path: String = output+"parts/"+source+".png"
+			atlases[source].save_png(path)
+			report.append({"path":path,"sha256":FileAccess.get_sha256(path),"native_frames":original.parts[source].frames})
+		for index in slots.size():
+			var row := 1+index/4
+			var column := index%4
+			var x := roundi(float(column)*design.get_width()/4)
+			var y := roundi(float(row)*design.get_height()/4)
+			var end_x := roundi(float(column+1)*design.get_width()/4)
+			var end_y := roundi(float(row+1)*design.get_height()/4)
+			var cell := design.get_region(Rect2i(x,y,end_x-x,end_y-y))
+			var icon := cell.get_region(cell.get_used_rect())
+			var factor := minf(28.0/icon.get_width(),28.0/icon.get_height())
+			icon.resize(maxi(1,roundi(icon.get_width()*factor)),maxi(1,roundi(icon.get_height()*factor)),Image.INTERPOLATE_NEAREST)
+			var canvas := Image.create(32,32,false,Image.FORMAT_RGBA8)
+			canvas.blit_rect(icon,Rect2i(Vector2i.ZERO,icon.get_size()),(Vector2i(32,32)-icon.get_size())/2)
+			var path: String = output+"icons/"+slots[index]+".png"
+			canvas.save_png(path)
+			report.append({"path":path,"sha256":FileAccess.get_sha256(path),"source_cell":4+index})
+	var file := FileAccess.open(DATA+"runtime-import-report.json",FileAccess.WRITE)
+	file.store_string(JSON.stringify(report,"  ")+"\n")
+	print("Published ",report.size()," native runtime textures (30 parts, 60 icons)")
+	quit()

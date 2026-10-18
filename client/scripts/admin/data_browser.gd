@@ -117,8 +117,10 @@ func _category_selected(index: int) -> void:
 func _fill_list(preferred_id: String = "") -> void:
 	for item in CATALOG.CATEGORIES:
 		if item[0] == category: %Section.text = item[1]
-	%Context.visible = category in ["maps", "quests", "enemies", "effects", "archive"]
-	if category == "maps":
+	%Context.visible = category in ["appearance", "maps", "quests", "enemies", "effects", "archive"]
+	if category == "appearance":
+		%Context.text = "武器、衣服和帽子参与换装，其余槽位仅影响属性。可切换职业、性别和动作对照；衣帽对应为现行重建规则，具体部件与依据见字段详情。"
+	elif category == "maps":
 		%Context.text = "原包目录 %d 条（%d 个不同名称）；总图 %d 个位置 / %d 条连线已恢复。原版场景布局仍缺失；另有 %d 张AI生成场景，可用状态筛选查看。" % [catalog.original_map_names, catalog.original_distinct_map_names, int(catalog.original_overview.get("visible_location_count", 0)), int(catalog.original_overview.get("route_count", 0)), catalog.find("maps", "", "AI生成").size()]
 	elif category == "quests":
 		var stages: int = catalog.find("quests", "", "重建阶段").size()
@@ -170,7 +172,10 @@ func _show_entry(entry: Dictionary) -> void:
 	%RawAnimations.visible = false
 	%AnimationHelp.text = ""
 	%AnimationHelp.visible = false
-	%Preview.display(entry)
+	var equipment := ShopRules.item(entry.get("preview", {}).get("equipment_id", ""))
+	%AppearanceComparison.set_equipment(equipment)
+	%Preview.visible = equipment.is_empty()
+	%Preview.display(entry if equipment.is_empty() else {})
 	%Copy.disabled = entry.is_empty()
 	%DetailTitle.text = entry.get("name", "未选择条目")
 	%Summary.text = entry.get("summary", "当前分类没有匹配结果，请调整搜索或筛选条件。")

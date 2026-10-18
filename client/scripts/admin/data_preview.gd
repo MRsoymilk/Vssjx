@@ -8,6 +8,8 @@ var atlas: Texture2D
 var show_blocked := false
 var overview_icons: Array[Texture2D] = []
 var hovered_node: Dictionary = {}
+@export var fit_visible_animation := false
+var _visible_bounds: Dictionary = {}
 const ACTION_LABELS := {"idle": "待机", "walk": "行走", "attack": "普通攻击", "cast": "施法", "hurt": "受击"}
 const ACTION_ORDER := ["idle", "walk", "attack", "cast", "hurt"]
 
@@ -18,6 +20,7 @@ func display(entry: Dictionary) -> void:
 	sprite = null
 	icon = null
 	record = entry
+	_visible_bounds.clear()
 	hovered_node = {}
 	tooltip_text = ""
 	var preview: Dictionary = entry.get("preview", {})
@@ -135,6 +138,23 @@ func _draw_overview() -> void:
 
 func _place_sprite() -> void:
 	if not is_instance_valid(sprite): return
+	if fit_visible_animation:
+		if not _visible_bounds.has(sprite.animation):
+			var bounds := Rect2()
+			for index in sprite.sprite_frames.get_frame_count(sprite.animation):
+				var texture := sprite.sprite_frames.get_frame_texture(sprite.animation, index)
+				var image := texture.get_image()
+				var rect := Rect2(image.get_used_rect())
+				# Trimmed dynamic atlases retain their placement in AtlasTexture.margin.
+				if texture is AtlasTexture and image.get_size() != Vector2i(texture.get_size()): rect.position += texture.margin.position
+				if rect.has_area(): bounds = bounds.merge(rect) if bounds.has_area() else rect
+			_visible_bounds[sprite.animation] = bounds
+		var bounds: Rect2 = _visible_bounds[sprite.animation]
+		if bounds.has_area():
+			var zoom := maxf(0.25, minf(2.0, minf((size.x - 16) / bounds.size.x, (size.y - 16) / bounds.size.y)))
+			sprite.scale = Vector2.ONE * zoom
+			sprite.position = size * 0.5 - (sprite.offset + bounds.get_center()) * zoom
+			return
 	var info: Dictionary = record.preview.animation if record.preview.kind in ["original_animation", "image_frames"] else OriginalArt.actor_info(record.preview.art)
 	var dimensions := Vector2(info.width, info.height)
 	var zoom := maxf(0.25, minf(2.0, minf((size.x - 30) / dimensions.x, (size.y - 24) / dimensions.y)))
@@ -198,6 +218,7 @@ func play_animation(animation: String) -> void:
 	if is_instance_valid(sprite) and sprite.sprite_frames.has_animation(animation):
 		sprite.stop()
 		sprite.play(animation)
+		if fit_visible_animation: _place_sprite()
 
 func _draw() -> void:
 	draw_rect(Rect2(Vector2.ZERO, size), Color("101923"))

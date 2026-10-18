@@ -208,12 +208,6 @@ theme_override_colors/font_color = Color(0.68, 0.79, 0.86, 1)
 [node name="AnimationBar" type="HBoxContainer" parent="Margin/Layout/Body/Split/Inspector/Details"]
 unique_name_in_owner = true
 
-[node name="ExpandOverview" type="Button" parent="Margin/Layout/Body/Split/Inspector/Details"]
-unique_name_in_owner = true
-visible = false
-text = "展开世界总图 · 查看地点 / 等级 / 连线"
-tooltip_text = "世界总图恢复数据；单张场景地形仍缺少.map文件"
-
 [node name="Label" type="Label" parent="Margin/Layout/Body/Split/Inspector/Details/AnimationBar"]
 text = "动画"
 

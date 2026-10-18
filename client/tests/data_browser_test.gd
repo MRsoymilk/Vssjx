@@ -183,10 +183,9 @@ func _ready() -> void:
 	browser.get_node("%StatusFilter").select(5)
 	browser._fill_list()
 	check(browser.visible_entries.size() == 214 and browser.get_node("%Context").text.contains("157"), "Map directory filter and contextual counts")
-	check(not browser.get_node("%PreviewMessage").visible and not browser.get_node("%Collision").visible and browser.get_node("%ExpandOverview").visible, "World overview preview is separate from scene collision")
-	var overview_window: Window = browser.open_world_overview()
+	check(not browser.get_node("%PreviewMessage").visible and not browser.get_node("%Collision").visible, "World overview preview is separate from scene collision")
 	await get_tree().process_frame
-	var world_preview: Control = overview_window.get_node("Overview").get_node("%WorldPreview")
+	var world_preview: Control = browser.get_node("%Preview")
 	var first_node: Dictionary = catalog.original_overview.nodes[0]
 	var position: Array = first_node.world_position
 	var point: Vector2 = world_preview.overview_transform() * Vector2(position[0], position[1])
@@ -196,8 +195,6 @@ func _ready() -> void:
 	world_preview._gui_input(motion)
 	check(world_preview.tooltip_text.contains(first_node.name) and world_preview.tooltip_text.contains("等级"), "Overview exposes verified name and levels")
 	check(world_preview.overview_icons.size() == 3 and world_preview.overview_icons[0] != null, "Original world node icons load")
-	overview_window.queue_free()
-	await get_tree().process_frame
 	browser.select_category("quests")
 	browser.get_node("%StatusFilter").select(6)
 	browser._fill_list()
@@ -301,13 +298,6 @@ func _ready() -> void:
 				browser._fill_list()
 				await get_tree().process_frame
 				check(capture_image(output.get_basename() + "-original-maps.png"), "Rendered original map directory and recovery boundary")
-				var expanded: Window = browser.open_world_overview()
-				await get_tree().process_frame
-				await get_tree().process_frame
-				RenderingServer.force_draw()
-				check(expanded.get_texture().get_image().save_png(output.get_basename() + "-world-overview.png") == OK, "Rendered recovered original world overview")
-				expanded.queue_free()
-				await get_tree().process_frame
 				browser.select_category("quests")
 				browser.get_node("%StatusFilter").select(6)
 				browser._fill_list()

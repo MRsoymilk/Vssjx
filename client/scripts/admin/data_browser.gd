@@ -2,7 +2,6 @@ extends Control
 ## Standalone project-data workbench. No editing, network calls or save loading.
 
 const CATALOG := preload("res://scripts/admin/data_catalog.gd")
-const OVERVIEW := preload("res://scenes/admin/world_overview_popup.tscn")
 const LAYOUT := preload("res://scripts/admin/admin_window_layout.gd")
 const DESKTOP_SIZE := Vector2i(960, 640)
 var catalog := CATALOG.new()
@@ -44,18 +43,7 @@ func _ready() -> void:
 	)
 	%RawAnimations.toggled.connect(func(_value: bool) -> void: _fill_animations())
 	%Collision.toggled.connect(func(value: bool) -> void: %Preview.show_blocked = value; %Preview.queue_redraw())
-	%ExpandOverview.pressed.connect(open_world_overview)
 	reload_data()
-
-func open_world_overview() -> Window:
-	if current.get("preview", {}).get("kind") != "world_overview": return null
-	var window: Window = OVERVIEW.instantiate()
-	window.theme = theme
-	add_child(window)
-	window.get_node("Overview").display(current)
-	window.close_requested.connect(window.queue_free)
-	window.popup_centered_clamped(LAYOUT.DESKTOP_SIZE, 0.95)
-	return window
 
 func _apply_theme() -> void:
 	var design := Theme.new()
@@ -190,7 +178,6 @@ func _show_entry(entry: Dictionary) -> void:
 	%AnimationBar.visible = entry.get("preview", {}).get("kind") in ["actor", "original_animation", "image_frames"]
 	%Collision.visible = entry.get("preview", {}).get("kind") == "map"
 	var preview_kind: String = entry.get("preview", {}).get("kind", "")
-	%ExpandOverview.visible = preview_kind == "world_overview"
 	%PreviewMessage.visible = preview_kind == "unavailable"
 	%PreviewMessage.text = entry.get("preview", {}).get("message", "")
 	_update_preview_height()

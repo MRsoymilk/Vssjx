@@ -4,6 +4,8 @@
 *.godot text eol=lf
 *.py text eol=lf
 *.sh text eol=lf
+# SQLx validates the exact historical bytes; never convert migration newlines.
+server/migrations/*.sql -text whitespace=cr-at-eol
 *.md text eol=lf
 client/assets/data/actors.json text eol=lf
 client/assets/data/actors/** text eol=lf

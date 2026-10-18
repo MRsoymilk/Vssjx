@@ -16,6 +16,7 @@ services:
       context: ..
       dockerfile: deploy/server.Dockerfile
       args:
+        RUST_BUILDER_IMAGE: ${SSJX_RUST_BUILDER_IMAGE:-rust:1-slim-bookworm}
         CARGO_BUILD_JOBS: ${SSJX_CARGO_BUILD_JOBS:-1}
         CARGO_REGISTRY_MIRROR: ${SSJX_CARGO_REGISTRY_MIRROR:-crates-io}
     image: vssjx-server:local

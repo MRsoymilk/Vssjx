@@ -24,6 +24,7 @@
 | [characters.md](characters.md) | 当前角色创建/查询、固定昵称规则、账号级回执及离线隔离 |
 | [shared_world.md](shared_world.md) | 当前共享地图、票据、移动、重连和快照契约 |
 | [chat.md](chat.md) | 当前公共频道、短期去重、限流、禁言和内存历史 |
+| [ai-equipment-art.md](ai-equipment-art.md) | 根据参考图制作主题一致的装备图标、分层着装动画、映射与试穿验收流程 |
 | [platform_interface.md](platform_interface.md) | 多平台接口边界、目录结构、手机浏览器适配、Web联机与P1～P4验收门槛；P1实施中 |
 | [roadmap.md](roadmap.md) | 已完成工作、重新排列的实施阶段、依赖与决策关口 |
 | [联机测试计划](../tests/online_test_plan.md) | 各阶段验收、故障注入、混合负载与恢复门槛 |

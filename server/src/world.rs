@@ -156,6 +156,9 @@ struct SavedPosition {
     map_id: String,
 }
 impl WorldHub {
+    pub(crate) fn online_characters(&self) -> std::collections::HashSet<Uuid> {
+        self.data.lock().expect("world state").actors.values().filter(|a|a.connected).map(|a|a.id).collect()
+    }
     pub(crate) fn chat_snapshot(&self) -> (Uuid, Vec<crate::chat::ChatMessage>) {
         let state = self.data.lock().expect("world state");
         (state.chat.epoch, state.chat.recent())

@@ -1,0 +1,10 @@
+{
+  "tool": "image_gen built-in",
+  "prompt": "Precise-object-edit: repair the BATTLEAXE symmetry in this exact 4-column by 8-row production sprite atlas. Change ONLY the weapon sprites in ROW 4 COLUMNS 3 AND 4, and matching weapon icon in ROW 6 COLUMN 1. Everything else must remain identical, including head, body and accessory icons, layout, cells and transparency.\n\nThe current equipped axe has a huge lower crescent and a tiny upper stump: this is the defect. Redesign it as a perfectly BALANCED DOUBLE-BITTED AXE, NOT a scythe and NOT an axe with one cutting blade. Two equal opposing crescent cutting blades, identical size, arc, reach, thickness and ivory sharpened edges, mirrored across the longitudinal handle/shaft axis. The lime-green central gem sits exactly on that axis. The dark iron/ivory/moss materials and small vine marks remain consistent.\nFirst weapon frame (row 4 col 3): shaft remains horizontal, grip to left, axe head to right. Draw ONE matching upward crescent and ONE matching downward crescent of equal size. Upper tip extends exactly as far above the shaft as lower tip below. Do not shrink the whole axe.\nSecond weapon frame (row 4 col 4): the EXACT SAME symmetrical double axe rotated to the original diagonal pose; maintain its own shaft-axis symmetry. Preserve the handle ends and hand-grip coordinates, overall original part sizes and centers, so the weapon stays attached in the existing game animation. The same axe shown in two orientations, not two designs.\nWeapon icon (row 6 col 1): shaft vertical, two equal left/right blades mirrored around the shaft; same center gem and materials as the wearable weapon, readable as a balanced double axe at 32px.\nKeep coarse native pixel-art style and hard pixel edges. Transparent PNG, exact same 4x8 layout and canvas. No extra objects, no labels or borders, no changes to any other part.",
+  "source_output": "C:\\Users\\milk\\.codex\\generated_images\\01a13f9f-f6d1-7c41-b090-6fb33b951df1\\exec-e246e0db-7776-4cc6-bc02-3f6768f3bcff.png",
+  "cells": [
+    14,
+    15,
+    20
+  ]
+}

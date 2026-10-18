@@ -17,6 +17,8 @@
 
 最终运行时文件为30张原生部件图集及60个32×32图标，位于 `client/assets/generated/equipment/gravebloom/`。`native-frame-templates.json` 与 `runtime-import-report.json` 保留原始帧区域和每张正式资源SHA256。导入采用最近邻采样及透明边缘清理，将部件装回原生有效区域；所有原生坐标、画布、空帧、图层变换和动作配方保留。原输入头部的轮廓允许按参考做骷髅面具、兜帽和夸张发型，仍受当前人物画布约束。
 
+用户随后要求修正战斧不对称。`01_male_lishi-axe-symmetric.png` 与 `axe-symmetry-record.json` 保存此次内置image_gen修正；配置中的 `atlas_overrides` 只取两个武器帧（第14、15格）和武器图标（第20格，均从0开始），其他87张正式图片不变。双斧刃围绕柄轴等大，第一原生横向姿势的斧头轮廓镜像重叠率为94.2%，同时保留原生握持与帧区域。
+
 复现（在仓库根目录运行，`godot`为本项目Godot控制台程序）：
 
 ```powershell

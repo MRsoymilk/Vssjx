@@ -19,6 +19,7 @@ var definitions: Array = SETS
 var sheet_rows := 5
 var icon_start_cell := -1
 var weapon_icon_ids: Array = []
+var atlas_overrides: Dictionary = {}
 const ICON_SLOTS := ["weapon","hat","armor","wrist","belt","pants","boots","pendant","ring","necklace"]
 
 func _init() -> void:
@@ -33,6 +34,9 @@ func _init() -> void:
 		sheet_rows = int(config.get("sheet_rows",5))
 		icon_start_cell = int(config.get("icon_start_cell",-1))
 		weapon_icon_ids = config.get("weapon_icon_ids",[])
+		atlas_overrides = config.get("atlas_overrides",{})
+		for override in atlas_overrides.values():
+			override.cells = override.cells.map(func(value: Variant)->int:return int(value))
 	if "build" in OS.get_cmdline_user_args():
 		build_runtime()
 		return
@@ -85,6 +89,13 @@ func clean_alpha(image: Image) -> void:
 			color.a = 1.0 if color.a >= 0.5 else 0.0
 			image.set_pixel(x,y,color if color.a > 0 else Color.TRANSPARENT)
 
+func atlas_cell(image: Image, index: int, rows: int) -> Image:
+	var x := roundi(float(index%4)*image.get_width()/4)
+	var y := roundi(float(index/4)*image.get_height()/rows)
+	var end_x := roundi(float(index%4+1)*image.get_width()/4)
+	var end_y := roundi(float(index/4+1)*image.get_height()/rows)
+	return image.get_region(Rect2i(x,y,end_x-x,end_y-y))
+
 func build_runtime() -> void:
 	var templates: Array = JSON.parse_string(FileAccess.get_file_as_string(data_dir+"native-frame-templates.json"))
 	var original: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://assets/data/hero-parts.json"))
@@ -98,6 +109,11 @@ func build_runtime() -> void:
 		var design := painted if icon_start_cell >= 0 else Image.load_from_file(ProjectSettings.globalize_path(data_dir+entry.id+"-equipment-review.png"))
 		clean_alpha(painted)
 		clean_alpha(design)
+		var override: Dictionary = atlas_overrides.get(entry.id,{})
+		var override_image: Image
+		if not override.is_empty():
+			override_image = Image.load_from_file(ProjectSettings.globalize_path(data_dir+override.file))
+			clean_alpha(override_image)
 		var atlases := {}
 		for index in entry.cells.size():
 			var cell: Dictionary = entry.cells[index]
@@ -108,11 +124,8 @@ func build_runtime() -> void:
 			var original_rect := Rect2i(r[0],r[1],r[2],r[3])
 			var used := native.get_region(original_rect).get_used_rect()
 			if used.size == Vector2i.ZERO: continue
-			var x := roundi(float(index%4)*painted.get_width()/4)
-			var y := roundi(float(index/4)*painted.get_height()/sheet_rows)
-			var end_x := roundi(float(index%4+1)*painted.get_width()/4)
-			var end_y := roundi(float(index/4+1)*painted.get_height()/sheet_rows)
-			var tile := painted.get_region(Rect2i(x,y,end_x-x,end_y-y))
+			var input := override_image if index in override.get("cells",[]) else painted
+			var tile := atlas_cell(input,index,sheet_rows)
 			var new_used := tile.get_used_rect()
 			if new_used.size == Vector2i.ZERO:
 				push_error("Missing painted frame: "+entry.id+" / "+cell.source+" / "+str(cell.frame))
@@ -127,14 +140,9 @@ func build_runtime() -> void:
 			report.append({"path":path,"sha256":FileAccess.get_sha256(path),"native_frames":original.parts[source].frames})
 		for index in slots.size():
 			var source_cell := icon_start_cell+index if icon_start_cell >= 0 else 4+index
-			var row := source_cell/4
-			var column := source_cell%4
 			var rows := sheet_rows if icon_start_cell >= 0 else 4
-			var x := roundi(float(column)*design.get_width()/4)
-			var y := roundi(float(row)*design.get_height()/rows)
-			var end_x := roundi(float(column+1)*design.get_width()/4)
-			var end_y := roundi(float(row+1)*design.get_height()/rows)
-			var cell := design.get_region(Rect2i(x,y,end_x-x,end_y-y))
+			var input := override_image if source_cell in override.get("cells",[]) else design
+			var cell := atlas_cell(input,source_cell,rows)
 			var icon := cell.get_region(cell.get_used_rect())
 			var factor := minf(28.0/icon.get_width(),28.0/icon.get_height())
 			icon.resize(maxi(1,roundi(icon.get_width()*factor)),maxi(1,roundi(icon.get_height()*factor)),Image.INTERPOLATE_NEAREST)

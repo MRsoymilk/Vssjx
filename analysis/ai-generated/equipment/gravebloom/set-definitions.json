@@ -3,6 +3,9 @@
   "family_name": "冥林异装",
   "sheet_rows": 8,
   "icon_start_cell": 20,
+  "atlas_overrides": {
+    "01_male_lishi": {"file": "01_male_lishi-axe-symmetric.png", "cells": [14, 15, 20]}
+  },
   "sets": [
     ["01_male_lishi", "mzs", "冥苔断岳", 11, 6],
     ["02_female_lishi", "wzs", "腐焰镇魂", 14, 4],

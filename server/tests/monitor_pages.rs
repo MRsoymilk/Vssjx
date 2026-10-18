@@ -32,6 +32,7 @@ async fn pages_are_distinct_deep_linkable_and_keep_the_private_boundary() {
         ("/users", "users", "id=\"users-list\""),
         (user.as_str(), "user", "id=\"user-detail\""),
         ("/audit", "audit", "id=\"audit-filter\""),
+        ("/chat", "chat", "id=\"chat-admin-list\""),
         (
             "/announcements",
             "announcements",
@@ -70,6 +71,7 @@ async fn pages_are_distinct_deep_linkable_and_keep_the_private_boundary() {
             ("users", "id=\"users-list\""),
             ("user", "id=\"user-detail\""),
             ("audit", "id=\"audit-filter\""),
+            ("chat", "id=\"chat-admin-list\""),
             ("announcements", "id=\"announcement-form\""),
         ] {
             if other != page {
@@ -94,7 +96,7 @@ async fn pages_are_distinct_deep_linkable_and_keep_the_private_boundary() {
             .status(),
         StatusCode::BAD_REQUEST
     );
-    for asset in ["/admin.js", "/users.js", "/audit.js", "/announcements.js"] {
+    for asset in ["/admin.js", "/users.js", "/audit.js", "/announcements.js", "/chat.js"] {
         assert_eq!(
             game.clone().oneshot(request(asset)).await.unwrap().status(),
             StatusCode::NOT_FOUND

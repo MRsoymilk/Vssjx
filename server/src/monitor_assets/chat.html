@@ -1,0 +1,10 @@
+<section class="panel users-panel chat-admin-panel">
+  <h2>聊天管理</h2>
+  <p>查看当前服务缓存中的最近发言。按账号禁言影响该账号的全部角色；删除和处理结果会同步到游戏聊天框。重启后不保留聊天原文。</p>
+  <form id="chat-search" class="user-toolbar"><label for="chat-query">筛选发言</label><input id="chat-query" maxlength="64" placeholder="角色名、账号或聊天内容" autocomplete="off"><button type="submit">查询</button><button id="chat-clear" type="button">清除筛选</button></form>
+  <div class="user-toolbar"><label for="chat-duration">禁言时长</label><select id="chat-duration"><option value="600">10分钟</option><option value="1800" selected>30分钟</option><option value="3600">1小时</option><option value="86400">24小时</option></select><label for="chat-reason">公开处理原因</label><input id="chat-reason" maxlength="48" placeholder="例如：刷屏或不文明发言" autocomplete="off"></div>
+  <p id="chat-admin-status" role="status">正在读取聊天…</p>
+  <p id="chat-action-status" role="status" aria-live="polite"></p>
+  <h3>账号禁言状态</h3><p>默认显示正在禁言的账号；输入账号或角色名可查询并处理未发言的账号。</p><div id="chat-admin-accounts" class="user-toolbar"></div>
+  <div class="scroll"><table><thead><tr><th>时间</th><th>角色 / 账号</th><th>发言</th><th>处理</th></tr></thead><tbody id="chat-admin-list"></tbody></table></div>
+</section>

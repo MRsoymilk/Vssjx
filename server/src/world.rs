@@ -112,6 +112,7 @@ struct StateData {
     ruins_population: crate::population::Population,
 }
 pub struct WorldHub {
+    pub(crate) moderation: AsyncMutex<()>,
     metrics: Arc<Observability>,
     data: Mutex<StateData>,
     admissions: AsyncMutex<()>,
@@ -143,11 +144,25 @@ struct SavedPosition {
     map_id: String,
 }
 impl WorldHub {
+    pub(crate) fn chat_snapshot(&self) -> (Uuid, Vec<crate::chat::ChatMessage>) {
+        let state = self.data.lock().expect("world state");
+        (state.chat.epoch, state.chat.recent())
+    }
+    pub(crate) fn moderate_chat(&self, removed: Option<Uuid>, characters: &[Uuid], mute: Option<u64>, notice: String) {
+        let now = Instant::now();
+        let mut state = self.data.lock().expect("world state");
+        if let Some(id) = removed { state.chat.remove_message(id, now); }
+        if let Some(seconds) = mute {
+            state.chat.moderate_characters(characters, (seconds > 0).then(|| now + Duration::from_secs(seconds)), now);
+        }
+        state.chat.system_notice(notice);
+    }
     pub fn new(config: WorldConfig) -> Arc<Self> {
         Self::with_metrics(config, Arc::new(Observability::default()))
     }
     pub fn with_metrics(config: WorldConfig, metrics: Arc<Observability>) -> Arc<Self> {
         let hub = Arc::new(Self {
+            moderation: AsyncMutex::new(()),
             metrics,
             data: Mutex::new(StateData {
                 actors: HashMap::new(),
@@ -973,9 +988,9 @@ async fn connection(socket: WebSocket, auth: AuthService, hub: Arc<WorldHub>, an
                     if let Some(p)=hub.save_snapshot(&owner) && WorldHub::persist(&auth,p).await.is_err(){fail(&mut socket,"DATABASE_UNAVAILABLE").await;break;}
                     saved=Instant::now();
                 }
-                let (oldest,epoch,batch,result)={
+                let (oldest,epoch,batch,removed,result)={
                     let state=hub.data.lock().expect("world state");
-                    (state.chat.oldest(),state.chat.epoch,state.chat.batch(chat_cursor),chat_pending.and_then(|id|state.chat.result(owner.id,id)))
+                    (state.chat.oldest(),state.chat.epoch,state.chat.batch(chat_cursor),state.chat.removed_ids(),chat_pending.and_then(|id|state.chat.result(owner.id,id)))
                 };
                 if chat_cursor+1<oldest {
                     if send(&mut socket,json!({"type":"chat.gap","channel_epoch":epoch,"oldest_seq":oldest.to_string()})).await.is_err(){break;}
@@ -983,10 +998,10 @@ async fn connection(socket: WebSocket, auth: AuthService, hub: Arc<WorldHub>, an
                 }
                 if !batch.is_empty() {
                     let last=batch.last().expect("chat batch").seq.parse::<u64>().expect("chat sequence");
-                    if send(&mut socket,json!({"type":"chat.batch","channel_epoch":epoch,"messages":batch})).await.is_err(){break;}
+                    if send(&mut socket,json!({"type":"chat.batch","channel_epoch":epoch,"messages":batch,"removed_message_ids":removed})).await.is_err(){break;}
                     chat_cursor=last;
                 }
-                if let Some(result)=result && result.status=="SENT" {
+                if let Some(result)=result && result.status!="QUEUED" {
                     if send(&mut socket,json!({"type":"chat.result","result":result})).await.is_err(){break;}
                     chat_pending=None;
                 }

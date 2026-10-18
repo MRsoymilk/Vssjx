@@ -13,6 +13,7 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/world_map.tscn" id="WorldMap"]
 [ext_resource type="PackedScene" path="res://scenes/ui/npc_dialog.tscn" id="Npc"]
 [ext_resource type="PackedScene" path="res://scenes/ui/map_transition.tscn" id="MapTransition"]
+[ext_resource type="PackedScene" path="res://scenes/ui/duel_battle_view.tscn" id="DuelBattle"]
 
 [node name="OnlineWorldView" type="Control"]
 offset_right = 320.0
@@ -44,6 +45,8 @@ offset_bottom = 403.0
 online_mode = true
 
 [node name="MapTransition" parent="." instance=ExtResource("MapTransition")]
+
+[node name="DuelBattle" parent="." instance=ExtResource("DuelBattle")]
 
 [node name="WorldMap" parent="." instance=ExtResource("WorldMap")]
 visible = false

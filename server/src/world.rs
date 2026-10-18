@@ -1,5 +1,7 @@
 //! Single-process world coordinator. Map motion never waits for database/network IO.
 //! One owned CharacterActor record per character; socket replacement is epoch-fenced.
+#[path = "world_duel.rs"]
+mod duel_bridge;
 use crate::{
     AppState,
     auth::{self, AuthError, AuthService, Peer},
@@ -67,6 +69,7 @@ pub struct Entity {
 struct CharacterActor {
     business: Arc<AsyncMutex<()>>,
     in_battle: bool,
+    duel_enabled: bool,
     appearance: [i32;3],
     map_id: String,
     net_id: u32,
@@ -103,6 +106,7 @@ impl CharacterActor {
     }
 }
 struct StateData {
+    duels: crate::duel::Arena,
     actors: HashMap<Uuid, CharacterActor>,
     revision: u64,
     chat: ChatHub,
@@ -179,6 +183,7 @@ impl WorldHub {
             moderation: AsyncMutex::new(()),
             metrics,
             data: Mutex::new(StateData {
+                duels: crate::duel::Arena::default(),
                 actors: HashMap::new(),
                 revision: 0,
                 chat: ChatHub::new(config.chat),
@@ -210,9 +215,15 @@ impl WorldHub {
                 last = now;
                 let (revision, mut entities, mut ruins_entities, ai_entities) = {
                     let mut state = hub.data.lock().expect("world state");
+                    let now=Instant::now();
+                    let available=state.actors.iter().map(|(id,a)|(*id,(a.duel_enabled&&(a.connected||a.disconnected_at.is_some_and(|t|now.saturating_duration_since(t)<Duration::from_secs(15))),a.connected&&!a.in_battle))).collect();
+                    let invalid:Vec<_>=state.duels.offers.values().filter(|o|state.actors.get(&o.from).zip(state.actors.get(&o.to)).is_none_or(|(a,b)|a.map_id!=b.map_id)).map(|o|o.id).collect();
+                    for id in invalid{state.duels.remove_offer(id,"地图已变化，决斗邀请失效。");}
+                    state.duels.tick(now,&available);
+                    let dueling:std::collections::HashSet<_>=state.actors.keys().filter(|id|state.duels.active(**id)).copied().collect();
                     let mut changed = false;
                     for actor in state.actors.values_mut() {
-                        if actor.connected && !actor.in_battle {
+                        if actor.connected && !actor.in_battle && !dueling.contains(&actor.id) {
                             changed |= actor.motion.advance(dt);
                         }
                     }
@@ -399,6 +410,7 @@ impl WorldHub {
         let actor = CharacterActor {
             business: business.clone(),
             in_battle: row.get::<Option<Uuid>,_>("active_battle_id").is_some(),
+            duel_enabled: false,
             map_id,
             net_id,
             id,
@@ -427,6 +439,7 @@ impl WorldHub {
     }
     fn command(&self, owner: &Ownership, input: &ClientMessage) -> Result<(), AuthError> {
         let mut state = self.data.lock().expect("world state");
+        if state.duels.active(owner.id){return Err(error(409,"BATTLE_ACTIVE"));}
         let actor = state
             .actors
             .get_mut(&owner.id)
@@ -521,7 +534,7 @@ impl WorldHub {
         Ok(crate::pve::Context { character: owner.id,session:owner.session,owner:owner.owner,cell:actor.motion.cell,
             moving: actor.motion.next.is_some() || !actor.motion.route.is_empty(),
             target_cell:target.and_then(|id|state.population_for(&actor.map_id).get(id).map(|r|r.motion.cell).or_else(||crate::ai_world::target_cell(&actor.map_id,id))),
-            map_id: actor.map_id.clone(), position_revision: actor.motion.revision })
+            map_id: actor.map_id.clone(), position_revision: actor.motion.revision, duel_active:state.duels.active(owner.id) })
     }
     fn pve_applied(&self, owner: &Ownership, result: &Value) {
         let mut state = self.data.lock().expect("world state");
@@ -645,7 +658,7 @@ pub(crate) async fn ticket(
         .bind(auth::token_digest(&raw)?).bind(session).bind(request.character_id).execute(&mut *tx).await.map_err(db_error)?;
     tx.commit().await.map_err(db_error)?;
     Ok(Json(
-        json!({"ticket":raw,"expires_in":20,"character_id":request.character_id,"config_hash":config_hash(),"announcement_version":1,"population_version":1,"pve_version":1,"maps_version":1,"ai_world_version":1,"shop_version":2}),
+        json!({"ticket":raw,"expires_in":20,"character_id":request.character_id,"config_hash":config_hash(),"announcement_version":1,"population_version":1,"pve_version":1,"maps_version":1,"ai_world_version":1,"shop_version":2,"duel_version":1}),
     ))
 }
 #[derive(Deserialize)]
@@ -668,6 +681,8 @@ pub enum ClientMessage {
         maps_version: u32,
         #[serde(default)]
         shop_version: u32,
+        #[serde(default)]
+        duel_version: u32,
     },
     #[serde(rename = "world.move_to")]
     MoveTo {
@@ -686,6 +701,8 @@ pub enum ClientMessage {
     },
     #[serde(rename = "pve.command")]
     Pve { command: crate::pve_rules::Command },
+    #[serde(rename = "duel.command")]
+    Duel { command: crate::duel::Command },
     #[serde(rename = "ping")]
     Ping {},
     #[serde(rename = "world.leave")]
@@ -813,6 +830,7 @@ async fn connection(socket: WebSocket, auth: AuthService, hub: Arc<WorldHub>, an
         pve_version,
         maps_version,
         shop_version,
+        duel_version,
     }) = serde_json::from_str::<ClientMessage>(&text)
     else {
         fail(&mut socket, "INVALID_HANDSHAKE").await;
@@ -854,6 +872,7 @@ async fn connection(socket: WebSocket, auth: AuthService, hub: Arc<WorldHub>, an
         }
     };
     let stream = Uuid::new_v4();
+    hub.duel_enable(&owner,duel_version==1);
     tracing::info!(
         connection_epoch = owner.epoch,
         "world connection authenticated"
@@ -922,6 +941,7 @@ async fn connection(socket: WebSocket, auth: AuthService, hub: Arc<WorldHub>, an
     let mut window = Instant::now();
     let mut messages = 0;
     let mut leave = false;
+    let mut duel_revision=None;
     crate::security::connection_event(&auth,owner.session,owner.id,"world.join","OK",json!({"map_id":owner.map_id,"connection_id":id})).await;
     let mut audit_since = Instant::now();
     let mut move_accepted = 0_u32;
@@ -944,6 +964,11 @@ async fn connection(socket: WebSocket, auth: AuthService, hub: Arc<WorldHub>, an
                 if matches!(input,ClientMessage::Leave {}){leave=true;break;}
                 match auth.live_session(owner.session).await {Ok(true)=>{},Ok(false)=>{fail(&mut socket,"SESSION_REVOKED").await;leave=true;break},Err(_)=>{fail(&mut socket,"DATABASE_UNAVAILABLE").await;break}}
                 if matches!(input,ClientMessage::Ping {}){if send(&mut socket,json!({"type":"pong"})).await.is_err(){break;}}
+                else if let ClientMessage::Duel{command}=&input {
+                    if duel_version!=1 {fail(&mut socket,"DUEL_UNSUPPORTED").await;continue;}
+                    let result=hub.duel_command(&auth,&owner,command).await;
+                    if send(&mut socket,result).await.is_err(){break;}
+                }
                 else if let ClientMessage::Pve{command}=&input {
                     if pve_version != 1 { fail(&mut socket,"PVE_UNSUPPORTED").await;break; }
                     if (command.action == crate::pve_rules::Action::Transfer && maps_version < 1) || (command.action==crate::pve_rules::Action::AiTravel&&maps_version<2) { fail(&mut socket,"MAP_UPDATE_REQUIRED").await; continue; }
@@ -981,6 +1006,10 @@ async fn connection(socket: WebSocket, auth: AuthService, hub: Arc<WorldHub>, an
                 else {match hub.command(&owner,&input) { Ok(())=>{move_accepted+=1;},Err(e)=>{move_rejected+=1;last_move_code=e.1;fail(&mut socket,e.1).await;} }}
             },
             _=pulse.tick()=>{
+                if duel_version==1 {
+                    let packet=hub.data.lock().expect("world state").duels.packet(owner.id,duel_revision,Instant::now());
+                    if let Some((revision,packet))=packet {if send(&mut socket,packet).await.is_err(){break;}duel_revision=Some(revision);}
+                }
                 if shop_version == 1 || shop_version == 2 {
                     let update = {
                         let state = hub.data.lock().expect("world state");

@@ -27,6 +27,8 @@ var chat := OnlinePublicChat.new()
 var announcements := OnlineAnnouncements.new()
 var population := OnlinePopulation.new()
 var pve := OnlinePve.new()
+var duel := OnlineDuel.new()
+var _duel_version := 0
 var _pve_version := 0
 var _maps_version := 0
 var _shop_version := 0
@@ -53,6 +55,10 @@ var _snapshot_bytes := 0
 func _ready() -> void:
 	config_hash = FileAccess.get_sha256(MAP_PATH)
 	OnlineAccount.world_ticket_received.connect(_on_ticket)
+	duel.send_requested.connect(func(packet: Dictionary) -> void:
+		if socket != null and world_ready:
+			if socket.send_text(JSON.stringify(packet)) != OK: _failed("SEND_FAILED", true)
+	)
 	pve.send_requested.connect(func(packet: Dictionary) -> void:
 		if socket != null and world_ready:
 			if socket.send_text(JSON.stringify(packet)) != OK: _failed("SEND_FAILED", true)
@@ -67,6 +73,7 @@ func start(id: String) -> void:
 	server = OnlineAccount.server_address
 	login_session = OnlineAccount.login_session_id
 	pve.bind_character(id, server)
+	duel.bind_character(id)
 	_attempts = 0
 	_state = "request"
 	_retry_at = 0.0
@@ -89,11 +96,13 @@ func leave() -> void:
 	announcements.clear()
 	population.clear()
 	pve.disconnect_channel()
+	duel.clear()
 
 func _exit_tree() -> void:
 	leave()
 
 func _failed(code: String, retry: bool = false) -> void:
+	duel.disconnect_channel()
 	connection_failed.emit()
 	_pending_motion.clear()
 	chat.disconnect_channel()
@@ -116,6 +125,7 @@ func _failed(code: String, retry: bool = false) -> void:
 	else: _state = "failed"
 
 func _reconnect_map() -> void:
+	duel.clear()
 	map_transfer_started.emit()
 	# Keep the account-owned outbox: a lost transfer receipt is replayed on the new map.
 	_pending_motion.clear()
@@ -152,6 +162,9 @@ func _on_ticket(result: Dictionary) -> void:
 	# Servers keep maps_version=1 for older clients and advertise the expansion separately.
 	if _maps_version >= 1 and result.get("ai_world_version") == 1: _maps_version = 2
 	_shop_version = int(result.get("shop_version")) if result.get("shop_version") in [1,2] else 0
+	_duel_version = 1 if result.get("duel_version") == 1 else 0
+	duel.enabled = _duel_version == 1
+	if not duel.enabled: duel.clear()
 	appearances = {}
 	_population_version = 1 if result.get("population_version") == 1 else 0
 	socket = WebSocketPeer.new()
@@ -236,6 +249,7 @@ func _process(_delta: float) -> void:
 	if socket != null and now - _last_received > 12.0: _failed("HEARTBEAT_TIMEOUT", true)
 	chat.enabled = world_ready
 	chat.tick()
+	duel.tick()
 	if pve.ready and pve.pending() and now - pve.sent_at > 8.0: _failed("TIMEOUT", true)
 	_flush_motion()
 
@@ -246,6 +260,7 @@ func _exchange_packet() -> Dictionary:
 	if _pve_version == 1: packet.pve_version = 1
 	if _maps_version in [1, 2]: packet.maps_version = _maps_version
 	if _shop_version in [1,2]: packet.shop_version = _shop_version
+	if _duel_version == 1: packet.duel_version = 1
 	return packet
 
 static func _decimal(value: Variant) -> bool:
@@ -276,6 +291,9 @@ func _entity(value: Variant) -> bool:
 
 func _receive(data: Dictionary, raw: PackedByteArray) -> void:
 	var kind: Variant = data.get("type")
+	if kind in ["duel.state", "duel.result"]:
+		if not world_ready or _duel_version != 1 or not duel.receive(data): _failed("INVALID_DUEL")
+		return
 	if kind == "error":
 		var code := String(data.get("code", "SERVER_ERROR"))
 		if code in ["INVALID_TARGET", "STALE_INPUT", "RATE_LIMITED", "BATTLE_ACTIVE"]:
@@ -455,11 +473,12 @@ func stop_moving() -> void:
 	_send_motion("world.stop")
 
 func _send_motion(kind: String, target: Array = []) -> void:
-	if not world_ready or pve.active() or pve.pending(): return
+	if not world_ready or pve.active() or pve.pending() or duel.active(): return
 	_pending_motion = {"type": kind, "target": target.duplicate()}
 	_flush_motion()
 
 func _flush_motion() -> void:
+	if duel.active(): _pending_motion.clear(); return
 	var now := Time.get_unix_time_from_system()
 	if not world_ready or socket == null or socket.get_ready_state() != WebSocketPeer.STATE_OPEN or _pending_motion.is_empty() or now - _last_input_at < 0.1: return
 	var intent := _pending_motion

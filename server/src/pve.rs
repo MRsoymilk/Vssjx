@@ -33,6 +33,7 @@ pub struct Context {
     pub moving: bool,
     pub map_id: String,
     pub position_revision: u64,
+    pub duel_active: bool,
 }
 #[derive(Clone)]
 struct Loaded {
@@ -503,7 +504,7 @@ pub async fn execute(
     let previous_quantities=loaded.quantities.clone();
     let original = loaded.clone();
     let before = crate::security::state_summary(&original.state());
-    let applied = loaded.apply(command, context);
+    let applied = if context.duel_active {Err("DUEL_ACTIVE")}else{loaded.apply(command, context)};
     if applied.is_err() {
         loaded = original;
     }

@@ -21,9 +21,22 @@ fn offline_ui_vectors_match_the_authoritative_attribute_contract() {
         for key in ["available", "recommended"] {
             assert_eq!(p[key], c[key]);
         }
-        for key in ["physical_attack", "magic_attack"] {
+        for key in ["physical_attack", "magic_attack", "physical_crit", "magic_crit"] {
             assert_eq!(p["combat"][key], c[key]);
         }
+    }
+}
+#[test]
+fn agility_increases_both_critical_ratings_for_every_job() {
+    for job in 0..3 {
+        for agility in [0, 1, 50, 300] {
+            let profile = attributes::profile(job, 60, false, [0, 0, 0, agility, 0]);
+            assert_eq!(profile["combat"]["physical_crit"], agility);
+            assert_eq!(profile["combat"]["magic_crit"], agility);
+        }
+        let other = attributes::profile(job, 60, true, [50, 50, 50, 0, 50]);
+        assert_eq!(other["combat"]["physical_crit"], 0);
+        assert_eq!(other["combat"]["magic_crit"], 0);
     }
 }
 #[test]

@@ -34,6 +34,6 @@ pub fn profile(job: i16, level: i32, equipped: bool, a: [i32; 5]) -> Value {
     let s = stats(job, level, equipped, a);
     json!({"version":VERSION,"allocated":a,"available":available(level,a),"recommended":recommended(job,level,a),
         "combat":{"hp":s.hp,"mp":s.mp,"physical_attack":base.attack+a[2]*2+a[3],"magic_attack":base.attack+a[1]*2+a[3],
-        "physical_defense":s.defense,"magic_defense":s.defense,"physical_crit":0,"magic_crit":0,
+        "physical_defense":s.defense,"magic_defense":s.defense,"physical_crit":a[3],"magic_crit":a[3],
         "physical_hit":100,"magic_hit":100,"physical_evasion":0,"magic_evasion":0,"damage_reduction":0}})
 }

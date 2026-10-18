@@ -4,7 +4,7 @@ func attribute_state(revision: int = 1, allocated: Array = [0,0,0,0,0]) -> Dicti
 	var value := pve_state(revision)
 	var a := allocated
 	value.stats = {"hp":95+int(a[0])*8+int(a[2])*2, "mp":45+int(a[1])*5+int(a[4])*2, "attack":28+int(a[2])*2+int(a[3]), "defense":4+int(a[0])/2+int(a[3])+int(a[4])*2}
-	var combat := {"hp":value.stats.hp,"mp":value.stats.mp,"physical_attack":value.stats.attack,"magic_attack":28+int(a[1])*2+int(a[3]),"physical_defense":value.stats.defense,"magic_defense":value.stats.defense,"physical_crit":0,"magic_crit":0,"physical_hit":100,"magic_hit":100,"physical_evasion":0,"magic_evasion":0,"damage_reduction":0}
+	var combat := {"hp":value.stats.hp,"mp":value.stats.mp,"physical_attack":value.stats.attack,"magic_attack":28+int(a[1])*2+int(a[3]),"physical_defense":value.stats.defense,"magic_defense":value.stats.defense,"physical_crit":int(a[3]),"magic_crit":int(a[3]),"physical_hit":100,"magic_hit":100,"physical_evasion":0,"magic_evasion":0,"damage_reduction":0}
 	value.attributes = {"version":"attributes-v1","allocated":a.duplicate(),"available":5-int(a.reduce(func(total: int, n: Variant) -> int: return total+int(n),0)),"recommended":[1,0,3,1,0] if a == [0,0,0,0,0] else a.duplicate(),"combat":combat}
 	return value
 
@@ -68,6 +68,7 @@ func _run() -> void:
 	check(model.receive({"type":"pve.result","operation_id":command.operation_id,"ok":true,"replayed":true,"lines":["属性已保存"],"state":saved}), "Allocation receipt clears retry outbox")
 	view._update_allocation_controls()
 	check(not model.pending() and page.content.get_node("Remaining").text == "0" and page.content.get_node("Minus2").disabled and page.content.get_node("Value_physical_attack").value == "35", "Authoritative saved totals and actual combat stats refresh")
+	check(page.content.get_node("Value_physical_crit").value == "1" and page.content.get_node("Value_magic_crit").value == "1", "Server agility refreshes both critical ratings after allocation replay")
 	check(not model.submit("allocate","",[0,0,3,1,0]) and not model.submit("allocate","",[2,0,3,1,0]), "Model rejects respec and budget overflow")
 	for key in ["version","allocated","available","recommended","combat"]:
 		var invalid := saved.duplicate(true)

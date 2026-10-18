@@ -12,6 +12,12 @@
 
 `POST /api/v1/teams` 使用现有 Bearer 会话，角色归属和世界会话须匹配。闭集动作：snapshot/create/invite/accept/reject/cancel/ready/leave/kick/transfer/disband/challenge/attack/skill/guard/potion/flee。写入须带 UUIDv4 operation_id；回合指令还需 battle_id、expected_revision。请求不能携带生命、伤害、奖励或成员权限。
 
+客户端入口为玩家资料“邀请组队”、左侧邀请确认、菜单“队伍”。多角色按左右双方错列排布，显示各自姓名、等级、血条及队员灵力条；原包选中标记定位当前敌人。战斗指令直接复用 `battle_hud.tscn` 的六项菜单，技能列表、查看面板、死亡墓碑与胜负字样复用已有原版表现；群攻只播放一次施法并在各目标上挂载对应技能特效。
+
+`skills-v1.json` 中旧的 group_target_basis 说明仍对应单人兼容协议；组队按每项技能的 `target` 字段处理 enemy/all_enemies/self/all_allies，不更改单人技能及原目录哈希。
+
 持久化为迁移 `0019_teams.sql`。客户端通过短轮询获取队伍状态，战斗 1 秒、平时 5 秒；世界 WebSocket 推送变化后的个人 PvE 快照。不是千人组队混合负载的容量验收。
 
 验证：`cargo test --test team_rules`、`python -X utf8 tests/run_teams.py` 使用独立测试数据库，覆盖双方确认、角色/队长权限、准备限制、多人共享战场、强化怪物、多目标、逐人回合、群攻消耗、禁止单人旁路、审计失败回滚、重复胜利回执及队伍重启恢复。
+
+额外覆盖活跃战场重启恢复、超时防御审计、提交阶段失败回滚及后续快照解除保守移动锁。设置 `GODOT_BIN` 后使用真实 Godot 登录、接受邀请、准备、与独立网络队友轮流战斗并播放胜利返回地图。`res://tests/team_test.tscn` 覆盖多角色布局、原版指令/查看面板、选敌、技能列表、群攻一次施法、请求重试、墓碑和本地角色隔离；`SSJX_TEAM_CAPTURE` 可保存渲染截图。

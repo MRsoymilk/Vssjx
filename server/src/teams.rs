@@ -184,6 +184,7 @@ pub(crate) async fn command(
     } else {
         vec![]
     };
+    let mut affected=ids.clone();affected.push(c.character_id);
     ids.push(c.character_id);
     if matches!(c.action.as_str(), "invite" | "kick" | "transfer") {
         ids.push(target(&c)?);
@@ -201,6 +202,7 @@ pub(crate) async fn command(
         .as_mut()
         .filter(|b| b.active() && b.deadline_ms <= now)
     {
+        let actor = b.fighters[b.turn].id;
         if now - b.last_action_ms >= 120_000 {
             b.finish("fled");
             b.revision += 1;
@@ -216,6 +218,7 @@ pub(crate) async fn command(
             .map_err(err)?;
         }
         save_battle(&mut tx, team.unwrap(), b, !b.active()).await?;
+        crate::security::append(&mut *tx,crate::security::Event{account:None,character:Some(actor),session:None,operation:None,action:"team.timeout",outcome:"accepted",code:if b.active(){"AUTO_GUARD"}else{"BATTLE_ENDED"},details:json!({"battle_id":b.id,"revision":b.revision,"requested_by":c.character_id})}).await.map_err(db)?;
         dirty = true;
     }
     let mut reservation = None;
@@ -287,13 +290,15 @@ pub(crate) async fn command(
         None
     };
     if let Some(t) = final_team {
-        ids.extend(members(&mut tx, t).await?);
+        affected.extend(members(&mut tx, t).await?);
     }
-    tx.commit().await.map_err(db)?;
-    hub.team_sync(&ids, final_battle.as_ref(), dirty);
     if let Some(r) = reservation {
+        // A lost commit acknowledgement is ambiguous: keep the movement fence
+        // until a later snapshot/retry resolves the durable battle state.
         r.commit();
     }
+    tx.commit().await.map_err(db)?;
+    hub.team_sync(&affected, final_battle.as_ref(), dirty);
     Ok(Json(
         json!({"version":"team-v1","character_id":c.character_id,"operation_id":c.operation_id,"ok":code=="OK","code":code,"replayed":replayed,"server_time_ms":now,"state":response}),
     ))
@@ -477,6 +482,8 @@ async fn apply(
             if count >= 10 {
                 return Err(err("TEAM_INVITE_LIMIT"));
             }
+            let received:i64=sqlx::query_scalar("SELECT count(*) FROM team_invites WHERE target=$1 AND status='pending'").bind(other).fetch_one(&mut **tx).await.map_err(db)?;
+            if received>=10{return Err(err("TEAM_INVITE_LIMIT"));}
             sqlx::query("INSERT INTO team_invites(id,team_id,target) VALUES($1,$2,$3)")
                 .bind(Uuid::new_v4())
                 .bind(team)
@@ -571,7 +578,7 @@ async fn apply(
             let pool: Vec<_> = crate::population::definitions_for(&context.map_id)
                 .into_iter()
                 .filter(|e| {
-                    e.kind == enemy.kind
+                    e.kind == enemy.kind && e.id != enemy.id
                         && e.level <= enemy.level + 3
                         && !unavailable.contains(&e.id)
                 })
@@ -579,7 +586,7 @@ async fn apply(
             let mut sources = vec![enemy.clone()];
             let n = (ids.len() + usize::from(rand::random::<bool>())).min(5);
             for i in 1..n {
-                sources.push(pool.get(i % pool.len().max(1)).unwrap_or(&enemy).clone());
+                sources.push(pool.get((i-1) % pool.len().max(1)).unwrap_or(&enemy).clone());
             }
             let b = Battle::new(context.map_id, fighters, sources, now);
             save_battle(tx, team, &b, false).await?;

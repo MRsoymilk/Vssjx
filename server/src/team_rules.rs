@@ -343,6 +343,7 @@ impl Battle {
                 incoming
             };
             let (incoming, reflected) = a.effects.enemy_hit(incoming, false);
+            let reflected = reflected + if a.job == 0 && a.guarding { 6 } else { 0 };
             a.hp = (a.hp - incoming).max(0);
             e.hp = (e.hp - reflected).max(0);
             self.events.push(Event {
@@ -354,7 +355,9 @@ impl Battle {
                 healed: 0,
             });
         }
-        for ally in &mut self.fighters { ally.effects.end_turn(); }
+        for ally in &mut self.fighters {
+            ally.effects.end_turn();
+        }
         if self.fighters.iter().all(|a| a.hp == 0) {
             self.finish("defeat");
         } else if self.enemies.iter().all(|e| e.hp == 0) {

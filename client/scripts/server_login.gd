@@ -203,7 +203,7 @@ func _show_account() -> void:
 	_update_controls()
 
 func _account_result(action: String, result: Dictionary) -> void:
-	if action=="social":return
+	if action in ["social","teams"]:return
 	if ServerConnectionSettings.is_local(address_input.text): return
 	password_input.clear()
 	_update_controls()

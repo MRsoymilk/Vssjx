@@ -285,7 +285,7 @@ impl AuthService {
         }
     }
     pub(crate) fn admit_team(&self, ip:IpAddr,account:Option<Uuid>)->Result<(),AuthError>{
-        let keys=account.map_or_else(||vec![("team:global".into(),12000),(format!("team:ip:{ip}"),2400)],|id|vec![(format!("team:account:{id}"),240)]);
+        let keys=account.map_or_else(||vec![("team:global".into(),120000),(format!("team:ip:{ip}"),60000)],|id|vec![(format!("team:account:{id}"),240)]);
         if self.limiter.lock().map_err(|_|busy())?.admit_keys(keys){Ok(())}else{Err(AuthError(StatusCode::TOO_MANY_REQUESTS,"RATE_LIMITED"))}
     }
 

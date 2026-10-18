@@ -2,6 +2,7 @@ extends Control
 ## Paper and native gold corner ornaments; one scrolling page at phone size.
 signal dismissed
 signal duel_requested(id: String)
+signal team_requested(id:String)
 var model: RefCounted
 var section := "friends"
 var guild_section := "members"
@@ -183,6 +184,7 @@ func _profile() -> void:
 		if friend:_label("已是好友")
 		else:_actions([["加为好友",func()->void:_send("friend_request",p.id)]])
 		_actions([["邀请决斗",func()->void:duel_requested.emit(p.id);dismiss()]])
+		_actions([["邀请组队",func()->void:team_requested.emit(p.id);dismiss()]])
 	var c: Dictionary=p.combat
 	_label("气血 %d　灵力 %d\n物攻 %d　法攻 %d\n物防 %d　法防 %d\n物暴 %d　法暴 %d\n物命 %d　法命 %d\n物闪 %d　法闪 %d\n减伤 %d"%[c.hp,c.mp,c.physical_attack,c.magic_attack,c.physical_defense,c.magic_defense,c.physical_crit,c.magic_crit,c.physical_hit,c.magic_hit,c.physical_evasion,c.magic_evasion,c.damage_reduction],126)
 	_label("已装备物品")

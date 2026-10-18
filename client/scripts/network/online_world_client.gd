@@ -10,6 +10,7 @@ signal movement_cancelled
 const MAP_PATH := SharedWorldMap.MAP_PATH
 var map_id := "qingyun_trail"
 var world_ready := false
+var team_active := false
 var character_id := ""
 var entities: Dictionary = {}
 var server := ""
@@ -296,8 +297,9 @@ func _receive(data: Dictionary, raw: PackedByteArray) -> void:
 		return
 	if kind == "error":
 		var code := String(data.get("code", "SERVER_ERROR"))
-		if code in ["INVALID_TARGET", "STALE_INPUT", "RATE_LIMITED", "BATTLE_ACTIVE"]:
-			status_changed.emit("战斗中暂不能移动。" if code == "BATTLE_ACTIVE" else "目标不可达或操作过快，请重试。")
+		if code in ["INVALID_TARGET", "STALE_INPUT", "RATE_LIMITED", "BATTLE_ACTIVE","TEAM_BATTLE_ACTIVE"]:
+			if code=="TEAM_BATTLE_ACTIVE":_pending_motion.clear()
+			status_changed.emit("战斗中暂不能移动。" if code in ["BATTLE_ACTIVE","TEAM_BATTLE_ACTIVE"] else "目标不可达或操作过快，请重试。")
 		else: _failed(code, code in ["DATABASE_UNAVAILABLE", "SERVER_BUSY", "WORLD_STREAM_LAGGED"])
 		return
 	if kind == "pong": return
@@ -473,12 +475,12 @@ func stop_moving() -> void:
 	_send_motion("world.stop")
 
 func _send_motion(kind: String, target: Array = []) -> void:
-	if not world_ready or pve.active() or pve.pending() or duel.active(): return
+	if not world_ready or pve.active() or pve.pending() or duel.active() or team_active: return
 	_pending_motion = {"type": kind, "target": target.duplicate()}
 	_flush_motion()
 
 func _flush_motion() -> void:
-	if duel.active(): _pending_motion.clear(); return
+	if duel.active() or team_active: _pending_motion.clear(); return
 	var now := Time.get_unix_time_from_system()
 	if not world_ready or socket == null or socket.get_ready_state() != WebSocketPeer.STATE_OPEN or _pending_motion.is_empty() or now - _last_input_at < 0.1: return
 	var intent := _pending_motion

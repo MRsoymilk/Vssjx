@@ -1,0 +1,11 @@
+[gd_scene format=3]
+[ext_resource type="Script" path="res://scripts/team_battle_view.gd" id="Script"]
+[ext_resource type="Theme" path="res://scenes/ui/online_pve_theme.tres" id="Theme"]
+[node name="TeamBattle" type="Control"]
+visible = false
+offset_top = 28.0
+offset_right = 320.0
+offset_bottom = 424.0
+clip_contents = true
+theme = ExtResource("Theme")
+script = ExtResource("Script")

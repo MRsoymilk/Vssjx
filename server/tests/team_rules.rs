@@ -111,3 +111,51 @@ fn killed_monsters_never_take_a_turn() {
     assert_eq!(b.outcome, "victory");
     assert!(b.events.is_empty());
 }
+#[test]
+fn group_support_buffs_living_allies_and_charges_only_caster() {
+    let mut b = encounter();
+    b.fighters = vec![fighter(2, 35), fighter(1, 35)];
+    for f in &mut b.fighters {
+        f.hp -= 100;
+    }
+    let before = b.fighters.iter().map(|f| f.mp).collect::<Vec<_>>();
+    b.act(b.fighters[0].id, "skill", None, Some("sheet_041"), 2000, 99)
+        .unwrap();
+    assert!(b.fighters.iter().all(|f| f.effects.regen > 0));
+    assert_eq!(
+        b.fighters[0].mp,
+        before[0] - skills::item("sheet_041").unwrap().mp_cost
+    );
+    assert_eq!(b.fighters[1].mp, before[1]);
+    assert_eq!(b.events.len(), 2);
+}
+#[test]
+fn enemy_debuffs_remain_on_the_selected_monster() {
+    let s = skills::ITEMS
+        .iter()
+        .find(|s| s.effect == "bleed" && s.active)
+        .unwrap();
+    let mut b = encounter();
+    b.fighters[0] = fighter(s.job, 60);
+    for e in &mut b.enemies {
+        e.hp = 10000;
+        e.definition.hp = 10000;
+    }
+    b.act(b.fighters[0].id, "skill", Some("m1"), Some(&s.id), 2000, 0)
+        .unwrap();
+    assert!(b.enemies[1].effects.enemy_bleed > 0);
+    assert_eq!(b.enemies[0].effects.enemy_bleed, 0);
+    assert_eq!(b.fighters[0].effects.enemy_bleed, 0);
+}
+#[test]
+fn defense_does_not_expire_before_the_enemy_phase() {
+    let mut b = encounter();
+    b.fighters[0].effects.defense = 1;
+    b.fighters[0].effects.defense_percent = 50;
+    b.act(b.fighters[0].id, "guard", None, None, 2000, 99)
+        .unwrap();
+    assert_eq!(b.fighters[0].effects.defense, 1);
+    b.act(b.fighters[1].id, "guard", None, None, 3000, 99)
+        .unwrap();
+    assert_eq!(b.fighters[0].effects.defense, 0);
+}

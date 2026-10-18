@@ -5,6 +5,7 @@ pub mod attributes;
 pub mod announcements;
 pub mod characters;
 pub mod chat;
+mod chat_admin;
 pub mod config;
 pub mod logging;
 mod monitor;

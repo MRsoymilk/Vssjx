@@ -114,7 +114,7 @@ clear_button_enabled = true
 
 [node name="StatusFilter" type="OptionButton" parent="Margin/Layout/Body/Split/Listing/SearchBar"]
 unique_name_in_owner = true
-item_count = 13
+item_count = 14
 selected = 0
 popup/item_0/text = "全部"
 popup/item_0/id = 0
@@ -142,6 +142,8 @@ popup/item_11/text = "未解析"
 popup/item_11/id = 11
 popup/item_12/text = "解析失败"
 popup/item_12/id = 12
+popup/item_13/text = "AI生成"
+popup/item_13/id = 13
 
 [node name="Records" type="Tree" parent="Margin/Layout/Body/Split/Listing"]
 unique_name_in_owner = true

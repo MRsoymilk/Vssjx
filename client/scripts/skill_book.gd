@@ -10,6 +10,9 @@ var selected_index:=0
 func present(player:Dictionary,martial:bool)->void:
 	level=int(player.level)
 	items=SkillRules.list_for(int(player.job),int(player.school),level,true).filter(func(s:Dictionary)->bool:return bool(s.active)==martial)
+	var unlocked:=items.filter(func(skill:Dictionary)->bool:return level>=int(skill.unlock_level)).size()
+	$Provenance.text="%d级 · 已解锁%d项 · 门派不限"%[level,unlocked]
+	$Coverage.hide()
 	for child in rows.get_children():rows.remove_child(child);child.queue_free()
 	for index in items.size():
 		var skill:Dictionary=items[index]
@@ -17,7 +20,7 @@ func present(player:Dictionary,martial:bool)->void:
 		for state in ["normal","hover","pressed","focus"]:row.add_theme_stylebox_override(state,StyleBoxEmpty.new())
 		var name_label:=Label.new();name_label.name="Name";name_label.text=skill.name;name_label.position=Vector2(6,3);name_label.size=Vector2(190,22);name_label.add_theme_font_size_override("font_size",14);name_label.mouse_filter=Control.MOUSE_FILTER_IGNORE;row.add_child(name_label)
 		var rank:=Label.new();rank.name="Rank";rank.text="—/—";rank.position=Vector2(211,3);rank.size=Vector2(61,22);rank.horizontal_alignment=HORIZONTAL_ALIGNMENT_RIGHT;rank.add_theme_font_size_override("font_size",13);rank.mouse_filter=Control.MOUSE_FILTER_IGNORE;row.add_child(rank)
-		row.tooltip_text="技能阶数尚未恢复";rows.add_child(row);row.pressed.connect(select_skill.bind(index))
+		rows.add_child(row);row.pressed.connect(select_skill.bind(index))
 	$Label0.visible=items.is_empty()
 	if not items.is_empty():
 		var first_unlocked:=items.find_custom(func(s:Dictionary)->bool:return level>=int(s.unlock_level))
@@ -31,14 +34,26 @@ func select_skill(index:int)->void:
 	$SkillName.text=skill.name
 	detail.text=String(skill.description)
 	if int(skill.mp_cost)>0:detail.text+="\n（消耗灵力%d）"%int(skill.mp_cost)
-	detail.text+="\n%d级解锁"%int(skill.unlock_level) if level<int(skill.unlock_level) else ("\n已生效" if not skill.active else "")
+	detail.text+="\n%d级解锁"%int(skill.unlock_level) if level<int(skill.unlock_level) else ("\n已生效" if not skill.active else "\n已解锁 · %d级可用"%int(skill.unlock_level))
 	for i in rows.get_child_count():
 		var row:Button=rows.get_child(i)
 		var selected:=i==selected_index
-		var bg:=StyleBoxFlat.new();bg.bg_color=Color("bc791d") if selected else Color.TRANSPARENT
-		row.add_theme_stylebox_override("normal",bg)
-		for child in row.get_children():child.add_theme_color_override("font_color",Color("fff10d") if selected else Color("402718"))
-	$Provenance.text="阶数 —/— · 按角色等级解锁"
+		var bg:=StyleBoxFlat.new();bg.bg_color=Color("a33d2f") if selected else Color.TRANSPARENT
+		for state in ["normal","hover","pressed","focus","disabled"]:row.add_theme_stylebox_override(state,bg)
+		var locked:bool=level<int(items[i].unlock_level)
+		var color:Color=(Color("e5c59d") if selected else Color("79674b")) if locked else (Color("fff10d") if selected else Color("402718"))
+		for child in row.get_children():child.add_theme_color_override("font_color",color)
+	_reveal_selected.call_deferred()
+
+func _reveal_selected()->void:
+	# Newly populated rows need container layout before their final positions exist.
+	if not is_inside_tree():return
+	var scene_tree:=get_tree()
+	await scene_tree.process_frame
+	if not is_inside_tree():return
+	await scene_tree.process_frame
+	if not is_inside_tree() or rows.get_child_count()==0:return
+	$SkillCatalog.ensure_control_visible(rows.get_child(selected_index))
 
 func _unhandled_key_input(event:InputEvent)->void:
 	if not is_visible_in_tree() or not event is InputEventKey or not event.pressed:return

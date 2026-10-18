@@ -5,10 +5,17 @@ import unittest
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'tools'))
-from build_skill_catalog import build
+from build_skill_catalog import build, build_coverage
 
 
 class SkillCatalogTests(unittest.TestCase):
+    def test_reference_gaps_are_ui_metadata_not_playable_definitions(self):
+        coverage=build_coverage()
+        self.assertEqual(coverage,json.loads((ROOT/'client/assets/data/skill-reference-coverage.json').read_text('utf8')))
+        self.assertEqual(coverage['roles']['1/0']['named_count'],0)
+        self.assertEqual(coverage['roles']['1/0']['missing_levels'],[15,25,35,45,55])
+        self.assertEqual(sum(len(role['missing_levels']) for role in coverage['roles'].values()),18)
+
     def test_generation_is_reproducible(self):
         self.assertEqual(build(),json.loads((ROOT/'client/assets/data/skills-v1.json').read_text('utf8')))
 

@@ -5,6 +5,19 @@ from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 
 
+def build_coverage():
+    """UI-only gaps in the supplied sheet; never create playable unknown skills."""
+    rows=json.loads((ROOT/'analysis/references/player-sheet/skills.json').read_text('utf8'))
+    roles={}
+    for row in rows:
+        job=next(i for i,name in enumerate(['力士','侠客','隐者']) if row['role_raw'].endswith(name))
+        school=next((i for i,name in enumerate(['峨眉','花间','昆仑']) if row['role_raw'].startswith(name)),-1)
+        entry=roles.setdefault(f'{job}/{school}',{'source_role':row['role_raw'],'named_count':0,'missing_levels':[]})
+        if row['name']: entry['named_count']+=1
+        else: entry['missing_levels'].append(int(row['level_column_raw']))
+    return {'source':'analysis/references/player-sheet/skills.json','roles':roles}
+
+
 def build():
     source=json.loads((ROOT/'analysis/references/player-sheet/skills.json').read_text('utf8'))
     items=[]
@@ -51,4 +64,5 @@ def build():
 if __name__=='__main__':
     path=ROOT/'client/assets/data/skills-v1.json'
     path.write_text(json.dumps(build(),ensure_ascii=False,indent=2)+'\n','utf8')
+    (path.parent/'skill-reference-coverage.json').write_text(json.dumps(build_coverage(),ensure_ascii=False,indent=2)+'\n','utf8')
     print('Published 30 named skills and 3 legacy skills; 18 unnamed rows remain analysis-only.')

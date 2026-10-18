@@ -110,6 +110,12 @@ struct StateData {
     appearance_revision: u64,
     population: crate::population::Population,
     ruins_population: crate::population::Population,
+    ai_populations: HashMap<String,crate::population::Population>,
+}
+impl StateData {
+    fn population_for(&self,id:&str)->&crate::population::Population {
+        if id=="ancient_ruins"{&self.ruins_population}else{self.ai_populations.get(id).unwrap_or(&self.population)}
+    }
 }
 pub struct WorldHub {
     pub(crate) moderation: AsyncMutex<()>,
@@ -118,6 +124,8 @@ pub struct WorldHub {
     admissions: AsyncMutex<()>,
     map: WorldMap,
     ruins: WorldMap,
+    ai_maps: HashMap<String,WorldMap>,
+    ai_publications: HashMap<String,Publisher>,
     config: WorldConfig,
     pub sockets: Arc<Semaphore>,
     publications: Publisher,
@@ -161,6 +169,12 @@ impl WorldHub {
         Self::with_metrics(config, Arc::new(Observability::default()))
     }
     pub fn with_metrics(config: WorldConfig, metrics: Arc<Observability>) -> Arc<Self> {
+        let ai_maps:HashMap<String,WorldMap>=crate::ai_world::maps().iter().map(|m| {
+            let id=m["map_id"].as_str().unwrap().to_owned();
+            let map=WorldMap::load(&id).expect("AI map");(id,map)
+        }).collect();
+        let ai_populations=ai_maps.iter().map(|(id,map)|(id.clone(),crate::population::Population::new(map))).collect();
+        let ai_publications=ai_maps.keys().map(|id|(id.clone(),Publisher::default())).collect();
         let hub = Arc::new(Self {
             moderation: AsyncMutex::new(()),
             metrics,
@@ -172,10 +186,12 @@ impl WorldHub {
                 appearance_revision: 1,
                 population: crate::population::Population::new(&WorldMap::default()),
                 ruins_population: crate::population::Population::new(&WorldMap::load("ancient_ruins").expect("ruins")),
+                ai_populations,
             }),
             admissions: AsyncMutex::new(()),
             map: WorldMap::default(),
             ruins: WorldMap::load("ancient_ruins").expect("ruins"),
+            ai_maps,ai_publications,
             config,
             sockets: Arc::new(Semaphore::new(config.max_players + 64)),
             publications: Publisher::default(),
@@ -192,7 +208,7 @@ impl WorldHub {
                 let now = Instant::now();
                 let dt = now.duration_since(last).as_secs_f64();
                 last = now;
-                let (revision, mut entities, mut ruins_entities) = {
+                let (revision, mut entities, mut ruins_entities, ai_entities) = {
                     let mut state = hub.data.lock().expect("world state");
                     let mut changed = false;
                     for actor in state.actors.values_mut() {
@@ -206,6 +222,11 @@ impl WorldHub {
                     state.chat.drain(now);
                     state.population.advance(&hub.map, dt);
                     state.ruins_population.advance(&hub.ruins, dt);
+                    let mut ai_entities:HashMap<String,Vec<Entity>>=HashMap::new();
+                    for a in state.actors.values().filter(|a|a.connected&&hub.ai_maps.contains_key(&a.map_id)) {
+                        ai_entities.entry(a.map_id.clone()).or_default().push(a.public());
+                    }
+                    for id in ai_entities.keys(){state.ai_populations.get_mut(id).unwrap().advance(&hub.ai_maps[id],dt);}
                     let entities: Vec<_> = state
                         .actors
                         .values()
@@ -213,12 +234,18 @@ impl WorldHub {
                         .map(CharacterActor::public)
                         .collect();
                     let ruins_entities = state.actors.values().filter(|a| a.connected && a.map_id == "ancient_ruins").map(CharacterActor::public).collect::<Vec<_>>();
-                    (state.revision, entities, ruins_entities)
+                    (state.revision, entities, ruins_entities, ai_entities)
                 };
                 // No world-state lock is held while sorting/encoding for network IO.
                 entities.sort_unstable_by_key(|e| e.net_id);
                 ruins_entities.sort_unstable_by_key(|e| e.net_id);
-                let bytes = hub.publications.publish(revision, entities) + hub.ruins_publications.publish(revision, ruins_entities);
+                let mut bytes = hub.publications.publish(revision, entities) + hub.ruins_publications.publish(revision, ruins_entities);
+                for (id,publisher) in &hub.ai_publications {
+                    if ai_entities.contains_key(id)||publisher.sequence()>0 {
+                        let mut records=ai_entities.get(id).cloned().unwrap_or_default();
+                        records.sort_unstable_by_key(|e|e.net_id);bytes+=publisher.publish(revision,records);
+                    }
+                }
                 hub.metrics.record_tick(
                     (dt * 1_000_000.0) as u64,
                     now.elapsed().as_micros() as u64,
@@ -229,10 +256,10 @@ impl WorldHub {
         hub
     }
     fn map_for(&self, id: &str) -> &WorldMap {
-        if id == "ancient_ruins" { &self.ruins } else { &self.map }
+        if id == "ancient_ruins" { &self.ruins } else { self.ai_maps.get(id).unwrap_or(&self.map) }
     }
     fn publisher_for(&self, id: &str) -> &Publisher {
-        if id == "ancient_ruins" { &self.ruins_publications } else { &self.publications }
+        if id == "ancient_ruins" { &self.ruins_publications } else { self.ai_publications.get(id).unwrap_or(&self.publications) }
     }
     pub(crate) fn monitor_snapshot(&self) -> Value {
         let (connected, retained, moving, chat) = {
@@ -321,7 +348,7 @@ impl WorldHub {
                 if actor.session != session {
                     return Err(error(409, "CHARACTER_BUSY"));
                 }
-                if actor.map_id != "qingyun_trail" && maps_version != 1 { return Err(error(409,"MAP_UPDATE_REQUIRED")); }
+                if (actor.map_id != "qingyun_trail" && maps_version < 1) || (self.ai_maps.contains_key(&actor.map_id)&&maps_version<2) { return Err(error(409,"MAP_UPDATE_REQUIRED")); }
                 actor.epoch += 1;
                 actor.connected = true;
                 actor.disconnected_at = None;
@@ -346,8 +373,8 @@ impl WorldHub {
                 return Err(error(503, "WORLD_FULL"));
             }
         }
-        let row=sqlx::query("UPDATE characters c SET owner_epoch=owner_epoch+1,position_revision=0 WHERE c.id=$1 AND map_id IN ('qingyun_trail','ancient_ruins') AND ($3 OR map_id='qingyun_trail') AND owner_epoch<9223372036854775807 AND EXISTS(SELECT 1 FROM sessions s JOIN accounts a ON a.id=s.account_id WHERE s.id=$2 AND s.account_id=c.account_id AND NOT a.disabled AND s.revoked_at IS NULL AND s.access_expires_at>clock_timestamp() AND s.refresh_expires_at>clock_timestamp()) RETURNING display_name,job,gender,cell_x,cell_y,owner_epoch,active_battle_id,map_id")
-            .bind(id).bind(session).bind(maps_version == 1).fetch_optional(auth.pool()).await.map_err(db_error)?.ok_or(error(403,"WORLD_UNAVAILABLE"))?;
+        let row=sqlx::query("UPDATE characters c SET owner_epoch=owner_epoch+1,position_revision=0 WHERE c.id=$1 AND (map_id='qingyun_trail' OR ($3>=1 AND map_id='ancient_ruins') OR ($3>=2 AND map_id LIKE 'ai_%')) AND owner_epoch<9223372036854775807 AND EXISTS(SELECT 1 FROM sessions s JOIN accounts a ON a.id=s.account_id WHERE s.id=$2 AND s.account_id=c.account_id AND NOT a.disabled AND s.revoked_at IS NULL AND s.access_expires_at>clock_timestamp() AND s.refresh_expires_at>clock_timestamp()) RETURNING display_name,job,gender,cell_x,cell_y,owner_epoch,active_battle_id,map_id")
+            .bind(id).bind(session).bind(maps_version as i32).fetch_optional(auth.pool()).await.map_err(db_error)?.ok_or(error(403,"WORLD_UNAVAILABLE"))?;
         let cell = [row.get("cell_x"), row.get("cell_y")];
         let map_id: String = row.get("map_id");
         if !self.map_for(&map_id).walkable(cell) {
@@ -455,6 +482,14 @@ impl WorldHub {
             if !actor.motion.move_to(self.map_for(&actor.map_id), goal) {
                 return Err(error(422, "INVALID_TARGET"));
             }
+            // Stop on a transfer cell even when a longer click route crosses it.
+            // The client then submits the normal authenticated, durable travel
+            // operation instead of walking past the trigger during a tick.
+            if actor.motion.next.is_some_and(|point|crate::ai_world::exit_target(&actor.map_id,point).is_some()){
+                actor.motion.route.clear();
+            }else if let Some(index)=actor.motion.route.iter().position(|point|crate::ai_world::exit_target(&actor.map_id,*point).is_some()){
+                actor.motion.route.truncate(index+1);
+            }
         } else {
             actor.motion.stop();
         }
@@ -485,7 +520,7 @@ impl WorldHub {
         let actor = state.actors.get(&owner.id).filter(|a|Self::owned(a,owner)).ok_or(error(401,"SESSION_REPLACED"))?;
         Ok(crate::pve::Context { character: owner.id,session:owner.session,owner:owner.owner,cell:actor.motion.cell,
             moving: actor.motion.next.is_some() || !actor.motion.route.is_empty(),
-            target_cell:target.and_then(|id| if actor.map_id == "ancient_ruins" { state.ruins_population.get(id) } else { state.population.get(id) }).map(|r|r.motion.cell),
+            target_cell:target.and_then(|id|state.population_for(&actor.map_id).get(id).map(|r|r.motion.cell).or_else(||crate::ai_world::target_cell(&actor.map_id,id))),
             map_id: actor.map_id.clone(), position_revision: actor.motion.revision })
     }
     fn pve_applied(&self, owner: &Ownership, result: &Value) {
@@ -610,7 +645,7 @@ pub(crate) async fn ticket(
         .bind(auth::token_digest(&raw)?).bind(session).bind(request.character_id).execute(&mut *tx).await.map_err(db_error)?;
     tx.commit().await.map_err(db_error)?;
     Ok(Json(
-        json!({"ticket":raw,"expires_in":20,"character_id":request.character_id,"config_hash":config_hash(),"announcement_version":1,"population_version":1,"pve_version":1,"maps_version":1,"shop_version":2}),
+        json!({"ticket":raw,"expires_in":20,"character_id":request.character_id,"config_hash":config_hash(),"announcement_version":1,"population_version":1,"pve_version":1,"maps_version":1,"ai_world_version":1,"shop_version":2}),
     ))
 }
 #[derive(Deserialize)]
@@ -911,10 +946,10 @@ async fn connection(socket: WebSocket, auth: AuthService, hub: Arc<WorldHub>, an
                 if matches!(input,ClientMessage::Ping {}){if send(&mut socket,json!({"type":"pong"})).await.is_err(){break;}}
                 else if let ClientMessage::Pve{command}=&input {
                     if pve_version != 1 { fail(&mut socket,"PVE_UNSUPPORTED").await;break; }
-                    if command.action == crate::pve_rules::Action::Transfer && maps_version != 1 { fail(&mut socket,"MAP_UPDATE_REQUIRED").await; continue; }
+                    if (command.action == crate::pve_rules::Action::Transfer && maps_version < 1) || (command.action==crate::pve_rules::Action::AiTravel&&maps_version<2) { fail(&mut socket,"MAP_UPDATE_REQUIRED").await; continue; }
                     let result = {
                         let _business = owner.business.lock().await;
-                        match hub.pve_context(&owner,command.target.as_deref()) {
+                        match hub.pve_context(&owner,if command.action==crate::pve_rules::Action::SchoolJoin {Some("qingwei")}else{command.target.as_deref()}) {
                             Ok(context) => match crate::pve::execute(&auth,&context,command).await {
                                 Ok(value) => match crate::pve::snapshot(&auth,&context).await {
                                     Ok(current) => {hub.pve_applied(&owner,&current);Ok(value)},
@@ -965,7 +1000,7 @@ async fn connection(socket: WebSocket, auth: AuthService, hub: Arc<WorldHub>, an
                 if !hub.current(&owner){fail(&mut socket,"SESSION_REPLACED").await;break;}
                 if population_version == 1 {
                     let packet = { let state = hub.data.lock().expect("world state");
-                        if owner.map_id == "ancient_ruins" { state.ruins_population.packet_since(population_revision) } else { state.population.packet_since(population_revision) } };
+                        state.population_for(&owner.map_id).packet_since(population_revision) };
                     if let Some((revision, packet)) = packet {
                         if send_raw(&mut socket, packet.to_string()).await.is_err(){break;}
                         population_revision=Some(revision);

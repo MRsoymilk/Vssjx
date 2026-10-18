@@ -4,6 +4,7 @@ extends Control
 signal action_requested(action: String)
 signal movement_pause_requested
 signal chat_expand_requested
+signal local_control_completed
 @export var online_mode := false
 @onready var chrome: OriginalSceneChrome = $Chrome
 @onready var hud: Control = $Hud
@@ -25,8 +26,8 @@ func _ready() -> void:
 			if local_chat != null: local_chat.close()
 			action_requested.emit(action)
 	)
-	chat.visible = online_mode
-	chrome.log_label.visible = not online_mode
+	chat.show()
+	chrome.log_label.hide()
 	$CountLabel.visible = online_mode
 	$GameMode.text = "联机模式" if online_mode else "本地模式"
 	$ExpandedChat.visibility_changed.connect(_update_chat_arrow)

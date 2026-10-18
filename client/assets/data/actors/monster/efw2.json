@@ -1,0 +1,103 @@
+{
+  "texture": "res://assets/actors/monster_efw2.png",
+  "width": 53,
+  "height": 40,
+  "columns": 8,
+  "origin": [-30, -34],
+  "anchor_x": 0,
+  "playback": {
+    "idle": [
+      [19, 8],
+      [18, 8]
+    ],
+    "walk": [
+      [19, 8],
+      [18, 8]
+    ],
+    "attack": [
+      [15, 1],
+      [14, 1],
+      [13, 1],
+      [12, 1],
+      [11, 1],
+      [10, 1],
+      [9, 1],
+      [8, 1]
+    ],
+    "hurt": [
+      [19, 1],
+      [7, 1],
+      [6, 1],
+      [5, 1],
+      [4, 2]
+    ]
+  },
+  "count": 20,
+  "sequences": [
+    [
+      [0, 1],
+      [1, 1],
+      [16, 3],
+      [17, 1],
+      [18, 1],
+      [19, 1]
+    ],
+    [
+      [0, 1],
+      [12, 1],
+      [13, 1],
+      [14, 1],
+      [15, 2]
+    ],
+    [
+      [4, 1],
+      [5, 1],
+      [6, 1],
+      [7, 1],
+      [8, 1],
+      [9, 1],
+      [10, 1],
+      [11, 1]
+    ],
+    [
+      [0, 8],
+      [1, 8]
+    ],
+    [
+      [2, 8],
+      [3, 8]
+    ],
+    [
+      [0, 8],
+      [1, 8]
+    ],
+    [],
+    []
+  ],
+  "native_battle": {
+    "indexing": "reverse_serialized_tables",
+    "source_frame_count": 20,
+    "sequence_ids": {"idle": 4, "walk": 4, "attack": 5, "hurt": 6},
+    "impact_steps": {
+      "idle": [],
+      "walk": [],
+      "attack": [3],
+      "hurt": []
+    },
+    "attack_x": [84, 36, 18, 16, 12, 9, 58, 98],
+    "pose_x": {
+      "idle": [1, 1],
+      "walk": [1, 1],
+      "hurt": [1, 2, 3, 4, 5]
+    },
+    "attack_basis": "target",
+    "cast_mapping": null
+  },
+  "alignment": {
+    "source": "AI接入，原生动作槽4/5/6",
+    "primary_source": "ewf2",
+    "body_frame": null,
+    "combat_extent_frames": [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 18, 19],
+    "source_sha256": "98426869433b76f35d08994ae8d8b496eb519e57a6d4fcc7546c6343ad3b1e60"
+  }
+}

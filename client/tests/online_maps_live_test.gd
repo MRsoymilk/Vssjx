@@ -52,7 +52,7 @@ func _run() -> void:
 	check(view.network.pve.state.battle.enemy.art == "monster/xt1", "Guardian uses its own original animation")
 	check(view.network.pve.submit("flee"), "Ruins encounter accepts authoritative retreat")
 	check(await wait_until(func() -> bool: return not view.network.pve.active() and not view.network.pve.pending() and view.battle_view.animation_time <= 0), "Retreat completes before returning to map")
-	view.battle_view.get_node("Result/Return").pressed.emit()
+	check(await wait_until(func() -> bool: return not view.battle_view.visible), "Retreat returns to the map without a result confirmation")
 	check(not view.battle_view.visible, "Battle returns to the ruins map")
 	# Return using the rendered portal and the same authoritative movement workflow.
 	click_gate()

@@ -1,39 +1,44 @@
-[gd_resource type="Theme" format=3]
+[gd_resource type="Theme" format=3 uid="uid://n17aacqtsovu"]
 
-[ext_resource type="Script" path="res://scripts/interface/adapters/common/cjk_system_font.gd" id="BundledCjk"]
-[sub_resource type="SystemFont" id="Font"]
-script = ExtResource("BundledCjk")
-font_names = PackedStringArray("SimHei", "Microsoft YaHei", "sans-serif")
-antialiasing = 0
-[sub_resource type="StyleBoxFlat" id="Normal"]
-bg_color = Color(0.16, 0.30, 0.45, 1)
-border_color = Color(0.63, 0.77, 0.87, 1)
-border_width_left = 1
-border_width_right = 1
-border_width_top = 1
-border_width_bottom = 1
-[sub_resource type="StyleBoxFlat" id="Hover"]
-bg_color = Color(0.30, 0.50, 0.72, 1)
-border_color = Color(1, 0.91, 0.52, 1)
-border_width_left = 1
-border_width_right = 1
-border_width_top = 1
-border_width_bottom = 1
+[ext_resource type="Script" uid="uid://coxeyvdb08y84" path="res://scripts/interface/adapters/common/cjk_system_font.gd" id="BundledCjk"]
+
 [sub_resource type="StyleBoxFlat" id="Disabled"]
 bg_color = Color(0.19, 0.28, 0.35, 1)
-border_color = Color(0.36, 0.44, 0.50, 1)
 border_width_left = 1
-border_width_right = 1
 border_width_top = 1
+border_width_right = 1
 border_width_bottom = 1
+border_color = Color(0.36, 0.44, 0.5, 1)
+
+[sub_resource type="StyleBoxFlat" id="Hover"]
+bg_color = Color(0.3, 0.5, 0.72, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(1, 0.91, 0.52, 1)
+
+[sub_resource type="StyleBoxFlat" id="Normal"]
+bg_color = Color(0.16, 0.3, 0.45, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.63, 0.77, 0.87, 1)
+
+[sub_resource type="SystemFont" id="Font"]
+font_names = PackedStringArray("SimHei", "Microsoft YaHei", "sans-serif")
+antialiasing = 0
+script = ExtResource("BundledCjk")
+
 [resource]
 default_font = SubResource("Font")
 default_font_size = 12
-Button/styles/normal = SubResource("Normal")
-Button/styles/hover = SubResource("Hover")
-Button/styles/pressed = SubResource("Hover")
-Button/styles/focus = SubResource("Hover")
-Button/styles/disabled = SubResource("Disabled")
 Button/colors/font_color = Color(1, 0.95, 0.72, 1)
-Button/colors/font_disabled_color = Color(0.50, 0.58, 0.62, 1)
-Label/colors/font_color = Color(1, 0.96, 0.80, 1)
+Button/colors/font_disabled_color = Color(0.5, 0.58, 0.62, 1)
+Button/styles/disabled = SubResource("Disabled")
+Button/styles/focus = SubResource("Hover")
+Button/styles/hover = SubResource("Hover")
+Button/styles/normal = SubResource("Normal")
+Button/styles/pressed = SubResource("Hover")
+Label/colors/font_color = Color(1, 0.96, 0.8, 1)

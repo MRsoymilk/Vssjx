@@ -78,7 +78,7 @@ func _run() -> void:
 	await capture("01_name_taken")
 	page.nickname.text = "界面青衫"
 	page.select_variant(5)
-	flow.school.select(1)
+	check(flow.school.disabled and flow.school.get_item_text(0)=="闲云野鹤","Creation starts without a school and directs admission to an NPC")
 	flow._create()
 	await idle_account()
 	check(not OnlineAccount.pending_creation.is_empty() and page.get_node("Create").text == "重试", "Lost committed response preserves operation")
@@ -92,7 +92,7 @@ func _run() -> void:
 	await until(func() -> bool: return app.mode == "online_world", "Explicit Enter starts shared world")
 	check(OnlineAccount.pending_creation.is_empty() and OnlineAccount.characters.size() == 1, "Retry resolves original receipt")
 	var character: Dictionary = OnlineAccount.characters[0]
-	check(character.display_name == "界面青衫" and int(character.job) == 2 and int(character.gender) == 1 and int(character.school) == 1, "Server confirms portrait and school selection")
+	check(character.display_name == "界面青衫" and int(character.job) == 2 and int(character.gender) == 1 and int(character.school) == SchoolRules.UNJOINED, "Server confirms portrait and unjoined identity")
 	for field in ["id", "state_revision"]:
 		var malformed := character.duplicate(true)
 		malformed[field] += "\n"

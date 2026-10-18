@@ -88,7 +88,7 @@ func _render() -> void:
 		$Details/Level.text = str(int(character.get("level", 1)))
 		$Details/Job.text = Game.JOBS[clampi(int(character.get("job", 0)), 0, 2)]
 		$Details/Gender.text = "男" if int(character.get("gender", 0)) == 0 else "女"
-		$Details/School.text = Game.SCHOOLS[clampi(int(character.get("school", 0)), 0, 2)] + "派"
+		$Details/School.text = SchoolRules.label(int(character.get("school",SchoolRules.UNJOINED)))
 		$Details/Scene.text = scene_name(character)
 	set_controls(locked, can_create)
 

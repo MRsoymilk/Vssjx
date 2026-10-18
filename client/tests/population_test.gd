@@ -40,7 +40,22 @@ func _run() -> void:
 	check(view.residents.qingwei.position == Vector2(168,216), "Quest NPC remains at the bridge")
 	output = OS.get_environment("SSJX_POPULATION_CAPTURE_PATH")
 	await capture("online_population")
+	await get_tree().process_frame
+	var names: Control=view.image.get_node("WorldNameplates")
+	names._process(0.0)
+	var source: Label=wolf.get_node("Name")
+	var proxy: Label=names.entries[source.get_instance_id()].proxy
+	check(proxy.get_viewport()!=source.get_viewport() and proxy.text==source.text and source.self_modulate.a==0,"Names render once at UI resolution outside the low-resolution world texture")
+	var name_before:=proxy.position
+	wolf.position+=Vector2(5,3);names._process(0.0)
+	check(proxy.position.is_equal_approx(name_before+Vector2(5,3)),"Readable text continues following the moving monster")
+	source.hide();names._process(0.0)
+	check(not proxy.visible,"Name overlay follows actor-label visibility")
+	source.show()
 	view.network.population.clear()
+	await get_tree().process_frame
+	names._process(0.0)
+	check(not names.entries.has(source.get_instance_id()) if is_instance_valid(source) else not is_instance_valid(proxy) or proxy.is_queued_for_deletion(),"Removed residents leave no floating names")
 	check(view.residents.is_empty(), "Disconnect clears resident nodes")
 	check(Game.player == old, "Shared residents never modify local progress")
 	app.queue_free()

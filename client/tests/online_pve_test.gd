@@ -138,8 +138,8 @@ func _run() -> void:
 	output = OS.get_environment("SSJX_PVE_CAPTURE_PATH")
 	await capture("online_battle")
 	view.battle_view.get_node("Hud/ActionMenu/BattleButtons1").pressed.emit()
-	check(view.battle_view.get_node("Choice").visible, "Reference skill menu opens a skill choice")
-	view.battle_view.get_node("Choice/Use").pressed.emit()
+	check(view.battle_view.skill_picker.visible, "Reference skill list also serves older server capabilities")
+	view.battle_view.skill_picker.activate(view.battle_view.skill_picker.selected_id)
 	check(sent[-1].command.action == "skill" and sent[-1].command.battle_id == PEER and sent[-1].command.expected_revision == "1", "Battle action includes server battle identity and revision")
 	check(view.battle_view.get_node("Result/Return").disabled, "Active encounter cannot be dismissed into movement")
 	output = OS.get_environment("SSJX_PVE_CAPTURE_PATH")
@@ -156,6 +156,7 @@ func _run() -> void:
 	await capture("online_victory")
 	view.battle_view.animation_time = 0
 	view.battle_view.refresh()
+	view.battle_view.get_node("Result").advance(0.4)
 	view.battle_view.get_node("Result/Return").pressed.emit()
 	view.resident_selected.emit("qingwei")
 	view.network._pending_motion = {}

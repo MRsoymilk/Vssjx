@@ -53,6 +53,7 @@ func valid(value: Variant) -> bool:
 		if not integer(value.stats.get(key), 1, 10000): return false
 	if value.character.hp > value.stats.hp or value.character.mp > value.stats.mp: return false
 	if value.has("skills") and not SkillRules.valid_view(value.skills,value.character):return false
+	if value.has("ai_world") and not AIWorld.valid_progress(value.ai_world, true): return false
 	if value.has("attributes") and not valid_attributes(value.attributes, value): return false
 	if value.has("shop"):
 		if not ShopRules.valid_gear(value.shop): return false
@@ -86,9 +87,15 @@ func valid(value: Variant) -> bool:
 	if not battle.get("outcome") in ["active", "victory", "defeat", "fled"] or not integer(battle.get("round"), 0, 30): return false
 	if not battle.get("enemy") is Dictionary: return false
 	var enemy: Dictionary = battle.enemy
-	if not enemy.get("id") in ["wolf_a", "wolf_b", "wolf_c", "spirit", "guardian", "boss"] or not enemy.get("name") is String or enemy.name.length() > 24: return false
-	if not enemy.get("art") in ["monster/langw", "monster/hs1", "monster/xt1", "monster/nt1"]: return false
-	if not integer(enemy.get("hp"), 1, 10000) or not integer(enemy.get("level"), 1, 50): return false
+	if not enemy.get("id") is String: return false
+	if (not enemy.get("id") in ["wolf_a", "wolf_b", "wolf_c", "spirit", "guardian", "boss"] and AIWorld.resident(enemy.get("id", "")).is_empty()) or not enemy.get("name") is String or enemy.name.length() > 24: return false
+	if not AIWorld.resident(enemy.id).is_empty():
+		var definition := AIWorld.resident(enemy.id)
+		for key in ["art", "kind", "hp", "attack", "defense", "level", "gold", "xp"]:
+			if enemy.get(key) != definition[key]: return false
+		if not OriginalArt.has_actor(definition.art): return false
+	elif not enemy.get("art") in ["monster/langw", "monster/hs1", "monster/xt1", "monster/nt1"]: return false
+	if not integer(enemy.get("hp"), 1, 10000) or not integer(enemy.get("level"), 1, 60): return false
 	if not integer(battle.get("hp"), 0, int(value.stats.hp)) or not integer(battle.get("mp"), 0, int(value.stats.mp)) or not integer(battle.get("enemy_hp"), 0, int(enemy.hp)) or not integer(battle.get("potions"), 0, 99): return false
 	return true
 
@@ -106,6 +113,8 @@ func receive(packet: Dictionary) -> bool:
 		var previous_progress: Dictionary = state.get("progress", {})
 		var previous_shop: Dictionary = state.get("shop", {})
 		var previous_skills:Dictionary=state.get("skills",{})
+		var previous_ai: Dictionary = state.get("ai_world", {})
+		var keep_ai: bool = state.has("ai_world") and not packet.state.has("ai_world") and packet.state.character.state_revision==state.character.state_revision
 		var keep_skills:bool=state.has("skills") and not packet.state.has("skills") and packet.state.character.state_revision==state.character.state_revision
 		var keep_shop: bool = state.has("shop") and not packet.state.has("shop") and packet.state.character.state_revision == state.character.state_revision
 		var previous_equipment: Dictionary = state.get("equipment", {})
@@ -113,6 +122,7 @@ func receive(packet: Dictionary) -> bool:
 		var keep_respawns: bool = state.has("server_time_ms") and not packet.state.has("server_time_ms") and packet.state.character.state_revision == state.character.state_revision
 		var previous_time: int = int(state.get("server_time_ms", 0))
 		state = packet.state.duplicate(true)
+		if keep_ai: state.ai_world = previous_ai.duplicate(true)
 		if keep_skills:state.skills=previous_skills.duplicate(true)
 		if keep_shop: state.shop = previous_shop.duplicate(true)
 		if keep_equipment: state.equipment = previous_equipment.duplicate(true)
@@ -156,10 +166,13 @@ func unavailable_monsters() -> Array:
 	var hidden: Array = []
 	for id in progress.respawns:
 		if int(progress.respawns[id]) > server_time_ms(): hidden.append(id)
+	for id in state.get("ai_world", {}).get("respawns", {}):
+		if int(state.ai_world.respawns[id]) > server_time_ms(): hidden.append(id)
 	return hidden
 
 func submit(action: String, target: String = "", points: Array = [], count: int=1) -> bool:
 	if not ready or pending(): return false
+	if action=="school_join" and (active() or int(state.character.school)!=SchoolRules.UNJOINED or SchoolRules.index(target)<0):return false
 	if action=="skill" and not target.is_empty():
 		if not active() or not state.has("skills") or not target in state.skills.available:return false
 		if not SkillRules.check(target,int(state.character.job),int(state.character.school),int(state.character.level)).is_empty():return false
@@ -188,7 +201,7 @@ func submit(action: String, target: String = "", points: Array = [], count: int=
 	if action == "allocate":
 		command.attributes = normalized_points(points)
 		command.expected_revision = state.character.state_revision
-	elif action in ["buy", "equip", "unequip", "use", "discard"]:
+	elif action in ["buy", "equip", "unequip", "use", "discard","school_join"]:
 		command.target = target
 		if count!=1: command.quantity=count
 		command.expected_revision = state.character.state_revision
@@ -212,6 +225,7 @@ func retry() -> void:
 
 func quest_text() -> String:
 	if state.is_empty(): return "正在同步试炼进度……"
+	if state.has("ai_world") and not AIWorld.map_data(state.character.map_id).is_empty(): return AIWorld.quest_hint(state.character.map_id,state.ai_world,int(state.character.level))
 	var stage := int(state.character.quest_stage)
 	if stage == 0: return "山林试炼\n前往桥边拜访清微道人，领受试炼。"
 	if stage == 1: return "山林试炼\n击败山狼 %d / 3\n三只山狼各计一次，请留意小地图红点。" % int(state.progress.kills)
@@ -220,7 +234,11 @@ func quest_text() -> String:
 	return "古剑遗迹 · 已完成\n妖气已散，可返回青云山道恢复元气，或继续探索遗迹。"
 
 static func error_text(code: String) -> String:
-	var skills:={"INVALID_SKILL":"未知技能，请更新客户端。","SKILL_ROLE_MISMATCH":"此技能不属于当前职业或门派。","SKILL_LEVEL_REQUIRED":"角色等级尚未达到技能要求。","PASSIVE_SKILL":"此心法自动生效，无需施展。"}
+	var schools:={"INVALID_SCHOOL":"请选择有效门派。","SCHOOL_ALREADY_JOINED":"已正式入派，不能重复加入其他门派。","STALE_SCHOOL":"角色状态已变化，请重新与清微道人交谈。","INVALID_SCHOOL_NPC":"请在青云山道找清微道人办理入派。"}
+	if schools.has(code):return schools[code]
+	var ai := {"AI_INVALID_TARGET":"AI生成目标不属于当前地图。", "AI_QUEST_LIMIT":"最多同时接取三个AI生成任务。", "AI_LEVEL_REQUIRED":"等级不足，请先完成较低等级区域。", "AI_PREREQUISITE":"请先完成本地图的前章任务。", "AI_NO_OBJECTIVE":"先接取任务，并按目标顺序调查。", "AI_SAME_MAP":"已经在当前地图。"}
+	if ai.has(code): return ai[code]
+	var skills:={"INVALID_SKILL":"未知技能，请更新客户端。","SKILL_ROLE_MISMATCH":"此技能不属于当前职业。","SKILL_LEVEL_REQUIRED":"角色等级尚未达到技能要求。","PASSIVE_SKILL":"此心法自动生效，无需施展。"}
 	if skills.has(code):return skills[code]
 	var equipment := {"WRONG_JOB":"此兵器不适合当前职业。", "INVALID_QUANTITY":"数量无效。", "ITEM_NOT_USABLE":"此物品不能直接使用。","GOLD_INSUFFICIENT":"铜钱不足。", "ITEM_ALREADY_OWNED":"已经拥有这件装备。", "BAG_FULL":"背包或补给已满。","INVALID_EQUIPMENT":"此装备尚未开放。", "STALE_EQUIPMENT":"装备状态已更新，请重新选择。", "WEAPON_NOT_OWNED":"背包中没有这件装备。", "EQUIPMENT_UNCHANGED":"当前已是该装备状态。"}
 	if equipment.has(code): return equipment[code]

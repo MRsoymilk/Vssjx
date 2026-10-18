@@ -19,8 +19,12 @@ func receive(packet: Dictionary) -> bool:
 	if packet.epoch == epoch and int(packet.revision) <= revision: return int(packet.revision) == revision
 	var next := {}
 	for value in values:
-		if not value is Dictionary or not value.get("id") is String or RegEx.create_from_string("^[a-z_]{1,32}$").search(value.id) == null or next.has(value.id): return false
-		if not value.get("kind") in ARTS or value.get("art") != ARTS[value.kind] or not OnlineAccount.valid_nickname(value.get("name", "")): return false
+		if not value is Dictionary or not value.get("id") is String or RegEx.create_from_string("^[a-z0-9_]{1,32}$").search(value.id) == null or next.has(value.id): return false
+		var generated := AIWorld.resident(value.id)
+		if not generated.is_empty():
+			for field in ["name", "kind", "art", "level", "hp", "attack", "defense", "gold", "xp"]:
+				if value.get(field) != generated[field]: return false
+		elif not value.get("kind") in ARTS or value.get("art") != ARTS[value.kind] or not OnlineAccount.valid_nickname(value.get("name", "")): return false
 		if not OnlineWorldClient._cell(value.get("cell")) or (value.get("next_cell") != null and not OnlineWorldClient._cell(value.next_cell)): return false
 		if value.next_cell != null and absi(int(value.cell[0]) - int(value.next_cell[0])) + absi(int(value.cell[1]) - int(value.next_cell[1])) != 1: return false
 		if not OnlineWorldClient._integer(value.get("segment_progress"), 0, 1000) or not OnlineWorldClient._decimal(value.get("world_epoch")) or not OnlineWorldClient._decimal(value.get("entity_revision")): return false

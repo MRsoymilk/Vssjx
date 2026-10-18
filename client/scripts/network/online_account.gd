@@ -83,7 +83,7 @@ func create_character(display_name: String, job: int, gender: int, school: int) 
 		bytes[8] = (bytes[8] & 63) | 128
 		var hex := bytes.hex_encode()
 		var operation_id := "%s-%s-%s-%s-%s" % [hex.substr(0, 8), hex.substr(8, 4), hex.substr(12, 4), hex.substr(16, 4), hex.substr(20, 12)]
-		pending_creation = {"operation_id": operation_id, "display_name": display_name, "job": job, "gender": gender, "school": school, "rules_version": "creation-v1"}
+		pending_creation = {"operation_id": operation_id, "display_name": display_name, "job": job, "gender": gender, "school": SchoolRules.UNJOINED, "rules_version": "creation-v1"}
 	# An unknown result always retries the ORIGINAL payload, not edited fields.
 	_send("character_create", server_address, pending_creation, true)
 
@@ -189,7 +189,7 @@ func _on_response(result: int, code: int, _headers: PackedStringArray, body: Pac
 		if not data.get("ticket") is String or RegEx.create_from_string("^[0-9a-f]{64}\\z").search(data.ticket) == null:
 			_finish({"ok": false, "code": "INVALID_RESPONSE"})
 		else:
-			_finish({"ok": true, "ticket": data.ticket, "announcement_version": 1 if data.get("announcement_version") == 1 else 0, "population_version": 1 if data.get("population_version") == 1 else 0, "pve_version": 1 if data.get("pve_version") == 1 else 0, "maps_version": 1 if data.get("maps_version") == 1 else 0, "shop_version": int(data.shop_version) if data.get("shop_version")==1 or data.get("shop_version")==2 else 0})
+			_finish({"ok": true, "ticket": data.ticket, "announcement_version": 1 if data.get("announcement_version") == 1 else 0, "population_version": 1 if data.get("population_version") == 1 else 0, "pve_version": 1 if data.get("pve_version") == 1 else 0, "maps_version": 2 if data.get("ai_world_version")==1 else (1 if data.get("maps_version")==1 else 0), "shop_version": int(data.shop_version) if data.get("shop_version")==1 or data.get("shop_version")==2 else 0})
 		return
 	if code not in [200, 201]:
 		if _action == "character_create" and code in [409, 422] and data.get("operation_id") == pending_creation.get("operation_id"): pending_creation = {}
@@ -300,7 +300,7 @@ static func _valid_character(value: Variant) -> bool:
 	if value.state_revision.length() == 19 and value.state_revision > "9223372036854775807": return false
 	for key in ["job", "gender", "school", "level", "gold", "hp", "mp", "xp", "quest_stage", "cell_x", "cell_y"]:
 		var number: Variant = value.get(key)
-		var maximum := 1 if key == "gender" else (2 if key in ["job", "school"] else (31 if key in ["cell_x", "cell_y"] else (60 if key == "level" else 2147483647)))
+		var maximum := 1 if key == "gender" else (SchoolRules.UNJOINED if key == "school" else (2 if key == "job" else (31 if key in ["cell_x", "cell_y"] else (60 if key == "level" else 2147483647))))
 		if not (number is int or number is float) or not is_finite(float(number)) or number < 0 or number > maximum or float(number) != floor(float(number)): return false
 	if value.has("appearance_v2"):
 		var look_v2: Variant = value.appearance_v2
@@ -312,7 +312,7 @@ static func _valid_character(value: Variant) -> bool:
 		if not look is Array or look.size() != 2: return false
 		for i in 2:
 			if not (look[i] is int or look[i] is float) or not is_finite(float(look[i])) or float(look[i]) != floor(float(look[i])) or look[i] < 0 or look[i] > (3 if i == 0 else 2): return false
-	if value.level < 1 or value.hp < 1 or not SharedWorldMap.MAPS.has(value.get("map_id")): return false
+	if value.level < 1 or value.hp < 1 or not SharedWorldMap.exists(value.get("map_id")): return false
 	return true
 
 func _process(_delta: float) -> void:

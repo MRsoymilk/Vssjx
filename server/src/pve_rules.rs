@@ -8,6 +8,12 @@ pub const RULES: &str = "qingyun-pve-v1";
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "snake_case")]
 pub enum Action {
+    SchoolJoin,
+    AiAccept,
+    AiClaim,
+    AiInteract,
+    AiTravel,
+    AiRestore,
     Buy,
     Use,
     Discard,
@@ -159,6 +165,11 @@ impl Battle {
         if self.skill_rules_version == 0 {
             self.skills = crate::skills::State::new(job, school, level, self.enemy.level);
             self.skill_rules_version = 1;
+        } else {
+            // Refresh eligibility-derived passives in saved encounters without resetting buffs.
+            let current = crate::skills::State::new(job, school, level, self.enemy.level);
+            self.skills.passive_physical = current.passive_physical;
+            self.skills.passive_magic = current.passive_magic;
         }
         self.skills.reset_turn();
         self.round += 1;

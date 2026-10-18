@@ -1,0 +1,16 @@
+{
+  "texture": "res://assets/actors/main_ltz_win.png",
+  "width": 65,
+  "height": 38,
+  "columns": 2,
+  "origin": [-30, -37],
+  "anchor_x": 0,
+  "playback": {},
+  "count": 2,
+  "sequences": [
+    [
+      [0, 2],
+      [1, 2]
+    ]
+  ]
+}

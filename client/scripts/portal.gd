@@ -1,14 +1,17 @@
 extends Node2D
 
-var elapsed := 0.0
+var ground: Sprite2D
+var gate: Dictionary = {}
+const TILE := preload("res://assets/ui/portal_tile.png")
 
-func _process(delta: float) -> void:
-	elapsed += delta
-	queue_redraw()
-
-func _draw() -> void:
-	var alpha := 0.65 + sin(elapsed * 2.0) * 0.2
-	draw_circle(Vector2(0, -18), 13, Color(0.4, 0.87, 1.0, 0.24))
-	draw_arc(Vector2(0, -18), 18, 0, TAU, 32, Color(0.6, 0.96, 1.0, alpha), 2)
-	draw_arc(Vector2(0, -18), 11, elapsed, elapsed + PI * 1.5, 24, Color("b3f4f1"), 1)
-	draw_line(Vector2(-20, 1), Vector2(20, 1), Color("7cc7bd"), 2)
+func _ready() -> void:
+	# neverpic frame 0 is the original cyan spiral transfer tile. select.ani
+	# belongs to selection/move targets and is not a map portal.
+	for point in gate.get("cells",[gate.get("cell",[0,0])]):
+		var tile := Sprite2D.new()
+		tile.name = "NativeTransferTile"
+		tile.texture = TILE
+		tile.position=Vector2(point[0]-gate.get("cell",[0,0])[0],point[1]-gate.get("cell",[0,0])[1])*16.0
+		tile.z_index = 0
+		add_child(tile,false,Node.INTERNAL_MODE_BACK)
+		if ground==null:ground=tile

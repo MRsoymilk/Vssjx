@@ -16,3 +16,6 @@ __pycache__/
 /deploy/proxy.local.env
 /deploy/docker-proxy.local.txt
 /tools/use-proxy.local.ps1
+
+# Obsolete lobby can be re-saved by an editor tab; active lobby is character_selection.
+/client/scenes/ui/online_characters.tscn

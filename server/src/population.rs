@@ -27,7 +27,7 @@ pub fn definitions_for(map_id: &str) -> Vec<ResidentDefinition> {
     let bytes = match map_id {
         "qingyun_trail" => include_str!("../../shared/data/qingyun-population-v1.json"),
         "ancient_ruins" => include_str!("../../shared/data/ruins-population-v1.json"),
-        _ => return Vec::new(),
+        _ => return crate::ai_world::map(map_id).map(|m|serde_json::from_value(m["residents"].clone()).expect("AI residents")).unwrap_or_default(),
     };
     serde_json::from_str(bytes).expect("resident definitions")
 }

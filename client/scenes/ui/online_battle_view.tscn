@@ -7,6 +7,7 @@
 [ext_resource type="Theme" path="res://scenes/ui/online_pve_theme.tres" id="Theme"]
 [ext_resource type="PackedScene" path="res://scenes/actors/player_ring.tscn" id="Ring"]
 [ext_resource type="Texture2D" path="res://assets/ui/create_cursor.png" id="Cursor"]
+[ext_resource type="PackedScene" path="res://scenes/ui/battle_result.tscn" id="Result"]
 [sub_resource type="StyleBoxFlat" id="Paper"]
 bg_color = Color(1, 0.953, 0.678, 1)
 border_color = Color(0.424, 0.329, 0.165, 1)
@@ -224,38 +225,6 @@ offset_right = 164.0
 offset_bottom = 141.0
 focus_mode = 0
 text = "返回"
-[node name="Result" type="Panel" parent="."]
-visible = false
-offset_left = 66.0
-offset_top = 149.0
-offset_right = 254.0
-offset_bottom = 249.0
-theme_override_styles/panel = SubResource("Paper")
-[node name="Title" type="Label" parent="Result"]
-offset_left = 6.0
-offset_top = 8.0
-offset_right = 182.0
-offset_bottom = 33.0
-horizontal_alignment = 1
-theme_override_font_sizes/font_size = 17
-theme_override_colors/font_color = Color(0.40, 0.32, 0.11, 1)
-[node name="Body" type="Label" parent="Result"]
-offset_left = 6.0
-offset_top = 36.0
-offset_right = 182.0
-offset_bottom = 61.0
-horizontal_alignment = 1
-theme_override_font_sizes/font_size = 11
-theme_override_colors/font_color = Color(0.40, 0.32, 0.11, 1)
-[node name="Return" type="Button" parent="Result"]
-offset_left = 6.0
-offset_top = 66.0
-offset_right = 182.0
-offset_bottom = 94.0
-focus_mode = 0
-theme_override_colors/font_color = Color(0.40, 0.32, 0.11, 1)
-theme_override_styles/normal = SubResource("Empty")
-theme_override_styles/hover = SubResource("Highlight")
-text = "返回山道"
+[node name="Result" parent="." instance=ExtResource("Result")]
 
 [editable path="Hud"]

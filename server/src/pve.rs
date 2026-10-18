@@ -36,6 +36,7 @@ pub struct Context {
 }
 #[derive(Clone)]
 struct Loaded {
+    ai: crate::ai_world::Progress,
     character: Character,
     defeated: i32,
     respawns: BTreeMap<String, i64>,
@@ -59,7 +60,7 @@ async fn load(tx: &mut Transaction<'_, Postgres>, context: &Context) -> Result<L
     let account: Option<Uuid> = sqlx::query_scalar("SELECT s.account_id FROM sessions s JOIN accounts a ON a.id=s.account_id WHERE s.id=$1 AND NOT a.disabled AND s.revoked_at IS NULL AND s.access_expires_at>clock_timestamp() AND s.refresh_expires_at>clock_timestamp() FOR SHARE OF s,a")
         .bind(context.session).fetch_optional(&mut **tx).await.map_err(database)?;
     let account = account.ok_or(AuthError(StatusCode::UNAUTHORIZED, "SESSION_REVOKED"))?;
-    let row=sqlx::query(&format!("SELECT {CHARACTER_COLUMNS},defeated_mask,monster_respawns,active_battle_id,owner_epoch,allocated_attributes FROM characters WHERE id=$1 AND account_id=$2 FOR UPDATE"))
+    let row=sqlx::query(&format!("SELECT {CHARACTER_COLUMNS},ai_progress,defeated_mask,monster_respawns,active_battle_id,owner_epoch,allocated_attributes FROM characters WHERE id=$1 AND account_id=$2 FOR UPDATE"))
         .bind(context.character).bind(account).fetch_optional(&mut **tx).await.map_err(database)?
         .ok_or(AuthError(StatusCode::FORBIDDEN,"FORBIDDEN"))?;
     if row.get::<i64, _>("owner_epoch") != context.owner {
@@ -96,7 +97,10 @@ async fn load(tx: &mut Transaction<'_, Postgres>, context: &Context) -> Result<L
     let rows=sqlx::query("SELECT definition_id,equipped,quantity FROM inventory_items WHERE character_id=$1 AND definition_id<>'potion'").bind(context.character).fetch_all(&mut **tx).await.map_err(database)?;
     let quantities=rows.iter().map(|r|(r.get("definition_id"),r.get("quantity"))).collect();
     let gear = rows.into_iter().map(|r|(r.get("definition_id"),r.get("equipped"))).collect();
+    let ai:crate::ai_world::Progress=serde_json::from_value(row.get::<Json<Value>,_>("ai_progress").0).map_err(|_|unavailable())?;
+    if !ai.valid(){return Err(unavailable());}
     Ok(Loaded {
+        ai,
         gear,
         quantities,
         character,
@@ -141,6 +145,7 @@ impl Loaded {
             "stats":self.stats(),
             "attributes":profile,"shop":crate::shop::view(&self.gear,&self.quantities,self.potions),
             "skills":crate::skills::view(self.character.job,self.character.school,self.character.level),
+            "ai_world":self.ai.view(&self.character.map_id),
             "server_time_ms":unix_ms(),
             "progress":{"kills":(self.defeated&7).count_ones(),"defeated":defeated,"respawns":self.respawns},"battle":self.battle.as_ref().map(Battle::view)})
     }
@@ -173,6 +178,50 @@ impl Loaded {
         }
         if context.moving {
             return Err("PLAYER_MOVING");
+        }
+        if command.action==Action::SchoolJoin {
+            if self.battle.is_some(){return Err("BATTLE_ACTIVE");}
+            if command.battle_id.is_some()||command.attributes.is_some()||command.quantity.is_some(){return Err("INVALID_PVE_COMMAND");}
+            if command.expected_revision.as_deref()!=Some(&self.character.state_revision){return Err("STALE_SCHOOL");}
+            if self.character.school!=3{return Err("SCHOOL_ALREADY_JOINED");}
+            if context.map_id!="qingyun_trail"{return Err("INVALID_SCHOOL_NPC");}
+            let npc=context.target_cell.ok_or("INVALID_SCHOOL_NPC")?;
+            if (npc[0]-context.cell[0]).abs()+(npc[1]-context.cell[1]).abs()>2{return Err("RESIDENT_TOO_FAR");}
+            let school=match command.target.as_deref(){Some("emei")=>0,Some("huajian")=>1,Some("kunlun")=>2,_=>return Err("INVALID_SCHOOL")};
+            self.character.school=school;
+            return Ok(vec![format!("经清微道人引荐，你已正式拜入{}。技能暂按职业和等级开放，不受门派限制。",["峨眉派","花涧派","昆仑派"][school as usize])]);
+        }
+        self.ai.respawns.retain(|_,deadline|*deadline>unix_ms());
+        if matches!(command.action,Action::AiTravel|Action::AiAccept|Action::AiClaim|Action::AiInteract|Action::AiRestore) {
+            if self.battle.is_some(){return Err("BATTLE_ACTIVE");}
+            if command.battle_id.is_some()||command.expected_revision.is_some()||command.attributes.is_some()||command.quantity.is_some(){return Err("INVALID_PVE_COMMAND");}
+            let id=command.target.as_deref().ok_or("AI_INVALID_TARGET")?;
+            let near=|point:[i32;2]| (point[0]-context.cell[0]).abs()+(point[1]-context.cell[1]).abs()<=2;
+            if command.action==Action::AiTravel {
+                let at_exit=crate::ai_world::map(&context.map_id).is_some()&&crate::ai_world::exit_target(&context.map_id,context.cell).as_deref()==Some(id);
+                if !at_exit&&!near(crate::ai_world::station(&context.map_id)){return Err("PORTAL_TOO_FAR");}
+                let map=crate::world_map::WorldMap::load(id).ok_or("AI_INVALID_TARGET")?;
+                if id!="qingyun_trail"&&crate::ai_world::map(id).is_none(){return Err("AI_INVALID_TARGET");}
+                if id==context.map_id{return Err("AI_SAME_MAP");}
+                self.character.map_id=id.into();self.character.cell_x=map.spawn[0];self.character.cell_y=map.spawn[1];
+                return Ok(vec!["已沿蜀山驿路抵达。AI生成场景与任务，不是原版恢复内容。".into()]);
+            }
+            let point=crate::ai_world::target_cell(&context.map_id,id).ok_or("AI_INVALID_TARGET")?;
+            if !near(point){return Err("RESIDENT_TOO_FAR");}
+            return match command.action {
+                Action::AiAccept=>{self.ai.accept(id,&context.map_id,self.character.level)?;Ok(vec!["已接取AI生成任务，请按目标顺序行动。".into()])},
+                Action::AiClaim=>{let (gold,xp)=self.ai.claim(id)?;self.rewards(gold,xp)?;Ok(vec![format!("AI生成任务完成，获得{gold}铜钱、{xp}修为。")])},
+                Action::AiRestore=>{
+                    if !id.ends_with("_guide"){return Err("AI_INVALID_TARGET");}
+                    self.restore();Ok(vec!["巡山人以灵泉为你恢复了元气。".into()])
+                },
+                Action::AiInteract=>{
+                    if crate::ai_world::resident(id).is_none_or(|r|r["kind"]!="npc"){return Err("AI_INVALID_TARGET");}
+                    if !self.ai.event("interact",id){return Err("AI_NO_OBJECTIVE");}
+                    Ok(vec!["已记录此处见闻，任务目标更新。".into()])
+                },
+                _=>unreachable!()
+            };
         }
         if matches!(command.action,Action::Buy|Action::Equip|Action::Unequip|Action::Use|Action::Discard) {
             if self.battle.is_some(){return Err("BATTLE_ACTIVE");}
@@ -218,6 +267,7 @@ impl Loaded {
         }
         if command.quantity.is_some(){return Err("INVALID_PVE_COMMAND");}
         if command.action == Action::Transfer {
+            if crate::ai_world::map(&context.map_id).is_some(){return Err("INVALID_PORTAL");}
             if self.battle.is_some() { return Err("BATTLE_ACTIVE"); }
             if command.battle_id.is_some() || command.expected_revision.is_some() || command.attributes.is_some() {
                 return Err("INVALID_PVE_COMMAND");
@@ -296,7 +346,8 @@ impl Loaded {
                     {
                         return Err("MONSTER_RESPAWNING");
                     }
-                    if self.character.quest_stage == 0 {
+                    if self.ai.respawns.get(&definition.id).is_some_and(|t|*t>unix_ms()){return Err("MONSTER_RESPAWNING");}
+                    if self.character.quest_stage == 0 && crate::ai_world::map(&context.map_id).is_none() {
                         return Err("QUEST_REQUIRED");
                     }
                     let name = definition.name.clone();
@@ -372,9 +423,13 @@ impl Loaded {
                 if battle.outcome == "victory" {
                     let gold = battle.enemy.gold;
                     let xp = battle.enemy.xp;
-                    self.defeated |= pve_rules::mask(&battle.enemy.id).ok_or("INVALID_RESIDENT")?;
-                    self.respawns
-                        .insert(battle.enemy.id.clone(), unix_ms() + MONSTER_RESPAWN_MS);
+                    if crate::ai_world::resident(&battle.enemy.id).is_some() {
+                        self.ai.event("kill",&battle.enemy.id);
+                        self.ai.respawns.insert(battle.enemy.id.clone(),unix_ms()+MONSTER_RESPAWN_MS);
+                    } else {
+                        self.defeated |= pve_rules::mask(&battle.enemy.id).ok_or("INVALID_RESIDENT")?;
+                        self.respawns.insert(battle.enemy.id.clone(), unix_ms() + MONSTER_RESPAWN_MS);
+                    }
                     if self.character.quest_stage == 1 && self.defeated & 7 == 7 {
                         self.character.quest_stage = 2;
                         lines.push("三只山狼已清除，请返回清微道人处领取奖励。".into());
@@ -421,7 +476,7 @@ pub async fn execute(
     let admitted: bool = sqlx::query_scalar("INSERT INTO gameplay_budgets(account_id,window_start,requests) VALUES($1,clock_timestamp(),1) ON CONFLICT(account_id) DO UPDATE SET requests=CASE WHEN gameplay_budgets.window_start<=clock_timestamp()-interval '60 seconds' THEN 1 ELSE LEAST(gameplay_budgets.requests+1,181) END, window_start=CASE WHEN gameplay_budgets.window_start<=clock_timestamp()-interval '60 seconds' THEN clock_timestamp() ELSE gameplay_budgets.window_start END RETURNING requests<=180")
         .bind(account).fetch_one(&mut *tx).await.map_err(database)?;
     let action = format!("pve.{}",serde_json::to_value(command.action).expect("typed action").as_str().expect("action string"));
-    let target = command.target.as_deref().map(|v| if crate::shop::item(v).is_some() || crate::skills::item(v).is_some() || ["sword","qingwei","wolf_a","wolf_b","wolf_c","spirit","guardian","boss","ruins","trail_gate"].contains(&v) { v } else { "[invalid]" });
+    let target = command.target.as_deref().map(|v| if crate::ai_world::map(v).is_some() || crate::ai_world::quest(v).is_some() || crate::ai_world::resident(v).is_some() || crate::shop::item(v).is_some() || crate::skills::item(v).is_some() || ["sword","qingwei","wolf_a","wolf_b","wolf_c","spirit","guardian","boss","ruins","trail_gate"].contains(&v) { v } else { "[invalid]" });
     if !admitted {
         // One bounded audit event per exhausted window, not one per flood packet.
         let logged = sqlx::query("SELECT 1 FROM security_audit WHERE account_id=$1 AND code='GAMEPLAY_RATE_LIMITED' AND created_at>clock_timestamp()-interval '60 seconds' LIMIT 1")
@@ -482,9 +537,9 @@ pub async fn execute(
         }
         let character_id = loaded.character.id;
         let c = &loaded.character;
-        let revision:i64=sqlx::query_scalar("UPDATE characters SET level=$2,xp=$3,gold=$4,hp=$5,mp=$6,quest_stage=$7,defeated_mask=$8,active_battle_id=$9,allocated_attributes=$10,monster_respawns=$11,state_revision=state_revision+1 WHERE id=$1 RETURNING state_revision")
+        let revision:i64=sqlx::query_scalar("UPDATE characters SET level=$2,xp=$3,gold=$4,hp=$5,mp=$6,quest_stage=$7,defeated_mask=$8,active_battle_id=$9,allocated_attributes=$10,monster_respawns=$11,ai_progress=$12,school=$13,state_revision=state_revision+1 WHERE id=$1 RETURNING state_revision")
             .bind(c.id).bind(c.level).bind(c.xp).bind(c.gold).bind(c.hp).bind(c.mp).bind(c.quest_stage).bind(loaded.defeated).bind(active).bind(loaded.allocated.to_vec()).bind(Json(&loaded.respawns))
-            .fetch_one(&mut *tx).await.map_err(database)?;
+            .bind(Json(&loaded.ai)).bind(c.school).fetch_one(&mut *tx).await.map_err(database)?;
         loaded.character.state_revision = revision.to_string();
         if loaded.potions == 0 {
             sqlx::query(

@@ -1,0 +1,15 @@
+{
+  "texture": "res://assets/actors/map_m8.png",
+  "width": 64,
+  "height": 88,
+  "columns": 1,
+  "origin": [-32, -87],
+  "anchor_x": 0,
+  "playback": {},
+  "count": 1,
+  "sequences": [
+    [
+      [0, 1]
+    ]
+  ]
+}

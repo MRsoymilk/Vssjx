@@ -1,0 +1,117 @@
+{
+  "texture": "res://assets/actors/monster_dyq2.png",
+  "width": 95,
+  "height": 69,
+  "columns": 8,
+  "origin": [-56, -66],
+  "anchor_x": 0,
+  "playback": {
+    "idle": [
+      [21, 8],
+      [20, 8]
+    ],
+    "walk": [
+      [21, 8],
+      [20, 8]
+    ],
+    "attack": [
+      [17, 1],
+      [16, 1],
+      [15, 1],
+      [14, 1],
+      [13, 2],
+      [12, 1],
+      [11, 1],
+      [10, 1],
+      [9, 1],
+      [16, 1],
+      [17, 1]
+    ],
+    "hurt": [
+      [8, 1],
+      [7, 1],
+      [6, 1],
+      [5, 1],
+      [4, 2]
+    ]
+  },
+  "count": 22,
+  "sequences": [
+    [],
+    [],
+    [
+      [18, 1],
+      [19, 2],
+      [20, 1],
+      [21, 2],
+      [18, 1],
+      [19, 2],
+      [20, 1],
+      [21, 2],
+      [18, 1],
+      [19, 2],
+      [20, 1],
+      [21, 2]
+    ],
+    [
+      [13, 1],
+      [14, 1],
+      [15, 1],
+      [16, 1],
+      [17, 2]
+    ],
+    [
+      [4, 1],
+      [5, 1],
+      [6, 1],
+      [7, 1],
+      [8, 2],
+      [9, 1],
+      [10, 1],
+      [11, 1],
+      [12, 1],
+      [5, 1],
+      [4, 1]
+    ],
+    [
+      [0, 8],
+      [1, 8]
+    ],
+    [
+      [2, 8],
+      [3, 8]
+    ],
+    [
+      [0, 8],
+      [1, 8]
+    ],
+    [],
+    []
+  ],
+  "native_battle": {
+    "indexing": "reverse_serialized_tables",
+    "source_frame_count": 22,
+    "sequence_ids": {"idle": 4, "walk": 4, "attack": 5, "hurt": 6},
+    "impact_steps": {
+      "idle": [],
+      "walk": [],
+      "attack": [5],
+      "hurt": []
+    },
+    "attack_x": [140, 108, 69, 70, 71, 55, 54, 53, 52, 108, 140],
+    "pose_x": {
+      "idle": [6, 6],
+      "walk": [6, 6],
+      "hurt": [6, 9, 10, 11, 12]
+    },
+    "attack_basis": "target",
+    "cast_mapping": null
+  },
+  "alignment": {
+    "source": "AI接入，原生动作槽4/5/6",
+    "primary_source": "dyq",
+    "body_frame": 7,
+    "combat_extent_frames": [],
+    "source_sha256": "cb71ac2c1ec0acb051e62345473e93ff1e7566f7be3ea4c152c8473f56b00de7"
+  }
+}

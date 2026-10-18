@@ -81,15 +81,14 @@ func _run() -> void:
 		var battle: Dictionary = view.network.pve.state.battle
 		var action := "skill" if int(battle.mp) >= 9 else "attack"
 		view.battle_view.choose(action)
-		if action == "skill": view.battle_view.get_node("Choice/Use").pressed.emit()
+		if action == "skill": view.battle_view.skill_picker.activate(view.battle_view.skill_picker.selected_id)
 		if not await wait_until(func() -> bool: return not view.network.pve.pending()): break
 		await get_tree().create_timer(0.85).timeout
 	check(view.network.pve.state.battle.outcome == "victory" and int(view.network.pve.state.progress.kills) == 1, "UI battle awards first wolf progress")
 	check(not view.residents.has("wolf_a") and view.network.population.entities.has("wolf_a"), "Defeat filtering is personal while shared population persists")
 	if OS.get_environment("SSJX_TEST_PVE_RESPAWN") == "1":
 		var completed_id: String = view.network.pve.state.battle.id
-		check(await wait_until(func() -> bool: return view.battle_view.animation_time <= 0, 5.0), "Final attack completes before returning to the map")
-		view.battle_view.get_node("Result/Return").pressed.emit()
+		check(await wait_until(func() -> bool: return not view.battle_view.visible, 8.0), "Final action, death and result animation automatically return to the map")
 		check(await wait_until(func() -> bool: return view.residents.has("wolf_a"), 35.0), "Real Godot client automatically respawns the wolf after the production 30-second cooldown")
 		check(view.screen.hud.get_node("Minimap").shared_population.has("wolf_a") and int(view.network.pve.state.progress.kills) == 1, "Real respawn restores the minimap without resetting quest credit")
 		view.resident_selected.emit("wolf_a")

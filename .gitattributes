@@ -1,6 +1,7 @@
 *.gd text eol=lf
 *.gd.uid text eol=lf
 *.tscn text eol=lf
+*.tres text eol=lf
 *.godot text eol=lf
 *.py text eol=lf
 *.sh text eol=lf
@@ -9,6 +10,8 @@ server/migrations/*.sql -text whitespace=cr-at-eol
 *.md text eol=lf
 client/assets/data/actors.json text eol=lf
 client/assets/data/actors/** text eol=lf
+client/assets/data/ai-world-v1.json text eol=lf
+shared/data/ai-world-v1.json text eol=lf
 .gitattributes text eol=lf
 .gitignore text eol=lf
 LICENSE text eol=lf

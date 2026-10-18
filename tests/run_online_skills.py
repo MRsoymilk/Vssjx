@@ -63,12 +63,13 @@ def main():
             seed(0,2,60,0)
             value,_=a.command('',request=request('sheet_010'),ok=False); assert value['code']=='MP_INSUFFICIENT'
             value,_=a.command('',request=request('sheet_014'),ok=False); assert value['code']=='PASSIVE_SKILL'
-            value,_=a.command('',request=request('sheet_025'),ok=False); assert value['code']=='SKILL_ROLE_MISMATCH'
+            value,_=a.command('',request=request('sheet_025'),ok=False); assert value['code']=='MP_INSUFFICIENT'
 
             count=0
             for skill in catalog['items']:
                 if not skill['source_row']: continue
-                seed(skill['job'],max(0,skill['school']))
+                # Every source skill must work for an unjoined character of its job.
+                seed(skill['job'],3)
                 assert skill['id'] in a.state['skills']['available']
                 before=copy.deepcopy(a.state)
                 command=request(skill['id'])
@@ -107,7 +108,7 @@ def main():
             value,_=a.command('',request=command)
             assert value['state']['attributes']['available']==0 and value['state']['attributes']['allocated']==[300,0,0,0,0]
             assert count==30
-            print('ONLINE SKILLS: PASS (30 named skills, role/school/level/MP/passive guards, atomic rollback, replay, stale turns, restart, DOT expiry, level-60 allocation)')
+            print('ONLINE SKILLS: PASS (30 named skills without school gating, job/level/MP/passive guards, atomic rollback, replay, stale turns, restart, DOT expiry, level-60 allocation)')
         finally:
             for c in clients:
                 try:c.close()

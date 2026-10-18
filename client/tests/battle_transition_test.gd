@@ -78,7 +78,10 @@ func _run() -> void:
 		check(app.mode == "battle" and app.battle.enemy.id == enemy.id and app.battle.round_number == 0, "Prepared encounter enters exactly the intended battle at round zero")
 		check(ready_seen and app.battle_transition == null and not app.action_menu.visible, "Completion removes loading UI without opening commands or auto-attacking")
 		for field in resources: check(Game.player[field] == resources[field], "Encounter presentation never spends resources or awards loot")
-		check(OriginalArt.cached.has(Game.actor_key()) and OriginalArt.cached.has(String(enemy.art)) and OriginalArt.cached.has("effect/t47"), "Battle actors and spell SpriteFrames are really prepared")
+		var required: Array[String]=[Game.appearance_key(),String(enemy.art),BattleDeathPlayback.ART_KEY]
+		required.append_array(BattleEffects.preload_keys(int(Game.player.job),int(Game.player.school),int(Game.player.level)))
+		required.append_array(BattleResultView.ART_KEYS)
+		check(required.all(func(key:String)->bool:return OriginalArt.cached.has(key)), "Battle actors, mapped spells, death and outcome SpriteFrames are really prepared")
 		await sample(app, zone, index)
 		app._home()
 		await get_tree().process_frame

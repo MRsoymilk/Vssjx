@@ -7,16 +7,40 @@ const MAPS := {"qingyun_trail": MAP_PATH, "ancient_ruins": "res://assets/data/an
 const POPULATIONS := {"qingyun_trail": POPULATION_PATH, "ancient_ruins": "res://assets/data/ruins-population-v1.json"}
 
 static func load_data(map_id: String = "qingyun_trail") -> Dictionary:
+	if not AIWorld.map_data(map_id).is_empty(): return AIWorld.map_data(map_id)
 	return JSON.parse_string(FileAccess.get_file_as_string(MAPS[map_id]))
 
 static func population(map_id: String = "qingyun_trail") -> Array:
+	if not AIWorld.map_data(map_id).is_empty(): return AIWorld.map_data(map_id).residents
 	return JSON.parse_string(FileAccess.get_file_as_string(POPULATIONS[map_id]))
 
 static func portal(map_id: String) -> Dictionary:
+	if not AIWorld.map_data(map_id).is_empty(): return AIWorld.map_data(map_id).portal
 	return {"id": "ruins_gate", "cell": [28, 16], "name": "古剑遗迹 · 灵门"} if map_id == "qingyun_trail" else {"id": "trail_gate", "cell": [3, 16], "name": "返回山道"}
 
+static func exits(map_id: String) -> Array:
+	var generated := AIWorld.map_data(map_id)
+	if not generated.is_empty(): return generated.exits
+	var gate := portal(map_id)
+	var station := AIWorld.station(map_id)
+	return [{"cell":gate.cell,"target_map":"ancient_ruins" if map_id=="qingyun_trail" else "qingyun_trail","name":gate.name,"legacy":true},{"cell":[station.x,station.y],"target_map":"ai_001","name":"灵空台 · AI生成"}]
+
+static func exit_at(map_id: String, cell: Vector2i) -> Dictionary:
+	for gate in exits(map_id):
+		for point in gate.get("cells",[gate.cell]):
+			if cell==Vector2i(point[0],point[1]): return gate
+	return {}
+
 static func title(map_id: String) -> String:
+	if not AIWorld.map_data(map_id).is_empty(): return AIWorld.map_data(map_id).name + " · AI生成"
 	return "青云山道" if map_id == "qingyun_trail" else "古剑遗迹"
+
+static func exists(map_id: Variant) -> bool:
+	return map_id is String and (MAPS.has(map_id) or not AIWorld.map_data(map_id).is_empty())
+
+static func map_hash(map_id: String) -> String:
+	if not AIWorld.map_data(map_id).is_empty(): return AIWorld.catalog_hash
+	return FileAccess.get_sha256(MAPS[map_id])
 
 static func build(terrain: TileMapLayer, grid: AStarGrid2D, data: Dictionary) -> void:
 	var width := int(data.width)

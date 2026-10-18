@@ -1,0 +1,112 @@
+{
+  "texture": "res://assets/actors/monster_zb6.png",
+  "width": 65,
+  "height": 69,
+  "columns": 8,
+  "origin": [-49, -62],
+  "anchor_x": 0,
+  "playback": {
+    "idle": [
+      [20, 2],
+      [19, 1],
+      [20, 5],
+      [18, 8]
+    ],
+    "walk": [
+      [20, 2],
+      [19, 1],
+      [20, 5],
+      [18, 8]
+    ],
+    "attack": [
+      [14, 1],
+      [13, 1],
+      [12, 2],
+      [11, 1],
+      [10, 1],
+      [9, 1],
+      [8, 1],
+      [13, 1],
+      [14, 1]
+    ],
+    "hurt": [
+      [20, 1],
+      [7, 1],
+      [6, 1],
+      [5, 1]
+    ]
+  },
+  "count": 21,
+  "sequences": [
+    [
+      [16, 2],
+      [17, 1],
+      [18, 1],
+      [19, 1],
+      [20, 2]
+    ],
+    [
+      [0, 1],
+      [13, 1],
+      [14, 1],
+      [15, 1]
+    ],
+    [
+      [6, 1],
+      [7, 1],
+      [8, 2],
+      [9, 1],
+      [10, 1],
+      [11, 1],
+      [12, 1],
+      [7, 1],
+      [6, 1]
+    ],
+    [
+      [0, 2],
+      [1, 1],
+      [0, 5],
+      [2, 8]
+    ],
+    [
+      [3, 2],
+      [4, 1],
+      [3, 5],
+      [5, 8]
+    ],
+    [
+      [0, 2],
+      [1, 1],
+      [0, 5],
+      [2, 8]
+    ],
+    [],
+    []
+  ],
+  "native_battle": {
+    "indexing": "reverse_serialized_tables",
+    "source_frame_count": 21,
+    "sequence_ids": {"idle": 4, "walk": 4, "attack": 5, "hurt": 6},
+    "impact_steps": {
+      "idle": [],
+      "walk": [],
+      "attack": [3],
+      "hurt": []
+    },
+    "attack_x": [105, 73, 48, 46, 45, 44, 43, 73, 105],
+    "pose_x": {
+      "idle": [3, 3, 3, 3],
+      "walk": [3, 3, 3, 3],
+      "hurt": [3, 5, 5, 4]
+    },
+    "attack_basis": "target",
+    "cast_mapping": null
+  },
+  "alignment": {
+    "source": "AI接入，原生动作槽4/5/6",
+    "primary_source": "zb3",
+    "body_frame": 0,
+    "combat_extent_frames": [],
+    "source_sha256": "998a2b8d365be6206b7cfb1db594c371345cc0b135bdbefa0da65d8842432c4e"
+  }
+}

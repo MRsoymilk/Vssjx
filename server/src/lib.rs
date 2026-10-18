@@ -14,6 +14,7 @@ mod security;
 mod user_admin;
 pub mod observability;
 pub mod population;
+pub mod ai_world;
 pub mod pve_rules;
 pub mod pve;
 pub mod world;

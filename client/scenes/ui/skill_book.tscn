@@ -46,6 +46,17 @@ offset_right = 308.0
 offset_bottom = 407.0
 mouse_filter = 2
 theme_override_styles/panel = SubResource("Description")
+[node name="Coverage" type="Label" parent="."]
+visible = false
+offset_left = 22.0
+offset_top = 158.0
+offset_right = 296.0
+offset_bottom = 286.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.396, 0.271, 0.094, 1)
+theme_override_font_sizes/font_size = 11
+autowrap_mode = 3
+clip_text = true
 [node name="Description" type="Label" parent="."]
 offset_left = 22.0
 offset_top = 311.0
@@ -63,7 +74,7 @@ offset_right = 296.0
 offset_bottom = 180.0
 theme_override_colors/font_color = Color(0.251, 0.153, 0.094, 1)
 theme_override_font_sizes/font_size = 13
-text = "暂无此门派的具名心法资料"
+text = "暂无此职业的具名心法资料"
 horizontal_alignment = 1
 [node name="Points" type="Label" parent="."]
 offset_left = 20.0

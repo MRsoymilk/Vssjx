@@ -71,6 +71,30 @@
       "sha256": "21b3b8e188ee93ff1a8a664d59ee5678eea1fb983c6e3299e250f9700b3916b8"
     },
     {
+      "name": "battle_skill_list_draw",
+      "start": "0x31a4",
+      "end_exclusive": "0x3202",
+      "sha256": "536b46e1279cb0f6a1e280c3c1e6fb99e015dae888227165a5eee485e0fe6ac7"
+    },
+    {
+      "name": "battle_description_strip",
+      "start": "0x3ff8",
+      "end_exclusive": "0x4030",
+      "sha256": "1faf73bf75bcc72a0b407feebccb01ba832a021d5b2548c0dc9f004a5da16f20"
+    },
+    {
+      "name": "battle_skill_row",
+      "start": "0x4158",
+      "end_exclusive": "0x41a0",
+      "sha256": "645a45feac3d1536de83eca3d9a81483d6c642a903f74496704754e4f80c3b8b"
+    },
+    {
+      "name": "battle_choice_panel",
+      "start": "0x41ac",
+      "end_exclusive": "0x422c",
+      "sha256": "0fee39a4467874eb534a3cc851ad13fe2e98c61bd8694aa19139e9128eddb0e2"
+    },
+    {
       "name": "parameter_decoder",
       "start": "0x2fdb0",
       "end_exclusive": "0x2fe28",

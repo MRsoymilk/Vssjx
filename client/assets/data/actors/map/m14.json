@@ -1,0 +1,21 @@
+{
+  "texture": "res://assets/actors/map_m14.png",
+  "width": 62,
+  "height": 79,
+  "columns": 3,
+  "origin": [-31, -78],
+  "anchor_x": 0,
+  "playback": {},
+  "count": 3,
+  "sequences": [
+    [
+      [2, 1]
+    ],
+    [
+      [1, 1]
+    ],
+    [
+      [0, 1]
+    ]
+  ]
+}

@@ -129,7 +129,7 @@ func _regular() -> void:
 	content.add_child(preview)
 	content.get_node("NameValue").text = String(player.get("name", ""))
 	content.get_node("JobValue").text = Game.JOBS[int(player.get("job", 0))]
-	content.get_node("SchoolValue").text = Game.SCHOOLS[int(player.get("school", 0))] + "派"
+	content.get_node("SchoolValue").text = SchoolRules.label(int(player.get("school",SchoolRules.UNJOINED)))
 	var title := String(player.get("title", ""))
 	content.get_node("TitleValue").text = "无" if title.is_empty() else title
 	for key in ["level", "hp", "mp", "xp", "gold", "ingots", "guild_contribution", "essence"]:

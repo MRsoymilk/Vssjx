@@ -36,12 +36,13 @@ static HASH: LazyLock<String> = LazyLock::new(|| {
 pub fn item(id: &str) -> Option<&'static Skill> {
     ITEMS.iter().find(|s| s.id == id)
 }
-pub fn eligible(s: &Skill, job: i16, school: i16, level: i32) -> bool {
-    s.job == job && (s.school < 0 || s.school == school) && level >= s.unlock_level
+pub fn eligible(s: &Skill, job: i16, _school: i16, level: i32) -> bool {
+    // Keep the original school as source metadata; unlock by job and level for now.
+    s.job == job && level >= s.unlock_level
 }
-pub fn check(id: &str, job: i16, school: i16, level: i32) -> Result<&'static Skill, &'static str> {
+pub fn check(id: &str, job: i16, _school: i16, level: i32) -> Result<&'static Skill, &'static str> {
     let s = item(id).ok_or("INVALID_SKILL")?;
-    if s.job != job || (s.school >= 0 && s.school != school) {
+    if s.job != job {
         return Err("SKILL_ROLE_MISMATCH");
     }
     if level < s.unlock_level {

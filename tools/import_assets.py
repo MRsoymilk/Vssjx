@@ -35,6 +35,7 @@ SELECTED = ['hero/mck', 'hero/mzs', 'hero/mfs', 'hero/wck', 'hero/wzs', 'hero/wf
             'monster/langw', 'monster/xt1', 'monster/hs1', 'monster/nt1',
             'map/m1', 'map/m2', 'map/m3', 'map/m4', 'map/m5', 'map/m6',
             'map/m7', 'map/m9', 'map/m10', 'main/biaoti', 'main/death',
+            'main/ltz_win', 'main/ltz_lose',
             'effect/flash', 'effect/t1', 'effect/t20', 'effect/t36', 'effect/t44', 'effect/t47', 'effect/t71']
 
 # Native sequence IDs, not serialized sequence positions. Raw archive/admin
@@ -206,6 +207,10 @@ def build_actor_catalog(parsed, write_textures=True):
                 for layer in layers:
                     if layer['source'] == 'ezs1': layer['source'] = 'ezs2'
         baked[preview_key] = bake(key, preview, preview_key, write_texture=write_textures)
+    from build_ai_world_art import build_assets
+    baked.update(build_assets(parsed,write_textures))
+    from build_ai_monster_art import build_assets as build_monsters
+    baked.update(build_monsters(write_textures))
     return baked
 
 

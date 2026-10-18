@@ -88,12 +88,21 @@ func reload() -> void:
 	_load_resource_archive()
 	_load_maps()
 	_load_original_world()
+	_load_ai_world()
 	var manifest := _read_json(ART.INDEX_PATH)
 	var actors: Dictionary = manifest.get("actors", {})
 	for key in actors:
 		var info := _read_json(actors[key])
 		if info.is_empty(): continue
 		_add("art", key, key, "%s 帧 · %s × %s" % [info.get("count", 0), info.get("width", 0), info.get("height", 0)], "资源", actors[key], info, {"kind": "actor", "art": key})
+
+func _load_ai_world() -> void:
+	AIWorld.prepare()
+	for id in AIWorld.maps:
+		var m: Dictionary = AIWorld.maps[id]
+		_add("maps",id,m.name + " · #%03d" % int(m.original_map_id),"%s · %d～%d级 · 3个任务" % [m.layout_name,int(m.level_min),int(m.level_max)],"AI生成",AIWorld.PATH,m,{"kind":"map"})
+		for q in m.quests: _add("quests",q.id,q.name,q.description,"AI生成",AIWorld.PATH,q)
+		for r in m.residents: _add("characters" if r.kind=="npc" else "enemies",r.id,r.name,m.name + " · AI生成布置","AI生成",AIWorld.PATH,r,{"kind":"actor","art":r.art})
 
 func _load_original_monsters() -> void:
 	var manifest := _read_json(ORIGINAL_MONSTERS)

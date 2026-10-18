@@ -228,5 +228,12 @@ func _draw() -> void:
 			draw_texture_rect_region(atlas, rect, Rect2((tile % 32) * 16, (tile / 32) * 16, 16, 16))
 			if show_blocked and i < blocked.size() and blocked[i]: draw_rect(rect, Color(1, 0.25, 0.28, 0.55))
 	if data.has("spawn"):
+		if data.get("source")=="AI生成":
+			preload("res://scripts/ai_map_preview.gd").draw_scenery(self,data,start,cell/16.0)
+			preload("res://scripts/ai_map_preview.gd").draw_spawn(self,data,start,cell/16.0)
 		var spawn: Array = data.spawn
-		draw_circle(start + (Vector2(spawn[0], spawn[1]) + Vector2.ONE * 0.5) * cell, cell * 0.6, Color("77efba"))
+		if data.get("source")!="AI生成": draw_circle(start + (Vector2(spawn[0], spawn[1]) + Vector2.ONE * 0.5) * cell, cell * 0.6, Color("77efba"))
+	for resident in data.get("residents", []):
+		var spot := start + (Vector2(resident.cell[0], resident.cell[1]) + Vector2.ONE*0.5)*cell
+		draw_circle(spot, maxf(2,cell*0.6),Color("ffe390") if resident.kind=="npc" else Color("ff5e5e"))
+		draw_string(get_theme_default_font(), spot+Vector2(4,-3),resident.name,HORIZONTAL_ALIGNMENT_LEFT,-1,10,Color("fff2cf"))

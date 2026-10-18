@@ -12,6 +12,7 @@
 [ext_resource type="PackedScene" path="res://scenes/world_move_target.tscn" id="MoveTarget"]
 [ext_resource type="PackedScene" path="res://scenes/ui/world_map.tscn" id="WorldMap"]
 [ext_resource type="PackedScene" path="res://scenes/ui/npc_dialog.tscn" id="Npc"]
+[ext_resource type="PackedScene" path="res://scenes/ui/map_transition.tscn" id="MapTransition"]
 
 [node name="OnlineWorldView" type="Control"]
 offset_right = 320.0
@@ -41,6 +42,8 @@ offset_right = 320.0
 offset_bottom = 403.0
 [node name="Screen" parent="." instance=ExtResource("Screen")]
 online_mode = true
+
+[node name="MapTransition" parent="." instance=ExtResource("MapTransition")]
 
 [node name="WorldMap" parent="." instance=ExtResource("WorldMap")]
 visible = false

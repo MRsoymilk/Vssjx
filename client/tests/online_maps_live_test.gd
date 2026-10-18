@@ -35,6 +35,7 @@ func _run() -> void:
 	check(await wait_until(func() -> bool: return view.network.world_ready and view.network.pve.ready and view.residents.size() == 5), "First map and NPCs synchronized")
 	click_gate()
 	check(view.network._input_seq > 0 or not view.network._pending_motion.is_empty(), "Real portal click requests authoritative movement to its tile")
+	check(await wait_until(func() -> bool: return view.map_transition.blocking), "Walking onto a real online portal opens the native loading page")
 	check(await wait_until(func() -> bool: return view.network.world_ready and view.network.pve.ready and not view.network.pve.pending() and view.network.map_id == "ancient_ruins" and view.residents.has("boss"), 30.0), "Portal approaches, commits and reconnects automatically")
 	if view.network.map_id != "ancient_ruins":
 		print("Enter diagnostics: ", view._approach, " input=", view.network._input_seq, " pending=", view.network._pending_motion, " own=", view.network.entities.get(view.character_id, {}), " status=", view._system_text, " pve=", view.network.pve.last_code)
@@ -45,6 +46,7 @@ func _run() -> void:
 	check(view.screen.hud.get_node("Minimap").shared_map.map_id == "ancient_ruins", "Minimap switches terrain")
 	check(view.portal_marker.get_child(0).text == "返回山道", "Return portal is visible")
 	check(view.network.entities.has(view.character_id), "New baseline includes own character")
+	check(await wait_until(func() -> bool: return not view.map_transition.blocking), "New baseline, character receipt and population release the loading page")
 	if DisplayServer.get_name() != "headless":
 		await RenderingServer.frame_post_draw
 		var path := OS.get_environment("SSJX_MAP_CAPTURE")
@@ -63,6 +65,7 @@ func _run() -> void:
 		print("Return diagnostics: ", view._approach, " input=", view.network._input_seq, " own=", view.network.entities.get(view.character_id, {}), " status=", view._system_text)
 	check(view.residents.size() == 5 and not view.residents.has("boss"), "No ruins actors remain in first map")
 	check(view.screen.hud.get_node("MapName").text == "青云山道", "First map HUD is restored")
+	check(await wait_until(func() -> bool: return not view.map_transition.blocking), "Return journey finishes loading before input resumes")
 	check(Game.player == old, "Online map changes never touch local saves")
 	check(not connection_statuses.any(func(text: String) -> bool: return text.begins_with("连接中断")), "Normal map transfers never report a disconnected failure")
 	view.network.move_to(Vector2i(11,16))

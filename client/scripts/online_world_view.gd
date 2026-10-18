@@ -57,6 +57,8 @@ var _battle_load_epoch := 0
 var _battle_resource_request: PlatformResourceRequest
 var _battle_load_failed := false
 var _hidden_residents: Array = []
+@onready var map_transition: OriginalMapTransition = $MapTransition
+var _transfer_origin := ""
 
 func _ready() -> void:
 	if OS.has_feature("web"): Platform.context.lifecycle.changed.connect(_web_lifecycle)
@@ -120,6 +122,7 @@ func _ready() -> void:
 	)
 	network.pve.changed.connect(_pve_changed)
 	network.pve.message.connect(func(text: String) -> void:
+		if network.pve.last_action in ["transfer", "ai_travel"] and not network.pve.last_code.is_empty(): map_transition.cancel()
 		_pve_log = text
 		_system_text = text
 		expanded_chat.add_system(text)
@@ -128,6 +131,9 @@ func _ready() -> void:
 		if network.pve.last_code.is_empty() and network.pve.last_action in ["accept", "claim", "restore","ai_accept","ai_claim","ai_restore","ai_interact","school_join"]: npc_dialog.hide()
 	)
 	network.map_changed.connect(_map_changed)
+	network.map_transfer_started.connect(_begin_map_transition)
+	network.connection_failed.connect(map_transition.cancel)
+	network.pve.send_requested.connect(_map_command_sent)
 	network.changed.connect(_snapshot)
 	network.population.changed.connect(_population)
 	network.status_changed.connect(_status_changed)
@@ -148,6 +154,7 @@ func _leave_world() -> void:
 	close_requested.emit()
 
 func _scene_action(action: String) -> void:
+	if map_transition.blocking: return
 	_close_inventory()
 	_close_world_map()
 	_close_attributes()
@@ -205,6 +212,41 @@ func _status_changed(text_value: String) -> void:
 		move_target.clear()
 		for actor in actors.values(): actor.sprite.play("idle")
 	_chat_changed()
+
+func _map_command_sent(packet: Dictionary) -> void:
+	if packet.get("command", {}).get("action") in ["transfer", "ai_travel"]:
+		_begin_map_transition()
+
+func _begin_map_transition() -> void:
+	if map_transition.blocking: return
+	_transfer_origin = String(map_data.map_id)
+	_cancel_approach()
+	_close_inventory()
+	_close_world_map()
+	_close_attributes()
+	menu.hide()
+	details.hide()
+	npc_dialog.hide()
+	if expanded_chat.visible: expanded_chat.dismiss()
+	emote_picker.hide()
+	Platform.context.text_input.release_focus(chat_input)
+	move_target.clear()
+	_was_keyboard = false
+	map_transition.begin(ShopRules.actor_key(int(_character.get("job", 0)), int(_character.get("gender", 0)), _character.get("appearance", [1, 0])))
+	map_transition.set_progress(0.15)
+
+func _advance_map_transition() -> void:
+	if not map_transition.blocking: return
+	# auth.ready changes terrain before the baseline and population have arrived.
+	# Do not reveal the new map until all three authoritative channels agree.
+	if network.map_id == _transfer_origin: return
+	map_transition.set_progress(0.50)
+	if not network.world_ready or not actors.has(character_id): return
+	map_transition.set_progress(0.70)
+	if not network.pve.ready or network.pve.state.get("character", {}).get("map_id") != network.map_id or network.pve.pending(): return
+	map_transition.set_progress(0.85)
+	if network.population.revision < 0 or String(map_data.map_id) != network.map_id: return
+	map_transition.complete()
 
 func _build_map() -> void:
 	SharedWorldMap.build($Viewport/Scene/Terrain, _motion_grid, map_data)
@@ -405,6 +447,7 @@ func _update_chat_controls() -> void:
 func _process(delta: float) -> void:
 	_update_chat_controls()
 	_update_allocation_controls()
+	_advance_map_transition()
 	if network == null or not network.world_ready: return
 	if network.pve.ready and network.pve.unavailable_monsters() != _hidden_residents:
 		_population(network.population.entities)
@@ -432,6 +475,7 @@ func _process(delta: float) -> void:
 	if actors.has(character_id): camera.position = actors[character_id].root.position
 	if encounter.visible: encounter.set_hero_point(_hero_screen_point())
 	_update_move_target(delta)
+	if map_transition.blocking: return
 	if OS.has_feature("web") and (not Platform.context.lifecycle.focused or Platform.context.lifecycle.suspended): return
 	_advance_approach()
 	if bag_overlay != null or chat_input.has_focus() or menu.visible or details.visible or npc_dialog.visible or emote_picker.visible or encounter.visible or battle_view.visible or expanded_chat.visible or attributes.visible or world_map.visible or network.pve.pending() or network.pve.active():
@@ -456,6 +500,7 @@ func _process(delta: float) -> void:
 		_was_keyboard = false
 
 func _map_input(event: InputEvent) -> void:
+	if map_transition.blocking: return
 	if _battle_load_failed:
 		if (event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed) or (event is InputEventScreenTouch and event.pressed): _pve_changed()
 		return
@@ -488,6 +533,7 @@ func _map_input(event: InputEvent) -> void:
 		chat_status.text = "目标不可达，已停止原路线。"
 
 func _unhandled_key_input(event: InputEvent) -> void:
+	if map_transition.blocking: return
 	if not event is InputEventKey or not event.pressed: return
 	if ai_panel != null:
 		if event.keycode == KEY_ESCAPE: _close_inventory(); get_viewport().set_input_as_handled()

@@ -69,6 +69,7 @@ var _ui_epoch := 0
 var _storage_notice: Label
 var _ui_process_mode: ProcessMode
 var _closing := false
+var map_transition: OriginalMapTransition
 
 func _exit_tree() -> void:
 	_ui_epoch += 1
@@ -129,6 +130,7 @@ func _autosave() -> void:
 
 func _process(delta: float) -> void:
 	if Game.storage_busy or _closing: return
+	if is_instance_valid(map_transition) and map_transition.blocking: return
 	if OS.has_feature("web") and (not Platform.context.lifecycle.focused or Platform.context.lifecycle.suspended): return
 	if battle_playback != null: battle_playback.advance(delta)
 	if battle_death != null: battle_death.advance(delta)
@@ -155,6 +157,7 @@ func _process(delta: float) -> void:
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	if Game.storage_busy or _closing: return
+	if is_instance_valid(map_transition) and map_transition.blocking: return
 	if get_viewport().gui_get_focus_owner() is LineEdit: return
 	if not event is InputEventKey or not event.pressed or event.echo: return
 	if mode == "battle_loading":
@@ -542,6 +545,7 @@ func _world_ui() -> void:
 
 func _scene_action(action: String) -> void:
 	if Game.storage_busy or _closing: return
+	if is_instance_valid(map_transition) and map_transition.blocking: return
 	if mode=="battle" and battle.finished and battle_committed:return
 	if mode == "battle_loading": return
 	match action:
@@ -580,6 +584,7 @@ func _refresh_hud() -> void:
 
 func _world_interaction(kind: String, data: Dictionary) -> void:
 	if Game.storage_busy or _closing: return
+	if is_instance_valid(map_transition) and map_transition.blocking: return
 	if mode == "battle_loading": return
 	match kind:
 		"map_exit":
@@ -588,10 +593,7 @@ func _world_interaction(kind: String, data: Dictionary) -> void:
 		"ai_gate": _open_ai("maps")
 		"ai_npc": _open_ai_npc(String(data.id))
 		"ai_travel":
-			var error := AIWorld.apply_local("ai_travel", data.target)
-			if not error.is_empty(): _message("驿路", error); return
-			await _save_current()
-			_enter_world()
+			_travel_local("ai_travel", data.target)
 		"ai_command":
 			var error := AIWorld.apply_local(data.action, data.target)
 			await _save_current()
@@ -606,13 +608,46 @@ func _world_interaction(kind: String, data: Dictionary) -> void:
 			if int(Game.player.zone) == 0 and int(Game.player.quest) < 3:
 				_message("灵门未开", "完成山狼试炼，并向清微道人复命后，方可前往古剑遗迹。")
 			else:
-				Game.player.zone = 1 - int(Game.player.zone)
-				Game.player.cell = [10, 16] if int(Game.player.zone) == 0 else [5, 16]
-				var result := await _save_current()
-				if result.status == PlatformResult.Status.CANCELLED or _closing: return
-				_enter_world()
-				if not result.ok: _message("保存失败", result.message + "\n当前位置仍在内存中，请重试保存。")
+				_travel_local("portal")
 		"hint": _message("交互", String(data.text))
+
+func _travel_local(kind: String, target: String = "") -> void:
+	_release_local_chat_input()
+	world.pause_moving()
+	var before := Game.player.duplicate(true)
+	if kind == "ai_travel":
+		var error := AIWorld.apply_local(kind, target)
+		if not error.is_empty(): _message("驿路", error); return
+	else:
+		Game.player.zone = 1 - int(Game.player.zone)
+		Game.player.cell = [10, 16] if int(Game.player.zone) == 0 else [5, 16]
+	world.enabled = false
+	mode = "map_loading"
+	if not is_instance_valid(map_transition):
+		map_transition = preload("res://scenes/ui/map_transition.tscn").instantiate()
+		add_child(map_transition) # Survives rebuilding UI and the map's SubViewport.
+	map_transition.begin(Game.appearance_key())
+	map_transition.set_progress(0.25)
+	var epoch := _ui_epoch
+	await get_tree().process_frame
+	if DisplayServer.get_name() != "headless": await RenderingServer.frame_post_draw
+	if epoch != _ui_epoch or _closing: map_transition.cancel(); return
+	var result := await _save_current()
+	if result.status == PlatformResult.Status.CANCELLED or _closing: map_transition.cancel(); return
+	if not result.ok:
+		Game.player = before
+		map_transition.cancel()
+		_world_ui()
+		_message("保存失败", result.message + "\n未切换地图，请重试。")
+		return
+	map_transition.set_progress(0.65)
+	_enter_world()
+	world.enabled = false
+	epoch = _ui_epoch
+	await get_tree().process_frame
+	map_transition.complete()
+	await map_transition.finished
+	if epoch == _ui_epoch and not _closing and mode == "world": world.enabled = true
 
 func _npc() -> void:
 	var dialog := _local_npc_dialog()

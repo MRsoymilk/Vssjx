@@ -4,6 +4,8 @@ extends Node
 signal changed(entities: Dictionary)
 signal status_changed(text: String)
 signal map_changed(map_id: String)
+signal map_transfer_started
+signal connection_failed
 signal movement_cancelled
 const MAP_PATH := SharedWorldMap.MAP_PATH
 var map_id := "qingyun_trail"
@@ -92,6 +94,7 @@ func _exit_tree() -> void:
 	leave()
 
 func _failed(code: String, retry: bool = false) -> void:
+	connection_failed.emit()
 	_pending_motion.clear()
 	chat.disconnect_channel()
 	announcements.clear()
@@ -113,6 +116,7 @@ func _failed(code: String, retry: bool = false) -> void:
 	else: _state = "failed"
 
 func _reconnect_map() -> void:
+	map_transfer_started.emit()
 	# Keep the account-owned outbox: a lost transfer receipt is replayed on the new map.
 	_pending_motion.clear()
 	world_ready = false

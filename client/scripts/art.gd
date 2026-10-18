@@ -93,6 +93,7 @@ static func actor(key: String) -> AnimatedSprite2D:
 		for i in int(info.count):
 			var region := AtlasTexture.new()
 			region.atlas = texture
+			region.filter_clip = true
 			if info.has("frame_regions"):
 				var r: Array = info.frame_regions[i]
 				region.region = Rect2(r[0],r[1],r[2],r[3])

@@ -23,7 +23,7 @@ func _ready() -> void:
 	var catalog := CATALOG.new()
 	catalog.reload()
 	check(catalog.errors.is_empty(), "All JSON sources load")
-	var counts := {"weapons": 115, "equipment": 174, "items": 422, "characters": 6, "quests": 16, "maps": 217, "enemies": 123, "effects": 159, "art": 100, "archive": 1917}
+	var counts := {"weapons": 121, "equipment": 228, "items": 482, "characters": 6, "quests": 16, "maps": 217, "enemies": 123, "effects": 159, "art": 100, "archive": 1917}
 	for category in counts:
 		check(catalog.find(category).size() == counts[category], "Expected current definitions for " + category)
 	var keys: Dictionary = {}

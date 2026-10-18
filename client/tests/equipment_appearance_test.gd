@@ -14,8 +14,8 @@ func _ready() -> void:
 		for job in 3:
 			for gender in 2:
 				var value := MAPPING.variant(entry, job, gender)
-				if int(entry.job) >= 0 and int(entry.job) != job:
-					check(value.is_empty(), "Job restriction preserved: "+entry.id)
+				if not ShopRules.equipment_error(entry,job,gender).is_empty():
+					check(value.is_empty(), "Job and gender restrictions preserved: "+entry.id)
 					continue
 				check(not value.is_empty() and OriginalArt.has_actor(value["装备后动画"]), "Uses supported runtime actor: "+entry.id)
 				for path in value["部件贴图"].values(): check(ResourceLoader.exists(path), "Mapped part exists: "+path)

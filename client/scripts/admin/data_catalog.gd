@@ -54,8 +54,9 @@ func reload() -> void:
 		record["部件说明"] = entry.get("appearance_basis","武器按职业替换 e{zs,ck,fs} 部件；衣服与头饰对应为可调整重建规则。") if ShopRules.is_equipment(entry) else "非换装物品"
 		var icon := {"kind":"icon","path":entry.icon}
 		var record_id:String="shop/"+entry.id if String(entry.id).begins_with("original/") else entry.id
-		_add("items",record_id,entry.name,ShopRules.description(entry.id),"重建商店","res://assets/data/shop-v2.json",record,icon)
-		if category!="items":_add(category,record_id,entry.name,ShopRules.description(entry.id),"重建商店","res://assets/data/shop-v2.json",record,icon)
+		var status := "AI生成" if entry.get("art_source") == "AI生成" else "重建商店"
+		_add("items",record_id,entry.name,ShopRules.description(entry.id),status,"res://assets/data/shop-v2.json",record,icon)
+		if category!="items":_add(category,record_id,entry.name,ShopRules.description(entry.id),status,"res://assets/data/shop-v2.json",record,icon)
 	_load_original_items()
 	for index in INVENTORY.EQUIPMENT.size():
 		var slot: String = INVENTORY.EQUIPMENT[index]
@@ -65,7 +66,7 @@ func reload() -> void:
 	for entry in ShopRules.catalog.items:
 		if not ShopRules.is_equipment(entry): continue
 		var mapping := APPEARANCE.describe(entry)
-		_add("appearance", entry.id, entry.name, APPEARANCE.changes(entry), "已接入", "res://assets/data/shop-v2.json", mapping, {"kind":"icon", "path":entry.icon, "equipment_id":entry.id})
+		_add("appearance", entry.id, entry.name, APPEARANCE.changes(entry), "AI生成" if entry.get("art_source") == "AI生成" else "已接入", "res://assets/data/shop-v2.json", mapping, {"kind":"icon", "path":entry.icon, "equipment_id":entry.id})
 		for record in entries:
 			if record.category in ["weapons", "equipment", "items"] and (record.id == entry.id or record.id == "shop/"+entry.id):
 				record.data["外观对应"] = mapping

@@ -261,7 +261,9 @@ impl Loaded {
                 return Ok(vec![format!("已{}{}×{}。",if command.action==Action::Use{"使用"}else{"丢弃"},item.name,count)]);
             }
             if !item.equipment(){return Err("INVALID_EQUIPMENT");}
-            if command.action==Action::Equip&&item.job>=0&&item.job!=self.character.job{return Err("WRONG_JOB");}
+            if command.action==Action::Equip {
+                if let Some(code)=item.equip_error(self.character.job,self.character.gender){return Err(code);}
+            }
             let on=command.action==Action::Equip;
             if self.gear.get(id)==Some(&on){return Err("EQUIPMENT_UNCHANGED");}
             if !on&&bag_count>=60{return Err("BAG_FULL");}

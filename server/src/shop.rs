@@ -10,8 +10,18 @@ pub struct Item {
     pub id:String, pub name:String, pub slot:String, pub price:i32,
     pub attack:i32, pub defense:i32, pub visual:i32, pub head_visual:i32,
     pub job:i16, pub restore_hp:i32, pub restore_mp:i32,
+    #[serde(default="any_gender")]
+    pub gender:i16,
 }
-impl Item { pub fn equipment(&self)->bool {SLOTS.contains(&self.slot.as_str())} }
+fn any_gender()->i16{-1}
+impl Item {
+    pub fn equipment(&self)->bool {SLOTS.contains(&self.slot.as_str())}
+    pub fn equip_error(&self,job:i16,gender:i16)->Option<&'static str>{
+        if self.job>=0&&self.job!=job{return Some("WRONG_JOB");}
+        if self.gender>=0&&self.gender!=gender{return Some("WRONG_GENDER");}
+        None
+    }
+}
 static CATALOG: LazyLock<Value> = LazyLock::new(||serde_json::from_str(DATA).expect("fixed catalog"));
 static LEGACY: LazyLock<Value> = LazyLock::new(||serde_json::from_str(include_str!("../../client/assets/data/shop-v1.json")).expect("legacy catalog"));
 pub static ITEMS: LazyLock<Vec<Item>> = LazyLock::new(||serde_json::from_value(CATALOG["items"].clone()).expect("typed catalog"));
@@ -48,6 +58,33 @@ pub fn client_packet(mut packet:Value,version:u32)->Value {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn boneglow_sets_use_authoritative_slots_codes_and_role_restrictions(){
+        let stems=["mzs","wzs","mck","wck","mfs","wfs"];
+        for (index,stem) in stems.iter().enumerate(){
+            let job=(index/2) as i16;
+            let gender=(index%2) as i16;
+            let mut gear=BTreeMap::new();
+            for slot in SLOTS {
+                let id=format!("ai/boneglow/{stem}/{slot}");
+                let entry=item(&id).expect("every slot exists");
+                assert_eq!(entry.slot,slot);
+                assert!(entry.equipment());
+                assert_eq!(entry.equip_error(job,gender),None);
+                assert_eq!(entry.equip_error(job,1-gender),Some("WRONG_GENDER"));
+                assert_eq!(entry.equip_error((job+1)%3,gender),Some("WRONG_JOB"));
+                gear.insert(id,true);
+            }
+            assert_eq!(appearance(&gear),[28+index as i32,12+index as i32,10+index as i32]);
+            assert_eq!(bonus(&gear),(12,27));
+            let quantities=gear.keys().map(|id|(id.clone(),1)).collect();
+            let view=view(&gear,&quantities,6);
+            assert_eq!(view["slots"].as_object().unwrap().len(),10);
+            assert_eq!(view["owned"].as_array().unwrap().len(),10);
+        }
+        assert_eq!(item("original/if1").unwrap().gender,-1);
+        assert!(item("ai/boneglow/fake/weapon").is_none());
+    }
     #[test]
     fn legacy_wire_response_never_rewrites_full_receipt_or_exposes_unknown_items(){
         let gear:BTreeMap<String,bool>=BTreeMap::from([("sword".into(),false),("weapon_2".into(),true),("original/if1".into(),true)]);

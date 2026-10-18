@@ -308,9 +308,9 @@ func _receive(data: Dictionary, raw: PackedByteArray) -> void:
 			_failed("INVALID_APPEARANCE"); return
 		for id in data.looks:
 			var look: Variant = data.looks[id]
-			if not _uuid(id) or not look is Array or look.size() != (3 if _shop_version==2 else 2) or not _integer(look[0],0,27 if _shop_version==2 else 3) or not _integer(look[1],0,11 if _shop_version==2 else 2):
+			if not _uuid(id) or not look is Array or look.size() != (3 if _shop_version==2 else 2):
 				_failed("INVALID_APPEARANCE"); return
-			if _shop_version==2 and not _integer(look[2],0,9):
+			if (_shop_version==2 and not ShopRules.valid_appearance(look)) or (_shop_version==1 and (not _integer(look[0],0,3) or not _integer(look[1],0,2))):
 				_failed("INVALID_APPEARANCE"); return
 		var removed: Variant = data.get("removed",[])
 		if not removed is Array or removed.size()>1000:

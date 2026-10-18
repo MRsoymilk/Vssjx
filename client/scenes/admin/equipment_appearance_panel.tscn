@@ -45,6 +45,12 @@ popup/item_1/id = 1
 popup/item_2/text = "攻击"
 popup/item_2/id = 2
 
+[node name="SetPreview" type="CheckButton" parent="."]
+unique_name_in_owner = true
+visible = false
+text = "查看整套（武器 / 衣服 / 头饰）"
+theme_override_font_sizes/font_size = 12
+
 [node name="Comparison" type="HBoxContainer" parent="."]
 theme_override_constants/separation = 8
 
@@ -66,7 +72,8 @@ fit_visible_animation = true
 [node name="After" type="VBoxContainer" parent="Comparison"]
 size_flags_horizontal = 3
 
-[node name="Caption" type="Label" parent="Comparison/After"]
+[node name="AfterCaption" type="Label" parent="Comparison/After"]
+unique_name_in_owner = true
 text = "装备后 · 仅当前装备"
 theme_override_font_sizes/font_size = 11
 horizontal_alignment = 1

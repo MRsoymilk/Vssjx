@@ -91,7 +91,7 @@ func _battle(value: Variant) -> bool:
 			if not OnlineWorldClient._integer(fighter.stats.get(key), 0 if key == "mp" else 1, 100000): return false
 		if not OnlineWorldClient._integer(fighter.get("hp"), 0, int(fighter.stats.hp)) or not OnlineWorldClient._integer(fighter.get("mp"), 0, int(fighter.stats.mp)): return false
 		for i in 3:
-			if not OnlineWorldClient._integer(fighter.appearance[i], 0, [27,11,9][i]): return false
+			if not OnlineWorldClient._integer(fighter.appearance[i], 0, ShopRules.APPEARANCE_LIMITS[i]): return false
 	if not character_id in ids or value.get("turn") not in ids or (value.get("winner") != null and value.winner not in ids) or (value.get("last_actor") != null and value.last_actor not in ids): return false
 	return value.get("lines") is Array and value.lines.size() <= 12 and value.lines.all(func(line: Variant)->bool:return line is String and line.length() <= 200) and value.get("last_action") is String and value.get("last_skill") is String and value.last_skill.length() <= 32 and OnlineWorldClient._integer(value.get("remaining_ms"), 0, 30000)
 

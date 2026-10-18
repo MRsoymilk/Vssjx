@@ -76,6 +76,7 @@ func _ready() -> void:
 	for state in ["normal","hover","pressed","focus"]:category_box.add_theme_stylebox_override(state,_style(Color("f5df9b")))
 	for state in ["font_color","font_hover_color","font_pressed_color","font_focus_color"]:category_box.add_theme_color_override(state,GOLD)
 	for label in ["全部","武器","帽子","衣服","手腕","腰带","裤子","鞋子","戒指","项链","腰佩","药品","药材","宝石","配方","材料","特殊"]:category_box.add_item(label)
+	category_box.add_item("骨甲幽光 · 本角色")
 	add_child(category_box)
 	category_box.item_selected.connect(func(index: int) -> void:category=category_box.get_item_text(index);notice="";_filter())
 	scroll=ScrollContainer.new()
@@ -124,14 +125,15 @@ func _character() -> Dictionary:
 	return Game.player if online_model==null else online_model.state.get("character",{})
 func _appearance() -> String:
 	var character:=_character();var gear:=_gear().duplicate(true);var entry:=ShopRules.item(selected)
-	if not gear.is_empty() and ShopRules.is_equipment(entry) and (int(entry.job)<0 or int(entry.job)==int(character.get("job",0))):
+	if not gear.is_empty() and ShopRules.is_equipment(entry) and ShopRules.equipment_error(entry,int(character.get("job",0)),int(character.get("gender",0))).is_empty():
 		if not gear.has("slots"):gear.slots={}
 		gear.slots[entry.slot]=selected
 		if entry.slot in ["weapon","armor"]:gear[entry.slot]=selected
 	return ShopRules.actor_key(int(character.get("job",0)),int(character.get("gender",0)),ShopRules.appearance(gear))
 
 func _filter() -> void:
-	goods=ShopRules.catalog.items.filter(func(item: Dictionary) -> bool:return item.sections.has(section) and (category=="全部" or item.category==category))
+	var character := _character()
+	goods=ShopRules.catalog.items.filter(func(item: Dictionary) -> bool:return item.sections.has(section) and (category=="全部" or item.category==category or (category=="骨甲幽光 · 本角色" and item.get("set_id", "").begins_with("boneglow/") and ShopRules.equipment_error(item,int(character.get("job",0)),int(character.get("gender",0))).is_empty())))
 	for child in grid.get_children():grid.remove_child(child);child.queue_free()
 	rows.clear();scroll.scroll_vertical=0
 	if not goods.any(func(item: Dictionary) -> bool:return item.id==selected):selected=goods[0].id if not goods.is_empty() else ""
@@ -174,14 +176,16 @@ func refresh() -> void:
 	var amount:=int(quantity_box.value)
 	summary.text=entry.name+" · "+entry.category+"\n"+ShopRules.description(selected)
 	if int(entry.job)>=0:summary.text+=" · "+Game.JOBS[int(entry.job)]
+	if int(entry.get("gender",-1))>=0:summary.text+=" · "+("男" if int(entry.gender)==0 else "女")
 	total.text="物品总价：%d铜钱"%(int(entry.price)*amount)
 	OriginalArt.apply_appearance(preview,_appearance())
-	var version_locked: bool=online_model!=null and gear.get("version")!="shop-v2" and selected.begins_with("original/")
+	var version_locked: bool=online_model!=null and gear.get("version")!="shop-v2" and (selected.begins_with("original/") or selected.begins_with("ai/"))
 	buy_button.disabled=locked or version_locked or gold<int(entry.price)*amount or (equipment and count>0) or (not equipment and count+amount>99)
-	equip_button.disabled=locked or version_locked or not equipment or count==0 or (int(entry.job)>=0 and int(entry.job)!=int(character.get("job",0)))
+	var incompatible := not ShopRules.equipment_error(entry,int(character.get("job",0)),int(character.get("gender",0))).is_empty()
+	equip_button.disabled=locked or version_locked or not equipment or count==0 or incompatible
 	equip_button.text="卸下" if ShopRules.equipped_id(gear,entry.slot)==selected else "装备"
-	preview_button.disabled=not equipment or (int(entry.job)>=0 and int(entry.job)!=int(character.get("job",0)))
-	hint.text=notice if not notice.is_empty() else ("此商品需要更新服务端" if version_locked else "原包图标 · 名称、数值和部分换装映射为重建规则")
+	preview_button.disabled=not equipment or incompatible
+	hint.text=notice if not notice.is_empty() else ("此商品需要更新服务端" if version_locked else ("骨甲幽光 · AI新设计 · 名称、数值为重建规则" if entry.get("art_source")=="AI生成" else "原包图标 · 名称、数值和部分换装映射为重建规则"))
 	_refreshing=false
 
 func _online_changed() -> void:

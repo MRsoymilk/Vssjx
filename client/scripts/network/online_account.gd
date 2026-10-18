@@ -321,7 +321,7 @@ static func _valid_character(value: Variant) -> bool:
 		var look_v2: Variant = value.appearance_v2
 		if not look_v2 is Array or look_v2.size()!=3: return false
 		for i in 3:
-			if not OnlinePve.integer(look_v2[i],0,[27,11,9][i]): return false
+			if not OnlinePve.integer(look_v2[i],0,ShopRules.APPEARANCE_LIMITS[i]): return false
 	if value.has("appearance"):
 		var look: Variant = value.appearance
 		if not look is Array or look.size() != 2: return false

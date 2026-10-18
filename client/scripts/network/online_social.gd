@@ -117,7 +117,7 @@ func valid(v: Dictionary) -> bool:
 	if p!=null:
 		if not person(p) or not OnlinePve.integer(p.get("school"),0,3) or not p.get("combat") is Dictionary or not p.get("equipment") is Dictionary or not p.get("appearance") is Array or p.appearance.size()!=3: return false
 		for i in 3:
-			if not OnlinePve.integer(p.appearance[i],0,[27,11,9][i]): return false
+			if not OnlinePve.integer(p.appearance[i],0,ShopRules.APPEARANCE_LIMITS[i]): return false
 		for key in ["hp","mp","physical_attack","magic_attack","physical_defense","magic_defense","physical_crit","magic_crit","physical_hit","magic_hit","physical_evasion","magic_evasion","damage_reduction"]:
 			if not OnlinePve.integer(p.combat.get(key),0,100000): return false
 		for slot in ShopRules.SLOTS:

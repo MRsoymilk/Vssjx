@@ -22,7 +22,7 @@ func _ready() -> void:
 	add_child(browser)
 	await settle()
 	browser.select_category("appearance")
-	check(browser.visible_entries.size() == 142, "All 142 equipment mappings appear in their own category")
+	check(browser.visible_entries.size() == 202, "All 142 original/compatible and 60 AI equipment mappings appear")
 	check(browser.catalog.find("appearance", "eck1").any(func(row: Dictionary) -> bool: return row.id == "original/iw28"), "Mappings can be searched by original part number")
 	var panel = browser.get_node("%AppearanceComparison")
 	for id in ["original/iw28", "original/if11", "original/if1", "original/if3", "weapon_2", "armor_2"]:

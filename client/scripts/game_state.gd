@@ -465,7 +465,7 @@ func valid_save(data: Variant) -> bool:
 		if not local_gear.owned.has(id) or not ShopRules._integer(data.shop_quantities[id],1,1 if ShopRules.is_equipment(ShopRules.item(id)) else 99): return false
 	for slot in ShopRules.SLOTS:
 		var id: Variant = ShopRules.equipped_id(local_gear,slot)
-		if id!=null and int(ShopRules.item(id).job)>=0 and int(ShopRules.item(id).job)!=int(data.job): return false
+		if id!=null and not ShopRules.equipment_error(ShopRules.item(id),int(data.job),int(data.get("gender",0))).is_empty(): return false
 	var order: Variant = data.get("bag_order", ["potion", "sword"])
 	if not order is Array or order.size() != 2 or not order.has("potion") or not order.has("sword"): return false
 	for key in ["signature", "title"]:

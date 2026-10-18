@@ -100,7 +100,7 @@ func receive(data: Dictionary) -> bool:
 				confirmed.emit()
 			else:
 				pending = {}
-				var errors := {"CHAT_MUTED": "当前账号被禁言。", "CHAT_RATE_LIMITED": "发送过快，请稍后再试。", "CHAT_BUSY": "公共频道繁忙，请稍后再试。", "CHAT_INVALID_TEXT": "消息含控制符或超过长度限制。", "CHAT_PENDING": "上一条消息仍在排队。", "CHAT_ID_CONFLICT": "原消息ID内容不一致，未发送。"}
+				var errors := {"CHAT_MUTED": "当前账号被禁言。", "CHAT_REMOVED": "该发言已被管理员删除。", "CHAT_RATE_LIMITED": "发送过快，请稍后再试。", "CHAT_BUSY": "公共频道繁忙，请稍后再试。", "CHAT_INVALID_TEXT": "消息含控制符或超过长度限制。", "CHAT_PENDING": "上一条消息仍在排队。", "CHAT_ID_CONFLICT": "原消息ID内容不一致，未发送。"}
 				status_changed.emit(String(errors.get(result.code, "发送失败：" + result.code)))
 		return true
 	if data.get("channel_epoch") != epoch: return false
@@ -111,16 +111,21 @@ func receive(data: Dictionary) -> bool:
 		return true
 	if kind != "chat.batch" or not data.get("messages") is Array or data.messages.is_empty() or data.messages.size() > 16: return false
 	var cursor := _cursor
+	var removed: Variant = data.get("removed_message_ids", [])
+	if not removed is Array or removed.size() > 100: return false
+	for id in removed:
+		if not OnlineWorldClient._uuid(id): return false
 	var ids: Dictionary = {}
 	for message in messages: ids[message.message_id] = true
 	for value in data.messages:
 		if not value is Dictionary or not OnlineWorldClient._decimal(value.get("seq")) or int(value.seq) != cursor + 1 or not OnlineWorldClient._uuid(value.get("message_id")) or ids.has(value.message_id): return false
 		if not OnlineWorldClient._uuid(value.get("sender_character_id")) or not value.get("display_name") is String or OnlineAccount.canonical_nickname(value.display_name).get("display_name") != value.display_name: return false
 		if not OnlineWorldClient._decimal(value.get("server_time_ms")) or value.get("channel") != "public" or not value.get("text") is String or not valid_text(value.text): return false
+		if not value.get("system", false) is bool or not value.get("deleted", false) is bool: return false
 		ids[value.message_id] = true
 		cursor += 1
 	_cursor = cursor
 	messages.append_array(data.messages)
-	while messages.size() > _history_limit: messages.pop_front()
+	messages = messages.filter(func(message: Dictionary) -> bool: return not message.get("deleted", false) and not removed.has(message.message_id) and int(message.seq) > _cursor - _history_limit)
 	changed.emit()
 	return true

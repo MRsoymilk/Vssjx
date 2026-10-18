@@ -421,7 +421,7 @@ func _chat_changed() -> void:
 	expanded_chat.sync_messages(network.chat.messages)
 	var lines := PackedStringArray()
 	if not _pve_log.is_empty() or network.chat.messages.is_empty() or not network.world_ready: lines.append("[系统] " + _system_text)
-	for message in network.chat.messages: lines.append("[公共] %s：%s" % [message.display_name, message.text])
+	for message in network.chat.messages: lines.append("[系统] " + message.text if message.get("system", false) else "[公共] %s：%s" % [message.display_name, message.text])
 	var text_value := "\n".join(lines)
 	if text_value != _rendered_chat:
 		_rendered_chat = text_value
@@ -432,7 +432,7 @@ func _chat_changed() -> void:
 		for index in network.chat.messages.size():
 			if index > 0: chat_log.add_text("\n")
 			var message: Dictionary = network.chat.messages[index]
-			chat_log.add_text("[公共] %s：" % message.display_name)
+			chat_log.add_text("[系统] " if message.get("system", false) else "[公共] %s：" % message.display_name)
 			ChatEmotePicker.CATALOG.append_body(chat_log, message.text)
 	chat_button.tooltip_text = "公共聊天 · %d条消息" % network.chat.messages.size()
 

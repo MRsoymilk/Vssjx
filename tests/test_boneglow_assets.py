@@ -9,8 +9,10 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class BoneglowAssets(unittest.TestCase):
+    FAMILY = 'boneglow'
+
     def test_native_frames_and_design_icons(self):
-        manifest = json.loads((ROOT/'client/assets/data/boneglow-equipment.json').read_text('utf8'))
+        manifest = json.loads((ROOT/f'client/assets/data/{self.FAMILY}-equipment.json').read_text('utf8'))
         native = json.loads((ROOT/'client/assets/data/hero-parts.json').read_text('utf8'))
         self.assertEqual(len(manifest['sets']), 6)
         self.assertEqual(len(manifest['parts']), 30)
@@ -29,7 +31,7 @@ class BoneglowAssets(unittest.TestCase):
                         if expected:
                             self.assertLessEqual(abs(actual[0]-expected[0]), 1)
                             self.assertLessEqual(abs(actual[3]-expected[3]), 1)
-            folder = ROOT/f"client/assets/generated/equipment/boneglow/{set_['stem']}/icons"
+            folder = ROOT/f"client/assets/generated/equipment/{self.FAMILY}/{set_['stem']}/icons"
             self.assertEqual(len(list(folder.glob('*.png'))), 10)
             for path in folder.glob('*.png'):
                 with Image.open(path) as icon:
@@ -38,7 +40,7 @@ class BoneglowAssets(unittest.TestCase):
                     self.assertEqual(icon.getpixel((0, 0))[3], 0)
 
     def test_import_checksums(self):
-        report = json.loads((ROOT/'analysis/ai-generated/equipment/boneglow/runtime-import-report.json').read_text('utf8'))
+        report = json.loads((ROOT/f'analysis/ai-generated/equipment/{self.FAMILY}/runtime-import-report.json').read_text('utf8'))
         self.assertEqual(len(report), 90)
         for record in report:
             path = ROOT/'client'/record['path'].removeprefix('res://')

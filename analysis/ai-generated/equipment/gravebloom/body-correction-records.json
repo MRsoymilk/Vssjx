@@ -1,0 +1,15 @@
+{
+  "tool": "image_gen built-in",
+  "sets": [
+    {
+      "id": "02_female_lishi",
+      "prompt": "Precise production sprite atlas correction. Image 1 is the painted 4-column by 8-row atlas to edit. Image 2 is its exact native part geometry template. Preserve the entire canvas, all first-image HEAD parts, weapons, leg frames and ALL ten icons unchanged.\nONLY FIX BODY PARTS WITH ACCIDENTALLY DRAWN HEADS: The small body sprites in rows 1-5, excluding the first two head cells, must be HEADLESS TORSO OR LIMBS, exactly like image 2. Remove every miniature face, skull, hood, horn or hair painted inside those body cells. In particular row 1 columns 3-4 and row 2 column 4 are not whole characters. They must be the matching headless armor/robe torso, pants or arm shape shown in image 2. Use image 2's exact body frame shape/placement/occupied extent; repaint only that body region with the SAME first-image costume, closed dark armor/robe, bone trim, green gems, cuffs. Tiny arm cells remain just hands or arms. NO skull/face/hood/hair anywhere except row 1 columns 1-2 and the headwear icon in row 6 column 2. No change to facial design in the real head cell. Keep all empty cells transparent. No new objects or text. Same 4x8 layout and alpha background, coarse native pixel grid.",
+      "path": "C:\\Users\\milk\\.codex\\generated_images\\01a13f9f-f6d1-7c41-b090-6fb33b951df1\\exec-ddfb416c-c889-4041-b40f-3811b9ffee76.png"
+    },
+    {
+      "id": "05_male_yinzhe",
+      "prompt": "Precise production sprite atlas correction. Image 1 is the painted 4-column by 8-row atlas to edit. Image 2 is its exact native part geometry template. Preserve the entire canvas, all first-image HEAD parts, weapons, leg frames and ALL ten icons unchanged.\nONLY FIX BODY PARTS WITH ACCIDENTALLY DRAWN HEADS: The small body sprites in rows 1-5, excluding the first two head cells, must be HEADLESS TORSO OR LIMBS, exactly like image 2. Remove every miniature face, skull, hood, horn or hair painted inside those body cells. In particular row 1 columns 3-4 and row 2 column 4 are not whole characters. They must be the matching headless armor/robe torso, pants or arm shape shown in image 2. Use image 2's exact body frame shape/placement/occupied extent; repaint only that body region with the SAME first-image costume, closed dark armor/robe, bone trim, green gems, cuffs. Tiny arm cells remain just hands or arms. NO skull/face/hood/hair anywhere except row 1 columns 1-2 and the headwear icon in row 6 column 2. No change to facial design in the real head cell. Keep all empty cells transparent. No new objects or text. Same 4x8 layout and alpha background, coarse native pixel grid.",
+      "path": "C:\\Users\\milk\\.codex\\generated_images\\01a13f9f-f6d1-7c41-b090-6fb33b951df1\\exec-e896d8ed-8d2f-4022-8208-3af067d8e6e8.png"
+    }
+  ]
+}

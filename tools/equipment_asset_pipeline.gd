@@ -12,21 +12,41 @@ const SETS := [
 	["05_male_yinzhe", "mfs", "幽篁摄灵", 2, 3],
 	["06_female_yinzhe", "wfs", "苍灵月骨", 2, 3]
 ]
+var data_dir := DATA
+var work_dir := WORK
+var family := "boneglow"
+var definitions: Array = SETS
+var sheet_rows := 5
+var icon_start_cell := -1
+var weapon_icon_ids: Array = []
+const ICON_SLOTS := ["weapon","hat","armor","wrist","belt","pants","boots","pendant","ring","necklace"]
 
 func _init() -> void:
+	var args := OS.get_cmdline_user_args()
+	var config_index := args.find("--config")
+	if config_index >= 0:
+		var config: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(args[config_index+1]))
+		family = config.family
+		data_dir = ROOT+"analysis/ai-generated/equipment/"+family+"/"
+		work_dir = ROOT+"work/"+family+"-production/"
+		definitions = config.sets
+		sheet_rows = int(config.get("sheet_rows",5))
+		icon_start_cell = int(config.get("icon_start_cell",-1))
+		weapon_icon_ids = config.get("weapon_icon_ids",[])
 	if "build" in OS.get_cmdline_user_args():
 		build_runtime()
 		return
-	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(WORK))
-	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(DATA))
+	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(work_dir))
+	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(data_dir))
 	var parts: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://assets/data/hero-parts.json"))
 	var manifest: Array = []
-	for definition in SETS:
+	for definition_index in definitions.size():
+		var definition: Array = definitions[definition_index]
 		var id: String = definition[0]
 		var stem: String = definition[1]
 		var recipe: Dictionary = parts.recipes[stem]
-		var sources := [stem+"t"+str(definition[4]), recipe.sources[1], recipe.sources[3], recipe.sources[4], "e"+stem.substr(1)+str(definition[3])]
-		var atlas := Image.create(1024, 1280, false, Image.FORMAT_RGBA8)
+		var sources := [stem+"t"+str(int(definition[4])), recipe.sources[1], recipe.sources[3], recipe.sources[4], "e"+stem.substr(1)+str(int(definition[3]))]
+		var atlas := Image.create(1024, 256*sheet_rows, false, Image.FORMAT_RGBA8)
 		var cells: Array = []
 		for source in sources:
 			var info: Dictionary = parts.parts[source]
@@ -39,11 +59,21 @@ func _init() -> void:
 				var pos := Vector2i((index%4)*256+(256-tile.get_width())/2, (index/4)*256+(256-tile.get_height())/2)
 				atlas.blit_rect(tile, Rect2i(Vector2i.ZERO, tile.get_size()), pos)
 				cells.append({"source":source,"frame":frame,"original_region":r,"template_region":[pos.x,pos.y,tile.get_width(),tile.get_height()]})
-		atlas.save_png(WORK+id+"-parts-template.png")
+		if icon_start_cell >= 0:
+			var ids: Array = [weapon_icon_ids[definition_index],"original/if1","original/if2","original/if3","original/if4","original/if5","original/if6","original/if9","original/if7","original/if8"]
+			var catalog: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://assets/data/shop-v2.json"))
+			for index in ids.size():
+				var item: Dictionary = catalog.items.filter(func(entry: Dictionary)->bool:return entry.id==ids[index])[0]
+				var image := Image.load_from_file(ProjectSettings.globalize_path(item.icon))
+				image.resize(image.get_width()*4,image.get_height()*4,Image.INTERPOLATE_NEAREST)
+				var cell := icon_start_cell+index
+				var pos := Vector2i((cell%4)*256+(256-image.get_width())/2,(cell/4)*256+(256-image.get_height())/2)
+				atlas.blit_rect(image,Rect2i(Vector2i.ZERO,image.get_size()),pos)
+		atlas.save_png(work_dir+id+"-parts-template.png")
 		manifest.append({"id":id,"stem":stem,"name":definition[2],"weapon_template":definition[3],"head_template":definition[4],"cells":cells})
-	var file := FileAccess.open(DATA+"native-frame-templates.json",FileAccess.WRITE)
+	var file := FileAccess.open(data_dir+"native-frame-templates.json",FileAccess.WRITE)
 	file.store_string(JSON.stringify(manifest,"  ")+"\n")
-	print("Prepared six exact native part atlases: ", ProjectSettings.globalize_path(WORK))
+	print("Prepared six exact native part atlases: ", ProjectSettings.globalize_path(work_dir))
 	quit()
 
 func clean_alpha(image: Image) -> void:
@@ -56,16 +86,16 @@ func clean_alpha(image: Image) -> void:
 			image.set_pixel(x,y,color if color.a > 0 else Color.TRANSPARENT)
 
 func build_runtime() -> void:
-	var templates: Array = JSON.parse_string(FileAccess.get_file_as_string(DATA+"native-frame-templates.json"))
+	var templates: Array = JSON.parse_string(FileAccess.get_file_as_string(data_dir+"native-frame-templates.json"))
 	var original: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://assets/data/hero-parts.json"))
 	var report: Array = []
-	var slots := ["weapon","hat","armor","wrist","belt","pants","boots","pendant","ring","necklace"]
+	var slots := ICON_SLOTS
 	for entry in templates:
-		var output: String = "res://assets/generated/equipment/boneglow/"+entry.stem+"/"
+		var output: String = "res://assets/generated/equipment/"+family+"/"+entry.stem+"/"
 		for folder in ["parts","icons"]: DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(output+folder))
-		var paint_path: String = DATA+entry.id+"-parts-painted.png"
+		var paint_path: String = data_dir+entry.id+"-parts-painted.png"
 		var painted := Image.load_from_file(ProjectSettings.globalize_path(paint_path))
-		var design := Image.load_from_file(ProjectSettings.globalize_path(DATA+entry.id+"-equipment-review.png"))
+		var design := painted if icon_start_cell >= 0 else Image.load_from_file(ProjectSettings.globalize_path(data_dir+entry.id+"-equipment-review.png"))
 		clean_alpha(painted)
 		clean_alpha(design)
 		var atlases := {}
@@ -79,9 +109,9 @@ func build_runtime() -> void:
 			var used := native.get_region(original_rect).get_used_rect()
 			if used.size == Vector2i.ZERO: continue
 			var x := roundi(float(index%4)*painted.get_width()/4)
-			var y := roundi(float(index/4)*painted.get_height()/5)
+			var y := roundi(float(index/4)*painted.get_height()/sheet_rows)
 			var end_x := roundi(float(index%4+1)*painted.get_width()/4)
-			var end_y := roundi(float(index/4+1)*painted.get_height()/5)
+			var end_y := roundi(float(index/4+1)*painted.get_height()/sheet_rows)
 			var tile := painted.get_region(Rect2i(x,y,end_x-x,end_y-y))
 			var new_used := tile.get_used_rect()
 			if new_used.size == Vector2i.ZERO:
@@ -96,12 +126,14 @@ func build_runtime() -> void:
 			atlases[source].save_png(path)
 			report.append({"path":path,"sha256":FileAccess.get_sha256(path),"native_frames":original.parts[source].frames})
 		for index in slots.size():
-			var row := 1+index/4
-			var column := index%4
+			var source_cell := icon_start_cell+index if icon_start_cell >= 0 else 4+index
+			var row := source_cell/4
+			var column := source_cell%4
+			var rows := sheet_rows if icon_start_cell >= 0 else 4
 			var x := roundi(float(column)*design.get_width()/4)
-			var y := roundi(float(row)*design.get_height()/4)
+			var y := roundi(float(row)*design.get_height()/rows)
 			var end_x := roundi(float(column+1)*design.get_width()/4)
-			var end_y := roundi(float(row+1)*design.get_height()/4)
+			var end_y := roundi(float(row+1)*design.get_height()/rows)
 			var cell := design.get_region(Rect2i(x,y,end_x-x,end_y-y))
 			var icon := cell.get_region(cell.get_used_rect())
 			var factor := minf(28.0/icon.get_width(),28.0/icon.get_height())
@@ -110,8 +142,8 @@ func build_runtime() -> void:
 			canvas.blit_rect(icon,Rect2i(Vector2i.ZERO,icon.get_size()),(Vector2i(32,32)-icon.get_size())/2)
 			var path: String = output+"icons/"+slots[index]+".png"
 			canvas.save_png(path)
-			report.append({"path":path,"sha256":FileAccess.get_sha256(path),"source_cell":4+index})
-	var file := FileAccess.open(DATA+"runtime-import-report.json",FileAccess.WRITE)
+			report.append({"path":path,"sha256":FileAccess.get_sha256(path),"source_cell":source_cell})
+	var file := FileAccess.open(data_dir+"runtime-import-report.json",FileAccess.WRITE)
 	file.store_string(JSON.stringify(report,"  ")+"\n")
 	print("Published ",report.size()," native runtime textures (30 parts, 60 icons)")
 	quit()

@@ -1,0 +1,5 @@
+# Activate only after Certbot has issued the vssjx-ip certificate successfully.
+services:
+  nginx:
+    volumes:
+      - ./public.https.nginx.conf:/etc/nginx/conf.d/default.conf:ro

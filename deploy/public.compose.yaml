@@ -1,0 +1,86 @@
+# Ubuntu/Debian Docker Engine: host networking preserves loopback-only monitoring.
+# Overlay on compose.yaml; keep its project name and existing PostgreSQL volume.
+x-public-logging: &public-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+services:
+  postgres:
+    restart: unless-stopped
+    logging: *public-logging
+
+  game:
+    build:
+      context: ..
+      dockerfile: deploy/server.Dockerfile
+    image: vssjx-server:local
+    network_mode: host
+    restart: unless-stopped
+    stop_grace_period: 45s
+    env_file:
+      - ../.env
+    environment:
+      SSJX_ENV_FILE: ""
+      SSJX_BIND_ADDR: "127.0.0.1:8080"
+      SSJX_MONITOR_BIND_ADDR: "127.0.0.1:9090"
+      SSJX_LOG_DIR: /app/logs
+      SSJX_DATABASE_URL: ${SSJX_DATABASE_URL:?Set SSJX_DATABASE_URL to the existing loopback PostgreSQL URL}
+    volumes:
+      - game-logs:/app/logs
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "--silent", "--max-time", "3", "http://127.0.0.1:8080/readyz"]
+      interval: 10s
+      timeout: 5s
+      start_period: 60s
+      retries: 5
+    logging: *public-logging
+
+  nginx:
+    image: nginx:stable-alpine@sha256:970364228b1e4f932abc22d321932816782cca8a20b85a77552a7cfe9acfb3b5
+    network_mode: host
+    restart: unless-stopped
+    volumes:
+      - ./public.http.nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - acme-webroot:/var/www/acme:ro
+      - letsencrypt:/etc/letsencrypt:ro
+    depends_on:
+      game:
+        condition: service_healthy
+    logging: *public-logging
+
+  certbot:
+    image: certbot/certbot:v5.8.0
+    profiles: ["tools"]
+    volumes:
+      - acme-webroot:/var/www/acme
+      - letsencrypt:/etc/letsencrypt
+      - certbot-work:/var/lib/letsencrypt
+      - certbot-logs:/var/log/letsencrypt
+    command:
+      - certonly
+      - --webroot
+      - --webroot-path
+      - /var/www/acme
+      - --preferred-profile
+      - shortlived
+      - --ip-address
+      - ${SSJX_PUBLIC_IP:?Set SSJX_PUBLIC_IP to your real public IP}
+      - --cert-name
+      - vssjx-ip
+      - --email
+      - ${SSJX_ACME_EMAIL:?Set SSJX_ACME_EMAIL}
+      - --agree-tos
+      - --non-interactive
+    logging: *public-logging
+
+volumes:
+  game-logs:
+  acme-webroot:
+  letsencrypt:
+  certbot-work:
+  certbot-logs:

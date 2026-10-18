@@ -3,6 +3,7 @@
 *.tscn text eol=lf
 *.godot text eol=lf
 *.py text eol=lf
+*.sh text eol=lf
 *.md text eol=lf
 client/assets/data/actors.json text eol=lf
 client/assets/data/actors/** text eol=lf

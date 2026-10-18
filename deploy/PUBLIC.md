@@ -108,6 +108,20 @@ docker compose --env-file .env \
 
 机制依据：[Certbot renew与deploy hook](https://eff-certbot.readthedocs.io/en/stable/using.html#renewing-certificates)。
 
+### 同时迁移已有网页客户端
+
+将已导出的`public`目录复制到服务器，例如`/opt/Vssjx/public`。仅复制可公开的导出产物，不将项目源码或配置目录作为网页根目录。在`.env`中设置`SSJX_PUBLIC_WEB_ROOT=/opt/Vssjx/public`，并保持`SSJX_WEB_ALLOWED_ORIGINS=https://真实公网IP`。
+
+申请证书并启用TLS后，额外应用网页覆盖文件：
+
+```sh
+docker compose --env-file .env \
+  -f deploy/compose.yaml -f deploy/public.compose.yaml \
+  -f deploy/public.tls.compose.yaml -f deploy/public.web.compose.yaml up -d
+```
+
+以后日常操作都保留这四份Compose文件。`renew-public-certificate.sh`检测到`.env`中的非空`SSJX_PUBLIC_WEB_ROOT`时自动保留网页覆盖文件。浏览器访问`https://真实公网IP/`，API仍通过同源`/api/v1/`连接；网页缺失资源返回404，带版本的资源保留长期缓存。
+
 ## 7. 监控、更新与备份
 
 监控从本机SSH隧道访问：

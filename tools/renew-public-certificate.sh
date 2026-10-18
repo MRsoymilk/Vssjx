@@ -4,6 +4,10 @@ set -eu
 task_root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 cd "$task_root"
 dc() {
+    # Keep the optional Web overlay when renewing an existing Web deployment.
+    if grep -q '^SSJX_PUBLIC_WEB_ROOT=.' .env; then
+        set -- -f deploy/public.web.compose.yaml "$@"
+    fi
     docker compose --env-file .env \
         -f deploy/compose.yaml \
         -f deploy/public.compose.yaml \

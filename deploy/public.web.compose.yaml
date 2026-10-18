@@ -1,0 +1,12 @@
+# Optional: serve an existing, reviewed Godot Web export beside the public API.
+# Apply after public.tls.compose.yaml. Never mount the project source directory.
+services:
+  nginx:
+    volumes:
+      - ./public.web.https.nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - type: bind
+        source: ${SSJX_PUBLIC_WEB_ROOT:?Set SSJX_PUBLIC_WEB_ROOT to the exported public directory}
+        target: /usr/share/nginx/html
+        read_only: true
+        bind:
+          create_host_path: false

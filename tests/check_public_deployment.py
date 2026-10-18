@@ -38,11 +38,11 @@ def main():
     with tempfile.TemporaryDirectory(prefix='vssjx-public-check-') as temporary:
         base = Path(temporary)
         (base / 'deploy').mkdir()
-        for name in ['compose.yaml', 'public.compose.yaml', 'public.tls.compose.yaml']:
+        for name in ['compose.yaml', 'public.compose.yaml', 'public.tls.compose.yaml', 'public.web.compose.yaml']:
             shutil.copyfile(ROOT / 'deploy' / name, base / 'deploy' / name)
         (base / '.env').write_text('SSJX_POSTGRES_PASSWORD=owned-test-only\n'
                                  'SSJX_DATABASE_URL=postgresql://vssjx:owned-test-only@127.0.0.1:5432/vssjx\n'
-                                 'SSJX_PUBLIC_IP=203.0.113.10\nSSJX_ACME_EMAIL=test@example.invalid\n', encoding='utf-8')
+                                 'SSJX_PUBLIC_IP=203.0.113.10\nSSJX_ACME_EMAIL=test@example.invalid\nSSJX_PUBLIC_WEB_ROOT=/owned-fixture/public\n', encoding='utf-8')
         command = ['docker', 'compose', '--env-file', '.env', '-f', 'deploy/compose.yaml', '-f', 'deploy/public.compose.yaml']
 
         def config(extra=()):
@@ -67,7 +67,11 @@ def main():
         configs = [mount for mount in nginx_mounts if mount['target'] == '/etc/nginx/conf.d/default.conf']
         check(len(configs) == 1 and configs[0]['source'].endswith('public.https.nginx.conf'), 'TLS overlay replaces only bootstrap config and retains certificate volumes')
         check(initial['volumes'] == tls['volumes'], 'Enabling HTTPS never changes persistent volume identity')
-        for name in ['public.http.nginx.conf', 'public.https.nginx.conf']:
+        web = config(['-f', 'deploy/public.tls.compose.yaml', '-f', 'deploy/public.web.compose.yaml'])
+        mounts = web['services']['nginx']['volumes']
+        check(len([m for m in mounts if m['target'] == '/etc/nginx/conf.d/default.conf']) == 1 and any(m['source'].endswith('public.web.https.nginx.conf') for m in mounts), 'Web overlay selects exactly one HTTPS configuration')
+        check(any(m['target'] == '/usr/share/nginx/html' and m['read_only'] and not m['bind']['create_host_path'] for m in mounts), 'Web export is mounted read-only without creating an empty source directory')
+        for name in ['public.http.nginx.conf', 'public.https.nginx.conf', 'public.web.https.nginx.conf']:
             text = (ROOT / 'deploy' / name).read_text(encoding='utf-8')
             check('/.well-known/acme-challenge/' in text and 'root /var/www/acme' in text, 'ACME challenge survives configuration stage: ' + name)
         text = (ROOT / 'deploy/public.https.nginx.conf').read_text(encoding='utf-8')
@@ -80,7 +84,7 @@ def main():
             cert.mkdir(parents=True)
             run([args.openssl, 'req', '-x509', '-newkey', 'rsa:2048', '-nodes', '-days', '1',
                  '-subj', '/CN=deployment-fixture.invalid', '-keyout', str(cert / 'privkey.pem'), '-out', str(cert / 'fullchain.pem')])
-            for name in ['public.http.nginx.conf', 'public.https.nginx.conf']:
+            for name in ['public.http.nginx.conf', 'public.https.nginx.conf', 'public.web.https.nginx.conf']:
                 run(['docker', 'run', '--rm', '--pull=never',
                      '--mount', f'type=bind,source={ROOT / "deploy" / name},target=/etc/nginx/conf.d/default.conf,readonly',
                      '--mount', f'type=bind,source={base / "certs"},target=/etc/letsencrypt,readonly',

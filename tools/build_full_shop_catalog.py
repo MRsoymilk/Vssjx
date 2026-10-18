@@ -35,6 +35,8 @@ MEDICINES = {
     22:('赤玉葫芦',70,0),23:('铜口葫芦',100,25),24:('烧饼',20,0),25:('灵果',25,10),
     26:('莲蓬',0,20),27:('朱果',35,15),28:('回春药罐',45,0),70:('白玉药囊',75,0),71:('赤陶药罐',100,0),72:('青纹药罐',60,40),
 }
+# Material resource names confirmed by the user; keep recovered evidence intact.
+MATERIAL_NAMES = {42: '当归', 43: '茯苓'}
 
 
 def build():
@@ -75,7 +77,7 @@ def build():
             elif n in [7,8,9,10,11,12,13,14,62,63,73]: category='药材';name='灵草';row['price']=10
             elif n in [30,55,56,58,64,65,66,69]: category='特殊';name='奇珍';row['price']=30
             else: category='材料';name='炼制材料';row['price']=8
-            row.update(name=f'{name}·{n:02}',category=category,sections=['hot','rare' if category=='特殊' else 'craft'])
+            row.update(name=MATERIAL_NAMES.get(n,f'{name}·{n:02}'),category=category,sections=['hot','rare' if category=='特殊' else 'craft'])
         items.append(row)
     assert len(items)==208 and len({r['id'] for r in items})==208
     assert {r['source_member'] for r in items}=={r['source_member'] for r in original['items']}

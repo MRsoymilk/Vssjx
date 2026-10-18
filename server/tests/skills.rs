@@ -12,12 +12,50 @@ fn stats() -> Stats {
     }
 }
 #[test]
+fn all_school_identities_share_job_skills_but_not_level_or_class_permissions() {
+    for job in 0..3 {
+        for level in [1, 5, 15, 25, 35, 45, 50, 55, 60] {
+            let unjoined = skills::view(job, 3, level);
+            for school in 0..3 {
+                assert_eq!(skills::view(job, school, level), unjoined);
+            }
+        }
+    }
+    let emei_knight = skills::view(1, 0, 50);
+    assert_eq!(emei_knight["available"].as_array().unwrap().len(), 8);
+    assert!(emei_knight["available"].as_array().unwrap().contains(&json!("sheet_051")));
+    assert!(!emei_knight["available"].as_array().unwrap().contains(&json!("sheet_008")));
+    assert_eq!(skills::check("sheet_008", 1, 0, 50).err(), Some("SKILL_LEVEL_REQUIRED"));
+    assert_eq!(skills::check("sheet_011", 1, 0, 60).err(), Some("SKILL_ROLE_MISMATCH"));
+}
+
+#[test]
+fn saved_encounter_refreshes_cross_school_passives_without_clearing_active_effects() {
+    use vssjx_server::{population, pve_rules::{Action, Battle}};
+    let enemy = population::definitions().into_iter().find(|e| e.id == "wolf_a").unwrap();
+    let mut battle = Battle::new(enemy, 100, 200, 6);
+    battle.enemy_hp = 10000;
+    battle.skill_rules_version = 1;
+    battle.skills.enemy_sleep = 2;
+    battle.skills.defense = 2;
+    battle.skills.defense_percent = 25;
+    // Old saved encounters may have neither passive from the newly shared job pool.
+    battle.turn_selected(Action::Guard, 0, 3, 60, stats(), 0, 0, None, 99).unwrap();
+    assert_eq!(battle.skills.passive_physical, 20);
+    assert_eq!(battle.skills.passive_magic, 20);
+    assert_eq!(battle.skills.enemy_sleep, 1);
+    assert_eq!(battle.skills.defense, 1);
+    assert_eq!(battle.skills.defense_percent, 25);
+    assert!(!battle.skills.last_enemy_acted);
+}
+#[test]
 fn catalog_restrictions_and_typed_effects() {
     assert_eq!(skills::ITEMS.len(), 33);
     for s in skills::ITEMS.iter() {
         assert!(skills::check(&s.id, (s.job + 1) % 3, s.school.max(0), 60).is_err());
-        if s.school >= 0 {
-            assert!(skills::check(&s.id, s.job, (s.school + 1) % 3, 60).is_err());
+        for school in 0..=3 {
+            assert_eq!(skills::check(&s.id, s.job, school, 60).is_ok(), s.active);
+            assert!(skills::eligible(s, s.job, school, 60));
         }
         if s.unlock_level > 1 {
             assert!(skills::check(&s.id, s.job, s.school.max(0), s.unlock_level - 1).is_err());
@@ -30,7 +68,7 @@ fn catalog_restrictions_and_typed_effects() {
     let mut state = State::new(0, 2, 45, 1);
     assert_eq!(state.passive_physical, 20);
     assert_eq!(state.enemy_hit(50, false), (50, 10));
-    assert_eq!(state.enemy_hit(50, true), (50, 0));
+    assert_eq!(state.enemy_hit(50, true), (50, 10));
     let mut hp = 10;
     let mut mp = 100;
     let heal = skills::ITEMS.iter().find(|s| s.name == "起死回生").unwrap();

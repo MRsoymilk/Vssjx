@@ -83,6 +83,7 @@ class NativeBattleAniTests(unittest.TestCase):
         self.assertEqual(struct.unpack_from('<I', blob, 0x2e5b8)[0], 0xa38)
 
     def test_all_runtime_actor_variants_match_native_tables_and_masks(self):
+        audited = json.loads((ROOT / 'tests/fixtures/native_battle_playback.json').read_text('utf8'))
         for folder in ('hero', 'creation', 'monster'):
             for path in (ROOT / 'client/assets/data/actors' / folder).glob('*.json'):
                 info = json.loads(path.read_text('utf-8'))
@@ -92,8 +93,12 @@ class NativeBattleAniTests(unittest.TestCase):
                     self.assertEqual(info['playback'][mode], native_steps(source, native_id))
                 self.assertTrue(info['native_battle']['impact_steps']['attack'])
                 x = info['native_battle']['attack_x']
-                self.assertGreater(x[0] - min(x), 50)
-                self.assertGreater(x[-1] - min(x), 50)
+                self.assertEqual(len(x), len(info['playback']['attack']))
+                # The original four monsters/heroes lunge; newly restored ANI
+                # can attack from their station. Do not invent 50px of travel.
+                if f'{folder}/{path.stem}' in audited:
+                    self.assertGreater(x[0] - min(x), 50)
+                    self.assertGreater(x[-1] - min(x), 50)
 
 
 if __name__ == '__main__': unittest.main()

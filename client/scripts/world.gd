@@ -17,6 +17,10 @@ static func _enemy_definitions() -> Array:
 
 var map_data: Dictionary
 var zone := 0
+var map_id := "qingyun_trail"
+var ai_npcs: Dictionary = {}
+var ai_markers: Dictionary = {}
+var ai_station: Node2D
 var enabled := true:
 	set(value):
 		enabled = value
@@ -45,6 +49,7 @@ var quest_marker: NpcQuestMarker
 
 func _ready() -> void:
 	zone = int(Game.player.zone)
+	map_id = AIWorld.local_map_id()
 	cell = Vector2i(Game.player.cell[0], Game.player.cell[1])
 	_build_map()
 	move_target = preload("res://scenes/world_move_target.tscn").instantiate()
@@ -55,17 +60,48 @@ func _ready() -> void:
 	_add_scenery()
 	portal_marker = Node2D.new()
 	portal_marker.set_script(preload("res://scripts/portal.gd"))
-	portal_marker.position = cell_center(Vector2i(28, 16) if zone == 0 else Vector2i(3, 16))
+	var gate: Dictionary = SharedWorldMap.exits(map_id)[0]
+	portal_marker.set("gate",gate)
+	portal_marker.position = cell_center(Vector2i(gate.cell[0], gate.cell[1]))
 	actors.add_child(portal_marker)
-	_name_tag(portal_marker, "古剑遗迹 · 灵门" if zone == 0 else "返回山道", Color("c2f7f4"))
-	portal_marker.get_child(0).position.y = -50
+	_name_tag(portal_marker, gate.name, Color("c2f7f4"))
+	portal_marker.get_child(0).position.y = -24
+	if not AIWorld.map_data(map_id).is_empty():
+		for exit in SharedWorldMap.exits(map_id).slice(1):
+			var node := Node2D.new()
+			node.set_script(preload("res://scripts/portal.gd"))
+			node.set("gate",exit)
+			node.position=cell_center(Vector2i(exit.cell[0],exit.cell[1]))
+			actors.add_child(node)
+			_name_tag(node,exit.name,Color("c2f7f4"));node.get_child(0).position.y=-24
 	var art: String = Game.appearance_key()
 	hero = OriginalArt.actor(art)
 	hero.position = cell_center(cell)
 	actors.add_child(hero)
 	_name_tag(hero, String(Game.player.name), Color("fff4c9"))
 	hero.add_child(preload("res://scenes/actors/player_ring.tscn").instantiate())
-	if zone == 0:
+	if not AIWorld.map_data(map_id).is_empty():
+		for definition in SharedWorldMap.population(map_id):
+			if definition.kind != "npc": continue
+			var npc := OriginalArt.actor(definition.art)
+			npc.position = cell_center(Vector2i(definition.cell[0], definition.cell[1]))
+			actors.add_child(npc)
+			_name_tag(npc, definition.name + " · AI", Color("ffe095"))
+			if not String(definition.get("service_label","")).is_empty():
+				_name_tag(npc,String(definition.service_label),Color("c2f7f4"))
+				npc.get_child(1).position.y=-92
+			ai_npcs[definition.id] = npc
+			var marker := preload("res://scenes/actors/npc_quest_marker.tscn").instantiate()
+			marker.position.y-=22
+			npc.add_child(marker);ai_markers[definition.id]=marker
+			if String(definition.id).ends_with("_guide"):quest_marker=marker
+	else:
+		ai_station = Node2D.new()
+		ai_station.set_script(preload("res://scripts/portal.gd"))
+		ai_station.position = cell_center(AIWorld.station(map_id))
+		actors.add_child(ai_station)
+		_name_tag(ai_station, "灵空台 · AI生成", Color("c2f7f4"));ai_station.get_child(0).position.y=-24
+	if zone == 0 and AIWorld.map_data(map_id).is_empty():
 		var definition: Dictionary = SharedWorldMap.population()[0]
 		var npc := OriginalArt.actor(definition.art)
 		npc.position = cell_center(Vector2i(definition.cell[0], definition.cell[1]))
@@ -83,7 +119,7 @@ func _ready() -> void:
 	camera.limit_bottom = 512
 	add_child(camera)
 	if astar.is_point_solid(cell):
-		cell = Vector2i(10, 16)
+		cell = Vector2i(map_data.spawn[0],map_data.spawn[1])
 		hero.position = cell_center(cell)
 		_save_position()
 	queue_redraw()
@@ -93,7 +129,15 @@ func refresh_appearance() -> void:
 	OriginalArt.apply_appearance(hero,Game.appearance_key())
 
 func refresh_quest_marker() -> void:
-	if is_instance_valid(quest_marker): quest_marker.set_stage(int(Game.player.get("quest", -1)))
+	if not AIWorld.map_data(map_id).is_empty():
+		for id in ai_markers:
+			var value := AIWorld.npc_marker(id,AIWorld.progress(),int(Game.player.level))
+			ai_markers[id].set_stage(value.stage);ai_markers[id].tooltip_text=value.hint
+		return
+	if is_instance_valid(quest_marker):
+		var unjoined:bool=int(Game.player.get("school",SchoolRules.UNJOINED))==SchoolRules.UNJOINED
+		quest_marker.set_stage(0 if unjoined else int(Game.player.get("quest",-1)))
+		if unjoined:quest_marker.tooltip_text="与清微道人交谈，选择门派。"
 
 func cell_center(value: Vector2i) -> Vector2:
 	return Vector2(value * CELL) + Vector2(8, 8)
@@ -101,7 +145,7 @@ func cell_center(value: Vector2i) -> Vector2:
 func _build_map() -> void:
 	terrain = TileMapLayer.new()
 	add_child(terrain)
-	map_data = SharedWorldMap.load_data() if zone == 0 else _ruins_data()
+	map_data = SharedWorldMap.load_data(map_id)
 	SharedWorldMap.build(terrain, astar, map_data)
 
 func _ruins_data() -> Dictionary:
@@ -127,24 +171,14 @@ func _add_scenery() -> void:
 func _name_tag(sprite: Node2D, value: String, color: Color) -> void:
 	var label := Label.new()
 	label.text = value
-	label.position = Vector2(-65, -68)
-	label.size = Vector2(130, 16)
-	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	label.add_theme_font_size_override("font_size", 10)
-	var font := preload("res://scripts/interface/adapters/common/cjk_system_font.gd").new()
-	font.font_names = PackedStringArray(["SimHei", "Microsoft YaHei", "Noto Sans CJK SC", "sans-serif"])
-	font.antialiasing = TextServer.FONT_ANTIALIASING_NONE
-	label.add_theme_font_override("font", font)
-	label.add_theme_color_override("font_outline_color", Color("182821"))
-	label.add_theme_constant_override("outline_size", 1)
-	label.add_theme_color_override("font_color", color)
-	label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0))
+	label.position.y=-74
+	preload("res://scripts/world_nameplate.gd").apply(label,color)
 	sprite.add_child(label)
 
 func _sync_enemies() -> void:
 	var now := Time.get_unix_time_from_system()
-	for enemy in ENEMIES:
-		var enemy_zone := 1 if enemy.id in ["guardian", "boss"] else 0
+	for enemy in _map_enemies():
+		var enemy_zone := zone if not AIWorld.map_data(map_id).is_empty() else (1 if enemy.id in ["guardian", "boss"] else 0)
 		if enemy_zone != zone or not Game.enemy_available(String(enemy.id), now):
 			if not enemy_nodes.has(enemy.id): continue
 			var removed: AnimatedSprite2D = enemy_nodes[enemy.id]
@@ -174,14 +208,34 @@ func _sync_enemies() -> void:
 func available_enemies() -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
 	var now := Time.get_unix_time_from_system()
-	for enemy in ENEMIES:
-		var enemy_zone := 1 if enemy.id in ["guardian", "boss"] else 0
+	for enemy in _map_enemies():
+		var enemy_zone := zone if not AIWorld.map_data(map_id).is_empty() else (1 if enemy.id in ["guardian", "boss"] else 0)
 		if enemy_zone == zone and enemy_nodes.has(enemy.id) and Game.enemy_available(String(enemy.id), now):
 			var current: Dictionary = enemy.duplicate(true)
 			var spot := _enemy_cell(enemy_nodes[enemy.id])
 			current.cell = [spot.x, spot.y]
 			result.append(current)
 	return result
+
+func _map_enemies() -> Array:
+	return SharedWorldMap.population(map_id).filter(func(r: Dictionary) -> bool: return r.kind != "npc") if not AIWorld.map_data(map_id).is_empty() else ENEMIES
+
+func _ai_targets() -> Array[Dictionary]:
+	var values: Array[Dictionary] = []
+	for id in ai_npcs:
+		var r := AIWorld.resident(id)
+		values.append({"kind": "ai_npc", "cell": Vector2i(r.cell[0], r.cell[1]), "data": r})
+	for gate in SharedWorldMap.exits(map_id):
+		if gate.get("legacy",false): continue
+		values.append({"kind":"map_exit","cell":Vector2i(gate.cell[0],gate.cell[1]),"data":gate})
+	return values
+
+func travel(destination: String) -> void:
+	_walk_to({"kind": "ai_travel", "cell": AIWorld.station(map_id), "data": {"target": destination}})
+
+func approach_ai_target(id: String) -> void:
+	var r := AIWorld.resident(id)
+	if not r.is_empty(): _walk_to({"kind": "ai_npc" if r.kind == "npc" else "enemy", "cell": Vector2i(r.cell[0], r.cell[1]), "data": r})
 
 func click(local: Vector2) -> void:
 	if not enabled: return
@@ -208,7 +262,12 @@ func _route_to(target: Vector2i) -> Array[Vector2i]:
 	return route
 
 func target_at_pixel(point: Vector2) -> Dictionary:
-	if zone == 0:
+	for target in _ai_targets():
+		if target.kind=="map_exit":
+			if Rect2(cell_center(target.cell)-Vector2(8,8),Vector2(16,16)).has_point(point):return target
+			continue
+		if Rect2(cell_center(target.cell) - Vector2(22, 50), Vector2(44, 58)).has_point(point): return target
+	if zone == 0 and AIWorld.map_data(map_id).is_empty():
 		var npc_cell := Vector2i(10, 13)
 		if Rect2(cell_center(npc_cell) - Vector2(28, 72), Vector2(56, 80)).has_point(point):
 			return {"kind": "npc", "cell": npc_cell, "data": {}}
@@ -220,10 +279,15 @@ func target_at_pixel(point: Vector2) -> Dictionary:
 	return {}
 
 func target_at(target: Vector2i) -> Dictionary:
-	if zone == 0 and target.distance_to(Vector2i(10, 13)) <= 2.0:
+	for value in _ai_targets():
+		if value.kind=="map_exit":
+			if target==value.cell:return value
+			continue
+		if target.distance_to(value.cell) <= 1.3: return value
+	if zone == 0 and AIWorld.map_data(map_id).is_empty() and target.distance_to(Vector2i(10, 13)) <= 2.0:
 		return {"kind": "npc", "cell": Vector2i(10, 13), "data": {}}
 	var portal := Vector2i(28, 16) if zone == 0 else Vector2i(3, 16)
-	if target.distance_to(portal) <= 1.5:
+	if AIWorld.map_data(map_id).is_empty() and target.distance_to(portal) <= 1.5:
 		return {"kind": "portal", "cell": portal, "data": {}}
 	for enemy in available_enemies():
 		var spot := Vector2i(enemy.cell[0], enemy.cell[1])
@@ -232,6 +296,11 @@ func target_at(target: Vector2i) -> Dictionary:
 	return {}
 
 func _walk_to(target: Dictionary) -> void:
+	if target.kind=="map_exit":
+		pending={};path=_route_to(target.cell)
+		if not path.is_empty():move_target.set_destination(target.cell)
+		elif cell==target.cell:_enter_exit(target.data)
+		return
 	pending = target
 	if target.kind == "enemy" and enemy_nodes.has(target.data.id):
 		enemy_nodes[target.data.id].play("idle")
@@ -258,8 +327,9 @@ func interact_nearest() -> void:
 	var nearest: Dictionary = {}
 	var distance := 3.5
 	var targets: Array[Dictionary] = []
-	if zone == 0: targets.append({"kind": "npc", "cell": Vector2i(10, 13), "data": {}})
-	targets.append({"kind": "portal", "cell": Vector2i(28, 16) if zone == 0 else Vector2i(3, 16), "data": {}})
+	targets.append_array(_ai_targets())
+	if zone == 0 and AIWorld.map_data(map_id).is_empty(): targets.append({"kind": "npc", "cell": Vector2i(10, 13), "data": {}})
+	if AIWorld.map_data(map_id).is_empty(): targets.append({"kind": "portal", "cell": Vector2i(28, 16) if zone == 0 else Vector2i(3, 16), "data": {}})
 	for enemy in available_enemies():
 		targets.append({"kind": "enemy", "cell": Vector2i(enemy.cell[0], enemy.cell[1]), "data": enemy})
 	for target in targets:
@@ -278,6 +348,10 @@ func _interact_pending() -> void:
 	pending = {}
 	path.clear()
 	if not target.is_empty(): interaction.emit(target.kind, target.data)
+
+func _enter_exit(gate: Dictionary) -> void:
+	path.clear();pending={};enabled=false
+	interaction.emit("map_exit",gate)
 
 func _process(delta: float) -> void:
 	refresh_quest_marker()
@@ -304,6 +378,9 @@ func _process(delta: float) -> void:
 			cell = next_cell
 			next_cell = Vector2i(-1, -1)
 			_save_position()
+			var exit := SharedWorldMap.exit_at(map_id,cell)
+			if not exit.is_empty():
+				_idle_hero();_enter_exit(exit);return
 			if path.is_empty() and not pending.is_empty():
 				_idle_hero()
 				_interact_pending()
@@ -361,7 +438,7 @@ func _face_actor(sprite: AnimatedSprite2D, left: bool) -> void:
 	if sprite.get_child_count() > 0:
 		var tag: Label = sprite.get_child(0)
 		tag.scale.x = sprite.scale.x
-		tag.position.x = -65 * sprite.scale.x
+		tag.position.x = -tag.size.x*0.5*sprite.scale.x
 
 func _enemy_cell(sprite: AnimatedSprite2D) -> Vector2i:
 	return Vector2i(roundi((sprite.position.x - 8) / CELL), roundi((sprite.position.y - 8) / CELL))

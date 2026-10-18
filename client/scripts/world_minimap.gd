@@ -59,6 +59,9 @@ func _draw() -> void:
 			else: fill = Color("666374")
 			if local and world.astar.is_point_solid(point): fill = fill.darkened(0.35)
 			draw_rect(Rect2(origin + Vector2(point) * scale_value, Vector2.ONE * scale_value), fill)
+	var map_id: String = world.map_id if local else String(shared_map.map_id)
+	for gate in SharedWorldMap.exits(map_id):
+		draw_rect(Rect2(origin+Vector2(gate.cell[0],gate.cell[1])*scale_value,Vector2(3,3)),Color("59e3d7"))
 	if not local:
 		for entry in shared_population.values():
 			draw_rect(Rect2(origin + Vector2(entry.cell[0], entry.cell[1]) * scale_value, Vector2(2, 2)), Color("e2e29b") if entry.kind == "npc" else Color("d27950"))
@@ -70,5 +73,8 @@ func _draw() -> void:
 	for enemy in world.available_enemies():
 		var cell := Vector2(enemy.cell[0], enemy.cell[1])
 		draw_rect(Rect2(origin + cell * scale_value, Vector2(2, 2)), Color("d27950"))
-	if world.zone == 0: draw_rect(Rect2(origin + Vector2(10, 13) * scale_value, Vector2(2, 2)), Color("e2e29b"))
+	if not AIWorld.map_data(map_id).is_empty():
+		for resident in world.map_data.residents:
+			if resident.kind=="npc":draw_rect(Rect2(origin+Vector2(resident.cell[0],resident.cell[1])*scale_value,Vector2(2,2)),Color("e2e29b"))
+	elif world.zone == 0: draw_rect(Rect2(origin + Vector2(10, 13) * scale_value, Vector2(2, 2)), Color("e2e29b"))
 	draw_rect(Rect2(origin + Vector2(world.cell) * scale_value, Vector2(3, 3)), Color("f7ed21"))

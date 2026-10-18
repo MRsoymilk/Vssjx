@@ -117,7 +117,7 @@ func _run() -> void:
 	app.free()
 	var model := OnlinePve.new()
 	model.ready = true
-	model.state = {"character":{"job":1,"gender":1,"level":1,"hp":100,"mp":40,"display_name":"死亡检查"},
+	model.state = {"character":{"job":1,"school":0,"gender":1,"level":1,"hp":100,"mp":40,"display_name":"死亡检查"},
 		"stats":{"hp":100,"mp":40},"potions":6,
 		"battle":{"id":"death-test","revision":"1","outcome":"active","enemy_hp":62,"hp":100,"mp":40,
 		"enemy":{"art":"monster/langw","name":"山狼","level":1,"hp":62,"attack":13,"defense":3}}}
@@ -143,8 +143,9 @@ func _run() -> void:
 	view.present(model)
 	check(view._hero_death == death and death.elapsed == elapsed, "Repeated authoritative snapshots never restart death")
 	view._process(death.remaining())
-	check(view.get_node("Result").visible and not view.get_node("Result/Return").disabled and not view.hero.visible, "Online settlement appears after the tombstone is reached")
+	check(view.get_node("Result").visible and view.get_node("Result/Return").disabled and not view.hero.visible, "Original defeat glyph starts after the tombstone before permitting return")
 	check(model.state == authoritative, "Presentation does not alter authoritative HP, rewards or restoration")
+	view._process(0.4)
 	view.return_to_map()
 	check(not view.visible and death.cancelled and death.sprite == null, "Online dismissal cleans the held tombstone")
 	# A restored connection may initially contain an already-completed defeat.
@@ -174,6 +175,7 @@ func _run() -> void:
 		if art_key == "monster/langw": await capture("-online-monster-tombstone")
 		view._process(death.remaining())
 		check(death.sprite.frame == 9 and not view.enemy.visible and view.get_node("Result").visible and model.state == authoritative, "Monster tombstone persists through settlement without changing server state")
+		view._process(0.4)
 		view.return_to_map()
 		check(death.cancelled and death.sprite == null and view._enemy_death == null, "Dismissal cleans up the held monster tombstone")
 	view.present(model)

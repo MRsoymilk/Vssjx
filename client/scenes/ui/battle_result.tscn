@@ -1,0 +1,47 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/battle_result_view.gd" id="Script"]
+[sub_resource type="StyleBoxEmpty" id="Empty"]
+
+[node name="Result" type="Control"]
+visible = false
+offset_right = 320.0
+offset_bottom = 396.0
+mouse_filter = 2
+script = ExtResource("Script")
+
+[node name="Title" type="Label" parent="."]
+offset_left = 90.0
+offset_top = 145.0
+offset_right = 230.0
+offset_bottom = 175.0
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(1, 0.94, 0.35, 1)
+theme_override_colors/font_outline_color = Color(0.5, 0.15, 0.05, 1)
+theme_override_constants/outline_size = 2
+mouse_filter = 2
+
+[node name="Body" type="Label" parent="."]
+offset_left = 25.0
+offset_top = 310.0
+offset_right = 295.0
+offset_bottom = 378.0
+horizontal_alignment = 1
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(1, 0.97, 0.74, 1)
+theme_override_colors/font_outline_color = Color(0.27, 0.17, 0.08, 1)
+theme_override_constants/outline_size = 1
+mouse_filter = 2
+
+[node name="Return" type="Button" parent="."]
+offset_right = 320.0
+offset_bottom = 396.0
+focus_mode = 0
+theme_override_styles/normal = SubResource("Empty")
+theme_override_styles/hover = SubResource("Empty")
+theme_override_styles/pressed = SubResource("Empty")
+theme_override_styles/disabled = SubResource("Empty")
+theme_override_styles/focus = SubResource("Empty")
+disabled = true

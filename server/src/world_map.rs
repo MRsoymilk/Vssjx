@@ -8,7 +8,7 @@ pub fn config_hash() -> String {
     format!("{:x}", Sha256::digest(MAP_BYTES.as_bytes()))
 }
 
-#[derive(Deserialize)]
+#[derive(Clone, Deserialize)]
 pub struct WorldMap {
     pub map_id: String,
     pub width: i32,
@@ -28,7 +28,7 @@ impl WorldMap {
         let bytes = match id {
             "qingyun_trail" => MAP_BYTES,
             "ancient_ruins" => RUINS_BYTES,
-            _ => return None,
+            _ => return crate::ai_world::map(id).map(|v|serde_json::from_value(v.clone()).expect("AI map")),
         };
         let map: Self = serde_json::from_str(bytes).expect("bundled map JSON");
         assert_eq!((map.width, map.height, map.cell_size), (32, 32, 16));
@@ -38,6 +38,7 @@ impl WorldMap {
         Some(map)
     }
     pub fn hash(&self) -> String {
+        if crate::ai_world::map(&self.map_id).is_some() {return crate::ai_world::hash();}
         let bytes = if self.map_id == "ancient_ruins" { RUINS_BYTES } else { MAP_BYTES };
         format!("{:x}", Sha256::digest(bytes.as_bytes()))
     }

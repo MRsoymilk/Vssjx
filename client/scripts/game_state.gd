@@ -2,7 +2,7 @@ extends Node
 ## Local rules are newly authored. Original server formulas were not recovered.
 
 const JOBS := ["力士", "侠客", "隐者"]
-const SCHOOLS := ["峨眉", "花涧", "昆仑"]
+const SCHOOLS := ["峨眉", "花涧", "昆仑", "闲云野鹤"]
 const SAVE_VERSION := 1
 const MAX_LOCAL_CHARACTERS := 5
 const START_CELL := Vector2i(10, 16)
@@ -71,7 +71,7 @@ func create_local_character(nickname: String, job: int, school: int, gender: int
 			_local_roster_busy = false
 			return PlatformResult.new(PlatformResult.Status.INVALID_DATA, "NAME_TAKEN", "已有同名本地角色，请修改昵称或返回选择。")
 	var id := Crypto.new().generate_random_bytes(16).hex_encode()
-	new_player(nickname, job, school, gender)
+	new_player(nickname, job, SchoolRules.UNJOINED, gender)
 	entries.append({"id": id, "data": _local_snapshot()})
 	player.local_characters = {"version": 1, "active_id": id, "characters": entries}
 	var generation := _player_generation
@@ -137,7 +137,7 @@ func new_player(nickname: String, job: int, school: int, gender: int = 0) -> voi
 	last_save_receipt = {}
 	player = {
 		"version": SAVE_VERSION, "name": nickname.strip_edges().left(24), "gender": clampi(gender, 0, 1),
-		"job": clampi(job, 0, 2), "school": clampi(school, 0, 2),
+		"job": clampi(job, 0, 2), "school": clampi(school, 0, SchoolRules.UNJOINED), "school_membership_version": 1,
 		"level": 1, "xp": 0, "gold": 30, "potions": 6,
 		"hp": 0, "mp": 0, "quest": 0, "kills": 0,
 		"equipped": false, "zone": 0, "cell": [START_CELL.x, START_CELL.y],
@@ -247,6 +247,46 @@ func restore() -> void:
 	player.hp = values.hp
 	player.mp = values.mp
 
+func join_local_school(school: int) -> PlatformResult:
+	if storage_busy or _local_roster_busy:return PlatformResult.new(PlatformResult.Status.TEMPORARY_FAILURE,"STORAGE_BUSY","正在保存，请稍候。")
+	if school<0 or school>2:return PlatformResult.new(PlatformResult.Status.INVALID_DATA,"INVALID_SCHOOL","请选择有效门派。")
+	if int(player.get("school",SchoolRules.UNJOINED))!=SchoolRules.UNJOINED:
+		return PlatformResult.new(PlatformResult.Status.INVALID_DATA,"SCHOOL_ALREADY_JOINED","已加入门派，不能重复入派。")
+	var before:=player.duplicate(true)
+	var generation:=_player_generation
+	var path:=save_path
+	player.school=school;player.school_membership_version=1
+	var result:=await save_game()
+	if not result.ok and generation==_player_generation and path==save_path:player=before
+	return result
+
+func _migrate_school_membership(data: Dictionary) -> void:
+	if not data.has("school_membership_version"):
+		data.school=SchoolRules.UNJOINED
+		data.school_membership_version=1
+	for entry in data.get("local_characters",{}).get("characters",[]):
+		_migrate_school_membership(entry.data)
+
+## Offline test helper. Only LocalWorldChat exposes this; no network protocol hook.
+func set_local_test_level(level: int) -> PlatformResult:
+	if storage_busy or _local_roster_busy:
+		return PlatformResult.new(PlatformResult.Status.TEMPORARY_FAILURE,"STORAGE_BUSY","正在保存，请稍候。")
+	if player.is_empty() or level < 1 or level > 60:
+		return PlatformResult.new(PlatformResult.Status.INVALID_DATA,"INVALID_TEST_LEVEL","本地测试等级范围为1～60。")
+	var before := player.duplicate(true)
+	var generation := _player_generation
+	var path := save_path
+	player.level = level
+	player.xp = 0
+	var reset_points := not ATTRIBUTE_RULES.valid_points(allocated_attributes(),level)
+	if reset_points: player.allocated_attributes = [0,0,0,0,0]
+	restore()
+	var result := await save_game()
+	if not result.ok:
+		if generation == _player_generation and path == save_path: player = before
+		return result
+	return PlatformResult.success({"level":level,"reset_attributes":reset_points})
+
 func add_rewards(gold: int, xp: int) -> bool:
 	player.gold = int(player.gold) + gold
 	player.xp = int(player.xp) + xp
@@ -260,6 +300,7 @@ func add_rewards(gold: int, xp: int) -> bool:
 	return leveled
 
 func quest_text() -> String:
+	if not AIWorld.map_data(AIWorld.local_map_id()).is_empty(): return AIWorld.quest_hint(AIWorld.local_map_id(),AIWorld.progress(),int(player.level))
 	match int(player.get("quest", 0)):
 		0: return "拜访石桥旁的清微道人"
 		1: return "山林试炼：击败山狼 %d / 3" % int(player.kills)
@@ -269,6 +310,7 @@ func quest_text() -> String:
 
 func enemy_respawn_remaining(id: String, now: float = -1.0) -> float:
 	if now < 0.0: now = Time.get_unix_time_from_system()
+	if not AIWorld.resident(id).is_empty(): return maxf(0.0, float(AIWorld.progress().respawns.get(id, 0)) / 1000.0 - now)
 	return maxf(0.0, float(player.get("enemy_respawns", {}).get(id, 0.0)) - now)
 
 func enemy_available(id: String, now: float = -1.0) -> bool:
@@ -278,6 +320,13 @@ func enemy_available(id: String, now: float = -1.0) -> bool:
 
 func finish_enemy(enemy: Dictionary) -> bool:
 	var id := String(enemy.id)
+	if not AIWorld.resident(id).is_empty():
+		var state := AIWorld.progress()
+		for previous in state.respawns.keys():
+			if float(state.respawns[previous]) <= Time.get_unix_time_from_system()*1000: state.respawns.erase(previous)
+		state.respawns[id] = int((Time.get_unix_time_from_system() + ENEMY_RESPAWN_SECONDS) * 1000)
+		AIWorld.event("kill", id)
+		return add_rewards(int(enemy.gold), int(enemy.xp))
 	if not player.defeated.has(id):
 		player.defeated.append(id)
 	if not player.has("enemy_respawns"): player.enemy_respawns = {}
@@ -372,6 +421,7 @@ func load_game() -> PlatformResult:
 	var data: Variant = parser.data
 	if not valid_save(data):
 		return _finish_storage(_invalid_save(), generation)
+	_migrate_school_membership(data)
 	player = data
 	last_save_receipt = {}
 	if not player.has("gender"): player.gender = 0
@@ -392,6 +442,8 @@ func _invalid_save() -> PlatformResult:
 func valid_save(data: Variant) -> bool:
 	if not data is Dictionary:
 		return false
+	if data.has("ai_map") and (not data.ai_map is String or (not data.ai_map.is_empty() and AIWorld.map_data(data.ai_map).is_empty())): return false
+	if data.has("ai_progress") and not AIWorld.valid_progress(data.ai_progress): return false
 	if data.has("local_characters") and not _valid_local_roster(data): return false
 	for key in ["version", "name", "job", "school", "level", "xp", "gold", "potions", "hp", "mp", "quest", "kills", "equipped", "zone", "cell", "defeated"]:
 		if not data.has(key): return false
@@ -428,7 +480,8 @@ func valid_save(data: Variant) -> bool:
 		if not is_finite(float(data[key])) or float(data[key]) != floor(float(data[key])): return false
 		if data[key] < 0 or data[key] > 1000000: return false
 	if int(data.version) != SAVE_VERSION: return false
-	if int(data.job) > 2 or int(data.school) > 2 or int(data.zone) > 1: return false
+	if int(data.job) > 2 or int(data.school) > SchoolRules.UNJOINED or int(data.zone) > 1: return false
+	if data.has("school_membership_version") and data.school_membership_version!=1:return false
 	if int(data.quest) > 4 or int(data.kills) > 3: return false
 	if int(data.level) < 1 or int(data.level) > 60: return false
 	if not ATTRIBUTE_RULES.valid_points(data.get("allocated_attributes",[0,0,0,0,0]),int(data.level)): return false

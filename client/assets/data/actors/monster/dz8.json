@@ -1,0 +1,110 @@
+{
+  "texture": "res://assets/actors/monster_dz8.png",
+  "width": 91,
+  "height": 53,
+  "columns": 8,
+  "origin": [-68, -49],
+  "anchor_x": 0,
+  "playback": {
+    "idle": [
+      [15, 2],
+      [14, 1],
+      [15, 5],
+      [13, 8]
+    ],
+    "walk": [
+      [15, 2],
+      [14, 1],
+      [15, 5],
+      [13, 8]
+    ],
+    "attack": [
+      [9, 1],
+      [8, 1],
+      [7, 1],
+      [6, 1],
+      [5, 1],
+      [4, 1],
+      [8, 1],
+      [9, 1]
+    ],
+    "hurt": [
+      [13, 1],
+      [3, 1],
+      [2, 1],
+      [1, 1],
+      [0, 2]
+    ]
+  },
+  "count": 16,
+  "sequences": [
+    [
+      [0, 1],
+      [1, 6],
+      [0, 1]
+    ],
+    [
+      [2, 1],
+      [12, 1],
+      [13, 1],
+      [14, 1],
+      [15, 2]
+    ],
+    [
+      [6, 1],
+      [7, 1],
+      [8, 1],
+      [9, 1],
+      [10, 1],
+      [11, 1],
+      [7, 1],
+      [6, 1]
+    ],
+    [
+      [0, 2],
+      [1, 1],
+      [0, 5],
+      [2, 8]
+    ],
+    [
+      [3, 2],
+      [4, 1],
+      [3, 5],
+      [5, 8]
+    ],
+    [
+      [0, 2],
+      [1, 1],
+      [0, 5],
+      [2, 8]
+    ],
+    [],
+    []
+  ],
+  "native_battle": {
+    "indexing": "reverse_serialized_tables",
+    "source_frame_count": 16,
+    "sequence_ids": {"idle": 4, "walk": 4, "attack": 5, "hurt": 6},
+    "impact_steps": {
+      "idle": [],
+      "walk": [],
+      "attack": [3],
+      "hurt": []
+    },
+    "attack_x": [108, 76, 58, 57, 56, 55, 76, 108],
+    "pose_x": {
+      "idle": [4, 4, 4, 4],
+      "walk": [4, 4, 4, 4],
+      "hurt": [4, 6, 7, 8, 9]
+    },
+    "attack_basis": "target",
+    "cast_mapping": null
+  },
+  "alignment": {
+    "source": "AI接入，原生动作槽4/5/6",
+    "primary_source": "dzt2",
+    "body_frame": 0,
+    "combat_extent_frames": [],
+    "source_sha256": "fe0939dda45827ca732b05d26466a8f781f6d27f899fb7e966c3e68ffabf4eb4"
+  }
+}

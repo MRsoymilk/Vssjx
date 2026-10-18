@@ -31,7 +31,7 @@ var auto_timer := 0.0
 var battle_committed := false
 var selected_job := 0
 var selected_gender := 0
-var selected_school := 0
+var selected_school := SchoolRules.UNJOINED
 var nickname: LineEdit
 var preview: AnimatedSprite2D
 var create_description: Label
@@ -54,6 +54,7 @@ var battle_transition_epoch := 0
 var battle_resource_request: PlatformResourceRequest
 var battle_playback: BattleActionPlayback
 var battle_death: BattleDeathPlayback
+var battle_result: BattleResultView
 var battle_ring: Node2D
 var clock_timer := 0.0
 var effects_layer: Control
@@ -161,7 +162,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		return
 	if event.keycode == KEY_ESCAPE:
 		if mode == "battle" and battle.phase == "finished":
-			_enter_world()
+			if is_instance_valid(battle_result) and battle_result.can_return(): _enter_world()
 		elif modal != null:
 			_close_modal()
 		elif mode == "attributes":
@@ -264,6 +265,7 @@ func _clear_ui() -> void:
 	_ui_epoch += 1
 	if battle_death != null: battle_death.cancel()
 	battle_death = null
+	battle_result = null
 	if is_instance_valid(battle_move_callout): battle_move_callout.clear()
 	battle_move_callout = null
 	if battle_playback != null: battle_playback.cancel()
@@ -504,6 +506,7 @@ func _enter_world() -> void:
 			world.click(event.position)
 	)
 	add_child(world_view)
+	preload("res://scripts/world_nameplate_layer.gd").attach(world_view,viewport)
 	move_child(ui, get_child_count() - 1)
 	_world_ui()
 
@@ -519,6 +522,7 @@ func _world_ui() -> void:
 	var screen: GameWorldScreen = preload("res://scenes/ui/game_world_screen.tscn").instantiate()
 	screen.local_messages = _local_messages
 	ui.add_child(screen)
+	screen.local_control_completed.connect(_refresh_hud)
 	chrome = screen.chrome
 	screen.action_requested.connect(_scene_action)
 	screen.movement_pause_requested.connect(world.pause_moving)
@@ -527,7 +531,8 @@ func _world_ui() -> void:
 	minimap = hud.get_node("Minimap")
 	minimap.world = world
 	map_name = hud.get_node("MapName")
-	map_name.text = "青云山道" if int(Game.player.zone) == 0 else "古剑遗迹"
+	map_name.text = SharedWorldMap.title(AIWorld.local_map_id())
+	if not AIWorld.map_data(AIWorld.local_map_id()).is_empty(): map_name.size.x=220
 	map_coordinates = hud.get_node("MapCoordinates")
 	hud_name = hud.get_node("HudName")
 	world_identity = hud.get_node("WorldIdentity")
@@ -537,6 +542,7 @@ func _world_ui() -> void:
 
 func _scene_action(action: String) -> void:
 	if Game.storage_busy or _closing: return
+	if mode=="battle" and battle.finished and battle_committed:return
 	if mode == "battle_loading": return
 	match action:
 		"menu": _menu()
@@ -561,22 +567,39 @@ func _scene_action(action: String) -> void:
 
 func _refresh_hud() -> void:
 	if mode != "world" or hud_name == null or not is_instance_valid(hud_name): return
-	hud_name.text = "%s  Lv.%d  ·  %s%s" % [Game.player.name, int(Game.player.level), Game.SCHOOLS[int(Game.player.school)], Game.JOBS[int(Game.player.job)]]
+	hud_name.text = "%s  Lv.%d  ·  %s%s" % [Game.player.name, int(Game.player.level), SchoolRules.label(int(Game.player.school)), Game.JOBS[int(Game.player.job)]]
 	world.refresh_appearance()
 	var values := Game.stats()
 	hud_stats.text = ""
-	world_identity.text = "等级 %d\n%s派" % [int(Game.player.level), Game.SCHOOLS[int(Game.player.school)]]
+	world_identity.text = "等级 %d\n%s" % [int(Game.player.level), SchoolRules.label(int(Game.player.school))]
 	map_coordinates.text = "%d  %d" % [world.cell.x, world.cell.y]
 	quest_label.text = "[系统] " + Game.quest_text() + "\n[系统] 气血 %d/%d  灵力 %d/%d" % [int(Game.player.hp), int(values.hp), int(Game.player.mp), int(values.mp)]
+	if not _local_messages.is_empty() and _local_messages[-1].channel=="system":
+		quest_label.text="[系统] "+String(_local_messages[-1].text).replace("\n","\n[系统] ")
 	chrome.update_header(int(Game.player.hp), int(Game.player.mp), 0)
 
 func _world_interaction(kind: String, data: Dictionary) -> void:
 	if Game.storage_busy or _closing: return
 	if mode == "battle_loading": return
 	match kind:
+		"map_exit":
+			if data.get("legacy",false):_world_interaction("portal",data)
+			else:_world_interaction("ai_travel",{"target":data.target_map})
+		"ai_gate": _open_ai("maps")
+		"ai_npc": _open_ai_npc(String(data.id))
+		"ai_travel":
+			var error := AIWorld.apply_local("ai_travel", data.target)
+			if not error.is_empty(): _message("驿路", error); return
+			await _save_current()
+			_enter_world()
+		"ai_command":
+			var error := AIWorld.apply_local(data.action, data.target)
+			await _save_current()
+			if error.is_empty(): _close_modal();_refresh_hud()
+			else: _message("AI生成任务", error)
 		"npc": _npc()
 		"enemy":
-			if int(Game.player.quest) == 0:
+			if int(Game.player.quest) == 0 and AIWorld.map_data(AIWorld.local_map_id()).is_empty():
 				_message("尚未领受试炼", "先找清微道人领受试炼，再挑战山中的妖物。")
 			else: _encounter_battle(data)
 		"portal":
@@ -592,38 +615,50 @@ func _world_interaction(kind: String, data: Dictionary) -> void:
 		"hint": _message("交互", String(data.text))
 
 func _npc() -> void:
-	var panel := _modal_panel("清微道人")
-	var stage := int(Game.player.quest)
-	var text_value := ""
-	match stage:
-		0: text_value = "小友，山中妖物惊扰行人。\n请击败三只山狼，再回来见我。\n\n试炼奖励：60 铜钱 / 35 修为\n道人可为你免费恢复生命与灵力。"
-		1: text_value = "山狼试炼进度：%d / 3\n\n山狼出没于东北、东南与南方山林。\n点击怪物即可自动走近挑战。" % int(Game.player.kills)
-		2: text_value = "小友果然身手不凡！\n收下这份谢礼。东侧灵门已经为你开启。\n\n遗迹中赤焰妖王盘踞，请再走一遭。"
-		3: text_value = "穿过东侧的蓝色灵门，进入古剑遗迹。\n击败赤焰妖王，便可消除山中妖气。\n\n出发前，先让我为你恢复元气。"
-		_: text_value = "妖气已散，山门安宁。\n多谢小友！蜀山初行至此完成。\n\n你可以继续探索，或创建其他职业体验。"
-	_label(panel, text_value, Rect2(18, 52, 248, 126), 12)
-	if stage == 0:
-		_button(panel, "领受试炼", Rect2(18, 186, 148, 32), func() -> void:
-			if Game.storage_busy or _closing or int(Game.player.quest) != stage: return
-			Game.player.quest = 1
-			Game.restore()
-			await _save_local_change()
-		, true)
-	elif stage == 2:
-		_button(panel, "领取奖励", Rect2(18, 186, 148, 32), func() -> void:
-			if Game.storage_busy or _closing or int(Game.player.quest) != stage: return
-			Game.player.quest = 3
-			Game.add_rewards(60, 35)
-			Game.restore()
-			await _save_local_change()
-		, true)
-	else:
-		_button(panel, "恢复元气", Rect2(18, 186, 148, 32), func() -> void:
-			if Game.storage_busy or _closing: return
-			Game.restore()
-			await _save_local_change()
-		, true)
-	_button(panel, "告辞", Rect2(176, 186, 88, 32), _close_modal)
+	var dialog := _local_npc_dialog()
+	dialog.present_local({"id":"qingwei","name":"清微道人"})
+
+func _local_npc_dialog() -> OriginalNpcDialog:
+	_close_modal();world.pause_moving();world.enabled=false
+	var dialog: OriginalNpcDialog=preload("res://scenes/ui/npc_dialog.tscn").instantiate()
+	modal=dialog;ui.add_child(dialog)
+	dialog.dismissed.connect(_close_modal)
+	dialog.action_requested.connect(_local_npc_action)
+	return dialog
+
+func _open_ai_npc(id: String) -> void:
+	var resident := AIWorld.resident(id)
+	if resident.is_empty() or id.left(6)!=AIWorld.local_map_id():return
+	var dialog := _local_npc_dialog()
+	dialog.present_ai(id,resident,AIWorld.progress(),int(Game.player.level))
+
+func _local_npc_action(action: String, target: String) -> void:
+	if Game.storage_busy or _closing or mode!="world" or not modal is OriginalNpcDialog:return
+	var dialog: OriginalNpcDialog=modal
+	if not dialog.allows(action,target):return
+	var point: Array=AIWorld.resident(dialog.target).get("cell",[10,13])
+	if absi(world.cell.x-int(point[0]))+absi(world.cell.y-int(point[1]))>2:return
+	if action=="school_join":
+		if AIWorld.local_map_id()!="qingyun_trail" or dialog.target!="qingwei":return
+		dialog.approaching=true;dialog.refresh()
+		var joined:=await Game.join_local_school(SchoolRules.index(target))
+		if not is_instance_valid(dialog):return
+		dialog.approaching=false
+		if joined.ok:
+			_local_messages.append({"message_id":"school-%d"%Time.get_ticks_usec(),"channel":"system","display_name":"系统","text":"经清微道人引荐，你已正式拜入%s。技能暂按职业和等级开放，不受门派限制。"%SchoolRules.label(int(Game.player.school))})
+			while _local_messages.size()>LocalWorldChat.LIMIT:_local_messages.pop_front()
+			_world_ui()
+		else:dialog.refresh();dialog.hint.text=joined.message
+		return
+	var error := ""
+	if action.begins_with("ai_"):error=AIWorld.apply_local(action,target)
+	elif action=="accept" and int(Game.player.quest)==0:Game.player.quest=1;Game.restore()
+	elif action=="claim" and int(Game.player.quest)==2:Game.player.quest=3;Game.add_rewards(60,35);Game.restore()
+	elif action=="restore":Game.restore()
+	else:return
+	if not error.is_empty():dialog.hint.text=error;return
+	dialog.approaching=true;dialog.refresh()
+	await _save_local_change()
 
 func _modal_panel(title: String, height: int = 246, page: String = "scene") -> Panel:
 	_close_modal()
@@ -734,9 +769,42 @@ func _open_world_map() -> void:
 	modal = page
 	ui.add_child(page)
 	page.back_requested.connect(_close_modal)
+	page.ai_requested.connect(func(id: String) -> void:
+		_open_ai("maps")
+		if modal is AIWorldPanel: modal.selected_map=id; modal.refresh()
+	)
 	page.present()
 
+func _open_ai(section: String = "maps", npc: String = "") -> void:
+	if section=="quests" and not npc.is_empty():_open_ai_npc(npc);return
+	_close_modal()
+	world.pause_moving(); world.enabled = false
+	var panel := AIWorldPanel.new()
+	modal = panel
+	panel.present(AIWorld.local_map_id(), AIWorld.progress(), int(Game.player.level), section, npc)
+	ui.add_child(panel)
+	panel.back_requested.connect(_close_modal)
+	panel.requested.connect(_ai_requested)
+
+func _ai_requested(action: String, target: String) -> void:
+	_close_modal()
+	if action == "ai_travel": world.travel(target); return
+	if action == "ai_track":
+		var destination := target.left(6)
+		if destination != AIWorld.local_map_id(): world.travel(destination)
+		else: world.approach_ai_target(target)
+		return
+	if action=="ai_talk":
+		if target.left(6)!=AIWorld.local_map_id():world.travel(target.left(6))
+		else:world.approach_ai_target(target)
+		return
+	var r := AIWorld.resident(String(AIWorld.quest(target).get("giver", target)))
+	if r.is_empty(): return
+	if target.left(6) != AIWorld.local_map_id(): world.travel(target.left(6)); return
+	world._walk_to({"kind": "ai_command", "cell": Vector2i(r.cell[0], r.cell[1]), "data": {"action": action, "target": target}})
+
 func _quest() -> void:
+	if not AIWorld.map_data(AIWorld.local_map_id()).is_empty() or not AIWorld.progress().active.is_empty(): _open_ai("quests"); return
 	_message("蜀山初行", Game.quest_text() + "\n\n路线：道人领受试炼 → 三只山狼 →\n道人领取奖励 → 东侧灵门 → 遗迹妖王\n\n点击目标可自动寻路。战斗失败会回山门，\n保留任务进度、铜钱和装备。")
 
 func _menu() -> void:
@@ -777,28 +845,7 @@ func _system_menu() -> void:
 	)
 
 func _school() -> void:
-	var panel := _modal_panel("角色门派", 226)
-	_label(panel, "选择角色门派。\n当前：" + Game.SCHOOLS[int(Game.player.school)] + "派", Rect2(18, 53, 248, 57), 12)
-	for i in 3:
-		var button := _button(panel, Game.SCHOOLS[i] + "派", Rect2(18 + i * 84, 118, 78, 34), func() -> void:
-			if Game.storage_busy or _closing: return
-			var previous_school := int(Game.player.school)
-			Game.player.school = i
-			var result := await _save_current()
-			if result.status == PlatformResult.Status.CANCELLED or _closing: return
-			if result.ok: _world_ui()
-			else:
-				Game.player.school = previous_school
-				_message("保存失败", result.message)
-		)
-		var colors := OriginalUITheme.palette("scene")
-		for state in ["normal", "hover", "pressed"]:
-			var style := StyleBoxFlat.new()
-			style.bg_color = colors.main
-			style.border_color = colors.edge
-			style.set_border_width_all(1)
-			button.add_theme_stylebox_override(state, style)
-	_button(panel, "返回", Rect2(18, 172, 248, 30), _close_modal)
+	_message("角色门派", "当前："+SchoolRules.label(int(Game.player.school))+"\n未入派时，请前往青云山道石桥旁，与清微道人交谈，正式选择门派。")
 
 func _attributes() -> void:
 	if Game.storage_busy or _closing: return
@@ -871,6 +918,7 @@ func _encounter_battle(enemy: Dictionary) -> void:
 	await get_tree().create_timer(0.20).timeout
 	if not _encounter_current(epoch, world_id): return
 	var keys: Array[String] = [Game.appearance_key(), String(enemy.get("art", "")), "effect/flash", BattleDeathPlayback.ART_KEY]
+	keys.append_array(BattleResultView.ART_KEYS)
 	keys.append_array(BattleEffects.preload_keys(int(Game.player.job),int(Game.player.school),int(Game.player.level)))
 	var paths: Array[String] = ["res://assets/tiles/original_tiles.png"]
 	for key in keys:
@@ -893,7 +941,7 @@ func _encounter_battle(enemy: Dictionary) -> void:
 		_encounter_failed(request.result.message)
 		return
 	for index in keys.size():
-		# SpriteFrames preparation is bounded to these four battle actors/effects.
+		# Prepare only the actors, outcomes and effects referenced by this encounter.
 		var prepared := OriginalArt.actor(keys[index])
 		prepared.free()
 		battle_transition.set_progress(0.75 + 0.20 * float(index + 1) / keys.size(), "准备角色动作与招式")
@@ -995,15 +1043,16 @@ func _battle_inspect() -> void:
 	var max_hp := int(battle.enemy.hp) if enemy else int(values.hp)
 	panel.get_node("Hp").text = "气血：%d/%d" % [hp, max_hp]
 	panel.get_node("Secondary").text = "攻击：%d" % int(battle.enemy.attack) if enemy else "灵力：%d/%d" % [battle.mp, int(values.mp)]
-	panel.get_node("Tertiary").text = "防御：%d" % int(battle.enemy.defense) if enemy else "门派：" + Game.SCHOOLS[int(Game.player.school)] + "派"
+	panel.get_node("Tertiary").text = "防御：%d" % int(battle.enemy.defense) if enemy else "门派：" + SchoolRules.label(int(Game.player.school))
 
 func _battle_skills()->void:
 	if battle.phase!="select" or modal!=null:return
 	if action_menu!=null:action_menu.hide()
 	modal=preload("res://scenes/ui/modal_overlay.tscn").instantiate()
 	ui.add_child(modal)
+	modal.get_node("Shade").hide()
 	var picker:=SkillPicker.new();modal.add_child(picker)
-	picker.dismissed.connect(_close_modal)
+	picker.dismissed.connect(func()->void:_close_modal();_battle_menu())
 	picker.chosen.connect(func(id:String)->void:_close_modal();battle.selected_skill=id;_battle_turn("skill",id))
 	picker.present(int(Game.player.job),int(Game.player.school),int(Game.player.level),battle.mp)
 
@@ -1146,7 +1195,7 @@ func _refresh_battle() -> void:
 	battle_enemy_status.visible = not moving_enemy and not dead_enemy
 	if battle_buttons.size() == 6:
 		for button in battle_buttons: button.disabled = battle.phase != "select"
-		battle_buttons[1].disabled = battle.phase != "select" or battle.mp < 9
+		battle_buttons[1].disabled = battle.phase != "select" or not SkillPicker.has_usable(int(Game.player.job),int(Game.player.school),int(Game.player.level),battle.mp)
 		battle_buttons[3].disabled = battle.phase != "select" or battle.potions < 1 or battle.hp >= int(values.hp)
 
 func _battle_result() -> void:
@@ -1154,20 +1203,34 @@ func _battle_result() -> void:
 	battle_committed = true
 	battle_auto = false
 	battle_status.text = "战斗结束"
+	battle_status.hide()
+	auto_button.hide()
+	battle_hero_status.hide()
+	battle_enemy_status.hide()
+	if action_menu!=null:action_menu.hide()
 	for button in battle_buttons: button.disabled = true
 	var epoch := _ui_epoch
 	var current := battle
 	var leveled := await battle.commit()
 	if epoch != _ui_epoch or current != battle or _closing: return
-	var title := "战 斗 胜 利" if battle.victory else ("撤离山林" if battle.escaped else "重整旗鼓")
-	var description := "获得 %d 铜钱、%d 修为。" % [int(battle.enemy.gold), int(battle.enemy.xp)] if battle.victory else ("未获得奖励，当前生命与灵力已保留。" if battle.escaped else "道人送你回到了山门，元气已经恢复。")
+	var outcome := "victory" if battle.victory else ("fled" if battle.escaped else "defeat")
+	var description := "战斗结束，你获得了胜利。\n获得 %d 铜钱、%d 修为。" % [int(battle.enemy.gold), int(battle.enemy.xp)] if battle.victory else ("战斗结束，你撤离了战场。" if battle.escaped else "战斗结束，你战败了。\n道人送你回到山门，元气已经恢复。")
 	if leveled: description += "\n境界提升！生命与灵力已恢复。"
-	if int(Game.player.quest) == 4: description += "\n\n妖王伏诛，蜀山初行已完成！"
-	description += "\n\n" + Game.quest_text()
 	if battle.save_result != null and not battle.save_result.ok: description += "\n保存未确认：" + battle.save_result.message
-	var panel := _modal_panel(title)
-	_label(panel, description, Rect2(18, 56, 248, 126), 12)
-	_button(panel, "返回山道", Rect2(18, 192, 248, 32), _enter_world, true)
+	battle_log.text="[系统] "+description.replace("\n","\n[系统] ")
+	_local_messages.append({"message_id":"battle-%d"%Time.get_ticks_usec(),"channel":"system","display_name":"系统","text":description})
+	while _local_messages.size()>LocalWorldChat.LIMIT:_local_messages.pop_front()
+	modal=preload("res://scenes/ui/modal_overlay.tscn").instantiate()
+	modal.get_node("Shade").hide()
+	ui.add_child(modal)
+	battle_result=preload("res://scenes/ui/battle_result.tscn").instantiate()
+	modal.add_child(battle_result)
+	battle_result.position.y=28
+	var leave:=func()->void:
+		if epoch==_ui_epoch and current==battle and not _closing and battle_result.can_return():_enter_world()
+	battle_result.finished.connect(leave)
+	battle_result.get_node("Return").pressed.connect(leave)
+	battle_result.present(outcome,description,battle.save_result==null or battle.save_result.ok)
 
 func _request_exit() -> void:
 	if Game.storage_busy: return

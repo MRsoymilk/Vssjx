@@ -4,6 +4,8 @@ extends Node
 const LIMIT := 100
 var messages: Array[Dictionary] = []
 var _sequence := 0
+var _control_busy := false
+const CONTROL_HELP := "本地测试指令：/control lv <1～60>，例如 /control lv 50。仅修改当前本地角色。"
 @onready var screen: Control = get_parent()
 @onready var panel: Panel = screen.get_node("Chat")
 @onready var input: LineEdit = screen.get_node("Chat/ChatInput")
@@ -36,18 +38,18 @@ func _ready() -> void:
 	_render()
 
 func toggle() -> void:
-	if panel.visible: close()
+	if expanded.visible: expanded.dismiss()
 	else:
-		panel.show()
-		screen.chrome.log_label.hide()
-		_focus()
+		picker.hide()
+		expanded.open()
 
 func close() -> void:
 	picker.hide()
 	expanded.hide()
 	expanded.close_emotes()
-	panel.hide()
-	screen.chrome.log_label.show()
+	# The inline composer stays available while menus/history close.
+	panel.show()
+	screen.chrome.log_label.hide()
 	Platform.context.text_input.release_focus(input)
 
 func _focus() -> void:
@@ -80,11 +82,19 @@ func _insert_emote(token: String) -> void:
 	_focus()
 
 func send() -> void:
+	if screen.online_mode or _control_busy: return
 	var submission := Platform.context.text_input.check_submission([input])
 	if not submission.ok: return
 	var text := input.text.strip_edges()
 	if not OnlinePublicChat.valid_text(text):
 		expanded.set_status("消息不能为空，最多120字。")
+		return
+	var words := text.split(" ", false)
+	if words[0].to_lower() == "/control":
+		input.clear()
+		picker.hide()
+		expanded.close_emotes()
+		await _control(words)
 		return
 	_sequence += 1
 	messages.append({"message_id": "local-%d-%d" % [Time.get_ticks_usec(), _sequence], "channel": "public",
@@ -96,10 +106,40 @@ func send() -> void:
 	expanded.set_status("本地聊天 · 仅自己可见")
 	_render()
 
+func _control(words: PackedStringArray) -> void:
+	if screen.online_mode: return
+	if words.size()==1 or (words.size()==2 and words[1].to_lower()=="help"):
+		_control_message(CONTROL_HELP)
+		return
+	if words.size()!=3 or words[1].to_lower()!="lv" or not words[2].is_valid_int():
+		_control_message(CONTROL_HELP)
+		return
+	var level := words[2].to_int()
+	if level<1 or level>60:
+		_control_message("等级必须为1～60。"+CONTROL_HELP)
+		return
+	_control_busy = true
+	var result := await Game.set_local_test_level(level)
+	if not is_inside_tree(): return
+	_control_busy = false
+	if result.ok:
+		_control_message("本地测试：等级已设置为%d，经验清零，气血与灵力已回满。已保存。"%level+("等级降低，已重置属性分配。" if result.value.reset_attributes else ""))
+	else:
+		_control_message("本地测试未生效："+result.message)
+
+func _control_message(text: String) -> void:
+	_sequence += 1
+	messages.append({"message_id":"local-control-%d-%d"%[Time.get_ticks_usec(),_sequence],"channel":"system","display_name":"系统","text":text})
+	while messages.size()>LIMIT: messages.pop_front()
+	expanded.set_status(text)
+	_render()
+	screen.local_control_completed.emit()
+
 func _render() -> void:
 	log.clear()
 	log.add_text("[系统] 本地消息仅自己可见")
+	if messages.is_empty(): log.add_text("\n[系统] "+Game.quest_text())
 	for message in messages:
-		log.add_text("\n[本地] %s：" % message.display_name)
+		log.add_text("\n[系统] " if message.channel=="system" else "\n[本地] %s：" % message.display_name)
 		ChatEmotePicker.CATALOG.append_body(log, message.text)
 	expanded.sync_messages(messages)

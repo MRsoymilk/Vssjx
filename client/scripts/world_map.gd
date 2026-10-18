@@ -2,6 +2,7 @@ class_name OriginalWorldMap
 extends Control
 ## Recovered overview coordinates are browsing data, not teleport destinations.
 signal back_requested
+signal ai_requested(map_id: String)
 const STEP := Vector2(46, 56)
 const PADDING := Vector2(24, 24)
 const GRAPH_SIZE := Vector2(1060, 1448)
@@ -29,6 +30,12 @@ func _ready() -> void:
 	$MapMenu/Details.pressed.connect(func() -> void: popup.hide(); _place_selection())
 	$MapMenu/City.pressed.connect(func() -> void: popup.hide(); cycle_kind(1))
 	$MapMenu/Close.pressed.connect(func() -> void: back_requested.emit())
+	var ai_button := Button.new()
+	ai_button.text = "AI生成 · 驿路目录"
+	ai_button.position = Vector2(130, 404); ai_button.size = Vector2(180, 30)
+	ai_button.add_theme_font_size_override("font_size", 12)
+	add_child(ai_button)
+	ai_button.pressed.connect(func() -> void: ai_requested.emit("ai_%03d" % selected_id))
 	select_location(selected_id, true)
 
 func present() -> void:

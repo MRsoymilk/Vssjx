@@ -1,0 +1,89 @@
+{
+  "source": "analysis/references/player-sheet/skills.json",
+  "roles": {
+    "1/-1": {
+      "source_role": "侠客",
+      "named_count": 1,
+      "missing_levels": []
+    },
+    "1/2": {
+      "source_role": "昆仑派侠客",
+      "named_count": 5,
+      "missing_levels": []
+    },
+    "0/-1": {
+      "source_role": "力士",
+      "named_count": 1,
+      "missing_levels": []
+    },
+    "0/2": {
+      "source_role": "昆仑派力士",
+      "named_count": 5,
+      "missing_levels": []
+    },
+    "2/-1": {
+      "source_role": "隐者",
+      "named_count": 1,
+      "missing_levels": []
+    },
+    "2/0": {
+      "source_role": "峨眉派隐者",
+      "named_count": 3,
+      "missing_levels": [
+        35,
+        55
+      ]
+    },
+    "0/0": {
+      "source_role": "峨眉派力士",
+      "named_count": 2,
+      "missing_levels": [
+        25,
+        45,
+        55
+      ]
+    },
+    "0/1": {
+      "source_role": "花间派力士",
+      "named_count": 5,
+      "missing_levels": []
+    },
+    "2/1": {
+      "source_role": "花间派隐者",
+      "named_count": 3,
+      "missing_levels": [
+        25,
+        55
+      ]
+    },
+    "2/2": {
+      "source_role": "昆仑派隐者",
+      "named_count": 2,
+      "missing_levels": [
+        25,
+        45,
+        55
+      ]
+    },
+    "1/1": {
+      "source_role": "花间派侠客",
+      "named_count": 2,
+      "missing_levels": [
+        35,
+        45,
+        55
+      ]
+    },
+    "1/0": {
+      "source_role": "峨眉派侠客",
+      "named_count": 0,
+      "missing_levels": [
+        15,
+        25,
+        35,
+        45,
+        55
+      ]
+    }
+  }
+}

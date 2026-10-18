@@ -20,6 +20,10 @@ var portal_marker: Node2D
 var shop: ShopPanel
 var backpack: OriginalInventory
 var bag_overlay: Control
+var ai_panel: AIWorldPanel
+var ai_station: Node2D
+var _portal_latch := ""
+var _portal_stop := ""
 var _motion_grid := AStarGrid2D.new()
 var _key_timer := 0.0
 var _was_keyboard := false
@@ -59,6 +63,7 @@ func _ready() -> void:
 	map_data = SharedWorldMap.load_data()
 	_build_map()
 	image.texture = viewport.get_texture()
+	preload("res://scripts/world_nameplate_layer.gd").attach(image,viewport)
 	image.gui_input.connect(_map_input)
 	for character in OnlineAccount.characters:
 		if character.id == character_id: _character = character.duplicate(true)
@@ -69,6 +74,10 @@ func _ready() -> void:
 	menu.chosen.connect(_scene_action)
 	attributes.back_requested.connect(_close_attributes)
 	world_map.back_requested.connect(_close_world_map)
+	world_map.ai_requested.connect(func(id: String) -> void:
+		_open_ai("maps")
+		if ai_panel != null: ai_panel.selected_map=id; ai_panel.refresh()
+	)
 	attributes.allocation_requested.connect(_allocate_attributes)
 	$Menu/Panel/Continue.pressed.connect(func() -> void: details.hide())
 	$Menu/Panel/Leave.pressed.connect(_leave_world)
@@ -116,7 +125,7 @@ func _ready() -> void:
 		expanded_chat.add_system(text)
 		_chat_changed()
 		if _loading_battle.is_empty(): encounter.hide()
-		if network.pve.last_code.is_empty() and network.pve.last_action in ["accept", "claim", "restore"]: npc_dialog.hide()
+		if network.pve.last_code.is_empty() and network.pve.last_action in ["accept", "claim", "restore","ai_accept","ai_claim","ai_restore","ai_interact","school_join"]: npc_dialog.hide()
 	)
 	network.map_changed.connect(_map_changed)
 	network.changed.connect(_snapshot)
@@ -169,6 +178,9 @@ func _scene_action(action: String) -> void:
 	if action == "map":
 		_open_world_map()
 		return
+	if action == "quest" and (not AIWorld.map_data(String(map_data.map_id)).is_empty() or not network.pve.state.get("ai_world",{}).get("active",{}).is_empty()):
+		_open_ai("quests")
+		return
 	if action == "shop":
 		_open_shop()
 		return
@@ -197,25 +209,43 @@ func _status_changed(text_value: String) -> void:
 func _build_map() -> void:
 	SharedWorldMap.build($Viewport/Scene/Terrain, _motion_grid, map_data)
 	SharedWorldMap.add_scenery(actor_layer, map_data)
-	var gate := SharedWorldMap.portal(String(map_data.map_id))
+	var gate: Dictionary = SharedWorldMap.exits(String(map_data.map_id))[0]
 	portal_marker = Node2D.new()
 	portal_marker.set_script(preload("res://scripts/portal.gd"))
+	portal_marker.set("gate",gate)
 	portal_marker.position = Vector2(gate.cell[0] * 16 + 8, gate.cell[1] * 16 + 8)
 	actor_layer.add_child(portal_marker)
 	var label := Label.new()
 	label.text = gate.name
-	label.position = Vector2(-65, -50)
+	label.position = Vector2(-65, -24)
 	label.size = Vector2(130, 16)
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.add_theme_font_size_override("font_size", 10)
 	label.add_theme_color_override("font_color", Color("c2f7f4"))
 	label.add_theme_color_override("font_outline_color", Color("182821"))
 	label.add_theme_constant_override("outline_size", 1)
+	preload("res://scripts/world_nameplate.gd").apply(label,Color("c2f7f4"))
 	portal_marker.add_child(label)
+	if not AIWorld.map_data(String(map_data.map_id)).is_empty():
+		for exit in SharedWorldMap.exits(String(map_data.map_id)).slice(1):
+			var node := Node2D.new();node.set_script(preload("res://scripts/portal.gd"))
+			node.set("gate",exit)
+			node.position=Vector2(exit.cell[0]*16+8,exit.cell[1]*16+8);actor_layer.add_child(node)
+			var tag := label.duplicate();tag.text=exit.name;preload("res://scripts/world_nameplate.gd").apply(tag,Color("c2f7f4"));node.add_child(tag)
+	if AIWorld.map_data(String(map_data.map_id)).is_empty():
+		ai_station = Node2D.new(); ai_station.set_script(preload("res://scripts/portal.gd"))
+		ai_station.position = Vector2(AIWorld.station(String(map_data.map_id))*16)+Vector2(8,8)
+		actor_layer.add_child(ai_station)
+		var tag := label.duplicate()
+		tag.text = "灵空台 · AI生成";preload("res://scripts/world_nameplate.gd").apply(tag,Color("c2f7f4")); ai_station.add_child(tag)
 
 func _map_changed(id: String) -> void:
+	_portal_latch=""
+	_portal_stop=""
 	_cancel_approach()
 	_cancel_battle_preparation()
+	_close_inventory()
+	ai_station = null
 	npc_dialog.hide()
 	move_target.clear()
 	actors.clear()
@@ -226,6 +256,7 @@ func _map_changed(id: String) -> void:
 	map_data = SharedWorldMap.load_data(id)
 	_build_map()
 	screen.hud.get_node("MapName").text = SharedWorldMap.title(id)
+	screen.hud.get_node("MapName").size.x = 78 if AIWorld.map_data(id).is_empty() else 220
 	screen.hud.get_node("Minimap").set_shared_world(map_data, {}, character_id)
 	screen.hud.get_node("Minimap").set_shared_population({})
 	_was_keyboard = false
@@ -246,6 +277,11 @@ func _population(values: Dictionary) -> void:
 			residents[id] = resident
 		residents[id].receive(visible_values[id], _motion_grid)
 		residents[id].set_quest_stage(int(network.pve.state.get("character", {}).get("quest_stage", -1)) if network.pve.ready else -1)
+		if id=="qingwei" and network.pve.ready and int(_character.get("school",SchoolRules.UNJOINED))==SchoolRules.UNJOINED:
+			residents[id].set_quest_stage(0,"与清微道人交谈，选择门派。")
+		if not AIWorld.resident(id).is_empty():
+			var marker := AIWorld.npc_marker(id,network.pve.state.get("ai_world",{}),int(_character.get("level",1))) if network.pve.ready else {"stage":-1,"hint":""}
+			residents[id].set_quest_stage(marker.stage,marker.hint)
 	screen.hud.get_node("Minimap").set_shared_population(visible_values)
 
 func _snapshot(values: Dictionary) -> void:
@@ -267,9 +303,8 @@ func _snapshot(values: Dictionary) -> void:
 			root.add_child(sprite)
 			if id == character_id: root.add_child(preload("res://scenes/actors/player_ring.tscn").instantiate())
 			var label := OriginalSceneChrome.label(root, entity.display_name, Rect2(-65, -72, 130, 18), 11, Color("fff0a5") if id == character_id else Color("9ef6ff"))
-			label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-			label.add_theme_constant_override("outline_size", 1)
-			label.add_theme_color_override("font_outline_color", Color("1e343b"))
+			label.position.y=-74
+			preload("res://scripts/world_nameplate.gd").apply(label,Color("fff0a5") if id==character_id else Color("9ef6ff"))
 			actors[id] = {"root": root, "sprite": sprite, "target": point, "distance": 0.0, "motion": OnlineActorMotion.new()}
 		var look: Array = network.appearances.get(id,[1,0])
 		OriginalArt.apply_appearance(actors[id].sprite,ShopRules.actor_key(int(entity.job),int(entity.gender),look))
@@ -281,7 +316,7 @@ func _snapshot(values: Dictionary) -> void:
 	if values.has(character_id):
 		var own: Dictionary = values[character_id]
 		screen.hud.get_node("MapCoordinates").text = "%d  %d" % [int(own.cell[0]), int(own.cell[1])]
-		screen.hud.get_node("WorldIdentity").text = "等级 %d\n%s派" % [int(_character.get("level", 1)), ["峨眉", "花涧", "昆仑"][int(_character.get("school", 0))]]
+		screen.hud.get_node("WorldIdentity").text = "等级 %d\n%s" % [int(_character.get("level",1)),SchoolRules.label(int(_character.get("school",SchoolRules.UNJOINED)))]
 	if _pve_log.is_empty(): _system_text = "同图%d人 · 点击移动 / WASD" % actors.size()
 	status.text = _system_text
 	_chat_changed()
@@ -402,6 +437,7 @@ func _process(delta: float) -> void:
 	if bag_overlay != null or chat_input.has_focus() or menu.visible or details.visible or npc_dialog.visible or emote_picker.visible or encounter.visible or battle_view.visible or expanded_chat.visible or attributes.visible or world_map.visible or network.pve.pending() or network.pve.active():
 		_was_keyboard = false
 		return
+	if _auto_transfer(): return
 	_key_timer -= delta
 	var direction := Vector2i(int(Input.is_physical_key_pressed(KEY_D) or Input.is_physical_key_pressed(KEY_RIGHT)) - int(Input.is_physical_key_pressed(KEY_A) or Input.is_physical_key_pressed(KEY_LEFT)), int(Input.is_physical_key_pressed(KEY_S) or Input.is_physical_key_pressed(KEY_DOWN)) - int(Input.is_physical_key_pressed(KEY_W) or Input.is_physical_key_pressed(KEY_UP)))
 	if direction.x != 0: direction.y = 0
@@ -434,10 +470,10 @@ func _map_input(event: InputEvent) -> void:
 	Platform.context.text_input.release_focus(chat_input)
 	_was_keyboard = false
 	var world_point := camera.get_screen_center_position() + point - Vector2(viewport.size) / 2.0
-	if is_instance_valid(portal_marker) and Rect2(portal_marker.position + Vector2(-20, -45), Vector2(40, 60)).has_point(world_point):
-		_cancel_approach()
-		_resident_action("transfer", SharedWorldMap.portal(String(map_data.map_id)).id)
-		return
+	for gate in SharedWorldMap.exits(String(map_data.map_id)):
+		var center:=Vector2(gate.cell[0]*16+8,gate.cell[1]*16+8)
+		if Rect2(center-Vector2(8,8),Vector2(16,16)).has_point(world_point):
+			_cancel_approach();network.move_to(Vector2i(gate.cell[0],gate.cell[1]));_mark_destination(Vector2i(gate.cell[0],gate.cell[1]));return
 	for id in residents:
 		if residents[id].hit(world_point):
 			resident_selected.emit(id)
@@ -453,6 +489,9 @@ func _map_input(event: InputEvent) -> void:
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	if not event is InputEventKey or not event.pressed: return
+	if ai_panel != null:
+		if event.keycode == KEY_ESCAPE: _close_inventory(); get_viewport().set_input_as_handled()
+		return
 	if shop != null:
 		if event.keycode == KEY_ESCAPE:
 			_close_inventory()
@@ -518,7 +557,7 @@ func _pve_changed() -> void:
 		_character.next_xp = int(_character.level) * 40
 		if attributes.visible: attributes.display_online(_character, model.state.stats, model.state.get("attributes", {}))
 		screen.chrome.display_character(_character)
-		screen.hud.get_node("WorldIdentity").text = "等级 %d\n%s派" % [int(_character.level), ["峨眉", "花涧", "昆仑"][int(_character.school)]]
+		screen.hud.get_node("WorldIdentity").text = "等级 %d\n%s" % [int(_character.level),SchoolRules.label(int(_character.school))]
 		_population(network.population.entities)
 		if model.state.battle is Dictionary and (model.active() or model.state.battle.id != _closed_battle):
 			if battle_view.battle_id == model.state.battle.id:
@@ -542,7 +581,7 @@ func _select_resident(id: String) -> void:
 	details.hide()
 	emote_picker.hide()
 	npc_dialog.hide()
-	_resident_action("npc" if id == "qingwei" else "challenge", id)
+	_resident_action("ai_npc" if not AIWorld.resident(id).is_empty() and AIWorld.resident(id).kind=="npc" else ("npc" if id=="qingwei" else "challenge"),id)
 
 func _cancel_approach() -> void:
 	if not _approach.is_empty() and network.world_ready: network.stop_moving()
@@ -551,9 +590,29 @@ func _cancel_approach() -> void:
 		npc_dialog.approaching = false
 		npc_dialog.refresh()
 
+func _auto_transfer() -> bool:
+	if not network.pve.ready or not network.entities.has(character_id): return false
+	var own: Dictionary=network.entities[character_id]
+	if own.next_cell!=null:
+		return not SharedWorldMap.exit_at(String(map_data.map_id),Vector2i(own.next_cell[0],own.next_cell[1])).is_empty()
+	var cell:=Vector2i(own.cell[0],own.cell[1])
+	var gate:=SharedWorldMap.exit_at(String(map_data.map_id),cell)
+	if gate.is_empty():_portal_latch="";_portal_stop="";return false
+	var key: String=String(map_data.map_id)+":"+str(cell)
+	if _portal_latch==key:return false
+	if _portal_stop!=key:
+		_portal_stop=key;network.stop_moving();return true
+	if not network._pending_motion.is_empty() or int(own.last_input_seq)<network._input_seq:return true
+	if actors.has(character_id) and actors[character_id].motion.has_motion():return true
+	_portal_latch=key
+	_cancel_approach();move_target.clear()
+	if gate.get("legacy",false):network.pve.submit("transfer",SharedWorldMap.portal(String(map_data.map_id)).id)
+	else:network.pve.submit("ai_travel",gate.target_map)
+	return true
+
 func _npc_action_chosen(action: String, target: String) -> void:
 	if not npc_dialog.visible or not _approach.is_empty() or not network.world_ready or not network.pve.ready or network.pve.pending() or network.pve.active(): return
-	if target != npc_dialog.target or action not in ["accept", "claim", "restore"]: return
+	if not npc_dialog.allows(action,target): return
 	_resident_action(action, target)
 	npc_dialog.approaching = true
 	npc_dialog.refresh()
@@ -573,13 +632,15 @@ func _advance_approach() -> void:
 		chat_status.text = "未能抵达，请重新选择目标。"
 		return
 	var transfer: bool = _approach.action == "transfer"
-	if (not transfer and not network.population.entities.has(_approach.target)) or not network.entities.has(character_id):
+	var ai_travel: bool = _approach.action == "ai_travel"
+	var resident_id: String = "qingwei" if _approach.action=="school_join" else String(AIWorld.quest(_approach.target).get("giver",_approach.target))
+	if (not transfer and not ai_travel and not network.population.entities.has(resident_id)) or not network.entities.has(character_id):
 		_cancel_approach()
 		return
 	var own: Dictionary = network.entities[character_id]
 	if own.next_cell != null or not network._pending_motion.is_empty() or int(own.last_input_seq) < network._input_seq: return
 	var cell := Vector2i(own.cell[0], own.cell[1])
-	var resident: Dictionary = SharedWorldMap.portal(String(map_data.map_id)) if transfer else network.population.entities[_approach.target]
+	var resident: Dictionary = SharedWorldMap.portal(String(map_data.map_id)) if transfer else ({"cell":[AIWorld.station(String(map_data.map_id)).x,AIWorld.station(String(map_data.map_id)).y]} if ai_travel else network.population.entities[resident_id])
 	var target := Vector2i(resident.cell[0], resident.cell[1])
 	# Moving wolves can cross a cell while the challenge is in flight.
 	var reach := 1 if resident.get("kind") == "wolf" else 2
@@ -593,6 +654,9 @@ func _advance_approach() -> void:
 		var action: String = request.action
 		if action == "npc":
 			npc_dialog.present(request.target, resident, network.pve)
+			return
+		if action == "ai_npc":
+			npc_dialog.present_ai(request.target,AIWorld.resident(request.target),network.pve.state.get("ai_world",{}),int(_character.get("level",1)),network.pve)
 			return
 		npc_dialog.approaching = false
 		network.pve.submit(action, request.target)
@@ -664,6 +728,7 @@ func _prepare_battle(snapshot: Dictionary) -> void:
 	var c: Dictionary = network.pve.state.character
 	var key: String = (["mzs", "mck", "mfs"] if int(c.gender) == 0 else ["wzs", "wck", "wfs"])[int(c.job)]
 	var keys: Array[String] = [ShopRules.actor_key(int(c.job),int(c.gender),ShopRules.appearance(network.pve.state.shop)) if network.pve.state.has("shop") else "hero/" + key, String(snapshot.enemy.art), "effect/flash", BattleDeathPlayback.ART_KEY]
+	keys.append_array(BattleResultView.ART_KEYS)
 	keys.append_array(BattleEffects.preload_keys(int(c.job),int(c.school),int(c.level),not network.pve.state.has("skills")))
 	var paths: Array[String] = ["res://assets/tiles/original_tiles.png"]
 	for actor_key in keys:
@@ -836,6 +901,38 @@ func _close_inventory() -> void:
 	bag_overlay = null
 	backpack = null
 	shop = null
+	ai_panel = null
+
+func _open_ai(section: String = "maps", npc: String = "") -> void:
+	if section=="quests" and not npc.is_empty():
+		_close_inventory();_resident_action("ai_npc",npc);return
+	_close_inventory(); _close_world_map()
+	if not network.pve.ready or network.pve.active(): return
+	if not network.pve.state.has("ai_world"):
+		chat_status.text = "当前服务尚未启用AI生成扩展；本分支构建服务后可用。"
+		return
+	network.stop_moving(); _was_keyboard=false
+	details.hide(); menu.hide(); npc_dialog.hide()
+	ai_panel = AIWorldPanel.new(); bag_overlay = ai_panel
+	ai_panel.present(String(map_data.map_id),network.pve.state.ai_world,int(_character.get("level",1)),section,npc)
+	add_child(ai_panel)
+	ai_panel.back_requested.connect(_close_inventory)
+	ai_panel.requested.connect(_ai_requested)
+	battle_view.set_process_unhandled_key_input(false)
+
+func _ai_requested(action: String, target: String) -> void:
+	_close_inventory()
+	if not network.pve.ready or network.pve.pending() or network.pve.active(): return
+	if action=="ai_talk":
+		if target.left(6)!=String(map_data.map_id):_resident_action("ai_travel",target.left(6))
+		else:_select_resident(target)
+		return
+	if action == "ai_track":
+		if target.left(6)!=String(map_data.map_id): _resident_action("ai_travel",target.left(6))
+		else: _select_resident(target)
+		return
+	if action!="ai_travel" and target.left(6)!=String(map_data.map_id): _resident_action("ai_travel",target.left(6)); return
+	_resident_action(action,target)
 
 func _close_world_map() -> void:
 	if not world_map.visible: return

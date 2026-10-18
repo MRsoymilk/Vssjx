@@ -1,0 +1,114 @@
+{
+  "texture": "res://assets/actors/monster_tm2.png",
+  "width": 35,
+  "height": 47,
+  "columns": 8,
+  "origin": [-27, -46],
+  "anchor_x": 0,
+  "playback": {
+    "idle": [
+      [25, 8],
+      [24, 8]
+    ],
+    "walk": [
+      [25, 8],
+      [24, 8]
+    ],
+    "attack": [
+      [21, 1],
+      [20, 1],
+      [19, 1],
+      [18, 1],
+      [17, 1],
+      [16, 1],
+      [15, 1],
+      [14, 2],
+      [13, 1],
+      [12, 1],
+      [11, 1],
+      [20, 1],
+      [21, 1]
+    ],
+    "hurt": [
+      [10, 1],
+      [9, 1],
+      [8, 1],
+      [7, 1],
+      [6, 2]
+    ]
+  },
+  "count": 26,
+  "sequences": [
+    [
+      [1, 1],
+      [20, 1],
+      [21, 1],
+      [22, 1],
+      [23, 1],
+      [24, 1],
+      [25, 1]
+    ],
+    [
+      [15, 1],
+      [16, 1],
+      [17, 1],
+      [18, 1],
+      [19, 2]
+    ],
+    [
+      [4, 1],
+      [5, 1],
+      [6, 1],
+      [7, 1],
+      [8, 1],
+      [9, 1],
+      [10, 1],
+      [11, 2],
+      [12, 1],
+      [13, 1],
+      [14, 1],
+      [5, 1],
+      [4, 1]
+    ],
+    [
+      [0, 8],
+      [1, 8]
+    ],
+    [
+      [2, 8],
+      [3, 8]
+    ],
+    [
+      [0, 8],
+      [1, 8]
+    ],
+    [],
+    []
+  ],
+  "native_battle": {
+    "indexing": "reverse_serialized_tables",
+    "source_frame_count": 26,
+    "sequence_ids": {"idle": 4, "walk": 4, "attack": 5, "hurt": 6},
+    "impact_steps": {
+      "idle": [],
+      "walk": [],
+      "attack": [4],
+      "hurt": []
+    },
+    "attack_x": [119, 82, 42, 6, 6, 6, 6, 6, 6, 6, 40, 82, 119],
+    "pose_x": {
+      "idle": [11, 11],
+      "walk": [11, 11],
+      "hurt": [10, 11, 12, 13, 14]
+    },
+    "attack_basis": "target",
+    "cast_mapping": null
+  },
+  "alignment": {
+    "source": "AI接入，原生动作槽4/5/6",
+    "primary_source": "xtm2",
+    "body_frame": 4,
+    "combat_extent_frames": [],
+    "source_sha256": "353cd1749c100e961ba6b082c7152cdf5559319e6d097d74ca2ac4df6556faa6"
+  }
+}

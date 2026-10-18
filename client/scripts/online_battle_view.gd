@@ -36,7 +36,7 @@ const ACTIONS := ["attack", "skill", "guard", "potion", "inspect", "flee"]
 
 func _ready() -> void:
 	effects=BattleEffects.new();$Hud/EffectsLayer.add_child(effects)
-	skill_picker=SkillPicker.new();add_child(skill_picker);skill_picker.hide()
+	skill_picker=SkillPicker.new();add_child(skill_picker);skill_picker.position.y=-28;skill_picker.hide()
 	skill_picker.dismissed.connect(_open_menu)
 	skill_picker.chosen.connect(func(id:String)->void:
 		if model==null or not model.ready or model.pending() or animation_time>0:return
@@ -57,6 +57,8 @@ func _ready() -> void:
 	$Choice/Cancel.pressed.connect(_open_menu)
 	$Inspect/Close.pressed.connect(_open_menu)
 	$Result/Return.pressed.connect(return_to_map)
+	$Result.manual_clock = true
+	$Result.finished.connect(return_to_map)
 	_highlight(0)
 
 func _highlight(index: int) -> void:
@@ -83,7 +85,7 @@ func present(pve: OnlinePve) -> void:
 		$Choice.hide()
 		skill_picker.hide()
 		$Inspect.hide()
-		$Result.hide()
+		$Result.reset()
 		$Hud/ActionMenu.show()
 		if hero != null: hero.queue_free()
 		if enemy != null: enemy.queue_free()
@@ -229,14 +231,17 @@ func refresh() -> void:
 	$Hud/BattleHeroHp.value = _shown_hero_hp
 	$Hud/BattleEnemyHp.value = _shown_enemy_hp
 	var locked := not model.ready or model.pending() or animation_time > 0
+	skill_picker.locked = locked or not model.active()
 	for button in buttons: button.disabled = locked or not model.active()
 	if not locked and model.active():
-		buttons[1].disabled = int(model.state.battle.mp) < 9
+		buttons[1].disabled = not SkillPicker.has_usable(int(model.state.character.job),int(model.state.character.school),int(model.state.character.level),int(model.state.battle.mp),model.state.get("skills",{}).get("available",[]),not model.state.has("skills"))
 		buttons[3].disabled = int(model.state.potions) == 0 or int(model.state.battle.hp) >= int(model.state.stats.hp)
 	$Choice/Use.disabled = locked
 	$Hud/AutoButton.disabled = not model.ready or not model.active()
+	$Hud/AutoButton.visible = model.active()
 	$Hud/AutoButton.text = "0键手动战斗" if automatic else "0键自动战斗"
-	$Result/Return.disabled = model.active() or model.pending() or not model.ready or animation_time > 0
+	$Result.paused = locked
+	$Result/Return.disabled = model.active() or locked or not $Result.can_return()
 	if not model.ready:
 		automatic = false
 		$Hint.text = "连接中断，正在恢复战斗……"
@@ -246,11 +251,12 @@ func refresh() -> void:
 		$Hint.text = ""
 		$Hud/ActionMenu.hide()
 		$Choice.hide()
+		skill_picker.hide()
 		$Inspect.hide()
-		$Result.visible = animation_time <= 0
 		var outcome: String = model.state.battle.outcome
-		$Result/Title.text = {"victory":"战 斗 胜 利", "defeat":"重整旗鼓", "fled":"撤离山林"}.get(outcome,"战斗结束")
-		$Result/Body.text = "奖励已入账" if outcome == "victory" else ("元气已经恢复" if outcome == "defeat" else "试炼进度保留")
+		if animation_time <= 0:
+			$Result.present(outcome,{"victory":"战斗结束，你获得了胜利。", "defeat":"战斗结束，你战败了。", "fled":"战斗结束，你撤离了战场。"}.get(outcome,"战斗结束"))
+		else: $Result.hide()
 	else: $Hint.text = SkillRules.status_text(model.state.battle.get("skills",{}))
 	var hero_attacking := _hero_motion != null and _hero_motion.active and _hero_motion.action == &"attack"
 	$Hud/BattleHeroHp.visible = not hero_attacking and _hero_death == null
@@ -265,16 +271,16 @@ func refresh() -> void:
 
 func choose(action: String) -> void:
 	if model == null or not model.ready or not model.active() or model.pending() or animation_time > 0: return
-	if action=="skill" and model.state.has("skills"):
+	if action=="skill":
 		$Hud/ActionMenu.hide();$Inspect.hide();$Choice.hide()
 		var c:Dictionary=model.state.character
-		skill_picker.present(int(c.job),int(c.school),int(c.level),int(model.state.battle.mp),model.state.skills.available)
+		skill_picker.present(int(c.job),int(c.school),int(c.level),int(model.state.battle.mp),model.state.get("skills",{}).get("available",[]),not model.state.has("skills"))
 		return
-	if action in ["skill", "potion"]:
+	if action == "potion":
 		choice_action = action
 		$Hud/ActionMenu.hide()
 		$Inspect.hide()
-		$Choice/Use.text = (["破山诀", "御剑诀", "摄灵诀"][int(model.state.character.job)] + "  9灵力") if action == "skill" else "回春散 ×%d" % int(model.state.potions)
+		$Choice/Use.text = "回春散 ×%d" % int(model.state.potions)
 		$Choice.show()
 	elif action == "inspect":
 		$Hud/ActionMenu.hide()
@@ -314,8 +320,9 @@ func toggle_auto() -> void:
 	refresh()
 
 func return_to_map() -> void:
-	if model == null or model.active() or model.pending() or not model.ready or animation_time > 0: return
+	if not visible or model == null or model.active() or model.pending() or not model.ready or animation_time > 0 or not $Result.can_return(): return
 	_cancel_motion()
+	$Result.hide()
 	hide()
 	dismissed.emit()
 
@@ -350,9 +357,12 @@ func _process(delta: float) -> void:
 		if automatic and auto_time >= 1.4: _send("attack")
 		elif countdown == 0: _send("guard")
 	refresh()
+	if $Result.visible and not was_animating:
+		$Result.advance(delta)
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	if not visible or not event is InputEventKey or not event.pressed or event.echo: return
+	if skill_picker.visible: return
 	if model == null: return
 	match event.keycode:
 		KEY_0, KEY_KP_0: toggle_auto()

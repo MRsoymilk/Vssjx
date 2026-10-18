@@ -69,7 +69,7 @@ func _run() -> void:
 		check(app.mode == "local_select" and app.world == null and app.character_selection != null, "Existing local save stops on character selection")
 		app.character_selection.enter_button.pressed.emit()
 		check(app.mode == "world" and app.creation == null, "Explicit local Enter resumes saved character")
-		var expected := {"name": "本地青衫", "job": 2, "gender": 1, "school": 1, "hp": 51, "mp": 23, "gold": 73, "potions": 4, "quest": 2, "equipped": true, "signature": "本地保存", "cell": [17, 17]}
+		var expected := {"name": "本地青衫", "job": 2, "gender": 1, "school": SchoolRules.UNJOINED, "hp": 51, "mp": 23, "gold": 73, "potions": 4, "quest": 2, "equipped": true, "signature": "本地保存", "cell": [17, 17]}
 		for key in expected:
 			var actual: Variant = Game.player.get(key)
 			if key == "cell": check(Vector2i(actual[0], actual[1]) == Vector2i(17, 17), "Local save restores cell")

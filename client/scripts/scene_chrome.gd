@@ -38,6 +38,7 @@ func _request_action(action: String) -> void:
 	action_requested.emit(action)
 
 func update_header(hp: int, mp: int, round_number: int) -> void:
+	if use_local_player: identity.text = "LV.%d" % int(Game.player.level)
 	var values := Game.stats()
 	hp_bar.max_value = values.hp
 	hp_bar.value = hp

@@ -144,7 +144,7 @@ func _on_ticket(result: Dictionary) -> void:
 	_ticket = result.ticket
 	_announcement_version = 1 if result.get("announcement_version") == 1 else 0
 	_pve_version = 1 if result.get("pve_version") == 1 else 0
-	_maps_version = 1 if result.get("maps_version") == 1 else 0
+	_maps_version = int(result.get("maps_version", 0)) if result.get("maps_version") in [1, 2] else 0
 	_shop_version = int(result.get("shop_version")) if result.get("shop_version") in [1,2] else 0
 	appearances = {}
 	_population_version = 1 if result.get("population_version") == 1 else 0
@@ -228,7 +228,7 @@ func _exchange_packet() -> Dictionary:
 	if _announcement_version == 1: packet.announcement_version = 1
 	if _population_version == 1: packet.population_version = 1
 	if _pve_version == 1: packet.pve_version = 1
-	if _maps_version == 1: packet.maps_version = 1
+	if _maps_version in [1, 2]: packet.maps_version = _maps_version
 	if _shop_version in [1,2]: packet.shop_version = _shop_version
 	return packet
 
@@ -302,11 +302,11 @@ func _receive(data: Dictionary, raw: PackedByteArray) -> void:
 		if stream.is_empty() or not chat.receive(data): _failed("INVALID_CHAT")
 		return
 	if kind == "auth.ready":
-		if _state != "syncing" or not stream.is_empty() or data.get("character_id") != character_id or data.get("config_hash") != config_hash or not SharedWorldMap.MAPS.has(data.get("map_id")) or data.get("instance_id") != "main":
+		if _state != "syncing" or not stream.is_empty() or data.get("character_id") != character_id or data.get("config_hash") != config_hash or not SharedWorldMap.exists(data.get("map_id")) or data.get("instance_id") != "main":
 			_failed("INVALID_HANDSHAKE"); return
 		if not _uuid(data.get("game_session_id")) or not _uuid(data.get("stream_id")) or not _decimal(data.get("connection_epoch")) or not _decimal(data.get("world_epoch")) or not _uuid(data.get("world_stream_id")) or data.get("world_sync_version") != 2:
 			_failed("INVALID_HANDSHAKE"); return
-		if data.has("map_hash") and data.map_hash != FileAccess.get_sha256(SharedWorldMap.MAPS[data.map_id]):
+		if data.has("map_hash") and data.map_hash != SharedWorldMap.map_hash(data.map_id):
 			_failed("CONFIG_MISMATCH"); return
 		if data.map_id != "qingyun_trail" and not data.has("map_hash"):
 			_failed("CONFIG_MISMATCH"); return

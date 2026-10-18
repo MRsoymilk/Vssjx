@@ -171,6 +171,7 @@ func commit() -> bool:
 	elif not escaped:
 		Game.restore()
 		Game.player.zone = 0
+		Game.player.ai_map = ""
 		Game.player.cell = [Game.START_CELL.x, Game.START_CELL.y]
 	save_result = await Game.save_game()
 	return leveled

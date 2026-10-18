@@ -1,0 +1,73 @@
+{
+  "source": "用户提供的真实游玩视频；原包 ssjx.mrp 素材",
+  "video": {
+    "filename": "冒泡蜀山剑侠.mp4",
+    "sha256": "cd46f8676d6a6dfa7d1b62f4eac75b9b16c2b7dcd7d306317ba43b4031fa7892",
+    "width": 270,
+    "height": 480,
+    "fps": 15,
+    "duration_seconds": 1796.47
+  },
+  "observations": [
+    {
+      "seconds": [
+        100,
+        220
+      ],
+      "scene": "草地坡台",
+      "applied": "连片台阶、崖面和弯曲山路，而非随机碎石"
+    },
+    {
+      "seconds": [
+        450
+      ],
+      "scene": "蓝灰色石台",
+      "applied": "连续高台边缘、向下崖面和雪松；不是白色棋盘雪地"
+    },
+    {
+      "seconds": [
+        480,
+        1020
+      ],
+      "scene": "火山区域",
+      "applied": "紫色台地、连续熔岩岸线、裂谷及崖面"
+    },
+    {
+      "seconds": [
+        1580,
+        1660
+      ],
+      "scene": "建筑庭院",
+      "applied": "原包红瓦房、紫顶祠院、石砖庭院与池塘分区"
+    }
+  ],
+  "layout_revision": 2,
+  "authorship": "27类结构、214张具体布局、NPC坐标、出生点坐标和任务均为AI设计；视频仅作构图依据，不是恢复出的原版地图。",
+  "original_art": {
+    "script": "tools/build_ai_world_art.py",
+    "new_exports": [
+      "map/m8",
+      "map/m11",
+      "map/m12",
+      "map/m13",
+      "map/m14"
+    ],
+    "static_anchor_authored": [
+      "map/m8",
+      "map/m11"
+    ],
+    "other_games_used": false
+  },
+  "review": "work/ai-world-review/index.html",
+  "portal": {
+    "source": "analysis/decoded_png/ssjx/neverpic_frame000.png",
+    "sha256": "8d62cc0462188bc9633bd0e1e0353b8bbd1e310a1633966b989dabfb17a21040",
+    "runtime_texture": "client/assets/ui/portal_tile.png",
+    "size": [
+      16,
+      16
+    ],
+    "selection_animation": "select.ani 是选中/移动落点提示，不能作为传送点",
+    "behavior": "踩格直接切图；具体地图连接、落点为AI设计，方向参考总图坐标"
+  }
+}

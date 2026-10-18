@@ -15,6 +15,8 @@ func _ready() -> void:
 
 func _start() -> void:
 	if not page.online_mode: return
+	school.clear();school.add_item("闲云野鹤",SchoolRules.UNJOINED);school.disabled=true
+	school.tooltip_text="出生后前往青云山道找清微道人选择门派。"
 	$"../OnlineControls".show()
 	$"../OnlineControls/Account".text = "账号：" + String(OnlineAccount.account.get("username", ""))
 	$"../OnlineControls/Back".pressed.connect(func() -> void: close_requested.emit())
@@ -33,7 +35,7 @@ func _restore_pending() -> void:
 	page.active = true
 	page.select_variant(int(pending.job) * 2 + int(pending.gender))
 	page.nickname.text = pending.display_name
-	school.select(int(pending.school))
+	school.select(0)
 
 func _process(_delta: float) -> void:
 	_update_controls()
@@ -45,7 +47,7 @@ func _update_controls() -> void:
 	page.active = not locked and _loaded and not pending and not full
 	for button in page.portrait_buttons: button.disabled = not page.active
 	for path in ["Previous", "Next", "Edit", "Rename", "Random"]: page.get_node(path).disabled = not page.active
-	school.disabled = not page.active
+	school.disabled = true
 	$"../Create".disabled = locked or (full and not pending)
 	$"../Create".text = "重试" if pending or not _loaded else "创建"
 
@@ -68,7 +70,7 @@ func _create() -> void:
 		status.text = "昵称须为2～12位汉字、英数字或下划线。"
 		return
 	status.text = "正在创建角色，请稍候……"
-	OnlineAccount.create_character(page.nickname.text, floori(page.selected_variant / 2.0), page.selected_variant % 2, school.selected)
+	OnlineAccount.create_character(page.nickname.text, floori(page.selected_variant / 2.0), page.selected_variant % 2, SchoolRules.UNJOINED)
 	_update_controls()
 
 func _result(action: String, result: Dictionary) -> void:

@@ -2,6 +2,7 @@
 import configparser
 import importlib.util
 import json
+import os
 import re
 from pathlib import Path
 import struct
@@ -112,6 +113,7 @@ class NativeExportTests(unittest.TestCase):
             with self.assertRaises(AssertionError):
                 export.check_pe(file)
 
+    @unittest.skipIf(os.name == 'nt', 'Windows filesystems do not expose POSIX executable mode bits')
     def test_linux_binary_requires_elf64_x86_64_and_execute_permission(self):
         with TemporaryDirectory(prefix='vssjx-elf-', dir='/tmp/opencode') as folder:
             path = Path(folder) / 'vssjx.x86_64'

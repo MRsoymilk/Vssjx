@@ -11,21 +11,22 @@ static func item(id:String)->Dictionary:
 		for skill in catalog.items:_items[skill.id]=skill
 	return _items.get(id,{}).duplicate(true)
 
-static func eligible(skill:Dictionary,job:int,school:int,level:int)->bool:
-	return not skill.is_empty() and int(skill.job)==job and (int(skill.school)<0 or int(skill.school)==school) and level>=int(skill.unlock_level)
+static func eligible(skill:Dictionary,job:int,_school:int,level:int)->bool:
+	# School remains source metadata; current gameplay unlocks by job and level only.
+	return not skill.is_empty() and int(skill.job)==job and level>=int(skill.unlock_level)
 
-static func list_for(job:int,school:int,level:int,locked:bool=false)->Array:
-	return catalog.items.filter(func(s:Dictionary)->bool:return int(s.job)==job and (int(s.school)<0 or int(s.school)==school) and (locked or level>=int(s.unlock_level)))
+static func list_for(job:int,_school:int,level:int,locked:bool=false)->Array:
+	return catalog.items.filter(func(s:Dictionary)->bool:return int(s.job)==job and (locked or level>=int(s.unlock_level)))
 
 static func default_id(job:int,school:int,level:int)->String:
 	for skill in list_for(job,school,level):
 		if skill.active and int(skill.school)<0:return skill.id
 	return "legacy_%d"%job
 
-static func check(id:String,job:int,school:int,level:int)->String:
+static func check(id:String,job:int,_school:int,level:int)->String:
 	var skill:=item(id)
 	if skill.is_empty():return "INVALID_SKILL"
-	if int(skill.job)!=job or (int(skill.school)>=0 and int(skill.school)!=school):return "SKILL_ROLE_MISMATCH"
+	if int(skill.job)!=job:return "SKILL_ROLE_MISMATCH"
 	if level<int(skill.unlock_level):return "SKILL_LEVEL_REQUIRED"
 	if not skill.active:return "PASSIVE_SKILL"
 	return ""

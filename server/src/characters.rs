@@ -202,7 +202,7 @@ pub(crate) async fn create(
         Some((409_i16, "CHARACTER_LIMIT_REACHED"))
     } else if payload.rules_version != RULES_VERSION {
         Some((422, "RULES_UNSUPPORTED"))
-    } else if payload.job > 2 || payload.gender > 1 || payload.school > 2 {
+    } else if payload.job > 2 || payload.gender > 1 || payload.school > 3 {
         Some((422, "INVALID_APPEARANCE"))
     } else if name.is_err() {
         Some((422, "INVALID_NAME"))
@@ -216,7 +216,7 @@ pub(crate) async fn create(
         let id = Uuid::new_v4();
         let inserted = sqlx::query("INSERT INTO characters (id, account_id, display_name, name_key, name_rules_version, rules_version, job, gender, school, hp, mp, slot) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12) ON CONFLICT DO NOTHING")
             .bind(id).bind(account.id).bind(display).bind(key).bind(NAME_RULES_VERSION).bind(RULES_VERSION)
-            .bind(i16::from(payload.job)).bind(i16::from(payload.gender)).bind(i16::from(payload.school))
+            .bind(i16::from(payload.job)).bind(i16::from(payload.gender)).bind(3_i16)
             .bind([120_i32,95,85][payload.job as usize]).bind([35_i32,45,65][payload.job as usize])
             .bind(slot.expect("validated free slot") as i16)
             .execute(&mut *tx).await.map_err(database_error)?;

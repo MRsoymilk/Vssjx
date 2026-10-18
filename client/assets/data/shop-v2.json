@@ -4300,7 +4300,7 @@
     },
     {
       "id": "original/ix42",
-      "name": "炼制材料·42",
+      "name": "当归",
       "slot": "material",
       "price": 8,
       "attack": 0,
@@ -4323,7 +4323,7 @@
     },
     {
       "id": "original/ix43",
-      "name": "炼制材料·43",
+      "name": "茯苓",
       "slot": "material",
       "price": 8,
       "attack": 0,

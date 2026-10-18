@@ -20,7 +20,11 @@ func _ready()->void:
 		check(hit.x==int(vector.incoming) and hit.y==int(vector.reflected),"Cross-language defense/reflection "+skill.id)
 		check(state.size()==vector.state.size() and state.keys().all(func(key:String)->bool:return state[key]==vector.state.get(key)),"Cross-language complete status "+skill.id)
 		check(not RULES.check(skill.id,(int(skill.job)+1)%3,maxi(0,int(skill.school)),60).is_empty(),"Wrong class rejected "+skill.id)
-		if int(skill.school)>=0:check(not RULES.check(skill.id,int(skill.job),(int(skill.school)+1)%3,60).is_empty(),"Wrong school rejected "+skill.id)
+		for school in 4:check(RULES.check(skill.id,int(skill.job),school,60)==("" if skill.active else "PASSIVE_SKILL"),"School does not restrict job skill "+skill.id)
 		if int(skill.unlock_level)>1:check(not RULES.check(skill.id,int(skill.job),maxi(0,int(skill.school)),int(skill.unlock_level)-1).is_empty(),"Level gating "+skill.id)
+	for job in 3:
+		for level in [1,5,15,25,35,45,50,55,60]:
+			for school in 3:
+				check(RULES.list_for(job,school,level)==RULES.list_for(job,SchoolRules.UNJOINED,level),"Every school and unjoined identity share the same job/level skill pool")
 	print("SKILLS: %d checks, %d failures"%[checks,failures])
 	get_tree().quit(1 if failures else 0)

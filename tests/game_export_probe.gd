@@ -20,9 +20,16 @@ func _verify() -> void:
 	for path in ["res://scenes/admin", "res://scripts/admin", "res://assets/admin", "res://tests"]:
 		check(not DirAccess.dir_exists_absolute(path), "Developer directory is absent: " + path)
 	var manifest: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://assets/data/actors.json"))
-	check(manifest.get("actors", {}).size() == 100 and manifest.actors.has("main/death"), "Actor index includes reviewed death and equipment variants")
+	check(manifest.get("actors", {}).size() >= 100 and manifest.actors.has("main/death") and manifest.actors.has("main/ltz_win") and manifest.actors.has("main/ltz_lose"), "Actor index includes death, battle results, equipment and expanded monsters")
 	for path in manifest.actors.values():
 		check(FileAccess.file_exists(path), "Dynamically loaded actor JSON is included: " + path)
+	var ai_world: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://assets/data/ai-world-v1.json"))
+	check(ai_world.maps.size() == 214, "All generated map definitions are included")
+	for map in ai_world.maps:
+		for resident in map.residents:
+			check(manifest.actors.has(resident.art), "Packed resident actor: " + resident.id)
+	var skill_rules = load("res://scripts/skill_rules.gd")
+	check(skill_rules.list_for(1, 0, 50).size() == 8 and skill_rules.list_for(1, 3, 50) == skill_rules.list_for(1, 0, 50), "Packed skills unlock by job and level for all schools")
 	var shop_rules = load("res://scripts/shop_rules.gd")
 	check(shop_rules.catalog.items.size()==214,"All recovered goods are in the packed catalog")
 	for item in shop_rules.catalog.items:

@@ -145,6 +145,8 @@ func _on_ticket(result: Dictionary) -> void:
 	_announcement_version = 1 if result.get("announcement_version") == 1 else 0
 	_pve_version = 1 if result.get("pve_version") == 1 else 0
 	_maps_version = int(result.get("maps_version", 0)) if result.get("maps_version") in [1, 2] else 0
+	# Servers keep maps_version=1 for older clients and advertise the expansion separately.
+	if _maps_version >= 1 and result.get("ai_world_version") == 1: _maps_version = 2
 	_shop_version = int(result.get("shop_version")) if result.get("shop_version") in [1,2] else 0
 	appearances = {}
 	_population_version = 1 if result.get("population_version") == 1 else 0
@@ -178,12 +180,11 @@ func _process(_delta: float) -> void:
 		_failed("TIMEOUT", true)
 		return
 	if socket == null: return
+	var polled_socket := socket
 	socket.poll()
-	if socket.get_ready_state() == WebSocketPeer.STATE_CLOSED:
-		_failed("DISCONNECTED", true)
-		return
-	if socket.get_ready_state() != WebSocketPeer.STATE_OPEN: return
-	if _state == "connecting":
+	var socket_state := socket.get_ready_state()
+	if socket_state not in [WebSocketPeer.STATE_OPEN, WebSocketPeer.STATE_CLOSING, WebSocketPeer.STATE_CLOSED]: return
+	if socket_state == WebSocketPeer.STATE_OPEN and _state == "connecting":
 		_state = "syncing"
 		_seq = 0
 		_input_seq = 0
@@ -197,7 +198,7 @@ func _process(_delta: float) -> void:
 		_heartbeat = now
 		_last_received = now
 	for _packet in 64:
-		if socket == null or socket.get_available_packet_count() == 0: break
+		if socket != polled_socket or socket.get_available_packet_count() == 0: break
 		var raw := socket.get_packet()
 		_last_received = now
 		if not socket.was_string_packet():
@@ -213,6 +214,17 @@ func _process(_delta: float) -> void:
 		if raw.size() > 32768 and data.get("type") != "world.appearance":
 			_failed("INVALID_PACKET"); return
 		_receive(data, raw)
+	# A transfer receipt and the old room's close can arrive in the same poll.
+	# Consume queued receipts/errors before deciding whether the close was unexpected.
+	if socket != polled_socket: return
+	if socket_state == WebSocketPeer.STATE_CLOSED:
+		if socket.get_available_packet_count() > 0: return
+		if world_ready and pve.pending() and OnlineAccount.pending_pve.command.action in ["transfer", "ai_travel"]:
+			# A lost receipt is still pending. Rejoin and replay its UUID to confirm the outcome.
+			_reconnect_map()
+		else: _failed("DISCONNECTED", true)
+		return
+	if socket_state != WebSocketPeer.STATE_OPEN: return
 	if socket != null and now - _heartbeat >= 3.0:
 		socket.send_text(JSON.stringify({"type": "ping"}))
 		_heartbeat = now

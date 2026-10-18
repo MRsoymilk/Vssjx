@@ -2,6 +2,7 @@ extends Node
 var checks := 0
 var failures := 0
 var view: OnlineWorldView
+var connection_statuses: Array[String] = []
 
 func _ready() -> void: call_deferred("_run")
 func check(value: bool, text: String) -> void:
@@ -30,9 +31,10 @@ func _run() -> void:
 	view = load("res://scenes/ui/online_world_view.tscn").instantiate()
 	view.character_id = OnlineAccount.characters[0].id
 	add_child(view)
+	view.network.status_changed.connect(func(text: String) -> void: connection_statuses.append(text))
 	check(await wait_until(func() -> bool: return view.network.world_ready and view.network.pve.ready and view.residents.size() == 5), "First map and NPCs synchronized")
 	click_gate()
-	check(not view._approach.is_empty() and view._approach.action == "transfer", "Real portal click starts approach")
+	check(view.network._input_seq > 0 or not view.network._pending_motion.is_empty(), "Real portal click requests authoritative movement to its tile")
 	check(await wait_until(func() -> bool: return view.network.world_ready and view.network.pve.ready and not view.network.pve.pending() and view.network.map_id == "ancient_ruins" and view.residents.has("boss"), 30.0), "Portal approaches, commits and reconnects automatically")
 	if view.network.map_id != "ancient_ruins":
 		print("Enter diagnostics: ", view._approach, " input=", view.network._input_seq, " pending=", view.network._pending_motion, " own=", view.network.entities.get(view.character_id, {}), " status=", view._system_text, " pve=", view.network.pve.last_code)
@@ -62,6 +64,9 @@ func _run() -> void:
 	check(view.residents.size() == 5 and not view.residents.has("boss"), "No ruins actors remain in first map")
 	check(view.screen.hud.get_node("MapName").text == "青云山道", "First map HUD is restored")
 	check(Game.player == old, "Online map changes never touch local saves")
+	check(not connection_statuses.any(func(text: String) -> bool: return text.begins_with("连接中断")), "Normal map transfers never report a disconnected failure")
+	view.network.move_to(Vector2i(11,16))
+	check(await wait_until(func() -> bool: return view.network.entities.has(view.character_id) and view.network.entities[view.character_id].cell==[11,16] and view.network.entities[view.character_id].next_cell==null), "Movement remains usable after round-trip transfer")
 	view.network.leave()
 	view.queue_free()
 	await get_tree().process_frame

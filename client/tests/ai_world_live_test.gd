@@ -10,9 +10,11 @@ func _run() -> void:
 	view=load("res://scenes/ui/online_world_view.tscn").instantiate()
 	view.character_id=OnlineAccount.characters[0].id;add_child(view)
 	view.network.status_changed.connect(func(text: String)->void:print("AI LIVE STATUS: ",text))
+	view.network.status_changed.connect(func(text: String)->void:connection_statuses.append(text))
 	check(await wait_until(func()->bool:return view.network.world_ready and view.network.pve.ready and view.residents.size()==5),"Shared AI map, hash, residents and progress validate")
 	if not view.network.pve.ready: print(view._system_text);get_tree().quit(1);return
 	check(view.map_data==SharedWorldMap.load_data("ai_001"),"Offline and online use identical generated layout")
+	check(view.network._maps_version==2,"Real client negotiates expansion support from the ticket capability")
 	check("AI生成" in view.screen.hud.get_node("MapName").text,"HUD marks synthetic scene")
 	view._open_ai("quests","ai_001_guide")
 	check(await wait_until(func()->bool:return view.npc_dialog.visible and view.npc_dialog.target=="ai_001_guide",30),"Walk to giver and open the same original NPC paper dialogue")
@@ -44,6 +46,7 @@ func _run() -> void:
 	view.network.move_to(Vector2i(return_gate.cell[0],return_gate.cell[1]))
 	check(await wait_until(func()->bool:return view.network.world_ready and view.network.pve.ready and not view.network.pve.pending() and view.network.map_id=="qingyun_trail",30),"Return to existing world from generated scene")
 	check(Game.player==old,"Online expansion never touches local player")
+	check(not connection_statuses.any(func(text: String)->bool:return text.begins_with("连接中断")),"Generated map round trip has no false disconnect or stopped reconnect")
 	view.network.leave();view.queue_free();await get_tree().process_frame
 	print("AI WORLD LIVE: %d checks, %d failures"%[checks,failures]);get_tree().quit(1 if failures else 0)
 

@@ -45,4 +45,6 @@
 
 `tools/build_boneglow_equipment.py` 生成独立映射，`tools/build_full_shop_catalog.py` 合并60件新装备后目录共274项，原208件图标及六件兼容物品保留。重新运行原商城生成器不会丢失新套装。生产切片复现命令见分析目录README。
 
+后续冥林异装接入后，共用 `GeneratedEquipment` 注册表读取两系列，商城目录增至334项；本系列的60件物品、编码、属性、图标和部件保持原定义，两系列可按相同职业／性别独立混穿。
+
 验收命令和结果见 [骨甲幽光验证](../tests/boneglow_equipment.md)。

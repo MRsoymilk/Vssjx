@@ -5,7 +5,7 @@ static var catalog: Dictionary = JSON.parse_string(FileAccess.get_file_as_string
 static var catalog_hash: String = FileAccess.get_file_as_string("res://assets/data/shop-v2.json").replace("\r\n","\n").sha256_text()
 static var _index: Dictionary = {}
 const SLOTS := ["weapon","pendant","armor","wrist","belt","pants","boots","ring","necklace","hat"]
-const APPEARANCE_LIMITS := [33,17,15]
+static var APPEARANCE_LIMITS: Array = GeneratedEquipment.appearance_limits()
 
 static func valid_appearance(look: Variant) -> bool:
 	if not look is Array or look.size() != 3: return false

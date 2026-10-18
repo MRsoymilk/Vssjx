@@ -76,7 +76,7 @@ func _ready() -> void:
 	for state in ["normal","hover","pressed","focus"]:category_box.add_theme_stylebox_override(state,_style(Color("f5df9b")))
 	for state in ["font_color","font_hover_color","font_pressed_color","font_focus_color"]:category_box.add_theme_color_override(state,GOLD)
 	for label in ["全部","武器","帽子","衣服","手腕","腰带","裤子","鞋子","戒指","项链","腰佩","药品","药材","宝石","配方","材料","特殊"]:category_box.add_item(label)
-	category_box.add_item("骨甲幽光 · 本角色")
+	for family in GeneratedEquipment.FAMILIES: category_box.add_item(family.name+" · 本角色")
 	add_child(category_box)
 	category_box.item_selected.connect(func(index: int) -> void:category=category_box.get_item_text(index);notice="";_filter())
 	scroll=ScrollContainer.new()
@@ -133,7 +133,8 @@ func _appearance() -> String:
 
 func _filter() -> void:
 	var character := _character()
-	goods=ShopRules.catalog.items.filter(func(item: Dictionary) -> bool:return item.sections.has(section) and (category=="全部" or item.category==category or (category=="骨甲幽光 · 本角色" and item.get("set_id", "").begins_with("boneglow/") and ShopRules.equipment_error(item,int(character.get("job",0)),int(character.get("gender",0))).is_empty())))
+	var family := GeneratedEquipment.family_for_category(category)
+	goods=ShopRules.catalog.items.filter(func(item: Dictionary) -> bool:return item.sections.has(section) and (category=="全部" or item.category==category or (not family.is_empty() and item.get("set_id", "").begins_with(family+"/") and ShopRules.equipment_error(item,int(character.get("job",0)),int(character.get("gender",0))).is_empty())))
 	for child in grid.get_children():grid.remove_child(child);child.queue_free()
 	rows.clear();scroll.scroll_vertical=0
 	if not goods.any(func(item: Dictionary) -> bool:return item.id==selected):selected=goods[0].id if not goods.is_empty() else ""
@@ -185,7 +186,7 @@ func refresh() -> void:
 	equip_button.disabled=locked or version_locked or not equipment or count==0 or incompatible
 	equip_button.text="卸下" if ShopRules.equipped_id(gear,entry.slot)==selected else "装备"
 	preview_button.disabled=not equipment or incompatible
-	hint.text=notice if not notice.is_empty() else ("此商品需要更新服务端" if version_locked else ("骨甲幽光 · AI新设计 · 名称、数值为重建规则" if entry.get("art_source")=="AI生成" else "原包图标 · 名称、数值和部分换装映射为重建规则"))
+	hint.text=notice if not notice.is_empty() else ("此商品需要更新服务端" if version_locked else (entry.get("set_name", "套装")+" · AI新设计 · 数值为重建规则" if entry.get("art_source")=="AI生成" else "原包图标 · 名称、数值和部分换装映射为重建规则"))
 	_refreshing=false
 
 func _online_changed() -> void:

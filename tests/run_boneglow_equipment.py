@@ -15,10 +15,10 @@ from run_server_connection import wait_for_server
 
 ROOT = Path(__file__).resolve().parents[1]
 CATALOG = json.loads((ROOT/'client/assets/data/shop-v2.json').read_text('utf8'))
-SETS = json.loads((ROOT/'client/assets/data/boneglow-equipment.json').read_text('utf8'))['sets']
 
 
-def main():
+def main(family='boneglow'):
+    sets = json.loads((ROOT/f'client/assets/data/{family}-equipment.json').read_text('utf8'))['sets']
     checks, peers, fixtures = 0, [], []
 
     def check(value, description):
@@ -52,8 +52,8 @@ def main():
                 return result
 
             actors = []
-            for index, definition in enumerate(SETS):
-                username, password = f'boneglow_{index}', 'owned-equipment-test'
+            for index, definition in enumerate(sets):
+                username, password = f'{family}_{index}', 'owned-equipment-test'
                 check(api(base, '/api/v1/auth/register', dict(username=username,password=password))[0]==201, 'register')
                 status, session = api(base, '/api/v1/auth/login', dict(username=username,password=password))
                 check(status==200, 'login')
@@ -65,7 +65,7 @@ def main():
                 db.query(f"UPDATE characters SET gold=10000 WHERE id='{cid}'")
                 actors.append(join(session,cid))
             witness = actors[0]
-            for index, (definition, actor) in enumerate(zip(SETS,actors)):
+            for index, (definition, actor) in enumerate(zip(sets,actors)):
                 base_defense, base_attack = actor.state['stats']['defense'], actor.state['stats']['attack']
                 members = [entry for entry in CATALOG['items'] if entry.get('set_id')==definition['id']]
                 for entry in members:
@@ -75,17 +75,23 @@ def main():
                     command(actor,'equip',entry['id'])
                     check(actor.state['shop']['slots'][entry['slot']]==entry['id'],'authoritative slot')
                 look = [definition['weapon_code'],definition['clothing_code'],definition['head_code']]
-                check(actor.state['stats']['defense']==base_defense+27 and actor.state['stats']['attack']==base_attack+12,'all set stats')
+                check(actor.state['stats']['defense']==base_defense+27 and actor.state['stats']['attack']==base_attack+(14 if family=='gravebloom' else 12),'all set stats')
                 check(int(db.query(f"SELECT COUNT(*) FROM inventory_items WHERE character_id='{actor.id}' AND equipped"))==10,'ten database slots')
                 expected_hash = hashlib.sha256((ROOT/'client/assets/data/shop-v2.json').read_text('utf8').encode()).hexdigest()
                 check(actor.state['shop']['catalog_sha256']==expected_hash,'matching client/server catalog')
-                wrong_gender = f"ai/{SETS[index^1]['id']}/hat"
+                wrong_gender = f"ai/{sets[index^1]['id']}/hat"
                 command(actor,'buy',wrong_gender)
                 check(command(actor,'equip',wrong_gender,False)['code']=='WRONG_GENDER','server rejects opposite gender')
-                wrong_job = f"ai/{SETS[(index+2)%6]['id']}/weapon"
+                wrong_job = f"ai/{sets[(index+2)%6]['id']}/weapon"
                 command(actor,'buy',wrong_job)
                 check(command(actor,'equip',wrong_job,False)['code']=='WRONG_JOB','server rejects another job')
-                check(command(actor,'buy','ai/boneglow/fake/weapon',False)['code']=='INVALID_EQUIPMENT','unknown item refused')
+                check(command(actor,'buy',f'ai/{family}/fake/weapon',False)['code']=='INVALID_EQUIPMENT','unknown item refused')
+                if family=='gravebloom':
+                    old_hat=f"ai/boneglow/{definition['stem']}/hat"
+                    command(actor,'buy',old_hat)
+                    command(actor,'equip',old_hat)
+                    check(actor.state['shop']['slots']['hat']==old_hat,'prior family items remain usable and mix with the new set')
+                    command(actor,'equip',f"ai/{definition['id']}/hat")
                 if index:
                     for _ in range(120):
                         packet = witness.until('world.appearance')
@@ -100,9 +106,9 @@ def main():
                 status, roster = api(base,'/api/v1/characters',token=actor.session['access_token'])
                 check(status==200 and roster['characters'][0]['appearance_v2']==look,'roster persistence')
                 fixtures.append(dict(character=roster['characters'][0], state=restored.state))
-            output = ROOT/'work/boneglow-production/live-fixtures.json'
+            output = ROOT/f'work/{family}-production/live-fixtures.json'
             output.write_text(json.dumps(fixtures,ensure_ascii=False,indent=2),encoding='utf8')
-            print(f'BONEGLOW SERVER: {checks} checks, 0 failures',flush=True)
+            print(f'{family.upper()} SERVER: {checks} checks, 0 failures',flush=True)
         finally:
             for peer in peers:
                 try: peer.close()

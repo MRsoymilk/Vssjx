@@ -29,6 +29,7 @@
 | [ai-equipment-art.md](ai-equipment-art.md) | 根据参考图制作主题一致的装备图标、分层着装动画、映射与试穿验收流程 |
 | [ai-equipment-style-spec.md](ai-equipment-style-spec.md) | 装备美术规范：现有人物、头部变化、武器上手、图标与六套确认方案 |
 | [boneglow-equipment.md](boneglow-equipment.md) | 骨甲幽光六套正式接入：商城、穿戴部件、动画、存档、联机编码与维护 |
+| [gravebloom-equipment.md](gravebloom-equipment.md) | 冥林异装六套：战斧／重锤／剑爪／法器、骨面兜帽与金焰高发、联机规则及对称斧修正 |
 | [platform_interface.md](platform_interface.md) | 多平台接口边界、目录结构、手机浏览器适配、Web联机与P1～P4验收门槛；P1实施中 |
 | [roadmap.md](roadmap.md) | 已完成工作、重新排列的实施阶段、依赖与决策关口 |
 | [联机测试计划](../tests/online_test_plan.md) | 各阶段验收、故障注入、混合负载与恢复门槛 |

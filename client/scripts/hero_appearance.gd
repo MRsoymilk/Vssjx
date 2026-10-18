@@ -8,7 +8,8 @@ static var _prepared: Dictionary = {}
 static var _order: Array[String] = []
 
 static func is_key(key: String) -> bool:
-	return RegEx.create_from_string("^hero/[mw](zs|ck|fs)_w([0-9]|[12][0-9]|3[0-3])_c([0-9]|1[0-7])_h([0-9]|1[0-5])$").search(key) != null
+	var parsed := RegEx.create_from_string("^hero/([mw](zs|ck|fs))_w([0-9]{1,3})_c([0-9]{1,3})_h([0-9]{1,3})$").search(key)
+	return parsed != null and GeneratedEquipment.valid_key(parsed.get_string(1),[int(parsed.get_string(3)),int(parsed.get_string(4)),int(parsed.get_string(5))])
 
 static func _part(source: String, frame: int, transform: int) -> Image:
 	var id := "%s:%d:%d" % [source,frame,transform]
@@ -40,7 +41,7 @@ static func build(key: String, base: Dictionary) -> Dictionary:
 	if not is_key(key): return {}
 	if _data.is_empty():
 		_data = JSON.parse_string(FileAccess.get_file_as_string("res://assets/data/hero-parts.json"))
-		_data.parts.merge(BoneglowEquipment.manifest().parts)
+		_data.parts.merge(GeneratedEquipment.manifest().parts)
 	var fields := key.trim_prefix("hero/").split("_")
 	var stem: String = fields[0]
 	var weapon := int(fields[1].trim_prefix("w"))
@@ -52,7 +53,7 @@ static func build(key: String, base: Dictionary) -> Dictionary:
 		var body := clothing - 2 if clothing >= 3 else clothing + (2 if stem.ends_with("fs") else 1)
 		for i in [[1,""],[3,"q"],[4,"x"]]: replacements[recipe.sources[i[0]]] = stem+str(body)+i[1]
 	if head > 0 and head <= 9: replacements[recipe.sources[0]] = stem+"t"+str(head)
-	var generated := BoneglowEquipment.replacements(stem, weapon, clothing, head, recipe.sources)
+	var generated := GeneratedEquipment.replacements(stem, weapon, clothing, head, recipe.sources)
 	# A foreign set code must not silently fall back to a native part.
 	if (weapon >= 28 and not generated.has(recipe.sources[2])) or (clothing >= 12 and not generated.has(recipe.sources[1])) or (head >= 10 and not generated.has(recipe.sources[0])): return {}
 	replacements.merge(generated, true)

@@ -35,13 +35,13 @@ static func variant(entry: Dictionary, job: int, gender: int, full_set: bool = f
 		var body := clothing - 2 if clothing >= 3 else clothing + (2 if stem.ends_with("fs") else 1)
 		after["衣服"] = [stem+str(body), stem+str(body)+"q", stem+str(body)+"x"]
 	if int(look[2]) > 0 and int(look[2]) <= 9: after["头饰"] = [stem+"t"+str(int(look[2]))]
-	var generated := BoneglowEquipment.replacements(stem, int(look[0]), clothing, int(look[2]), sources)
+	var generated := GeneratedEquipment.replacements(stem, int(look[0]), clothing, int(look[2]), sources)
 	if generated.has(sources[0]): after["头饰"] = [generated[sources[0]]]
 	if generated.has(sources[1]): after["衣服"] = [generated[sources[1]],generated[sources[3]],generated[sources[4]]]
 	if generated.has(sources[2]): after["武器"] = [generated[sources[2]]]
 	var resources := {}
 	for group in after.values():
-		for id in group: resources[id] = BoneglowEquipment.manifest().parts.get(id, parts().parts.get(id, {})).get("texture", "缺少部件资源")
+		for id in group: resources[id] = GeneratedEquipment.manifest().parts.get(id, parts().parts.get(id, {})).get("texture", "缺少部件资源")
 	return {"职业":JOBS[job], "性别":"男" if gender == 0 else "女", "外观编码":look,
 		"装备前动画":before_key, "装备后动画":key, "装备前部件":before, "装备后部件":after,
 		"部件贴图":resources, "原始配方":"ssjx/hero.mrp:"+stem+".ani"}

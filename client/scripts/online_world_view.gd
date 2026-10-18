@@ -63,8 +63,19 @@ var _transfer_origin := ""
 var duel_invitation: DuelInvitation
 var _closed_duel := ""
 var _duel_lines := ""
+var social: RefCounted = preload("res://scripts/network/online_social.gd").new()
+var social_panel: Control
+var _social_incoming: Array = []
 
 func _ready() -> void:
+	social.bind_character(character_id)
+	social.send_requested.connect(OnlineAccount.social_request)
+	OnlineAccount.completed.connect(_social_completed)
+	social_panel=preload("res://scenes/ui/social_panel.tscn").instantiate()
+	social_panel.model=social
+	add_child(social_panel)
+	social_panel.duel_requested.connect(_invite_player)
+	social.changed.connect(_social_changed)
 	duel_invitation = DuelInvitation.new()
 	duel_invitation.channel = network.duel
 	add_child(duel_invitation)
@@ -96,7 +107,7 @@ func _ready() -> void:
 	screen.action_requested.connect(_scene_action)
 	screen.hud.get_node("MapName").text = "青云山道"
 	screen.hud.get_node("Minimap").set_shared_world(map_data, {}, character_id)
-	menu.chosen.connect(_scene_action)
+	menu.chosen.connect(func(action: String)->void:_scene_action("friends" if action=="social" else action))
 	attributes.back_requested.connect(_close_attributes)
 	world_map.back_requested.connect(_close_world_map)
 	world_map.ai_requested.connect(func(id: String) -> void:
@@ -171,6 +182,7 @@ func _ready() -> void:
 	network.start(character_id)
 
 func _leave_world() -> void:
+	if social_panel.visible:social_panel.dismiss()
 	_close_inventory()
 	_cancel_battle_preparation()
 	network.leave()
@@ -179,6 +191,7 @@ func _leave_world() -> void:
 func _scene_action(action: String) -> void:
 	if map_transition.blocking: return
 	if network.duel.active() or duel_battle.visible: return
+	if social_panel.visible: social_panel.dismiss()
 	_close_inventory()
 	_close_world_map()
 	_close_attributes()
@@ -198,6 +211,9 @@ func _scene_action(action: String) -> void:
 	menu.hide()
 	if action == "social":
 		_toggle_chat()
+		return
+	if action in ["friends","guild"]:
+		_open_social("friends" if action=="friends" else "guild")
 		return
 	if network.world_ready: network.stop_moving()
 	emote_picker.hide()
@@ -242,14 +258,39 @@ func _map_command_sent(packet: Dictionary) -> void:
 		_begin_map_transition()
 
 func _select_player(id: String) -> void:
-	if not network.duel.enabled:
-		chat_status.text = "服务器尚未支持玩家决斗。";return
 	if id == character_id or not network.entities.has(id) or network.pve.active() or network.pve.pending(): return
 	_cancel_approach()
 	network.stop_moving();move_target.clear();_was_keyboard=false
-	duel_invitation.select_player(id,network.entities[id].display_name)
+	_open_social("profile",id)
+
+func _open_social(section: String, target: String="") -> void:
+	_close_inventory();_close_world_map();_close_attributes();_cancel_approach()
+	menu.hide();details.hide();npc_dialog.hide();encounter.hide();duel_invitation.selected=""
+	if expanded_chat.visible:expanded_chat.dismiss()
+	if network.world_ready:network.stop_moving()
+	Platform.context.text_input.release_focus(chat_input)
+	_was_keyboard=false
+	social_panel.open(section,target)
+	if not social.supported:social_panel.notice.text="当前服务尚未支持，请更新并重启游戏服务。"
+
+func _social_completed(action: String, result: Dictionary) -> void:
+	if action=="social":social.receive(result)
+
+func _social_changed() -> void:
+	var incoming: Array=[]
+	for entry in social.state.get("incoming",[]):incoming.append(entry.id)
+	menu.rows[3].text="社交（%d）"%incoming.size() if not incoming.is_empty() else "社交"
+	for id in incoming:
+		if not _social_incoming.has(id):
+			expanded_chat.add_system("收到好友申请，请在菜单 → 社交 → 申请中查看。")
+			break
+	_social_incoming=incoming
 
 func _invite_player(id: String) -> void:
+	if not network.duel.enabled:
+		chat_status.text="服务器尚未支持玩家决斗。";return
+	if not network.entities.has(id):
+		chat_status.text="只能邀请同地图的在线玩家决斗。";return
 	if not network.world_ready or not network.entities.has(id) or network.pve.pending() or network.pve.active() or map_transition.blocking: return
 	network.duel.submit("invite",id)
 
@@ -266,6 +307,7 @@ func _duel_changed() -> void:
 		_closed_duel = data.id
 		return
 	if data.status == "active":
+		if social_panel.visible:social_panel.dismiss()
 		_cancel_approach();move_target.clear();_was_keyboard=false
 		_close_inventory();_close_world_map();_close_attributes()
 		npc_dialog.hide();menu.hide();details.hide()
@@ -346,6 +388,7 @@ func _build_map() -> void:
 		tag.text = "灵空台 · AI生成";preload("res://scripts/world_nameplate.gd").apply(tag,Color("c2f7f4")); ai_station.add_child(tag)
 
 func _map_changed(id: String) -> void:
+	if social_panel.visible:social_panel.dismiss()
 	duel_invitation.selected = ""
 	_portal_latch=""
 	_portal_stop=""
@@ -511,6 +554,10 @@ func _update_chat_controls() -> void:
 		if emote_button.disabled: emote_picker.hide()
 
 func _process(delta: float) -> void:
+	var social_available:=network.world_ready and OnlineAccount.is_logged_in() and not OnlineAccount.busy and not OnlineAccount.network_suspended
+	if Platform.context.lifecycle.suspended:social_available=false
+	if OS.has_feature("web") and (not Platform.context.lifecycle.focused or Platform.context.lifecycle.suspended):social_available=false
+	social.tick(social_available)
 	_update_chat_controls()
 	_update_allocation_controls()
 	_advance_map_transition()
@@ -545,7 +592,7 @@ func _process(delta: float) -> void:
 	if network.duel.active() or duel_battle.visible: return
 	if OS.has_feature("web") and (not Platform.context.lifecycle.focused or Platform.context.lifecycle.suspended): return
 	_advance_approach()
-	if bag_overlay != null or chat_input.has_focus() or menu.visible or details.visible or npc_dialog.visible or emote_picker.visible or encounter.visible or battle_view.visible or expanded_chat.visible or attributes.visible or world_map.visible or network.pve.pending() or network.pve.active():
+	if social_panel.visible or bag_overlay != null or chat_input.has_focus() or menu.visible or details.visible or npc_dialog.visible or emote_picker.visible or encounter.visible or battle_view.visible or expanded_chat.visible or attributes.visible or world_map.visible or network.pve.pending() or network.pve.active():
 		_was_keyboard = false
 		return
 	if _auto_transfer(): return
@@ -572,7 +619,7 @@ func _map_input(event: InputEvent) -> void:
 	if _battle_load_failed:
 		if (event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed) or (event is InputEventScreenTouch and event.pressed): _pve_changed()
 		return
-	if bag_overlay != null or not network.world_ready or menu.visible or details.visible or npc_dialog.visible or encounter.visible or battle_view.visible or expanded_chat.visible or attributes.visible or world_map.visible or network.pve.pending() or network.pve.active(): return
+	if social_panel.visible or bag_overlay != null or not network.world_ready or menu.visible or details.visible or npc_dialog.visible or encounter.visible or battle_view.visible or expanded_chat.visible or attributes.visible or world_map.visible or network.pve.pending() or network.pve.active(): return
 	var point := Vector2.ZERO
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed: point = event.position
 	elif event is InputEventScreenTouch and event.pressed: point = event.position
@@ -611,6 +658,10 @@ func _unhandled_key_input(event: InputEvent) -> void:
 	if map_transition.blocking: return
 	if network.duel.active() or duel_battle.visible: return
 	if not event is InputEventKey or not event.pressed: return
+	if social_panel.visible:
+		if event.keycode==KEY_ESCAPE:
+			social_panel.dismiss();get_viewport().set_input_as_handled()
+		return
 	if ai_panel != null:
 		if event.keycode == KEY_ESCAPE: _close_inventory(); get_viewport().set_input_as_handled()
 		return
@@ -663,6 +714,7 @@ func _pve_changed() -> void:
 	var model := network.pve
 	if not model.ready or model.active(): move_target.clear()
 	if model.active():
+		if social_panel.visible:social_panel.dismiss()
 		_close_world_map()
 		_close_inventory()
 	if model.active(): npc_dialog.hide()
@@ -940,6 +992,7 @@ func _set_battle_layout(active: bool) -> void:
 	expanded_chat.get_node("Shade").size.y = chat_panel.position.y
 
 func _open_expanded_chat() -> void:
+	if social_panel.visible:social_panel.dismiss()
 	_close_inventory()
 	_close_world_map()
 	_close_attributes()

@@ -558,10 +558,11 @@ func _scene_action(action: String) -> void:
 		"rest": _rest()
 		"map": _open_world_map()
 		"mail": _message("邮件", "暂无邮件。")
-		"social": _message("社交", "尚未结交好友。")
+		"social": _message("社交", "好友关系在联机模式开放。\n进入联机后，可点击玩家查看资料、发送好友申请，或从菜单管理好友与帮派。")
+		"guild": _message("帮派", "帮派在联机模式开放。\n进入联机后，可创建帮派、申请入帮，并查看成员与公告。")
 		"system": _system_menu()
 		"shop": _shop()
-		"craft", "team", "guild", "trade":
+		"craft", "team", "trade":
 			var titles := {"shop": "商城", "craft": "炼制", "team": "队伍", "guild": "帮会", "trade": "交易"}
 			_message(titles[action], titles[action] + "暂未开放。")
 		"reward":

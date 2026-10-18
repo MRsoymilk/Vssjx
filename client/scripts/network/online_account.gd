@@ -20,6 +20,7 @@ var _target := ""
 var characters: Array = []
 var pending_creation: Dictionary = {}
 var pending_pve: Dictionary = {}
+var pending_social: Dictionary = {}
 var _after_refresh: Dictionary = {}
 var _generation := 0
 
@@ -61,10 +62,14 @@ func clear() -> void:
 	characters = []
 	pending_creation = {}
 	pending_pve = {}
+	pending_social = {}
 	_after_refresh = {}
 
 func list_characters() -> void:
 	_send("characters", server_address, {}, true)
+
+func social_request(payload: Dictionary) -> void:
+	_send("social", server_address, payload, true)
 
 func request_world_ticket(character_id: String, config_hash: String) -> void:
 	_send("world_ticket", server_address, {"character_id": character_id, "protocol_version": 1, "config_hash": config_hash}, true)
@@ -144,7 +149,7 @@ func _send(action: String, address: String, payload: Dictionary, bearer: bool = 
 	busy = true
 	_request = HTTPRequest.new()
 	_request.timeout = REQUEST_TIMEOUT
-	_request.body_size_limit = 32768
+	_request.body_size_limit = 262144 if action == "social" else 32768
 	_request.max_redirects = 0
 	add_child(_request)
 	_request.request_completed.connect(_on_response.bind(_generation))
@@ -153,6 +158,7 @@ func _send(action: String, address: String, payload: Dictionary, bearer: bool = 
 	var route := "/api/v1/auth/" + action
 	if action in ["characters", "character_create"]: route = "/api/v1/characters"
 	if action == "world_ticket": route = "/api/v1/world/ticket"
+	if action == "social": route = "/api/v1/social"
 	var error := _request.request(_target + route, headers, method, body)
 	if error != OK: _finish({"ok": false, "code": "NETWORK_ERROR", "request_error": int(error)})
 
@@ -195,6 +201,9 @@ func _on_response(result: int, code: int, _headers: PackedStringArray, body: Pac
 		if _action == "character_create" and code in [409, 422] and data.get("operation_id") == pending_creation.get("operation_id"): pending_creation = {}
 		if code == 401 and _action in ["refresh", "me", "characters", "character_create"]: clear()
 		_finish({"ok": false, "code": data.get("code", "SERVER_ERROR")})
+		return
+	if _action == "social":
+		_finish(data)
 		return
 	if _action in ["characters", "character_create"]:
 		if _action == "characters" and (data.get("rules_version") != "creation-v1" or data.get("name_rules_version") != "nickname-v1"):

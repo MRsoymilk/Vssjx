@@ -79,7 +79,7 @@ pub(crate) async fn command(
     body: Result<Json<Command>, JsonRejection>,
 ) -> Result<Json<Value>, AuthError> {
     let auth = auth::service(&state)?;
-    auth.admit(auth::peer_ip(peer), None)?;
+    auth.admit_social_peer(auth::peer_ip(peer))?;
     let bearer = auth::bearer(&headers)?;
     let account = auth.me(bearer).await?;
     auth.admit_social(account.id)?;

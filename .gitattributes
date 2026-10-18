@@ -1,6 +1,7 @@
 *.gd text eol=lf
 *.gd.uid text eol=lf
 *.tscn text eol=lf
+*.tres text eol=lf
 *.godot text eol=lf
 *.py text eol=lf
 *.sh text eol=lf

@@ -16,7 +16,7 @@ from run_server_connection import wait_for_server
 from ws_fixture import WebSocket
 
 ROOT=Path(__file__).resolve().parents[1]
-AI_HASH=hashlib.sha256((ROOT/"shared/data/ai-world-v1.json").read_bytes()).hexdigest()
+AI_HASH=hashlib.sha256((ROOT/"shared/data/ai-world-v1.json").read_bytes().replace(b"\r\n",b"\n")).hexdigest()
 AI_MAPS={m['map_id']:m for m in json.loads((ROOT/'shared/data/ai-world-v1.json').read_text(encoding='utf8'))['maps']}
 
 class AIPlayer(MapPlayer):

@@ -9,11 +9,16 @@ func _run()->void:
 	var popup=effects.number(actor,123,true)
 	check(popup.get_node("Number").text=="-123" and popup.get_node("Critical").visible and popup.get_node("Burst").visible,"Critical feedback uses the reference red outlined number and impact flash")
 	check(popup.global_position==actor.global_position+Vector2(0,-53) and popup.scale.x>0,"Damage is placed above the receiver without inheriting mirrored facing")
+	check(effects._critical_flash.get_node("Veil").visible,"A true critical impact triggers screen flash")
+	var flash=effects._critical_flash
+	effects.number(actor,12,true)
+	check(effects._critical_flash==flash,"Simultaneous critical targets share one flash overlay")
 	await get_tree().create_timer(0.95).timeout
 	check(not is_instance_valid(popup) and effects._numbers.is_empty(),"Floating damage expires and releases tracking")
 	popup=effects.number(actor,20,false,true)
 	check(popup.get_node("Number").text=="+20" and not popup.critical,"Healing has a separate positive display")
 	effects.clear();check(popup.is_queued_for_deletion(),"Cancelling a battle removes pending numbers")
+	check(not flash.get_node("Veil").visible,"Cancelling combat clears its screen flash")
 	effects.queue_free();actor.queue_free();await get_tree().process_frame
 	var state:=SkillRules.new_state(0,0,60)
 	state.crit=1;state.crit_chance=100
@@ -33,11 +38,12 @@ func _run()->void:
 	output=OS.get_environment("SSJX_HIT_NUMBER_CAPTURE") if DisplayServer.get_name()!="headless" else ""
 	if not output.is_empty():
 		DirAccess.make_dir_recursive_absolute(output)
+		await capture("critical_flash")
 		await get_tree().create_timer(0.12).timeout
 		await capture("local_critical")
 	deadline=Time.get_ticks_msec()+5000
 	while app.battle_playback!=null and Time.get_ticks_msec()<deadline:await get_tree().process_frame
-	await get_tree().create_timer(0.2).timeout
+	await get_tree().create_timer(0.5).timeout
 	app._home();app.queue_free();await get_tree().process_frame
 	var model:=OnlinePve.new();model.bind_character(SELF,"http://127.0.0.1:9999")
 	var original:=pve_state();original.character.level=60
@@ -57,5 +63,19 @@ func _run()->void:
 	check(view.effects._numbers.size()==2 and view.effects._numbers[1].amount==12,"Enemy impact displays damage above the hero")
 	view._cancel_motion();check(view.effects._numbers.is_empty(),"Leaving online playback clears all numbers")
 	view.queue_free();await get_tree().process_frame
+	var factory=load("res://tests/team_test.gd").new()
+	var party=load("res://scripts/network/online_team.gd").new()
+	party.character_id=factory.SELF;party.state=factory.state(factory.encounter())
+	var team=load("res://scenes/ui/team_battle_view.tscn").instantiate();team.model=party;add_child(team);team.set_process(false);team.present()
+	team._play({"actor":factory.SELF,"target":"m0","action":"attack","skill":"","damage":44,"healed":0,"critical":true})
+	check(team.effects._numbers.is_empty(),"Party hits also wait for their native impact")
+	team.motion.advance(team.motion.impact_time)
+	check(team.effects._numbers.size()==1 and team.effects._numbers[0].amount==44 and team.effects._numbers[0].critical,"Party displays the specific hit's server critical result")
+	check(team.effects._critical_flash.get_node("Veil").visible,"Party critical triggers the shared screen flash")
+	team._cancel()
+	check(team.effects._numbers.is_empty() and not team.effects._critical_flash.get_node("Veil").visible,"Party cancellation clears damage and screen flash")
+	team.queue_free();factory.free();await get_tree().process_frame
+	var invalid:=SkillRules.new_state(0,0,1);invalid.last_critical="true"
+	check(not SkillRules.valid_state(invalid),"Invalid critical flags cannot enter presentation")
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(Game.save_path));Game.save_path=old_path;Game.player=old
 	print("HIT NUMBER: %d checks, %d failures"%[checks,failures]);get_tree().quit(0 if failures==0 else 1)

@@ -6,6 +6,7 @@ static var catalog:Dictionary=JSON.parse_string(FileAccess.get_file_as_string("r
 var _attachments:Array[Dictionary]=[]
 var _sounds:Array[AudioStreamPlayer]=[]
 var _numbers:Array[Node2D]=[]
+var _critical_flash:CanvasLayer
 signal audio_played(id:String)
 
 func _init()->void:
@@ -65,6 +66,11 @@ func number(subject:Node2D,amount:int,critical:bool=false,healed:bool=false)->No
 	_numbers.append(popup)
 	popup.tree_exiting.connect(func()->void:_numbers.erase(popup))
 	popup.present(amount,critical,healed)
+	if critical and not healed:
+		if not is_instance_valid(_critical_flash):
+			_critical_flash=preload("res://scenes/ui/battle_critical_flash.tscn").instantiate()
+			add_child(_critical_flash,false,Node.INTERNAL_MODE_BACK)
+		_critical_flash.pulse()
 	return popup
 
 func attach(key:String,subject:Node2D,sequence:int=0,anchor_offset:Vector2=Vector2.ZERO)->AnimatedSprite2D:
@@ -95,6 +101,7 @@ func _process(_delta:float)->void:
 		else:_follow(sprite,subject,entry.offset)
 
 func clear()->void:
+	if is_instance_valid(_critical_flash):_critical_flash.clear()
 	for popup in _numbers.duplicate():
 		if is_instance_valid(popup):popup.hide();popup.queue_free()
 	_numbers.clear()

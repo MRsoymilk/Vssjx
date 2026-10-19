@@ -112,6 +112,7 @@ func _battle(value: Variant) -> bool:
 	if choice!=null and (not choice is Dictionary or choice.get("action") not in ["attack","skill","guard"] or (choice.action=="skill" and (not choice.get("skill") is String or SkillRules.item(choice.skill).is_empty()))):return false
 	if not value.get("events") is Array or value.events.size()>2:return false
 	for e in value.events:
+		if e is Dictionary and e.has("critical") and not e.critical is bool:return false
 		if not e is Dictionary or e.get("actor") not in ids or e.get("action") not in ["attack","skill","guard","sleep","fizzle","dot"] or not e.get("skill") is String or e.skill.length()>32 or (e.action=="skill" and SkillRules.item(e.skill).is_empty()):return false
 		if not OnlineWorldClient._integer(e.get("damage"),0,100000) or not OnlineWorldClient._integer(e.get("reflected"),0,100000) or not e.get("fighters") is Array or e.fighters.size()!=2:return false
 		for i in 2:

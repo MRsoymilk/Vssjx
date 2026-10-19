@@ -50,6 +50,7 @@ func _ready()->void:
 func _dismiss()->void:
 	_closed=battle_id;_cancel();hide();dismissed.emit()
 func _cancel()->void:
+	if is_instance_valid(effects):effects.clear()
 	if motion!=null:motion.cancel()
 	motion=null;queue=[]
 	for d in deaths:d.cancel()

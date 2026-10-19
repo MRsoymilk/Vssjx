@@ -103,6 +103,7 @@ func valid(v:Dictionary)->bool:
 		if not OnlinePve.integer(e.get("hp"),0,int(d.hp)):return false
 		enemies[e.slot]=true
 	for event in b.events:
+		if event is Dictionary and event.has("critical") and not event.critical is bool:return false
 		if not event is Dictionary or not (fighters.has(event.get("actor")) or enemies.has(event.get("actor"))) or not (fighters.has(event.get("target")) or enemies.has(event.get("target"))) or event.get("action") not in ["attack","skill","potion"] or not event.get("skill") is String or not OnlinePve.integer(event.get("damage"),0,100000) or not OnlinePve.integer(event.get("healed"),0,100000):return false
 	return true
 

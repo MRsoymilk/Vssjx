@@ -35,7 +35,7 @@ func _run()->void:
 	check(heard==["thunder"],"Actual local impact plays thunder once")
 	deadline=Time.get_ticks_msec()+5000
 	while app.battle_playback!=null and Time.get_ticks_msec()<deadline:await get_tree().process_frame
-	await get_tree().create_timer(0.2).timeout
+	await get_tree().create_timer(0.5).timeout
 	app._home();app.queue_free();await get_tree().process_frame
 	var model:=OnlinePve.new();model.bind_character(SELF,"http://127.0.0.1:9999")
 	var state:=pve_state();state.character.job=0;state.character.school=2;state.character.level=60
@@ -52,6 +52,8 @@ func _run()->void:
 	view.present(model)
 	check(heard.size()==1,"Same revision refresh cannot replay thunder")
 	view.effects.clear();view.queue_free();await get_tree().process_frame
+	# The audio mixing thread releases stopped playback on its next update.
+	await get_tree().create_timer(0.2).timeout
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(Game.save_path));Game.save_path=path;Game.player=old
 	print("SKILL AUDIO: %d checks, %d failures"%[checks,failures])
 	get_tree().quit(0 if failures==0 else 1)

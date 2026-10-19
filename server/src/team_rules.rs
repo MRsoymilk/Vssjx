@@ -29,6 +29,8 @@ pub struct Enemy {
 }
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Event {
+    #[serde(default)]
+    pub critical: bool,
     pub actor: String,
     pub target: String,
     pub action: String,
@@ -193,6 +195,7 @@ impl Battle {
                         skill: s.id.clone(),
                         damage: 0,
                         healed: ally.hp - old,
+                        critical: false,
                     });
                 }
             } else {
@@ -228,6 +231,7 @@ impl Battle {
                         skill: s.id.clone(),
                         damage,
                         healed: actor.hp - old,
+                        critical: damage > 0 && actor.effects.last_critical,
                     });
                     if mode == "self" {
                         break;
@@ -236,7 +240,7 @@ impl Battle {
             }
         } else if action == "attack" {
             let e = &mut self.enemies[target_index.unwrap()];
-            let a = &self.fighters[i];
+            let a = &mut self.fighters[i];
             let damage = a
                 .effects
                 .critical((a.stats.attack - e.definition.defense).max(1), roll)
@@ -250,6 +254,7 @@ impl Battle {
                 skill: String::new(),
                 damage,
                 healed: 0,
+                critical: damage > 0 && a.effects.last_critical,
             });
         } else if action == "guard" {
             self.fighters[i].guarding = true;
@@ -267,6 +272,7 @@ impl Battle {
                 skill: String::new(),
                 damage: 0,
                 healed,
+                critical: false,
             });
         }
         let a = &mut self.fighters[i];
@@ -353,6 +359,7 @@ impl Battle {
                 skill: String::new(),
                 damage: incoming,
                 healed: 0,
+                critical: false,
             });
         }
         for ally in &mut self.fighters {

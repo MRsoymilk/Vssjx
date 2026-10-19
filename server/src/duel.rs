@@ -147,6 +147,7 @@ struct Choice {
 }
 #[derive(Clone, Serialize)]
 pub struct Event {
+    pub critical: bool,
     pub actor: Uuid,
     pub action: String,
     pub skill: String,
@@ -392,6 +393,7 @@ impl Battle {
                 }
             }
             self.events.push(Event {
+                critical: damage > 0 && self.fighters[me].effects.last_critical,
                 actor: self.fighters[me].id,
                 action,
                 skill: used,

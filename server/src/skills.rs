@@ -60,6 +60,8 @@ pub fn view(job: i16, school: i16, level: i32) -> Value {
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 #[serde(default)]
 pub struct State {
+    #[serde(skip_serializing_if = "not_critical")]
+    pub last_critical: bool,
     pub last_skill: String,
     pub last_enemy_acted: bool,
     pub enemy_mp: i32,
@@ -86,6 +88,9 @@ pub struct State {
     pub last_reflected: i32,
     pub last_healed: i32,
 }
+fn not_critical(value: &bool) -> bool {
+    !*value
+}
 impl State {
     pub fn new(job: i16, school: i16, level: i32, enemy_level: i32) -> Self {
         let mut state = Self {
@@ -105,6 +110,7 @@ impl State {
         state
     }
     pub fn reset_turn(&mut self) {
+        self.last_critical = false;
         self.last_skill.clear();
         self.last_enemy_acted = false;
         self.last_damage = 0;
@@ -112,8 +118,9 @@ impl State {
         self.last_reflected = 0;
         self.last_healed = 0;
     }
-    pub fn critical(&self, damage: i32, roll: i32) -> i32 {
-        if self.crit > 0 && roll < self.crit_chance {
+    pub fn critical(&mut self, damage: i32, roll: i32) -> i32 {
+        self.last_critical = damage > 0 && self.crit > 0 && roll < self.crit_chance;
+        if self.last_critical {
             damage * 3 / 2
         } else {
             damage

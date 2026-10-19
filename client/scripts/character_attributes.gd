@@ -11,6 +11,7 @@ var _attribute_profile: Dictionary = {}
 var allocation_draft: Array = []
 var allocation_enabled := false
 var allocation_hint := "停稳后可加点"
+var allocation_focus := -1
 const ONLINE_EXTENDED = preload("res://scenes/ui/attributes_online_extended.tscn")
 const BROWN := Color("654518")
 const PAGES := [
@@ -160,7 +161,9 @@ func _extended() -> void:
 		number.value = "" if value == null else str(int(value))
 		number.queue_redraw()
 		content.get_node("Unknown_" + key).visible = value == null
+		if key in ["physical_crit","magic_crit","physical_hit","magic_hit","physical_evasion","magic_evasion"]:number.tooltip_text=CharacterAttributeRules.RATING_HELP
 	for i in 5:
+		for prefix in ["Points","Minus","Plus"]:content.get_node(prefix+str(i)).tooltip_text=CharacterAttributeRules.POINT_HELP[i] if _attribute_profile.get("formula_revision")==2 else "以当前服务端属性规则为准"
 		content.get_node("Minus%d" % i).pressed.connect(_adjust_allocation.bind(i, -1))
 		content.get_node("Plus%d" % i).pressed.connect(_adjust_allocation.bind(i, 1))
 	content.get_node("Recommend").pressed.connect(_recommend_allocation)
@@ -192,17 +195,20 @@ func _refresh_allocation() -> void:
 	content.get_node("Recommend").disabled = not enabled or int(_attribute_profile.get("available", 0)) <= 0
 	content.get_node("Confirm").disabled = not enabled or allocation_draft == allocated
 	content.get_node("Status").text = "同步中，请稍候" if not available else (allocation_hint if not allocation_enabled else (("确认后保存到服务端" if online_mode else "确认后保存到本地") if allocation_draft != allocated else "每级获得5点属性点"))
+	if enabled and allocation_focus>=0 and _attribute_profile.get("formula_revision")==2:content.get_node("Status").text=CharacterAttributeRules.POINT_HELP[allocation_focus]
 
 func _adjust_allocation(index: int, delta: int) -> void:
 	if not allocation_enabled or allocation_draft.size() != 5: return
 	if delta > 0 and _draft_remaining() <= 0: return
 	if delta < 0 and int(allocation_draft[index]) <= int(_attribute_profile.allocated[index]): return
 	allocation_draft[index] = int(allocation_draft[index]) + delta
+	allocation_focus=index
 	_refresh_allocation()
 
 func _recommend_allocation() -> void:
 	if not allocation_enabled or not _attribute_profile.has("recommended"): return
 	allocation_draft = _attribute_profile.recommended.duplicate()
+	allocation_focus=-1
 	_refresh_allocation()
 
 func _confirm_allocation() -> void:

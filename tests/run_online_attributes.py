@@ -35,7 +35,7 @@ def main():
    a.close();time.sleep(.2);a=Player(base,session,char);clients.append(a)
    assert a.state['character']==before['character'] and a.state['attributes']==before['attributes']
    v,_=a.command('',request=request);assert v['state']['attributes']['allocated']==[0,0,5,0,0]
-   assert v['state']['stats']['attack']==original['stats']['attack']+10 and v['state']['stats']['hp']==original['stats']['hp']+10
+   assert v['state']['stats']['attack']==original['stats']['attack']+10 and v['state']['stats']['hp']==original['stats']['hp'] and v['state']['stats']['mp']==original['stats']['mp']+5
    saved=a.state
    v,_=a.command('',request=request);assert v['replayed'] and v['state']==saved
    v,_=a.command('',request=command([1,0,4,0,0]),ok=False);assert v['code']=='ATTRIBUTE_RESPEC_FORBIDDEN'
@@ -48,6 +48,18 @@ def main():
    damage=before_hp-v['state']['battle']['enemy_hp'];assert 28<=damage<=32,(damage,a.state)
    v,_=a.command('',request=command([0,0,5,0,0]),ok=False);assert v['code']=='BATTLE_ACTIVE'
    a.command('flee')
+   # A pre-rebalance character can have HP/MP above its new maxima. Retain
+   # allocated points and clamp only excess; reconnection must never refill.
+   a.close()
+   db.query(f"UPDATE characters SET level=60,allocated_attributes=ARRAY[0,0,150,0,150],hp=1457,mp=817 WHERE id='{char}'")
+   a=Player(base,session,char);clients.append(a)
+   assert a.state['attributes']['allocated']==[0,0,150,0,150]
+   assert a.state['character']['hp']==a.state['stats']['hp']==1157
+   assert a.state['character']['mp']==a.state['stats']['mp']==667
+   a.close()
+   db.query(f"UPDATE characters SET hp=100,mp=10 WHERE id='{char}'")
+   a=Player(base,session,char);clients.append(a)
+   assert (a.state['character']['hp'],a.state['character']['mp'])==(100,10)
    if os.environ.get('SSJX_TEST_ATTRIBUTES_GODOT'):
     # Separate account/character for the real UI test, with its own starting points.
     api(base,'/api/v1/auth/register',dict(username='attr_ui',password=password))

@@ -35,7 +35,7 @@ func _run() -> void:
 	for c in cases:
 		var stats := RULES.stats(int(c.job),int(c.level),bool(c.equipped),c.allocated)
 		var same_stats := true
-		for key in stats: same_stats = same_stats and stats[key] == int(c.stats[key])
+		for key in ["hp","mp","attack","defense"]: same_stats = same_stats and stats[key] == int(c.stats[key])
 		check(same_stats,"Local combat numbers match independent server vectors")
 		var profile := RULES.profile(int(c.job),int(c.level),bool(c.equipped),c.allocated)
 		var same_plan: bool = profile.available == int(c.available)
@@ -46,8 +46,15 @@ func _run() -> void:
 	for job in 3:
 		for agility in [0,1,50,300]:
 			var combat: Dictionary = RULES.profile(job,60,false,[0,0,0,agility,0]).combat
-			check(combat.physical_crit == agility and combat.magic_crit == agility,"Agility grants both critical ratings for every job, including zero and maximum")
+			check(combat.physical_crit == agility and combat.magic_crit == 0 and combat.physical_evasion==agility and combat.physical_hit==100+agility,"Agility grants physical ratings independently of magical ratings")
 	Game.new_player("共用属性",1,2)
+	var one:=RULES.stats(1,1,false,[0,0,0,1,0])
+	var effect:=SkillRules.new_state(1,3,1)
+	check(RULES.critical_at(one,false,effect,100,9)==150 and effect.last_critical,"One agility point has a 0.1 percent critical window")
+	check(RULES.critical_at(one,false,effect,100,10)==100 and not effect.last_critical,"Critical boundary does not spill into the next basis point")
+	check(RULES.critical_at(one,true,effect,100,0)==100,"Agility does not grant magical critical chance")
+	check(RULES.hit_chance({},RULES.stats(1,60,false,[0,0,0,300,0]))==7000,"Maximum agility produces the same physical evasion as the server")
+	check(RULES.hit_chance({},RULES.stats(2,60,false,[0,0,0,0,300]),true)==7000,"Focus produces separate magical evasion")
 	Game.player.equipped = true
 	Game.player.hp -= 5
 	var before := Game.player.duplicate(true)
@@ -81,7 +88,7 @@ func _run() -> void:
 	local.select_tab(0);local.select_tab(1)
 	check(local.allocation_draft == [0,0,1,0,0],"Local tab changes retain the draft")
 	local._recommend_allocation()
-	check(local.allocation_draft == [1,0,3,1,0] and local.content.get_node("Status").text.contains("本地"),"Same recommendation controls explain local persistence")
+	check(local.allocation_draft == [1,0,1,3,0] and local.content.get_node("Status").text.contains("本地"),"Same recommendation controls explain local persistence")
 	await capture("local_extended_draft")
 	local.hide();online.show();online._recommend_allocation()
 	await capture("online_extended_draft")
@@ -91,14 +98,21 @@ func _run() -> void:
 	var page: OriginalCharacterAttributes = app.attributes
 	page.select_tab(1);page._recommend_allocation();page._confirm_allocation()
 	await get_tree().process_frame
-	check(Game.allocated_attributes() == [1,0,3,1,0] and page.content.get_node("Remaining").text == "0","Real local properties entry confirms and persists allocation")
-	check(Game.stats().attack == 35 and Game.stats().hp == 109 and Game.player.hp == 104,"Allocation affects real combat while preserving lost HP")
-	check(page.content.get_node("Value_physical_crit").value == "1" and page.content.get_node("Value_magic_crit").value == "1","Confirmed agility refreshes both displayed critical ratings")
+	check(Game.allocated_attributes() == [1,0,1,3,0] and page.content.get_node("Remaining").text == "0","Real local properties entry confirms and persists allocation")
+	check(Game.stats().attack == 30 and Game.stats().hp == 103 and Game.player.hp == 98,"Allocation affects real combat while preserving lost HP")
+	check(page.content.get_node("Value_physical_crit").value == "3" and page.content.get_node("Value_magic_crit").value == "0","Confirmed agility refreshes physical ratings independently of magic")
 	check(page.content.get_node("Minus2").disabled and page.content.get_node("Confirm").disabled,"Saved allocation cannot be reduced or double-confirmed")
-	check((await Game.load_game()).ok and Game.allocated_attributes() == [1,0,3,1,0],"Confirmed points survive actual save reload")
+	check((await Game.load_game()).ok and Game.allocated_attributes() == [1,0,1,3,0],"Confirmed points survive actual save reload")
 	page.display_local();page.select_tab(1)
-	check(page.content.get_node("Value_physical_crit").value == "1" and page.content.get_node("Value_magic_crit").value == "1","Saved agility restores both displayed critical ratings after reload")
+	check(page.content.get_node("Value_physical_crit").value == "3" and page.content.get_node("Value_magic_crit").value == "0","Saved agility restores physical ratings independently of magic after reload")
 	await capture("local_extended_saved")
+	var old_caps:=Game.player.duplicate(true)
+	old_caps.erase("attribute_rules_revision")
+	old_caps.level=60;old_caps.allocated_attributes=[0,0,150,0,150];old_caps.hp=1457;old_caps.mp=817
+	var legacy_caps:=FileAccess.open(owned_path,FileAccess.WRITE);legacy_caps.store_string(JSON.stringify(old_caps));legacy_caps.close()
+	var current:=Game.player.duplicate(true)
+	check((await Game.load_game()).ok and Game.allocated_attributes()==[0,0,150,0,150] and Game.player.hp==1157 and Game.player.mp==667,"Legacy allocations survive formula rebalance and excess HP/MP are clamped")
+	Game.player=current;check((await Game.save_game()).ok,"Restore owned local test save after compatibility check")
 	check(not (await Game.allocate_attributes([0,0,3,1,0])).ok,"Local committed points cannot be refunded")
 	check(not (await Game.allocate_attributes([2,0,3,1,0])).ok,"Local budget cannot be exceeded")
 	for invalid in [[1,0,3,1],[-1,0,3,1,0],[1.5,0,2.5,1,0],[true,0,3,1,0],[INF,0,3,1,0]]:

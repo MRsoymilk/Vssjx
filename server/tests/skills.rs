@@ -9,6 +9,7 @@ fn stats() -> Stats {
         mp: 400,
         attack: 100,
         defense: 20,
+        attributes: [0; 5],
     }
 }
 #[test]

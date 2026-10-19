@@ -110,6 +110,8 @@ impl Fighter {
             mp: stat("mp")?,
             attack: stat("attack")?,
             defense: stat("defense")?,
+            attributes: serde_json::from_value(s["attributes"]["allocated"].clone())
+                .map_err(|_| "DUEL_PROFILE_UNAVAILABLE")?,
         };
         let (job, school, level) = (
             number("job")? as i16,
@@ -174,11 +176,11 @@ pub struct Battle {
 impl Battle {
     fn view(&self, who: Uuid, now: Instant) -> Value {
         let me = self.fighters.iter().position(|f| f.id == who).unwrap();
-        json!({"id":self.id,"fighters":self.fighters,"revision":self.revision.to_string(),"round":self.round,"decision_revision":self.decision_revision.to_string(),"resolved_round":self.resolved_round,
+        crate::attributes::public_battle(json!({"id":self.id,"fighters":self.fighters,"revision":self.revision.to_string(),"round":self.round,"decision_revision":self.decision_revision.to_string(),"resolved_round":self.resolved_round,
             "phase":if self.ended.is_some(){"finished"}else if self.resume_at.is_some(){"resolving"}else{"planning"},
             "submitted":self.choices.each_ref().map(|c|c.is_some()),"your_choice":self.choices[me].as_ref().map(|c|json!({"action":c.action,"skill":c.skill})),
             "events":self.events,"winner":self.winner,"status":if self.ended.is_some(){"finished"}else{"active"},"reason":self.reason,"lines":self.lines,
-            "remaining_ms":self.resume_at.unwrap_or(self.deadline).saturating_duration_since(now).as_millis().min(30000) as u64})
+            "remaining_ms":self.resume_at.unwrap_or(self.deadline).saturating_duration_since(now).as_millis().min(30000) as u64}))
     }
     pub fn finish(&mut self, winner: Option<Uuid>, reason: &str, now: Instant) {
         if self.ended.is_some() {
@@ -334,27 +336,41 @@ impl Battle {
                 let roll = rolls[1 + me];
                 let raw = match choice.action.as_str() {
                     "attack" => {
-                        actor.effects.enemy_sleep = 0;
-                        actor
-                            .effects
-                            .critical((actor.stats.attack - enemy.stats.defense).max(1), roll)
+                        if crate::attributes::lands(Some(actor.stats), Some(enemy.stats), false) {
+                            actor.effects.enemy_sleep = 0;
+                            let power = crate::attributes::for_attack(actor.stats, actor.job, false);
+                            crate::attributes::critical(
+                                actor.stats, false, &mut actor.effects,
+                                (power.attack - enemy.stats.defense).max(1), roll,
+                            )
+                        } else {
+                            0
+                        }
                     }
                     "skill" => {
                         let s = skill.unwrap();
                         used = s.id.clone();
                         actor.effects.enemy_mp = enemy.mp;
-                        let hit = actor.effects.cast(
-                            s,
-                            actor.stats,
-                            &mut actor.hp,
-                            &mut actor.mp,
-                            enemy.stats.defense,
-                            roll,
-                        );
-                        if s.effect == "mana_steal" {
-                            enemy.mp = actor.effects.enemy_mp;
+                        let magical = actor.job == 2;
+                        let directed = matches!(s.target.as_str(), "enemy" | "all_enemies");
+                        if directed && !crate::attributes::lands(Some(actor.stats), Some(enemy.stats), magical) {
+                            actor.mp -= s.mp_cost;
+                            actor.effects.last_skill = s.id.clone();
+                            0
+                        } else {
+                            let hit = actor.effects.cast(
+                                s,
+                                crate::attributes::for_attack(actor.stats, actor.job, magical),
+                                &mut actor.hp,
+                                &mut actor.mp,
+                                enemy.stats.defense,
+                                roll,
+                            );
+                            if s.effect == "mana_steal" {
+                                enemy.mp = actor.effects.enemy_mp;
+                            }
+                            crate::attributes::critical(actor.stats, magical, &mut actor.effects, hit, roll)
                         }
-                        actor.effects.critical(hit, roll)
                     }
                     "guard" => {
                         actor.mp = (actor.mp + 5).min(actor.stats.mp);

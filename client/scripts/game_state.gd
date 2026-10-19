@@ -98,6 +98,10 @@ func select_local_character(id: String) -> PlatformResult:
 	for entry in entries:
 		if entry.id == id:
 			player = entry.data.duplicate(true)
+			var maxima:=stats()
+			player.hp=mini(int(player.hp),int(maxima.hp))
+			player.mp=mini(int(player.mp),int(maxima.mp))
+			player.attribute_rules_revision=2
 			found = true
 	if not found:
 		_local_roster_busy = false
@@ -143,7 +147,7 @@ func new_player(nickname: String, job: int, school: int, gender: int = 0) -> voi
 		"equipped": false, "zone": 0, "cell": [START_CELL.x, START_CELL.y],
 		"defeated": [], "enemy_respawns": {}, "signature": "", "title": "",
 		"ingots": 0, "guild_contribution": 0, "essence": 0,
-		"allocated_attributes": [0,0,0,0,0]
+		"allocated_attributes": [0,0,0,0,0], "attribute_rules_revision": 2
 	}
 	if String(player.name).is_empty():
 		player.name = "青衫客"
@@ -432,6 +436,10 @@ func load_game() -> PlatformResult:
 	if not player.has("weapon_owned"): player.weapon_owned = true
 	if not player.has("bag_order"): player.bag_order = ["potion", "sword"]
 	if not player.has("enemy_respawns"): player.enemy_respawns = {}
+	var maxima:=stats()
+	player.hp=mini(int(player.hp),int(maxima.hp))
+	player.mp=mini(int(player.mp),int(maxima.mp))
+	player.attribute_rules_revision=2
 	_player_generation += 1
 	result = _finish_storage(PlatformResult.success(), _player_generation)
 	return result
@@ -503,7 +511,14 @@ func valid_save(data: Variant) -> bool:
 	player = data
 	var values := stats()
 	player = old
-	return int(data.hp) <= int(values.hp) and int(data.mp) <= int(values.mp)
+	var revision:Variant=data.get("attribute_rules_revision",1)
+	if not (revision is int or revision is float) or not is_finite(float(revision)) or float(revision)!=floor(float(revision)) or revision<1 or revision>2:return false
+	var max_hp:=int(values.hp);var max_mp:=int(values.mp)
+	if revision==1:
+		var a:Array=data.get("allocated_attributes",[0,0,0,0,0])
+		max_hp=maxi(max_hp,max_hp+2*int(a[2]))
+		max_mp=maxi(max_mp,max_mp-int(a[0])-int(a[2])+2*int(a[4]))
+	return int(data.hp)<=max_hp and int(data.mp)<=max_mp
 
 func _valid_local_roster(data: Dictionary) -> bool:
 	var roster: Variant = data.local_characters

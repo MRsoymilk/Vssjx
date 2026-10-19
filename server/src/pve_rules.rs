@@ -50,6 +50,8 @@ pub struct Stats {
     pub mp: i32,
     pub attack: i32,
     pub defense: i32,
+    #[serde(default, skip_serializing_if = "crate::attributes::unallocated")]
+    pub attributes: [i32; 5],
 }
 pub fn stats(job: i16, level: i32, equipped: bool) -> Stats {
     let job = job as usize;
@@ -58,6 +60,7 @@ pub fn stats(job: i16, level: i32, equipped: bool) -> Stats {
         mp: [35, 45, 65][job] + (level - 1) * 8,
         attack: [18, 23, 21][job] + (level - 1) * 4 + if equipped { 5 } else { 0 },
         defense: [7, 4, 3][job] + (level - 1) * 2,
+        attributes: [0; 5],
     }
 }
 pub fn mask(id: &str) -> Option<i32> {
@@ -178,23 +181,22 @@ impl Battle {
         let mut damage = match action {
             Action::Attack => {
                 self.skills.enemy_sleep = 0;
-                self.skills.critical(
-                    (stats.attack - self.enemy.defense + player_roll.clamp(-2, 2)).max(1),
-                    effect_roll,
-                )
+                let power = crate::attributes::for_attack(stats, job, false);
+                crate::attributes::critical(stats, false, &mut self.skills,
+                    (power.attack - self.enemy.defense + player_roll.clamp(-2, 2)).max(1), effect_roll)
             }
             Action::Skill => {
                 let skill = selected.expect("selected skill");
                 lines.push(format!("你施展{}。", skill.name));
                 let damage = self.skills.cast(
                     skill,
-                    stats,
+                    crate::attributes::for_attack(stats, job, job == 2),
                     &mut self.hp,
                     &mut self.mp,
                     self.enemy.defense,
                     effect_roll,
                 );
-                self.skills.critical(damage, effect_roll)
+                crate::attributes::critical(stats, job == 2, &mut self.skills, damage, effect_roll)
             }
             Action::Guard => {
                 self.mp = (self.mp + 5).min(stats.mp);
@@ -237,15 +239,17 @@ impl Battle {
             lines.push(format!("{}处于睡眠，无法行动。", self.enemy.name));
         } else {
             let mut incoming = (self.enemy.attack - stats.defense + enemy_roll.clamp(-2, 2)).max(1);
+            let landed = crate::attributes::lands(None, Some(stats), false);
+            if !landed { incoming = 0; }
             if action == Action::Guard {
-                incoming = (incoming / 2).max(1);
+                incoming = if landed { (incoming / 2).max(1) } else { 0 };
             }
-            let (incoming, mut reflected) = self.skills.enemy_hit(incoming, false);
+            let (incoming, mut reflected) = if landed { self.skills.enemy_hit(incoming, false) } else { (0, 0) };
             self.skills.last_enemy_acted = true;
             self.skills.last_incoming = incoming;
             self.hp = (self.hp - incoming).max(0);
             lines.push(format!("{}出击，你受到{incoming}点伤害。", self.enemy.name));
-            if job == 0 && action == Action::Guard {
+            if landed && job == 0 && action == Action::Guard {
                 reflected += 6;
             }
             reflected = reflected.min(self.enemy_hp);

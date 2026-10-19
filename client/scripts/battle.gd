@@ -70,13 +70,13 @@ func resolve_player() -> Dictionary:
 	var damage := 0
 	match pending_command:
 		"attack":
-			damage = maxi(1, int(values.attack) - int(enemy.defense) + rng.randi_range(-2, 2))
-			damage=SkillRules.critical(skills,damage,rng.randi_range(0,99))
+			damage = maxi(1, int(CharacterAttributeRules.power(values,int(Game.player.job),false).attack) - int(enemy.defense) + rng.randi_range(-2, 2))
+			damage=CharacterAttributeRules.critical_at(values,false,skills,damage,rng.randi_range(0,9999))
 			skills.enemy_sleep=0
 			lines.append("你%s出击，造成 %d 点伤害。" % [["挥锤", "挥剑", "挥杖"][int(Game.player.job)], damage])
 		"skill":
-			var cast:=SkillRules.cast(SkillRules.item(pending_skill),skills,values,hp,mp,int(enemy.defense),rng.randi_range(0,99))
-			hp=int(cast.hp);mp=int(cast.mp);damage=SkillRules.critical(skills,int(cast.damage),rng.randi_range(0,99))
+			var cast:=SkillRules.cast(SkillRules.item(pending_skill),skills,CharacterAttributeRules.power(values,int(Game.player.job),int(Game.player.job)==2),hp,mp,int(enemy.defense),rng.randi_range(0,99))
+			hp=int(cast.hp);mp=int(cast.mp);damage=CharacterAttributeRules.critical_at(values,int(Game.player.job)==2,skills,int(cast.damage),rng.randi_range(0,9999))
 			lines.append("你施展%s%s"%[action_name("skill",int(Game.player.job),pending_skill),"，造成 %d 点伤害。"%damage if damage>0 else "。"])
 		"potion":
 			potions -= 1
@@ -114,13 +114,14 @@ func resolve_enemy() -> Dictionary:
 		phase="settlement"
 		return {"ok":true,"lines":["%s处于睡眠，无法行动。"%enemy.name],"incoming":0,"reflected":0}
 	var incoming := maxi(1, int(enemy.attack) - int(values.defense) + rng.randi_range(-2, 2))
+	var landed:=rng.randi_range(0,9999)<CharacterAttributeRules.hit_chance({},values)
 	if guarding: incoming = maxi(1, incoming / 2)
-	var hit:=SkillRules.enemy_hit(skills,incoming)
+	var hit:=SkillRules.enemy_hit(skills,incoming) if landed else Vector2i.ZERO
 	incoming=hit.x;skills.last_enemy_acted=true
 	hp = maxi(0, hp - incoming)
 	lines.append("%s行动，你受到 %d 点伤害。" % [enemy.name, incoming])
 	var reflected := hit.y
-	if int(Game.player.job) == 0 and guarding:
+	if landed and int(Game.player.job) == 0 and guarding:
 		reflected+=6
 	reflected=mini(enemy_hp,reflected);enemy_hp=maxi(0,enemy_hp-reflected)
 	skills.last_incoming=incoming;skills.last_reflected=reflected

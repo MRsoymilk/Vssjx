@@ -103,7 +103,7 @@ async fn load_character(tx:&mut Transaction<'_,Postgres>,character_id:Uuid,accou
     let gear = rows.into_iter().map(|r|(r.get("definition_id"),r.get("equipped"))).collect();
     let ai:crate::ai_world::Progress=serde_json::from_value(row.get::<Json<Value>,_>("ai_progress").0).map_err(|_|unavailable())?;
     if !ai.valid(){return Err(unavailable());}
-    Ok(Loaded {
+    let mut loaded = Loaded {
         ai,
         gear,
         quantities,
@@ -118,7 +118,16 @@ async fn load_character(tx:&mut Transaction<'_,Postgres>,character_id:Uuid,accou
             .get::<Vec<i32>, _>("allocated_attributes")
             .try_into()
             .map_err(|_| unavailable())?,
-    })
+    };
+    // Formula updates retain allocations and never refill resources on login.
+    let maxima = loaded.stats();
+    loaded.character.hp = loaded.character.hp.min(maxima.hp);
+    loaded.character.mp = loaded.character.mp.min(maxima.mp);
+    if let Some(b) = loaded.battle.as_mut() {
+        b.hp = b.hp.min(maxima.hp);
+        b.mp = b.mp.min(maxima.mp);
+    }
+    Ok(loaded)
 }
 impl Loaded {
     fn stats(&self) -> pve_rules::Stats {
@@ -589,7 +598,7 @@ pub(crate) async fn team_fighter(tx:&mut Transaction<'_,Postgres>,context:&Conte
 pub(crate) async fn team_save(tx:&mut Transaction<'_,Postgres>,f:&crate::team_rules::Fighter,b:&crate::team_rules::Battle,settle:bool)->Result<(),AuthError>{
     let account=sqlx::query_scalar("SELECT account_id FROM characters WHERE id=$1").bind(f.id).fetch_one(&mut **tx).await.map_err(database)?;
     let mut a=load_character(tx,f.id,account,None).await?;
-    a.character.hp=f.hp.max(1);a.character.mp=f.mp;a.potions=f.potions;
+    a.character.hp=f.hp.max(1).min(a.stats().hp);a.character.mp=f.mp.min(a.stats().mp);a.potions=f.potions;
     if settle&&b.outcome=="victory"{
         let mut ids=std::collections::HashSet::new();
         for e in &b.enemies{

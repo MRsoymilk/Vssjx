@@ -638,7 +638,7 @@ async fn snapshot(
             .iter()
             .map(|r| json!({"id":r.get::<Uuid,_>("id"),"name":r.get::<String,_>("display_name")}))
             .collect();
-        json!({"id":id,"leader":leader,"members":members,"battle":b,"battle_active":battle_active,"outgoing":outgoing})
+        crate::attributes::public_battle(json!({"id":id,"leader":leader,"members":members,"battle":b,"battle_active":battle_active,"outgoing":outgoing}))
     } else {
         Value::Null
     };

@@ -210,13 +210,13 @@ impl Battle {
                     }
                     let damage = actor.effects.cast(
                         s,
-                        actor.stats,
+                        crate::attributes::for_attack(actor.stats, actor.job, actor.job == 2),
                         &mut actor.hp,
                         &mut actor.mp,
                         enemy.definition.defense,
                         roll,
                     );
-                    let damage = actor.effects.critical(damage, roll).min(enemy.hp);
+                    let damage = crate::attributes::critical(actor.stats, actor.job == 2, &mut actor.effects, damage, roll).min(enemy.hp);
                     Self::enemy_effects(&actor.effects, &mut enemy.effects);
                     Self::enemy_effects(&skills::State::default(), &mut actor.effects);
                     enemy.hp -= damage;
@@ -241,9 +241,9 @@ impl Battle {
         } else if action == "attack" {
             let e = &mut self.enemies[target_index.unwrap()];
             let a = &mut self.fighters[i];
-            let damage = a
-                .effects
-                .critical((a.stats.attack - e.definition.defense).max(1), roll)
+            let power = crate::attributes::for_attack(a.stats, a.job, false);
+            let damage = crate::attributes::critical(a.stats, false, &mut a.effects,
+                (power.attack - e.definition.defense).max(1), roll)
                 .min(e.hp);
             e.hp -= damage;
             e.effects.enemy_sleep = 0;
@@ -342,14 +342,15 @@ impl Battle {
             }
             let i = alive[((roll.max(0) as usize) + n + self.round as usize) % alive.len()];
             let a = &mut self.fighters[i];
-            let incoming = (e.definition.attack - a.stats.defense).max(1);
-            let incoming = if a.guarding {
+            let landed = crate::attributes::lands(None, Some(a.stats), false);
+            let incoming = if landed { (e.definition.attack - a.stats.defense).max(1) } else { 0 };
+            let incoming = if a.guarding && landed {
                 (incoming / 2).max(1)
             } else {
                 incoming
             };
-            let (incoming, reflected) = a.effects.enemy_hit(incoming, false);
-            let reflected = reflected + if a.job == 0 && a.guarding { 6 } else { 0 };
+            let (incoming, reflected) = if landed { a.effects.enemy_hit(incoming, false) } else { (0, 0) };
+            let reflected = reflected + if landed && a.job == 0 && a.guarding { 6 } else { 0 };
             a.hp = (a.hp - incoming).max(0);
             e.hp = (e.hp - reflected).max(0);
             self.events.push(Event {

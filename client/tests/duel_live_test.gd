@@ -38,8 +38,14 @@ func _run() -> void:
 		check(not peer.is_empty(),"Same-map opponent is selectable")
 		if peer.is_empty():get_tree().quit(1);return
 		view._select_player(peer)
-		check(view.duel_invitation.visible and view.duel_invitation.confirm.text=="邀请决斗","Player selection exposes the duel invitation action")
-		view.duel_invitation.confirm.pressed.emit()
+		check(await wait_until(func()->bool:return view.social_panel.visible and view.social.profile.get("id")==peer),"Player selection loads the public character card")
+		var invite:Button
+		for row in view.social_panel.rows.get_children():
+			for button in row.get_children():
+				if button is Button and button.text=="邀请决斗":invite=button
+		check(invite!=null,"Public character card exposes the duel invitation action")
+		if invite==null:get_tree().quit(1);return
+		invite.pressed.emit()
 		check(await wait_until(func()->bool:return view.network.duel.state.get("outgoing") is Dictionary or view.network.duel.active()),"Invite is sent through the real socket")
 	else:
 		check(await wait_until(func()->bool:return view.network.duel.state.get("incoming") is Dictionary),"Recipient receives the invitation")

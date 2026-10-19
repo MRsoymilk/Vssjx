@@ -170,8 +170,8 @@ func _on_ticket(result: Dictionary) -> void:
 	_shop_version = int(result.get("shop_version")) if result.get("shop_version") in [1,2] else 0
 	_team_version = 1 if result.get("team_version") == 1 else 0
 	team_following=false;team_marks={};team_travel={}
-	_duel_version = 1 if result.get("duel_version") == 1 else 0
-	duel.enabled = _duel_version == 1
+	_duel_version = 2 if result.get("duel_version") == 2 else 0
+	duel.enabled = _duel_version == 2
 	if not duel.enabled: duel.clear()
 	appearances = {}
 	_population_version = 1 if result.get("population_version") == 1 else 0
@@ -268,7 +268,7 @@ func _exchange_packet() -> Dictionary:
 	if _pve_version == 1: packet.pve_version = 1
 	if _maps_version in [1, 2]: packet.maps_version = _maps_version
 	if _shop_version in [1,2]: packet.shop_version = _shop_version
-	if _duel_version == 1: packet.duel_version = 1
+	if _duel_version == 2: packet.duel_version = 2
 	if _team_version == 1: packet.team_version = 1
 	return packet
 
@@ -301,7 +301,7 @@ func _entity(value: Variant) -> bool:
 func _receive(data: Dictionary, raw: PackedByteArray) -> void:
 	var kind: Variant = data.get("type")
 	if kind in ["duel.state", "duel.result"]:
-		if not world_ready or _duel_version != 1 or not duel.receive(data): _failed("INVALID_DUEL")
+		if not world_ready or _duel_version != 2 or not duel.receive(data): _failed("INVALID_DUEL")
 		return
 	if kind == "error":
 		var code := String(data.get("code", "SERVER_ERROR"))

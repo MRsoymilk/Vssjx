@@ -21,9 +21,9 @@ class DuelPlayer(Player):
     def __init__(self, base, session, character, supported=True):
         self.base, self.session, self.id = base, session, character
         code, ticket = api(base, '/api/v1/world/ticket', dict(character_id=character, protocol_version=1, config_hash=HASH), session['access_token'])
-        assert code == 200 and ticket['duel_version'] == 1, ticket
+        assert code == 200 and ticket['duel_version'] == 2, ticket
         self.ws = WebSocket(base.replace('http://', 'ws://') + '/api/v1/world/ws')
-        self.ws.send(dict(type='auth.exchange', ticket=ticket['ticket'], protocol_version=1, config_hash=HASH, world_sync_version=2, population_version=1, pve_version=1, maps_version=2, shop_version=2, duel_version=1 if supported else 0))
+        self.ws.send(dict(type='auth.exchange', ticket=ticket['ticket'], protocol_version=1, config_hash=HASH, world_sync_version=2, population_version=1, pve_version=1, maps_version=2, shop_version=2, duel_version=2 if supported else 0))
         self.population, self.state, self.seq, self.duel_state = {}, {}, 0, {}
         self.closed = False
         self.keepalive = time.monotonic()
@@ -97,6 +97,7 @@ def main():
 
         try:
             sa, ia = create('duel_a', 0, 0); sb, ib = create('duel_b', 1, 1); sc, ic = create('duel_c')
+            db.query(f"UPDATE characters SET allocated_attributes=ARRAY[0,0,0,20,0] WHERE id='{ib}'")
             a, b, c = DuelPlayer(base, sa, ia), DuelPlayer(base, sb, ib), DuelPlayer(base, sc, ic)
             resources = db.query("SELECT id,hp,mp,gold,xp FROM characters ORDER BY id")
             a.duel('invite', target=ib)
@@ -125,31 +126,42 @@ def main():
             check({f['id'] for f in state['fighters']} == {ia, ib} and state['fighters'][0]['stats']['hp'] != 180, 'Both authoritative profiles start with isolated full combat resources')
             a.move([11,16]); check(a.until('error')['code'] == 'BATTLE_ACTIVE', 'Movement is blocked by the server during PK')
             value, _ = a.command('restore', 'qingwei', ok=False); check(value['code'] == 'DUEL_ACTIVE', 'PvE and inventory mutations cannot overlap a duel')
-            wrong = b if state['turn'] == ia else a
-            value, _ = wrong.duel('attack', ok=False, battle_id=state['id'], expected_revision=state['revision']); check(value['code'] == 'DUEL_NOT_YOUR_TURN', 'A player cannot take the opponent turn')
-            actor = a if state['turn'] == ia else b
-            _, attack = actor.duel('attack', battle_id=state['id'], expected_revision=state['revision'])
-            next_state = a.synced(lambda s: int(s['battle']['revision']) > int(state['revision']))['battle']
-            b.synced(lambda s: s['battle']['revision'] == next_state['revision'])
-            actor.duel('', request=attack)
-            value, _ = actor.duel('attack', ok=False, battle_id=state['id'], expected_revision=state['revision']); check(value['code'] == 'DUEL_STALE_REVISION', 'Duplicate and stale commands do not apply damage twice')
-            # Real two-client combat until a knockout. Defender chooses guard, attacker attacks.
-            for _ in range(70):
-                if next_state['status'] != 'active': break
-                acting = a if next_state['turn'] == ia else b
-                acting.duel('attack', battle_id=state['id'], expected_revision=next_state['revision'])
-                rev = int(next_state['revision'])
-                next_state = a.synced(lambda s: int(s['battle']['revision']) > rev)['battle']
-                b.synced(lambda s: s['battle']['revision'] == next_state['revision'])
+            baseline=[f['hp'] for f in state['fighters']]
+            _, attack=a.duel('attack',battle_id=state['id'],expected_revision=state['decision_revision'])
+            locked=a.synced(lambda s:s['battle']['submitted'][0])['battle']
+            check([f['hp'] for f in locked['fighters']]==baseline and locked['events']==[],'One commitment cannot spend resources or deal damage')
+            value,_=a.duel('guard',ok=False,battle_id=state['id'],expected_revision=state['decision_revision']);check(value['code']=='DUEL_ALREADY_SUBMITTED','A locked decision cannot be changed or submitted twice')
+            hidden=b.synced(lambda s:s['battle']['submitted'][0])['battle']
+            check(hidden['your_choice'] is None and 'choices' not in hidden and 'turn' not in hidden,'Opponent decision is hidden until simultaneous resolution')
+            b.duel('attack',battle_id=state['id'],expected_revision=state['decision_revision'])
+            next_state=a.synced(lambda s:s['battle']['resolved_round']==1)['battle']
+            b.synced(lambda s:s['battle']['resolved_round']==1)
+            check(next_state['events'][0]['actor']==ib and next_state['fighters'][1]['speed']==120,'Allocated agility determines initiative, irrespective of arrival order')
+            actor=a
+            actor.duel('',request=attack)
+            next_state=a.synced(lambda s:s['battle']['phase']=='planning' or s['battle']['status']=='finished')['battle']
+            value,_=actor.duel('attack',ok=False,battle_id=state['id'],expected_revision=state['decision_revision']);check(value['code']=='DUEL_STALE_REVISION','A prior round token cannot deal damage again')
+            for _ in range(50):
+                if next_state['status']!='active':break
+                next_state=a.synced(lambda s:s['battle']['phase']=='planning' or s['battle']['status']=='finished')['battle']
+                if next_state['status']!='active':break
+                b.synced(lambda s:s['battle']['decision_revision']==next_state['decision_revision'])
+                token=next_state['decision_revision'];round_no=next_state['round']
+                a.duel('attack',battle_id=state['id'],expected_revision=token)
+                b.duel('attack',battle_id=state['id'],expected_revision=token)
+                next_state=a.synced(lambda s:s['battle']['resolved_round']>=round_no)['battle']
+                b.synced(lambda s:s['battle']['resolved_round']>=round_no)
             check(next_state['status'] == 'finished' and next_state['winner'] in [ia, ib], 'Two real players reach one authoritative winner')
             check(db.query("SELECT id,hp,mp,gold,xp FROM characters ORDER BY id") == resources, 'Sparring never changes permanent health, mana, gold or XP')
             a.duel('invite',target=ib)
             offer=b.synced(lambda s:s.get('incoming') is not None)['incoming']['id']
             b.duel('accept',invite_id=offer)
             active=a.synced(lambda s:s.get('battle') is not None and s['battle']['status']=='active')['battle']
+            a.duel('attack',battle_id=active['id'],expected_revision=active['decision_revision'])
+            a.synced(lambda s:s['battle']['submitted'][0])
             a.close();time.sleep(.4);a=DuelPlayer(base,sa,ia)
-            check(a.duel_state['battle']['id']==active['id'] and a.duel_state['battle']['status']=='active','Reconnecting within grace restores the same duel')
-            a.duel('flee',battle_id=active['id'],expected_revision=a.duel_state['battle']['revision'])
+            check(a.duel_state['battle']['id']==active['id'] and a.duel_state['battle']['status']=='active' and a.duel_state['battle']['submitted'][0] and a.duel_state['battle']['your_choice']['action']=='attack','Reconnect restores the same hidden commitment without another choice')
+            a.duel('flee',battle_id=active['id'],expected_revision=a.duel_state['battle']['decision_revision'])
             b.synced(lambda s:s.get('battle') is not None and s['battle']['id']==active['id'] and s['battle']['status']=='finished')
             check(b.duel_state['battle']['winner']==ib,'Surrender ends both views with the same winner')
             a.move([11,16]); a.until('world.delta')
@@ -167,7 +179,12 @@ def main():
                     partner_role='b' if role=='a' else 'a'
                     _, session=api(base,'/api/v1/auth/login',dict(username='duel_ui_'+partner_role,password=password))
                     partner=DuelPlayer(base,session,ui_b if role=='a' else ui_a)
-                    errors=[]
+                    errors=[];heartbeat_done=threading.Event()
+                    def heartbeat():
+                        while not heartbeat_done.wait(2):
+                            try:partner.ws.send(dict(type='ping'))
+                            except OSError:return
+                    threading.Thread(target=heartbeat,daemon=True).start()
                     def sparring_peer():
                         try:
                             if role=='a':
@@ -177,13 +194,15 @@ def main():
                                 while ui_b not in partner.ws.entities:partner.until('world.delta')
                                 partner.duel('invite',target=ui_b)
                             partner.synced(lambda s:s.get('battle') is not None and s['battle']['status']=='active')
+                            submitted_tokens=set()
                             while partner.duel_state['battle']['status']=='active':
                                 duel=partner.duel_state['battle']
-                                if duel['turn']==partner.id:
-                                    time.sleep(1.3) # Simulate choosing after the preceding animation.
-                                    partner.duel('attack',battle_id=duel['id'],expected_revision=duel['revision'])
-                                rev=int(duel['revision'])
-                                partner.synced(lambda s:int(s['battle']['revision'])>rev)
+                                me=0 if duel['fighters'][0]['id']==partner.id else 1
+                                if duel['phase']=='planning' and not duel['submitted'][me] and duel['decision_revision'] not in submitted_tokens:
+                                    time.sleep(.4)
+                                    partner.duel('attack',battle_id=duel['id'],expected_revision=duel['decision_revision'])
+                                    submitted_tokens.add(duel['decision_revision'])
+                                partner.until('duel.state')
                         except BaseException as e:errors.append(repr(e))
                     worker=threading.Thread(target=sparring_peer,daemon=True);worker.start()
                     child_env=dict(os.environ,SSJX_DUEL_BASE=base,SSJX_DUEL_ROLE=role,SSJX_DUEL_PASSWORD=password)
@@ -195,7 +214,7 @@ def main():
                     try:output,_=p.communicate(timeout=110)
                     except BaseException:p.kill();print(p.communicate()[0]);raise
                     print(output,flush=True)
-                    partner.close();worker.join(timeout=3)
+                    heartbeat_done.set();partner.close();worker.join(timeout=3)
                     check(not errors, 'Protocol sparring peer: '+str(errors))
                     check(p.returncode==0 and '0 failures' in output and 'SCRIPT ERROR' not in output,'Real Godot duel UI completes as '+role)
                     time.sleep(1.2)

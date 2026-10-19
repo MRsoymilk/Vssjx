@@ -711,7 +711,7 @@ pub(crate) async fn ticket(
         .bind(auth::token_digest(&raw)?).bind(session).bind(request.character_id).execute(&mut *tx).await.map_err(db_error)?;
     tx.commit().await.map_err(db_error)?;
     Ok(Json(
-        json!({"ticket":raw,"expires_in":20,"character_id":request.character_id,"config_hash":config_hash(),"announcement_version":1,"population_version":1,"pve_version":1,"maps_version":1,"ai_world_version":1,"shop_version":2,"duel_version":1,"team_version":1}),
+        json!({"ticket":raw,"expires_in":20,"character_id":request.character_id,"config_hash":config_hash(),"announcement_version":1,"population_version":1,"pve_version":1,"maps_version":1,"ai_world_version":1,"shop_version":2,"duel_version":2,"team_version":1}),
     ))
 }
 #[derive(Deserialize)]
@@ -928,7 +928,7 @@ async fn connection(socket: WebSocket, auth: AuthService, hub: Arc<WorldHub>, an
         }
     };
     let stream = Uuid::new_v4();
-    hub.duel_enable(&owner,duel_version==1);
+    hub.duel_enable(&owner,duel_version==2);
     tracing::info!(
         connection_epoch = owner.epoch,
         "world connection authenticated"
@@ -1022,7 +1022,7 @@ async fn connection(socket: WebSocket, auth: AuthService, hub: Arc<WorldHub>, an
                 match auth.live_session(owner.session).await {Ok(true)=>{},Ok(false)=>{fail(&mut socket,"SESSION_REVOKED").await;leave=true;break},Err(_)=>{fail(&mut socket,"DATABASE_UNAVAILABLE").await;break}}
                 if matches!(input,ClientMessage::Ping {}){if send(&mut socket,json!({"type":"pong"})).await.is_err(){break;}}
                 else if let ClientMessage::Duel{command}=&input {
-                    if duel_version!=1 {fail(&mut socket,"DUEL_UNSUPPORTED").await;continue;}
+                    if duel_version!=2 {fail(&mut socket,"DUEL_UNSUPPORTED").await;continue;}
                     let result=hub.duel_command(&auth,&owner,command).await;
                     if send(&mut socket,result).await.is_err(){break;}
                 }
@@ -1076,7 +1076,7 @@ async fn connection(socket: WebSocket, auth: AuthService, hub: Arc<WorldHub>, an
                     let value={let _business=owner.business.lock().await;match hub.pve_context(&owner,None){Ok(c)=>crate::pve::snapshot(&auth,&c).await,Err(e)=>Err(e)}};
                     match value{Ok(value)=>{hub.pve_applied(&owner,&value);if send(&mut socket,crate::shop::client_packet(value,shop_version)).await.is_err(){break;}},Err(_)=>{hub.data.lock().expect("world state").team_dirty.insert(owner.id);}}
                 }
-                if duel_version==1 {
+                if duel_version==2 {
                     let packet=hub.data.lock().expect("world state").duels.packet(owner.id,duel_revision,Instant::now());
                     if let Some((revision,packet))=packet {if send(&mut socket,packet).await.is_err(){break;}duel_revision=Some(revision);}
                 }

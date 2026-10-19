@@ -11,6 +11,8 @@ use uuid::Uuid;
 pub const INVITE_SECONDS: u64 = 30;
 pub const REJECT_SECONDS: i64 = 300;
 pub const TURN_SECONDS: u64 = 30;
+pub const PLAYBACK_SECONDS: u64 = 4;
+pub const MAX_ROUNDS: u64 = 50;
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
@@ -82,6 +84,7 @@ pub struct Fighter {
     pub school: i16,
     pub level: i32,
     pub stats: Stats,
+    pub speed: i32,
     pub appearance: [i32; 3],
     pub hp: i32,
     pub mp: i32,
@@ -124,6 +127,11 @@ impl Fighter {
             school,
             level,
             stats,
+            speed: 100
+                + s["attributes"]["allocated"][3]
+                    .as_i64()
+                    .filter(|v| (0..=300).contains(v))
+                    .ok_or("DUEL_PROFILE_UNAVAILABLE")? as i32,
             appearance,
             hp: stats.hp,
             mp: stats.mp,
@@ -132,36 +140,53 @@ impl Fighter {
         })
     }
 }
+#[derive(Clone)]
+struct Choice {
+    action: String,
+    skill: Option<String>,
+}
+#[derive(Clone, Serialize)]
+pub struct Event {
+    pub actor: Uuid,
+    pub action: String,
+    pub skill: String,
+    pub damage: i32,
+    pub reflected: i32,
+    pub fighters: [Fighter; 2],
+}
 pub struct Battle {
     pub id: Uuid,
     pub fighters: [Fighter; 2],
     pub revision: u64,
-    pub turn: usize,
+    pub round: u64,
+    pub decision_revision: u64,
+    pub resolved_round: u64,
+    choices: [Option<Choice>; 2],
+    pub events: Vec<Event>,
+    pub resume_at: Option<Instant>,
     pub winner: Option<Uuid>,
     pub reason: String,
-    pub last_actor: Option<Uuid>,
-    pub last_action: String,
-    pub last_skill: String,
     pub lines: Vec<String>,
     pub deadline: Instant,
     pub ended: Option<Instant>,
 }
 impl Battle {
-    fn view(&self, now: Instant) -> Value {
-        json!({"id":self.id,"fighters":self.fighters,"revision":self.revision.to_string(),"turn":self.fighters[self.turn].id,"winner":self.winner,"status":if self.ended.is_some(){"finished"}else{"active"},"reason":self.reason,"last_actor":self.last_actor,"last_action":self.last_action,"last_skill":self.last_skill,"lines":self.lines,"remaining_ms":self.deadline.saturating_duration_since(now).as_millis() as u64})
+    fn view(&self, who: Uuid, now: Instant) -> Value {
+        let me = self.fighters.iter().position(|f| f.id == who).unwrap();
+        json!({"id":self.id,"fighters":self.fighters,"revision":self.revision.to_string(),"round":self.round,"decision_revision":self.decision_revision.to_string(),"resolved_round":self.resolved_round,
+            "phase":if self.ended.is_some(){"finished"}else if self.resume_at.is_some(){"resolving"}else{"planning"},
+            "submitted":self.choices.each_ref().map(|c|c.is_some()),"your_choice":self.choices[me].as_ref().map(|c|json!({"action":c.action,"skill":c.skill})),
+            "events":self.events,"winner":self.winner,"status":if self.ended.is_some(){"finished"}else{"active"},"reason":self.reason,"lines":self.lines,
+            "remaining_ms":self.resume_at.unwrap_or(self.deadline).saturating_duration_since(now).as_millis().min(30000) as u64})
     }
     pub fn finish(&mut self, winner: Option<Uuid>, reason: &str, now: Instant) {
         if self.ended.is_some() {
             return;
         }
-        if reason != "knockout" {
-            self.last_actor = None;
-            self.last_action = "flee".into();
-            self.last_skill.clear();
-        }
         self.winner = winner;
         self.reason = reason.into();
         self.ended = Some(now);
+        self.resume_at = None;
         self.revision += 1;
         self.lines.push(match winner {
             Some(id) => format!(
@@ -176,7 +201,7 @@ impl Battle {
         who: Uuid,
         c: &Command,
         now: Instant,
-        roll: i32,
+        rolls: [i32; 3],
     ) -> Result<(), &'static str> {
         if self.ended.is_some() {
             return Err("DUEL_FINISHED");
@@ -189,139 +214,49 @@ impl Battle {
         if c.battle_id != Some(self.id) {
             return Err("DUEL_NOT_FOUND");
         }
-        if c.expected_revision.as_deref() != Some(self.revision.to_string().as_str()) {
+        if c.expected_revision.as_deref() != Some(self.decision_revision.to_string().as_str()) {
             return Err("DUEL_STALE_REVISION");
         }
         if c.action == "flee" {
             self.finish(Some(self.fighters[1 - me].id), "surrender", now);
             return Ok(());
         }
-        if me != self.turn {
-            return Err("DUEL_NOT_YOUR_TURN");
+        if self.resume_at.is_some() {
+            return Err("DUEL_RESOLVING");
         }
-        let skill = if c.action == "skill" {
-            Some(skills::check(
+        if now >= self.deadline {
+            return Err("DUEL_DECISION_EXPIRED");
+        }
+        if self.choices[me].is_some() {
+            return Err("DUEL_ALREADY_SUBMITTED");
+        }
+        if !matches!(c.action.as_str(), "attack" | "skill" | "guard") {
+            return Err("INVALID_DUEL_COMMAND");
+        }
+        if c.action == "skill" {
+            let f = &self.fighters[me];
+            let skill = skills::check(
                 c.skill.as_deref().ok_or("INVALID_SKILL")?,
-                self.fighters[me].job,
-                self.fighters[me].school,
-                self.fighters[me].level,
-            )?)
-        } else {
-            None
-        };
-        let silence = self.fighters[1 - me].effects.enemy_silence > 0;
-        if skill.is_some() && silence {
-            return Err("DUEL_SILENCED");
-        }
-        if skill.is_some_and(|s| self.fighters[me].mp < s.mp_cost) {
-            return Err("MP_INSUFFICIENT");
-        }
-        let (a, b) = self.fighters.split_at_mut(1);
-        let (actor, enemy) = if me == 0 {
-            (&mut a[0], &mut b[0])
-        } else {
-            (&mut b[0], &mut a[0])
-        };
-        actor.effects.reset_turn();
-        enemy.effects.reset_turn();
-        // Enemy-targeted counters belong to the caster. Tick on the affected player's turn.
-        let dot = (if enemy.effects.enemy_bleed > 0 {
-            enemy.effects.bleed_damage
-        } else {
-            0
-        }) + (if enemy.effects.enemy_poison > 0 {
-            enemy.effects.poison_damage
-        } else {
-            0
-        });
-        enemy.effects.enemy_bleed = (enemy.effects.enemy_bleed - 1).max(0);
-        enemy.effects.enemy_poison = (enemy.effects.enemy_poison - 1).max(0);
-        actor.hp = (actor.hp - dot).max(0);
-        actor.guarding = false;
-        self.lines = vec![format!("轮到{}行动。", actor.name)];
-        if dot > 0 {
-            self.lines.push(format!("持续伤害：{}。", dot));
-        }
-        let asleep = enemy.effects.enemy_sleep > 0;
-        self.last_action = c.action.clone();
-        self.last_skill = String::new();
-        self.last_actor = Some(who);
-        if actor.hp > 0 && !asleep {
-            let damage = match c.action.as_str() {
-                "attack" => {
-                    actor.effects.enemy_sleep = 0;
-                    actor
-                        .effects
-                        .critical((actor.stats.attack - enemy.stats.defense).max(1), roll)
-                }
-                "skill" => {
-                    let s = skill.unwrap();
-                    self.last_skill = s.id.clone();
-                    actor.effects.enemy_mp = enemy.mp;
-                    let damage = actor.effects.cast(
-                        s,
-                        actor.stats,
-                        &mut actor.hp,
-                        &mut actor.mp,
-                        enemy.stats.defense,
-                        roll,
-                    );
-                    if s.effect == "mana_steal" {
-                        enemy.mp = actor.effects.enemy_mp;
-                    }
-                    actor.effects.critical(damage, roll)
-                }
-                "guard" => {
-                    actor.guarding = true;
-                    actor.mp = (actor.mp + 5).min(actor.stats.mp);
-                    0
-                }
-                _ => return Err("INVALID_DUEL_COMMAND"),
-            };
-            let incoming = if enemy.guarding { damage / 2 } else { damage };
-            let (hit, reflection) = if incoming > 0 {
-                enemy
-                    .effects
-                    .enemy_hit(incoming, c.action == "skill" && actor.job == 2)
-            } else {
-                (0, 0)
-            };
-            enemy.hp = (enemy.hp - hit).max(0);
-            actor.hp = (actor.hp - reflection).max(0);
-            enemy.effects.last_incoming = hit;
-            enemy.effects.last_reflected = reflection;
-            actor.effects.last_damage = hit;
-            actor.effects.last_reflected = reflection;
-            self.lines.push(format!(
-                "{}{}，造成{}点伤害。",
-                actor.name,
-                if c.action == "guard" {
-                    "防御"
-                } else if c.action == "skill" {
-                    skill.unwrap().name.as_str()
-                } else {
-                    "攻击"
-                },
-                hit
-            ));
-            if reflection > 0 {
-                self.lines.push(format!("反弹{}点伤害。", reflection));
+                f.job,
+                f.school,
+                f.level,
+            )?;
+            if f.mp < skill.mp_cost {
+                return Err("MP_INSUFFICIENT");
             }
-        } else if asleep {
-            self.last_action = "sleep".into();
-            self.lines.push(format!("{}沉睡中，跳过行动。", actor.name));
         }
-        if actor.effects.regen > 0 {
-            let heal = actor.effects.regen_amount.min(actor.stats.hp - actor.hp);
-            actor.hp += heal;
-            actor.effects.regen -= 1;
-        }
-        // Caster buffs last through the opponent's turn; enemy debuffs tick when applied.
-        enemy.effects.end_turn();
-        let alive = [self.fighters[0].hp > 0, self.fighters[1].hp > 0];
+        self.choices[me] = Some(Choice {
+            action: c.action.clone(),
+            skill: c.skill.clone(),
+        });
         self.revision += 1;
-        self.turn = 1 - me;
-        self.deadline = now + Duration::from_secs(TURN_SECONDS);
+        if self.choices.iter().all(Option::is_some) {
+            self.resolve(now, rolls);
+        }
+        Ok(())
+    }
+    fn check_end(&mut self, now: Instant) -> bool {
+        let alive = self.fighters.each_ref().map(|f| f.hp > 0);
         if !alive[0] || !alive[1] {
             self.finish(
                 if alive[0] {
@@ -334,10 +269,216 @@ impl Battle {
                 "knockout",
                 now,
             );
-        } else if self.revision >= 100 {
-            self.finish(None, "round_limit", now);
+            true
+        } else {
+            false
         }
-        Ok(())
+    }
+    fn resolve(&mut self, now: Instant, rolls: [i32; 3]) {
+        self.events.clear();
+        self.lines = vec![format!("第{}回合，双方指令已锁定。", self.round)];
+        self.resolved_round = self.round;
+        for i in 0..2 {
+            self.fighters[i].effects.reset_turn();
+            // Guard is a round-wide defensive commitment, independent of initiative.
+            self.fighters[i].guarding = self.choices[i].as_ref().unwrap().action == "guard"
+                && self.fighters[1 - i].effects.enemy_sleep == 0;
+        }
+        let first = match self.fighters[0].speed.cmp(&self.fighters[1].speed) {
+            std::cmp::Ordering::Greater => 0,
+            std::cmp::Ordering::Less => 1,
+            std::cmp::Ordering::Equal => (rolls[0].rem_euclid(2)) as usize,
+        };
+        for me in [first, 1 - first] {
+            let choice = self.choices[me].as_ref().unwrap().clone();
+            let skill = choice.skill.as_deref().and_then(skills::item);
+            let (a, b) = self.fighters.split_at_mut(1);
+            let (actor, enemy) = if me == 0 {
+                (&mut a[0], &mut b[0])
+            } else {
+                (&mut b[0], &mut a[0])
+            };
+            let dot = (if enemy.effects.enemy_bleed > 0 {
+                enemy.effects.bleed_damage
+            } else {
+                0
+            }) + (if enemy.effects.enemy_poison > 0 {
+                enemy.effects.poison_damage
+            } else {
+                0
+            });
+            enemy.effects.enemy_bleed = (enemy.effects.enemy_bleed - 1).max(0);
+            enemy.effects.enemy_poison = (enemy.effects.enemy_poison - 1).max(0);
+            actor.hp = (actor.hp - dot).max(0);
+            let mut action = choice.action.clone();
+            let mut used = String::new();
+            let mut damage = 0;
+            let mut reflected = 0;
+            if dot > 0 {
+                self.lines
+                    .push(format!("{}受到{}点持续伤害。", actor.name, dot));
+            }
+            if actor.hp == 0 {
+                action = "dot".into();
+            } else if enemy.effects.enemy_sleep > 0 {
+                action = "sleep".into();
+                self.lines.push(format!("{}沉睡中，跳过行动。", actor.name));
+            } else if choice.action == "skill"
+                && (enemy.effects.enemy_silence > 0 || skill.is_none_or(|s| actor.mp < s.mp_cost))
+            {
+                action = "fizzle".into();
+                self.lines
+                    .push(format!("{}的施法因封印或灵力不足而失败。", actor.name));
+            } else {
+                let roll = rolls[1 + me];
+                let raw = match choice.action.as_str() {
+                    "attack" => {
+                        actor.effects.enemy_sleep = 0;
+                        actor
+                            .effects
+                            .critical((actor.stats.attack - enemy.stats.defense).max(1), roll)
+                    }
+                    "skill" => {
+                        let s = skill.unwrap();
+                        used = s.id.clone();
+                        actor.effects.enemy_mp = enemy.mp;
+                        let hit = actor.effects.cast(
+                            s,
+                            actor.stats,
+                            &mut actor.hp,
+                            &mut actor.mp,
+                            enemy.stats.defense,
+                            roll,
+                        );
+                        if s.effect == "mana_steal" {
+                            enemy.mp = actor.effects.enemy_mp;
+                        }
+                        actor.effects.critical(hit, roll)
+                    }
+                    "guard" => {
+                        actor.mp = (actor.mp + 5).min(actor.stats.mp);
+                        0
+                    }
+                    _ => 0,
+                };
+                let incoming = if enemy.guarding { raw / 2 } else { raw };
+                (damage, reflected) = if incoming > 0 {
+                    enemy
+                        .effects
+                        .enemy_hit(incoming, choice.action == "skill" && actor.job == 2)
+                } else {
+                    (0, 0)
+                };
+                enemy.hp = (enemy.hp - damage).max(0);
+                actor.hp = (actor.hp - reflected).max(0);
+                enemy.effects.last_incoming = damage;
+                enemy.effects.last_reflected = reflected;
+                actor.effects.last_damage = damage;
+                actor.effects.last_reflected = reflected;
+                self.lines.push(format!(
+                    "{}{}，造成{}点伤害。",
+                    actor.name,
+                    if action == "guard" {
+                        "防御"
+                    } else if action == "skill" {
+                        skill.unwrap().name.as_str()
+                    } else {
+                        "攻击"
+                    },
+                    damage
+                ));
+                if reflected > 0 {
+                    self.lines.push(format!("反弹{}点伤害。", reflected));
+                }
+            }
+            self.events.push(Event {
+                actor: self.fighters[me].id,
+                action,
+                skill: used,
+                damage,
+                reflected,
+                fighters: self.fighters.clone(),
+            });
+            if self.check_end(now) {
+                break;
+            }
+        }
+        if self.ended.is_none() {
+            for f in &mut self.fighters {
+                if f.effects.regen > 0 {
+                    let heal = f.effects.regen_amount.min(f.stats.hp - f.hp);
+                    f.hp += heal;
+                    f.effects.regen -= 1;
+                }
+                let refreshed = skills::item(&f.effects.last_skill)
+                    .map(|s| s.effect.as_str())
+                    .unwrap_or("");
+                for (name, n) in [
+                    ("defense", &mut f.effects.defense),
+                    ("crit", &mut f.effects.crit),
+                    ("reflect_physical", &mut f.effects.reflect_physical),
+                    ("reflect_magic", &mut f.effects.reflect_magic),
+                ] {
+                    if name != refreshed {
+                        *n = (*n - 1).max(0);
+                    }
+                }
+                f.effects.enemy_sleep = (f.effects.enemy_sleep - 1).max(0);
+                f.effects.enemy_silence = (f.effects.enemy_silence - 1).max(0);
+            }
+            if let Some(e) = self.events.last_mut() {
+                e.fighters = self.fighters.clone();
+            }
+            if self.round >= MAX_ROUNDS {
+                self.finish(None, "round_limit", now);
+            } else {
+                self.resume_at = Some(now + Duration::from_secs(PLAYBACK_SECONDS));
+            }
+        }
+        self.revision += 1;
+    }
+    fn tick(&mut self, now: Instant) -> bool {
+        if self.ended.is_some() {
+            return false;
+        }
+        if let Some(resume) = self.resume_at {
+            if now < resume {
+                return false;
+            }
+            self.resume_at = None;
+            self.round += 1;
+            self.decision_revision += 1;
+            self.choices = [None, None];
+            for f in &mut self.fighters {
+                f.guarding = false;
+            }
+            self.deadline = now + Duration::from_secs(TURN_SECONDS);
+            self.revision += 1;
+            return true;
+        }
+        if now < self.deadline {
+            return false;
+        }
+        for choice in &mut self.choices {
+            if choice.is_none() {
+                *choice = Some(Choice {
+                    action: "guard".into(),
+                    skill: None,
+                });
+            }
+        }
+        use rand::Rng;
+        let mut rng = rand::thread_rng();
+        self.resolve(
+            now,
+            [
+                rng.gen_range(0..100),
+                rng.gen_range(0..100),
+                rng.gen_range(0..100),
+            ],
+        );
+        self.lines.insert(0, "未提交的指令已默认防御。".into());
+        true
     }
 }
 
@@ -429,7 +570,6 @@ impl Arena {
         offer: Uuid,
         who: Uuid,
         fighters: [Fighter; 2],
-        first: usize,
         now: Instant,
     ) -> Result<Uuid, &'static str> {
         let o = self.offers.get(&offer).ok_or("DUEL_INVITE_EXPIRED")?;
@@ -451,12 +591,14 @@ impl Arena {
                 id,
                 fighters,
                 revision: 0,
-                turn: first,
+                round: 1,
+                decision_revision: 0,
+                resolved_round: 0,
+                choices: [None, None],
+                events: vec![],
+                resume_at: None,
                 winner: None,
                 reason: String::new(),
-                last_actor: None,
-                last_action: String::new(),
-                last_skill: String::new(),
                 lines: vec!["双方已确认，决斗开始。".into()],
                 deadline: now + Duration::from_secs(TURN_SECONDS),
                 ended: None,
@@ -479,11 +621,11 @@ impl Arena {
         who: Uuid,
         c: &Command,
         now: Instant,
-        roll: i32,
+        rolls: [i32; 3],
     ) -> Result<(), &'static str> {
         let id = *self.slots.get(&who).ok_or("DUEL_NOT_FOUND")?;
         let b = self.battles.get_mut(&id).ok_or("DUEL_NOT_FOUND")?;
-        b.act(who, c, now, roll)?;
+        b.act(who, c, now, rolls)?;
         let ids = [b.fighters[0].id, b.fighters[1].id];
         self.touch(&ids, "");
         Ok(())
@@ -507,7 +649,7 @@ impl Arena {
             .slots
             .get(&id)
             .and_then(|b| self.battles.get(b))
-            .map(|b| b.view(now));
+            .map(|b| b.view(id, now));
         Some((
             rev,
             json!({"type":"duel.state","revision":rev.to_string(),"incoming":incoming,"outgoing":outgoing,"battle":battle,"notice":self.notices.get(&id).map_or("",String::as_str)}),
@@ -535,8 +677,8 @@ impl Arena {
                 .position(|f| !available.get(&f.id).is_some_and(|v| v.0));
             if let Some(i) = lost {
                 b.finish(Some(b.fighters[1 - i].id), "disconnect", now);
-            } else if b.deadline <= now {
-                b.finish(Some(b.fighters[1 - b.turn].id), "turn_timeout", now);
+            } else if b.tick(now) {
+                changed.extend(b.fighters.iter().map(|f| f.id));
             }
             if b.ended.is_some() {
                 changed.extend(b.fighters.iter().map(|f| f.id));

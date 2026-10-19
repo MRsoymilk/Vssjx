@@ -107,11 +107,10 @@ impl WorldHub {
                     let mut state=self.data.lock().expect("world state");
                     if !state.actors.get(&peer).is_some_and(|a|Self::owned(a,&other))||!state.actors.get(&owner.id).is_some_and(|a|Self::owned(a,owner)){return Err(("DUEL_PLAYER_OFFLINE",0));}
                     let fighters=[Fighter::from_snapshot(&from,state.actors[&peer].appearance).map_err(|e|(e,0))?,Fighter::from_snapshot(&to,state.actors[&owner.id].appearance).map_err(|e|(e,0))?];
-                    let first=rand::random::<bool>() as usize;
-                    state.duels.start(c.invite_id.unwrap(),owner.id,fighters,first,Instant::now()).map_err(|e|(e,0))?;
+                    state.duels.start(c.invite_id.unwrap(),owner.id,fighters,Instant::now()).map_err(|e|(e,0))?;
                     for who in [owner.id,peer]{state.actors.get_mut(&who).unwrap().motion.stop();}state.revision+=1;
                 },
-                _=>self.data.lock().expect("world state").duels.act(owner.id,c,Instant::now(),rand::thread_rng().gen_range(0..100)).map_err(|e|(e,0))?,
+                _=>self.data.lock().expect("world state").duels.act(owner.id,c,Instant::now(),[rand::thread_rng().gen_range(0..100),rand::thread_rng().gen_range(0..100),rand::thread_rng().gen_range(0..100)]).map_err(|e|(e,0))?,
             }
             Ok(())
         }.await;

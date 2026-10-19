@@ -13,25 +13,32 @@ var received_at := 0
 var last_code := ""
 var cooldowns: Dictionary = {}
 var _last_notice := ""
-const ERRORS := {"DUEL_REJECT_COOLDOWN":"对方已拒绝，请在5分钟冷却结束后再次邀请。", "DUEL_BUSY":"你或对方正忙，暂时不能决斗。", "DUEL_SELF":"不能邀请自己决斗。", "DUEL_PLAYER_OFFLINE":"对方已离线，或客户端尚未支持决斗。", "DUEL_DIFFERENT_MAP":"只能邀请同地图玩家。", "DUEL_INVITE_EXPIRED":"决斗邀请已失效。", "DUEL_NOT_YOUR_TURN":"请等待对方行动。", "DUEL_STALE_REVISION":"回合已更新，请重新选择行动。", "DUEL_FORBIDDEN":"不能处理其他玩家的邀请或决斗。", "DUEL_RATE_LIMITED":"操作过快，请稍后再试。", "DUEL_SILENCED":"受到禁言效果，暂时不能施展技能。", "MP_INSUFFICIENT":"灵力不足。", "DATABASE_UNAVAILABLE":"服务暂不可用，请稍后重试。"}
+var _locked_battle := ""
+var _locked_revision := ""
+const ERRORS := {"DUEL_ALREADY_SUBMITTED":"本回合指令已锁定，等待对方选择。","DUEL_RESOLVING":"双方指令已锁定，正在结算。","DUEL_DECISION_EXPIRED":"选择时间已到，未提交的指令将默认防御。","DUEL_REJECT_COOLDOWN":"对方已拒绝，请在5分钟冷却结束后再次邀请。", "DUEL_BUSY":"你或对方正忙，暂时不能决斗。", "DUEL_SELF":"不能邀请自己决斗。", "DUEL_PLAYER_OFFLINE":"对方已离线，或客户端尚未支持决斗。", "DUEL_DIFFERENT_MAP":"只能邀请同地图玩家。", "DUEL_INVITE_EXPIRED":"决斗邀请已失效。", "DUEL_NOT_YOUR_TURN":"请等待对方行动。", "DUEL_STALE_REVISION":"回合已更新，请重新选择行动。", "DUEL_FORBIDDEN":"不能处理其他玩家的邀请或决斗。", "DUEL_RATE_LIMITED":"操作过快，请稍后再试。", "DUEL_SILENCED":"受到禁言效果，暂时不能施展技能。", "MP_INSUFFICIENT":"灵力不足。", "DATABASE_UNAVAILABLE":"服务暂不可用，请稍后重试。"}
 
 func bind_character(id: String) -> void:
 	character_id = id
-	state = {};request = {};cooldowns = {};connected = false;enabled = false;_last_notice = ""
+	state = {};request = {};cooldowns = {};connected = false;enabled = false;_last_notice = "";_locked_battle="";_locked_revision=""
 
 func disconnect_channel() -> void:
 	connected = false
 	changed.emit()
 
 func clear() -> void:
-	state = {};request = {};connected = false
+	state = {};request = {};connected = false;_locked_battle="";_locked_revision=""
 	changed.emit()
 
 func active() -> bool:
 	return state.get("battle") is Dictionary and state.battle.status == "active"
 
-func my_turn() -> bool:
-	return active() and state.battle.turn == character_id
+func can_decide()->bool:
+	if not active() or not connected or state.battle.phase!="planning":return false
+	var b:Dictionary=state.battle
+	var me:=0 if b.fighters[0].id==character_id else 1
+	return not b.submitted[me] and not (b.id==_locked_battle and b.decision_revision==_locked_revision) and int(b.remaining_ms)>Time.get_ticks_msec()-received_at
+
+func my_turn() -> bool:return can_decide()
 
 func pending() -> bool: return not request.is_empty()
 
@@ -51,7 +58,7 @@ func submit(action: String, target: String = "") -> bool:
 	elif action in ["attack", "skill", "guard", "flee"]:
 		if not active() or (not my_turn() and action != "flee"): return false
 		command.battle_id = state.battle.id
-		command.expected_revision = state.battle.revision
+		command.expected_revision = state.battle.decision_revision
 		if action == "skill": command.skill = target
 	else: return false
 	var bytes := Crypto.new().generate_random_bytes(16)
@@ -77,23 +84,39 @@ func _offer(value: Variant, incoming: bool) -> bool:
 	if value == null: return true
 	return value is Dictionary and OnlineWorldClient._uuid(value.get("id")) and OnlineWorldClient._uuid(value.get("from")) and OnlineWorldClient._uuid(value.get("to")) and value.from != value.to and value.get("to" if incoming else "from") == character_id and OnlineAccount.valid_nickname(value.get("from_name", "")) and OnlineAccount.valid_nickname(value.get("to_name", "")) and OnlineWorldClient._integer(value.get("remaining_ms"), 0, 30000)
 
+func _fighter(fighter:Variant)->bool:
+	if not fighter is Dictionary or not OnlineWorldClient._uuid(fighter.get("id")) or not OnlineAccount.valid_nickname(fighter.get("name","")):return false
+	if not OnlineWorldClient._integer(fighter.get("job"),0,2) or not OnlineWorldClient._integer(fighter.get("gender"),0,1) or not OnlineWorldClient._integer(fighter.get("school"),0,3) or not OnlineWorldClient._integer(fighter.get("level"),1,60) or not OnlineWorldClient._integer(fighter.get("speed"),100,400):return false
+	if not fighter.get("stats") is Dictionary or not fighter.get("effects") is Dictionary or not fighter.get("appearance") is Array or fighter.appearance.size()!=3 or not fighter.get("guarding") is bool:return false
+	if not SkillRules.valid_state(fighter.effects):return false
+	for key in ["hp","mp","attack","defense"]:
+		if not OnlineWorldClient._integer(fighter.stats.get(key),0 if key=="mp" else 1,100000):return false
+	if not OnlineWorldClient._integer(fighter.get("hp"),0,int(fighter.stats.hp)) or not OnlineWorldClient._integer(fighter.get("mp"),0,int(fighter.stats.mp)):return false
+	return ShopRules.valid_appearance(fighter.appearance)
+
 func _battle(value: Variant) -> bool:
-	if value == null: return true
-	if not value is Dictionary or not OnlineWorldClient._uuid(value.get("id")) or not OnlineWorldClient._decimal(value.get("revision")) or value.get("status") not in ["active", "finished"] or not value.get("fighters") is Array or value.fighters.size() != 2: return false
-	var ids := []
-	for fighter in value.fighters:
-		if not fighter is Dictionary or not OnlineWorldClient._uuid(fighter.get("id")) or ids.has(fighter.id) or not OnlineAccount.valid_nickname(fighter.get("name", "")): return false
-		ids.append(fighter.id)
-		if not OnlineWorldClient._integer(fighter.get("job"), 0, 2) or not OnlineWorldClient._integer(fighter.get("gender"), 0, 1) or not OnlineWorldClient._integer(fighter.get("school"), 0, 3) or not OnlineWorldClient._integer(fighter.get("level"), 1, 60): return false
-		if not fighter.get("stats") is Dictionary or not fighter.get("effects") is Dictionary or not fighter.get("appearance") is Array or fighter.appearance.size() != 3: return false
-		if not SkillRules.valid_state(fighter.effects): return false
-		for key in ["hp", "mp", "attack", "defense"]:
-			if not OnlineWorldClient._integer(fighter.stats.get(key), 0 if key == "mp" else 1, 100000): return false
-		if not OnlineWorldClient._integer(fighter.get("hp"), 0, int(fighter.stats.hp)) or not OnlineWorldClient._integer(fighter.get("mp"), 0, int(fighter.stats.mp)): return false
-		for i in 3:
-			if not OnlineWorldClient._integer(fighter.appearance[i], 0, ShopRules.APPEARANCE_LIMITS[i]): return false
-	if not character_id in ids or value.get("turn") not in ids or (value.get("winner") != null and value.winner not in ids) or (value.get("last_actor") != null and value.last_actor not in ids): return false
-	return value.get("lines") is Array and value.lines.size() <= 12 and value.lines.all(func(line: Variant)->bool:return line is String and line.length() <= 200) and value.get("last_action") is String and value.get("last_skill") is String and value.last_skill.length() <= 32 and OnlineWorldClient._integer(value.get("remaining_ms"), 0, 30000)
+	if value==null:return true
+	if not value is Dictionary or not OnlineWorldClient._uuid(value.get("id")) or not OnlineWorldClient._decimal(value.get("revision")) or not OnlineWorldClient._decimal(value.get("decision_revision")) or value.get("status") not in ["active","finished"] or not value.get("fighters") is Array or value.fighters.size()!=2:return false
+	var ids:Array=[]
+	for f in value.fighters:
+		if not _fighter(f) or ids.has(f.id):return false
+		ids.append(f.id)
+	if not character_id in ids or value.get("winner")!=null and value.winner not in ids:return false
+	if value.has("choices") or value.has("turn") or not OnlineWorldClient._integer(value.get("round"),1,50) or int(value.decision_revision)!=int(value.round)-1 or not OnlineWorldClient._integer(value.get("resolved_round"),0,int(value.round)):return false
+	if value.get("phase") not in ["planning","resolving","finished"] or (value.status=="finished")!=(value.phase=="finished"):return false
+	if not value.get("submitted") is Array or value.submitted.size()!=2 or not value.submitted.all(func(v:Variant)->bool:return v is bool):return false
+	if value.phase=="resolving" and not value.submitted.all(func(v:bool)->bool:return v):return false
+	var me:=ids.find(character_id)
+	var choice:Variant=value.get("your_choice")
+	if (choice!=null)!=bool(value.submitted[me]):return false
+	if choice!=null and (not choice is Dictionary or choice.get("action") not in ["attack","skill","guard"] or (choice.action=="skill" and (not choice.get("skill") is String or SkillRules.item(choice.skill).is_empty()))):return false
+	if not value.get("events") is Array or value.events.size()>2:return false
+	for e in value.events:
+		if not e is Dictionary or e.get("actor") not in ids or e.get("action") not in ["attack","skill","guard","sleep","fizzle","dot"] or not e.get("skill") is String or e.skill.length()>32 or (e.action=="skill" and SkillRules.item(e.skill).is_empty()):return false
+		if not OnlineWorldClient._integer(e.get("damage"),0,100000) or not OnlineWorldClient._integer(e.get("reflected"),0,100000) or not e.get("fighters") is Array or e.fighters.size()!=2:return false
+		for i in 2:
+			if not _fighter(e.fighters[i]) or e.fighters[i].id!=ids[i]:return false
+	return value.get("lines") is Array and value.lines.size()<=12 and value.lines.all(func(line:Variant)->bool:return line is String and line.length()<=200) and OnlineWorldClient._integer(value.get("remaining_ms"),0,30000)
 
 func receive(packet: Dictionary) -> bool:
 	if packet.get("type") == "duel.result":
@@ -101,6 +124,8 @@ func receive(packet: Dictionary) -> bool:
 		if not pending() or request.request_id != packet.request_id: return true
 		last_code = "" if packet.ok else packet.code
 		if packet.code == "DUEL_REJECT_COOLDOWN" and request.action == "invite": cooldowns[request.target] = Time.get_ticks_msec() + int(packet.retry_after_ms)
+		if (packet.ok or packet.code=="DUEL_ALREADY_SUBMITTED") and request.action in ["attack","skill","guard"]:
+			_locked_battle=request.battle_id;_locked_revision=request.expected_revision
 		request = {}
 		if not packet.ok: message.emit(ERRORS.get(packet.code, "决斗操作未完成：" + packet.code))
 		changed.emit();return true

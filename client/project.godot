@@ -11,9 +11,9 @@ config_version=5
 [application]
 
 config/name="蜀山剑侠 · 归来"
-config/icon="res://assets/ui/app_icon.png"
 run/main_scene="res://scenes/main.tscn"
 config/features=PackedStringArray("4.7", "GL Compatibility")
+config/icon="res://assets/ui/app_icon.png"
 config/quit_on_go_back.android=false
 
 [autoload]
@@ -34,9 +34,9 @@ window/handheld/orientation.android=1
 
 [rendering]
 
-2d/snap/snap_2d_transforms_to_pixel=true
 textures/canvas_textures/default_texture_filter=0
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
 textures/vram_compression/import_etc2_astc=true
 environment/defaults/default_clear_color=Color(0.045, 0.075, 0.1, 1)
+2d/snap/snap_2d_transforms_to_pixel=true

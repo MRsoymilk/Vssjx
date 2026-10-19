@@ -20,3 +20,6 @@ __pycache__/
 
 # Obsolete lobby can be re-saved by an editor tab; active lobby is character_selection.
 /client/scenes/ui/online_characters.tscn
+
+# Obsolete duplicate admin popup can be re-saved by an editor tab.
+/client/scenes/admin/world_overview_popup.tscn

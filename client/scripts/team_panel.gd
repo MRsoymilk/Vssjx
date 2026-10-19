@@ -16,7 +16,7 @@ func _ready()->void:
 	hint=OriginalSceneChrome.label(paper,"",Rect2(12,334,280,32),11,INK);hint.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
 	var back:=_button(paper,"返回");back.position=Vector2(114,371);back.size=Vector2(76,28);back.pressed.connect(dismiss)
 	for i in 4:
-		var corner:=TextureRect.new();corner.texture=preload("res://assets/ui/chat_corner.png");corner.size=Vector2(14,14);corner.position=Vector2(0 if i%2==0 else 290,0 if i<2 else 396);corner.flip_h=i%2==1;corner.flip_v=i>=2;corner.mouse_filter=MOUSE_FILTER_IGNORE;paper.add_child(corner)
+		var corner:=TextureRect.new();corner.texture=preload("res://assets/ui/chat_corner.png");corner.size=Vector2(14,14);corner.position=Vector2(0 if i%2==0 else 290,0 if i<2 else 396);corner.flip_h=i%2==1;corner.flip_v=i<2;corner.mouse_filter=MOUSE_FILTER_IGNORE;paper.add_child(corner)
 	model.changed.connect(refresh);model.message.connect(func(text:String)->void:hint.text=text)
 	refresh()
 func _button(parent:Node,text:String)->Button:

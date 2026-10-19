@@ -58,7 +58,7 @@ impl Battle {
         source: Vec<ResidentDefinition>,
         now: i64,
     ) -> Self {
-        assert!((2..=MAX_MEMBERS).contains(&fighters.len()) && !source.is_empty());
+        assert!((1..=MAX_MEMBERS).contains(&fighters.len()) && !source.is_empty());
         let extra = fighters.len() as i32 - 1;
         let enemies = source
             .into_iter()
@@ -91,7 +91,7 @@ impl Battle {
             deadline_ms: now + TURN_MS,
             last_action_ms: now,
             events: vec![],
-            lines: vec!["队伍遭遇战开始，全员各自选择指令。".into()],
+            lines: vec!["遭遇战开始，参战成员各自选择指令。".into()],
         }
     }
     pub fn active(&self) -> bool {
@@ -101,8 +101,8 @@ impl Battle {
         self.outcome = outcome.into();
         self.lines.push(
             match outcome {
-                "victory" => "战斗胜利！全队获得分配奖励。",
-                "defeat" => "战斗失败，全队恢复元气。",
+                "victory" => "战斗胜利！参战成员获得分配奖励。",
+                "defeat" => "战斗失败，参战成员恢复元气。",
                 _ => "队伍退出本次战斗，无击败奖励。",
             }
             .into(),

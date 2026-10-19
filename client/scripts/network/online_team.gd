@@ -10,7 +10,7 @@ var next_poll:=0
 var received_at:=0
 var server_time:=0
 var supported:=true
-const ERRORS:={"TEAM_MEMBER_REQUIRED":"队长负责带队，无需跟随。","TEAM_NOT_READY":"队友还没准备好，请全员停稳后点击准备。","TEAM_NOT_TOGETHER":"请全员在同一地图、队长附近集合并停稳。","TEAM_LEADER_REQUIRED":"只能由队长进行此操作。","TEAM_LEADER_MUST_TRANSFER":"请先移交队长，或解散队伍。","TEAM_PLAYER_OFFLINE":"队友已离线，请等待重连或调整队伍。","TEAM_BUSY":"有队员正在单人战斗或决斗中。","TEAM_FULL":"队伍最多5人。","TEAM_NEEDS_MEMBERS":"至少两人组队才能共同战斗。","TEAM_BATTLE_ACTIVE":"正在组队战斗，不能更改队伍。","TEAM_NOT_YOUR_TURN":"请等待当前队友行动。","INVALID_BATTLE_TARGET":"目标已倒下，请重新选择。","TEAM_INVITE_EXPIRED":"邀请已过期或已被处理。","TEAM_INVITE_PENDING":"已发送邀请，请等待对方确认。","TEAM_INVITE_COOLDOWN":"对方已拒绝，请5分钟后再邀请。","ALREADY_IN_TEAM":"你或对方已加入队伍。","MONSTER_RESPAWNING":"有队员的怪物尚未刷新，请稍候。","RESIDENT_TOO_FAR":"请队长靠近怪物。","QUEST_REQUIRED":"有队员尚未领取入门任务，请先找清微道人。","STALE_BATTLE":"战场已更新，请重新选择指令。","NO_ACTIVE_BATTLE":"战斗已经结束。","NOT_IN_TEAM":"尚未加入队伍。","MP_INSUFFICIENT":"灵力不足。","NO_POTION":"没有回春散。","HP_FULL":"气血已满。","NOT_FOUND":"服务尚未支持组队，需要更新游戏服务。","RATE_LIMITED":"操作过快，请稍候。","SESSION_REPLACED":"当前角色已在另一会话进入游戏。"}
+const ERRORS:={"TEAM_MEMBER_REQUIRED":"队长负责带队，无需跟随。","TEAM_NOT_READY":"在线跟随队员尚未准备，请停稳后在队伍窗口准备。","TEAM_NOT_TOGETHER":"请参战队员在同一地图、队长附近集合并停稳。","TEAM_LEADER_REQUIRED":"只能由队长进行此操作。","TEAM_LEADER_MUST_TRANSFER":"请先移交队长，或解散队伍。","TEAM_PLAYER_OFFLINE":"队友已离线，请等待重连或调整队伍。","TEAM_BUSY":"有队员正在单人战斗或决斗中。","TEAM_FULL":"队伍最多5人。","TEAM_NEEDS_MEMBERS":"至少两人组队才能共同战斗。","TEAM_BATTLE_ACTIVE":"正在组队战斗，不能更改队伍。","TEAM_NOT_YOUR_TURN":"请等待当前队友行动。","INVALID_BATTLE_TARGET":"目标已倒下，请重新选择。","TEAM_INVITE_EXPIRED":"邀请已过期或已被处理。","TEAM_INVITE_PENDING":"已发送邀请，请等待对方确认。","TEAM_INVITE_COOLDOWN":"对方已拒绝，请5分钟后再邀请。","ALREADY_IN_TEAM":"你或对方已加入队伍。","MONSTER_RESPAWNING":"有队员的怪物尚未刷新，请稍候。","RESIDENT_TOO_FAR":"请队长靠近怪物。","QUEST_REQUIRED":"有队员尚未领取入门任务，请先找清微道人。","STALE_BATTLE":"战场已更新，请重新选择指令。","NO_ACTIVE_BATTLE":"战斗已经结束。","NOT_IN_TEAM":"尚未加入队伍。","MP_INSUFFICIENT":"灵力不足。","NO_POTION":"没有回春散。","HP_FULL":"气血已满。","NOT_FOUND":"服务尚未支持组队，需要更新游戏服务。","RATE_LIMITED":"操作过快，请稍候。","SESSION_REPLACED":"当前角色已在另一会话进入游戏。"}
 func bind_character(id:String)->void:
 	character_id=id;request={};inflight=false;next_poll=0;state={"team":null,"incoming":[]}
 	var saved:Dictionary=OnlineAccount.pending_team
@@ -67,6 +67,7 @@ func valid(v:Dictionary)->bool:
 	var p:Variant=s.team
 	if p==null:return true
 	if not p is Dictionary or not OnlineWorldClient._uuid(p.get("id")) or not p.get("leader") is bool or not p.get("members") is Array or p.members.is_empty() or p.members.size()>5 or not p.has("battle") or not p.get("outgoing") is Array or p.outgoing.size()>10:return false
+	if p.has("battle_active") and not p.battle_active is bool:return false
 	var ids:={};var leaders:=0
 	for m in p.members:
 		if not preload("res://scripts/network/online_social.gd").person(m) or ids.has(m.id) or not m.get("ready") is bool or not m.get("following",true) is bool or not m.get("leader") is bool or not SharedWorldMap.exists(m.get("map_id")):return false
@@ -77,7 +78,7 @@ func valid(v:Dictionary)->bool:
 		if not offer is Dictionary or not OnlineWorldClient._uuid(offer.get("id")) or not OnlineAccount.valid_nickname(offer.get("name","")):return false
 	var b:Variant=p.battle
 	if b==null:return true
-	if not b is Dictionary or not OnlineWorldClient._uuid(b.get("id")) or b.get("outcome") not in ["active","victory","defeat","fled"] or not b.get("fighters") is Array or b.fighters.size()<2 or b.fighters.size()>5 or not b.get("enemies") is Array or b.enemies.size()<2 or b.enemies.size()>5 or not b.get("events") is Array or b.events.size()>40 or not b.get("lines") is Array:return false
+	if not b is Dictionary or not OnlineWorldClient._uuid(b.get("id")) or b.get("outcome") not in ["active","victory","defeat","fled"] or not b.get("fighters") is Array or b.fighters.is_empty() or b.fighters.size()>5 or not b.get("enemies") is Array or b.enemies.is_empty() or b.enemies.size()>5 or not b.get("events") is Array or b.events.size()>40 or not b.get("lines") is Array:return false
 	if not OnlinePve.integer(b.get("turn"),0,b.fighters.size()-1) or not OnlinePve.integer(b.get("revision"),0,1000) or not OnlinePve.integer(b.get("round"),1,61) or not OnlinePve.integer(b.get("deadline_ms"),0,253402300799999):return false
 	var fighters:={}
 	for f in b.fighters:

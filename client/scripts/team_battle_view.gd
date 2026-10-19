@@ -117,7 +117,7 @@ func _choose(action:String)->void:
 				inspect_panel.get_node("NameValue").text=e.definition.name
 				inspect_panel.get_node("Hp").text="气血 %d / %d"%[int(e.hp),int(e.definition.hp)]
 				inspect_panel.get_node("Secondary").text="攻击 %d　防御 %d"%[int(e.definition.attack),int(e.definition.defense)]
-				inspect_panel.get_node("Tertiary").text="组队强化 · Lv.%d"%int(e.definition.level);inspect_panel.show();return
+				inspect_panel.get_node("Tertiary").text=("组队强化" if model.battle().fighters.size()>1 else "独自迎战")+" · Lv.%d"%int(e.definition.level);inspect_panel.show();return
 	if action=="skill":
 		for f in model.battle().fighters:
 			if f.id==model.character_id:picker.present(int(f.job),int(f.school),int(f.level),int(f.mp));picker.show();return

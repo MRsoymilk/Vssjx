@@ -8,6 +8,7 @@ var confirmation:Dictionary={}
 var summary:Label
 var footer:HBoxContainer
 var member_scroll:ScrollContainer
+var tip:Label
 const Chrome=preload("res://scripts/social_chrome.gd")
 const INK:=Color("654518")
 func _ready()->void:
@@ -15,7 +16,7 @@ func _ready()->void:
 	var shade:=ColorRect.new();shade.color=Color(0,0,0,.6);shade.size=Vector2(320,480);add_child(shade)
 	var paper:=Chrome.frame(self,Rect2(8,28,304,418),"队　伍")
 	summary=OriginalSceneChrome.label(paper,"",Rect2(14,38,276,22),13,INK)
-	var tip:=OriginalSceneChrome.label(paper,"跟随队长集合，停稳并准备后由队长迎战。",Rect2(14,62,276,30),11,INK)
+	tip=OriginalSceneChrome.label(paper,"",Rect2(14,62,276,30),11,INK)
 	tip.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
 	var scroll:=ScrollContainer.new();scroll.name="Members";scroll.position=Vector2(14,96);scroll.size=Vector2(276,212);scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED;paper.add_child(scroll)
 	member_scroll=scroll
@@ -44,8 +45,10 @@ func _member(m:Dictionary)->void:
 	var title:=OriginalSceneChrome.label(content,m.display_name+("（你）" if m.id==model.character_id else ""),Rect2(74,3,180,22),13,INK);title.text_overrun_behavior=TextServer.OVERRUN_TRIM_ELLIPSIS;title.tooltip_text=m.display_name
 	OriginalSceneChrome.label(content,"Lv.%d　%s"%[int(m.level),["力士","侠客","隐者"][clampi(int(m.job),0,2)]],Rect2(55,24,122,16),11,INK)
 	OriginalSceneChrome.label(content,"离线" if not m.online else "队长" if m.leader else "跟随中" if m.get("following",true) else "暂离",Rect2(55,40,122,16),11,INK)
-	var ready:=OriginalSceneChrome.panel(content,Rect2(180,29,73,22),Color("d8e0a1") if m.ready and m.online else Color("ead6a0"),Color("9c8442"))
-	var status:=OriginalSceneChrome.label(ready,"已准备" if m.ready and m.online else "未就绪",Rect2(0,0,73,22),11,Color("36562a") if m.ready and m.online else INK);status.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;status.vertical_alignment=VERTICAL_ALIGNMENT_CENTER
+	var participating:bool=m.online and (m.leader or m.get("following",true))
+	var prepared:bool=participating and (m.leader or m.ready)
+	var ready:=OriginalSceneChrome.panel(content,Rect2(180,29,73,22),Color("d8e0a1") if prepared else Color("ead6a0"),Color("9c8442"))
+	var status:=OriginalSceneChrome.label(ready,"不参战" if not participating else "带队迎战" if m.leader else "已准备" if m.ready else "未准备",Rect2(0,0,73,22),11,Color("36562a") if prepared else INK);status.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;status.vertical_alignment=VERTICAL_ALIGNMENT_CENTER
 func _actions(actions:Array,parent:Node=null)->void:
 	var h:=HBoxContainer.new();(rows if parent==null else parent).add_child(h)
 	h.size_flags_horizontal=SIZE_EXPAND_FILL
@@ -64,8 +67,10 @@ func refresh()->void:
 	var p:Dictionary=model.party()
 	var ready_count:=0
 	for m in p.get("members",[]):
-		if m.ready and m.online:ready_count+=1
+		if m.online and (m.leader or (m.get("following",true) and m.ready)):ready_count+=1
 	summary.text="尚未组队 · 最多五人同行" if p.is_empty() else "%d / 5 人　·　%d 人已准备"%[p.members.size(),ready_count]
+	tip.text="离线、暂离不参战；队长迎战，跟随队员需准备。"
+	if p.get("battle_active",false) and not model.active():tip.text="队友正在战斗；本轮未参战，结束后可重新集合。"
 	if not confirmation.is_empty():
 		_label(confirmation.text)
 		_actions([["确认",func()->void:model.submit(confirmation.action,confirmation.id);confirmation={};refresh()],["取消",func()->void:confirmation={};refresh()]])
@@ -81,8 +86,9 @@ func refresh()->void:
 		_member(m)
 		var actions:Array=[["资料",func()->void:profile_requested.emit(m.id)]]
 		if m.id==model.character_id:
-			actions.append(["取消准备" if m.ready else "准备",func()->void:model.submit("ready","","",not m.ready)])
-			if not m.leader:actions.append(["暂离" if m.get("following",true) else "跟随队长",func()->void:model.submit("follow","","",not m.get("following",true))])
+			if not m.leader:
+				if m.get("following",true):actions.append(["取消准备" if m.ready else "准备",func()->void:model.submit("ready","","",not m.ready)])
+				actions.append(["暂离" if m.get("following",true) else "跟随队长",func()->void:model.submit("follow","","",not m.get("following",true))])
 		elif p.leader:
 			actions.append(["移交",func()->void:confirm("transfer",m.id,"将队长移交给%s？"%m.display_name)])
 			actions.append(["移出",func()->void:confirm("kick",m.id,"将%s移出队伍？"%m.display_name)])

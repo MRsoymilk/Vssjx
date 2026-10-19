@@ -113,9 +113,21 @@ func _run()->void:
 	await get_tree().process_frame;await get_tree().process_frame
 	check(view.motion!=null and view.queue.is_empty(),"Group attack plays one cast for all five target impacts")
 	await get_tree().create_timer(1.6).timeout
+	var solo:=encounter();solo.id="99999999-9999-4999-8999-999999999999";solo.fighters.resize(1);solo.enemies.resize(1)
+	model.refresh();model.tick(true)
+	var solo_packet:=response(model,state(solo))
+	check(model.receive(solo_packet) and model.my_turn() and view.visible and view.actors.size()==2,"Leader can retain the party and render a one-participant encounter")
+	view._choose("inspect")
+	check(view.inspect_panel.get_node("Tertiary").text.contains("独自迎战"),"Lone encounter never claims a party strength multiplier")
+	view.inspect_panel.hide();await get_tree().process_frame;await get_tree().process_frame;await capture("team_solo")
+	model.refresh();model.tick(true)
+	var empty_fight:=response(model,state(solo));empty_fight.state.team.battle.fighters=[]
+	check(not model.valid(empty_fight),"A zero-participant encounter remains invalid")
 	panel.queue_free();view.queue_free();await get_tree().process_frame
 	var world:OnlineWorldView=load("res://scenes/ui/online_world_view.tscn").instantiate();world.character_id=SELF;add_child(world);world.set_process(false);world.network.set_process(false)
 	world._scene_action("team");check(world.team_panel.visible and not world.details.visible,"Team menu replaces placeholder")
+	world.team.state=state();world.team.state.team.battle_active=true;world.team_panel.refresh()
+	check(world.team_panel.tip.text.contains("本轮未参战"),"Reconnecting or away member is told the team already has an encounter")
 	world.team_panel.dismiss();world.team.state=state(encounter());world.team.changed.emit()
 	check(world.team_battle.visible and world.network.team_active,"Shared encounter activates world movement gate")
 	world.network.world_ready=true;world.network._state="ready";world.network._pending_motion={"type":"world.move_to"}

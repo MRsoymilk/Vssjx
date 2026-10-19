@@ -545,23 +545,30 @@ async fn apply(
             }
         }
         "challenge" => {
-            let ids = members(tx, team).await?;
-            if ids.len() < 2 {
-                return Err(err("TEAM_NEEDS_MEMBERS"));
+            // Membership survives disconnects; only online followers join a new
+            // encounter. Never load, reserve, charge or reward absent members.
+            let rows = sqlx::query("SELECT character_id,ready,following FROM team_members WHERE team_id=$1 ORDER BY leader DESC,joined_at,character_id")
+                .bind(team).fetch_all(&mut **tx).await.map_err(db)?;
+            let mut ids = vec![];
+            let mut contexts = vec![];
+            for row in rows {
+                let id: Uuid = row.get("character_id");
+                if id != me && !row.get::<bool, _>("following") {
+                    continue;
+                }
+                let member = match hub.team_context(id) {
+                    Ok(member) => member,
+                    Err(e) if id != me && e.1 == "TEAM_PLAYER_OFFLINE" => continue,
+                    Err(e) => return Err(e),
+                };
+                // Choosing the encounter is the leader's confirmation. Online
+                // followers must still explicitly prepare; do not omit them.
+                if id != me && !row.get::<bool, _>("ready") {
+                    return Err(err("TEAM_NOT_READY"));
+                }
+                ids.push(id);
+                contexts.push(member);
             }
-            let ready: bool =
-                sqlx::query_scalar("SELECT bool_and(ready) FROM team_members WHERE team_id=$1")
-                    .bind(team)
-                    .fetch_one(&mut **tx)
-                    .await
-                    .map_err(db)?;
-            if !ready {
-                return Err(err("TEAM_NOT_READY"));
-            }
-            let contexts = ids
-                .iter()
-                .map(|id| hub.team_context(*id))
-                .collect::<Result<Vec<_>, _>>()?;
             if contexts.iter().any(|p| {
                 p.map_id != context.map_id
                     || (p.cell[0] - context.cell[0]).abs() + (p.cell[1] - context.cell[1]).abs() > 8
@@ -594,7 +601,11 @@ async fn apply(
                 })
                 .collect();
             let mut sources = vec![enemy.clone()];
-            let n = (ids.len() + usize::from(rand::random::<bool>())).min(5);
+            let n = if ids.len() == 1 {
+                1
+            } else {
+                (ids.len() + usize::from(rand::random::<bool>())).min(5)
+            };
             for i in 1..n {
                 sources.push(pool.get((i-1) % pool.len().max(1)).unwrap_or(&enemy).clone());
             }
@@ -615,9 +626,9 @@ async fn snapshot(
     let team = if let Some((id, leader)) = membership(tx, me).await? {
         let rows=sqlx::query("SELECT c.id,c.display_name,c.job,c.gender,c.level,c.map_id,m.leader,m.ready,m.following FROM team_members m JOIN characters c ON c.id=m.character_id WHERE m.team_id=$1 ORDER BY m.leader DESC,m.joined_at,c.id").bind(id).fetch_all(&mut **tx).await.map_err(db)?;
         let members:Vec<_>=rows.into_iter().map(|r|{let id:Uuid=r.get("id");json!({"id":id,"display_name":r.get::<String,_>("display_name"),"job":r.get::<i16,_>("job"),"gender":r.get::<i16,_>("gender"),"level":r.get::<i32,_>("level"),"map_id":r.get::<String,_>("map_id"),"leader":r.get::<bool,_>("leader"),"ready":r.get::<bool,_>("ready"),"following":r.get::<bool,_>("following"),"online":online.contains(&id)})}).collect();
-        let b = battle(tx, id)
-            .await?
-            .filter(|b| b.fighters.iter().any(|f| f.id == me));
+        let current = battle(tx, id).await?;
+        let battle_active = current.as_ref().is_some_and(|b| b.active());
+        let b = current.filter(|b| b.fighters.iter().any(|f| f.id == me));
         let rows = if leader {
             sqlx::query("SELECT i.id,c.display_name FROM team_invites i JOIN characters c ON c.id=i.target WHERE i.team_id=$1 AND i.status='pending' ORDER BY i.expires_at,i.id").bind(id).fetch_all(&mut **tx).await.map_err(db)?
         } else {
@@ -627,7 +638,7 @@ async fn snapshot(
             .iter()
             .map(|r| json!({"id":r.get::<Uuid,_>("id"),"name":r.get::<String,_>("display_name")}))
             .collect();
-        json!({"id":id,"leader":leader,"members":members,"battle":b,"outgoing":outgoing})
+        json!({"id":id,"leader":leader,"members":members,"battle":b,"battle_active":battle_active,"outgoing":outgoing})
     } else {
         Value::Null
     };

@@ -34,6 +34,25 @@ fn encounter() -> Battle {
     )
 }
 #[test]
+fn lone_participant_keeps_base_stats_and_can_complete_rounds() {
+    let f = fighter(1, 20);
+    let original = population::definitions().into_iter().find(|d| d.kind != "npc").unwrap();
+    let mut b = Battle::new("qingyun_trail".into(), vec![f], vec![original.clone()], 1000);
+    assert_eq!(b.enemies.len(), 1);
+    assert_eq!((b.enemies[0].hp, b.enemies[0].definition.attack, b.enemies[0].definition.defense),
+               (original.hp, original.attack, original.defense));
+    let me = b.fighters[0].id;
+    b.act(me, "guard", None, None, 2000, 99).unwrap();
+    assert_eq!(b.turn, 0);
+    assert_eq!(b.round, 2);
+    assert_eq!(b.events.len(), 1);
+    assert_eq!(b.events[0].target, me.to_string());
+    b.enemies[0].hp = 1;
+    b.act(me, "attack", Some("m0"), None, 3000, 99).unwrap();
+    assert_eq!(b.outcome, "victory");
+    assert_eq!(b.events.len(), 1);
+}
+#[test]
 fn party_scaling_and_multiple_targets() {
     let b = encounter();
     assert_eq!(b.enemies.len(), 3);

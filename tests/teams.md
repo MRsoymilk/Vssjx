@@ -6,6 +6,7 @@
 cargo test --locked --manifest-path server/Cargo.toml --test team_rules
 python -X utf8 tests/run_teams.py
 python -X utf8 tests/run_team_follow.py
+python -X utf8 tests/run_team_participation.py
 ```
 
 集成脚本使用独立临时数据库，覆盖双方确认、角色／队长权限、准备限制、共享战场、强化怪物、多目标、逐人回合、群攻消耗、禁止单人旁路、审计失败回滚、重复胜利回执及重启恢复。
@@ -19,3 +20,5 @@ python -X utf8 tests/run_team_follow.py
 跟随验证使用独立临时数据库和真实 WebSocket，覆盖默认跟随、暂离、手动移动拒绝、逐人传送条件、快照保留过图路线、换房、服务重启、队长移交、移出及解散。设置 `GODOT_BIN` 时额外运行 `res://tests/team_follow_live_test.tscn`，由真实客户端无手动输入地跟随并自动过图；`team_test.tscn` 同时验证原包三色旗帜、名字旁定位和暂离按钮。
 
 持久化依赖 `0019_teams.sql` 和 `0022_team_follow.sql`。上述入口不能替代千人组队混合负载验收。
+
+`run_team_participation.py` 使用独立 PostgreSQL 与真实 WebSocket，验证离线成员不阻塞、在线跟随队员仍需准备、三人队籍仅两人参战的强化倍率、缺席者重连不能补入战场、暂离且已准备仍不参战、仅队长时一只原始数值怪、胜利重试不重复奖励，以及未参战者资源／药品／任务／冷却不变。`team_rules` 覆盖单人推进回合和胜利；`team_test.tscn` 覆盖单人战场接收与两名战斗实体、查看面板、空参战名单拒绝和未参战提示，截图 `team_solo`。

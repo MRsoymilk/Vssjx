@@ -39,8 +39,8 @@ func _ready()->void:
 	for i in 6:
 		var button:Button=menu.get_node("BattleButtons%d"%i);action_buttons.append(button);button.pressed.connect(_choose.bind(commands[i]))
 	action_buttons[2].text="3 防御";action_buttons[5].text="6 撤退"
-	command_toggle=OriginalSceneChrome.button(self,"战斗指令",Rect2(115,326,90,30),13)
-	command_toggle.add_theme_stylebox_override("normal",menu.get_theme_stylebox("panel"));command_toggle.add_theme_color_override("font_color",Color("654518"));command_toggle.pressed.connect(func()->void:menu.visible=not menu.visible)
+	command_toggle=preload("res://scripts/social_chrome.gd").placed_button(self,"战斗指令",Rect2(115,326,90,30))
+	command_toggle.pressed.connect(func()->void:menu.visible=not menu.visible)
 	inspect_panel=preload("res://scenes/ui/battle_inspect.tscn").instantiate();add_child(inspect_panel);inspect_panel.size.y=140;inspect_panel.hide()
 	var close:=OriginalSceneChrome.button(inspect_panel,"返回",Rect2(57,112,50,24),12);close.add_theme_color_override("font_color",Color("654518"));close.pressed.connect(inspect_panel.hide)
 	picker=SkillPicker.new();add_child(picker);picker.position.y=-28;picker.hide();picker.chosen.connect(func(id:String)->void:picker.hide();_send("skill",id));picker.dismissed.connect(picker.hide)

@@ -9,20 +9,16 @@ var panel: Panel
 var caption: Label
 var confirm: Button
 var reject: Button
+const Chrome = preload("res://scripts/social_chrome.gd")
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	z_index = 25
-	panel = OriginalSceneChrome.panel(self,Rect2(4,105,218,77),Color("294d74"),Color("eed18b"))
-	panel.mouse_filter = Control.MOUSE_FILTER_STOP
-	caption = OriginalSceneChrome.label(panel,"",Rect2(8,6,202,28),12,Color("fff3b5"))
+	panel = Chrome.frame(self,Rect2(4,100,218,112),"切磋邀请")
+	caption = OriginalSceneChrome.label(panel,"",Rect2(14,36,190,32),12,Chrome.INK)
 	caption.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	confirm = OriginalSceneChrome.button(panel,"确认",Rect2(8,40,84,29),13)
-	reject = OriginalSceneChrome.button(panel,"拒绝",Rect2(126,40,84,29),13)
-	for button in [confirm,reject]:
-		var style := StyleBoxFlat.new()
-		style.bg_color = Color("365f84");style.border_color = Color("e8d28f");style.set_border_width_all(1)
-		button.add_theme_stylebox_override("normal",style)
+	confirm = Chrome.placed_button(panel,"确认",Rect2(14,74,84,30))
+	reject = Chrome.placed_button(panel,"拒绝",Rect2(120,74,84,30))
 	confirm.pressed.connect(func()->void:
 		if channel == null: return
 		if channel.state.get("incoming") is Dictionary: reply_requested.emit("accept")

@@ -5,28 +5,50 @@ var model:RefCounted
 var rows:VBoxContainer
 var hint:Label
 var confirmation:Dictionary={}
+var summary:Label
+var footer:HBoxContainer
+var member_scroll:ScrollContainer
+const Chrome=preload("res://scripts/social_chrome.gd")
 const INK:=Color("654518")
 func _ready()->void:
 	z_index=20
 	var shade:=ColorRect.new();shade.color=Color(0,0,0,.6);shade.size=Vector2(320,480);add_child(shade)
-	var paper:=OriginalSceneChrome.panel(self,Rect2(8,30,304,410),Color("fff1b8"),Color("bb7b25"));paper.mouse_filter=MOUSE_FILTER_STOP
-	OriginalSceneChrome.label(paper,"队伍",Rect2(12,10,270,30),18,INK)
-	var scroll:=ScrollContainer.new();scroll.position=Vector2(12,48);scroll.size=Vector2(280,280);scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED;paper.add_child(scroll)
+	var paper:=Chrome.frame(self,Rect2(8,28,304,418),"队　伍")
+	summary=OriginalSceneChrome.label(paper,"",Rect2(14,38,276,22),13,INK)
+	var tip:=OriginalSceneChrome.label(paper,"跟随队长集合，停稳并准备后由队长迎战。",Rect2(14,62,276,30),11,INK)
+	tip.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+	var scroll:=ScrollContainer.new();scroll.name="Members";scroll.position=Vector2(14,96);scroll.size=Vector2(276,212);scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED;paper.add_child(scroll)
+	member_scroll=scroll
+	var track:=StyleBoxFlat.new();track.bg_color=Color("e4cd8b");track.content_margin_left=6
+	var thumb:=StyleBoxFlat.new();thumb.bg_color=Color("a36b22");thumb.border_color=Color("f4d68c");thumb.set_border_width_all(1)
+	var bar:=scroll.get_v_scroll_bar();bar.add_theme_stylebox_override("scroll",track)
+	for state in ["grabber","grabber_highlight","grabber_pressed"]:bar.add_theme_stylebox_override(state,thumb)
 	rows=VBoxContainer.new();rows.size_flags_horizontal=SIZE_EXPAND_FILL;rows.add_theme_constant_override("separation",5);scroll.add_child(rows)
-	hint=OriginalSceneChrome.label(paper,"",Rect2(12,334,280,32),11,INK);hint.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
-	var back:=_button(paper,"返回");back.position=Vector2(114,371);back.size=Vector2(76,28);back.pressed.connect(dismiss)
-	for i in 4:
-		var corner:=TextureRect.new();corner.texture=preload("res://assets/ui/chat_corner.png");corner.size=Vector2(14,14);corner.position=Vector2(0 if i%2==0 else 290,0 if i<2 else 396);corner.flip_h=i%2==1;corner.flip_v=i<2;corner.mouse_filter=MOUSE_FILTER_IGNORE;paper.add_child(corner)
+	footer=HBoxContainer.new();footer.position=Vector2(14,314);footer.size=Vector2(276,30);paper.add_child(footer)
+	hint=OriginalSceneChrome.label(paper,"",Rect2(14,347,276,20),10,INK);hint.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+	OriginalSceneChrome.panel(paper,Rect2(8,369,288,41),Color("b97a24"),Color("d8a64e"))
+	var back:=Chrome.placed_button(paper,"返回",Rect2(110,374,84,30));back.name="Back";back.pressed.connect(dismiss)
 	model.changed.connect(refresh);model.message.connect(func(text:String)->void:hint.text=text)
 	refresh()
 func _button(parent:Node,text:String)->Button:
-	var b:=Button.new();b.text=text;b.custom_minimum_size.y=30
-	var style:=StyleBoxFlat.new();style.bg_color=Color("ac6b20");style.border_color=Color("e8c67b");style.set_border_width_all(1)
-	b.add_theme_stylebox_override("normal",style);b.add_theme_color_override("font_color",Color("fff4bd"));b.add_theme_font_size_override("font_size",12);parent.add_child(b);return b
+	return Chrome.button(parent,text)
 func _label(text:String)->void:
 	var l:=Label.new();l.text=text;l.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;l.custom_minimum_size=Vector2(260,26);l.add_theme_font_size_override("font_size",12);l.add_theme_color_override("font_color",INK);rows.add_child(l)
-func _actions(actions:Array)->void:
-	var h:=HBoxContainer.new();rows.add_child(h)
+func _member(m:Dictionary)->void:
+	var card:=PanelContainer.new();card.name="MemberCard";card.custom_minimum_size=Vector2(260,58);rows.add_child(card)
+	var style:=StyleBoxFlat.new();style.bg_color=Color("f9e8aa") if m.id!=model.character_id else Color("f5dda0");style.border_color=Color("bd923f");style.set_border_width_all(1);card.add_theme_stylebox_override("panel",style)
+	var content:=Control.new();card.add_child(content)
+	OriginalSceneChrome.panel(content,Rect2(5,6,44,44),Color("d6b96e"),INK)
+	var portrait:=TextureRect.new();portrait.name="Portrait";portrait.texture=load("res://assets/ui/create_portrait_%d.png"%(clampi(int(m.job),0,2)*2+clampi(int(m.gender),0,1)));portrait.texture_filter=TEXTURE_FILTER_NEAREST;portrait.position=Vector2(7,8);portrait.size=Vector2(40,40);portrait.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;portrait.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;portrait.mouse_filter=MOUSE_FILTER_IGNORE;content.add_child(portrait)
+	var flag:=TextureRect.new();flag.name="Flag";flag.texture=load("res://assets/ui/team_%s.png"%("leader" if m.leader else "member" if m.get("following",true) else "away"));flag.texture_filter=TEXTURE_FILTER_NEAREST;flag.position=Vector2(55,5);flag.size=Vector2(15,18);flag.mouse_filter=MOUSE_FILTER_IGNORE;content.add_child(flag)
+	var title:=OriginalSceneChrome.label(content,m.display_name+("（你）" if m.id==model.character_id else ""),Rect2(74,3,180,22),13,INK);title.text_overrun_behavior=TextServer.OVERRUN_TRIM_ELLIPSIS;title.tooltip_text=m.display_name
+	OriginalSceneChrome.label(content,"Lv.%d　%s"%[int(m.level),["力士","侠客","隐者"][clampi(int(m.job),0,2)]],Rect2(55,24,122,16),11,INK)
+	OriginalSceneChrome.label(content,"离线" if not m.online else "队长" if m.leader else "跟随中" if m.get("following",true) else "暂离",Rect2(55,40,122,16),11,INK)
+	var ready:=OriginalSceneChrome.panel(content,Rect2(180,29,73,22),Color("d8e0a1") if m.ready and m.online else Color("ead6a0"),Color("9c8442"))
+	var status:=OriginalSceneChrome.label(ready,"已准备" if m.ready and m.online else "未就绪",Rect2(0,0,73,22),11,Color("36562a") if m.ready and m.online else INK);status.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;status.vertical_alignment=VERTICAL_ALIGNMENT_CENTER
+func _actions(actions:Array,parent:Node=null)->void:
+	var h:=HBoxContainer.new();(rows if parent==null else parent).add_child(h)
+	h.size_flags_horizontal=SIZE_EXPAND_FILL
 	for a in actions:
 		var b:=_button(h,a[0]);b.size_flags_horizontal=SIZE_EXPAND_FILL;b.disabled=model.pending() or model.inflight;b.pressed.connect(a[1])
 func open()->void:show();model.refresh();refresh()
@@ -34,7 +56,16 @@ func dismiss()->void:confirmation={};hide();dismissed.emit()
 func confirm(action:String,id:String,text:String)->void:confirmation={"action":action,"id":id,"text":text};refresh()
 func refresh()->void:
 	if not is_node_ready():return
+	# Polling must not jump away from the member being inspected at the bottom.
+	var scroll_offset:=member_scroll.scroll_vertical
 	for c in rows.get_children():rows.remove_child(c);c.queue_free()
+	for c in footer.get_children():footer.remove_child(c);c.queue_free()
+	member_scroll.set_deferred("scroll_vertical",scroll_offset if confirmation.is_empty() else 0)
+	var p:Dictionary=model.party()
+	var ready_count:=0
+	for m in p.get("members",[]):
+		if m.ready and m.online:ready_count+=1
+	summary.text="尚未组队 · 最多五人同行" if p.is_empty() else "%d / 5 人　·　%d 人已准备"%[p.members.size(),ready_count]
 	if not confirmation.is_empty():
 		_label(confirmation.text)
 		_actions([["确认",func()->void:model.submit(confirmation.action,confirmation.id);confirmation={};refresh()],["取消",func()->void:confirmation={};refresh()]])
@@ -42,15 +73,12 @@ func refresh()->void:
 	for offer in model.state.incoming:
 		_label("%s 邀请你加入队伍"%offer.name)
 		_actions([["同意",func()->void:model.submit("accept",offer.id)],["拒绝",func()->void:model.submit("reject",offer.id)]])
-	var p:Dictionary=model.party()
 	if p.is_empty():
 		_label("尚未加入任何队伍。\n点击其他玩家资料中的“邀请组队”，或先创建队伍。")
 		_actions([["创建队伍",func()->void:model.submit("create")],["刷新",func()->void:model.refresh()]])
 		return
-	_label("%d / 5人 · %s"%[p.members.size(),"你是队长" if p.leader else "队长发起战斗"])
-	_label("入队后自动跟随队长；可暂离自由行动。全员停稳并准备后，队长发起战斗。")
 	for m in p.members:
-		_label("%s Lv.%d%s\n%s · %s"%[m.display_name,int(m.level)," · 队长" if m.leader else "",("在线 · " if m.online else "离线 · ")+("带队" if m.leader else ("跟随" if m.get("following",true) else "暂离")),"已准备" if m.ready else "未准备"])
+		_member(m)
 		var actions:Array=[["资料",func()->void:profile_requested.emit(m.id)]]
 		if m.id==model.character_id:
 			actions.append(["取消准备" if m.ready else "准备",func()->void:model.submit("ready","","",not m.ready)])
@@ -62,4 +90,4 @@ func refresh()->void:
 	for offer in p.outgoing:
 		_label("已邀请%s，等待确认"%offer.name)
 		_actions([["取消邀请",func()->void:model.submit("cancel",offer.id)]])
-	_actions([["解散队伍" if p.leader else "退出队伍",func()->void:confirm("disband" if p.leader else "leave","","确定%s当前队伍？"%("解散" if p.leader else "退出"))],["刷新",func()->void:model.refresh()]])
+	_actions([["解散队伍" if p.leader else "退出队伍",func()->void:confirm("disband" if p.leader else "leave","","确定%s当前队伍？"%("解散" if p.leader else "退出"))],["刷新",func()->void:model.refresh()]],footer)

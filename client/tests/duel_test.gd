@@ -46,6 +46,7 @@ func _run() -> void:
 	check(view.duel_invitation.visible and view.duel_invitation.panel.position.x==4 and view.duel_invitation.confirm.text=="确认" and view.duel_invitation.reject.text=="拒绝","Invitation is on the left with explicit accept/reject buttons")
 	check(not duel.active() and not view.duel_battle.visible,"Being invited cannot start battle")
 	await capture("invitation")
+	check(view.duel_invitation.caption.get_rect().end.y<=view.duel_invitation.confirm.position.y and view.duel_invitation.confirm.get_rect().end.y<view.duel_invitation.panel.size.y,"Invitation text and touch controls fit within the frame")
 	view.duel_invitation.reject.pressed.emit()
 	check(sent.size()==1 and sent[0].command.action=="reject" and sent[0].command.invite_id==OFFER,"Reject button addresses only its server-issued invitation")
 	check(duel.pending() and view.duel_invitation.confirm.disabled,"Pending reply disables repeated confirmation")

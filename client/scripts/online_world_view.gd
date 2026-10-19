@@ -74,6 +74,7 @@ var team_notice:Panel
 var team_notice_text:Label
 var team_confirm:Button
 var team_reject:Button
+const SocialChrome = preload("res://scripts/social_chrome.gd")
 
 func _ready() -> void:
 	team.bind_character(character_id)
@@ -82,10 +83,11 @@ func _ready() -> void:
 	team_panel.profile_requested.connect(func(id:String)->void:team_panel.dismiss();_open_social("profile",id))
 	team_battle=preload("res://scenes/ui/team_battle_view.tscn").instantiate();team_battle.model=team;add_child(team_battle)
 	team_battle.dismissed.connect(func()->void:screen.hud.show();count_label.show();_set_battle_layout(false);team.refresh())
-	team_notice=OriginalSceneChrome.panel(self,Rect2(4,186,216,75),Color("294d74"),Color("eed18b"));team_notice.z_index=26;team_notice.mouse_filter=MOUSE_FILTER_STOP
-	team_notice_text=OriginalSceneChrome.label(team_notice,"",Rect2(8,5,200,27),12,Color("fff3b5"))
-	team_confirm=OriginalSceneChrome.button(team_notice,"同意",Rect2(8,39,86,28),13)
-	team_reject=OriginalSceneChrome.button(team_notice,"拒绝",Rect2(122,39,86,28),13)
+	team_notice=SocialChrome.frame(self,Rect2(4,218,218,112),"组队邀请");team_notice.z_index=26
+	team_notice_text=OriginalSceneChrome.label(team_notice,"",Rect2(14,36,190,32),12,SocialChrome.INK)
+	team_notice_text.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+	team_confirm=SocialChrome.placed_button(team_notice,"同意",Rect2(14,74,84,30))
+	team_reject=SocialChrome.placed_button(team_notice,"拒绝",Rect2(120,74,84,30))
 	team_confirm.pressed.connect(func()->void:if not team.state.incoming.is_empty():team.submit("accept",team.state.incoming[0].id))
 	team_reject.pressed.connect(func()->void:if not team.state.incoming.is_empty():team.submit("reject",team.state.incoming[0].id))
 	team_notice.hide()

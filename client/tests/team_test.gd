@@ -36,8 +36,26 @@ func _run()->void:
 	model.tick(false);check(sent.is_empty(),"Offline transport cannot dispatch team operations")
 	model.tick(true);check(model.receive(response(model,state())),"Initial versioned team state validates")
 	var panel:Control=load("res://scenes/ui/team_panel.tscn").instantiate();panel.model=model;add_child(panel);panel.show()
-	check(panel.rows.get_child_count()>5,"Team window shows members and their readiness")
+	check(panel.rows.get_children().filter(func(row:Node)->bool:return row is PanelContainer).size()==2,"Team window shows one portrait card per member")
+	await get_tree().process_frame
+	var back:Button=panel.find_child("Back",true,false)
+	check(back!=null and is_equal_approx(back.get_rect().get_center().x,back.get_parent().size.x/2) and back.get_rect().end.y<=back.get_parent().size.y-12,"Return stays centered inside the footer with clearance above the gold frame")
 	await capture("team")
+	var preview:=state()
+	for i in 3:
+		var m:=member([TEAM,BATTLE,"55555555-5555-4555-8555-555555555555"][i]);m.job=i;m.gender=i%2;m.following=i!=1;m.online=i!=2;m.ready=i==0;m.display_name="天涯明月清风剑客" if i==2 else ["青云力士","花间隐者"][i%2];preview.team.members.append(m)
+	model.state=preview;panel.refresh();await get_tree().process_frame;await get_tree().process_frame
+	check(panel.rows.get_children().filter(func(row:Node)->bool:return row is PanelContainer).size()==5,"Full team retains every member including offline and away players")
+	var scroll:ScrollContainer=panel.rows.get_parent()
+	check(scroll.get_v_scroll_bar().max_value>scroll.size.y and panel.footer.get_global_rect().position.y>=scroll.get_global_rect().end.y,"Five-member list scrolls without covering persistent management buttons")
+	await capture("team_five")
+	scroll.scroll_vertical=int(scroll.get_v_scroll_bar().max_value);await get_tree().process_frame
+	var bottom:=scroll.scroll_vertical;panel.refresh();await get_tree().process_frame;await get_tree().process_frame
+	check(scroll.scroll_vertical==bottom,"Background team refresh preserves the member being inspected")
+	await capture("team_five_bottom")
+	panel.confirm("disband","","确定解散当前队伍？");await capture("team_confirmation")
+	model.state={"team":null,"incoming":[]};panel.confirmation={};panel.refresh();await capture("team_empty")
+	model.state=state();panel.refresh()
 	panel.hide()
 	var view:Control=load("res://scenes/ui/team_battle_view.tscn").instantiate();view.model=model;add_child(view)
 	model.refresh();model.tick(true)
@@ -104,6 +122,10 @@ func _run()->void:
 	world.network._receive({"type":"error","code":"TEAM_BATTLE_ACTIVE"},PackedByteArray())
 	check(world.network.world_ready and world.network._pending_motion.is_empty(),"A late movement refusal cannot disconnect a team player")
 	world.team_battle.hide();world.network.team_active=false
+	world.team.state={"team":null,"incoming":[{"id":OTHER,"name":"天涯明月清风剑客"}]};world.team.changed.emit()
+	check(world.team_notice.visible and not world.team_notice.get_global_rect().intersects(world.duel_invitation.panel.get_global_rect()),"Left team and duel invitations have separate touch areas")
+	await capture("team_invitation")
+	world.team.state=state();world.team.changed.emit()
 	world.network._team_version=1
 	var mark:={SELF:{"leader":true,"following":true},OTHER:{"leader":false,"following":true},TEAM:{"leader":false,"following":false}}
 	var packet:={"type":"world.team","map_id":"qingyun_trail","members":mark,"following":true,"travel":null}

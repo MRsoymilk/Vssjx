@@ -31,8 +31,8 @@ class PortalPageTests(unittest.TestCase):
 
     def test_only_explicit_game_and_existing_download_links(self):
         links = [attrs['href'] for tag, attrs in self.page.elements if tag == 'a']
-        self.assertIn('/webgame/', links)
-        self.assertIn('/downloads/vssjx-arm64.apk', links)
+        self.assertIn('/go/webgame', links)
+        self.assertIn('/go/android', links)
         self.assertIn('#game', links)
         self.assertNotIn('#download', links)
         self.assertNotIn('/flarum/', links)
@@ -43,8 +43,8 @@ class PortalPageTests(unittest.TestCase):
     def test_platforms_share_one_game_entry_without_web_first_navigation(self):
         game = self.html.split('<article class="destination-card game-card"', 1)[1].split('</article>', 1)[0]
         self.assertIn('id="game"', game)
-        self.assertIn('href="/webgame/"', game)
-        self.assertIn('href="/downloads/vssjx-arm64.apk"', game)
+        self.assertIn('href="/go/webgame"', game)
+        self.assertIn('href="/go/android"', game)
         hero = self.html.split('<section class="hero"', 1)[1].split('</section>', 1)[0]
         self.assertIn('href="#game"', hero)
         self.assertNotIn('href="/webgame/"', hero)

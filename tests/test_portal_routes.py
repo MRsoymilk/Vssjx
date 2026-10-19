@@ -145,11 +145,11 @@ class PortalRouteTests(unittest.TestCase):
                 time.sleep(0.05)
 
     @classmethod
-    def request(cls, path, headers=None, plain=False):
+    def request(cls, path, headers=None, plain=False, method='GET'):
         connection = (http.client.HTTPConnection('127.0.0.1', cls.http_port, timeout=5) if plain else
                       http.client.HTTPSConnection('127.0.0.1', cls.https_port, context=cls.context, timeout=5))
         try:
-            connection.request('GET', path, headers=headers or {})
+            connection.request(method, path, headers=headers or {})
             response = connection.getresponse()
             return response.status, response.headers, response.read()
         finally:
@@ -270,6 +270,34 @@ class PortalRouteTests(unittest.TestCase):
         self.assertEqual(status, 301)
         self.assertTrue(headers['Location'].endswith('/webgame/?from=old'))
         self.assertTrue(headers['Location'].startswith('https://'))
+
+    def test_fixed_entry_redirects_and_private_event_log(self):
+        from portal_stats.store import parse_event
+        secret = 'synthetic-do-not-log-credential'
+        for path, target in (('/go/webgame', '/webgame/'), ('/go/android', '/downloads/vssjx-arm64.apk')):
+            status, headers, _ = self.request(path + '?next=https://untrusted.invalid&token=' + secret,
+                                             {'Authorization': 'Bearer ' + secret, 'User-Agent': secret})
+            self.assertEqual(status, 302)
+            self.assertTrue(headers['Location'].endswith(target))
+            self.assertNotIn('untrusted', headers['Location'])
+        self.request('/')
+        self.request('/webgame/')
+        self.request('/downloads/vssjx-arm64.apk', {'Range': 'bytes=0-3'})
+        logs = subprocess.check_output(['docker', 'logs', self.container], stderr=subprocess.DEVNULL)
+        events = [parse_event(line) for line in logs.splitlines() if line.startswith(b'VSSJX_PORTAL_V1 ')]
+        routes = {entry['route'] for entry in events}
+        self.assertTrue({'portal', 'game', 'web_click', 'android_click', 'apk'} <= routes)
+        self.assertTrue(any(entry['route'] == 'apk' and entry['status'] == 206 and entry['bytes'] == 4 for entry in events))
+        raw_events = b'\n'.join(line for line in logs.splitlines() if line.startswith(b'VSSJX_PORTAL_V1 '))
+        for forbidden in (secret.encode(), b'127.0.0.1', b'/api/', b'Authorization', b'User-Agent', b'next='):
+            self.assertNotIn(forbidden, raw_events)
+        before = {entry['id'] for entry in events}
+        self.request('/go/android', method='HEAD')
+        self.request('/api/v1/server-info', {'Authorization': secret})
+        self.request('/navigation/portal.css')
+        later = subprocess.check_output(['docker', 'logs', self.container], stderr=subprocess.DEVNULL)
+        after = {parse_event(line)['id'] for line in later.splitlines() if line.startswith(b'VSSJX_PORTAL_V1 ')}
+        self.assertEqual(before, after, 'HEAD, API and portal assets do not produce analytics events')
 
 
 if __name__ == '__main__':

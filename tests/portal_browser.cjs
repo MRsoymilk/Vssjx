@@ -17,6 +17,11 @@ let browser, checks = 0;
 const check = (condition, message) => {assert.ok(condition, message); checks++; console.log('PASS: ' + message);};
 const server = http.createServer((request, response) => {
   requests.push(request.url);
+  if (request.url === '/go/webgame' || request.url === '/go/android') {
+    response.writeHead(302, {Location: request.url === '/go/webgame' ? '/webgame/' : '/downloads/vssjx-arm64.apk'});
+    response.end();
+    return;
+  }
   // Inert documents only for the explicit same-origin storage migration check.
   if (request.url === '/index.html' || request.url === '/webgame/') {
     response.setHeader('Content-Type', 'text/html; charset=utf-8');
@@ -49,7 +54,7 @@ const server = http.createServer((request, response) => {
       check(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), name + ': no horizontal overflow');
       check(await page.getByRole('button', {name: '论坛筹备中'}).isDisabled(), name + ': forum stays disabled');
       check(await page.getByRole('link', {name: '开始游戏'}).getAttribute('href') === '#game', name + ': platform-neutral game selection');
-      check(await page.locator('#game a[href="/webgame/"]').count() === 1 && await page.locator('#game a[href="/downloads/vssjx-arm64.apk"]').count() === 1, name + ': Web and Android are choices in one game item');
+      check(await page.locator('#game a[href="/go/webgame"]').count() === 1 && await page.locator('#game a[href="/go/android"]').count() === 1, name + ': Web and Android are choices in one game item');
       check(await page.locator('.hero-icon').evaluate(image => image.complete && image.naturalWidth === 256), name + ': reused icon decoded');
       await page.screenshot({path: path.join(output, name + '.png'), fullPage: true});
     }
@@ -81,7 +86,7 @@ const server = http.createServer((request, response) => {
     await page.goto(base);
     await page.getByRole('link', {name: '开始游戏'}).click();
     check(new URL(page.url()).hash === '#game', 'Main action selects the game item without defaulting to Web');
-    await page.locator('#game a[href="/webgame/"]').click();
+    await page.locator('#game a[href="/go/webgame"]').click();
     check(new URL(page.url()).pathname === '/webgame/' && (await storage('read')).value === saved, 'Explicit game link preserves same-origin IndexedDB after passing through navigation');
     check(errors.length === 0, 'Storage path check has no browser errors');
     fs.writeFileSync(path.join(output, 'requests.json'), JSON.stringify(requests, null, 2));

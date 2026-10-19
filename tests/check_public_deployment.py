@@ -39,7 +39,7 @@ def main():
     with tempfile.TemporaryDirectory(prefix='vssjx-public-check-') as temporary:
         base = Path(temporary)
         (base / 'deploy').mkdir()
-        for name in ['compose.yaml', 'public.compose.yaml', 'public.tls.compose.yaml', 'public.web.compose.yaml']:
+        for name in ['compose.yaml', 'public.compose.yaml', 'public.tls.compose.yaml', 'public.web.compose.yaml', 'public.apks.compose.yaml']:
             shutil.copyfile(ROOT / 'deploy' / name, base / 'deploy' / name)
         (base / '.env').write_text('SSJX_POSTGRES_PASSWORD=owned-test-only\n'
                                  'SSJX_DATABASE_URL=postgresql://vssjx:owned-test-only@127.0.0.1:5432/vssjx\n'
@@ -77,6 +77,10 @@ def main():
         mounts = web['services']['nginx']['volumes']
         check(len([m for m in mounts if m['target'] == '/etc/nginx/conf.d/default.conf']) == 1 and any(m['source'].endswith('public.web.https.nginx.conf') for m in mounts), 'Web overlay selects exactly one HTTPS configuration')
         check(any(m['target'] == '/usr/share/nginx/html' and m['read_only'] and not m['bind']['create_host_path'] for m in mounts), 'Web export is mounted read-only without creating an empty source directory')
+        (base / 'deploy/portal-apks.local.env').write_text('SSJX_APK_PUBLIC_ROOT=/owned-fixture/apk-public\n', encoding='utf-8')
+        managed = config(['--env-file', 'deploy/portal-apks.local.env', '-f', 'deploy/public.tls.compose.yaml', '-f', 'deploy/public.web.compose.yaml', '-f', 'deploy/public.apks.compose.yaml'])
+        check(any(m['target'] == '/srv/vssjx-apks' and m['read_only'] and not m['bind']['create_host_path'] for m in managed['services']['nginx']['volumes']), 'Managed APK overlay mounts only its explicit public directory read-only')
+        check(managed['services']['game'] == web['services']['game'] and managed['services']['postgres'] == web['services']['postgres'] and managed['volumes'] == web['volumes'], 'APK overlay never changes game, PostgreSQL or persistent volume identity')
         for name in ['public.http.nginx.conf', 'public.https.nginx.conf', 'public.web.https.nginx.conf']:
             text = (ROOT / 'deploy' / name).read_text(encoding='utf-8')
             check('/.well-known/acme-challenge/' in text and 'root /var/www/acme' in text, 'ACME challenge survives configuration stage: ' + name)

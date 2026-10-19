@@ -9,11 +9,12 @@ DOCUMENTS = [
     ROOT / 'README.md',
     ROOT / 'CONTRIBUTING.md',
     ROOT / 'server/README.md',
+    ROOT / 'portal_stats/README.md',
     *sorted((ROOT / 'docs').glob('*.md')),
     *sorted((ROOT / 'design').glob('*.md')),
     *sorted((ROOT / 'deploy').glob('*.md')),
     *(ROOT / 'tests' / name for name in (
-        'documentation.md', 'player_duels.md', 'social.md', 'teams.md', 'testing.md', 'portal_navigation.md', 'portal_release_20261019.md',
+        'documentation.md', 'player_duels.md', 'social.md', 'teams.md', 'testing.md', 'portal_navigation.md', 'portal_release_20261019.md', 'portal_stats.md',
     )),
 ]
 

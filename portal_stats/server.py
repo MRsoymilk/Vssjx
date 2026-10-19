@@ -100,9 +100,11 @@ class Handler(BaseHTTPRequestHandler):
                 or (origin is not None and origin != 'http://' + host)):
             self.reply(403, {'code': 'LOCAL_ORIGIN_REQUIRED'})
             return False
+        candidate_token = self.headers.get('X-Portal-Token', '')
         if write and (origin != 'http://' + host
                       or len(self.headers.get_all('X-Portal-Token', [])) != 1
-                      or not secrets.compare_digest(self.headers.get('X-Portal-Token', ''), self.server.token)):
+                      or not candidate_token.isascii() or len(candidate_token) > 128
+                      or not secrets.compare_digest(candidate_token, self.server.token)):
             self.reply(403, {'code': 'MANAGEMENT_TOKEN_REQUIRED'})
             return False
         return True

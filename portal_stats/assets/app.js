@@ -61,7 +61,7 @@
     $('apk-publish-note').textContent = data.publish_enabled ? '可设为当前下载。只有未来配置了对应 Nginx 挂载时才影响下载入口；当前版本受删除保护。' : '未配置 --apk-public-directory：上传仅保存，不会改动任何现有下载。';
     if (data.warning) notice(messages[data.warning] || data.warning, true);
     $('apk-list').replaceChildren(...data.files.map(file => {
-      const row = document.createElement('tr'); cell(row, file.name, 'filename'); cell(row, bytes(file.bytes)); cell(row, new Date(file.uploaded).toLocaleString('zh-CN')); cell(row, file.sha256, 'hash'); cell(row, file.current ? '当前下载' : file.state === 'deleting' ? '删除未完成，可重试' : '已保存 / 未验签');
+      const row = document.createElement('tr'); cell(row, file.name, 'filename'); cell(row, bytes(file.bytes)); cell(row, new Date(file.uploaded).toLocaleString('zh-CN', {timeZone: 'Asia/Shanghai'})); cell(row, file.sha256, 'hash'); cell(row, file.current ? '当前下载' : file.state === 'deleting' ? '删除未完成，可重试' : '已保存 / 未验签');
       const actions = cell(row, '', 'row-actions');
       for (const [label, action, disabled] of [['设为当前', 'publish', file.current || !data.publish_enabled || file.state !== 'ready'], ['删除旧版', 'delete', file.current]]) {
         const button = document.createElement('button'); button.textContent = label; button.disabled = busy || disabled || Boolean(data.warning); if (action === 'delete') button.className = 'danger';

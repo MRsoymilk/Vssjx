@@ -116,6 +116,16 @@ class ApkManagerTests(unittest.TestCase):
         self.assertFalse(release.exists())
         self.assertEqual(self.manager.listing()['current'], other['id'])
 
+    def test_unknown_current_pointer_is_not_overwritten(self):
+        record = self.upload()['file']
+        public = self.root / 'public'
+        public.mkdir()
+        (public / 'current').symlink_to('releases/' + 'f' * 32)
+        with self.assertRaisesRegex(ApkError, 'UNMANAGED_CURRENT'):
+            self.manager.publish(record['id'])
+        self.assertEqual((public / 'current').readlink().as_posix(), 'releases/' + 'f' * 32)
+        self.assertEqual(self.manager.listing()['warning'], 'UNMANAGED_CURRENT')
+
 
 if __name__ == '__main__':
     unittest.main()

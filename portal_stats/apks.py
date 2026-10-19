@@ -143,7 +143,7 @@ class ApkManager:
         finally:
             self.lock.release()
 
-    def _current(self):
+    def _current(self, verify=False):
         if not self.public:
             return None
         pointer = self.public / 'current'
@@ -154,7 +154,17 @@ class ApkManager:
         target = os.readlink(pointer)
         if not re.fullmatch(r'releases/[a-f0-9]{32}', target):
             raise ApkError('UNMANAGED_CURRENT', 409)
-        return target.split('/')[1]
+        key = target.split('/')[1]
+        with self._database() as database:
+            row = database.execute('SELECT * FROM apks WHERE id=?', (key,)).fetchone()
+        release = self.public / 'releases' / key
+        package = release / 'downloads' / APK_NAME
+        if (not row or row['state'] != 'ready' or release.is_symlink()
+                or (release / 'downloads').is_symlink() or package.is_symlink() or not package.is_file()):
+            raise ApkError('UNMANAGED_CURRENT', 409)
+        if verify:
+            self._check_release(dict(row))
+        return key
 
     def listing(self):
         with self._database() as db:
@@ -236,7 +246,7 @@ class ApkManager:
             if row['state'] != 'ready':
                 raise ApkError('APK_NOT_READY', 409)
             source = self._check_package(row)
-            self._current()  # Refuse unmanaged files/links before changing anything.
+            self._current(verify=True)  # Refuse unmanaged files/links before changing anything.
             new_public = not self.public.exists()
             self.public.mkdir(mode=0o755, parents=True, exist_ok=True)
             if new_public:
@@ -313,7 +323,7 @@ class ApkManager:
     def delete(self, key):
         identifier(key)
         with self._exclusive():
-            if self._current() == key:
+            if self._current(verify=True) == key:
                 raise ApkError('APK_IS_CURRENT', 409)
             try:
                 row = self._record(key)

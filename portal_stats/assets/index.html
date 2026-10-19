@@ -24,7 +24,7 @@
       <div class="section-top"><div><h2 id="apks-title">APK 文件管理</h2><p>上传、切换当前下载及删除旧版。只管理本后台登记的文件，不触碰原有游戏包。</p></div></div>
       <section class="surface"><h3>上传新 APK</h3><div class="upload-row"><input type="file" id="apk-file" accept=".apk,application/vnd.android.package-archive" aria-label="选择 APK 文件"><button id="upload">上传 APK</button></div><p id="apk-capacity" class="hint"></p><p class="hint">检查文件扩展名、ZIP 结构及有界 AndroidManifest，计算 SHA256；不会执行或解包。容器检查不等于签名验证或安装安全保证。上传不会自动发布。</p></section>
       <p id="apk-publish-note" class="hint"></p>
-      <section class="surface"><h3>版本列表</h3><div class="table-wrap"><table><thead><tr><th>文件名</th><th>大小</th><th>上传时间</th><th>SHA256</th><th>状态</th><th>操作</th></tr></thead><tbody id="apk-list"></tbody></table></div></section>
+      <section class="surface"><h3>版本列表</h3><div class="table-wrap"><table><thead><tr><th>文件名</th><th>大小</th><th>上传时间（UTC+8）</th><th>SHA256</th><th>状态</th><th>操作</th></tr></thead><tbody id="apk-list"></tbody></table></div></section>
     </section>
   </main>
   <footer>独立 SQLite · 不连接游戏数据库 · 不提供公网管理入口</footer>

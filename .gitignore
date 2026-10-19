@@ -14,6 +14,7 @@ __pycache__/
 /server/logs/
 /.cargo/config.toml
 /deploy/proxy.local.env
+/deploy/portal-apks.local.env
 /deploy/docker-proxy.local.txt
 /tools/use-proxy.local.ps1
 

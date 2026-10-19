@@ -60,6 +60,8 @@ class AdminTests(unittest.TestCase):
                         {'Sec-Fetch-Site': 'cross-site'}, {'Sec-Fetch-Site': 'same-site'}):
             self.assertEqual(self.request('/api/bootstrap', headers=headers)[0], 403)
         self.assertEqual(self.request('/api/apks/upload?name=test.apk', 'POST', apk(), headers={'Content-Type': 'application/octet-stream'})[0], 403)
+        self.assertEqual(self.request('/api/apks/upload?name=test.apk', 'POST', apk(),
+                                      headers={'Content-Type': 'application/octet-stream', 'Origin': self.origin, 'X-Portal-Token': '\xe9'})[0], 403)
         status, headers, data = self.request('/api/bootstrap')
         self.assertEqual(status, 200)
         self.assertEqual(json.loads(data)['token'], self.server.token)

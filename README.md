@@ -70,6 +70,7 @@ cargo run --locked --manifest-path server/Cargo.toml
 | 素材来源、AI 标识与许可边界 | [资源来源说明](docs/asset-provenance.md) |
 | 本机联机服务与配置 | [服务端说明](server/README.md) |
 | 自行部署网页或公网服务 | [部署导航](deploy/README.md) |
+| 私有门户统计与 APK 上传／版本管理 | [管理工具说明](portal_stats/README.md)，当前仅本地实现 |
 | 开发与提交贡献 | [贡献指南](CONTRIBUTING.md) |
 | 回归入口与历史验收记录 | [测试说明](tests/testing.md) |
 
@@ -83,6 +84,7 @@ design/    架构、玩法、平台与美术设计
 docs/      使用指南与资源说明
 deploy/    Docker Compose、代理与部署说明
 tools/     资源转换、内容生成与导出工具
+portal_stats/ 独立门户统计与 APK 管理，不连接游戏数据库
 tests/     仓库级回归、集成脚本与验收记录
 analysis/  原包静态分析、恢复证据与资料归档
 ```

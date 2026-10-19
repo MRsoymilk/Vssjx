@@ -97,6 +97,8 @@ class PortalRouteTests(unittest.TestCase):
         cls.base = Path(temporary.name)
         cls.public = cls.base / 'public'
         cls.public.mkdir()
+        cls.managed_public = cls.base / 'managed-apks'
+        cls.managed_public.mkdir()
         for name in ('index.js', 'index.wasm', 'index.pck'):
             (cls.public / name).write_bytes((name.encode() + b' fixture, not a real executable\n') * 1024)
         config = {'executable': 'index', 'fileSizes': {'index.wasm': 1000, 'index.pck': 1000}}
@@ -132,6 +134,7 @@ class PortalRouteTests(unittest.TestCase):
         subprocess.run(['docker', 'run', '--detach', '--rm', '--pull=never', '--network', 'host', '--name', cls.container,
                         '--mount', f'type=bind,source={cls.base / "default.conf"},target=/etc/nginx/conf.d/default.conf,readonly',
                         '--mount', f'type=bind,source={cls.public},target=/usr/share/nginx/html,readonly',
+                        '--mount', f'type=bind,source={cls.managed_public},target=/srv/vssjx-apks,readonly',
                         '--mount', f'type=bind,source={cls.base / "certs"},target=/etc/letsencrypt,readonly',
                         cls.image], capture_output=True, check=True)
         deadline = time.monotonic() + 15
@@ -298,6 +301,27 @@ class PortalRouteTests(unittest.TestCase):
         later = subprocess.check_output(['docker', 'logs', self.container], stderr=subprocess.DEVNULL)
         after = {parse_event(line)['id'] for line in later.splitlines() if line.startswith(b'VSSJX_PORTAL_V1 ')}
         self.assertEqual(before, after, 'HEAD, API and portal assets do not produce analytics events')
+
+    def test_managed_apk_can_switch_without_changing_legacy_files(self):
+        from io import BytesIO
+        from portal_stats.apks import ApkManager
+        from test_portal_apks import apk
+        manager = ApkManager(self.base / 'private-apks', self.managed_public)
+        data = apk(b'managed download fixture')
+        record = manager.upload(BytesIO(data), len(data), 'test.apk')['file']
+        try:
+            manager.publish(record['id'])
+            status, headers, body = self.request('/downloads/vssjx-arm64.apk')
+            self.assertEqual((status, body), (200, data))
+            self.assertEqual(headers.get('Cache-Control'), 'no-store')
+            self.assertNotIn('ETag', headers)
+            self.assertEqual(self.request('/downloads/vssjx-arm64.apk', {'If-Modified-Since': 'Thu, 31 Dec 2099 23:59:59 GMT'})[0], 200)
+            self.assertIn(record['sha256'].encode(), self.request('/downloads/SHA256SUMS.txt')[2])
+            self.assertEqual(self.request('/downloads/vssjx-arm64.apk', {'Range': 'bytes=0-3'})[2], data[:4])
+            self.assertEqual((self.public / 'downloads/vssjx-arm64.apk').read_bytes(), b'inert APK download fixture')
+        finally:
+            (self.managed_public / 'current').unlink(missing_ok=True)  # Owned test fixture only.
+        self.assertEqual(self.request('/downloads/vssjx-arm64.apk')[2], b'inert APK download fixture')
 
 
 if __name__ == '__main__':

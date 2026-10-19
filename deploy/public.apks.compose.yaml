@@ -1,0 +1,11 @@
+# Optional future activation only. No service is started by adding this file.
+# Mount PUBLIC releases, never the private APK registry/packages or metrics DB.
+services:
+  nginx:
+    volumes:
+      - type: bind
+        source: ${SSJX_APK_PUBLIC_ROOT:?Set SSJX_APK_PUBLIC_ROOT to the dedicated APK public directory}
+        target: /srv/vssjx-apks
+        read_only: true
+        bind:
+          create_host_path: false

@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>门户管理 · 蜀山剑侠</title>
+  <link rel="stylesheet" href="/style.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <header><div><p class="eyebrow">蜀山剑侠 · 归来</p><h1>门户管理</h1></div><span class="private-badge">仅本机 / SSH 隧道</span></header>
+  <main>
+    <nav class="tabs" aria-label="管理功能"><button id="tab-stats" aria-selected="true">访问统计</button><button id="tab-apks" aria-selected="false">APK 文件</button></nav>
+    <p id="notice" role="status" aria-live="polite"></p>
+    <section id="stats-panel" aria-labelledby="stats-title">
+      <div class="section-top"><div><h2 id="stats-title">访问与下载</h2><p>北京时间 UTC+8 · 请求次数不是独立人数，下载请求不等于下载完成</p></div><a id="csv" class="button" href="/api/export.csv">导出 CSV</a></div>
+      <div class="filters"><div id="presets"><button data-days="today" class="selected">今日</button><button data-days="yesterday">昨日</button><button data-days="7">近 7 天</button><button data-days="30">近 30 天</button></div><label>开始 <input type="date" id="start"></label><label>结束 <input type="date" id="end"></label><button id="query">查询</button></div>
+      <div id="cards" class="cards"></div>
+      <section class="surface"><h3>每日趋势</h3><p class="legend">门户访问 / 网页点击 / APK 请求</p><div id="chart" aria-label="每日请求趋势"></div></section>
+      <section class="surface"><h3>每日明细</h3><div class="table-wrap"><table><thead><tr><th>日期</th><th>门户 PV</th><th>网页点击</th><th>游戏访问</th><th>Android 点击</th><th>APK 请求</th><th>分段请求</th><th>缓存复用</th><th>异常请求</th><th>发送流量</th></tr></thead><tbody id="daily"></tbody></table></div></section>
+      <section class="surface"><h3>采集状态</h3><div id="collector"></div><p class="hint">只记录白名单事件，无 IP、账号、查询参数或访客追踪。原始 Docker 日志轮转后无法补回未采集部分，过去关闭访问日志时的数据也无法恢复。</p></section>
+    </section>
+    <section id="apks-panel" hidden aria-labelledby="apks-title">
+      <div class="section-top"><div><h2 id="apks-title">APK 文件管理</h2><p>上传、切换当前下载及删除旧版。只管理本后台登记的文件，不触碰原有游戏包。</p></div></div>
+      <section class="surface"><h3>上传新 APK</h3><div class="upload-row"><input type="file" id="apk-file" accept=".apk,application/vnd.android.package-archive" aria-label="选择 APK 文件"><button id="upload">上传 APK</button></div><p id="apk-capacity" class="hint"></p><p class="hint">检查文件扩展名、ZIP 结构及有界 AndroidManifest，计算 SHA256；不会执行或解包。容器检查不等于签名验证或安装安全保证。上传不会自动发布。</p></section>
+      <p id="apk-publish-note" class="hint"></p>
+      <section class="surface"><h3>版本列表</h3><div class="table-wrap"><table><thead><tr><th>文件名</th><th>大小</th><th>上传时间</th><th>SHA256</th><th>状态</th><th>操作</th></tr></thead><tbody id="apk-list"></tbody></table></div></section>
+    </section>
+  </main>
+  <footer>独立 SQLite · 不连接游戏数据库 · 不提供公网管理入口</footer>
+</body>
+</html>

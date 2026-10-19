@@ -1,0 +1,17 @@
+{
+  "tool": "image_gen built-in",
+  "date": "2026-10-20",
+  "set": "boneglow/wzs",
+  "target": "client/assets/generated/equipment/boneglow/wzs/parts/wzst2.png",
+  "source": "02_female_lishi-hair-connected.png",
+  "cells": [
+    0
+  ],
+  "preserve_aspect": true,
+  "reason": "Restore the broad upper-hair seam to meet the separately composited lower hair segment while keeping the face above the collar.",
+  "prompt": "Precise pixel-art sprite edit. Edit target image 1 is a transparent 4-column by 5-row sprite parts sheet. Image 2 is native geometry reference only. ONLY repair lower-right burgundy hair in the top-left head cell of image 1. This head is NOT a complete hairstyle: another separate lower hair piece attaches directly to its bottom edge. Current bottom slopes diagonally to a sharp point, causing a visible triangular hole at the join. Replace that pointed/tapered lower-right tail with a BROAD STRAIGHT VERTICAL CURTAIN OF HAIR ending at the SAME y approximately 254. The bottom join must be a FULL OPAQUE HORIZONTAL STRIP from approximately x152 through x209, at least 58 source pixels wide and no gaps. Fill the entire triangular missing area under the existing diagonal edge with matching burgundy strands. Hair continues beyond this crop in the game, so do NOT draw a tapered tip, upward slope, or rounded end. Keep head crown at y110, width and all face/eye/chin positions EXACTLY unchanged. Preserve tiny chunky pixel clusters and existing burgundy palette. Keep every other cell unchanged. Same canvas, same grid, transparent background. No text.",
+  "generated_path": "C:/Users/milk/.codex/generated_images/01a13a91-69ac-7d52-b1d5-c25c1f7e6a26/exec-799d4f17-7c8b-4826-bd5f-93876475ca91.png",
+  "source_sha256": "1b3f6d570daa93df74474e31be5e0a5aeef6f5354b2b665f2c50b3bb2e1d21c7",
+  "runtime_sha256": "992b5bc2789d39b8756280bea398565bf162130e3ab38c2b9e6c5ad932561fe4",
+  "validated": "5 asset checks and 490 real-render game checks passed; all native pose seams checked against original contact width; only one of 90 runtime textures changed, lower hair segment pixels unchanged."
+}

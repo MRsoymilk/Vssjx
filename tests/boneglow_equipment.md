@@ -54,3 +54,14 @@ godot --headless --path client res://tests/boneglow_equipment_test.tscn
 - `godot --headless --path client --script res://tests/equipment_icon_cleanup_test.gd`：边界残片、成对部件、内部细节、对角连接和重复清理验证通过。
 - 两个装备系列重新导入，共120个图标、60张部件；Git差异仅四个目标图标，其他资源一致。`python tests/test_boneglow_assets.py`、`python tests/test_gravebloom_assets.py`、`python tests/test_full_shop_catalog.py`全部适用检查通过。
 - 实际OpenGL运行 `res://tests/boneglow_equipment_test.tscn`，设置 `SSJX_EQUIPMENT_GAME_CAPTURE=work/shop-icon-cleanup` 的绝对路径：490项检查、0失败，存档恢复检查通过。六角色商城及地图、背包、管理预览截图保存在该忽略目录，重点核对 `shop-wck.png` 的四个目标图标无上方杂点。
+
+
+## 2026-10-20 赤翎破军头部与发尾接缝修正
+
+女力士头图集的第二块是下方发尾，原版逐帧配方将它接在主头部下方，并不是背面头部。先前主头部按长发最低点对齐，使脸部陷入衣领；整体上移后又出现发尾断层。现在补齐主头部右下方的宽发束，按原生接缝与下方发尾相接，保留等比缩放和原动作锚点。
+
+- 使用内置 image_gen 修补主头部素材；生产源及完整提示词记录在 `analysis/ai-generated/equipment/boneglow/hair-connection-record.json`。
+- 导入仅更新 `wzs/parts/wzst2.png` 的第一块，第二块发尾像素、其他89张运行纹理及原版帧区域保持一致。
+- 新增接缝回归检查：先复现尖尾造成接触宽度不足的失败，再验证完整接缝在原版各姿势、左右朝向均连通，并保留脸部高度。骨甲幽光5项资源检查通过；另一套装备4项适用检查通过。
+- 实际OpenGL装备场景490项通过；站立、行走、攻击、受击逐帧截图见忽略目录 `work/face-game-captures/head-actions.png`，对比图为 `head-alignment.png`。
+- 本次为本地素材修正，未打包、推送或部署。

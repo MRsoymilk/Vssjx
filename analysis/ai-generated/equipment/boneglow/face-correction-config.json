@@ -47,7 +47,7 @@
   "sheet_rows": 5,
   "atlas_overrides": {
     "02_female_lishi": {
-      "file": "02_female_lishi-face-corrected.png",
+      "file": "02_female_lishi-hair-connected.png",
       "cells": [
         0
       ],

@@ -264,6 +264,7 @@
     },
     "sheet_018": {
       "name": "星火燎原",
+      "audio_id": "fire",
       "basis": "authored_semantic_mapping",
       "trigger": "cast_impact",
       "reason": "星火坠落并燃起火柱",

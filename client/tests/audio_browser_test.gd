@@ -9,6 +9,16 @@ func _run()->void:
 	var before:=Game.player.duplicate(true)
 	var browser=load("res://scenes/admin/data_browser.tscn").instantiate();add_child(browser)
 	browser.select_category("audio")
+	check(browser.visible_entries.size()==2,"Audio category exposes both registered skill sounds")
+	browser.get_node("%Search").text="星火"
+	browser._fill_list()
+	check(browser.visible_entries.size()==1 and browser.current.id=="fire" and browser.current.data.skill_id=="sheet_018","Fire is searchable with its correct skill binding")
+	var fire_preview=browser.get_node("%AudioPreview")
+	fire_preview.get_node("Controls/Play").pressed.emit()
+	check(fire_preview.get_node("Player").playing and absf(fire_preview.get_node("Player").stream.get_length()-1.3749792)<0.001,"Fire WAV can be auditioned at full duration")
+	browser.get_node("%Search").text="雷霆"
+	browser._fill_list()
+	check(not fire_preview.get_node("Player").playing,"Changing audio selection stops the previous sound")
 	var audio=browser.get_node("%AudioPreview")
 	check(browser.visible_entries.size()==1 and browser.current.id=="thunder","Audio category exposes the shared thunder resource")
 	check(audio.visible and not browser.get_node("%Preview").visible,"Audio uses an authored preview instead of an empty image")

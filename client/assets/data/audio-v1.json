@@ -10,6 +10,16 @@
       "volume_db": -6.0,
       "source": "用户提供 thunder.wav",
       "description": "雷霆一击命中特效开始时播放一次；离开战斗时停止。"
+    },
+    {
+      "id": "fire",
+      "name": "星火燎原 · 烈焰音效",
+      "path": "res://assets/audio/skills/fire.wav",
+      "skill_id": "sheet_018",
+      "trigger": "cast_impact",
+      "volume_db": -6.0,
+      "source": "用户提供 fire.wav",
+      "description": "星火燎原命中特效开始时播放一次；离开战斗时停止。"
     }
   ]
 }

@@ -30,7 +30,8 @@ def sha(path):
 
 def public_ignore(directory, names):
     return [name for name in names if name.startswith('.') or name in ['admin', 'tests', 'android']
-            or name.endswith(('.import', '.tmp', '.keystore', '.jks', '.p12', '.pfx', '.pem', '.key'))]
+            or (name.endswith('.import') and not name.endswith('.wav.import'))
+            or name.endswith(('.tmp', '.keystore', '.jks', '.p12', '.pfx', '.pem', '.key'))]
 
 
 def check_pe(path):
@@ -200,7 +201,7 @@ def build(args):
                 raise ValueError('Signing material must remain outside build output and dist')
             development_signing(args.development_key_dir, run, env)
             config = config.replace('package/unique_name="com.mrsoymilk.vssjx"', 'package/unique_name="com.mrsoymilk.vssjx.preview"')
-            config = config.replace('version/name="0.1.0"', 'version/name="0.1.0-preview"')
+            config = re.sub(r'version/name="([^"]+)"', lambda match: 'version/name="' + match.group(1) + '-preview"', config, count=1)
         elif not all(env.get('GODOT_ANDROID_KEYSTORE_RELEASE_' + key) for key in ['PATH', 'USER', 'PASSWORD']):
             raise ValueError('Provide release signing through GODOT_ANDROID_KEYSTORE_RELEASE_* or explicitly use --development-signing')
         settings = output / 'config/godot/editor_settings-4.7.tres'

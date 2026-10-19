@@ -71,7 +71,8 @@ def build(output, template=None, debug=False, loopback=False):
         shutil.copy2(ROOT / 'client' / name, project / name)
 
     def ignored(directory, names):
-        return [name for name in names if name.startswith('.') or name in ['admin', 'tests'] or name.endswith(('.import', '.tmp'))]
+        return [name for name in names if name.startswith('.') or name in ['admin', 'tests']
+                or name.endswith('.tmp') or (name.endswith('.import') and not name.endswith('.wav.import'))]
 
     for name in ['scripts', 'assets', 'scenes', 'web']:
         shutil.copytree(ROOT / 'client' / name, project / name, ignore=ignored)

@@ -31,13 +31,30 @@ func _verify() -> void:
 	var skill_rules = load("res://scripts/skill_rules.gd")
 	check(skill_rules.list_for(1, 0, 50).size() == 8 and skill_rules.list_for(1, 3, 50) == skill_rules.list_for(1, 0, 50), "Packed skills unlock by job and level for all schools")
 	var shop_rules = load("res://scripts/shop_rules.gd")
-	check(shop_rules.catalog.items.size()==214,"All recovered goods are in the packed catalog")
+	check(shop_rules.catalog.items.size()==334,"Original goods and both approved equipment collections are in the packed catalog")
 	for item in shop_rules.catalog.items:
 		check(ResourceLoader.exists(item.icon),"Packed product icon: "+item.id)
+	var art=load("res://scripts/art.gd")
+	for collection in ["boneglow","gravebloom"]:
+		for stem in ["mzs","wzs","mck","wck","mfs","wfs"]:
+			var prefix:String="ai/%s/%s/"%[collection,stem]
+			for slot in shop_rules.SLOTS:
+				check(not shop_rules.item(prefix+slot).is_empty(),"Packed set component: "+prefix+slot)
+			var weapon:Dictionary=shop_rules.item(prefix+"weapon")
+			var armor:Dictionary=shop_rules.item(prefix+"armor")
+			var hat:Dictionary=shop_rules.item(prefix+"hat")
+			var key:String=shop_rules.actor_key(int(weapon.job),int(weapon.gender),[weapon.visual,armor.visual,hat.head_visual])
+			var actor=art.actor(key)
+			check(actor.sprite_frames!=null and actor.get_meta("art_key","")==key,"Packed full set appearance: "+key)
+			actor.free()
+	var audio=load("res://scripts/game_audio.gd")
+	for id in ["thunder","fire"]:
+		var stream=audio.stream(id)
+		check(stream is AudioStreamWAV and stream.format==AudioStreamWAV.FORMAT_16_BITS and stream.stereo and stream.mix_rate==48000,"Packed skill audio retains original PCM: "+id)
+	check(ResourceLoader.exists("res://assets/ui/team_waiting.tres"),"Yellow unready team flag material is packaged")
 	var parts:Dictionary=JSON.parse_string(FileAccess.get_file_as_string("res://assets/data/hero-parts.json"))
 	check(parts.parts.size()==299,"All original appearance parts are packaged")
 	for part in parts.parts.values():check(ResourceLoader.exists(part.texture),"Packed original part: "+part.texture)
-	var art=load("res://scripts/art.gd")
 	for stem in ["mzs","wzs","mck","wck","mfs","wfs"]:
 		var key:String="hero/%s_w19_c11_h9"%stem
 		var actor=art.actor(key)

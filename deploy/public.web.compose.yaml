@@ -1,4 +1,6 @@
 # Optional: serve an existing, reviewed Godot Web export beside the public API.
+# An additive navigation/ directory enables the portal; keep this same mount
+# so the prefix migration does not require recreating the proxy container.
 # Apply after public.tls.compose.yaml. Never mount the project source directory.
 services:
   nginx:

@@ -16,6 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--nginx', action='store_true', help='Check cached Nginx with temporary, untrusted test certificate')
+    parser.add_argument('--nginx-image', default='nginx:stable-alpine', help='Locally cached Nginx image; never pulled by these checks')
     parser.add_argument('--openssl', default=shutil.which('openssl'))
     parser.add_argument('--context', action='store_true', help='Inspect an inert scratch image using the exact build-context allowlist')
     args = parser.parse_args()
@@ -93,11 +94,11 @@ def main():
                 run(['docker', 'run', '--rm', '--pull=never',
                      '--mount', f'type=bind,source={ROOT / "deploy" / name},target=/etc/nginx/conf.d/default.conf,readonly',
                      '--mount', f'type=bind,source={base / "certs"},target=/etc/letsencrypt,readonly',
-                     'nginx:stable-alpine', 'nginx', '-t'])
+                     args.nginx_image, 'nginx', '-t'])
                 check(True, 'Actual Nginx accepts configuration: ' + name)
             script = ROOT / 'tools/renew-public-certificate.sh'
             run(['docker', 'run', '--rm', '--pull=never', '--entrypoint', 'sh',
-                 '--mount', f'type=bind,source={script},target=/renew.sh,readonly', 'nginx:stable-alpine', '-n', '/renew.sh'])
+                 '--mount', f'type=bind,source={script},target=/renew.sh,readonly', args.nginx_image, '-n', '/renew.sh'])
             check(True, 'Certificate renewal script passes real POSIX shell parsing')
         if args.context:
             context = base / 'context'

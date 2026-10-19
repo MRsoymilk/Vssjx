@@ -7,6 +7,7 @@
 | 范围 | 说明 |
 |---|---|
 | 开源文档与链接 | [文档检查](documentation.md) |
+| 导航与游戏子路径 | [页面、浏览器与隔离 Nginx 验证](portal_navigation.md) |
 | 任务、战斗与地图 | [线上 PVE](online_pve.md)、[第二张地图](online_maps.md)、[技能](../design/skills.md#验证) |
 | 社交与多人战斗 | [社交](social.md)、[组队](teams.md)、[决斗](player_duels.md) |
 | 平台与网页 | [平台基础](platform_interface.md)、[主游戏 Web](web_game.md)、[浏览器存储](web_storage.md) |

@@ -9,6 +9,7 @@
 | 本机开发：Rust 与 PostgreSQL | [服务端说明](../server/README.md) |
 | 网页入口、本机与局域网 HTTPS | [网页部署](WEB.md) |
 | Ubuntu／Debian 公网 IP、Docker 与 TLS | [公网服务部署](PUBLIC.md) |
+| 导航首页与 `/webgame/` 兼容切换 | [导航切换说明](PORTAL.md)，尚未执行公网变更 |
 
 当前世界仅支持**一个游戏写进程**。多个进程连接同一数据库不构成世界集群；网页代理、容器健康和配置的人数上限也不代表容量验收。
 

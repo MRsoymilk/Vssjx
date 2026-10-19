@@ -134,6 +134,8 @@ docker compose --env-file .env \
 
 以后日常操作都保留这四份Compose文件。`renew-public-certificate.sh`检测到`.env`中的非空`SSJX_PUBLIC_WEB_ROOT`时自动保留网页覆盖文件。浏览器访问`https://真实公网IP/`，API仍通过同源`/api/v1/`连接；网页缺失资源返回404，带版本的资源保留长期缓存。
 
+当前源码额外提供 `/webgame/` 兼容入口；未安装导航目录时根路径继续原游戏。可选导航通过在原静态目录中增加 `navigation/` 启用，不改既有挂载或游戏文件。现有线上实例的语法验证、平滑切换和回退见 [导航说明](PORTAL.md)，不能为这项变更直接重建容器或重启游戏。
+
 ## 7. 监控、更新与备份
 
 启用HTTPS后，可在仓库根目录使用`sh tools/public-compose.sh ps`、`sh tools/public-compose.sh logs --tail=100 game`和`sh tools/public-compose.sh up -d --build game`，脚本会自动保留网页覆盖文件。

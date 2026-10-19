@@ -33,3 +33,24 @@ node tests/portal_browser.cjs work/portal-preview work/portal-captures
 - 截图在本机 `/tmp/opencode/vssjx-portal-captures-20261019/`，不提交截图、浏览器依赖或测试产物。
 
 页面预览不是实际 Godot 启动、手机真机或论坛验收。真实远程版本与现有 Nginx 挂载仍需在明确部署授权后核对。
+
+## 子路径与代理验证
+
+```sh
+python -m unittest discover -s tests -p test_portal_routes.py
+python -m unittest discover -s tests -p test_web_static_assets.py
+python tests/check_public_deployment.py --nginx --nginx-image nginx:1.29-alpine --openssl /usr/bin/openssl
+```
+
+路由测试需要 Linux Docker host 网络、OpenSSL 及已缓存的 Nginx 镜像。`SSJX_TEST_NGINX_IMAGE` 可指定本地镜像；不拉取镜像，缺少依赖时报告跳过。测试创建唯一名称的容器、临时证书和回环端口，不使用现有容器、证书、私有 `.env` 或数据库。夹具的 JS／WASM／PCK／APK 都是不可执行占位字节，不构建游戏。
+
+覆盖首页文件存在性开关及回退、预览、新旧入口字节一致、尾斜杠与查询参数、版本资源 gzip／缓存、缺失资源 404、WASM MIME、APK、隐藏文件及管理路径、API 授权／Origin 不改写、Flarum 404 预留。测试在真实 TLS WebSocket 上发送消息，平滑 reload，等待新 worker 的专用响应头出现后，再验证原连接继续收发。
+
+浏览器检查另调用**真实的游戏 IndexedDB 适配源码**，在测试旧路径写入专用记录，经过导航点击进入同源 `/webgame/` 后读取相同记录。测试页面本身没有游戏引擎；这只验证路径与存储契约，不冒充完整 Godot 游玩或生产存档迁移。
+
+### 最终结果（2026-10-19）
+
+- 导航静态 5 项、真实 Nginx／TLS 路由 7 项、既有静态资源回归 2 项通过。
+- 公网 Compose／配置验证 23 项通过，包含真实 Nginx 解析与续期脚本检查；使用缓存的 `nginx:1.29-alpine`，不宣称已在远程实际镜像重新验收。
+- Chromium 页面及真实存储适配检查合计 32 项通过；最终截图在 `/tmp/opencode/vssjx-portal-captures-final-20261019/`。
+- 公网配置保留原静态挂载，无需新增卷、PHP／论坛服务或游戏数据库迁移；页面与路由只提交本地候选，未推送、导出游戏或远程部署。

@@ -17,6 +17,12 @@ let browser, checks = 0;
 const check = (condition, message) => {assert.ok(condition, message); checks++; console.log('PASS: ' + message);};
 const server = http.createServer((request, response) => {
   requests.push(request.url);
+  // Inert documents only for the explicit same-origin storage migration check.
+  if (request.url === '/index.html' || request.url === '/webgame/') {
+    response.setHeader('Content-Type', 'text/html; charset=utf-8');
+    response.end('<!doctype html><title>Owned path fixture</title><link rel="icon" href="/navigation/app-icon.webp">');
+    return;
+  }
   const entry = routes.get(request.url);
   response.setHeader('Cache-Control', 'no-store');
   response.setHeader('X-Content-Type-Options', 'nosniff');
@@ -56,6 +62,26 @@ const server = http.createServer((request, response) => {
     check(await page.locator('.button-primary').evaluate(button => getComputedStyle(button).transitionDuration === '0s'), 'Reduced-motion preference respected');
     check(requests.every(url => routes.has(url)), 'Navigation never requests API, engine, forum or third-party resources');
     check(errors.length === 0, 'No browser or CSP errors: ' + errors.join('; '));
+    const source = fs.readFileSync(path.join(__dirname, '../client/scripts/interface/adapters/web/indexeddb_storage.js'), 'utf8');
+    async function storage(kind, text = '') {
+      return page.evaluate(async ({source, kind, text}) => {
+        const port = (0, eval)(source).create();
+        let id = 0;
+        const submit = (action, value = '') => new Promise(resolve => port.submit(++id, action, 'offline://save-v1', value, 1048576, data => resolve(JSON.parse(data))));
+        try {
+          const initialized = await submit('initialize');
+          if (!initialized.ok) throw new Error('Owned storage initialization failed');
+          return await submit(kind, text);
+        } finally {port.dispose();}
+      }, {source, kind, text});
+    }
+    await page.goto(base + '/index.html');
+    const saved = '{"fixture":"子路径迁移，不是真实玩家存档"}';
+    check((await storage('write', saved)).ok, 'Actual game storage adapter commits an owned save at the legacy path');
+    await page.goto(base);
+    await page.getByRole('link', {name: '进入游戏'}).click();
+    check(new URL(page.url()).pathname === '/webgame/' && (await storage('read')).value === saved, 'Explicit game link preserves same-origin IndexedDB after passing through navigation');
+    check(errors.length === 0, 'Storage path check has no browser errors');
     fs.writeFileSync(path.join(output, 'requests.json'), JSON.stringify(requests, null, 2));
     console.log(`PORTAL BROWSER: ${checks} checks, 0 failures`);
   } catch (error) {

@@ -24,6 +24,7 @@ var ai_panel: AIWorldPanel
 var ai_station: Node2D
 var _portal_latch := ""
 var _portal_stop := ""
+var _follow_trip := ""
 var _motion_grid := AStarGrid2D.new()
 var _key_timer := 0.0
 var _was_keyboard := false
@@ -508,7 +509,10 @@ func _snapshot(values: Dictionary) -> void:
 			var label := OriginalSceneChrome.label(root, entity.display_name, Rect2(-65, -72, 130, 18), 11, Color("fff0a5") if id == character_id else Color("9ef6ff"))
 			label.position.y=-74
 			preload("res://scripts/world_nameplate.gd").apply(label,Color("fff0a5") if id==character_id else Color("9ef6ff"))
-			actors[id] = {"root": root, "sprite": sprite, "target": point, "distance": 0.0, "motion": OnlineActorMotion.new()}
+			var flag:=Sprite2D.new();flag.set_script(preload("res://scripts/team_marker.gd"));root.add_child(flag)
+			flag.position=Vector2(-ceilf(label.get_theme_font("font").get_string_size(label.text,HORIZONTAL_ALIGNMENT_LEFT,-1,label.get_theme_font_size("font_size")).x/2.0)-10,-63)
+			actors[id] = {"flag":flag,"root": root, "sprite": sprite, "target": point, "distance": 0.0, "motion": OnlineActorMotion.new()}
+		actors[id].flag.update_state(network.team_marks.get(id,{}))
 		var look: Array = network.appearances.get(id,[1,0])
 		OriginalArt.apply_appearance(actors[id].sprite,ShopRules.actor_key(int(entity.job),int(entity.gender),look))
 		actors[id].target = point
@@ -645,10 +649,12 @@ func _process(delta: float) -> void:
 	if map_transition.blocking: return
 	if network.duel.active() or duel_battle.visible or team.active() or team_battle.visible: return
 	if OS.has_feature("web") and (not Platform.context.lifecycle.focused or Platform.context.lifecycle.suspended): return
+	if _follow_transfer():return
 	_advance_approach()
 	if team_panel.visible or social_panel.visible or bag_overlay != null or chat_input.has_focus() or menu.visible or details.visible or npc_dialog.visible or emote_picker.visible or encounter.visible or battle_view.visible or expanded_chat.visible or attributes.visible or world_map.visible or network.pve.pending() or network.pve.active():
 		_was_keyboard = false
 		return
+	if network.team_following: return
 	if _auto_transfer(): return
 	_key_timer -= delta
 	var direction := Vector2i(int(Input.is_physical_key_pressed(KEY_D) or Input.is_physical_key_pressed(KEY_RIGHT)) - int(Input.is_physical_key_pressed(KEY_A) or Input.is_physical_key_pressed(KEY_LEFT)), int(Input.is_physical_key_pressed(KEY_S) or Input.is_physical_key_pressed(KEY_DOWN)) - int(Input.is_physical_key_pressed(KEY_W) or Input.is_physical_key_pressed(KEY_UP)))
@@ -690,6 +696,9 @@ func _map_input(event: InputEvent) -> void:
 		if Rect2(actor.root.position - Vector2(20,60),Vector2(40,64)).has_point(world_point):
 			_select_player(id)
 			return
+	if network.team_following:
+		chat_status.text="跟随中由队长控制移动，可在队伍界面暂离。"
+		return
 	for gate in SharedWorldMap.exits(String(map_data.map_id)):
 		var center:=Vector2(gate.cell[0]*16+8,gate.cell[1]*16+8)
 		if Rect2(center-Vector2(8,8),Vector2(16,16)).has_point(world_point):
@@ -823,6 +832,22 @@ func _cancel_approach() -> void:
 	if npc_dialog != null:
 		npc_dialog.approaching = false
 		npc_dialog.refresh()
+
+func _follow_transfer()->bool:
+	if not network.team_following:
+		_follow_trip=""
+		return false
+	_cancel_approach();move_target.clear();_was_keyboard=false
+	var travel:Dictionary=network.team_travel
+	if travel.is_empty():_follow_trip="";return false
+	if not network.world_ready or not network.pve.ready or network.pve.pending() or network.pve.active() or not network.entities.has(character_id):return false
+	var own:Dictionary=network.entities[character_id]
+	if own.next_cell!=null or Vector2i(own.cell[0],own.cell[1])!=Vector2i(travel.cell[0],travel.cell[1]):return false
+	var key:=String(map_data.map_id)+JSON.stringify(travel)
+	if _follow_trip==key:return false
+	if actors.has(character_id) and actors[character_id].motion.has_motion():return true
+	if network.pve.submit(travel.action,travel.target):_follow_trip=key
+	return true
 
 func _auto_transfer() -> bool:
 	if not network.pve.ready or not network.entities.has(character_id): return false

@@ -10,7 +10,7 @@ func _ready()->void:_run.call_deferred()
 func check(ok:bool,text:String)->void:
 	checks+=1
 	if not ok:failures+=1;push_error("TEAM: "+text)
-func member(id:String)->Dictionary:return {"id":id,"display_name":"青云客" if id==SELF else "昆仑客","job":1,"gender":0,"level":15,"map_id":"qingyun_trail","leader":id==SELF,"ready":true,"online":true}
+func member(id:String)->Dictionary:return {"id":id,"display_name":"青云客" if id==SELF else "昆仑客","job":1,"gender":0,"level":15,"map_id":"qingyun_trail","leader":id==SELF,"ready":true,"online":true,"following":true}
 func fighter(id:String)->Dictionary:
 	var m:=member(id);var stats:=CharacterAttributeRules.stats(1,15,true,[0,0,0,0,0])
 	return {"id":id,"name":m.display_name,"job":1,"gender":0,"school":3,"level":15,"appearance":[1,0,0],"stats":stats,"hp":stats.hp,"mp":stats.mp,"potions":3,"effects":SkillRules.new_state(1,3,15,1),"guarding":false}
@@ -103,6 +103,43 @@ func _run()->void:
 	world.network.world_ready=true;world.network._state="ready";world.network._pending_motion={"type":"world.move_to"}
 	world.network._receive({"type":"error","code":"TEAM_BATTLE_ACTIVE"},PackedByteArray())
 	check(world.network.world_ready and world.network._pending_motion.is_empty(),"A late movement refusal cannot disconnect a team player")
+	world.team_battle.hide();world.network.team_active=false
+	world.network._team_version=1
+	var mark:={SELF:{"leader":true,"following":true},OTHER:{"leader":false,"following":true},TEAM:{"leader":false,"following":false}}
+	var packet:={"type":"world.team","map_id":"qingyun_trail","members":mark,"following":true,"travel":null}
+	check(OnlineWorldClient.valid_team_packet(packet,"qingyun_trail"),"Native team marker roles validate")
+	var bad:=packet.duplicate(true);bad.members[SELF].leader="yes"
+	check(not OnlineWorldClient.valid_team_packet(bad,"qingyun_trail"),"Forged flag roles are rejected")
+	bad=packet.duplicate(true);bad.travel={"action":"teleport","target":"ancient_ruins","cell":[28,16]}
+	check(not OnlineWorldClient.valid_team_packet(bad,"qingyun_trail"),"Following never accepts arbitrary teleport actions")
+	world.network._pending_motion={"type":"world.move_to"}
+	world.network._receive(packet,PackedByteArray())
+	check(world.network.team_following and world.network._pending_motion.is_empty(),"Entering follow clears queued manual motion")
+	packet.travel={"action":"transfer","target":"ruins_gate","cell":[28.0,16.0]}
+	world.network._receive(packet,PackedByteArray())
+	check(typeof(world.network.team_travel.cell[0])==TYPE_INT and world.network.team_travel.cell==[28,16],"JSON portal cells normalize to grid integers before arrival checks")
+	world.network._receive({"type":"error","code":"TEAM_FOLLOWING"},PackedByteArray())
+	check(world.network.world_ready,"Late manual motion rejection preserves connection")
+	var entities:={}
+	for i in 3:
+		var id:String=[SELF,OTHER,TEAM][i]
+		entities[id]={"id":id,"display_name":["青云队长","昆仑队友","暂离队友"][i],"job":i,"gender":0,"cell":[[18,10],[24,14],[28,18]][i],"next_cell":null,"segment_progress":0,"entity_revision":"1","world_epoch":"1"}
+	world.network.entities=entities;world._snapshot(entities)
+	for i in 3:
+		var id:String=[SELF,OTHER,TEAM][i];var flag:Sprite2D=world.actors[id].flag
+		check(flag.visible and flag.texture==[preload("res://assets/ui/team_leader.png"),preload("res://assets/ui/team_member.png"),preload("res://assets/ui/team_away.png")][i],"Leader/following/away flag matches recovered art")
+		check(flag.position.x < -30 and flag.position.y==-63,"Flag sits beside the name and moves with actor root")
+	world.team.state=state();world.team.state.team.leader=false;world.team.state.team.members[0].leader=false;world.team.state.team.members[1].leader=true;world.team_panel.open();world.team_panel.refresh()
+	var follow_button:Button
+	for row in world.team_panel.rows.get_children():
+		for button in row.get_children():
+			if button is Button and button.text=="暂离":follow_button=button
+	check(follow_button!=null,"Own party row exposes temporary leave")
+	if follow_button!=null:
+		world.team.request={};world.team.inflight=false;follow_button.pressed.emit()
+		check(world.team.request.get("action")=="follow" and world.team.request.ready==false,"Temporary leave submits a server-owned follow command")
+	world.team_panel.hide();world._set_battle_layout(false);world.screen.hud.show();world.camera.position=Vector2(392,232)
+	await capture("team_flags")
 	world.queue_free();await get_tree().process_frame
 	check(Game.player==old,"Team UI leaves the offline save untouched")
 	OnlineAccount.pending_team=outbox

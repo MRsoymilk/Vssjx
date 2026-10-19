@@ -89,6 +89,7 @@ def main():
             send(other,'attack','TEAM_NOT_YOUR_TURN',**fields)
             send(c,'attack','NO_ACTIVE_BATTLE',**fields)
             send(actor,'kick','TEAM_BATTLE_ACTIVE',target=other[1])
+            send(b,'follow','TEAM_BATTLE_ACTIVE',ready=False)
             # An injected audit failure rolls back HP, battle revision and receipt.
             db.query("CREATE FUNCTION reject_team_audit() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF NEW.action LIKE 'team.%' THEN RAISE EXCEPTION 'owned failure'; END IF; RETURN NEW; END $$; CREATE TRIGGER reject_team BEFORE INSERT ON security_audit FOR EACH ROW EXECUTE FUNCTION reject_team_audit();")
             failed=dict(character_id=actor[1],operation_id=str(uuid4()),action='attack',**fields)
@@ -126,6 +127,13 @@ def main():
             resources=db.query('SELECT id,gold,xp FROM characters ORDER BY id')
             send(a,'flee',battle_id=active['id'],expected_revision=active['revision'])
             check(db.query('SELECT id,gold,xp FROM characters ORDER BY id')==resources,'Retreat cannot award victory resources')
+            players[0].move([22,11])
+            deadline=time.monotonic()+5
+            while time.monotonic()<deadline:
+                players[0].until('world.delta')
+                own=players[0].ws.entities.get(a[1],{});follower=players[0].ws.entities.get(b[1],{})
+                if own.get('cell')==[22,11] and follower.get('cell') not in (None,[22,9]) and follower['next_cell'] is None:break
+            check(follower.get('cell') not in (None,[22,9]),'Following resumes after the shared battle ends')
             send(a,'transfer',target=b[1]);send(a,'disband','TEAM_LEADER_REQUIRED')
             send(b,'kick',target=a[1])
             check(send(a,'snapshot')[0]['state']['team'] is None,'Kicked member loses team membership')

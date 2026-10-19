@@ -2,6 +2,8 @@
 //! One owned CharacterActor record per character; socket replacement is epoch-fenced.
 #[path = "world_duel.rs"]
 mod duel_bridge;
+#[path = "world_team.rs"]
+pub(crate) mod team_bridge;
 use crate::{
     AppState,
     auth::{self, AuthError, AuthService, Peer},
@@ -106,6 +108,7 @@ impl CharacterActor {
     }
 }
 struct StateData {
+    following: team_bridge::Following,
     team_busy: std::collections::HashSet<Uuid>,
     team_dirty: std::collections::HashSet<Uuid>,
     duels: crate::duel::Arena,
@@ -125,6 +128,7 @@ impl StateData {
 }
 pub struct WorldHub {
     pub(crate) moderation: AsyncMutex<()>,
+    pub(crate) team_updates: AsyncMutex<()>,
     metrics: Arc<Observability>,
     data: Mutex<StateData>,
     admissions: AsyncMutex<()>,
@@ -220,8 +224,10 @@ impl WorldHub {
         let ai_publications=ai_maps.keys().map(|id|(id.clone(),Publisher::default())).collect();
         let hub = Arc::new(Self {
             moderation: AsyncMutex::new(()),
+            team_updates: AsyncMutex::new(()),
             metrics,
             data: Mutex::new(StateData {
+                following:Default::default(),
                 team_busy:Default::default(),team_dirty:Default::default(),
                 duels: crate::duel::Arena::default(),
                 actors: HashMap::new(),
@@ -262,6 +268,7 @@ impl WorldHub {
                     state.duels.tick(now,&available);
                     let dueling:std::collections::HashSet<_>=state.actors.keys().filter(|id|state.duels.active(**id)).copied().collect();
                     let teaming=state.team_busy.clone();
+                    hub.follow_tick(&mut state);
                     let mut changed = false;
                     for actor in state.actors.values_mut() {
                         if actor.connected && !actor.in_battle && !dueling.contains(&actor.id) && !teaming.contains(&actor.id) {
@@ -370,6 +377,7 @@ impl WorldHub {
         maps_version: u32,
     ) -> Result<Ownership, AuthError> {
         let _gate = self.admissions.lock().await;
+        self.restore_team_roster(auth,id).await?;
         let business = self.data.lock().expect("world state").actors.get(&id).map(|a| a.business.clone()).unwrap_or_else(|| Arc::new(AsyncMutex::new(())));
         let _business = business.lock().await;
         // Persist retired ownership before permitting a new login session to load it.
@@ -484,6 +492,7 @@ impl WorldHub {
         let mut state = self.data.lock().expect("world state");
         if state.duels.active(owner.id){return Err(error(409,"BATTLE_ACTIVE"));}
         if state.team_busy.contains(&owner.id){return Err(error(409,"TEAM_BATTLE_ACTIVE"));}
+        if Self::following(&state,owner.id) && matches!(input,ClientMessage::MoveTo{..}){return Err(error(409,"TEAM_FOLLOWING"));}
         let actor = state
             .actors
             .get_mut(&owner.id)
@@ -702,7 +711,7 @@ pub(crate) async fn ticket(
         .bind(auth::token_digest(&raw)?).bind(session).bind(request.character_id).execute(&mut *tx).await.map_err(db_error)?;
     tx.commit().await.map_err(db_error)?;
     Ok(Json(
-        json!({"ticket":raw,"expires_in":20,"character_id":request.character_id,"config_hash":config_hash(),"announcement_version":1,"population_version":1,"pve_version":1,"maps_version":1,"ai_world_version":1,"shop_version":2,"duel_version":1}),
+        json!({"ticket":raw,"expires_in":20,"character_id":request.character_id,"config_hash":config_hash(),"announcement_version":1,"population_version":1,"pve_version":1,"maps_version":1,"ai_world_version":1,"shop_version":2,"duel_version":1,"team_version":1}),
     ))
 }
 #[derive(Deserialize)]
@@ -727,6 +736,8 @@ pub enum ClientMessage {
         shop_version: u32,
         #[serde(default)]
         duel_version: u32,
+        #[serde(default)]
+        team_version: u32,
     },
     #[serde(rename = "world.move_to")]
     MoveTo {
@@ -875,6 +886,7 @@ async fn connection(socket: WebSocket, auth: AuthService, hub: Arc<WorldHub>, an
         maps_version,
         shop_version,
         duel_version,
+        team_version,
     }) = serde_json::from_str::<ClientMessage>(&text)
     else {
         fail(&mut socket, "INVALID_HANDSHAKE").await;
@@ -986,6 +998,7 @@ async fn connection(socket: WebSocket, auth: AuthService, hub: Arc<WorldHub>, an
     let mut messages = 0;
     let mut leave = false;
     let mut duel_revision=None;
+    let mut team_revision=None;
     crate::security::connection_event(&auth,owner.session,owner.id,"world.join","OK",json!({"map_id":owner.map_id,"connection_id":id})).await;
     let mut audit_since = Instant::now();
     let mut move_accepted = 0_u32;
@@ -1021,7 +1034,12 @@ async fn connection(socket: WebSocket, auth: AuthService, hub: Arc<WorldHub>, an
                         match hub.pve_context(&owner,if command.action==crate::pve_rules::Action::SchoolJoin {Some("qingwei")}else{command.target.as_deref()}) {
                             Ok(context) => match crate::pve::execute(&auth,&context,command).await {
                                 Ok(value) => match crate::pve::snapshot(&auth,&context).await {
-                                    Ok(current) => {hub.pve_applied(&owner,&current);Ok(value)},
+                                    Ok(current) => {
+                                        if let Some(to)=current["state"]["character"]["map_id"].as_str().filter(|to|*to!=context.map_id) {
+                                            hub.follow_departed(owner.id,&context.map_id,to,context.cell,command);
+                                        }
+                                        hub.pve_applied(&owner,&current);Ok(value)
+                                    },
                                     Err(e) => Err(e),
                                 },
                                 Err(e) => Err(e),
@@ -1050,6 +1068,9 @@ async fn connection(socket: WebSocket, auth: AuthService, hub: Arc<WorldHub>, an
                 else {match hub.command(&owner,&input) { Ok(())=>{move_accepted+=1;},Err(e)=>{move_rejected+=1;last_move_code=e.1;fail(&mut socket,e.1).await;} }}
             },
             _=pulse.tick()=>{
+                if team_version==1 {
+                    if let Some((revision,packet))=hub.team_packet(&owner,team_revision) {if send(&mut socket,packet).await.is_err(){break;}team_revision=Some(revision);}
+                }
                 let team_dirty=hub.data.lock().expect("world state").team_dirty.remove(&owner.id);
                 if team_dirty&&pve_version==1 {
                     let value={let _business=owner.business.lock().await;match hub.pve_context(&owner,None){Ok(c)=>crate::pve::snapshot(&auth,&c).await,Err(e)=>Err(e)}};

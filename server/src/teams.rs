@@ -33,8 +33,9 @@ pub struct Command {
     #[serde(default)]
     pub ready: Option<bool>,
 }
-const ACTIONS: [&str; 15] = [
+const ACTIONS: [&str; 16] = [
     "snapshot",
+    "follow",
     "create",
     "invite",
     "accept",
@@ -131,6 +132,7 @@ pub(crate) async fn command(
         return Err(AuthError(StatusCode::BAD_REQUEST, "INVALID_REQUEST"));
     }
     let hub = state.world.as_ref().ok_or(err("WORLD_UNAVAILABLE"))?;
+    let _update = hub.team_updates.lock().await;
     let mut tx = auth.pool().begin().await.map_err(db)?;
     sqlx::query("SET LOCAL lock_timeout='3s'")
         .execute(&mut *tx)
@@ -273,7 +275,7 @@ pub(crate) async fn command(
                     "rejected"
                 },
                 code: &code,
-                details: json!({"target":c.target,"battle_id":c.battle_id}),
+                details: json!({"target":c.target,"battle_id":c.battle_id,"ready":c.ready}),
             },
         )
         .await
@@ -297,7 +299,9 @@ pub(crate) async fn command(
         // until a later snapshot/retry resolves the durable battle state.
         r.commit();
     }
+    let roster=if let Some(t)=final_team {crate::world::team_bridge::roster(&mut tx,t).await?}else{vec![]};
     tx.commit().await.map_err(db)?;
+    hub.team_roster_sync(&affected,roster);
     hub.team_sync(&affected, final_battle.as_ref(), dirty);
     Ok(Json(
         json!({"version":"team-v1","character_id":c.character_id,"operation_id":c.operation_id,"ok":code=="OK","code":code,"replayed":replayed,"server_time_ms":now,"state":response}),
@@ -411,6 +415,12 @@ async fn apply(
         return Ok(false);
     }
     let (team, leader) = own_membership.ok_or(err("NOT_IN_TEAM"))?;
+    if c.action == "follow" {
+        if leader {return Err(err("TEAM_MEMBER_REQUIRED"));}
+        sqlx::query("UPDATE team_members SET following=$2,ready=FALSE WHERE character_id=$1")
+            .bind(me).bind(c.ready.ok_or(err("INVALID_TEAM_COMMAND"))?).execute(&mut **tx).await.map_err(db)?;
+        return Ok(false);
+    }
     if c.action == "ready" {
         if context.moving {
             return Err(err("TEAM_NOT_READY"));
@@ -603,8 +613,8 @@ async fn snapshot(
     now: i64,
 ) -> Result<Value, AuthError> {
     let team = if let Some((id, leader)) = membership(tx, me).await? {
-        let rows=sqlx::query("SELECT c.id,c.display_name,c.job,c.gender,c.level,c.map_id,m.leader,m.ready FROM team_members m JOIN characters c ON c.id=m.character_id WHERE m.team_id=$1 ORDER BY m.leader DESC,m.joined_at,c.id").bind(id).fetch_all(&mut **tx).await.map_err(db)?;
-        let members:Vec<_>=rows.into_iter().map(|r|{let id:Uuid=r.get("id");json!({"id":id,"display_name":r.get::<String,_>("display_name"),"job":r.get::<i16,_>("job"),"gender":r.get::<i16,_>("gender"),"level":r.get::<i32,_>("level"),"map_id":r.get::<String,_>("map_id"),"leader":r.get::<bool,_>("leader"),"ready":r.get::<bool,_>("ready"),"online":online.contains(&id)})}).collect();
+        let rows=sqlx::query("SELECT c.id,c.display_name,c.job,c.gender,c.level,c.map_id,m.leader,m.ready,m.following FROM team_members m JOIN characters c ON c.id=m.character_id WHERE m.team_id=$1 ORDER BY m.leader DESC,m.joined_at,c.id").bind(id).fetch_all(&mut **tx).await.map_err(db)?;
+        let members:Vec<_>=rows.into_iter().map(|r|{let id:Uuid=r.get("id");json!({"id":id,"display_name":r.get::<String,_>("display_name"),"job":r.get::<i16,_>("job"),"gender":r.get::<i16,_>("gender"),"level":r.get::<i32,_>("level"),"map_id":r.get::<String,_>("map_id"),"leader":r.get::<bool,_>("leader"),"ready":r.get::<bool,_>("ready"),"following":r.get::<bool,_>("following"),"online":online.contains(&id)})}).collect();
         let b = battle(tx, id)
             .await?
             .filter(|b| b.fighters.iter().any(|f| f.id == me));

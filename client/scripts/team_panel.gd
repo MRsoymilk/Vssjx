@@ -48,11 +48,13 @@ func refresh()->void:
 		_actions([["创建队伍",func()->void:model.submit("create")],["刷新",func()->void:model.refresh()]])
 		return
 	_label("%d / 5人 · %s"%[p.members.size(),"你是队长" if p.leader else "队长发起战斗"])
-	_label("全员同图、在队长附近集合并准备；队长靠近怪物后共同进入战斗。")
+	_label("入队后自动跟随队长；可暂离自由行动。全员停稳并准备后，队长发起战斗。")
 	for m in p.members:
-		_label("%s Lv.%d%s\n%s · %s"%[m.display_name,int(m.level)," · 队长" if m.leader else "","在线" if m.online else "离线","已准备" if m.ready else "未准备"])
+		_label("%s Lv.%d%s\n%s · %s"%[m.display_name,int(m.level)," · 队长" if m.leader else "",("在线 · " if m.online else "离线 · ")+("带队" if m.leader else ("跟随" if m.get("following",true) else "暂离")),"已准备" if m.ready else "未准备"])
 		var actions:Array=[["资料",func()->void:profile_requested.emit(m.id)]]
-		if m.id==model.character_id:actions.append(["取消准备" if m.ready else "准备",func()->void:model.submit("ready","","",not m.ready)])
+		if m.id==model.character_id:
+			actions.append(["取消准备" if m.ready else "准备",func()->void:model.submit("ready","","",not m.ready)])
+			if not m.leader:actions.append(["暂离" if m.get("following",true) else "跟随队长",func()->void:model.submit("follow","","",not m.get("following",true))])
 		elif p.leader:
 			actions.append(["移交",func()->void:confirm("transfer",m.id,"将队长移交给%s？"%m.display_name)])
 			actions.append(["移出",func()->void:confirm("kick",m.id,"将%s移出队伍？"%m.display_name)])

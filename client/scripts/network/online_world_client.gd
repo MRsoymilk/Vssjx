@@ -11,6 +11,10 @@ const MAP_PATH := SharedWorldMap.MAP_PATH
 var map_id := "qingyun_trail"
 var world_ready := false
 var team_active := false
+var team_following := false
+var team_marks: Dictionary = {}
+var team_travel: Dictionary = {}
+var _team_version := 0
 var character_id := ""
 var entities: Dictionary = {}
 var server := ""
@@ -89,6 +93,7 @@ func leave() -> void:
 	_state = "idle"
 	_ticket = ""
 	world_ready = false
+	team_following=false;team_marks={};team_travel={}
 	entities = {}
 	_net_ids = {}
 	_snapshot = {}
@@ -163,6 +168,8 @@ func _on_ticket(result: Dictionary) -> void:
 	# Servers keep maps_version=1 for older clients and advertise the expansion separately.
 	if _maps_version >= 1 and result.get("ai_world_version") == 1: _maps_version = 2
 	_shop_version = int(result.get("shop_version")) if result.get("shop_version") in [1,2] else 0
+	_team_version = 1 if result.get("team_version") == 1 else 0
+	team_following=false;team_marks={};team_travel={}
 	_duel_version = 1 if result.get("duel_version") == 1 else 0
 	duel.enabled = _duel_version == 1
 	if not duel.enabled: duel.clear()
@@ -229,7 +236,7 @@ func _process(_delta: float) -> void:
 		if not data is Dictionary:
 			_failed("INVALID_PACKET")
 			return
-		if raw.size() > 32768 and data.get("type") != "world.appearance":
+		if raw.size() > 32768 and data.get("type") not in ["world.appearance","world.team"]:
 			_failed("INVALID_PACKET"); return
 		_receive(data, raw)
 	# A transfer receipt and the old room's close can arrive in the same poll.
@@ -262,6 +269,7 @@ func _exchange_packet() -> Dictionary:
 	if _maps_version in [1, 2]: packet.maps_version = _maps_version
 	if _shop_version in [1,2]: packet.shop_version = _shop_version
 	if _duel_version == 1: packet.duel_version = 1
+	if _team_version == 1: packet.team_version = 1
 	return packet
 
 static func _decimal(value: Variant) -> bool:
@@ -297,12 +305,21 @@ func _receive(data: Dictionary, raw: PackedByteArray) -> void:
 		return
 	if kind == "error":
 		var code := String(data.get("code", "SERVER_ERROR"))
-		if code in ["INVALID_TARGET", "STALE_INPUT", "RATE_LIMITED", "BATTLE_ACTIVE","TEAM_BATTLE_ACTIVE"]:
-			if code=="TEAM_BATTLE_ACTIVE":_pending_motion.clear()
-			status_changed.emit("战斗中暂不能移动。" if code in ["BATTLE_ACTIVE","TEAM_BATTLE_ACTIVE"] else "目标不可达或操作过快，请重试。")
+		if code in ["INVALID_TARGET", "STALE_INPUT", "RATE_LIMITED", "BATTLE_ACTIVE","TEAM_BATTLE_ACTIVE","TEAM_FOLLOWING"]:
+			if code in ["TEAM_BATTLE_ACTIVE","TEAM_FOLLOWING"]:_pending_motion.clear()
+			status_changed.emit("跟随中由队长控制移动，可在队伍界面暂离。" if code=="TEAM_FOLLOWING" else "战斗中暂不能移动。" if code in ["BATTLE_ACTIVE","TEAM_BATTLE_ACTIVE"] else "目标不可达或操作过快，请重试。")
 		else: _failed(code, code in ["DATABASE_UNAVAILABLE", "SERVER_BUSY", "WORLD_STREAM_LAGGED"])
 		return
 	if kind == "pong": return
+	if kind == "world.team":
+		if not world_ready or _team_version!=1 or not valid_team_packet(data,map_id):
+			_failed("INVALID_TEAM_STATE");return
+		team_marks=data.members.duplicate(true);team_following=data.following
+		team_travel=data.travel.duplicate(true) if data.travel is Dictionary else {}
+		if not team_travel.is_empty():team_travel.cell=[int(team_travel.cell[0]),int(team_travel.cell[1])]
+		if team_following:_pending_motion.clear();movement_cancelled.emit()
+		changed.emit(entities)
+		return
 	if kind == "world.appearance":
 		if not world_ready or not _shop_version in [1,2] or data.get("map_id") != map_id or not data.get("looks") is Dictionary or data.looks.size() > 1000:
 			_failed("INVALID_APPEARANCE"); return
@@ -475,12 +492,12 @@ func stop_moving() -> void:
 	_send_motion("world.stop")
 
 func _send_motion(kind: String, target: Array = []) -> void:
-	if not world_ready or pve.active() or pve.pending() or duel.active() or team_active: return
+	if not world_ready or pve.active() or pve.pending() or duel.active() or team_active or (team_following and kind=="world.move_to"): return
 	_pending_motion = {"type": kind, "target": target.duplicate()}
 	_flush_motion()
 
 func _flush_motion() -> void:
-	if duel.active() or team_active: _pending_motion.clear(); return
+	if duel.active() or team_active or (team_following and _pending_motion.get("type")=="world.move_to"): _pending_motion.clear(); return
 	var now := Time.get_unix_time_from_system()
 	if not world_ready or socket == null or socket.get_ready_state() != WebSocketPeer.STATE_OPEN or _pending_motion.is_empty() or now - _last_input_at < 0.1: return
 	var intent := _pending_motion
@@ -490,3 +507,12 @@ func _flush_motion() -> void:
 	var message := {"type": intent.type, "game_session_id": game_session, "connection_epoch": connection_epoch, "world_epoch": world_epoch, "input_seq": str(_input_seq)}
 	if intent.type == "world.move_to": message.target = intent.target
 	if socket.send_text(JSON.stringify(message)) != OK: _failed("SEND_FAILED", true)
+
+static func valid_team_packet(data:Dictionary,current_map:String)->bool:
+	if data.get("map_id")!=current_map or not data.get("following") is bool or not data.get("members") is Dictionary or data.members.size()>1000:return false
+	for id in data.members:
+		var m:Variant=data.members[id]
+		if not _uuid(id) or not m is Dictionary or not m.get("leader") is bool or not m.get("following") is bool:return false
+	var travel:Variant=data.get("travel")
+	if travel==null:return true
+	return travel is Dictionary and travel.get("action") in ["transfer","ai_travel"] and travel.get("target") is String and travel.target.length()<=32 and _cell(travel.get("cell"))

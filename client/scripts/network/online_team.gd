@@ -10,7 +10,7 @@ var next_poll:=0
 var received_at:=0
 var server_time:=0
 var supported:=true
-const ERRORS:={"TEAM_NOT_READY":"队友还没准备好，请全员停稳后点击准备。","TEAM_NOT_TOGETHER":"请全员在同一地图、队长附近集合并停稳。","TEAM_LEADER_REQUIRED":"只能由队长进行此操作。","TEAM_LEADER_MUST_TRANSFER":"请先移交队长，或解散队伍。","TEAM_PLAYER_OFFLINE":"队友已离线，请等待重连或调整队伍。","TEAM_BUSY":"有队员正在单人战斗或决斗中。","TEAM_FULL":"队伍最多5人。","TEAM_NEEDS_MEMBERS":"至少两人组队才能共同战斗。","TEAM_BATTLE_ACTIVE":"正在组队战斗，不能更改队伍。","TEAM_NOT_YOUR_TURN":"请等待当前队友行动。","INVALID_BATTLE_TARGET":"目标已倒下，请重新选择。","TEAM_INVITE_EXPIRED":"邀请已过期或已被处理。","TEAM_INVITE_PENDING":"已发送邀请，请等待对方确认。","TEAM_INVITE_COOLDOWN":"对方已拒绝，请5分钟后再邀请。","ALREADY_IN_TEAM":"你或对方已加入队伍。","MONSTER_RESPAWNING":"有队员的怪物尚未刷新，请稍候。","RESIDENT_TOO_FAR":"请队长靠近怪物。","QUEST_REQUIRED":"有队员尚未领取入门任务，请先找清微道人。","STALE_BATTLE":"战场已更新，请重新选择指令。","NO_ACTIVE_BATTLE":"战斗已经结束。","NOT_IN_TEAM":"尚未加入队伍。","MP_INSUFFICIENT":"灵力不足。","NO_POTION":"没有回春散。","HP_FULL":"气血已满。","NOT_FOUND":"服务尚未支持组队，需要更新游戏服务。","RATE_LIMITED":"操作过快，请稍候。","SESSION_REPLACED":"当前角色已在另一会话进入游戏。"}
+const ERRORS:={"TEAM_MEMBER_REQUIRED":"队长负责带队，无需跟随。","TEAM_NOT_READY":"队友还没准备好，请全员停稳后点击准备。","TEAM_NOT_TOGETHER":"请全员在同一地图、队长附近集合并停稳。","TEAM_LEADER_REQUIRED":"只能由队长进行此操作。","TEAM_LEADER_MUST_TRANSFER":"请先移交队长，或解散队伍。","TEAM_PLAYER_OFFLINE":"队友已离线，请等待重连或调整队伍。","TEAM_BUSY":"有队员正在单人战斗或决斗中。","TEAM_FULL":"队伍最多5人。","TEAM_NEEDS_MEMBERS":"至少两人组队才能共同战斗。","TEAM_BATTLE_ACTIVE":"正在组队战斗，不能更改队伍。","TEAM_NOT_YOUR_TURN":"请等待当前队友行动。","INVALID_BATTLE_TARGET":"目标已倒下，请重新选择。","TEAM_INVITE_EXPIRED":"邀请已过期或已被处理。","TEAM_INVITE_PENDING":"已发送邀请，请等待对方确认。","TEAM_INVITE_COOLDOWN":"对方已拒绝，请5分钟后再邀请。","ALREADY_IN_TEAM":"你或对方已加入队伍。","MONSTER_RESPAWNING":"有队员的怪物尚未刷新，请稍候。","RESIDENT_TOO_FAR":"请队长靠近怪物。","QUEST_REQUIRED":"有队员尚未领取入门任务，请先找清微道人。","STALE_BATTLE":"战场已更新，请重新选择指令。","NO_ACTIVE_BATTLE":"战斗已经结束。","NOT_IN_TEAM":"尚未加入队伍。","MP_INSUFFICIENT":"灵力不足。","NO_POTION":"没有回春散。","HP_FULL":"气血已满。","NOT_FOUND":"服务尚未支持组队，需要更新游戏服务。","RATE_LIMITED":"操作过快，请稍候。","SESSION_REPLACED":"当前角色已在另一会话进入游戏。"}
 func bind_character(id:String)->void:
 	character_id=id;request={};inflight=false;next_poll=0;state={"team":null,"incoming":[]}
 	var saved:Dictionary=OnlineAccount.pending_team
@@ -22,7 +22,7 @@ func pending()->bool:return not request.is_empty() and request.action!="snapshot
 func my_turn()->bool:return active() and battle().fighters[int(battle().turn)].id==character_id
 func submit(action:String,target:String="",skill:String="",ready:Variant=null)->bool:
 	if pending() or inflight:return false
-	if action not in ["create","invite","accept","reject","cancel","leave","kick","transfer","disband","ready","challenge","attack","skill","guard","potion","flee"]:return false
+	if action not in ["follow","create","invite","accept","reject","cancel","leave","kick","transfer","disband","ready","challenge","attack","skill","guard","potion","flee"]:return false
 	var bytes:=Crypto.new().generate_random_bytes(16)
 	if bytes.size()!=16:return false
 	bytes[6]=(bytes[6]&15)|64;bytes[8]=(bytes[8]&63)|128;var hex:=bytes.hex_encode()
@@ -69,7 +69,7 @@ func valid(v:Dictionary)->bool:
 	if not p is Dictionary or not OnlineWorldClient._uuid(p.get("id")) or not p.get("leader") is bool or not p.get("members") is Array or p.members.is_empty() or p.members.size()>5 or not p.has("battle") or not p.get("outgoing") is Array or p.outgoing.size()>10:return false
 	var ids:={};var leaders:=0
 	for m in p.members:
-		if not preload("res://scripts/network/online_social.gd").person(m) or ids.has(m.id) or not m.get("ready") is bool or not m.get("leader") is bool or not SharedWorldMap.exists(m.get("map_id")):return false
+		if not preload("res://scripts/network/online_social.gd").person(m) or ids.has(m.id) or not m.get("ready") is bool or not m.get("following",true) is bool or not m.get("leader") is bool or not SharedWorldMap.exists(m.get("map_id")):return false
 		ids[m.id]=true
 		if m.leader:leaders+=1
 	if leaders!=1 or not ids.has(character_id):return false

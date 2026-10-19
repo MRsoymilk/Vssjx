@@ -1,0 +1,5 @@
+[gd_scene format=3]
+
+[node name="SkillSound" type="AudioStreamPlayer"]
+volume_db = -6.0
+max_polyphony = 1

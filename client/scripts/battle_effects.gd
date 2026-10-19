@@ -4,6 +4,8 @@ extends Node2D
 ## Bindings are authored from each skill's meaning, using original ANI artwork.
 static var catalog:Dictionary=JSON.parse_string(FileAccess.get_file_as_string("res://assets/data/skill-effects-v1.json"))
 var _attachments:Array[Dictionary]=[]
+var _sounds:Array[AudioStreamPlayer]=[]
+signal audio_played(id:String)
 
 func _init()->void:
 	# BattleActionPlayback advances in its owning view first.
@@ -36,6 +38,14 @@ func play_binding(id:String,trigger:String,hero:AnimatedSprite2D,enemy:AnimatedS
 		if sprite!=null:
 			sprite.set_meta("skill_id",id);sprite.set_meta("trigger",trigger)
 			if primary==null:primary=sprite
+	if primary!=null and selected.has("audio_id"):
+		var sound:=GameAudio.player(selected.audio_id)
+		if sound!=null:
+			add_child(sound,false,Node.INTERNAL_MODE_BACK)
+			_sounds.append(sound)
+			sound.finished.connect(func()->void:_sounds.erase(sound);sound.queue_free())
+			sound.play()
+			audio_played.emit(selected.audio_id)
 	return primary
 
 func play_reflection(job:int,school:int,level:int,state:Dictionary,magical:bool,hero:AnimatedSprite2D,enemy:AnimatedSprite2D)->void:
@@ -74,6 +84,9 @@ func _process(_delta:float)->void:
 		else:_follow(sprite,subject,entry.offset)
 
 func clear()->void:
+	for sound in _sounds:
+		if is_instance_valid(sound):sound.stop();sound.queue_free()
+	_sounds.clear()
 	for entry in _attachments:
 		if is_instance_valid(entry.sprite):entry.sprite.hide();entry.sprite.queue_free()
 	_attachments.clear()

@@ -130,6 +130,7 @@
     },
     "sheet_010": {
       "name": "雷霆一击",
+      "audio_id": "thunder",
       "basis": "authored_semantic_mapping",
       "trigger": "cast_impact",
       "reason": "青蓝雷电裂纹，表现雷霆重击",

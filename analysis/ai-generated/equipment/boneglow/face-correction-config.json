@@ -1,0 +1,57 @@
+{
+  "family": "boneglow",
+  "sets": [
+    [
+      "01_male_lishi",
+      "mzs",
+      "玄骸镇岳",
+      14,
+      2
+    ],
+    [
+      "02_female_lishi",
+      "wzs",
+      "赤翎破军",
+      14,
+      2
+    ],
+    [
+      "03_male_xiake",
+      "mck",
+      "紫冥斩魄",
+      1,
+      2
+    ],
+    [
+      "04_female_xiake",
+      "wck",
+      "霜骨流萤",
+      1,
+      2
+    ],
+    [
+      "05_male_yinzhe",
+      "mfs",
+      "幽篁摄灵",
+      2,
+      3
+    ],
+    [
+      "06_female_yinzhe",
+      "wfs",
+      "苍灵月骨",
+      2,
+      3
+    ]
+  ],
+  "sheet_rows": 5,
+  "atlas_overrides": {
+    "02_female_lishi": {
+      "file": "02_female_lishi-face-corrected.png",
+      "cells": [
+        0
+      ],
+      "preserve_aspect": true
+    }
+  }
+}

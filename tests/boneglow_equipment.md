@@ -1,5 +1,18 @@
 # 骨甲幽光装备验证
 
+## 2026-10-20 赤翎破军脸部修正
+
+用户指出女力士头部脸型、眼睛变形后，以内置 image_gen 编辑原生产稿的第 0 格，并参考原包 `wzst2` 头部；保留棕红长发、金色饰物和装备风格。新稿、修复前图集、生成记录与可复现配置保存在 `analysis/ai-generated/equipment/boneglow/face-correction-*` 及 `02_female_lishi-face-corrected.png`、`02_female_lishi-head-before.png`。
+
+原导入器按包围框独立拉伸宽高，本次增加 `--patch-only` 模式，只替换配置明确列出的部件格。`preserve_aspect` 使用等比采样、水平居中与底部颈部锚点对齐，避免把眼睛和下颌再次纵向拉长。后脑帧、其余部件和图标均保留原像素，更新导入清单中的目标 SHA256。
+
+```sh
+godot --headless --path client --script ../tools/equipment_asset_pipeline.gd -- build --patch-only --config res://../analysis/ai-generated/equipment/boneglow/face-correction-config.json
+python tests/test_boneglow_assets.py
+```
+
+运行图集只变更 `client/assets/generated/equipment/boneglow/wzs/parts/wzst2.png`，90 张资源中其他 89 张 SHA256 不变。实际 OpenGL 装备场景 490 项通过；另以实际人物合成器对照修复前后并检查待机、行走、攻击及受击。开发截图在忽略目录 `work/face-game-captures/`。本轮未打包、推送或部署，已发布客户端需要后续重新导出才能获得此图集。
+
 2026-10-19，使用项目Godot 4.7.2、本机OpenGL兼容渲染，以及Rust服务端和专用临时PostgreSQL数据库验证。未操作玩家实际存档和生产数据库，未部署公网。
 
 ## 命令

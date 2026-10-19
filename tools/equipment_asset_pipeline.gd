@@ -21,10 +21,12 @@ var sheet_rows := 5
 var icon_start_cell := -1
 var weapon_icon_ids: Array = []
 var atlas_overrides: Dictionary = {}
+var patch_only := false
 const ICON_SLOTS := ["weapon","hat","armor","wrist","belt","pants","boots","pendant","ring","necklace"]
 
 func _init() -> void:
 	var args := OS.get_cmdline_user_args()
+	patch_only = "--patch-only" in args
 	var config_index := args.find("--config")
 	if config_index >= 0:
 		var config: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(args[config_index+1]))
@@ -103,6 +105,7 @@ func build_runtime() -> void:
 	var report: Array = []
 	var slots := ICON_SLOTS
 	for entry in templates:
+		if patch_only and not atlas_overrides.has(entry.id): continue
 		var output: String = "res://assets/generated/equipment/"+family+"/"+entry.stem+"/"
 		for folder in ["parts","icons"]: DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(output+folder))
 		var paint_path: String = data_dir+entry.id+"-parts-painted.png"
@@ -117,10 +120,17 @@ func build_runtime() -> void:
 			clean_alpha(override_image)
 		var atlases := {}
 		for index in entry.cells.size():
+			if patch_only and index not in override.get("cells",[]): continue
 			var cell: Dictionary = entry.cells[index]
 			var info: Dictionary = original.parts[cell.source]
 			var native := Image.load_from_file(ProjectSettings.globalize_path(info.texture))
-			if not atlases.has(cell.source): atlases[cell.source] = Image.create(native.get_width(),native.get_height(),false,Image.FORMAT_RGBA8)
+			if not atlases.has(cell.source):
+				if patch_only:
+					var current: String = output+"parts/"+cell.source+".png"
+					if not FileAccess.file_exists(current):
+						push_error("Cannot patch missing runtime atlas: "+current);quit(1);return
+					atlases[cell.source] = Image.load_from_file(ProjectSettings.globalize_path(current))
+				else: atlases[cell.source] = Image.create(native.get_width(),native.get_height(),false,Image.FORMAT_RGBA8)
 			var r: Array = cell.original_region
 			var original_rect := Rect2i(r[0],r[1],r[2],r[3])
 			var used := native.get_region(original_rect).get_used_rect()
@@ -133,13 +143,21 @@ func build_runtime() -> void:
 				quit(1)
 				return
 			var fitted := tile.get_region(new_used)
-			fitted.resize(used.size.x, used.size.y, Image.INTERPOLATE_NEAREST)
-			atlases[cell.source].blit_rect(fitted,Rect2i(Vector2i.ZERO,fitted.get_size()),original_rect.position+used.position)
+			var placement := original_rect.position+used.position
+			if patch_only and override.get("preserve_aspect",false):
+				var factor := minf(float(used.size.x)/fitted.get_width(),float(used.size.y)/fitted.get_height())
+				fitted.resize(maxi(1,roundi(fitted.get_width()*factor)),maxi(1,roundi(fitted.get_height()*factor)),Image.INTERPOLATE_NEAREST)
+				# Keep the neck at the native bottom anchor; never stretch eyes/jaw.
+				placement += Vector2i((used.size.x-fitted.get_width())/2,used.size.y-fitted.get_height())
+			else: fitted.resize(used.size.x, used.size.y, Image.INTERPOLATE_NEAREST)
+			if patch_only: atlases[cell.source].fill_rect(original_rect,Color.TRANSPARENT)
+			atlases[cell.source].blit_rect(fitted,Rect2i(Vector2i.ZERO,fitted.get_size()),placement)
 		for source in atlases:
 			var path: String = output+"parts/"+source+".png"
 			atlases[source].save_png(path)
 			report.append({"path":path,"sha256":FileAccess.get_sha256(path),"native_frames":original.parts[source].frames})
 		for index in slots.size():
+			if patch_only: continue # A part repair never republishes unrelated icons.
 			var source_cell := icon_start_cell+index if icon_start_cell >= 0 else 4+index
 			var rows := sheet_rows if icon_start_cell >= 0 else 4
 			var input := override_image if source_cell in override.get("cells",[]) else design
@@ -155,7 +173,20 @@ func build_runtime() -> void:
 			var record := {"path":path,"sha256":FileAccess.get_sha256(path),"source_cell":source_cell}
 			if removed > 0: record["removed_border_pixels"] = removed
 			report.append(record)
+	var patched_count := report.size()
+	if patch_only:
+		if report.is_empty():push_error("No configured native frames were patched");quit(1);return
+		var saved: Array = JSON.parse_string(FileAccess.get_file_as_string(data_dir+"runtime-import-report.json"))
+		for record in report:
+			var matches: Array = saved.filter(func(row: Dictionary)->bool:return row.path==record.path)
+			if matches.size()!=1:push_error("Patch missing from import manifest: "+record.path);quit(1);return
+			matches[0].sha256=record.sha256
+		for record in saved:
+			for key in ["source_cell","removed_border_pixels"]:
+				if record.has(key):record[key]=int(record[key])
+		report=saved
 	var file := FileAccess.open(data_dir+"runtime-import-report.json",FileAccess.WRITE)
 	file.store_string(JSON.stringify(report,"  ")+"\n")
-	print("Published ",report.size()," native runtime textures (30 parts, 60 icons)")
+	if patch_only: print("Patched ",patched_count," native runtime texture(s); retained ",report.size()," manifest entries")
+	else: print("Published ",report.size()," native runtime textures (30 parts, 60 icons)")
 	quit()

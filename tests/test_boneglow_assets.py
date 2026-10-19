@@ -62,5 +62,25 @@ class BoneglowAssets(unittest.TestCase):
                 self.assertTrue(all(occupied), f'{slot}: no detached fragment above the item')
 
 
+    def test_female_lishi_face_preserves_aspect_neck_and_back_frame(self):
+        if self.FAMILY != 'boneglow':
+            self.skipTest('Face correction concerns boneglow female lishi')
+        folder = ROOT/'analysis/ai-generated/equipment/boneglow'
+        config = json.loads((folder/'face-correction-config.json').read_text('utf8'))
+        override = config['atlas_overrides']['02_female_lishi']
+        self.assertEqual(override['cells'], [0])
+        self.assertTrue(override['preserve_aspect'])
+        with Image.open(folder/'02_female_lishi-head-before.png') as old, Image.open(ROOT/'client/assets/generated/equipment/boneglow/wzs/parts/wzst2.png') as current, Image.open(folder/override['file']) as source:
+            self.assertEqual(current.size, old.size)
+            self.assertEqual(current.crop((42,0,62,16)).tobytes(), old.crop((42,0,62,16)).tobytes(), 'Back-facing head must remain unchanged')
+            alpha = current.crop((0,0,42,43)).getchannel('A')
+            actual = alpha.getbbox()
+            self.assertEqual(actual[3], old.crop((0,0,42,43)).getchannel('A').getbbox()[3], 'Neck remains at the native anchor')
+            cell = source.crop((0,0,int(source.width/4+.5),int(source.height/5+.5)))
+            bounds = cell.getchannel('A').point(lambda a: 255 if a >= 128 else 0).getbbox()
+            width, height = bounds[2]-bounds[0], bounds[3]-bounds[1]
+            self.assertLessEqual(abs((actual[2]-actual[0])*height-(actual[3]-actual[1])*width), max(width,height), 'Import must not stretch the new eyes and jaw')
+            self.assertLessEqual(set(alpha.tobytes()), {0,255}, 'Native sprite has no blended alpha fringe')
+
 if __name__ == '__main__':
     unittest.main()

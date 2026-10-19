@@ -1,0 +1,20 @@
+{
+  "tool": "image_gen built-in",
+  "date": "2026-10-20",
+  "set": "boneglow/wzs",
+  "target": "client/assets/generated/equipment/boneglow/wzs/parts/wzst2.png",
+  "cells": [
+    0
+  ],
+  "source": "02_female_lishi-face-corrected.png",
+  "before": "02_female_lishi-head-before.png",
+  "source_sha256": "85ef01cea9af0e8ee5b3e67d67379c5af27e5999078243cda345747d341d5245",
+  "reason": "Redraw malformed female lishi face; preserve burgundy hair and gold ornament; fit uniformly and align native neck anchor.",
+  "native_reference": "client/assets/hero_parts/wzst2.png",
+  "preserve_aspect": true,
+  "generated_path": "C:/Users/milk/.codex/generated_images/01a13a91-69ac-7d52-b1d5-c25c1f7e6a26/exec-0fbd0be2-5825-41f7-9182-d6d757301ab7.png",
+  "edit_target": "02_female_lishi-parts-painted.png",
+  "prompt": "Fix ONLY the front-facing head in top-left cell 0 of this 4-column by 5-row native parts sheet. Use the original wzst2 female head as the anatomy and pixel-density reference. A cute chibi adult female warrior with aligned small crimson eyes, tiny highlights, clean brows, a small delicate smile and balanced cheeks. Preserve burgundy long hair, cream-gold ornament, native head footprint and neck anchor. True chunky low-resolution pixel clusters for a 42x43 head; no realism, anti-aliasing, blur, gradients, giant anime eyes or elongated chin. Preserve every other head, body, limb, weapon, position and grid cell. Transparent background, opaque pixels, no captions.",
+  "runtime_sha256": "734fb42e6cde7ed9bd9e048378c0ee375bde97bf6bce2ced67670afd979c3f0e",
+  "validated": "Only one of 90 boneglow PNGs changed; native back-head pixels preserved; 4 asset checks and 490 rendered game checks passed."
+}

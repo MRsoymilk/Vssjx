@@ -11,6 +11,7 @@ var member_scroll:ScrollContainer
 var tip:Label
 const Chrome=preload("res://scripts/social_chrome.gd")
 const INK:=Color("654518")
+const TeamMarker=preload("res://scripts/team_marker.gd")
 func _ready()->void:
 	z_index=20
 	var shade:=ColorRect.new();shade.color=Color(0,0,0,.6);shade.size=Vector2(320,480);add_child(shade)
@@ -41,7 +42,7 @@ func _member(m:Dictionary)->void:
 	var content:=Control.new();card.add_child(content)
 	OriginalSceneChrome.panel(content,Rect2(5,6,44,44),Color("d6b96e"),INK)
 	var portrait:=TextureRect.new();portrait.name="Portrait";portrait.texture=load("res://assets/ui/create_portrait_%d.png"%(clampi(int(m.job),0,2)*2+clampi(int(m.gender),0,1)));portrait.texture_filter=TEXTURE_FILTER_NEAREST;portrait.position=Vector2(7,8);portrait.size=Vector2(40,40);portrait.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;portrait.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;portrait.mouse_filter=MOUSE_FILTER_IGNORE;content.add_child(portrait)
-	var flag:=TextureRect.new();flag.name="Flag";flag.texture=load("res://assets/ui/team_%s.png"%("leader" if m.leader else "member" if m.get("following",true) else "away"));flag.texture_filter=TEXTURE_FILTER_NEAREST;flag.position=Vector2(55,5);flag.size=Vector2(15,18);flag.mouse_filter=MOUSE_FILTER_IGNORE;content.add_child(flag)
+	var flag:=TextureRect.new();flag.name="Flag";flag.texture=TeamMarker.texture_for(m);flag.material=TeamMarker.material_for(m);flag.texture_filter=TEXTURE_FILTER_NEAREST;flag.position=Vector2(55,5);flag.size=Vector2(15,18);flag.mouse_filter=MOUSE_FILTER_IGNORE;content.add_child(flag)
 	var title:=OriginalSceneChrome.label(content,m.display_name+("（你）" if m.id==model.character_id else ""),Rect2(74,3,180,22),13,INK);title.text_overrun_behavior=TextServer.OVERRUN_TRIM_ELLIPSIS;title.tooltip_text=m.display_name
 	OriginalSceneChrome.label(content,"Lv.%d　%s"%[int(m.level),["力士","侠客","隐者"][clampi(int(m.job),0,2)]],Rect2(55,24,122,16),11,INK)
 	OriginalSceneChrome.label(content,"离线" if not m.online else "队长" if m.leader else "跟随中" if m.get("following",true) else "暂离",Rect2(55,40,122,16),11,INK)

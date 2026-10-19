@@ -513,6 +513,7 @@ static func valid_team_packet(data:Dictionary,current_map:String)->bool:
 	for id in data.members:
 		var m:Variant=data.members[id]
 		if not _uuid(id) or not m is Dictionary or not m.get("leader") is bool or not m.get("following") is bool:return false
+		if m.has("ready") and not m.ready is bool:return false
 	var travel:Variant=data.get("travel")
 	if travel==null:return true
 	return travel is Dictionary and travel.get("action") in ["transfer","ai_travel"] and travel.get("target") is String and travel.target.length()<=32 and _cell(travel.get("cell"))

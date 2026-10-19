@@ -8,8 +8,10 @@ pub(crate) struct Member {
     pub team: Uuid,
     pub leader: Uuid,
     pub following: bool,
+    pub ready: bool,
     pub order: usize,
 }
+
 #[derive(Clone)]
 struct Exit {
     from: String,
@@ -29,7 +31,7 @@ pub(crate) async fn roster(
     tx: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     team: Uuid,
 ) -> Result<Vec<Member>, AuthError> {
-    let rows = sqlx::query("SELECT m.character_id,m.following,l.character_id AS leader FROM team_members m JOIN team_members l ON l.team_id=m.team_id AND l.leader WHERE m.team_id=$1 ORDER BY m.leader DESC,m.joined_at,m.character_id")
+    let rows = sqlx::query("SELECT m.character_id,m.following,m.ready,l.character_id AS leader FROM team_members m JOIN team_members l ON l.team_id=m.team_id AND l.leader WHERE m.team_id=$1 ORDER BY m.leader DESC,m.joined_at,m.character_id")
         .bind(team).fetch_all(&mut **tx).await.map_err(db_error)?;
     Ok(rows
         .iter()
@@ -39,6 +41,7 @@ pub(crate) async fn roster(
             team,
             leader: r.get("leader"),
             following: r.get("following"),
+            ready: r.get("ready"),
             order,
         })
         .collect())
@@ -51,9 +54,16 @@ impl WorldHub {
             let next = members.iter().find(|m| m.id == *id);
             if s.following.members.get(id) != next {
                 s.following.revision += 1;
-                s.following.exits.remove(id);
-                if let Some(a) = s.actors.get_mut(id) {
-                    a.motion.stop();
+                let mut previous = s.following.members.get(id).cloned();
+                if let (Some(old), Some(new)) = (&mut previous, next) {
+                    old.ready = new.ready;
+                }
+                // Readiness is display state, not a change to the follow route.
+                if previous.as_ref() != next {
+                    s.following.exits.remove(id);
+                    if let Some(a) = s.actors.get_mut(id) {
+                        a.motion.stop();
+                    }
                 }
             }
             s.following.members.remove(id);
@@ -247,7 +257,7 @@ impl WorldHub {
             .map(|m| {
                 (
                     m.id.to_string(),
-                    json!({"leader":m.id==m.leader,"following":m.following}),
+                    json!({"leader":m.id==m.leader,"following":m.following,"ready":m.ready}),
                 )
             })
             .collect();
@@ -262,5 +272,40 @@ impl WorldHub {
             stamp,
             json!({"type":"world.team","map_id":owner.map_id,"members":members,"following":Self::following(&s,owner.id),"travel":travel}),
         ))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[tokio::test]
+    async fn readiness_updates_markers_without_discarding_portal_navigation() {
+        let hub = WorldHub::new(WorldConfig::default());
+        let mut member = Member {
+            id: Uuid::new_v4(), team: Uuid::new_v4(), leader: Uuid::new_v4(),
+            following: true, ready: false, order: 1,
+        };
+        hub.team_roster_sync(&[member.id], vec![member.clone()]);
+        let revision = {
+            let mut state = hub.data.lock().unwrap();
+            state.following.exits.insert(member.id, VecDeque::from([Exit {
+                from: "qingyun_trail".into(), to: "ancient_ruins".into(),
+                cell: [28, 16], action: "transfer".into(), target: "ruins_gate".into(),
+                created: Instant::now(),
+            }]));
+            state.following.revision
+        };
+        member.ready = true;
+        hub.team_roster_sync(&[member.id], vec![member.clone()]);
+        {
+            let state = hub.data.lock().unwrap();
+            assert!(state.following.revision > revision);
+            assert!(state.following.members[&member.id].ready);
+            assert_eq!(state.following.exits[&member.id].len(), 1);
+        }
+        member.following = false;
+        hub.team_roster_sync(&[member.id], vec![member.clone()]);
+        assert!(!hub.data.lock().unwrap().following.exits.contains_key(&member.id));
     }
 }

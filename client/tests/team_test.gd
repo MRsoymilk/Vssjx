@@ -142,6 +142,10 @@ func _run()->void:
 	var mark:={SELF:{"leader":true,"following":true},OTHER:{"leader":false,"following":true},TEAM:{"leader":false,"following":false}}
 	var packet:={"type":"world.team","map_id":"qingyun_trail","members":mark,"following":true,"travel":null}
 	check(OnlineWorldClient.valid_team_packet(packet,"qingyun_trail"),"Native team marker roles validate")
+	packet.members[OTHER].ready=true
+	check(OnlineWorldClient.valid_team_packet(packet,"qingyun_trail"),"Readiness is accepted as an optional server-owned boolean")
+	var invalid_ready:=packet.duplicate(true);invalid_ready.members[OTHER].ready="true"
+	check(not OnlineWorldClient.valid_team_packet(invalid_ready,"qingyun_trail"),"Non-boolean readiness cannot change flag colors")
 	var bad:=packet.duplicate(true);bad.members[SELF].leader="yes"
 	check(not OnlineWorldClient.valid_team_packet(bad,"qingyun_trail"),"Forged flag roles are rejected")
 	bad=packet.duplicate(true);bad.travel={"action":"teleport","target":"ancient_ruins","cell":[28,16]}
@@ -163,6 +167,24 @@ func _run()->void:
 		var id:String=[SELF,OTHER,TEAM][i];var flag:Sprite2D=world.actors[id].flag
 		check(flag.visible and flag.texture==[preload("res://assets/ui/team_leader.png"),preload("res://assets/ui/team_member.png"),preload("res://assets/ui/team_away.png")][i],"Leader/following/away flag matches recovered art")
 		check(flag.position.x < -30 and flag.position.y==-63,"Flag sits beside the name and moves with actor root")
+	check(world.actors[OTHER].flag.material==null,"Ready member keeps the original blue flag")
+	packet.members[OTHER].ready=false
+	world.network._receive(packet,PackedByteArray())
+	check(world.actors[OTHER].flag.material==preload("res://assets/ui/team_waiting.tres"),"Unready member switches to yellow from a live world packet")
+	world.team.state.team.members[1].ready=false;world.team_panel.refresh()
+	var cards=world.team_panel.rows.get_children().filter(func(row:Node)->bool:return row is PanelContainer)
+	check(cards[1].find_child("Flag",true,false).material==world.actors[OTHER].flag.material,"Team card and world marker share the same readiness color")
+	world.team_panel.hide();world._set_battle_layout(false);world.screen.hud.show();world.camera.position=Vector2(392,232)
+	await capture("team_flags_waiting")
+	packet.members[OTHER].ready=true
+	world.network._receive(packet,PackedByteArray())
+	check(world.actors[OTHER].flag.material==null,"Preparing clears yellow and restores blue")
+	packet.members[OTHER].following=false;packet.members[OTHER].ready=false
+	world.network._receive(packet,PackedByteArray())
+	check(world.actors[OTHER].flag.texture==preload("res://assets/ui/team_away.png") and world.actors[OTHER].flag.material==null,"Temporary leave takes priority over readiness and stays gray")
+	packet.members[OTHER].following=true;packet.members[OTHER].erase("ready")
+	world.network._receive(packet,PackedByteArray())
+	check(world.actors[OTHER].flag.texture==preload("res://assets/ui/team_member.png") and world.actors[OTHER].flag.material==null,"Older servers retain blue instead of inventing readiness")
 	world.team.state=state();world.team.state.team.leader=false;world.team.state.team.members[0].leader=false;world.team.state.team.members[1].leader=true;world.team_panel.open();world.team_panel.refresh()
 	var follow_button:Button
 	for row in world.team_panel.rows.get_children():

@@ -1,8 +1,14 @@
 extends Sprite2D
-## Recovered sceneui.imgs frames 19/20/21. Keep original pixels and transparency.
+## Recovered flags with a shared readiness palette for world markers and team cards.
 const LEADER=preload("res://assets/ui/team_leader.png")
 const MEMBER=preload("res://assets/ui/team_member.png")
 const AWAY=preload("res://assets/ui/team_away.png")
+const WAITING=preload("res://assets/ui/team_waiting.tres")
+static func texture_for(state:Dictionary)->Texture2D:
+	return LEADER if state.get("leader",false) else MEMBER if state.get("following",true) else AWAY
+static func material_for(state:Dictionary)->Material:
+	# An older server omits readiness; retain its blue follow marker.
+	return WAITING if not state.get("leader",false) and state.get("following",true) and state.has("ready") and not state.ready else null
 func _init()->void:
 	texture_filter=CanvasItem.TEXTURE_FILTER_NEAREST
 	position=Vector2(-20,-67)
@@ -10,4 +16,6 @@ func _init()->void:
 	visible=false
 func update_state(state:Dictionary)->void:
 	visible=not state.is_empty()
-	if visible:texture=LEADER if state.get("leader",false) else MEMBER if state.get("following",false) else AWAY
+	if visible:
+		texture=texture_for(state)
+		material=material_for(state)

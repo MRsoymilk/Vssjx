@@ -92,6 +92,12 @@ def main():
             wait(lambda:len(ca.team['members'])==3 and cb.team['following'],'Live party markers arrive without HTTP polling')
             check(ca.team['members'][a[1]]['leader'] and not ca.team['following'],'Leader has the red-flag role and keeps manual control')
             check(all(m['following'] for m in joined(a)['members']),'Joining enables following by default')
+            wait(lambda:all(x.team['members'].get(b[1],{}).get('ready') is False for x in (ca,cb,cc)),'All observers receive initial unready flag state')
+            team(b,'ready',ready=True)
+            wait(lambda:all(x.team['members'].get(b[1],{}).get('ready') is True for x in (ca,cb,cc)),'Preparing updates the flag for all three clients without polling')
+            check(True,'Readiness is broadcast to every map observer')
+            team(b,'ready',ready=False)
+            wait(lambda:all(x.team['members'].get(b[1],{}).get('ready') is False for x in (ca,cb,cc)),'Cancelling preparation returns every observer to yellow')
             team(a,'follow','TEAM_MEMBER_REQUIRED',ready=False)
             ca.move([27,14]);wait(lambda:settled(ca,[27,14]) and settled(cb) and settled(cc) and cb.own()['cell']!=[22,9],'Server moves both followers',8)
             for x in (cb,cc):

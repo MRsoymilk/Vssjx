@@ -45,4 +45,4 @@ func advance(delta: float) -> void:
 		if sprite.animation != "idle" or not sprite.is_playing(): sprite.play("idle")
 
 func hit(point: Vector2) -> bool:
-	return Rect2(position + Vector2(-25, -60), Vector2(50, 64)).has_point(point)
+	return WorldSpriteHit.hit(sprite, get_parent().to_global(point))

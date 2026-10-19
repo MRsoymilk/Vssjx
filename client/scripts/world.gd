@@ -243,7 +243,6 @@ func click(local: Vector2) -> void:
 	var target := Vector2i(floor(world_point.x / CELL), floor(world_point.y / CELL))
 	if not astar.region.has_point(target): return
 	var found := target_at_pixel(world_point)
-	if found.is_empty(): found = target_at(target)
 	if found.is_empty():
 		pending = {}
 		path = _route_to(target)
@@ -266,16 +265,15 @@ func target_at_pixel(point: Vector2) -> Dictionary:
 		if target.kind=="map_exit":
 			if Rect2(cell_center(target.cell)-Vector2(8,8),Vector2(16,16)).has_point(point):return target
 			continue
-		if Rect2(cell_center(target.cell) - Vector2(22, 50), Vector2(44, 58)).has_point(point): return target
+		if WorldSpriteHit.hit(ai_npcs.get(target.data.id), to_global(point)): return target
 	if zone == 0 and AIWorld.map_data(map_id).is_empty():
 		var npc_cell := Vector2i(10, 13)
-		if Rect2(cell_center(npc_cell) - Vector2(28, 72), Vector2(56, 80)).has_point(point):
+		if WorldSpriteHit.hit(quest_marker.get_parent() as AnimatedSprite2D, to_global(point)):
 			return {"kind": "npc", "cell": npc_cell, "data": {}}
 	for enemy in available_enemies():
-		var spot := Vector2i(enemy.cell[0], enemy.cell[1])
-		var position_now: Vector2 = enemy_nodes[enemy.id].position if enemy_nodes.has(enemy.id) else cell_center(spot)
-		if Rect2(position_now - Vector2(32, 72), Vector2(64, 80)).has_point(point):
-			return {"kind": "enemy", "cell": spot, "data": enemy}
+		var sprite: AnimatedSprite2D = enemy_nodes.get(enemy.id)
+		if WorldSpriteHit.hit(sprite, to_global(point)):
+			return {"kind": "enemy", "cell": _enemy_cell(sprite), "data": enemy}
 	return {}
 
 func target_at(target: Vector2i) -> Dictionary:
@@ -283,19 +281,22 @@ func target_at(target: Vector2i) -> Dictionary:
 		if value.kind=="map_exit":
 			if target==value.cell:return value
 			continue
-		if target.distance_to(value.cell) <= 1.3: return value
-	if zone == 0 and AIWorld.map_data(map_id).is_empty() and target.distance_to(Vector2i(10, 13)) <= 2.0:
+		if target == value.cell: return value
+	if zone == 0 and AIWorld.map_data(map_id).is_empty() and target == Vector2i(10, 13):
 		return {"kind": "npc", "cell": Vector2i(10, 13), "data": {}}
 	var portal := Vector2i(28, 16) if zone == 0 else Vector2i(3, 16)
-	if AIWorld.map_data(map_id).is_empty() and target.distance_to(portal) <= 1.5:
+	if AIWorld.map_data(map_id).is_empty() and target == portal:
 		return {"kind": "portal", "cell": portal, "data": {}}
 	for enemy in available_enemies():
-		var spot := Vector2i(enemy.cell[0], enemy.cell[1])
-		if target.distance_to(spot) <= 2.0:
+		var spot := _enemy_cell(enemy_nodes[enemy.id]) if enemy_nodes.has(enemy.id) else Vector2i(enemy.cell[0], enemy.cell[1])
+		if target == spot:
 			return {"kind": "enemy", "cell": spot, "data": enemy}
 	return {}
 
 func _walk_to(target: Dictionary) -> void:
+	if target.kind == "enemy" and enemy_nodes.has(target.data.id):
+		target = target.duplicate()
+		target.cell = _enemy_cell(enemy_nodes[target.data.id])
 	if target.kind=="map_exit":
 		pending={};path=_route_to(target.cell)
 		if not path.is_empty():move_target.set_destination(target.cell)

@@ -1,0 +1,118 @@
+[gd_resource type="Theme" format=3]
+
+[ext_resource type="Script" path="res://scripts/interface/adapters/common/cjk_system_font.gd" id="FontScript"]
+[ext_resource type="Texture2D" path="res://assets/ui/shop_dropdown_arrow.svg" id="Arrow"]
+[ext_resource type="Texture2D" path="res://assets/ui/shop_category_checked.svg" id="Checked"]
+[ext_resource type="Texture2D" path="res://assets/ui/shop_category_unchecked.svg" id="Unchecked"]
+
+[sub_resource type="SystemFont" id="Font"]
+font_names = PackedStringArray("SimHei", "Microsoft YaHei", "sans-serif")
+antialiasing = 0
+script = ExtResource("FontScript")
+
+[sub_resource type="StyleBoxFlat" id="Field"]
+content_margin_left = 8.0
+content_margin_top = 3.0
+content_margin_right = 8.0
+content_margin_bottom = 3.0
+bg_color = Color(0.960784, 0.87451, 0.607843, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.835294, 0.698039, 0.458824, 1)
+
+[sub_resource type="StyleBoxFlat" id="Focus"]
+bg_color = Color(1, 0.972549, 0.25098, 0)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.470588, 0.203922, 0.14902, 1)
+
+[sub_resource type="StyleBoxFlat" id="Paper"]
+content_margin_left = 5.0
+content_margin_top = 5.0
+content_margin_right = 5.0
+content_margin_bottom = 5.0
+bg_color = Color(1, 0.964706, 0.737255, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.643137, 0.419608, 0.180392, 1)
+shadow_color = Color(0.17, 0.08, 0.03, 0.3)
+shadow_size = 3
+shadow_offset = Vector2(1, 2)
+
+[sub_resource type="StyleBoxFlat" id="Selected"]
+content_margin_left = 8.0
+content_margin_top = 3.0
+content_margin_right = 8.0
+content_margin_bottom = 3.0
+bg_color = Color(0.960784, 0.87451, 0.607843, 1)
+border_width_left = 2
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.835294, 0.698039, 0.458824, 1)
+
+[sub_resource type="StyleBoxFlat" id="Track"]
+content_margin_left = 3.0
+content_margin_right = 3.0
+bg_color = Color(0.960784, 0.87451, 0.607843, 1)
+
+[sub_resource type="StyleBoxFlat" id="Thumb"]
+content_margin_left = 3.0
+content_margin_top = 8.0
+content_margin_right = 3.0
+content_margin_bottom = 8.0
+bg_color = Color(0.835294, 0.698039, 0.458824, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.643137, 0.419608, 0.180392, 1)
+
+[sub_resource type="StyleBoxFlat" id="ThumbHover"]
+content_margin_left = 3.0
+content_margin_top = 8.0
+content_margin_right = 3.0
+content_margin_bottom = 8.0
+bg_color = Color(0.921569, 0.619608, 0.211765, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.470588, 0.203922, 0.14902, 1)
+
+[resource]
+default_font = SubResource("Font")
+default_font_size = 11
+OptionButton/colors/font_color = Color(0.470588, 0.203922, 0.14902, 1)
+OptionButton/colors/font_hover_color = Color(0.470588, 0.203922, 0.14902, 1)
+OptionButton/colors/font_pressed_color = Color(0.470588, 0.203922, 0.14902, 1)
+OptionButton/colors/font_focus_color = Color(0.470588, 0.203922, 0.14902, 1)
+OptionButton/constants/arrow_margin = 8
+OptionButton/constants/modulate_arrow = 0
+OptionButton/icons/arrow = ExtResource("Arrow")
+OptionButton/styles/normal = SubResource("Field")
+OptionButton/styles/hover = SubResource("Selected")
+OptionButton/styles/pressed = SubResource("Selected")
+OptionButton/styles/focus = SubResource("Focus")
+PopupMenu/colors/font_color = Color(0.470588, 0.203922, 0.14902, 1)
+PopupMenu/colors/font_hover_color = Color(0.470588, 0.203922, 0.14902, 1)
+PopupMenu/colors/font_disabled_color = Color(0.643137, 0.419608, 0.180392, 0.6)
+PopupMenu/constants/v_separation = 8
+PopupMenu/constants/h_separation = 6
+PopupMenu/constants/item_start_padding = 4
+PopupMenu/constants/item_end_padding = 6
+PopupMenu/icons/radio_checked = ExtResource("Checked")
+PopupMenu/icons/radio_unchecked = ExtResource("Unchecked")
+PopupMenu/styles/panel = SubResource("Paper")
+PopupMenu/styles/hover = SubResource("Selected")
+VScrollBar/styles/scroll = SubResource("Track")
+VScrollBar/styles/scroll_focus = SubResource("Track")
+VScrollBar/styles/grabber = SubResource("Thumb")
+VScrollBar/styles/grabber_highlight = SubResource("ThumbHover")
+VScrollBar/styles/grabber_pressed = SubResource("ThumbHover")

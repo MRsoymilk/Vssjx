@@ -57,3 +57,9 @@
 - ARM64 APK：`work/builds/android-shop-arm64-20261017/dist/vssjx-android-preview-arm64.apk`，44,481,281 字节；复用之前的开发签名和包名。签名、16 KB 对齐、权限／架构检查及实际包内资源的桌面审计 286 项通过。未声称完成 ARM64 真机运行验收。
 - `tests/game_export_probe.gd` 更新为检查 100 个动画索引、全部 72 种组合、商店场景及真实持久化购买／装备／重载。开发管理页面、测试、配置和私钥不进入分发包。
 - 本机重启脚本 `work/security-deploy/restart-approved.ps1` 已指向新版，网页 Compose 参数保存于忽略的 `work/web-deploy.active.env`；旧服务映像、旧网页与数据库备份均保留，未推送远程 Git。
+
+## 2026-10-19 分类菜单主题与重叠修正
+
+- 分类按钮、弹窗、单选标记和滚动条统一商城金纸／棕金主题；顶部标签、分类栏、商品列表改用场景容器排列，避免文字最小高度引起重叠。
+- 实际OpenGL检查640×960和320×480窗口：标签与分类栏、分类栏与列表均保持间距，弹窗246×230逻辑像素；首项、滚动末项、键盘确认分类、恢复全部商品、再次展开及取消通过，玩家存档未变。截图保存在忽略目录 `work/shop-dropdown/`，小窗口截图在其 `small/` 子目录。
+- `res://tests/full_shop_test.tscn`：1576项、0失败；`res://tests/equipment_appearance_ui_test.tscn`：78项、0失败。未执行打包、推送或部署。

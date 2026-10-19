@@ -68,24 +68,25 @@ func _ready() -> void:
 	balance=_label("",Rect2(126,48,167,20))
 	for i in ShopRules.catalog.tabs.size():
 		var tab: Array=ShopRules.catalog.tabs[i]
-		tabs.append(_button(tab[1],Rect2(17+i*72,76,70,24),func() -> void:section=tab[0];notice="";_filter()))
-	_label("分类",Rect2(20,104,35,20),11)
-	category_box=OptionButton.new()
-	category_box.position=Vector2(57,103);category_box.size=Vector2(240,22)
-	category_box.add_theme_font_size_override("font_size",11)
-	for state in ["normal","hover","pressed","focus"]:category_box.add_theme_stylebox_override(state,_style(Color("f5df9b")))
-	for state in ["font_color","font_hover_color","font_pressed_color","font_focus_color"]:category_box.add_theme_color_override(state,GOLD)
+		var button:=_button(tab[1],Rect2(0,0,70,24),func() -> void:section=tab[0];notice="";_filter(),%Tabs)
+		button.custom_minimum_size.x=70
+		button.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+		tabs.append(button)
+	category_box=%Category
+	# PopupMenu is a separate Window; give it the authored theme explicitly.
+	var category_popup:=category_box.get_popup()
+	category_popup.theme=category_box.theme
+	category_popup.prefer_native_menu=false
+	category_popup.wrap_controls=false
+	category_popup.max_size=Vector2i(286,230)
+	category_popup.about_to_popup.connect(_fit_category_popup,CONNECT_DEFERRED)
 	for label in ["全部","武器","帽子","衣服","手腕","腰带","裤子","鞋子","戒指","项链","腰佩","药品","药材","宝石","配方","材料","特殊"]:category_box.add_item(label)
 	for family in GeneratedEquipment.FAMILIES: category_box.add_item(family.name+" · 本角色")
-	add_child(category_box)
+	# Keep the authored catalog above the dynamically added shop background.
+	move_child(%Catalog,get_child_count()-1)
 	category_box.item_selected.connect(func(index: int) -> void:category=category_box.get_item_text(index);notice="";_filter())
-	scroll=ScrollContainer.new()
-	scroll.position=Vector2(19,128);scroll.size=Vector2(283,206)
-	scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED
-	add_child(scroll)
-	grid=GridContainer.new();grid.columns=2
-	grid.add_theme_constant_override("h_separation",4);grid.add_theme_constant_override("v_separation",3)
-	scroll.add_child(grid)
+	scroll=%GoodsScroll
+	grid=%Goods
 	summary=_label("",Rect2(21,338,277,37),11)
 	summary.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
 	total=_label("",Rect2(21,378,172,21),11)
@@ -118,6 +119,14 @@ func _ready() -> void:
 	quantity_box.value_changed.connect(func(_value: float) -> void:if not _refreshing:refresh())
 	if online_model!=null:online_model.changed.connect(_online_changed)
 	_filter()
+
+func _fit_category_popup() -> void:
+	var popup:=category_box.get_popup()
+	var popup_size:=Vector2i(ceili(category_box.size.x),230)
+	popup.max_size=popup_size
+	popup.min_size=popup_size
+	popup.size=popup_size
+	popup.scroll_to_item(category_box.selected)
 
 func _gear() -> Dictionary:
 	return ShopRules.local_state(Game.player) if online_model==null else online_model.state.get("shop",{})

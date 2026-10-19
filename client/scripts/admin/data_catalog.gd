@@ -16,7 +16,7 @@ const RESOURCE_ARCHIVE := "res://assets/admin/archive/catalog.json"
 const CATEGORIES := [
 	["weapons", "武器"], ["equipment", "人物装备"], ["appearance", "装备外观"], ["items", "物品"],
 	["characters", "人物"], ["quests", "任务 / 线索"], ["maps", "地图"],
-	["enemies", "怪物"], ["effects", "特效"], ["art", "素材 / 动画"], ["archive", "原包归档"]
+	["enemies", "怪物"], ["effects", "特效"], ["audio", "音频"], ["art", "素材 / 动画"], ["archive", "原包归档"]
 ]
 var entries: Array[Dictionary] = []
 var errors: Array[String] = []
@@ -95,6 +95,7 @@ func reload() -> void:
 		_add("enemies", enemy.id, enemy.name, "气血 %s / 攻击 %s / %s" % [enemy.hp, enemy.attack, data["区域"]], "已接入", "res://scripts/world.gd", data, {"kind": "actor", "art": enemy.art})
 	_load_original_monsters()
 	_load_original_effects()
+	_load_audio()
 	_load_resource_archive()
 	_load_maps()
 	_load_original_world()
@@ -105,6 +106,18 @@ func reload() -> void:
 		var info := _read_json(actors[key])
 		if info.is_empty(): continue
 		_add("art", key, key, "%s 帧 · %s × %s" % [info.get("count", 0), info.get("width", 0), info.get("height", 0)], "资源", actors[key], info, {"kind": "actor", "art": key})
+
+func _load_audio() -> void:
+	for entry in GameAudio.catalog.items:
+		var stream:=GameAudio.stream(entry.id)
+		var data:Dictionary=entry.duplicate(true)
+		data["时长（秒）"]=stream.get_length() if stream!=null else 0
+		data["文件大小（字节）"]=FileAccess.get_file_as_bytes(entry.path).size()
+		if stream is AudioStreamWAV:
+			data["采样率"]=stream.mix_rate
+			data["声道"]="双声道" if stream.stereo else "单声道"
+			data["WAV编码"]="16位PCM" if stream.format==AudioStreamWAV.FORMAT_16_BITS else ("8位PCM" if stream.format==AudioStreamWAV.FORMAT_8_BITS else "压缩WAV")
+		_add("audio",entry.id,entry.name,"%.2f秒 · %s · %s"%[data["时长（秒）"],entry.skill_id,entry.trigger],"已接入",entry.path,data,{"kind":"audio","audio_id":entry.id})
 
 func _load_ai_world() -> void:
 	AIWorld.prepare()

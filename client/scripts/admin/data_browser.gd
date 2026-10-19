@@ -183,6 +183,8 @@ func _show_entry(entry: Dictionary) -> void:
 	%AnimationBar.visible = entry.get("preview", {}).get("kind") in ["actor", "original_animation", "image_frames"]
 	%Collision.visible = entry.get("preview", {}).get("kind") == "map"
 	var preview_kind: String = entry.get("preview", {}).get("kind", "")
+	%AudioPreview.display(entry)
+	if preview_kind=="audio":%Preview.hide()
 	%PreviewMessage.visible = preview_kind == "unavailable"
 	%PreviewMessage.text = entry.get("preview", {}).get("message", "")
 	_update_preview_height()

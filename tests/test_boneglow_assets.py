@@ -46,6 +46,21 @@ class BoneglowAssets(unittest.TestCase):
             path = ROOT/'client'/record['path'].removeprefix('res://')
             self.assertEqual(hashlib.sha256(path.read_bytes()).hexdigest(), record['sha256'])
 
+    def test_frost_icons_exclude_previous_row_feet(self):
+        if self.FAMILY != 'boneglow':
+            self.skipTest('Regression concerns the boneglow review atlas')
+        report = json.loads((ROOT/'analysis/ai-generated/equipment/boneglow/runtime-import-report.json').read_text('utf8'))
+        expected = {'weapon': 407, 'hat': 421, 'armor': 761, 'wrist': 211}
+        cleaned = {Path(r['path']).stem: r['removed_border_pixels'] for r in report if 'removed_border_pixels' in r}
+        self.assertEqual(cleaned, expected, 'Only the four clipped foot fragments need cleanup')
+        for slot in expected:
+            with Image.open(ROOT/f'client/assets/generated/equipment/boneglow/wck/icons/{slot}.png') as icon:
+                alpha = icon.getchannel('A')
+                bbox = alpha.getbbox()
+                # Detached feet previously left a large blank stripe above the item.
+                occupied = [any(alpha.getpixel((x, y)) for x in range(32)) for y in range(bbox[1], bbox[3])]
+                self.assertTrue(all(occupied), f'{slot}: no detached fragment above the item')
+
 
 if __name__ == '__main__':
     unittest.main()

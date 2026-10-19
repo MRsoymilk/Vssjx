@@ -1,5 +1,6 @@
 extends SceneTree
 ## Repeatable native frame slicing, no animation or original-resource rewriting.
+const IconCleanup := preload("equipment_icon_cleanup.gd")
 const ROOT := "res://../"
 const REVIEW := ROOT + "work/ai-equipment-review-20261018-v3/"
 const WORK := ROOT + "work/boneglow-production/"
@@ -143,6 +144,7 @@ func build_runtime() -> void:
 			var rows := sheet_rows if icon_start_cell >= 0 else 4
 			var input := override_image if source_cell in override.get("cells",[]) else design
 			var cell := atlas_cell(input,source_cell,rows)
+			var removed := IconCleanup.remove_border_fragments(cell)
 			var icon := cell.get_region(cell.get_used_rect())
 			var factor := minf(28.0/icon.get_width(),28.0/icon.get_height())
 			icon.resize(maxi(1,roundi(icon.get_width()*factor)),maxi(1,roundi(icon.get_height()*factor)),Image.INTERPOLATE_NEAREST)
@@ -150,7 +152,9 @@ func build_runtime() -> void:
 			canvas.blit_rect(icon,Rect2i(Vector2i.ZERO,icon.get_size()),(Vector2i(32,32)-icon.get_size())/2)
 			var path: String = output+"icons/"+slots[index]+".png"
 			canvas.save_png(path)
-			report.append({"path":path,"sha256":FileAccess.get_sha256(path),"source_cell":source_cell})
+			var record := {"path":path,"sha256":FileAccess.get_sha256(path),"source_cell":source_cell}
+			if removed > 0: record["removed_border_pixels"] = removed
+			report.append(record)
 	var file := FileAccess.open(data_dir+"runtime-import-report.json",FileAccess.WRITE)
 	file.store_string(JSON.stringify(report,"  ")+"\n")
 	print("Published ",report.size()," native runtime textures (30 parts, 60 icons)")

@@ -78,6 +78,7 @@ func _run() -> void:
 		shop.category = family_name+" · 本角色"
 		shop._filter()
 		check(shop.goods.size()==10 and shop.goods.all(func(entry: Dictionary) -> bool: return entry.set_id==definition.id),"Shop exposes the complete set for this character")
+		await capture("shop-"+definition.stem)
 		shop.queue_free()
 		await get_tree().process_frame
 	var app = load("res://scenes/main.tscn").instantiate()

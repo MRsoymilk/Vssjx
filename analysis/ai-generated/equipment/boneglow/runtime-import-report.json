@@ -667,22 +667,26 @@
   },
   {
     "path": "res://assets/generated/equipment/boneglow/wck/icons/weapon.png",
-    "sha256": "0003e7892c3d2fe4c5c6ebe272d55af6df56a43f4734444506184cf05b83c914",
+    "removed_border_pixels": 407,
+    "sha256": "c2e967ad2146d93c9984726edbb19452246375ba77ea976b11cc78a76dfc484c",
     "source_cell": 4
   },
   {
     "path": "res://assets/generated/equipment/boneglow/wck/icons/hat.png",
-    "sha256": "fbd582bff7be33878255721088b85a33efe85fdf6e7b6a829aff83151a905fce",
+    "removed_border_pixels": 421,
+    "sha256": "2eac0a2b2d771b22024745a5f56bb2b893d618cc9d9f1e4057d030b254e0796a",
     "source_cell": 5
   },
   {
     "path": "res://assets/generated/equipment/boneglow/wck/icons/armor.png",
-    "sha256": "66f243d2c477bb057d666ffc996fd646d4ab085fc2903ba1c3c6d21447357e30",
+    "removed_border_pixels": 761,
+    "sha256": "d5cad6528e84ff41a092ff8dd7091a9e93b88570559c6b52df3867a777b6316a",
     "source_cell": 6
   },
   {
     "path": "res://assets/generated/equipment/boneglow/wck/icons/wrist.png",
-    "sha256": "de4b09f97a43d891256e16edfcf60bc761b6c7d17b0ae49c110e43454fa1cad8",
+    "removed_border_pixels": 211,
+    "sha256": "a1e86041c739b3ef8a9510bcfc115aa017ab46caf943d289cad934baed636ce8",
     "source_cell": 7
   },
   {

@@ -33,3 +33,11 @@ godot --headless --path client res://tests/boneglow_equipment_test.tscn
 实际渲染文件保留于忽略目录 `work/boneglow-production/`：`native-runtime-review.png`、`world.png`、`shop.png`、`inventory.png`。独立六角色动作核对场景为 `res://tests/boneglow_review.tscn`，可切换动作；非隐者无原生施法动作时保留当前可用动作。
 
 导出配置检查：正式资源位于游戏资产目录，使用 `all_resources` 导出，未被管理工具／测试目录的排除规则覆盖。本次未执行游戏打包或公网部署，未将其记为已验证结果。
+
+## 2026-10-19 商城图标边界残片修正
+
+霜骨流萤审阅图第一行人物脚部越过网格边界，导致下一行武器、头冠、衣甲、护腕切片夹带残片。导入器现在先清除接触边界且面积不足主区域十分之一的八方向连通小块，再计算包围框和缩放；报告分别记录407、421、761、211个原始切片像素的清理。保留内部细节、成对部件和主要轮廓。
+
+- `godot --headless --path client --script res://tests/equipment_icon_cleanup_test.gd`：边界残片、成对部件、内部细节、对角连接和重复清理验证通过。
+- 两个装备系列重新导入，共120个图标、60张部件；Git差异仅四个目标图标，其他资源一致。`python tests/test_boneglow_assets.py`、`python tests/test_gravebloom_assets.py`、`python tests/test_full_shop_catalog.py`全部适用检查通过。
+- 实际OpenGL运行 `res://tests/boneglow_equipment_test.tscn`，设置 `SSJX_EQUIPMENT_GAME_CAPTURE=work/shop-icon-cleanup` 的绝对路径：490项检查、0失败，存档恢复检查通过。六角色商城及地图、背包、管理预览截图保存在该忽略目录，重点核对 `shop-wck.png` 的四个目标图标无上方杂点。

@@ -33,6 +33,7 @@ pub struct Context {
     pub moving: bool,
     pub map_id: String,
     pub position_revision: u64,
+    pub duel_active: bool,
 }
 #[derive(Clone)]
 struct Loaded {
@@ -60,10 +61,13 @@ async fn load(tx: &mut Transaction<'_, Postgres>, context: &Context) -> Result<L
     let account: Option<Uuid> = sqlx::query_scalar("SELECT s.account_id FROM sessions s JOIN accounts a ON a.id=s.account_id WHERE s.id=$1 AND NOT a.disabled AND s.revoked_at IS NULL AND s.access_expires_at>clock_timestamp() AND s.refresh_expires_at>clock_timestamp() FOR SHARE OF s,a")
         .bind(context.session).fetch_optional(&mut **tx).await.map_err(database)?;
     let account = account.ok_or(AuthError(StatusCode::UNAUTHORIZED, "SESSION_REVOKED"))?;
+    load_character(tx,context.character,account,Some(context.owner)).await
+}
+async fn load_character(tx:&mut Transaction<'_,Postgres>,character_id:Uuid,account:Uuid,owner:Option<i64>)->Result<Loaded,AuthError>{
     let row=sqlx::query(&format!("SELECT {CHARACTER_COLUMNS},ai_progress,defeated_mask,monster_respawns,active_battle_id,owner_epoch,allocated_attributes FROM characters WHERE id=$1 AND account_id=$2 FOR UPDATE"))
-        .bind(context.character).bind(account).fetch_optional(&mut **tx).await.map_err(database)?
+        .bind(character_id).bind(account).fetch_optional(&mut **tx).await.map_err(database)?
         .ok_or(AuthError(StatusCode::FORBIDDEN,"FORBIDDEN"))?;
-    if row.get::<i64, _>("owner_epoch") != context.owner {
+    if owner.is_some_and(|owner|row.get::<i64, _>("owner_epoch") != owner) {
         return Err(AuthError(StatusCode::CONFLICT, "SESSION_REPLACED"));
     }
     let character = Character::from_row(&row).map_err(database)?;
@@ -81,7 +85,7 @@ async fn load(tx: &mut Transaction<'_, Postgres>, context: &Context) -> Result<L
     let active: Option<Uuid> = row.get("active_battle_id");
     let battle = if let Some(id) = active {
         let row=sqlx::query("SELECT state,rules_version FROM pve_battles WHERE id=$1 AND character_id=$2 AND active FOR UPDATE")
-            .bind(id).bind(context.character).fetch_optional(&mut **tx).await.map_err(database)?.ok_or_else(unavailable)?;
+            .bind(id).bind(character_id).fetch_optional(&mut **tx).await.map_err(database)?.ok_or_else(unavailable)?;
         if row.get::<String, _>("rules_version") != pve_rules::RULES {
             return Err(unavailable());
         }
@@ -91,10 +95,10 @@ async fn load(tx: &mut Transaction<'_, Postgres>, context: &Context) -> Result<L
         None
     };
     let potions:i32=sqlx::query_scalar("SELECT COALESCE(SUM(quantity),0)::int FROM inventory_items WHERE character_id=$1 AND definition_id='potion'")
-        .bind(context.character).fetch_one(&mut **tx).await.map_err(database)?;
+        .bind(character_id).fetch_one(&mut **tx).await.map_err(database)?;
     let equipped:Option<bool>=sqlx::query_scalar("SELECT equipped FROM inventory_items WHERE character_id=$1 AND definition_id='sword'")
-        .bind(context.character).fetch_optional(&mut **tx).await.map_err(database)?;
-    let rows=sqlx::query("SELECT definition_id,equipped,quantity FROM inventory_items WHERE character_id=$1 AND definition_id<>'potion'").bind(context.character).fetch_all(&mut **tx).await.map_err(database)?;
+        .bind(character_id).fetch_optional(&mut **tx).await.map_err(database)?;
+    let rows=sqlx::query("SELECT definition_id,equipped,quantity FROM inventory_items WHERE character_id=$1 AND definition_id<>'potion'").bind(character_id).fetch_all(&mut **tx).await.map_err(database)?;
     let quantities=rows.iter().map(|r|(r.get("definition_id"),r.get("quantity"))).collect();
     let gear = rows.into_iter().map(|r|(r.get("definition_id"),r.get("equipped"))).collect();
     let ai:crate::ai_world::Progress=serde_json::from_value(row.get::<Json<Value>,_>("ai_progress").0).map_err(|_|unavailable())?;
@@ -257,7 +261,9 @@ impl Loaded {
                 return Ok(vec![format!("已{}{}×{}。",if command.action==Action::Use{"使用"}else{"丢弃"},item.name,count)]);
             }
             if !item.equipment(){return Err("INVALID_EQUIPMENT");}
-            if command.action==Action::Equip&&item.job>=0&&item.job!=self.character.job{return Err("WRONG_JOB");}
+            if command.action==Action::Equip {
+                if let Some(code)=item.equip_error(self.character.job,self.character.gender){return Err(code);}
+            }
             let on=command.action==Action::Equip;
             if self.gear.get(id)==Some(&on){return Err("EQUIPMENT_UNCHANGED");}
             if !on&&bag_count>=60{return Err("BAG_FULL");}
@@ -503,7 +509,9 @@ pub async fn execute(
     let previous_quantities=loaded.quantities.clone();
     let original = loaded.clone();
     let before = crate::security::state_summary(&original.state());
-    let applied = loaded.apply(command, context);
+    let team_active:bool=sqlx::query_scalar("SELECT EXISTS(SELECT 1 FROM team_members m JOIN team_battles b ON b.team_id=m.team_id AND b.active WHERE m.character_id=$1)").bind(context.character).fetch_one(&mut *tx).await.map_err(database)?;
+    let in_team:bool=sqlx::query_scalar("SELECT EXISTS(SELECT 1 FROM team_members WHERE character_id=$1)").bind(context.character).fetch_one(&mut *tx).await.map_err(database)?;
+    let applied = if team_active {Err("TEAM_BATTLE_ACTIVE")}else if context.duel_active {Err("DUEL_ACTIVE")}else if in_team&&command.action==Action::Challenge{Err("TEAM_CHALLENGE_REQUIRED")}else{loaded.apply(command, context)};
     if applied.is_err() {
         loaded = original;
     }
@@ -566,4 +574,40 @@ pub async fn execute(
     crate::security::append(&mut *tx, crate::security::Event{account:Some(account),character:Some(context.character),session:Some(context.session),operation:Some(command.operation_id),action:&action,outcome:if result["ok"]==true {"accepted"} else {"rejected"},code:result["code"].as_str().unwrap_or("OK"),details:json!({"target":target,"before":before,"after":crate::security::state_summary(&loaded.state())})}).await.map_err(database)?;
     tx.commit().await.map_err(database)?;
     Ok(result)
+}
+
+/// Uses the same character, equipment, skill and respawn rules as solo PvE.
+pub(crate) async fn team_fighter(tx:&mut Transaction<'_,Postgres>,context:&Context)->Result<(crate::team_rules::Fighter,std::collections::HashSet<String>),AuthError>{
+    let a=load(tx,context).await?;
+    if a.battle.is_some()||context.duel_active{return Err(AuthError(StatusCode::CONFLICT,"TEAM_BUSY"));}
+    if context.map_id!=a.character.map_id||context.moving{return Err(AuthError(StatusCode::CONFLICT,"TEAM_NOT_READY"));}
+    if crate::ai_world::map(&context.map_id).is_none()&&a.character.quest_stage==0{return Err(AuthError(StatusCode::CONFLICT,"QUEST_REQUIRED"));}
+    let c=&a.character;
+    let unavailable=a.respawns.iter().chain(a.ai.respawns.iter()).filter(|(_,t)|**t>unix_ms()).map(|(id,_)|id.clone()).collect();
+    Ok((crate::team_rules::Fighter{id:c.id,name:c.display_name.clone(),job:c.job,gender:c.gender,school:c.school,level:c.level,stats:a.stats(),appearance:crate::shop::appearance(&a.gear),hp:c.hp,mp:c.mp,potions:a.potions,effects:crate::skills::State::new(c.job,c.school,c.level,c.level),guarding:false},unavailable))
+}
+pub(crate) async fn team_save(tx:&mut Transaction<'_,Postgres>,f:&crate::team_rules::Fighter,b:&crate::team_rules::Battle,settle:bool)->Result<(),AuthError>{
+    let account=sqlx::query_scalar("SELECT account_id FROM characters WHERE id=$1").bind(f.id).fetch_one(&mut **tx).await.map_err(database)?;
+    let mut a=load_character(tx,f.id,account,None).await?;
+    a.character.hp=f.hp.max(1);a.character.mp=f.mp;a.potions=f.potions;
+    if settle&&b.outcome=="victory"{
+        let mut ids=std::collections::HashSet::new();
+        for e in &b.enemies{
+            if !ids.insert(e.definition.id.clone()){continue;}
+            if crate::ai_world::resident(&e.definition.id).is_some(){a.ai.event("kill",&e.definition.id);a.ai.respawns.insert(e.definition.id.clone(),unix_ms()+MONSTER_RESPAWN_MS);}
+            else if let Some(mask)=pve_rules::mask(&e.definition.id){a.defeated|=mask;a.respawns.insert(e.definition.id.clone(),unix_ms()+MONSTER_RESPAWN_MS);}
+            if e.definition.id=="boss"&&a.character.quest_stage==3{a.character.quest_stage=4;}
+        }
+        if a.character.quest_stage==1&&a.defeated&7==7{a.character.quest_stage=2;}
+        let index=b.fighters.iter().position(|p|p.id==f.id).unwrap() as i32;
+        let n=b.fighters.len()as i32;
+        let total_gold:i32=b.enemies.iter().map(|e|e.definition.gold).sum();
+        let total_xp:i32=b.enemies.iter().map(|e|e.definition.xp).sum();
+        a.rewards(total_gold/n+i32::from(index<total_gold%n),total_xp/n+i32::from(index<total_xp%n)).map_err(|c|AuthError(StatusCode::CONFLICT,c))?;
+    }else if settle&&b.outcome=="defeat"{a.restore();}
+    sqlx::query("UPDATE characters SET hp=$2,mp=$3,level=$4,xp=$5,gold=$6,quest_stage=$7,defeated_mask=$8,monster_respawns=$9,ai_progress=$10,state_revision=state_revision+1 WHERE id=$1")
+        .bind(f.id).bind(a.character.hp).bind(a.character.mp).bind(a.character.level).bind(a.character.xp).bind(a.character.gold).bind(a.character.quest_stage).bind(a.defeated).bind(Json(a.respawns)).bind(Json(a.ai)).execute(&mut **tx).await.map_err(database)?;
+    if a.potions==0{sqlx::query("DELETE FROM inventory_items WHERE character_id=$1 AND definition_id='potion'").bind(f.id).execute(&mut **tx).await.map_err(database)?;}
+    else{sqlx::query("INSERT INTO inventory_items(id,character_id,definition_id,quantity) VALUES($1,$2,'potion',$3) ON CONFLICT(character_id,definition_id) DO UPDATE SET quantity=EXCLUDED.quantity").bind(Uuid::new_v4()).bind(f.id).bind(a.potions).execute(&mut **tx).await.map_err(database)?;}
+    Ok(())
 }

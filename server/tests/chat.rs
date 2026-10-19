@@ -3,6 +3,43 @@ use uuid::Uuid;
 use vssjx_server::chat::{ChatConfig, ChatHub, text};
 
 #[test]
+fn moderation_removes_text_prevents_replay_and_preserves_sequence() {
+    let mut chat=ChatHub::new(ChatConfig::default());
+    let now=Instant::now();let sender=Uuid::new_v4();let client=Uuid::new_v4();
+    chat.submit((sender,"测试角色"),client,"public","应当删除的原文",false,now);
+    chat.drain(now+Duration::from_secs(1));
+    let id=chat.batch(0)[0].message_id;
+    chat.remove_message(id,now+Duration::from_secs(2));
+    chat.system_notice("测试角色的一条发言已被管理员删除。原因：刷屏".into());
+    assert_eq!(chat.oldest(),1);
+    assert_eq!(chat.batch(0)[0].seq,"1");
+    assert!(chat.batch(0)[0].deleted);
+    assert!(!serde_json::to_string(&chat.batch(0)).unwrap().contains("应当删除的原文"));
+    assert!(chat.batch(0)[1].system);
+    assert_eq!(chat.removed_ids(),vec![id]);
+    assert_eq!(chat.submit((sender,"测试角色"),client,"public","应当删除的原文",false,now+Duration::from_secs(3)).code,Some("CHAT_REMOVED"));
+    assert_eq!(chat.batch(0).len(),2);
+    // No raw account or login identifiers are present in public records.
+    assert!(!serde_json::to_string(&chat.batch(0)).unwrap().contains("account_id"));
+}
+
+#[test]
+fn account_mute_cancels_pending_and_fences_racing_sends_until_unmute() {
+    let mut chat=ChatHub::new(ChatConfig::default());let now=Instant::now();
+    let a=Uuid::new_v4();let b=Uuid::new_v4();let client=Uuid::new_v4();
+    chat.submit((a,"测试甲"),client,"public","尚未广播",false,now);
+    chat.moderate_characters(&[a,b],Some(now+Duration::from_secs(60)),now);
+    chat.drain(now+Duration::from_secs(1));
+    assert!(chat.batch(0).is_empty());
+    assert_eq!(chat.result(a,client).unwrap().code,Some("CHAT_MUTED"));
+    assert_eq!(chat.submit((b,"测试乙"),Uuid::new_v4(),"public","并发发送",false,now+Duration::from_secs(2)).code,Some("CHAT_MUTED"));
+    chat.moderate_characters(&[a,b],None,now+Duration::from_secs(3));
+    assert_eq!(chat.submit((b,"测试乙"),Uuid::new_v4(),"public","解除之后",false,now+Duration::from_secs(4)).status,"QUEUED");
+    chat.moderate_characters(&[a],Some(now+Duration::from_secs(60)),now);
+    assert_eq!(chat.submit((a,"测试甲"),Uuid::new_v4(),"public","到期之后",false,now+Duration::from_secs(61)).status,"QUEUED");
+}
+
+#[test]
 fn public_text_is_bounded_and_does_not_interpret_markup() {
     assert_eq!(
         text("  [url=https://invalid]你好[/url]  ").unwrap(),

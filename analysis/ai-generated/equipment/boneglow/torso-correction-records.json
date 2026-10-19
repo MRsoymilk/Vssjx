@@ -1,0 +1,15 @@
+{
+  "tool": "image_gen built-in",
+  "sets": [
+    {
+      "id": "01_male_lishi",
+      "prompt": "Use case: precise-object-edit. Correct the FIRST production native parts atlas, using SECOND approved armor design as reference. Keep exact first image canvas, grid cell centers, EVERY part's size, silhouette, frame count, orientations, head, weapons and legs unchanged. ONE correction only: fully cover the bare pink chest/abdomen/shoulder areas of ALL torso and arm parts with the approved dark armor and ivory rib/cross trim. These costumes are CLOSED armor, not shirtless outfits. Use tiny glove armor on hands if necessary, preserve their poses and connection points. Only the head's pink face should remain skin colored. Orange ember accents on charcoal black bone armor. Correct particularly row 1 column 3 and row 2 column 4. Keep native coarse pixel size. No other modifications, no extra sprites, no different face, no captions or borders. Same exact transparent PNG parts atlas, not assembled people.",
+      "path": "C:\\Users\\milk\\.codex\\generated_images\\01a13f9f-f6d1-7c41-b090-6fb33b951df1\\exec-d91a2b57-d3e3-4f0f-ac8b-b843766828af.png"
+    },
+    {
+      "id": "03_male_xiake",
+      "prompt": "Use case: precise-object-edit. Correct the FIRST production native parts atlas, using SECOND approved armor design as reference. Keep exact first image canvas, grid cell centers, EVERY part's size, silhouette, frame count, orientations, head, weapons and legs unchanged. ONE correction only: fully cover the bare pink chest/abdomen/shoulder areas of ALL torso and arm parts with the approved dark armor and ivory rib/cross trim. These costumes are CLOSED armor, not shirtless outfits. Use tiny glove armor on hands if necessary, preserve their poses and connection points. Only the head's pink face should remain skin colored. Purple accents on violet-black bone armor. Correct particularly row 1 column 3, row 2 column 1, row 3 columns 2 and 3. Keep native coarse pixel size. No other modifications, no extra sprites, no different face, no captions or borders. Same exact transparent PNG parts atlas, not assembled people.",
+      "path": "C:\\Users\\milk\\.codex\\generated_images\\01a13f9f-f6d1-7c41-b090-6fb33b951df1\\exec-2756b3b9-5437-4232-a474-0ca776b75ad9.png"
+    }
+  ]
+}

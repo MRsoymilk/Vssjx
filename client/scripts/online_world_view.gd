@@ -57,8 +57,69 @@ var _battle_load_epoch := 0
 var _battle_resource_request: PlatformResourceRequest
 var _battle_load_failed := false
 var _hidden_residents: Array = []
+@onready var map_transition: OriginalMapTransition = $MapTransition
+var _transfer_origin := ""
+@onready var duel_battle: DuelBattleView = $DuelBattle
+var duel_invitation: DuelInvitation
+var _closed_duel := ""
+var _duel_lines := ""
+var social: RefCounted = preload("res://scripts/network/online_social.gd").new()
+var social_panel: Control
+var _social_incoming: Array = []
+var team:RefCounted=preload("res://scripts/network/online_team.gd").new()
+var team_panel:Control
+var team_battle:Control
+var team_notice:Panel
+var team_notice_text:Label
+var team_confirm:Button
+var team_reject:Button
 
 func _ready() -> void:
+	team.bind_character(character_id)
+	team.send_requested.connect(OnlineAccount.team_request)
+	team_panel=preload("res://scenes/ui/team_panel.tscn").instantiate();team_panel.model=team;add_child(team_panel)
+	team_panel.profile_requested.connect(func(id:String)->void:team_panel.dismiss();_open_social("profile",id))
+	team_battle=preload("res://scenes/ui/team_battle_view.tscn").instantiate();team_battle.model=team;add_child(team_battle)
+	team_battle.dismissed.connect(func()->void:screen.hud.show();count_label.show();_set_battle_layout(false);team.refresh())
+	team_notice=OriginalSceneChrome.panel(self,Rect2(4,186,216,75),Color("294d74"),Color("eed18b"));team_notice.z_index=26;team_notice.mouse_filter=MOUSE_FILTER_STOP
+	team_notice_text=OriginalSceneChrome.label(team_notice,"",Rect2(8,5,200,27),12,Color("fff3b5"))
+	team_confirm=OriginalSceneChrome.button(team_notice,"同意",Rect2(8,39,86,28),13)
+	team_reject=OriginalSceneChrome.button(team_notice,"拒绝",Rect2(122,39,86,28),13)
+	team_confirm.pressed.connect(func()->void:if not team.state.incoming.is_empty():team.submit("accept",team.state.incoming[0].id))
+	team_reject.pressed.connect(func()->void:if not team.state.incoming.is_empty():team.submit("reject",team.state.incoming[0].id))
+	team_notice.hide()
+	team.changed.connect(_team_changed)
+	team.message.connect(func(text:String)->void:chat_status.text=text)
+	social.bind_character(character_id)
+	social.send_requested.connect(OnlineAccount.social_request)
+	OnlineAccount.completed.connect(_social_completed)
+	social_panel=preload("res://scenes/ui/social_panel.tscn").instantiate()
+	social_panel.model=social
+	add_child(social_panel)
+	social_panel.duel_requested.connect(_invite_player)
+	social_panel.team_requested.connect(func(id:String)->void:
+		if not team.submit("invite",id):chat_status.text="正在同步队伍，请稍后再邀请。"
+	)
+	social.changed.connect(_social_changed)
+	duel_invitation = DuelInvitation.new()
+	duel_invitation.channel = network.duel
+	add_child(duel_invitation)
+	duel_invitation.invite_requested.connect(_invite_player)
+	duel_invitation.reply_requested.connect(func(action: String)->void:
+		if action == "accept" and (network.pve.pending() or network.pve.active() or map_transition.blocking): return
+		network.duel.submit(action)
+	)
+	network.duel.changed.connect(_duel_changed)
+	network.duel.message.connect(func(text: String)->void:
+		_system_text = text;_pve_log = text;expanded_chat.add_system(text);_chat_changed()
+	)
+	duel_battle.action_requested.connect(func(action: String)->void: network.duel.submit(action))
+	duel_battle.skill_requested.connect(func(id: String)->void: network.duel.submit("skill",id))
+	duel_battle.dismissed.connect(func()->void:
+		_closed_duel = duel_battle.battle_id
+		screen.hud.show();count_label.show();_set_battle_layout(false)
+		if not _character.is_empty(): screen.chrome.display_character(_character)
+	)
 	if OS.has_feature("web"): Platform.context.lifecycle.changed.connect(_web_lifecycle)
 	map_data = SharedWorldMap.load_data()
 	_build_map()
@@ -71,7 +132,7 @@ func _ready() -> void:
 	screen.action_requested.connect(_scene_action)
 	screen.hud.get_node("MapName").text = "青云山道"
 	screen.hud.get_node("Minimap").set_shared_world(map_data, {}, character_id)
-	menu.chosen.connect(_scene_action)
+	menu.chosen.connect(func(action: String)->void:_scene_action("friends" if action=="social" else action))
 	attributes.back_requested.connect(_close_attributes)
 	world_map.back_requested.connect(_close_world_map)
 	world_map.ai_requested.connect(func(id: String) -> void:
@@ -120,6 +181,7 @@ func _ready() -> void:
 	)
 	network.pve.changed.connect(_pve_changed)
 	network.pve.message.connect(func(text: String) -> void:
+		if network.pve.last_action in ["transfer", "ai_travel"] and not network.pve.last_code.is_empty(): map_transition.cancel()
 		_pve_log = text
 		_system_text = text
 		expanded_chat.add_system(text)
@@ -128,6 +190,9 @@ func _ready() -> void:
 		if network.pve.last_code.is_empty() and network.pve.last_action in ["accept", "claim", "restore","ai_accept","ai_claim","ai_restore","ai_interact","school_join"]: npc_dialog.hide()
 	)
 	network.map_changed.connect(_map_changed)
+	network.map_transfer_started.connect(_begin_map_transition)
+	network.connection_failed.connect(map_transition.cancel)
+	network.pve.send_requested.connect(_map_command_sent)
 	network.changed.connect(_snapshot)
 	network.population.changed.connect(_population)
 	network.status_changed.connect(_status_changed)
@@ -142,12 +207,17 @@ func _ready() -> void:
 	network.start(character_id)
 
 func _leave_world() -> void:
+	if social_panel.visible:social_panel.dismiss()
 	_close_inventory()
 	_cancel_battle_preparation()
 	network.leave()
 	close_requested.emit()
 
 func _scene_action(action: String) -> void:
+	if map_transition.blocking: return
+	if network.duel.active() or duel_battle.visible or team.active() or team_battle.visible: return
+	if team_panel.visible:team_panel.dismiss()
+	if social_panel.visible: social_panel.dismiss()
 	_close_inventory()
 	_close_world_map()
 	_close_attributes()
@@ -168,6 +238,11 @@ func _scene_action(action: String) -> void:
 	if action == "social":
 		_toggle_chat()
 		return
+	if action in ["friends","guild"]:
+		_open_social("friends" if action=="friends" else "guild")
+		return
+	if action=="team":
+		_open_team();return
 	if network.world_ready: network.stop_moving()
 	emote_picker.hide()
 	Platform.context.text_input.release_focus(chat_input)
@@ -206,6 +281,132 @@ func _status_changed(text_value: String) -> void:
 		for actor in actors.values(): actor.sprite.play("idle")
 	_chat_changed()
 
+func _map_command_sent(packet: Dictionary) -> void:
+	if packet.get("command", {}).get("action") in ["transfer", "ai_travel"]:
+		_begin_map_transition()
+
+func _select_player(id: String) -> void:
+	if id == character_id or not network.entities.has(id) or network.pve.active() or network.pve.pending(): return
+	_cancel_approach()
+	network.stop_moving();move_target.clear();_was_keyboard=false
+	_open_social("profile",id)
+
+func _open_social(section: String, target: String="") -> void:
+	if team_panel.visible:team_panel.dismiss()
+	_close_inventory();_close_world_map();_close_attributes();_cancel_approach()
+	menu.hide();details.hide();npc_dialog.hide();encounter.hide();duel_invitation.selected=""
+	if expanded_chat.visible:expanded_chat.dismiss()
+	if network.world_ready:network.stop_moving()
+	Platform.context.text_input.release_focus(chat_input)
+	_was_keyboard=false
+	social_panel.open(section,target)
+	if not social.supported:social_panel.notice.text="当前服务尚未支持，请更新并重启游戏服务。"
+
+func _social_completed(action: String, result: Dictionary) -> void:
+	if action=="social":social.receive(result)
+	elif action=="teams":team.receive(result)
+
+func _open_team()->void:
+	if social_panel.visible:social_panel.dismiss()
+	_close_inventory();_close_attributes();_close_world_map();_cancel_approach()
+	menu.hide();details.hide();npc_dialog.hide();encounter.hide()
+	if expanded_chat.visible:expanded_chat.dismiss()
+	Platform.context.text_input.release_focus(chat_input)
+	network.stop_moving();_was_keyboard=false;team_panel.open()
+
+func _team_changed()->void:
+	network.team_active=team.active()
+	menu.rows[5].text="队伍（%d）"%team.party().get("members",[]).size() if not team.party().is_empty() else "队伍"
+	team_notice.visible=not team.state.incoming.is_empty() and not team.active() and not network.pve.active() and not network.duel.active()
+	if team_notice.visible:
+		team_notice_text.text="%s 邀请组队"%team.state.incoming[0].name
+		team_confirm.disabled=team.pending() or team.inflight;team_reject.disabled=team_confirm.disabled
+	if team.active():
+		network._pending_motion.clear();move_target.clear();_was_keyboard=false;_cancel_approach()
+		_close_inventory();_close_world_map();_close_attributes();menu.hide();details.hide();npc_dialog.hide();encounter.hide()
+		if social_panel.visible:social_panel.dismiss()
+		if team_panel.visible:team_panel.dismiss()
+		if expanded_chat.visible:expanded_chat.dismiss()
+		screen.hud.hide();count_label.hide();_set_battle_layout(true);screen.chrome.round_label.text="组队战斗"
+
+func _social_changed() -> void:
+	var incoming: Array=[]
+	for entry in social.state.get("incoming",[]):incoming.append(entry.id)
+	menu.rows[3].text="社交（%d）"%incoming.size() if not incoming.is_empty() else "社交"
+	for id in incoming:
+		if not _social_incoming.has(id):
+			expanded_chat.add_system("收到好友申请，请在菜单 → 社交 → 申请中查看。")
+			break
+	_social_incoming=incoming
+
+func _invite_player(id: String) -> void:
+	if not network.duel.enabled:
+		chat_status.text="服务器尚未支持玩家决斗。";return
+	if not network.entities.has(id):
+		chat_status.text="只能邀请同地图的在线玩家决斗。";return
+	if not network.world_ready or not network.entities.has(id) or network.pve.pending() or network.pve.active() or map_transition.blocking: return
+	network.duel.submit("invite",id)
+
+func _duel_changed() -> void:
+	duel_invitation.refresh()
+	var data: Variant = network.duel.state.get("battle")
+	if not data is Dictionary:
+		if (network.duel.connected or not network.duel.enabled) and duel_battle.visible:
+			duel_battle._cancel_motion();duel_battle.hide()
+			screen.hud.show();count_label.show();_set_battle_layout(false)
+			if not _character.is_empty(): screen.chrome.display_character(_character)
+		return
+	if data.status != "active" and (data.id == _closed_duel or duel_battle.battle_id != data.id):
+		_closed_duel = data.id
+		return
+	if data.status == "active":
+		if social_panel.visible:social_panel.dismiss()
+		_cancel_approach();move_target.clear();_was_keyboard=false
+		_close_inventory();_close_world_map();_close_attributes()
+		npc_dialog.hide();menu.hide();details.hide()
+		if expanded_chat.visible: expanded_chat.dismiss()
+		Platform.context.text_input.release_focus(chat_input)
+	duel_battle.present_duel(network.duel)
+	var me: Dictionary = data.fighters[0] if data.fighters[0].id == character_id else data.fighters[1]
+	screen.chrome.display_character({"level":me.level,"hp":me.hp,"mp":me.mp,"max_hp":me.stats.hp,"max_mp":me.stats.mp})
+	screen.hud.hide();count_label.hide();_set_battle_layout(true)
+	screen.chrome.round_label.text = "玩家决斗"
+	screen.chrome.round_label.add_theme_color_override("font_color",Color("fff3b5"))
+	var lines: String = "\n".join(PackedStringArray(data.lines))
+	if lines != _duel_lines:
+		_duel_lines = lines;_system_text = lines;_pve_log = lines;expanded_chat.add_system(lines);_chat_changed()
+
+func _begin_map_transition() -> void:
+	if map_transition.blocking: return
+	_transfer_origin = String(map_data.map_id)
+	_cancel_approach()
+	_close_inventory()
+	_close_world_map()
+	_close_attributes()
+	menu.hide()
+	details.hide()
+	npc_dialog.hide()
+	if expanded_chat.visible: expanded_chat.dismiss()
+	emote_picker.hide()
+	Platform.context.text_input.release_focus(chat_input)
+	move_target.clear()
+	_was_keyboard = false
+	map_transition.begin(ShopRules.actor_key(int(_character.get("job", 0)), int(_character.get("gender", 0)), _character.get("appearance", [1, 0])))
+	map_transition.set_progress(0.15)
+
+func _advance_map_transition() -> void:
+	if not map_transition.blocking: return
+	# auth.ready changes terrain before the baseline and population have arrived.
+	# Do not reveal the new map until all three authoritative channels agree.
+	if network.map_id == _transfer_origin: return
+	map_transition.set_progress(0.50)
+	if not network.world_ready or not actors.has(character_id): return
+	map_transition.set_progress(0.70)
+	if not network.pve.ready or network.pve.state.get("character", {}).get("map_id") != network.map_id or network.pve.pending(): return
+	map_transition.set_progress(0.85)
+	if network.population.revision < 0 or String(map_data.map_id) != network.map_id: return
+	map_transition.complete()
+
 func _build_map() -> void:
 	SharedWorldMap.build($Viewport/Scene/Terrain, _motion_grid, map_data)
 	SharedWorldMap.add_scenery(actor_layer, map_data)
@@ -240,6 +441,8 @@ func _build_map() -> void:
 		tag.text = "灵空台 · AI生成";preload("res://scripts/world_nameplate.gd").apply(tag,Color("c2f7f4")); ai_station.add_child(tag)
 
 func _map_changed(id: String) -> void:
+	if social_panel.visible:social_panel.dismiss()
+	duel_invitation.selected = ""
 	_portal_latch=""
 	_portal_stop=""
 	_cancel_approach()
@@ -311,6 +514,7 @@ func _snapshot(values: Dictionary) -> void:
 		actors[id].target = point
 		actors[id].motion.receive(entity, _motion_grid)
 		actors[id].root.position = actors[id].motion.position
+	if not duel_invitation.selected.is_empty() and not values.has(duel_invitation.selected): duel_invitation.selected = ""
 	count_label.text = "同图%d人" % actors.size()
 	screen.hud.get_node("Minimap").set_shared_world(map_data, values, character_id)
 	if values.has(character_id):
@@ -379,7 +583,7 @@ func _chat_changed() -> void:
 	expanded_chat.sync_messages(network.chat.messages)
 	var lines := PackedStringArray()
 	if not _pve_log.is_empty() or network.chat.messages.is_empty() or not network.world_ready: lines.append("[系统] " + _system_text)
-	for message in network.chat.messages: lines.append("[公共] %s：%s" % [message.display_name, message.text])
+	for message in network.chat.messages: lines.append("[系统] " + message.text if message.get("system", false) else "[公共] %s：%s" % [message.display_name, message.text])
 	var text_value := "\n".join(lines)
 	if text_value != _rendered_chat:
 		_rendered_chat = text_value
@@ -390,7 +594,7 @@ func _chat_changed() -> void:
 		for index in network.chat.messages.size():
 			if index > 0: chat_log.add_text("\n")
 			var message: Dictionary = network.chat.messages[index]
-			chat_log.add_text("[公共] %s：" % message.display_name)
+			chat_log.add_text("[系统] " if message.get("system", false) else "[公共] %s：" % message.display_name)
 			ChatEmotePicker.CATALOG.append_body(chat_log, message.text)
 	chat_button.tooltip_text = "公共聊天 · %d条消息" % network.chat.messages.size()
 
@@ -403,8 +607,14 @@ func _update_chat_controls() -> void:
 		if emote_button.disabled: emote_picker.hide()
 
 func _process(delta: float) -> void:
+	var social_available:=network.world_ready and OnlineAccount.is_logged_in() and not OnlineAccount.busy and not OnlineAccount.network_suspended
+	if Platform.context.lifecycle.suspended:social_available=false
+	if OS.has_feature("web") and (not Platform.context.lifecycle.focused or Platform.context.lifecycle.suspended):social_available=false
+	social.tick(social_available)
+	team.tick(social_available and not OnlineAccount.busy)
 	_update_chat_controls()
 	_update_allocation_controls()
+	_advance_map_transition()
 	if network == null or not network.world_ready: return
 	if network.pve.ready and network.pve.unavailable_monsters() != _hidden_residents:
 		_population(network.population.entities)
@@ -432,9 +642,11 @@ func _process(delta: float) -> void:
 	if actors.has(character_id): camera.position = actors[character_id].root.position
 	if encounter.visible: encounter.set_hero_point(_hero_screen_point())
 	_update_move_target(delta)
+	if map_transition.blocking: return
+	if network.duel.active() or duel_battle.visible or team.active() or team_battle.visible: return
 	if OS.has_feature("web") and (not Platform.context.lifecycle.focused or Platform.context.lifecycle.suspended): return
 	_advance_approach()
-	if bag_overlay != null or chat_input.has_focus() or menu.visible or details.visible or npc_dialog.visible or emote_picker.visible or encounter.visible or battle_view.visible or expanded_chat.visible or attributes.visible or world_map.visible or network.pve.pending() or network.pve.active():
+	if team_panel.visible or social_panel.visible or bag_overlay != null or chat_input.has_focus() or menu.visible or details.visible or npc_dialog.visible or emote_picker.visible or encounter.visible or battle_view.visible or expanded_chat.visible or attributes.visible or world_map.visible or network.pve.pending() or network.pve.active():
 		_was_keyboard = false
 		return
 	if _auto_transfer(): return
@@ -456,10 +668,12 @@ func _process(delta: float) -> void:
 		_was_keyboard = false
 
 func _map_input(event: InputEvent) -> void:
+	if map_transition.blocking: return
+	if network.duel.active() or duel_battle.visible or team.active() or team_battle.visible or team_panel.visible: return
 	if _battle_load_failed:
 		if (event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed) or (event is InputEventScreenTouch and event.pressed): _pve_changed()
 		return
-	if bag_overlay != null or not network.world_ready or menu.visible or details.visible or npc_dialog.visible or encounter.visible or battle_view.visible or expanded_chat.visible or attributes.visible or world_map.visible or network.pve.pending() or network.pve.active(): return
+	if social_panel.visible or bag_overlay != null or not network.world_ready or menu.visible or details.visible or npc_dialog.visible or encounter.visible or battle_view.visible or expanded_chat.visible or attributes.visible or world_map.visible or network.pve.pending() or network.pve.active(): return
 	var point := Vector2.ZERO
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed: point = event.position
 	elif event is InputEventScreenTouch and event.pressed: point = event.position
@@ -470,6 +684,12 @@ func _map_input(event: InputEvent) -> void:
 	Platform.context.text_input.release_focus(chat_input)
 	_was_keyboard = false
 	var world_point := camera.get_screen_center_position() + point - Vector2(viewport.size) / 2.0
+	for id in actors:
+		if id == character_id: continue
+		var actor: Dictionary = actors[id]
+		if Rect2(actor.root.position - Vector2(20,60),Vector2(40,64)).has_point(world_point):
+			_select_player(id)
+			return
 	for gate in SharedWorldMap.exits(String(map_data.map_id)):
 		var center:=Vector2(gate.cell[0]*16+8,gate.cell[1]*16+8)
 		if Rect2(center-Vector2(8,8),Vector2(16,16)).has_point(world_point):
@@ -478,6 +698,7 @@ func _map_input(event: InputEvent) -> void:
 		if residents[id].hit(world_point):
 			resident_selected.emit(id)
 			return
+	duel_invitation.selected = ""
 	_cancel_approach()
 	var destination := Vector2i(floori(world_point.x / 16.0), floori(world_point.y / 16.0))
 	if _motion_grid.region.has_point(destination) and not _motion_grid.is_point_solid(destination):
@@ -488,7 +709,16 @@ func _map_input(event: InputEvent) -> void:
 		chat_status.text = "目标不可达，已停止原路线。"
 
 func _unhandled_key_input(event: InputEvent) -> void:
+	if map_transition.blocking: return
+	if network.duel.active() or duel_battle.visible or team.active() or team_battle.visible: return
 	if not event is InputEventKey or not event.pressed: return
+	if team_panel.visible:
+		if event.keycode==KEY_ESCAPE:team_panel.dismiss();get_viewport().set_input_as_handled()
+		return
+	if social_panel.visible:
+		if event.keycode==KEY_ESCAPE:
+			social_panel.dismiss();get_viewport().set_input_as_handled()
+		return
 	if ai_panel != null:
 		if event.keycode == KEY_ESCAPE: _close_inventory(); get_viewport().set_input_as_handled()
 		return
@@ -541,6 +771,7 @@ func _pve_changed() -> void:
 	var model := network.pve
 	if not model.ready or model.active(): move_target.clear()
 	if model.active():
+		if social_panel.visible:social_panel.dismiss()
 		_close_world_map()
 		_close_inventory()
 	if model.active(): npc_dialog.hide()
@@ -574,6 +805,9 @@ func _pve_changed() -> void:
 	battle_view.refresh()
 
 func _select_resident(id: String) -> void:
+	if team.active():return
+	if not team.party().is_empty() and not team.party().get("leader",false) and network.population.entities.get(id,{}).get("kind")!="npc":
+		chat_status.text="组队时请由队长发起战斗。";return
 	if not network.world_ready or not network.pve.ready or not residents.has(id) or network.pve.active() or network.pve.pending(): return
 	_cancel_approach()
 	if network.world_ready: network.stop_moving()
@@ -659,7 +893,9 @@ func _advance_approach() -> void:
 			npc_dialog.present_ai(request.target,AIWorld.resident(request.target),network.pve.state.get("ai_world",{}),int(_character.get("level",1)),network.pve)
 			return
 		npc_dialog.approaching = false
-		network.pve.submit(action, request.target)
+		if action=="challenge" and not team.party().is_empty():
+			if not team.submit("challenge",request.target):chat_status.text="正在同步队伍，请稍后重试。"
+		else:network.pve.submit(action, request.target)
 		return
 	var best := Vector2i(-1, -1)
 	var shortest := 9999
@@ -818,6 +1054,8 @@ func _set_battle_layout(active: bool) -> void:
 	expanded_chat.get_node("Shade").size.y = chat_panel.position.y
 
 func _open_expanded_chat() -> void:
+	if team_panel.visible:team_panel.dismiss()
+	if social_panel.visible:social_panel.dismiss()
 	_close_inventory()
 	_close_world_map()
 	_close_attributes()

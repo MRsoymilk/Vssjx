@@ -1,0 +1,27 @@
+{
+  "family": "gravebloom",
+  "family_name": "冥林异装",
+  "sheet_rows": 8,
+  "icon_start_cell": 20,
+  "atlas_overrides": {
+    "01_male_lishi": {"file": "01_male_lishi-axe-symmetric.png", "cells": [14, 15, 20]}
+  },
+  "sets": [
+    ["01_male_lishi", "mzs", "冥苔断岳", 11, 6],
+    ["02_female_lishi", "wzs", "腐焰镇魂", 14, 4],
+    ["03_male_xiake", "mck", "枯藤照夜", 9, 8],
+    ["04_female_xiake", "wck", "碧毒裂影", 17, 5],
+    ["05_male_yinzhe", "mfs", "葬骨灯冢", 11, 6],
+    ["06_female_yinzhe", "wfs", "烬冠引魂", 7, 4]
+  ],
+  "weapon_icon_ids": ["original/iw16", "original/iw6", "original/iw29", "original/iw19", "original/iw41", "original/iw47"],
+  "weapon_names": ["冥苔战斧", "腐焰重锤", "枯藤长剑", "碧毒双爪", "葬骨魂杖", "烬冠灵炬"],
+  "themes": [
+    "Male Lishi, moss-covered executioner battleaxe, full charcoal heavy armor edged with pale bone and muted bronze, restrained toxic-lime cracks. Spiky ash-white hair, small antler/branch crown, deep green cloth. Keep existing compact native fighter face and exact axe grip.",
+    "Female Lishi, massive iron warhammer with a single green ember core and bone studs, full weathered bronze/black plate with burgundy tattered waistcloth and green seams. Silver hair under small horned dark bronze circlet. Distinct from the male axe set. Keep native compact female proportions and actual hammer handle attachment.",
+    "Male Xiake, long straight Chinese sword with vine-etched dark steel, ivory guard and thin emerald edge. Slim fully covered charcoal/moss lamellar jacket, torn sage scarf, ivory piping. Short pale moss-gray swept-up hair and a tiny twig crown. Hands keep native sword grip, no new body shape.",
+    "Female Xiake, paired curved talon/claw blades, preserve their original claw silhouette and attachment to native hand poses. Ink-violet fitted closed tunic and dark leggings, acid-jade claw tips, bone buckle and tiny violet gems. Cropped pale blonde hair with a violet wrap and small green bead. Agile, small native game proportions, no bare torso.",
+    "Male Yinzhe, the provided necromancer reference translated into THIS GAME: mossy dark-teal hood, a small ivory skull-mask face with two bright green pixel eyes, rotten plum/teal closed robe, ragged hem, little bone necklace and twisted vine horn motifs. Same head dimensions as the supplied native hood part. Staff with a compact skull/green soul orb at its existing circular head, black rooted shaft. Not realistic, no giant horns or different proportions.",
+    "Female Yinzhe, explicitly use the SECOND supplied tiny-head example for style: very voluminous GOLDEN FLAME/POMPADOUR hair flowing upward, dark maroon shadowed face with tiny glowing lime eyes and a violet headband. Keep the native part canvas and native game head/body scale. Fully covered charcoal/plum robe with pale bone trim and jade ties. A small jade-green ghost-flame torch/scepter, keeping exact native handle attachment. Palette gold, plum, lime, distinct from the male skull hood."
+  ]
+}

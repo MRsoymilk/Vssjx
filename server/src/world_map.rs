@@ -63,6 +63,8 @@ impl WorldMap {
         let index = |c: [i32; 2]| (c[1] * self.width + c[0]) as usize;
         let mut previous = vec![None; 1024];
         let mut queue = VecDeque::from([start]);
+        let avoid_exits = matches!(self.map_id.as_str(), "qingyun_trail" | "ancient_ruins");
+        let destination_exit = avoid_exits.then(||crate::ai_world::exit_target(&self.map_id, goal)).flatten();
         previous[index(start)] = Some(start);
         while let Some(cell) = queue.pop_front() {
             if cell == goal {
@@ -77,6 +79,10 @@ impl WorldMap {
             for delta in [[0, -1], [1, 0], [0, 1], [-1, 0]] {
                 let next = [cell[0] + delta[0], cell[1] + delta[1]];
                 if self.walkable(next) && previous[index(next)].is_none() {
+                    if avoid_exits && crate::ai_world::exit_target(&self.map_id, next)
+                        .is_some_and(|target| destination_exit.as_ref() != Some(&target)) {
+                        continue;
+                    }
                     previous[index(next)] = Some(cell);
                     queue.push_back(next);
                 }

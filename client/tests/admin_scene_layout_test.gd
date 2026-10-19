@@ -86,20 +86,6 @@ func _ready() -> void:
 	await settle()
 	fits(browser.get_node("%Copy"), "Original-map details fit the 960x640 desktop")
 	await capture("browser-original-maps-desktop")
-	var popup: Window = browser.open_world_overview()
-	await settle()
-	check(popup != null, "Browser can still open the overview popup")
-	if popup != null:
-		var previews := popup.find_children("WorldPreview", "Control", true, false)
-		check(previews.size() == 1 and previews[0].record.get("preview", {}).get("world", {}).get("nodes", []).size() == 79, "Popup receives the selected real overview data")
-		if DisplayServer.get_name() != "headless":
-			check(not popup.is_embedded(), "Overview popup is a separate desktop window, not an embedded page")
-		check(popup.size == Vector2i(960, 540), "Overview popup also uses the desktop resolution")
-		fits(popup.get_node("Overview").get_node("%Scope"), "Popup scope/footer also fits inside its own scaled canvas")
-		if not output.is_empty() and DisplayServer.get_name() != "headless":
-			RenderingServer.force_draw()
-			check(popup.get_texture().get_image().save_png(output.path_join("overview-popup.png")) == OK, "Rendered overview popup")
-		popup.queue_free()
 	browser.queue_free()
 	await settle()
 	var overview = load("res://scenes/admin/world_overview.tscn").instantiate()

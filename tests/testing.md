@@ -1,6 +1,19 @@
-# 当前客户端测试说明
+# 开发测试入口与历史记录
 
-本文记录已存在的测试入口、运行方式和隔离要求。未来联机版的测试与容量验收见[online_test_plan.md](online_test_plan.md)。测试说明和结果统一放在`tests/`，不写入项目或设计目录的README。
+本文记录已有测试入口、运行方式与隔离要求。下文带日期和阶段的结果是历史事实，不保证当前源码、发布包或全部设备都已通过。联机业务已有实现，完整混合负载目标继续见 [online_test_plan.md](online_test_plan.md)；测试说明和结果统一放在 `tests/`，不写入项目或设计 README。
+
+## 按变更选择入口
+
+| 范围 | 说明 |
+|---|---|
+| 开源文档与链接 | [文档检查](documentation.md) |
+| 任务、战斗与地图 | [线上 PVE](online_pve.md)、[第二张地图](online_maps.md)、[技能](../design/skills.md#验证) |
+| 社交与多人战斗 | [社交](social.md)、[组队](teams.md)、[决斗](player_duels.md) |
+| 平台与网页 | [平台基础](platform_interface.md)、[主游戏 Web](web_game.md)、[浏览器存储](web_storage.md) |
+| 素材与桌面工具 | [数据浏览](data_browser.md)、[游戏导出边界](game_export.md) |
+| 公网历史发布 | [发布基线](release_20261018.md)、[后续聊天管理](chat_moderation.md) |
+
+文档变更可只运行相关静态检查，不要求启动数据库、导出产物或部署服务。以下保留各阶段的具体入口，选择与修改范围对应的回归。
 
 Rust基础服务、登录服务器地址、重启保存与真实网络联调见[server_connection.md](server_connection.md)。
 
@@ -12,7 +25,7 @@ PostgreSQL账号、密码、会话、注销与账号界面验证见[account_auth
 
 角色元数据分片、按需加载、无损重建与读取微基准见[actor_catalog.md](actor_catalog.md)。
 
-服务端结构化日志、只读Web监控、真实浏览器与数据库故障验证见[observability.md](observability.md)。
+结构化日志与监控早期验证见 [observability.md](observability.md)；当前本机写入管理与审计另见 [security_admin.md](security_admin.md) 和 [chat_moderation.md](chat_moderation.md)，不再将整个管理页面称为只读。
 
 项目数据管理与世界总图独立桌面窗口、小窗口布局验证见[data_browser.md](data_browser.md#独立桌面工具布局)；开发工具不进入游戏包的真实导出检查见[game_export.md](game_export.md)。
 
@@ -24,7 +37,7 @@ P1c文本焦点、组合状态提交防护和原生退出/窗口关闭保存验�
 
 P2c-1可等待存档契约、全部游戏调用方迁移、延迟完成/失败与退出等待验证见[storage_async.md](storage_async.md)；不等于实现或验收浏览器持久化。
 
-P2c-2真实Godot Web存储夹具、IndexedDB事务确认、跨刷新/浏览器进程恢复及失败/超时验证见[web_storage.md](web_storage.md)；生产Web游戏工厂仍未启用。
+P2c-2 的存储夹具、IndexedDB 事务确认、重开恢复及失败／超时验证见 [web_storage.md](web_storage.md)。该早期阶段不代表主游戏验收；后续已接入 Web 工厂与网页发布，分别见 [web_game.md](web_game.md) 和 [release_20261018.md](release_20261018.md)。
 
 同一游戏界面的多人角色、内嵌聊天与本地入口验证见[shared_interface.md](shared_interface.md)及[local_mode.md](local_mode.md)。
 

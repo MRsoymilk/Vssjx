@@ -1,0 +1,1640 @@
+[
+  {
+    "cells": [
+      {
+        "frame": 0,
+        "original_region": [
+          0.0,
+          0.0,
+          42.0,
+          43.0
+        ],
+        "source": "mzst2",
+        "template_region": [
+          65,
+          63,
+          126,
+          129
+        ]
+      },
+      {
+        "frame": 1,
+        "original_region": [
+          42.0,
+          0.0,
+          20.0,
+          16.0
+        ],
+        "source": "mzst2",
+        "template_region": [
+          354,
+          104,
+          60,
+          48
+        ]
+      },
+      {
+        "frame": 0,
+        "original_region": [
+          0.0,
+          0.0,
+          19.0,
+          13.0
+        ],
+        "source": "mzs1",
+        "template_region": [
+          611,
+          108,
+          57,
+          39
+        ]
+      },
+      {
+        "frame": 1,
+        "original_region": [
+          26.0,
+          0.0,
+          26.0,
+          13.0
+        ],
+        "source": "mzs1",
+        "template_region": [
+          857,
+          108,
+          78,
+          39
+        ]
+      },
+      {
+        "frame": 2,
+        "original_region": [
+          52.0,
+          0.0,
+          6.0,
+          7.0
+        ],
+        "source": "mzs1",
+        "template_region": [
+          119,
+          373,
+          18,
+          21
+        ]
+      },
+      {
+        "frame": 0,
+        "original_region": [
+          0.0,
+          0.0,
+          11.0,
+          14.0
+        ],
+        "source": "mzs1q",
+        "template_region": [
+          367,
+          363,
+          33,
+          42
+        ]
+      },
+      {
+        "frame": 1,
+        "original_region": [
+          25.0,
+          0.0,
+          9.0,
+          10.0
+        ],
+        "source": "mzs1q",
+        "template_region": [
+          626,
+          369,
+          27,
+          30
+        ]
+      },
+      {
+        "frame": 2,
+        "original_region": [
+          50.0,
+          0.0,
+          25.0,
+          23.0
+        ],
+        "source": "mzs1q",
+        "template_region": [
+          858,
+          349,
+          75,
+          69
+        ]
+      },
+      {
+        "frame": 0,
+        "original_region": [
+          0.0,
+          0.0,
+          25.0,
+          15.0
+        ],
+        "source": "mzs1x",
+        "template_region": [
+          90,
+          617,
+          75,
+          45
+        ]
+      },
+      {
+        "frame": 1,
+        "original_region": [
+          26.0,
+          0.0,
+          26.0,
+          14.0
+        ],
+        "source": "mzs1x",
+        "template_region": [
+          345,
+          619,
+          78,
+          42
+        ]
+      },
+      {
+        "frame": 2,
+        "original_region": [
+          52.0,
+          0.0,
+          22.0,
+          13.0
+        ],
+        "source": "mzs1x",
+        "template_region": [
+          607,
+          620,
+          66,
+          39
+        ]
+      },
+      {
+        "frame": 3,
+        "original_region": [
+          78.0,
+          0.0,
+          20.0,
+          15.0
+        ],
+        "source": "mzs1x",
+        "template_region": [
+          866,
+          617,
+          60,
+          45
+        ]
+      },
+      {
+        "frame": 4,
+        "original_region": [
+          104.0,
+          0.0,
+          19.0,
+          14.0
+        ],
+        "source": "mzs1x",
+        "template_region": [
+          99,
+          875,
+          57,
+          42
+        ]
+      },
+      {
+        "frame": 5,
+        "original_region": [
+          130.0,
+          0.0,
+          22.0,
+          13.0
+        ],
+        "source": "mzs1x",
+        "template_region": [
+          351,
+          876,
+          66,
+          39
+        ]
+      },
+      {
+        "frame": 0,
+        "original_region": [
+          0.0,
+          0.0,
+          74.0,
+          38.0
+        ],
+        "source": "ezs14",
+        "template_region": [
+          529,
+          839,
+          222,
+          114
+        ]
+      },
+      {
+        "frame": 1,
+        "original_region": [
+          74.0,
+          0.0,
+          74.0,
+          47.0
+        ],
+        "source": "ezs14",
+        "template_region": [
+          785,
+          825,
+          222,
+          141
+        ]
+      }
+    ],
+    "head_template": 2,
+    "id": "01_male_lishi",
+    "name": "玄骸镇岳",
+    "stem": "mzs",
+    "weapon_template": 14
+  },
+  {
+    "cells": [
+      {
+        "frame": 0,
+        "original_region": [
+          0.0,
+          0.0,
+          42.0,
+          43.0
+        ],
+        "source": "wzst2",
+        "template_region": [
+          65,
+          63,
+          126,
+          129
+        ]
+      },
+      {
+        "frame": 1,
+        "original_region": [
+          42.0,
+          0.0,
+          20.0,
+          16.0
+        ],
+        "source": "wzst2",
+        "template_region": [
+          354,
+          104,
+          60,
+          48
+        ]
+      },
+      {
+        "frame": 0,
+        "original_region": [
+          0.0,
+          0.0,
+          13.0,
+          11.0
+        ],
+        "source": "wzs1",
+        "template_region": [
+          620,
+          111,
+          39,
+          33
+        ]
+      },
+      {
+        "frame": 1,
+        "original_region": [
+          24.0,
+          0.0,
+          24.0,
+          12.0
+        ],
+        "source": "wzs1",
+        "template_region": [
+          860,
+          110,
+          72,
+          36
+        ]
+      },
+      {
+        "frame": 2,
+        "original_region": [
+          48.0,
+          0.0,
+          7.0,
+          9.0
+        ],
+        "source": "wzs1",
+        "template_region": [
+          117,
+          370,
+          21,
+          27
+        ]
+      },
+      {
+        "frame": 0,
+        "original_region": [
+          0.0,
+          0.0,
+          10.0,
+          7.0
+        ],
+        "source": "wzs1q",
+        "template_region": [
+          369,
+          373,
+          30,
+          21
+        ]
+      },
+      {
+        "frame": 1,
+        "original_region": [
+          25.0,
+          0.0,
+          8.0,
+          7.0
+        ],
+        "source": "wzs1q",
+        "template_region": [
+          628,
+          373,
+          24,
+          21
+        ]
+      },
+      {
+        "frame": 2,
+        "original_region": [
+          50.0,
+          0.0,
+          25.0,
+          21.0
+        ],
+        "source": "wzs1q",
+        "template_region": [
+          858,
+          352,
+          75,
+          63
+        ]
+      },
+      {
+        "frame": 0,
+        "original_region": [
+          0.0,
+          0.0,
+          24.0,
+          14.0
+        ],
+        "source": "wzs1x",
+        "template_region": [
+          92,
+          619,
+          72,
+          42
+        ]
+      },
+      {
+        "frame": 1,
+        "original_region": [
+          24.0,
+          0.0,
+          13.0,
+          12.0
+        ],
+        "source": "wzs1x",
+        "template_region": [
+          364,
+          622,
+          39,
+          36
+        ]
+      },
+      {
+        "frame": 2,
+        "original_region": [
+          48.0,
+          0.0,
+          19.0,
+          12.0
+        ],
+        "source": "wzs1x",
+        "template_region": [
+          611,
+          622,
+          57,
+          36
+        ]
+      },
+      {
+        "frame": 3,
+        "original_region": [
+          72.0,
+          0.0,
+          22.0,
+          13.0
+        ],
+        "source": "wzs1x",
+        "template_region": [
+          863,
+          620,
+          66,
+          39
+        ]
+      },
+      {
+        "frame": 4,
+        "original_region": [
+          96.0,
+          0.0,
+          16.0,
+          14.0
+        ],
+        "source": "wzs1x",
+        "template_region": [
+          104,
+          875,
+          48,
+          42
+        ]
+      },
+      {
+        "frame": 5,
+        "original_region": [
+          120.0,
+          0.0,
+          17.0,
+          11.0
+        ],
+        "source": "wzs1x",
+        "template_region": [
+          358,
+          879,
+          51,
+          33
+        ]
+      },
+      {
+        "frame": 0,
+        "original_region": [
+          0.0,
+          0.0,
+          74.0,
+          38.0
+        ],
+        "source": "ezs14",
+        "template_region": [
+          529,
+          839,
+          222,
+          114
+        ]
+      },
+      {
+        "frame": 1,
+        "original_region": [
+          74.0,
+          0.0,
+          74.0,
+          47.0
+        ],
+        "source": "ezs14",
+        "template_region": [
+          785,
+          825,
+          222,
+          141
+        ]
+      }
+    ],
+    "head_template": 2,
+    "id": "02_female_lishi",
+    "name": "赤翎破军",
+    "stem": "wzs",
+    "weapon_template": 14
+  },
+  {
+    "cells": [
+      {
+        "frame": 0,
+        "original_region": [
+          0.0,
+          0.0,
+          42.0,
+          43.0
+        ],
+        "source": "mckt2",
+        "template_region": [
+          65,
+          63,
+          126,
+          129
+        ]
+      },
+      {
+        "frame": 1,
+        "original_region": [
+          42.0,
+          0.0,
+          20.0,
+          16.0
+        ],
+        "source": "mckt2",
+        "template_region": [
+          354,
+          104,
+          60,
+          48
+        ]
+      },
+      {
+        "frame": 0,
+        "original_region": [
+          0.0,
+          0.0,
+          21.0,
+          19.0
+        ],
+        "source": "mck1",
+        "template_region": [
+          608,
+          99,
+          63,
+          57
+        ]
+      },
+      {
+        "frame": 1,
+        "original_region": [
+          21.0,
+          0.0,
+          15.0,
+          13.0
+        ],
+        "source": "mck1",
+        "template_region": [
+          873,
+          108,
+          45,
+          39
+        ]
+      },
+      {
+        "frame": 0,
+        "original_region": [
+          0.0,
+          0.0,
+          22.0,
+          20.0
+        ],
+        "source": "mck1q",
+        "template_region": [
+          95,
+          354,
+          66,
+          60
+        ]
+      },
+      {
+        "frame": 1,
+        "original_region": [
+          24.0,
+          0.0,
+          11.0,
+          8.0
+        ],
+        "source": "mck1q",
+        "template_region": [
+          367,
+          372,
+          33,
+          24
+        ]
+      },
+      {
+        "frame": 2,
+        "original_region": [
+          48.0,
+          0.0,
+          20.0,
+          8.0
+        ],
+        "source": "mck1q",
+        "template_region": [
+          610,
+          372,
+          60,
+          24
+        ]
+      },
+      {
+        "frame": 3,
+        "original_region": [
+          72.0,
+          0.0,
+          14.0,
+          5.0
+        ],
+        "source": "mck1q",
+        "template_region": [
+          875,
+          376,
+          42,
+          15
+        ]
+      },
+      {
+        "frame": 4,
+        "original_region": [
+          96.0,
+          0.0,
+          12.0,
+          5.0
+        ],
+        "source": "mck1q",
+        "template_region": [
+          110,
+          632,
+          36,
+          15
+        ]
+      },
+      {
+        "frame": 5,
+        "original_region": [
+          120.0,
+          0.0,
+          21.0,
+          17.0
+        ],
+        "source": "mck1q",
+        "template_region": [
+          352,
+          614,
+          63,
+          51
+        ]
+      },
+      {
+        "frame": 6,
+        "original_region": [
+          144.0,
+          0.0,
+          24.0,
+          16.0
+        ],
+        "source": "mck1q",
+        "template_region": [
+          604,
+          616,
+          72,
+          48
+        ]
+      },
+      {
+        "frame": 0,
+        "original_region": [
+          0.0,
+          0.0,
+          15.0,
+          13.0
+        ],
+        "source": "mck1x",
+        "template_region": [
+          873,
+          620,
+          45,
+          39
+        ]
+      },
+      {
+        "frame": 1,
+        "original_region": [
+          16.0,
+          0.0,
+          16.0,
+          13.0
+        ],
+        "source": "mck1x",
+        "template_region": [
+          104,
+          876,
+          48,
+          39
+        ]
+      },
+      {
+        "frame": 2,
+        "original_region": [
+          32.0,
+          0.0,
+          14.0,
+          13.0
+        ],
+        "source": "mck1x",
+        "template_region": [
+          363,
+          876,
+          42,
+          39
+        ]
+      },
+      {
+        "frame": 3,
+        "original_region": [
+          48.0,
+          0.0,
+          13.0,
+          13.0
+        ],
+        "source": "mck1x",
+        "template_region": [
+          620,
+          876,
+          39,
+          39
+        ]
+      },
+      {
+        "frame": 4,
+        "original_region": [
+          64.0,
+          0.0,
+          13.0,
+          13.0
+        ],
+        "source": "mck1x",
+        "template_region": [
+          876,
+          876,
+          39,
+          39
+        ]
+      },
+      {
+        "frame": 5,
+        "original_region": [
+          80.0,
+          0.0,
+          14.0,
+          13.0
+        ],
+        "source": "mck1x",
+        "template_region": [
+          107,
+          1132,
+          42,
+          39
+        ]
+      },
+      {
+        "frame": 0,
+        "original_region": [
+          0.0,
+          0.0,
+          41.0,
+          14.0
+        ],
+        "source": "eck1",
+        "template_region": [
+          322,
+          1131,
+          123,
+          42
+        ]
+      },
+      {
+        "frame": 1,
+        "original_region": [
+          41.0,
+          0.0,
+          30.0,
+          30.0
+        ],
+        "source": "eck1",
+        "template_region": [
+          595,
+          1107,
+          90,
+          90
+        ]
+      }
+    ],
+    "head_template": 2,
+    "id": "03_male_xiake",
+    "name": "紫冥斩魄",
+    "stem": "mck",
+    "weapon_template": 1
+  },
+  {
+    "cells": [
+      {
+        "frame": 0,
+        "original_region": [
+          0.0,
+          0.0,
+          42.0,
+          43.0
+        ],
+        "source": "wckt2",
+        "template_region": [
+          65,
+          63,
+          126,
+          129
+        ]
+      },
+      {
+        "frame": 1,
+        "original_region": [
+          42.0,
+          0.0,
+          20.0,
+          16.0
+        ],
+        "source": "wckt2",
+        "template_region": [
+          354,
+          104,
+          60,
+          48
+        ]
+      },
+      {
+        "frame": 0,
+        "original_region": [
+          0.0,
+          0.0,
+          15.0,
+          12.0
+        ],
+        "source": "wck1",
+        "template_region": [
+          617,
+          110,
+          45,
+          36
+        ]
+      },
+      {
+        "frame": 1,
+        "original_region": [
+          15.0,
+          0.0,
+          11.0,
+          13.0
+        ],
+        "source": "wck1",
+        "template_region": [
+          879,
+          108,
+          33,
+          39
+        ]
+      },
+      {
+        "frame": 0,
+        "original_region": [
+          0.0,
+          0.0,
+          17.0,
+          21.0
+        ],
+        "source": "wck1q",
+        "template_region": [
+          102,
+          352,
+          51,
+          63
+        ]
+      },
+      {
+        "frame": 1,
+        "original_region": [
+          27.0,
+          0.0,
+          25.0,
+          22.0
+        ],
+        "source": "wck1q",
+        "template_region": [
+          346,
+          351,
+          75,
+          66
+        ]
+      },
+      {
+        "frame": 2,
+        "original_region": [
+          54.0,
+          0.0,
+          27.0,
+          26.0
+        ],
+        "source": "wck1q",
+        "template_region": [
+          599,
+          345,
+          81,
+          78
+        ]
+      },
+      {
+        "frame": 0,
+        "original_region": [
+          0.0,
+          0.0,
+          16.0,
+          12.0
+        ],
+        "source": "wck1x",
+        "template_region": [
+          872,
+          366,
+          48,
+          36
+        ]
+      },
+      {
+        "frame": 1,
+        "original_region": [
+          16.0,
+          0.0,
+          12.0,
+          13.0
+        ],
+        "source": "wck1x",
+        "template_region": [
+          110,
+          620,
+          36,
+          39
+        ]
+      },
+      {
+        "frame": 2,
+        "original_region": [
+          32.0,
+          0.0,
+          12.0,
+          13.0
+        ],
+        "source": "wck1x",
+        "template_region": [
+          366,
+          620,
+          36,
+          39
+        ]
+      },
+      {
+        "frame": 3,
+        "original_region": [
+          48.0,
+          0.0,
+          13.0,
+          11.0
+        ],
+        "source": "wck1x",
+        "template_region": [
+          620,
+          623,
+          39,
+          33
+        ]
+      },
+      {
+        "frame": 4,
+        "original_region": [
+          64.0,
+          0.0,
+          15.0,
+          13.0
+        ],
+        "source": "wck1x",
+        "template_region": [
+          873,
+          620,
+          45,
+          39
+        ]
+      },
+      {
+        "frame": 5,
+        "original_region": [
+          80.0,
+          0.0,
+          12.0,
+          13.0
+        ],
+        "source": "wck1x",
+        "template_region": [
+          110,
+          876,
+          36,
+          39
+        ]
+      },
+      {
+        "frame": 0,
+        "original_region": [
+          0.0,
+          0.0,
+          41.0,
+          14.0
+        ],
+        "source": "eck1",
+        "template_region": [
+          322,
+          875,
+          123,
+          42
+        ]
+      },
+      {
+        "frame": 1,
+        "original_region": [
+          41.0,
+          0.0,
+          30.0,
+          30.0
+        ],
+        "source": "eck1",
+        "template_region": [
+          595,
+          851,
+          90,
+          90
+        ]
+      }
+    ],
+    "head_template": 2,
+    "id": "04_female_xiake",
+    "name": "霜骨流萤",
+    "stem": "wck",
+    "weapon_template": 1
+  },
+  {
+    "cells": [
+      {
+        "frame": 0,
+        "original_region": [
+          0.0,
+          0.0,
+          42.0,
+          43.0
+        ],
+        "source": "mfst3",
+        "template_region": [
+          65,
+          63,
+          126,
+          129
+        ]
+      },
+      {
+        "frame": 1,
+        "original_region": [
+          42.0,
+          0.0,
+          20.0,
+          16.0
+        ],
+        "source": "mfst3",
+        "template_region": [
+          354,
+          104,
+          60,
+          48
+        ]
+      },
+      {
+        "frame": 0,
+        "original_region": [
+          0.0,
+          0.0,
+          28.0,
+          17.0
+        ],
+        "source": "mfs2",
+        "template_region": [
+          598,
+          102,
+          84,
+          51
+        ]
+      },
+      {
+        "frame": 1,
+        "original_region": [
+          28.0,
+          0.0,
+          23.0,
+          10.0
+        ],
+        "source": "mfs2",
+        "template_region": [
+          861,
+          113,
+          69,
+          30
+        ]
+      },
+      {
+        "frame": 2,
+        "original_region": [
+          56.0,
+          0.0,
+          5.0,
+          9.0
+        ],
+        "source": "mfs2",
+        "template_region": [
+          120,
+          370,
+          15,
+          27
+        ]
+      },
+      {
+        "frame": 0,
+        "original_region": [
+          0.0,
+          0.0,
+          11.0,
+          5.0
+        ],
+        "source": "mfs2q",
+        "template_region": [
+          367,
+          376,
+          33,
+          15
+        ]
+      },
+      {
+        "frame": 1,
+        "original_region": [
+          31.0,
+          0.0,
+          3.0,
+          4.0
+        ],
+        "source": "mfs2q",
+        "template_region": [
+          635,
+          378,
+          9,
+          12
+        ]
+      },
+      {
+        "frame": 2,
+        "original_region": [
+          62.0,
+          0.0,
+          31.0,
+          23.0
+        ],
+        "source": "mfs2q",
+        "template_region": [
+          849,
+          349,
+          93,
+          69
+        ]
+      },
+      {
+        "frame": 0,
+        "original_region": [
+          0.0,
+          0.0,
+          18.0,
+          14.0
+        ],
+        "source": "mfs2x",
+        "template_region": [
+          101,
+          619,
+          54,
+          42
+        ]
+      },
+      {
+        "frame": 1,
+        "original_region": [
+          18.0,
+          0.0,
+          16.0,
+          13.0
+        ],
+        "source": "mfs2x",
+        "template_region": [
+          360,
+          620,
+          48,
+          39
+        ]
+      },
+      {
+        "frame": 2,
+        "original_region": [
+          36.0,
+          0.0,
+          18.0,
+          12.0
+        ],
+        "source": "mfs2x",
+        "template_region": [
+          613,
+          622,
+          54,
+          36
+        ]
+      },
+      {
+        "frame": 3,
+        "original_region": [
+          54.0,
+          0.0,
+          16.0,
+          12.0
+        ],
+        "source": "mfs2x",
+        "template_region": [
+          872,
+          622,
+          48,
+          36
+        ]
+      },
+      {
+        "frame": 4,
+        "original_region": [
+          72.0,
+          0.0,
+          15.0,
+          12.0
+        ],
+        "source": "mfs2x",
+        "template_region": [
+          105,
+          878,
+          45,
+          36
+        ]
+      },
+      {
+        "frame": 5,
+        "original_region": [
+          90.0,
+          0.0,
+          16.0,
+          14.0
+        ],
+        "source": "mfs2x",
+        "template_region": [
+          360,
+          875,
+          48,
+          42
+        ]
+      },
+      {
+        "frame": 0,
+        "original_region": [
+          0.0,
+          0.0,
+          40.0,
+          40.0
+        ],
+        "source": "efs2",
+        "template_region": [
+          580,
+          836,
+          120,
+          120
+        ]
+      },
+      {
+        "frame": 1,
+        "original_region": [
+          49.0,
+          0.0,
+          49.0,
+          32.0
+        ],
+        "source": "efs2",
+        "template_region": [
+          822,
+          848,
+          147,
+          96
+        ]
+      }
+    ],
+    "head_template": 3,
+    "id": "05_male_yinzhe",
+    "name": "幽篁摄灵",
+    "stem": "mfs",
+    "weapon_template": 2
+  },
+  {
+    "cells": [
+      {
+        "frame": 0,
+        "original_region": [
+          0.0,
+          0.0,
+          42.0,
+          43.0
+        ],
+        "source": "wfst3",
+        "template_region": [
+          65,
+          63,
+          126,
+          129
+        ]
+      },
+      {
+        "frame": 1,
+        "original_region": [
+          42.0,
+          0.0,
+          20.0,
+          16.0
+        ],
+        "source": "wfst3",
+        "template_region": [
+          354,
+          104,
+          60,
+          48
+        ]
+      },
+      {
+        "frame": 0,
+        "original_region": [
+          0.0,
+          0.0,
+          22.0,
+          14.0
+        ],
+        "source": "wfs2",
+        "template_region": [
+          607,
+          107,
+          66,
+          42
+        ]
+      },
+      {
+        "frame": 1,
+        "original_region": [
+          22.0,
+          0.0,
+          12.0,
+          13.0
+        ],
+        "source": "wfs2",
+        "template_region": [
+          878,
+          108,
+          36,
+          39
+        ]
+      },
+      {
+        "frame": 2,
+        "original_region": [
+          44.0,
+          0.0,
+          11.0,
+          15.0
+        ],
+        "source": "wfs2",
+        "template_region": [
+          111,
+          361,
+          33,
+          45
+        ]
+      },
+      {
+        "frame": 0,
+        "original_region": [
+          0.0,
+          0.0,
+          19.0,
+          22.0
+        ],
+        "source": "wfs2q",
+        "template_region": [
+          355,
+          351,
+          57,
+          66
+        ]
+      },
+      {
+        "frame": 1,
+        "original_region": [
+          21.0,
+          0.0,
+          4.0,
+          6.0
+        ],
+        "source": "wfs2q",
+        "template_region": [
+          634,
+          375,
+          12,
+          18
+        ]
+      },
+      {
+        "frame": 2,
+        "original_region": [
+          42.0,
+          0.0,
+          21.0,
+          21.0
+        ],
+        "source": "wfs2q",
+        "template_region": [
+          864,
+          352,
+          63,
+          63
+        ]
+      },
+      {
+        "frame": 3,
+        "original_region": [
+          63.0,
+          0.0,
+          10.0,
+          8.0
+        ],
+        "source": "wfs2q",
+        "template_region": [
+          113,
+          628,
+          30,
+          24
+        ]
+      },
+      {
+        "frame": 0,
+        "original_region": [
+          0.0,
+          0.0,
+          13.0,
+          14.0
+        ],
+        "source": "wfs2x",
+        "template_region": [
+          364,
+          619,
+          39,
+          42
+        ]
+      },
+      {
+        "frame": 1,
+        "original_region": [
+          15.0,
+          0.0,
+          15.0,
+          13.0
+        ],
+        "source": "wfs2x",
+        "template_region": [
+          617,
+          620,
+          45,
+          39
+        ]
+      },
+      {
+        "frame": 2,
+        "original_region": [
+          30.0,
+          0.0,
+          12.0,
+          12.0
+        ],
+        "source": "wfs2x",
+        "template_region": [
+          878,
+          622,
+          36,
+          36
+        ]
+      },
+      {
+        "frame": 3,
+        "original_region": [
+          45.0,
+          0.0,
+          12.0,
+          14.0
+        ],
+        "source": "wfs2x",
+        "template_region": [
+          110,
+          875,
+          36,
+          42
+        ]
+      },
+      {
+        "frame": 4,
+        "original_region": [
+          60.0,
+          0.0,
+          13.0,
+          13.0
+        ],
+        "source": "wfs2x",
+        "template_region": [
+          364,
+          876,
+          39,
+          39
+        ]
+      },
+      {
+        "frame": 5,
+        "original_region": [
+          75.0,
+          0.0,
+          12.0,
+          12.0
+        ],
+        "source": "wfs2x",
+        "template_region": [
+          622,
+          878,
+          36,
+          36
+        ]
+      },
+      {
+        "frame": 0,
+        "original_region": [
+          0.0,
+          0.0,
+          40.0,
+          40.0
+        ],
+        "source": "efs2",
+        "template_region": [
+          836,
+          836,
+          120,
+          120
+        ]
+      },
+      {
+        "frame": 1,
+        "original_region": [
+          49.0,
+          0.0,
+          49.0,
+          32.0
+        ],
+        "source": "efs2",
+        "template_region": [
+          54,
+          1104,
+          147,
+          96
+        ]
+      }
+    ],
+    "head_template": 3,
+    "id": "06_female_yinzhe",
+    "name": "苍灵月骨",
+    "stem": "wfs",
+    "weapon_template": 2
+  }
+]

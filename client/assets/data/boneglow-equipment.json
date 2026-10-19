@@ -1,0 +1,866 @@
+{
+  "format_version": 1,
+  "source": "AI生成；原人物分层动画适配",
+  "sets": [
+    {
+      "id": "boneglow/mzs",
+      "name": "玄骸镇岳",
+      "stem": "mzs",
+      "job": 0,
+      "gender": 0,
+      "weapon_code": 28,
+      "clothing_code": 12,
+      "head_code": 10,
+      "head": "boneglow/mzs/mzst2",
+      "body": [
+        "boneglow/mzs/mzs1",
+        "boneglow/mzs/mzs1q",
+        "boneglow/mzs/mzs1x"
+      ],
+      "weapon": "boneglow/mzs/ezs14",
+      "design": "01_male_lishi-equipment-review.png",
+      "source_template": "01_male_lishi-parts-template.png"
+    },
+    {
+      "id": "boneglow/wzs",
+      "name": "赤翎破军",
+      "stem": "wzs",
+      "job": 0,
+      "gender": 1,
+      "weapon_code": 29,
+      "clothing_code": 13,
+      "head_code": 11,
+      "head": "boneglow/wzs/wzst2",
+      "body": [
+        "boneglow/wzs/wzs1",
+        "boneglow/wzs/wzs1q",
+        "boneglow/wzs/wzs1x"
+      ],
+      "weapon": "boneglow/wzs/ezs14",
+      "design": "02_female_lishi-equipment-review.png",
+      "source_template": "02_female_lishi-parts-template.png"
+    },
+    {
+      "id": "boneglow/mck",
+      "name": "紫冥斩魄",
+      "stem": "mck",
+      "job": 1,
+      "gender": 0,
+      "weapon_code": 30,
+      "clothing_code": 14,
+      "head_code": 12,
+      "head": "boneglow/mck/mckt2",
+      "body": [
+        "boneglow/mck/mck1",
+        "boneglow/mck/mck1q",
+        "boneglow/mck/mck1x"
+      ],
+      "weapon": "boneglow/mck/eck1",
+      "design": "03_male_xiake-equipment-review.png",
+      "source_template": "03_male_xiake-parts-template.png"
+    },
+    {
+      "id": "boneglow/wck",
+      "name": "霜骨流萤",
+      "stem": "wck",
+      "job": 1,
+      "gender": 1,
+      "weapon_code": 31,
+      "clothing_code": 15,
+      "head_code": 13,
+      "head": "boneglow/wck/wckt2",
+      "body": [
+        "boneglow/wck/wck1",
+        "boneglow/wck/wck1q",
+        "boneglow/wck/wck1x"
+      ],
+      "weapon": "boneglow/wck/eck1",
+      "design": "04_female_xiake-equipment-review.png",
+      "source_template": "04_female_xiake-parts-template.png"
+    },
+    {
+      "id": "boneglow/mfs",
+      "name": "幽篁摄灵",
+      "stem": "mfs",
+      "job": 2,
+      "gender": 0,
+      "weapon_code": 32,
+      "clothing_code": 16,
+      "head_code": 14,
+      "head": "boneglow/mfs/mfst3",
+      "body": [
+        "boneglow/mfs/mfs2",
+        "boneglow/mfs/mfs2q",
+        "boneglow/mfs/mfs2x"
+      ],
+      "weapon": "boneglow/mfs/efs2",
+      "design": "05_male_yinzhe-equipment-review.png",
+      "source_template": "05_male_yinzhe-parts-template.png"
+    },
+    {
+      "id": "boneglow/wfs",
+      "name": "苍灵月骨",
+      "stem": "wfs",
+      "job": 2,
+      "gender": 1,
+      "weapon_code": 33,
+      "clothing_code": 17,
+      "head_code": 15,
+      "head": "boneglow/wfs/wfst3",
+      "body": [
+        "boneglow/wfs/wfs2",
+        "boneglow/wfs/wfs2q",
+        "boneglow/wfs/wfs2x"
+      ],
+      "weapon": "boneglow/wfs/efs2",
+      "design": "06_female_yinzhe-equipment-review.png",
+      "source_template": "06_female_yinzhe-parts-template.png"
+    }
+  ],
+  "parts": {
+    "boneglow/mzs/mzst2": {
+      "texture": "res://assets/generated/equipment/boneglow/mzs/parts/mzst2.png",
+      "frames": [
+        [
+          0,
+          0,
+          42,
+          43
+        ],
+        [
+          42,
+          0,
+          20,
+          16
+        ]
+      ]
+    },
+    "boneglow/mzs/mzs1": {
+      "texture": "res://assets/generated/equipment/boneglow/mzs/parts/mzs1.png",
+      "frames": [
+        [
+          0,
+          0,
+          19,
+          13
+        ],
+        [
+          26,
+          0,
+          26,
+          13
+        ],
+        [
+          52,
+          0,
+          6,
+          7
+        ]
+      ]
+    },
+    "boneglow/mzs/mzs1q": {
+      "texture": "res://assets/generated/equipment/boneglow/mzs/parts/mzs1q.png",
+      "frames": [
+        [
+          0,
+          0,
+          11,
+          14
+        ],
+        [
+          25,
+          0,
+          9,
+          10
+        ],
+        [
+          50,
+          0,
+          25,
+          23
+        ]
+      ]
+    },
+    "boneglow/mzs/mzs1x": {
+      "texture": "res://assets/generated/equipment/boneglow/mzs/parts/mzs1x.png",
+      "frames": [
+        [
+          0,
+          0,
+          25,
+          15
+        ],
+        [
+          26,
+          0,
+          26,
+          14
+        ],
+        [
+          52,
+          0,
+          22,
+          13
+        ],
+        [
+          78,
+          0,
+          20,
+          15
+        ],
+        [
+          104,
+          0,
+          19,
+          14
+        ],
+        [
+          130,
+          0,
+          22,
+          13
+        ]
+      ]
+    },
+    "boneglow/mzs/ezs14": {
+      "texture": "res://assets/generated/equipment/boneglow/mzs/parts/ezs14.png",
+      "frames": [
+        [
+          0,
+          0,
+          74,
+          38
+        ],
+        [
+          74,
+          0,
+          74,
+          47
+        ]
+      ]
+    },
+    "boneglow/wzs/wzst2": {
+      "texture": "res://assets/generated/equipment/boneglow/wzs/parts/wzst2.png",
+      "frames": [
+        [
+          0,
+          0,
+          42,
+          43
+        ],
+        [
+          42,
+          0,
+          20,
+          16
+        ]
+      ]
+    },
+    "boneglow/wzs/wzs1": {
+      "texture": "res://assets/generated/equipment/boneglow/wzs/parts/wzs1.png",
+      "frames": [
+        [
+          0,
+          0,
+          13,
+          11
+        ],
+        [
+          24,
+          0,
+          24,
+          12
+        ],
+        [
+          48,
+          0,
+          7,
+          9
+        ]
+      ]
+    },
+    "boneglow/wzs/wzs1q": {
+      "texture": "res://assets/generated/equipment/boneglow/wzs/parts/wzs1q.png",
+      "frames": [
+        [
+          0,
+          0,
+          10,
+          7
+        ],
+        [
+          25,
+          0,
+          8,
+          7
+        ],
+        [
+          50,
+          0,
+          25,
+          21
+        ]
+      ]
+    },
+    "boneglow/wzs/wzs1x": {
+      "texture": "res://assets/generated/equipment/boneglow/wzs/parts/wzs1x.png",
+      "frames": [
+        [
+          0,
+          0,
+          24,
+          14
+        ],
+        [
+          24,
+          0,
+          13,
+          12
+        ],
+        [
+          48,
+          0,
+          19,
+          12
+        ],
+        [
+          72,
+          0,
+          22,
+          13
+        ],
+        [
+          96,
+          0,
+          16,
+          14
+        ],
+        [
+          120,
+          0,
+          17,
+          11
+        ]
+      ]
+    },
+    "boneglow/wzs/ezs14": {
+      "texture": "res://assets/generated/equipment/boneglow/wzs/parts/ezs14.png",
+      "frames": [
+        [
+          0,
+          0,
+          74,
+          38
+        ],
+        [
+          74,
+          0,
+          74,
+          47
+        ]
+      ]
+    },
+    "boneglow/mck/mckt2": {
+      "texture": "res://assets/generated/equipment/boneglow/mck/parts/mckt2.png",
+      "frames": [
+        [
+          0,
+          0,
+          42,
+          43
+        ],
+        [
+          42,
+          0,
+          20,
+          16
+        ]
+      ]
+    },
+    "boneglow/mck/mck1": {
+      "texture": "res://assets/generated/equipment/boneglow/mck/parts/mck1.png",
+      "frames": [
+        [
+          0,
+          0,
+          21,
+          19
+        ],
+        [
+          21,
+          0,
+          15,
+          13
+        ]
+      ]
+    },
+    "boneglow/mck/mck1q": {
+      "texture": "res://assets/generated/equipment/boneglow/mck/parts/mck1q.png",
+      "frames": [
+        [
+          0,
+          0,
+          22,
+          20
+        ],
+        [
+          24,
+          0,
+          11,
+          8
+        ],
+        [
+          48,
+          0,
+          20,
+          8
+        ],
+        [
+          72,
+          0,
+          14,
+          5
+        ],
+        [
+          96,
+          0,
+          12,
+          5
+        ],
+        [
+          120,
+          0,
+          21,
+          17
+        ],
+        [
+          144,
+          0,
+          24,
+          16
+        ]
+      ]
+    },
+    "boneglow/mck/mck1x": {
+      "texture": "res://assets/generated/equipment/boneglow/mck/parts/mck1x.png",
+      "frames": [
+        [
+          0,
+          0,
+          15,
+          13
+        ],
+        [
+          16,
+          0,
+          16,
+          13
+        ],
+        [
+          32,
+          0,
+          14,
+          13
+        ],
+        [
+          48,
+          0,
+          13,
+          13
+        ],
+        [
+          64,
+          0,
+          13,
+          13
+        ],
+        [
+          80,
+          0,
+          14,
+          13
+        ]
+      ]
+    },
+    "boneglow/mck/eck1": {
+      "texture": "res://assets/generated/equipment/boneglow/mck/parts/eck1.png",
+      "frames": [
+        [
+          0,
+          0,
+          41,
+          14
+        ],
+        [
+          41,
+          0,
+          30,
+          30
+        ]
+      ]
+    },
+    "boneglow/wck/wckt2": {
+      "texture": "res://assets/generated/equipment/boneglow/wck/parts/wckt2.png",
+      "frames": [
+        [
+          0,
+          0,
+          42,
+          43
+        ],
+        [
+          42,
+          0,
+          20,
+          16
+        ]
+      ]
+    },
+    "boneglow/wck/wck1": {
+      "texture": "res://assets/generated/equipment/boneglow/wck/parts/wck1.png",
+      "frames": [
+        [
+          0,
+          0,
+          15,
+          12
+        ],
+        [
+          15,
+          0,
+          11,
+          13
+        ]
+      ]
+    },
+    "boneglow/wck/wck1q": {
+      "texture": "res://assets/generated/equipment/boneglow/wck/parts/wck1q.png",
+      "frames": [
+        [
+          0,
+          0,
+          17,
+          21
+        ],
+        [
+          27,
+          0,
+          25,
+          22
+        ],
+        [
+          54,
+          0,
+          27,
+          26
+        ]
+      ]
+    },
+    "boneglow/wck/wck1x": {
+      "texture": "res://assets/generated/equipment/boneglow/wck/parts/wck1x.png",
+      "frames": [
+        [
+          0,
+          0,
+          16,
+          12
+        ],
+        [
+          16,
+          0,
+          12,
+          13
+        ],
+        [
+          32,
+          0,
+          12,
+          13
+        ],
+        [
+          48,
+          0,
+          13,
+          11
+        ],
+        [
+          64,
+          0,
+          15,
+          13
+        ],
+        [
+          80,
+          0,
+          12,
+          13
+        ]
+      ]
+    },
+    "boneglow/wck/eck1": {
+      "texture": "res://assets/generated/equipment/boneglow/wck/parts/eck1.png",
+      "frames": [
+        [
+          0,
+          0,
+          41,
+          14
+        ],
+        [
+          41,
+          0,
+          30,
+          30
+        ]
+      ]
+    },
+    "boneglow/mfs/mfst3": {
+      "texture": "res://assets/generated/equipment/boneglow/mfs/parts/mfst3.png",
+      "frames": [
+        [
+          0,
+          0,
+          42,
+          43
+        ],
+        [
+          42,
+          0,
+          20,
+          16
+        ]
+      ]
+    },
+    "boneglow/mfs/mfs2": {
+      "texture": "res://assets/generated/equipment/boneglow/mfs/parts/mfs2.png",
+      "frames": [
+        [
+          0,
+          0,
+          28,
+          17
+        ],
+        [
+          28,
+          0,
+          23,
+          10
+        ],
+        [
+          56,
+          0,
+          5,
+          9
+        ]
+      ]
+    },
+    "boneglow/mfs/mfs2q": {
+      "texture": "res://assets/generated/equipment/boneglow/mfs/parts/mfs2q.png",
+      "frames": [
+        [
+          0,
+          0,
+          11,
+          5
+        ],
+        [
+          31,
+          0,
+          3,
+          4
+        ],
+        [
+          62,
+          0,
+          31,
+          23
+        ]
+      ]
+    },
+    "boneglow/mfs/mfs2x": {
+      "texture": "res://assets/generated/equipment/boneglow/mfs/parts/mfs2x.png",
+      "frames": [
+        [
+          0,
+          0,
+          18,
+          14
+        ],
+        [
+          18,
+          0,
+          16,
+          13
+        ],
+        [
+          36,
+          0,
+          18,
+          12
+        ],
+        [
+          54,
+          0,
+          16,
+          12
+        ],
+        [
+          72,
+          0,
+          15,
+          12
+        ],
+        [
+          90,
+          0,
+          16,
+          14
+        ]
+      ]
+    },
+    "boneglow/mfs/efs2": {
+      "texture": "res://assets/generated/equipment/boneglow/mfs/parts/efs2.png",
+      "frames": [
+        [
+          0,
+          0,
+          40,
+          40
+        ],
+        [
+          49,
+          0,
+          49,
+          32
+        ]
+      ]
+    },
+    "boneglow/wfs/wfst3": {
+      "texture": "res://assets/generated/equipment/boneglow/wfs/parts/wfst3.png",
+      "frames": [
+        [
+          0,
+          0,
+          42,
+          43
+        ],
+        [
+          42,
+          0,
+          20,
+          16
+        ]
+      ]
+    },
+    "boneglow/wfs/wfs2": {
+      "texture": "res://assets/generated/equipment/boneglow/wfs/parts/wfs2.png",
+      "frames": [
+        [
+          0,
+          0,
+          22,
+          14
+        ],
+        [
+          22,
+          0,
+          12,
+          13
+        ],
+        [
+          44,
+          0,
+          11,
+          15
+        ]
+      ]
+    },
+    "boneglow/wfs/wfs2q": {
+      "texture": "res://assets/generated/equipment/boneglow/wfs/parts/wfs2q.png",
+      "frames": [
+        [
+          0,
+          0,
+          19,
+          22
+        ],
+        [
+          21,
+          0,
+          4,
+          6
+        ],
+        [
+          42,
+          0,
+          21,
+          21
+        ],
+        [
+          63,
+          0,
+          10,
+          8
+        ]
+      ]
+    },
+    "boneglow/wfs/wfs2x": {
+      "texture": "res://assets/generated/equipment/boneglow/wfs/parts/wfs2x.png",
+      "frames": [
+        [
+          0,
+          0,
+          13,
+          14
+        ],
+        [
+          15,
+          0,
+          15,
+          13
+        ],
+        [
+          30,
+          0,
+          12,
+          12
+        ],
+        [
+          45,
+          0,
+          12,
+          14
+        ],
+        [
+          60,
+          0,
+          13,
+          13
+        ],
+        [
+          75,
+          0,
+          12,
+          12
+        ]
+      ]
+    },
+    "boneglow/wfs/efs2": {
+      "texture": "res://assets/generated/equipment/boneglow/wfs/parts/efs2.png",
+      "frames": [
+        [
+          0,
+          0,
+          40,
+          40
+        ],
+        [
+          49,
+          0,
+          49,
+          32
+        ]
+      ]
+    }
+  }
+}

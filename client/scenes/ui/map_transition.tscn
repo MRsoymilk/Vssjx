@@ -1,0 +1,23 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/map_transition.gd" id="Script"]
+[ext_resource type="FontVariation" path="res://assets/fonts/cjk_fallback.tres" id="Font"]
+
+[node name="MapTransition" type="Control"]
+visible = false
+z_index = 100
+offset_right = 320.0
+offset_bottom = 480.0
+mouse_filter = 0
+script = ExtResource("Script")
+
+[node name="Tip" type="Label" parent="."]
+offset_left = 12.0
+offset_top = 146.0
+offset_right = 308.0
+offset_bottom = 206.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.56, 0.85, 0.46, 1)
+theme_override_fonts/font = ExtResource("Font")
+theme_override_font_sizes/font_size = 12
+autowrap_mode = 3

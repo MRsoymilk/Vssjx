@@ -1,4 +1,8 @@
-# AI生成世界扩展（临时试验）
+# AI 生成世界扩展
+
+[返回设计索引](README.md) · [地图证据](../analysis/recovery/maps/README.md) · [截图参考](map-screenshot-references.md)
+
+性质：**已接入源码的重建内容**，不是原版地图恢复。该扩展已有 [2026-10-18 发布记录](../tests/release_20261018.md)，后续修订是否已发布须单独核对。
 
 此扩展与原包恢复资料分开保存。214 个原地图编号（157 个不同地名）全部有独立生成场景；保留现有青云山道、古剑遗迹，共 216 张可玩场景。原版单张地图的布局仍未恢复，生成内容不能用作反编译证据。
 
@@ -54,4 +58,4 @@
 
 `cargo test --manifest-path server/Cargo.toml` 包含生成世界规则和全部214张地图的居民检查。Godot测试场景 `tests/ai_world_test.tscn` 验证本地真实存档、任务和地图；`tests/run_ai_world.py` 使用自建一次性PostgreSQL与测试服务验证真实协议、事务回滚、完整任务链、刷新与重启、地图隔离，并可用 `GODOT_BIN` 运行真实联机客户端测试。
 
-`python tools/review_ai_world.py` 生成 `work/ai-world-review/index.html`，可直接本地打开，搜索全部地图、NPC和任务，查看地形预览和完整剧情。该文件是审阅产物，不是线上部署。临时分支暂不提交，也不替换当前运行的服务、网页或APK。
+`python tools/review_ai_world.py` 生成 `work/ai-world-review/index.html`，可本地搜索地图、NPC 和任务，查看地形及剧情。该文件是忽略目录中的审阅产物，不是线上入口。修改生成规则和共享数据不会自动替换正在运行的服务、网页或 APK；发布仍需配套更新与独立验证。

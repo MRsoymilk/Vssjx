@@ -1,8 +1,12 @@
 # Vssjx 服务端
 
-Rust/Tokio/Axum服务已支持服务器发现、PostgreSQL账号认证、角色创建/查询/幂等回执、单次连接票据、共享地图权威移动与公共聊天。线上任务/PVE尚未接入，当前仅支持一个世界服务进程，不能将多进程直连同库作为世界集群运行。
+[项目首页](../README.md) · [设计索引](../design/README.md) · [部署导航](../deploy/README.md)
 
-- `src/`：启动入口、环境配置与HTTP服务。
+Rust／Tokio／Axum 联机服务，使用 PostgreSQL 保存账号、角色和玩法状态。当前源码已接入任务／PVE、商城装备、技能、AI 世界、社交、组队和邀请决斗；运行中的旧版本不自动获得新功能。
+
+**部署边界：一个世界只支持一个游戏写进程。** 多进程连接同库不是世界集群，人数配置不是容量保证。完整混合负载、长稳及设备兼容须分别验收，当前设计与限制见 [路线图](../design/roadmap.md)。
+
+- `src/`：HTTP／WebSocket、认证、世界同步、玩法规则与本机管理模块。
 - `migrations/`：SQLx启动时执行的PostgreSQL版本化迁移。
 - 当前使用Rust、Tokio、Axum、Serde、tracing、Argon2id、SQLx与PostgreSQL。
 - 架构与实施阶段见[design/README.md](../design/README.md)。
@@ -91,13 +95,15 @@ cargo run --locked --manifest-path server/Cargo.toml
 
 ## 客户端账号
 
-封面“注册账号”或“登录游戏”进入同一账号面板，服务器地址会自动回填。注册后重新输入密码登录；退出账号会撤销服务端会话。关闭面板不清除内存会话，重启客户端则重新输入密码。服务器地址是唯一写入本地偏好文件的字段。
+原生客户端从“注册账号”或“登录游戏”进入账号面板，有效服务器地址独立保存。关闭面板不清除内存会话，退出账号请求撤销服务端会话，访问／刷新令牌不持久化。
+
+默认不保存密码；原生可选“记住我”，成功登录后保存绑定服务器的加密用户名／密码，本机密钥与密文同处用户目录，不能防御同用户文件读取。取消勾选清除记忆；Web 禁用该功能并使用构建配置的同源入口。细节见 [账号契约](../design/auth.md) 和 [登录说明](../tests/remember_login.md)。
 
 登录账号使用3～32位英文字母、数字或下划线，首尾空白清理后按小写比较。密码为12～128个Unicode字符、最多512个UTF-8字节，不能全为空白，不裁剪密码。账号名不是角色昵称；登录后可在“线上角色”创建或查看服务器角色，具体昵称与回执契约见[design/characters.md](../design/characters.md)。
 
 密码使用带随机盐的Argon2id保存。默认访问令牌15分钟、刷新总期限7天，可通过`.env`在有效范围内调整，刷新不延长已签发会话的总期限；刷新同时轮换两种令牌，数据库仅存令牌摘要。账号禁用、注销或令牌过期后，身份查询和刷新被拒绝。
 
-局域网开放监听时，在`.env`中设置：
+仅在确需为受控代理或开发网络提供监听时，在 `.env` 中设置：
 
 ```sh
 SSJX_BIND_ADDR=0.0.0.0:8080
@@ -105,6 +111,8 @@ SSJX_SERVER_NAME="蜀山剑侠服务器"
 ```
 
 `SSJX_BIND_ADDR`支持IP和端口（IPv6用`[::1]:8080`），`SSJX_SERVER_NAME`设置显示名称，`RUST_LOG`控制日志级别。地址占用或配置错误时启动失败，不静默换端口；Ctrl+C或SIGTERM触发优雅关闭。
+
+`0.0.0.0` 会扩大监听范围，不是公网推荐默认值，也不会启用 TLS。局域网明文地址只能做无凭据连接检查，账号操作仍需 HTTPS；网页局域网开发见 [LAN HTTPS](../deploy/WEB.md#同一局域网的手机与电脑)。
 
 ## 当前接口
 
@@ -118,25 +126,29 @@ SSJX_SERVER_NAME="蜀山剑侠服务器"
 | `POST /api/v1/auth/refresh` | 单次轮换刷新令牌与访问令牌 |
 | `GET /api/v1/auth/me` | Bearer令牌查询本人账号 |
 | `POST /api/v1/auth/logout` | 撤销该Bearer会话，重复注销可安全重试 |
-| `GET /api/v1/characters` | 当前账号的角色基本行，至多一个，不读取离线存档 |
+| `GET /api/v1/characters` | 当前账号的角色基本行，最多五个，不读取离线存档 |
 | `POST /api/v1/characters` | 账号级幂等创建，昵称全服唯一，初始资产同事务提交 |
 | `GET /api/v1/character-operations/{operation_id}` | 读取当前账号的原创建回执，成功与明确拒绝均持久化 |
 | `POST /api/v1/world/ticket` | 账号角色归属校验后签发短时单次票据 |
 | `GET /api/v1/world/ws` | WebSocket升级后交换票据、进入世界、移动与公共聊天 |
+| `POST /api/v1/social` | 公开资料、好友与帮派的闭集动作 |
+| `POST /api/v1/teams` | 队伍邀请、准备、成员管理与组队战斗动作 |
 
-未配置数据库时`stage=connection_only`且能力列表为空；配置后为`stage=account_auth`、`capabilities=["account_auth","character_creation","shared_world","public_chat"]`。详细契约见[账号](../design/auth.md)、[角色](../design/characters.md)、[共享地图](../design/shared_world.md)与[聊天](../design/chat.md)。公开能力不代表1000人容量或公网TLS代理已经验收。
+未配置数据库时 `stage=connection_only` 且能力列表为空；配置后 `stage=account_auth`，当前列表为 `account_auth`、`character_creation`、`shared_world`、`public_chat`、`social_v1`。它不是全部玩法清单，PVE、地图与决斗扩展还通过票据／握手协商。
+
+接口规则见 [账号](../design/auth.md)、[角色](../design/characters.md)、[共享地图](../design/shared_world.md)、[聊天](../design/chat.md)、[社交](../design/social.md)、[组队](../design/teams.md)和[决斗](../design/player-duels.md)。PVE 使用世界连接的 `pve.command`／`pve.result`，不要照目标协议稿中的示例消息直接调用服务。当前按角色校验连接所有权，账号级单游戏连接仍是设计缺口，不由五角色容量或认证会话配额保证。
 
 ## 域名与路径前缀
 
 公网使用带有效证书的HTTPS反向代理，Rust服务放在受控内网。客户端支持`https://game.example.com`和`https://game.example.com/ssjx`；使用前缀时代理应将`/ssjx/api/v1/server-info`转发到后端`/api/v1/server-info`。
 
-域名无需修改客户端或重新编译服务端；把客户端地址改为域名即可。客户端不关闭证书校验，也不自动跟随重定向。完整地址与保存规则见[连接入口设计](../design/connection.md)。
+原生客户端更换域名可修改服务器地址，无需重编译游戏；网页使用构建控制的同源目标，不等同于可任意编辑地址的原生入口。客户端不关闭证书校验或自动跟随重定向。完整规则见 [连接设计](../design/connection.md)。
 
-共享地图还需代理支持WebSocket升级，并保留相同路径前缀；客户端将HTTPS地址转换为WSS。Rust本体不终止TLS。浏览器Web客户端尚未完成；服务端已提供下述Origin安全前置，不代表已交付Web游戏。
+共享地图需代理支持 WebSocket 升级并保留路径前缀，客户端将 HTTPS 转换为 WSS，Rust 本体不终止 TLS。Web 客户端和公网入口已有 [发布记录](../tests/release_20261018.md)，但手机真机、完整游玩和最新源码部署范围仍须独立核验。
 
 ### 浏览器WebSocket来源
 
-默认拒绝所有携带`Origin`的世界连接。未来部署网页时，在服务端私有配置中明确填写网页来源，例如：
+未配置白名单时拒绝携带 `Origin` 的世界连接。部署网页时，在服务端私有配置中填写准确的网页来源，例如：
 
 ```dotenv
 SSJX_WEB_ALLOWED_ORIGINS=https://game.example.com,https://game.example.com:8443
@@ -152,3 +164,10 @@ SSJX_WEB_DEV_ORIGINS=
 这里只配置游戏世界WebSocket，不启用HTTP跨域CORS，也不开放本机监控/通知或PC admin场景。公开网页仍需受控同域HTTPS/WSS入口，不能把Origin当身份凭据。验证范围见[tests/web_origins.md](../tests/web_origins.md)。
 
 客户端发送密码或令牌要求HTTPS，仅`localhost`、`127.*`、`[::1]`允许本机HTTP。局域网HTTP地址仍可用于连接检查，账号操作需要HTTPS；Rust本身当前不终止TLS，公网部署必须由受控反向代理提供TLS且限制后端直连。应用不信任任意`X-Forwarded-For`来放宽限流。
+
+## 进一步阅读
+
+- 本机回归、临时数据库和真实客户端联调：[测试说明](../tests/testing.md)。
+- 原生与网页平台边界：[平台方案](../design/platform_interface.md)。
+- 公网更新、迁移与备份：[部署导航](../deploy/README.md)。
+- 代码开源与素材授权的不同范围：[许可与来源](../docs/asset-provenance.md)。

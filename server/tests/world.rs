@@ -3,6 +3,21 @@ use vssjx_server::{
     world_map::{Motion, WorldMap},
 };
 #[test]
+fn click_routes_do_not_enter_a_different_portal_on_the_way_to_the_goal() {
+    let ruins = WorldMap::load("ancient_ruins").unwrap();
+    for (start, goal) in [([5,16],[17,19]), ([17,19],[3,16])] {
+        let route = ruins.route(start,goal).unwrap();
+        assert_eq!(route.back(),Some(&goal));
+        let intended = vssjx_server::ai_world::exit_target(&ruins.map_id,goal);
+        for point in route {
+            if let Some(destination) = vssjx_server::ai_world::exit_target(&ruins.map_id,point) {
+                assert_eq!(Some(destination),intended);
+            }
+        }
+    }
+    assert!(ruins.route([5,16],[12,16]).unwrap().contains(&[12,16]));
+}
+#[test]
 fn ruins_portal_and_population_are_reachable_and_separate() {
     let trail = WorldMap::default();
     let ruins = WorldMap::load("ancient_ruins").unwrap();

@@ -1,0 +1,26 @@
+# 玩家决斗验证
+
+[设计规则](../design/player-duels.md) · [测试总览](testing.md)
+
+## 入口与隔离
+
+`server/tests/duel.rs` 覆盖规则、权限、重复请求、技能、超时与断线。运行规则测试：
+
+```sh
+cargo test --locked --manifest-path server/Cargo.toml --test duel
+python -X utf8 tests/run_duels.py
+```
+
+集成脚本使用一次性 PostgreSQL 和真实 WebSocket；设置 `GODOT_BIN` 后分别验证邀请者／接收者实际界面，另一方使用独立协议客户端。`SSJX_DUEL_RENDER=1` 启用渲染与截图，Godot `res://tests/duel_test.tscn` 另覆盖界面及本地存档隔离。不把连接参数指向玩家数据库或正在使用的服务。
+
+覆盖拒绝写库失败、五分钟冷却、重启后保留冷却、越权确认、回合／版本校验、PVE 隔离、常规资源不变、短线恢复和认输。上线需要客户端、服务端及 `0017_duel_cooldowns.sql` 配套。
+
+## 既有接入验证记录
+
+以下从设计文档迁入，保留原历史结论，不是 2026-10-19 文档整理重新运行的结果：
+
+- Rust 决斗规则 9 项及世界／PVE／技能回归 13 项通过。
+- 真实服务、隔离数据库及双连接集成 21 项通过，含重启冷却、短线重连与认输。
+- 实际 OpenGL 界面按邀请方／接收方分别完成 14／16 项检查。
+- 本地协议／界面与原 PVE 全流程通过，覆盖任务、回执、回滚、重启、隔离及角色所有权。
+- 验证仅操作隔离环境，没有对现有服务或玩家数据库执行迁移。

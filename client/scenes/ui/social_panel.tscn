@@ -1,0 +1,16 @@
+[gd_scene load_steps=5 format=3]
+[ext_resource type="Script" path="res://scripts/social_panel.gd" id="Script"]
+[ext_resource type="Script" path="res://scripts/interface/adapters/common/cjk_system_font.gd" id="Cjk"]
+[sub_resource type="SystemFont" id="Font"]
+script = ExtResource("Cjk")
+font_names = PackedStringArray("SimHei", "Microsoft YaHei", "sans-serif")
+antialiasing = 0
+[sub_resource type="Theme" id="Theme"]
+default_font = SubResource("Font")
+default_font_size = 12
+[node name="SocialPanel" type="Control"]
+visible = false
+offset_right = 320.0
+offset_bottom = 480.0
+theme = SubResource("Theme")
+script = ExtResource("Script")

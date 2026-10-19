@@ -1,4 +1,8 @@
-# 当前线上角色接口
+# 线上角色接口
+
+[返回设计索引](README.md) · [账号与会话](auth.md) · [NPC 入派](school-membership.md)
+
+性质：**当前实现契约**。角色槽位与昵称规则按当前迁移维护；已发布服务可能早于本仓库源码。
 
 实现账号归属下的角色创建、读取和持久化回执。账号认证见[auth.md](auth.md)，进入游戏见[共享世界](shared_world.md)。创建完成后返回选角界面，必须明确选择角色再进入地图。
 
@@ -22,7 +26,7 @@
 
 请求schema：[character-create.schema.json](../shared/protocol/character-create.schema.json)。仅接受`operation_id`、`display_name`、`job`、`gender`、`school`、`rules_version`，拒绝未知字段和重复键；不接受账号归属、金币、HP、库存、name_key等权威字段。
 
-`operation_id`为带连字符的随机UUIDv4。`job`为0力士/1侠客/2隐者，`gender`为0男/1女，`school`为0峨眉/1花涧/2昆仑；`rules_version`当前固定为`creation-v1`。结构层允许三个枚举字段为u8、昵称至多256标量、版本至多64标量；实际枚举范围、版本及昵称业务校验在回执读取之后，避免旧操作被新规则遮挡。
+`operation_id` 为带连字符的 UUIDv4。`job` 为 0 力士／1 侠客／2 隐者，`gender` 为 0 男／1 女，`rules_version` 固定为 `creation-v1`。兼容字段 `school` 接受 0～3，但新角色始终由服务端写为 3（闲云野鹤），不能通过请求直接入派；0／1／2 分别为峨眉／花涧／昆仑，正式入派见 [NPC 流程](school-membership.md)。结构层三个枚举为 u8、昵称至多 256 标量、版本至多 64 标量；新操作的业务校验在回执读取之后，避免新规则遮挡旧操作。
 
 成功及重放均返回`201`：`{"operation_id":"<uuid>","character":{...},"replayed":false}`，重放仅将`replayed`改为`true`，保留原角色ID和创建时状态。角色字段包括ID、昵称、两种规则版本、职业/性别/门派、等级/经验/金币/HP/MP、任务阶段、地图ID/格子以及**十进制字符串**`state_revision`。不向客户端下发`account_id`或`name_key`。
 

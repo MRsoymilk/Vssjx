@@ -1,0 +1,110 @@
+extends Node
+const SELF:="11111111-1111-4111-8111-111111111111"
+const OTHER:="22222222-2222-4222-8222-222222222222"
+const TEAM:="33333333-3333-4333-8333-333333333333"
+const BATTLE:="44444444-4444-4444-8444-444444444444"
+var checks:=0
+var failures:=0
+var sent:Array=[]
+func _ready()->void:_run.call_deferred()
+func check(ok:bool,text:String)->void:
+	checks+=1
+	if not ok:failures+=1;push_error("TEAM: "+text)
+func member(id:String)->Dictionary:return {"id":id,"display_name":"青云客" if id==SELF else "昆仑客","job":1,"gender":0,"level":15,"map_id":"qingyun_trail","leader":id==SELF,"ready":true,"online":true}
+func fighter(id:String)->Dictionary:
+	var m:=member(id);var stats:=CharacterAttributeRules.stats(1,15,true,[0,0,0,0,0])
+	return {"id":id,"name":m.display_name,"job":1,"gender":0,"school":3,"level":15,"appearance":[1,0,0],"stats":stats,"hp":stats.hp,"mp":stats.mp,"potions":3,"effects":SkillRules.new_state(1,3,15,1),"guarding":false}
+func encounter()->Dictionary:
+	var es:Array=[]
+	for i in 3:
+		es.append({"slot":"m%d"%i,"hp":110,"definition":{"id":"wolf_a","name":"山狼","kind":"wolf","art":"monster/langw","hp":110,"attack":18,"defense":5,"level":1,"gold":12,"xp":16},"effects":SkillRules.new_state(1,3,1,1)})
+	return {"id":BATTLE,"map_id":"qingyun_trail","fighters":[fighter(SELF),fighter(OTHER)],"enemies":es,"turn":0,"round":1,"revision":0,"outcome":"active","deadline_ms":40000,"last_action_ms":10000,"events":[],"lines":["队伍遭遇战开始。"]}
+func state(b:Variant=null)->Dictionary:return {"team":{"id":TEAM,"leader":true,"members":[member(SELF),member(OTHER)],"outgoing":[],"battle":b},"incoming":[]}
+func response(model:RefCounted,s:Dictionary)->Dictionary:return {"version":"team-v1","character_id":SELF,"operation_id":model.request.get("operation_id"),"ok":true,"code":"OK","replayed":false,"server_time_ms":10000,"state":s}
+func capture(name:String)->void:
+	var path:=OS.get_environment("SSJX_TEAM_CAPTURE")
+	if path.is_empty() or DisplayServer.get_name()=="headless":return
+	DirAccess.make_dir_recursive_absolute(path)
+	await RenderingServer.frame_post_draw
+	check(get_viewport().get_texture().get_image().save_png(path.path_join(name+".png"))==OK,"Render "+name)
+func _run()->void:
+	await Platform.when_ready()
+	var old:=Game.player.duplicate(true)
+	var outbox:=OnlineAccount.pending_team.duplicate(true);OnlineAccount.pending_team={}
+	var model:RefCounted=preload("res://scripts/network/online_team.gd").new();model.bind_character(SELF)
+	model.send_requested.connect(func(payload:Dictionary)->void:sent.append(payload))
+	model.tick(false);check(sent.is_empty(),"Offline transport cannot dispatch team operations")
+	model.tick(true);check(model.receive(response(model,state())),"Initial versioned team state validates")
+	var panel:Control=load("res://scenes/ui/team_panel.tscn").instantiate();panel.model=model;add_child(panel);panel.show()
+	check(panel.rows.get_child_count()>5,"Team window shows members and their readiness")
+	await capture("team")
+	panel.hide()
+	var view:Control=load("res://scenes/ui/team_battle_view.tscn").instantiate();view.model=model;add_child(view)
+	model.refresh();model.tick(true)
+	var valid:=response(model,state(encounter()))
+	var invalid:=valid.duplicate(true);invalid.state.team.battle.enemies[0].hp=99999
+	check(not model.valid(invalid),"Over-maximum monster health rejected")
+	invalid=valid.duplicate(true);invalid.state.team.battle.fighters[1].id=SELF
+	check(not model.valid(invalid),"Duplicate member identities rejected")
+	check(model.receive(valid) and model.active() and model.my_turn(),"Shared battle opens only from authoritative state")
+	check(view.visible and view.actors.size()==5,"Both teammates and all three monsters are on the battlefield")
+	view.command_toggle.pressed.emit()
+	check(view.menu.visible and view.menu.get_node("BattleButtons5").text=="6 撤退","Battle uses the original six-command menu")
+	await capture("commands")
+	view._choose("inspect")
+	check(view.inspect_panel.visible and view.inspect_panel.get_node("Secondary").text.contains("18"),"Original inspect panel displays strengthened monster statistics")
+	view.inspect_panel.hide()
+	view.actors.m2.hit.pressed.emit();view._choose("attack")
+	check(model.request.target=="m2" and model.request.battle_id==BATTLE and model.request.expected_revision==0,"Selected enemy is fenced by shared battle and revision")
+	model.tick(true);var original:Dictionary=model.request.duplicate(true)
+	model.receive({"ok":false,"code":"NETWORK_ERROR"});check(model.pending() and OnlineAccount.pending_team.request==original,"Unknown combat response retains durable retry identity")
+	model.next_poll=0;model.tick(true);check(sent[-1]==original,"Combat retry never invents a new operation ID")
+	model.receive({"ok":false,"code":"SERVER_ERROR"});check(model.pending(),"Ambiguous gateway failure cannot discard the pending operation")
+	model.next_poll=0;model.tick(true)
+	var next:=encounter();next.turn=1;next.revision=1;next.enemies[2].hp=70;next.events=[{"actor":SELF,"target":"m2","action":"attack","skill":"","damage":40,"healed":0}]
+	check(model.receive(response(model,state(next))) and not model.my_turn(),"Authoritative turn passes to teammate")
+	await capture("battle")
+	await get_tree().create_timer(1.6).timeout
+	check(view.motion==null and view.queue.is_empty(),"Original attack playback completes without freezing")
+	view._choose("attack");check(not model.pending(),"Waiting player cannot send another action")
+	model.refresh();model.tick(true);var done:=next.duplicate(true);done.revision=2;done.outcome="victory"
+	for e in done.enemies:e.hp=0
+	done.events=[]
+	check(model.receive(response(model,state(done))),"Completed shared fight is received")
+	await get_tree().process_frame
+	await get_tree().process_frame
+	check(view.deaths.size()==3 and view.result.outcome=="victory","All dead monsters receive tombstones and original victory glyph")
+	await capture("victory")
+	view._dismiss();check(not view.visible,"Finished shared battle returns to map")
+	var full:=encounter();full.id="55555555-5555-4555-8555-555555555555"
+	var full_state:=state(full)
+	for i in 3:
+		var id:String=["66666666-6666-4666-8666-666666666666","77777777-7777-4777-8777-777777777777","88888888-8888-4888-8888-888888888888"][i]
+		full.fighters.append(fighter(id));full_state.team.members.append(member(id))
+	for i in 2:
+		var e:Dictionary=full.enemies[0].duplicate(true);e.slot="m%d"%(i+3);full.enemies.append(e)
+	model.refresh();model.tick(true)
+	check(model.receive(response(model,full_state)) and view.actors.size()==10,"Full five-player, five-monster formation renders all ten combatants")
+	for actor in view.actors.values():check(actor.home.x>=0 and actor.home.x<=320 and actor.home.y<=282,"Combatant formation stays above the command bar")
+	await capture("full_party")
+	view._choose("skill");view.picker.activate("sheet_004")
+	check(model.request.get("skill")=="sheet_004","Original skill picker submits the chosen group attack")
+	model.tick(true);full.revision=1;full.turn=1;full.events=[]
+	for e in full.enemies:e.hp-=20;full.events.append({"actor":SELF,"target":e.slot,"action":"skill","skill":"sheet_004","damage":20,"healed":0})
+	check(model.receive(response(model,full_state)),"Authoritative group hits validate")
+	await get_tree().process_frame;await get_tree().process_frame
+	check(view.motion!=null and view.queue.is_empty(),"Group attack plays one cast for all five target impacts")
+	await get_tree().create_timer(1.6).timeout
+	panel.queue_free();view.queue_free();await get_tree().process_frame
+	var world:OnlineWorldView=load("res://scenes/ui/online_world_view.tscn").instantiate();world.character_id=SELF;add_child(world);world.set_process(false);world.network.set_process(false)
+	world._scene_action("team");check(world.team_panel.visible and not world.details.visible,"Team menu replaces placeholder")
+	world.team_panel.dismiss();world.team.state=state(encounter());world.team.changed.emit()
+	check(world.team_battle.visible and world.network.team_active,"Shared encounter activates world movement gate")
+	world.network.world_ready=true;world.network._state="ready";world.network._pending_motion={"type":"world.move_to"}
+	world.network._receive({"type":"error","code":"TEAM_BATTLE_ACTIVE"},PackedByteArray())
+	check(world.network.world_ready and world.network._pending_motion.is_empty(),"A late movement refusal cannot disconnect a team player")
+	world.queue_free();await get_tree().process_frame
+	check(Game.player==old,"Team UI leaves the offline save untouched")
+	OnlineAccount.pending_team=outbox
+	print("TEAM CLIENT: %d checks, %d failures"%[checks,failures])
+	get_tree().quit(0 if failures==0 else 1)

@@ -24,6 +24,10 @@ pub(crate) fn router(state: Arc<AppState>) -> Router {
         .route("/users/{id}", get(|axum::extract::Path(_): axum::extract::Path<uuid::Uuid>| async { crate::monitor_pages::render("user") }))
         .route("/audit", get(|| async { crate::monitor_pages::render("audit") }))
         .route("/announcements", get(|| async { crate::monitor_pages::render("announcements") }))
+        .route("/chat", get(|| async { crate::monitor_pages::render("chat") }))
+        .route("/chat.js", get(|| async { ([(header::CONTENT_TYPE,"text/javascript; charset=utf-8")], include_str!("monitor_assets/chat.js")) }))
+        .route("/api/chat", get(crate::chat_admin::history))
+        .route("/api/chat/actions", axum::routing::post(crate::chat_admin::act))
         .route("/admin.js", get(|| async { ([(header::CONTENT_TYPE,"text/javascript; charset=utf-8")], include_str!("monitor_assets/admin.js")) }))
         .route("/audit.js", get(|| async { ([(header::CONTENT_TYPE,"text/javascript; charset=utf-8")], include_str!("monitor_assets/audit.js")) }))
         .route(

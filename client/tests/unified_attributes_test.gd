@@ -42,6 +42,11 @@ func _run() -> void:
 		for i in 5: same_plan = same_plan and profile.recommended[i] == int(c.recommended[i])
 		check(same_plan,"Budget and recommendation match server vectors")
 		check(profile.combat.physical_attack == c.physical_attack and profile.combat.magic_attack == c.magic_attack,"Both attack types match server vectors")
+		check(profile.combat.physical_crit == c.physical_crit and profile.combat.magic_crit == c.magic_crit,"Both critical ratings match server vectors")
+	for job in 3:
+		for agility in [0,1,50,300]:
+			var combat: Dictionary = RULES.profile(job,60,false,[0,0,0,agility,0]).combat
+			check(combat.physical_crit == agility and combat.magic_crit == agility,"Agility grants both critical ratings for every job, including zero and maximum")
 	Game.new_player("共用属性",1,2)
 	Game.player.equipped = true
 	Game.player.hp -= 5
@@ -88,9 +93,11 @@ func _run() -> void:
 	await get_tree().process_frame
 	check(Game.allocated_attributes() == [1,0,3,1,0] and page.content.get_node("Remaining").text == "0","Real local properties entry confirms and persists allocation")
 	check(Game.stats().attack == 35 and Game.stats().hp == 109 and Game.player.hp == 104,"Allocation affects real combat while preserving lost HP")
+	check(page.content.get_node("Value_physical_crit").value == "1" and page.content.get_node("Value_magic_crit").value == "1","Confirmed agility refreshes both displayed critical ratings")
 	check(page.content.get_node("Minus2").disabled and page.content.get_node("Confirm").disabled,"Saved allocation cannot be reduced or double-confirmed")
 	check((await Game.load_game()).ok and Game.allocated_attributes() == [1,0,3,1,0],"Confirmed points survive actual save reload")
 	page.display_local();page.select_tab(1)
+	check(page.content.get_node("Value_physical_crit").value == "1" and page.content.get_node("Value_magic_crit").value == "1","Saved agility restores both displayed critical ratings after reload")
 	await capture("local_extended_saved")
 	check(not (await Game.allocate_attributes([0,0,3,1,0])).ok,"Local committed points cannot be refunded")
 	check(not (await Game.allocate_attributes([2,0,3,1,0])).ok,"Local budget cannot be exceeded")

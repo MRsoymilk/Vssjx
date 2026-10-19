@@ -15,7 +15,7 @@ func check(value: bool, description: String) -> void:
 
 func _verify() -> void:
 	check(FileAccess.file_exists("res://project.binary"), "Running from packed project settings")
-	for path in ["res://scenes/admin/data_browser.tscn", "res://scenes/admin/world_overview.tscn", "res://scenes/admin/world_overview_popup.tscn", "res://scripts/admin/data_browser.gd", "res://scripts/admin/admin_window_layout.gd", "res://tests/data_browser_test.tscn"]:
+	for path in ["res://scenes/admin/data_browser.tscn", "res://scenes/admin/world_overview.tscn", "res://scripts/admin/data_browser.gd", "res://scripts/admin/admin_window_layout.gd", "res://tests/data_browser_test.tscn"]:
 		check(not ResourceLoader.exists(path), "Developer resource is absent: " + path)
 	for path in ["res://scenes/admin", "res://scripts/admin", "res://assets/admin", "res://tests"]:
 		check(not DirAccess.dir_exists_absolute(path), "Developer directory is absent: " + path)

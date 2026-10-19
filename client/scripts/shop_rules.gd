@@ -5,6 +5,19 @@ static var catalog: Dictionary = JSON.parse_string(FileAccess.get_file_as_string
 static var catalog_hash: String = FileAccess.get_file_as_string("res://assets/data/shop-v2.json").replace("\r\n","\n").sha256_text()
 static var _index: Dictionary = {}
 const SLOTS := ["weapon","pendant","armor","wrist","belt","pants","boots","ring","necklace","hat"]
+static var APPEARANCE_LIMITS: Array = GeneratedEquipment.appearance_limits()
+
+static func valid_appearance(look: Variant) -> bool:
+	if not look is Array or look.size() != 3: return false
+	for index in 3:
+		var value: Variant = look[index]
+		if not (value is int or value is float) or not is_finite(float(value)) or floor(float(value)) != value or value < 0 or value > APPEARANCE_LIMITS[index]: return false
+	return true
+
+static func equipment_error(entry: Dictionary, job: int, gender: int) -> String:
+	if int(entry.get("job", -1)) >= 0 and int(entry.job) != job: return "WRONG_JOB"
+	if int(entry.get("gender", -1)) >= 0 and int(entry.gender) != gender: return "WRONG_GENDER"
+	return ""
 
 static func item(id: String) -> Dictionary:
 	if _index.is_empty():
@@ -33,14 +46,14 @@ static func _integer(value: Variant, low: int, high: int) -> bool:
 	return (value is int or value is float) and is_finite(float(value)) and floor(float(value))==float(value) and value>=low and value<=high
 
 static func valid_gear(gear: Variant) -> bool:
-	if not gear is Dictionary or not gear.get("version") in ["shop-v1","shop-v2"] or not gear.get("owned") is Array or gear.owned.size()>214: return false
+	if not gear is Dictionary or not gear.get("version") in ["shop-v1","shop-v2"] or not gear.get("owned") is Array or gear.owned.size()>catalog.items.size(): return false
 	var seen := {}
 	for id in gear.owned:
 		if not id is String or item(id).is_empty() or id=="potion" or seen.has(id): return false
 		seen[id] = true
 	if gear.get("version")=="shop-v2":
 		if not gear.get("slots") is Dictionary or not gear.get("quantities") is Dictionary: return false
-		if gear.slots.size()!=10 or gear.quantities.size()>215: return false
+		if gear.slots.size()!=10 or gear.quantities.size()>catalog.items.size()+1: return false
 		for id in gear.quantities:
 			if id=="potion":
 				if not _integer(gear.quantities[id],0,1000000): return false
@@ -151,7 +164,9 @@ static func apply_local(player: Dictionary, action: String, id: String, count: i
 		_store(player,gear)
 		return ""
 	if not action in ["equip","unequip"] or not is_equipment(entry) or count!=1: return "INVALID_EQUIPMENT"
-	if action=="equip" and int(entry.job)>=0 and int(entry.job)!=int(player.job): return "WRONG_JOB"
+	if action=="equip":
+		var restriction := equipment_error(entry, int(player.job), int(player.get("gender",0)))
+		if not restriction.is_empty(): return restriction
 	var on: bool = action=="equip"
 	if (gear.slots[entry.slot]==id)==on: return "EQUIPMENT_UNCHANGED"
 	if not on and bag_slots(gear,int(player.potions))>=60: return "BAG_FULL"

@@ -7,7 +7,7 @@ func _run() -> void:
 	Game.new_player("试游修士",1,0)
 	AIWorld.prepare()
 	check(AIWorld.maps.size()==214 and AIWorld.quests.size()==642,"Entire AI directory and three-stage quest chains")
-	check(AIWorld.catalog_hash==FileAccess.get_sha256(AIWorld.PATH),"Client hashes exact shared bundle")
+	check(AIWorld.catalog_hash==FileAccess.get_file_as_string(AIWorld.PATH).replace("\r\n","\n").sha256_text(),"Client hashes the canonical LF shared bundle")
 	Game.player.cell=[3,16]
 	check(AIWorld.apply_local("ai_travel","ai_001").is_empty(),"Enter AI map from station")
 	check(AIWorld.local_map_id()=="ai_001","Map identity persists separately from tutorial zone")
@@ -67,6 +67,8 @@ func _run() -> void:
 	var deadline := Time.get_ticks_msec()+15000
 	while AIWorld.local_map_id()!=exit.target_map and Time.get_ticks_msec()<deadline:await get_tree().process_frame
 	check(AIWorld.local_map_id()==exit.target_map and app.modal==null,"Walking onto the pad transfers directly without a directory or confirmation")
+	while app.map_transition != null and app.map_transition.blocking and Time.get_ticks_msec()<deadline:await get_tree().process_frame
+	check(app.world.map_id==exit.target_map and app.world.enabled,"New local map is revealed only after its loading animation completes")
 	Game.player.ai_map="ai_021";Game.player.cell=[16,22]
 	app._enter_world()
 	check(app.world.ai_npcs.size()==4,"Flower sect uses the four screenshot/table NPC identities")

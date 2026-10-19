@@ -51,6 +51,8 @@ pub struct ChatMessage {
     pub server_time_ms: String,
     pub channel: &'static str,
     pub text: String,
+    pub system: bool,
+    pub deleted: bool,
 }
 #[derive(Clone, Serialize)]
 pub struct ChatResult {
@@ -96,6 +98,8 @@ pub struct ChatHub {
     pending: VecDeque<Pending>,
     budget: f64,
     last_drain: Instant,
+    removed: VecDeque<Uuid>,
+    blocked: HashMap<Uuid, Instant>,
 }
 impl ChatHub {
     pub(crate) fn monitor_snapshot(&self) -> serde_json::Value {
@@ -112,6 +116,8 @@ impl ChatHub {
             pending: VecDeque::new(),
             budget: 0.0,
             last_drain: Instant::now(),
+            removed: VecDeque::new(),
+            blocked: HashMap::new(),
         }
     }
     pub fn ready(&self) -> serde_json::Value {
@@ -129,6 +135,7 @@ impl ChatHub {
         (ready, cursor)
     }
     fn prune(&mut self, now: Instant) {
+        self.blocked.retain(|_, until| *until > now);
         let ttl = Duration::from_secs(self.config.dedup_seconds);
         self.receipts
             .retain(|_, r| r.result.status == "QUEUED" || now.duration_since(r.at) < ttl);
@@ -156,13 +163,14 @@ impl ChatHub {
             Err(code) => return ChatResult::rejected(client, code),
         };
         if let Some(receipt) = self.receipts.get(&(character, client)) {
+            if receipt.result.code == Some("CHAT_REMOVED") { return receipt.result.clone(); }
             return if receipt.text == text {
                 receipt.result.clone()
             } else {
                 ChatResult::rejected(client, "CHAT_ID_CONFLICT")
             };
         }
-        if muted {
+        if muted || self.blocked.get(&character).is_some_and(|until| *until > now) {
             return ChatResult::rejected(client, "CHAT_MUTED");
         }
         if self.pending.iter().any(|p| p.character == character) {
@@ -234,6 +242,8 @@ impl ChatHub {
                     .to_string(),
                 channel: "public",
                 text: pending.text,
+                system: false,
+                deleted: false,
             });
             while self.history.len() > self.config.history {
                 self.history.pop_front();
@@ -255,6 +265,50 @@ impl ChatHub {
     }
     pub fn oldest(&self) -> u64 {
         self.seq + 1 - self.history.len() as u64
+    }
+    pub fn recent(&self) -> Vec<ChatMessage> { self.history.iter().cloned().collect() }
+    pub fn removed_ids(&self) -> Vec<Uuid> { self.removed.iter().copied().collect() }
+    pub fn remove_message(&mut self, id: Uuid, now: Instant) {
+        if let Some(message) = self.history.iter_mut().find(|m| m.message_id == id) {
+            message.text = "该发言已被管理员删除".into();
+            message.deleted = true;
+        }
+        if !self.removed.contains(&id) { self.removed.push_back(id); }
+        while self.removed.len() > 100 { self.removed.pop_front(); }
+        for receipt in self.receipts.values_mut().filter(|r| r.result.message_id == Some(id)) {
+            receipt.text.clear();
+            receipt.result = ChatResult::rejected(receipt.result.client_message_id, "CHAT_REMOVED");
+            receipt.at = now;
+        }
+    }
+    /// Fence sends whose DB mute check raced the operator transaction, and cancel
+    /// already queued messages before they can be drained into public history.
+    pub fn moderate_characters(&mut self, ids: &[Uuid], until: Option<Instant>, now: Instant) {
+        self.prune(now);
+        for id in ids {
+            if let Some(until) = until { self.blocked.insert(*id, until); }
+            else { self.blocked.remove(id); }
+        }
+        if until.is_some() {
+            self.pending.retain(|p| !ids.contains(&p.character));
+            for ((character, _), receipt) in &mut self.receipts {
+                if ids.contains(character) && receipt.result.status == "QUEUED" {
+                    receipt.result = ChatResult::rejected(receipt.result.client_message_id, "CHAT_MUTED");
+                    receipt.at = now;
+                }
+            }
+        }
+    }
+    pub fn system_notice(&mut self, notice: String) {
+        assert!(text(&notice).is_ok());
+        self.seq += 1;
+        self.history.push_back(ChatMessage {
+            seq: self.seq.to_string(), message_id: Uuid::new_v4(),
+            sender_character_id: Uuid::new_v4(), display_name: "系统".into(),
+            server_time_ms: SystemTime::now().duration_since(UNIX_EPOCH).unwrap_or_default().as_millis().to_string(),
+            channel: "public", text: notice, system: true, deleted: false,
+        });
+        while self.history.len() > self.config.history { self.history.pop_front(); }
     }
     pub fn batch(&self, after: u64) -> Vec<ChatMessage> {
         self.history

@@ -1,6 +1,10 @@
-# 联机协议草案
+# 联机协议：设计原则与目标契约
 
-设计修订：2026-10-15。账号与角色HTTPS、单次连接票据、共享地图移动及公共聊天已分阶段实现，当前落地契约分别见[auth.md](auth.md)、[characters.md](characters.md)、[shared_world.md](shared_world.md)和[chat.md](chat.md)，对应schema/样例位于`shared/protocol/`。本文件仍包含尚未落地的战斗、增量订阅等目标设计；当前实现以对应专题文档为准。产品规则按[设计入口](README.md)D01～D08确认，事务所有权按[architecture.md](architecture.md)执行。
+[返回设计索引](README.md) · [架构](architecture.md) · [共享地图实现](shared_world.md)
+
+性质：**目标契约，不是可直接调用的完整 API 清单**。基础设计于 2026-10-15，状态说明于 2026-10-19 整理。账号、角色、世界、PVE、社交、队伍和决斗已有实现，但下文通用 `battle.command`、`operation.get` 等示例不代表实际已公开消息。当前 PVE 使用 `pve.command`／`pve.result`；世界 v2 使用二进制共享发布，而非完全采用本稿的订阅增量模型。
+
+实际契约见 [账号](auth.md)、[角色](characters.md)、[共享地图](shared_world.md)、[聊天](chat.md)、[社交](social.md)、[队伍](teams.md)和[决斗](player-duels.md)，并核对 `shared/protocol/`、源码与对应测试。昵称规则已冻结为 `nickname-v1`，不再是待设计项。D 编号的历史差异见 [设计索引](README.md)。
 
 ## 1. 传输、认证与连接接管
 
@@ -10,7 +14,7 @@ HTTPS处理注册、登录、刷新/撤销登录会话、角色列表/创建和�
 
 握手携带协议版本、配置清单版本/摘要及目标角色ID。服务器检查登录会话有效性、角色归属、封禁、协议兼容、配置兼容和在线占用。返回`auth.ready`时给出`game_session_id`、`connection_epoch`、服务端时间及限额；随后先同步，不直接开放业务操作。
 
-同一有效登录会话的网络重连可以原子接管原游戏连接，`connection_epoch`递增，旧连接立即失去新输入资格；CharacterActor及其在途事务保留。按已确认D03，每账号一个角色、一个有效游戏会话；不同登录会话的第二次上线返回CHARACTER_BUSY并拒绝，不自动顶掉原会话。进程重启后新建的`game_session_id`不能与旧连接混用；epoch只在其所属会话域比较。任何断连、接管、超时都不能成为撤销已提交扣款或奖励的依据。
+同一有效登录会话的网络重连可以接管同一角色的原连接，`connection_epoch`递增，旧连接失去输入资格。当前不同登录会话占用同一角色返回 `CHARACTER_BUSY`，不自动顶号；每账号最多五个角色，不能由此推导账号级唯一游戏连接已实现。独立于连接的完整业务执行器仍为架构目标。进程重启后的 `game_session_id` 不能与旧连接混用，任何断连或接管都不能撤销已提交资产。
 
 刷新令牌轮换、注销、过期及封禁同步到活动WSS；业务受理前检查当前权限。客户端不无限重试被封禁、无角色归属、重复登录或不兼容版本。浏览器Origin规则、原生连接的认证和代理信任边界见架构安全章节。
 
@@ -18,13 +22,13 @@ HTTPS处理注册、登录、刷新/撤销登录会话、角色列表/创建和�
 
 HTTPS角色创建提交operation_id及昵称、职业等类型化创建字段；账号身份取自认证，不接受客户端指定归属或初始金币/属性。D08已确认线上角色昵称全服唯一，不按地图或实例分别占名。昵称校验及name_key规则见[架构7.4节](architecture.md#74-昵称全服唯一与创建角色)，具体请求schema与规范化正反样例在M0/M1固化。
 
-账号级幂等顺序同第3节：先查原创建回执，再对新操作校验一账号一角色、昵称和初始规则。创建角色、初始状态与回执在同一事务提交；角色数量和name_key由数据库唯一约束保护。返回成功时提供原character_id和服务器确认的display_name；同operation_id同内容重试返回原角色，即使其昵称已经占用，也不得报NAME_TAKEN。
+账号级幂等顺序同第3节：先查原创建回执，再对新操作校验五槽容量、昵称和初始规则。创建角色、初始状态与回执同事务提交，槽位和 name_key 受数据库约束。成功提供原 character_id 与 display_name；同 operation_id 同内容重试返回原角色，不因昵称已占用报 NAME_TAKEN。
 
-新操作重名返回HTTP 409及稳定错误码`NAME_TAKEN`；账号已达一角色上限返回HTTP 409及`CHARACTER_LIMIT_REACHED`；昵称格式不合法返回`INVALID_NAME`。重名时保留输入、提示用户改名，不自动加后缀或随机创建。用户明确更换昵称后使用新operation_id；同operation_id改变昵称返回`IDEMPOTENCY_CONFLICT`。创建结果未知时只能查原账号回执或按原ID原内容重试，不能自动换名再创建。
+新操作重名返回 HTTP 409 及 `NAME_TAKEN`；五个角色槽位已满返回 HTTP 409 及 `CHARACTER_LIMIT_REACHED`；非法昵称返回 `INVALID_NAME`。重名保留输入，不自动加后缀或随机创建。用户更换昵称后用新 operation_id；同 ID 改内容返回 `IDEMPOTENCY_CONFLICT`。未知结果只能查原回执或原 ID 原内容重试。
 
 首版不增加在线改名、删除或名称释放操作，客户端可用性检查不代表占名保证。不同登录会话断开/封禁/注销均不释放昵称；离线重名不参与线上唯一索引。
 
-## 2. 消息、标识与版本
+## 2. 消息、标识与版本（目标示例）
 
 客户端持久化操作示例：
 
@@ -233,7 +237,7 @@ chat.message包含message_id、sender_character_id、display_name、server_time_
 | `STALE_REVISION`、`STALE_WORLD` | 只用于未执行的新操作；同步相关状态，再由用户意图决定是否新建操作 |
 | `IDEMPOTENCY_CONFLICT` | 同ID业务内容不一致，拒绝，不自动换ID绕过 |
 | `NAME_TAKEN` | 新创建操作的昵称全服已占用；提示用户更换，不自动加后缀/改名创建 |
-| `CHARACTER_LIMIT_REACHED` | 新创建操作超出每账号一个角色的限制；先同步既有角色，不自动删除或覆盖 |
+| `CHARACTER_LIMIT_REACHED` | 新创建操作超出每账号五个角色槽位；先同步既有角色，不自动删除或覆盖 |
 | `INVALID_NAME` | 昵称不符合服务端统一校验规则；提示修正，不将格式错误伪装成重名 |
 | `INVALID_TARGET`、`INSUFFICIENT_RESOURCE` | 业务拒绝，展示原因 |
 | `RATE_LIMITED`、`SERVER_BUSY` | 入口/队列保护；依据outcome和retry_mode使用原ID退避 |

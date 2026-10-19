@@ -20,6 +20,7 @@ pub struct Skill {
     pub duration: i32,
     pub chance: i32,
     pub legacy_heal: i32,
+    pub target: String,
 }
 pub static ITEMS: LazyLock<Vec<Skill>> = LazyLock::new(|| {
     serde_json::from_value(

@@ -20,6 +20,8 @@ var _target := ""
 var characters: Array = []
 var pending_creation: Dictionary = {}
 var pending_pve: Dictionary = {}
+var pending_social: Dictionary = {}
+var pending_team: Dictionary = {}
 var _after_refresh: Dictionary = {}
 var _generation := 0
 
@@ -61,10 +63,18 @@ func clear() -> void:
 	characters = []
 	pending_creation = {}
 	pending_pve = {}
+	pending_social = {}
+	pending_team = {}
 	_after_refresh = {}
 
 func list_characters() -> void:
 	_send("characters", server_address, {}, true)
+
+func social_request(payload: Dictionary) -> void:
+	_send("social", server_address, payload, true)
+
+func team_request(payload: Dictionary) -> void:
+	_send("teams", server_address, payload, true)
 
 func request_world_ticket(character_id: String, config_hash: String) -> void:
 	_send("world_ticket", server_address, {"character_id": character_id, "protocol_version": 1, "config_hash": config_hash}, true)
@@ -144,7 +154,7 @@ func _send(action: String, address: String, payload: Dictionary, bearer: bool = 
 	busy = true
 	_request = HTTPRequest.new()
 	_request.timeout = REQUEST_TIMEOUT
-	_request.body_size_limit = 32768
+	_request.body_size_limit = 262144 if action in ["social","teams"] else 32768
 	_request.max_redirects = 0
 	add_child(_request)
 	_request.request_completed.connect(_on_response.bind(_generation))
@@ -153,6 +163,8 @@ func _send(action: String, address: String, payload: Dictionary, bearer: bool = 
 	var route := "/api/v1/auth/" + action
 	if action in ["characters", "character_create"]: route = "/api/v1/characters"
 	if action == "world_ticket": route = "/api/v1/world/ticket"
+	if action == "social": route = "/api/v1/social"
+	if action == "teams": route = "/api/v1/teams"
 	var error := _request.request(_target + route, headers, method, body)
 	if error != OK: _finish({"ok": false, "code": "NETWORK_ERROR", "request_error": int(error)})
 
@@ -189,12 +201,15 @@ func _on_response(result: int, code: int, _headers: PackedStringArray, body: Pac
 		if not data.get("ticket") is String or RegEx.create_from_string("^[0-9a-f]{64}\\z").search(data.ticket) == null:
 			_finish({"ok": false, "code": "INVALID_RESPONSE"})
 		else:
-			_finish({"ok": true, "ticket": data.ticket, "announcement_version": 1 if data.get("announcement_version") == 1 else 0, "population_version": 1 if data.get("population_version") == 1 else 0, "pve_version": 1 if data.get("pve_version") == 1 else 0, "maps_version": 2 if data.get("ai_world_version")==1 else (1 if data.get("maps_version")==1 else 0), "shop_version": int(data.shop_version) if data.get("shop_version")==1 or data.get("shop_version")==2 else 0})
+			_finish({"ok": true, "ticket": data.ticket, "announcement_version": 1 if data.get("announcement_version") == 1 else 0, "population_version": 1 if data.get("population_version") == 1 else 0, "pve_version": 1 if data.get("pve_version") == 1 else 0, "maps_version": 2 if data.get("ai_world_version")==1 else (1 if data.get("maps_version")==1 else 0), "shop_version": int(data.shop_version) if data.get("shop_version")==1 or data.get("shop_version")==2 else 0, "duel_version":1 if data.get("duel_version")==1 else 0})
 		return
 	if code not in [200, 201]:
 		if _action == "character_create" and code in [409, 422] and data.get("operation_id") == pending_creation.get("operation_id"): pending_creation = {}
 		if code == 401 and _action in ["refresh", "me", "characters", "character_create"]: clear()
 		_finish({"ok": false, "code": data.get("code", "SERVER_ERROR")})
+		return
+	if _action in ["social","teams"]:
+		_finish(data)
 		return
 	if _action in ["characters", "character_create"]:
 		if _action == "characters" and (data.get("rules_version") != "creation-v1" or data.get("name_rules_version") != "nickname-v1"):
@@ -306,7 +321,7 @@ static func _valid_character(value: Variant) -> bool:
 		var look_v2: Variant = value.appearance_v2
 		if not look_v2 is Array or look_v2.size()!=3: return false
 		for i in 3:
-			if not OnlinePve.integer(look_v2[i],0,[27,11,9][i]): return false
+			if not OnlinePve.integer(look_v2[i],0,ShopRules.APPEARANCE_LIMITS[i]): return false
 	if value.has("appearance"):
 		var look: Variant = value.appearance
 		if not look is Array or look.size() != 2: return false

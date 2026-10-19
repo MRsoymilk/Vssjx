@@ -240,7 +240,7 @@ static func error_text(code: String) -> String:
 	if ai.has(code): return ai[code]
 	var skills:={"INVALID_SKILL":"未知技能，请更新客户端。","SKILL_ROLE_MISMATCH":"此技能不属于当前职业。","SKILL_LEVEL_REQUIRED":"角色等级尚未达到技能要求。","PASSIVE_SKILL":"此心法自动生效，无需施展。"}
 	if skills.has(code):return skills[code]
-	var equipment := {"WRONG_JOB":"此兵器不适合当前职业。", "INVALID_QUANTITY":"数量无效。", "ITEM_NOT_USABLE":"此物品不能直接使用。","GOLD_INSUFFICIENT":"铜钱不足。", "ITEM_ALREADY_OWNED":"已经拥有这件装备。", "BAG_FULL":"背包或补给已满。","INVALID_EQUIPMENT":"此装备尚未开放。", "STALE_EQUIPMENT":"装备状态已更新，请重新选择。", "WEAPON_NOT_OWNED":"背包中没有这件装备。", "EQUIPMENT_UNCHANGED":"当前已是该装备状态。"}
+	var equipment := {"WRONG_JOB":"此装备不适合当前职业。", "WRONG_GENDER":"此装备不适合当前性别。", "INVALID_QUANTITY":"数量无效。", "ITEM_NOT_USABLE":"此物品不能直接使用。","GOLD_INSUFFICIENT":"铜钱不足。", "ITEM_ALREADY_OWNED":"已经拥有这件装备。", "BAG_FULL":"背包或补给已满。","INVALID_EQUIPMENT":"此装备尚未开放。", "STALE_EQUIPMENT":"装备状态已更新，请重新选择。", "WEAPON_NOT_OWNED":"背包中没有这件装备。", "EQUIPMENT_UNCHANGED":"当前已是该装备状态。"}
 	if equipment.has(code): return equipment[code]
 	if code == "PORTAL_LOCKED": return "灵门未开，请完成山狼试炼并向清微道人复命。"
 	if code == "PORTAL_TOO_FAR": return "请走近灵门后再传送。"

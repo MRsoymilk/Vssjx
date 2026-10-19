@@ -1,0 +1,866 @@
+{
+  "format_version": 1,
+  "source": "AI生成；用户巫师与发型参考；原生人物分层适配",
+  "sets": [
+    {
+      "id": "gravebloom/mzs",
+      "name": "冥苔断岳",
+      "stem": "mzs",
+      "job": 0,
+      "gender": 0,
+      "weapon_code": 34,
+      "clothing_code": 18,
+      "head_code": 16,
+      "head": "gravebloom/mzs/mzst6",
+      "body": [
+        "gravebloom/mzs/mzs1",
+        "gravebloom/mzs/mzs1q",
+        "gravebloom/mzs/mzs1x"
+      ],
+      "weapon": "gravebloom/mzs/ezs11",
+      "weapon_name": "冥苔战斧",
+      "source_template": "01_male_lishi-parts-template.png"
+    },
+    {
+      "id": "gravebloom/wzs",
+      "name": "腐焰镇魂",
+      "stem": "wzs",
+      "job": 0,
+      "gender": 1,
+      "weapon_code": 35,
+      "clothing_code": 19,
+      "head_code": 17,
+      "head": "gravebloom/wzs/wzst4",
+      "body": [
+        "gravebloom/wzs/wzs1",
+        "gravebloom/wzs/wzs1q",
+        "gravebloom/wzs/wzs1x"
+      ],
+      "weapon": "gravebloom/wzs/ezs14",
+      "weapon_name": "腐焰重锤",
+      "source_template": "02_female_lishi-parts-template.png"
+    },
+    {
+      "id": "gravebloom/mck",
+      "name": "枯藤照夜",
+      "stem": "mck",
+      "job": 1,
+      "gender": 0,
+      "weapon_code": 36,
+      "clothing_code": 20,
+      "head_code": 18,
+      "head": "gravebloom/mck/mckt8",
+      "body": [
+        "gravebloom/mck/mck1",
+        "gravebloom/mck/mck1q",
+        "gravebloom/mck/mck1x"
+      ],
+      "weapon": "gravebloom/mck/eck9",
+      "weapon_name": "枯藤长剑",
+      "source_template": "03_male_xiake-parts-template.png"
+    },
+    {
+      "id": "gravebloom/wck",
+      "name": "碧毒裂影",
+      "stem": "wck",
+      "job": 1,
+      "gender": 1,
+      "weapon_code": 37,
+      "clothing_code": 21,
+      "head_code": 19,
+      "head": "gravebloom/wck/wckt5",
+      "body": [
+        "gravebloom/wck/wck1",
+        "gravebloom/wck/wck1q",
+        "gravebloom/wck/wck1x"
+      ],
+      "weapon": "gravebloom/wck/eck17",
+      "weapon_name": "碧毒双爪",
+      "source_template": "04_female_xiake-parts-template.png"
+    },
+    {
+      "id": "gravebloom/mfs",
+      "name": "葬骨灯冢",
+      "stem": "mfs",
+      "job": 2,
+      "gender": 0,
+      "weapon_code": 38,
+      "clothing_code": 22,
+      "head_code": 20,
+      "head": "gravebloom/mfs/mfst6",
+      "body": [
+        "gravebloom/mfs/mfs2",
+        "gravebloom/mfs/mfs2q",
+        "gravebloom/mfs/mfs2x"
+      ],
+      "weapon": "gravebloom/mfs/efs11",
+      "weapon_name": "葬骨魂杖",
+      "source_template": "05_male_yinzhe-parts-template.png"
+    },
+    {
+      "id": "gravebloom/wfs",
+      "name": "烬冠引魂",
+      "stem": "wfs",
+      "job": 2,
+      "gender": 1,
+      "weapon_code": 39,
+      "clothing_code": 23,
+      "head_code": 21,
+      "head": "gravebloom/wfs/wfst4",
+      "body": [
+        "gravebloom/wfs/wfs2",
+        "gravebloom/wfs/wfs2q",
+        "gravebloom/wfs/wfs2x"
+      ],
+      "weapon": "gravebloom/wfs/efs7",
+      "weapon_name": "烬冠灵炬",
+      "source_template": "06_female_yinzhe-parts-template.png"
+    }
+  ],
+  "parts": {
+    "gravebloom/mzs/mzst6": {
+      "texture": "res://assets/generated/equipment/gravebloom/mzs/parts/mzst6.png",
+      "frames": [
+        [
+          0,
+          0,
+          42,
+          43
+        ],
+        [
+          42,
+          0,
+          20,
+          16
+        ]
+      ]
+    },
+    "gravebloom/mzs/mzs1": {
+      "texture": "res://assets/generated/equipment/gravebloom/mzs/parts/mzs1.png",
+      "frames": [
+        [
+          0,
+          0,
+          19,
+          13
+        ],
+        [
+          26,
+          0,
+          26,
+          13
+        ],
+        [
+          52,
+          0,
+          6,
+          7
+        ]
+      ]
+    },
+    "gravebloom/mzs/mzs1q": {
+      "texture": "res://assets/generated/equipment/gravebloom/mzs/parts/mzs1q.png",
+      "frames": [
+        [
+          0,
+          0,
+          11,
+          14
+        ],
+        [
+          25,
+          0,
+          9,
+          10
+        ],
+        [
+          50,
+          0,
+          25,
+          23
+        ]
+      ]
+    },
+    "gravebloom/mzs/mzs1x": {
+      "texture": "res://assets/generated/equipment/gravebloom/mzs/parts/mzs1x.png",
+      "frames": [
+        [
+          0,
+          0,
+          25,
+          15
+        ],
+        [
+          26,
+          0,
+          26,
+          14
+        ],
+        [
+          52,
+          0,
+          22,
+          13
+        ],
+        [
+          78,
+          0,
+          20,
+          15
+        ],
+        [
+          104,
+          0,
+          19,
+          14
+        ],
+        [
+          130,
+          0,
+          22,
+          13
+        ]
+      ]
+    },
+    "gravebloom/mzs/ezs11": {
+      "texture": "res://assets/generated/equipment/gravebloom/mzs/parts/ezs11.png",
+      "frames": [
+        [
+          0,
+          0,
+          74,
+          38
+        ],
+        [
+          74,
+          0,
+          74,
+          47
+        ]
+      ]
+    },
+    "gravebloom/wzs/wzst4": {
+      "texture": "res://assets/generated/equipment/gravebloom/wzs/parts/wzst4.png",
+      "frames": [
+        [
+          0,
+          0,
+          42,
+          43
+        ],
+        [
+          42,
+          0,
+          20,
+          16
+        ]
+      ]
+    },
+    "gravebloom/wzs/wzs1": {
+      "texture": "res://assets/generated/equipment/gravebloom/wzs/parts/wzs1.png",
+      "frames": [
+        [
+          0,
+          0,
+          13,
+          11
+        ],
+        [
+          24,
+          0,
+          24,
+          12
+        ],
+        [
+          48,
+          0,
+          7,
+          9
+        ]
+      ]
+    },
+    "gravebloom/wzs/wzs1q": {
+      "texture": "res://assets/generated/equipment/gravebloom/wzs/parts/wzs1q.png",
+      "frames": [
+        [
+          0,
+          0,
+          10,
+          7
+        ],
+        [
+          25,
+          0,
+          8,
+          7
+        ],
+        [
+          50,
+          0,
+          25,
+          21
+        ]
+      ]
+    },
+    "gravebloom/wzs/wzs1x": {
+      "texture": "res://assets/generated/equipment/gravebloom/wzs/parts/wzs1x.png",
+      "frames": [
+        [
+          0,
+          0,
+          24,
+          14
+        ],
+        [
+          24,
+          0,
+          13,
+          12
+        ],
+        [
+          48,
+          0,
+          19,
+          12
+        ],
+        [
+          72,
+          0,
+          22,
+          13
+        ],
+        [
+          96,
+          0,
+          16,
+          14
+        ],
+        [
+          120,
+          0,
+          17,
+          11
+        ]
+      ]
+    },
+    "gravebloom/wzs/ezs14": {
+      "texture": "res://assets/generated/equipment/gravebloom/wzs/parts/ezs14.png",
+      "frames": [
+        [
+          0,
+          0,
+          74,
+          38
+        ],
+        [
+          74,
+          0,
+          74,
+          47
+        ]
+      ]
+    },
+    "gravebloom/mck/mckt8": {
+      "texture": "res://assets/generated/equipment/gravebloom/mck/parts/mckt8.png",
+      "frames": [
+        [
+          0,
+          0,
+          42,
+          43
+        ],
+        [
+          42,
+          0,
+          20,
+          16
+        ]
+      ]
+    },
+    "gravebloom/mck/mck1": {
+      "texture": "res://assets/generated/equipment/gravebloom/mck/parts/mck1.png",
+      "frames": [
+        [
+          0,
+          0,
+          21,
+          19
+        ],
+        [
+          21,
+          0,
+          15,
+          13
+        ]
+      ]
+    },
+    "gravebloom/mck/mck1q": {
+      "texture": "res://assets/generated/equipment/gravebloom/mck/parts/mck1q.png",
+      "frames": [
+        [
+          0,
+          0,
+          22,
+          20
+        ],
+        [
+          24,
+          0,
+          11,
+          8
+        ],
+        [
+          48,
+          0,
+          20,
+          8
+        ],
+        [
+          72,
+          0,
+          14,
+          5
+        ],
+        [
+          96,
+          0,
+          12,
+          5
+        ],
+        [
+          120,
+          0,
+          21,
+          17
+        ],
+        [
+          144,
+          0,
+          24,
+          16
+        ]
+      ]
+    },
+    "gravebloom/mck/mck1x": {
+      "texture": "res://assets/generated/equipment/gravebloom/mck/parts/mck1x.png",
+      "frames": [
+        [
+          0,
+          0,
+          15,
+          13
+        ],
+        [
+          16,
+          0,
+          16,
+          13
+        ],
+        [
+          32,
+          0,
+          14,
+          13
+        ],
+        [
+          48,
+          0,
+          13,
+          13
+        ],
+        [
+          64,
+          0,
+          13,
+          13
+        ],
+        [
+          80,
+          0,
+          14,
+          13
+        ]
+      ]
+    },
+    "gravebloom/mck/eck9": {
+      "texture": "res://assets/generated/equipment/gravebloom/mck/parts/eck9.png",
+      "frames": [
+        [
+          0,
+          0,
+          41,
+          14
+        ],
+        [
+          41,
+          0,
+          30,
+          30
+        ]
+      ]
+    },
+    "gravebloom/wck/wckt5": {
+      "texture": "res://assets/generated/equipment/gravebloom/wck/parts/wckt5.png",
+      "frames": [
+        [
+          0,
+          0,
+          42,
+          43
+        ],
+        [
+          42,
+          0,
+          20,
+          16
+        ]
+      ]
+    },
+    "gravebloom/wck/wck1": {
+      "texture": "res://assets/generated/equipment/gravebloom/wck/parts/wck1.png",
+      "frames": [
+        [
+          0,
+          0,
+          15,
+          12
+        ],
+        [
+          15,
+          0,
+          11,
+          13
+        ]
+      ]
+    },
+    "gravebloom/wck/wck1q": {
+      "texture": "res://assets/generated/equipment/gravebloom/wck/parts/wck1q.png",
+      "frames": [
+        [
+          0,
+          0,
+          17,
+          21
+        ],
+        [
+          27,
+          0,
+          25,
+          22
+        ],
+        [
+          54,
+          0,
+          27,
+          26
+        ]
+      ]
+    },
+    "gravebloom/wck/wck1x": {
+      "texture": "res://assets/generated/equipment/gravebloom/wck/parts/wck1x.png",
+      "frames": [
+        [
+          0,
+          0,
+          16,
+          12
+        ],
+        [
+          16,
+          0,
+          12,
+          13
+        ],
+        [
+          32,
+          0,
+          12,
+          13
+        ],
+        [
+          48,
+          0,
+          13,
+          11
+        ],
+        [
+          64,
+          0,
+          15,
+          13
+        ],
+        [
+          80,
+          0,
+          12,
+          13
+        ]
+      ]
+    },
+    "gravebloom/wck/eck17": {
+      "texture": "res://assets/generated/equipment/gravebloom/wck/parts/eck17.png",
+      "frames": [
+        [
+          0,
+          0,
+          41,
+          14
+        ],
+        [
+          41,
+          0,
+          30,
+          30
+        ]
+      ]
+    },
+    "gravebloom/mfs/mfst6": {
+      "texture": "res://assets/generated/equipment/gravebloom/mfs/parts/mfst6.png",
+      "frames": [
+        [
+          0,
+          0,
+          42,
+          43
+        ],
+        [
+          42,
+          0,
+          20,
+          16
+        ]
+      ]
+    },
+    "gravebloom/mfs/mfs2": {
+      "texture": "res://assets/generated/equipment/gravebloom/mfs/parts/mfs2.png",
+      "frames": [
+        [
+          0,
+          0,
+          28,
+          17
+        ],
+        [
+          28,
+          0,
+          23,
+          10
+        ],
+        [
+          56,
+          0,
+          5,
+          9
+        ]
+      ]
+    },
+    "gravebloom/mfs/mfs2q": {
+      "texture": "res://assets/generated/equipment/gravebloom/mfs/parts/mfs2q.png",
+      "frames": [
+        [
+          0,
+          0,
+          11,
+          5
+        ],
+        [
+          31,
+          0,
+          3,
+          4
+        ],
+        [
+          62,
+          0,
+          31,
+          23
+        ]
+      ]
+    },
+    "gravebloom/mfs/mfs2x": {
+      "texture": "res://assets/generated/equipment/gravebloom/mfs/parts/mfs2x.png",
+      "frames": [
+        [
+          0,
+          0,
+          18,
+          14
+        ],
+        [
+          18,
+          0,
+          16,
+          13
+        ],
+        [
+          36,
+          0,
+          18,
+          12
+        ],
+        [
+          54,
+          0,
+          16,
+          12
+        ],
+        [
+          72,
+          0,
+          15,
+          12
+        ],
+        [
+          90,
+          0,
+          16,
+          14
+        ]
+      ]
+    },
+    "gravebloom/mfs/efs11": {
+      "texture": "res://assets/generated/equipment/gravebloom/mfs/parts/efs11.png",
+      "frames": [
+        [
+          0,
+          0,
+          40,
+          40
+        ],
+        [
+          49,
+          0,
+          49,
+          32
+        ]
+      ]
+    },
+    "gravebloom/wfs/wfst4": {
+      "texture": "res://assets/generated/equipment/gravebloom/wfs/parts/wfst4.png",
+      "frames": [
+        [
+          0,
+          0,
+          42,
+          43
+        ],
+        [
+          42,
+          0,
+          20,
+          16
+        ]
+      ]
+    },
+    "gravebloom/wfs/wfs2": {
+      "texture": "res://assets/generated/equipment/gravebloom/wfs/parts/wfs2.png",
+      "frames": [
+        [
+          0,
+          0,
+          22,
+          14
+        ],
+        [
+          22,
+          0,
+          12,
+          13
+        ],
+        [
+          44,
+          0,
+          11,
+          15
+        ]
+      ]
+    },
+    "gravebloom/wfs/wfs2q": {
+      "texture": "res://assets/generated/equipment/gravebloom/wfs/parts/wfs2q.png",
+      "frames": [
+        [
+          0,
+          0,
+          19,
+          22
+        ],
+        [
+          21,
+          0,
+          4,
+          6
+        ],
+        [
+          42,
+          0,
+          21,
+          21
+        ],
+        [
+          63,
+          0,
+          10,
+          8
+        ]
+      ]
+    },
+    "gravebloom/wfs/wfs2x": {
+      "texture": "res://assets/generated/equipment/gravebloom/wfs/parts/wfs2x.png",
+      "frames": [
+        [
+          0,
+          0,
+          13,
+          14
+        ],
+        [
+          15,
+          0,
+          15,
+          13
+        ],
+        [
+          30,
+          0,
+          12,
+          12
+        ],
+        [
+          45,
+          0,
+          12,
+          14
+        ],
+        [
+          60,
+          0,
+          13,
+          13
+        ],
+        [
+          75,
+          0,
+          12,
+          12
+        ]
+      ]
+    },
+    "gravebloom/wfs/efs7": {
+      "texture": "res://assets/generated/equipment/gravebloom/wfs/parts/efs7.png",
+      "frames": [
+        [
+          0,
+          0,
+          40,
+          40
+        ],
+        [
+          49,
+          0,
+          49,
+          32
+        ]
+      ]
+    }
+  }
+}

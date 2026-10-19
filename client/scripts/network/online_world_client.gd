@@ -4,10 +4,13 @@ extends Node
 signal changed(entities: Dictionary)
 signal status_changed(text: String)
 signal map_changed(map_id: String)
+signal map_transfer_started
+signal connection_failed
 signal movement_cancelled
 const MAP_PATH := SharedWorldMap.MAP_PATH
 var map_id := "qingyun_trail"
 var world_ready := false
+var team_active := false
 var character_id := ""
 var entities: Dictionary = {}
 var server := ""
@@ -25,6 +28,8 @@ var chat := OnlinePublicChat.new()
 var announcements := OnlineAnnouncements.new()
 var population := OnlinePopulation.new()
 var pve := OnlinePve.new()
+var duel := OnlineDuel.new()
+var _duel_version := 0
 var _pve_version := 0
 var _maps_version := 0
 var _shop_version := 0
@@ -51,6 +56,10 @@ var _snapshot_bytes := 0
 func _ready() -> void:
 	config_hash = FileAccess.get_sha256(MAP_PATH)
 	OnlineAccount.world_ticket_received.connect(_on_ticket)
+	duel.send_requested.connect(func(packet: Dictionary) -> void:
+		if socket != null and world_ready:
+			if socket.send_text(JSON.stringify(packet)) != OK: _failed("SEND_FAILED", true)
+	)
 	pve.send_requested.connect(func(packet: Dictionary) -> void:
 		if socket != null and world_ready:
 			if socket.send_text(JSON.stringify(packet)) != OK: _failed("SEND_FAILED", true)
@@ -65,6 +74,7 @@ func start(id: String) -> void:
 	server = OnlineAccount.server_address
 	login_session = OnlineAccount.login_session_id
 	pve.bind_character(id, server)
+	duel.bind_character(id)
 	_attempts = 0
 	_state = "request"
 	_retry_at = 0.0
@@ -87,11 +97,14 @@ func leave() -> void:
 	announcements.clear()
 	population.clear()
 	pve.disconnect_channel()
+	duel.clear()
 
 func _exit_tree() -> void:
 	leave()
 
 func _failed(code: String, retry: bool = false) -> void:
+	duel.disconnect_channel()
+	connection_failed.emit()
 	_pending_motion.clear()
 	chat.disconnect_channel()
 	announcements.clear()
@@ -113,6 +126,8 @@ func _failed(code: String, retry: bool = false) -> void:
 	else: _state = "failed"
 
 func _reconnect_map() -> void:
+	duel.clear()
+	map_transfer_started.emit()
 	# Keep the account-owned outbox: a lost transfer receipt is replayed on the new map.
 	_pending_motion.clear()
 	world_ready = false
@@ -145,7 +160,12 @@ func _on_ticket(result: Dictionary) -> void:
 	_announcement_version = 1 if result.get("announcement_version") == 1 else 0
 	_pve_version = 1 if result.get("pve_version") == 1 else 0
 	_maps_version = int(result.get("maps_version", 0)) if result.get("maps_version") in [1, 2] else 0
+	# Servers keep maps_version=1 for older clients and advertise the expansion separately.
+	if _maps_version >= 1 and result.get("ai_world_version") == 1: _maps_version = 2
 	_shop_version = int(result.get("shop_version")) if result.get("shop_version") in [1,2] else 0
+	_duel_version = 1 if result.get("duel_version") == 1 else 0
+	duel.enabled = _duel_version == 1
+	if not duel.enabled: duel.clear()
 	appearances = {}
 	_population_version = 1 if result.get("population_version") == 1 else 0
 	socket = WebSocketPeer.new()
@@ -178,12 +198,11 @@ func _process(_delta: float) -> void:
 		_failed("TIMEOUT", true)
 		return
 	if socket == null: return
+	var polled_socket := socket
 	socket.poll()
-	if socket.get_ready_state() == WebSocketPeer.STATE_CLOSED:
-		_failed("DISCONNECTED", true)
-		return
-	if socket.get_ready_state() != WebSocketPeer.STATE_OPEN: return
-	if _state == "connecting":
+	var socket_state := socket.get_ready_state()
+	if socket_state not in [WebSocketPeer.STATE_OPEN, WebSocketPeer.STATE_CLOSING, WebSocketPeer.STATE_CLOSED]: return
+	if socket_state == WebSocketPeer.STATE_OPEN and _state == "connecting":
 		_state = "syncing"
 		_seq = 0
 		_input_seq = 0
@@ -197,7 +216,7 @@ func _process(_delta: float) -> void:
 		_heartbeat = now
 		_last_received = now
 	for _packet in 64:
-		if socket == null or socket.get_available_packet_count() == 0: break
+		if socket != polled_socket or socket.get_available_packet_count() == 0: break
 		var raw := socket.get_packet()
 		_last_received = now
 		if not socket.was_string_packet():
@@ -213,6 +232,17 @@ func _process(_delta: float) -> void:
 		if raw.size() > 32768 and data.get("type") != "world.appearance":
 			_failed("INVALID_PACKET"); return
 		_receive(data, raw)
+	# A transfer receipt and the old room's close can arrive in the same poll.
+	# Consume queued receipts/errors before deciding whether the close was unexpected.
+	if socket != polled_socket: return
+	if socket_state == WebSocketPeer.STATE_CLOSED:
+		if socket.get_available_packet_count() > 0: return
+		if world_ready and pve.pending() and OnlineAccount.pending_pve.command.action in ["transfer", "ai_travel"]:
+			# A lost receipt is still pending. Rejoin and replay its UUID to confirm the outcome.
+			_reconnect_map()
+		else: _failed("DISCONNECTED", true)
+		return
+	if socket_state != WebSocketPeer.STATE_OPEN: return
 	if socket != null and now - _heartbeat >= 3.0:
 		socket.send_text(JSON.stringify({"type": "ping"}))
 		_heartbeat = now
@@ -220,6 +250,7 @@ func _process(_delta: float) -> void:
 	if socket != null and now - _last_received > 12.0: _failed("HEARTBEAT_TIMEOUT", true)
 	chat.enabled = world_ready
 	chat.tick()
+	duel.tick()
 	if pve.ready and pve.pending() and now - pve.sent_at > 8.0: _failed("TIMEOUT", true)
 	_flush_motion()
 
@@ -230,6 +261,7 @@ func _exchange_packet() -> Dictionary:
 	if _pve_version == 1: packet.pve_version = 1
 	if _maps_version in [1, 2]: packet.maps_version = _maps_version
 	if _shop_version in [1,2]: packet.shop_version = _shop_version
+	if _duel_version == 1: packet.duel_version = 1
 	return packet
 
 static func _decimal(value: Variant) -> bool:
@@ -260,10 +292,14 @@ func _entity(value: Variant) -> bool:
 
 func _receive(data: Dictionary, raw: PackedByteArray) -> void:
 	var kind: Variant = data.get("type")
+	if kind in ["duel.state", "duel.result"]:
+		if not world_ready or _duel_version != 1 or not duel.receive(data): _failed("INVALID_DUEL")
+		return
 	if kind == "error":
 		var code := String(data.get("code", "SERVER_ERROR"))
-		if code in ["INVALID_TARGET", "STALE_INPUT", "RATE_LIMITED", "BATTLE_ACTIVE"]:
-			status_changed.emit("战斗中暂不能移动。" if code == "BATTLE_ACTIVE" else "目标不可达或操作过快，请重试。")
+		if code in ["INVALID_TARGET", "STALE_INPUT", "RATE_LIMITED", "BATTLE_ACTIVE","TEAM_BATTLE_ACTIVE"]:
+			if code=="TEAM_BATTLE_ACTIVE":_pending_motion.clear()
+			status_changed.emit("战斗中暂不能移动。" if code in ["BATTLE_ACTIVE","TEAM_BATTLE_ACTIVE"] else "目标不可达或操作过快，请重试。")
 		else: _failed(code, code in ["DATABASE_UNAVAILABLE", "SERVER_BUSY", "WORLD_STREAM_LAGGED"])
 		return
 	if kind == "pong": return
@@ -272,9 +308,9 @@ func _receive(data: Dictionary, raw: PackedByteArray) -> void:
 			_failed("INVALID_APPEARANCE"); return
 		for id in data.looks:
 			var look: Variant = data.looks[id]
-			if not _uuid(id) or not look is Array or look.size() != (3 if _shop_version==2 else 2) or not _integer(look[0],0,27 if _shop_version==2 else 3) or not _integer(look[1],0,11 if _shop_version==2 else 2):
+			if not _uuid(id) or not look is Array or look.size() != (3 if _shop_version==2 else 2):
 				_failed("INVALID_APPEARANCE"); return
-			if _shop_version==2 and not _integer(look[2],0,9):
+			if (_shop_version==2 and not ShopRules.valid_appearance(look)) or (_shop_version==1 and (not _integer(look[0],0,3) or not _integer(look[1],0,2))):
 				_failed("INVALID_APPEARANCE"); return
 		var removed: Variant = data.get("removed",[])
 		if not removed is Array or removed.size()>1000:
@@ -439,11 +475,12 @@ func stop_moving() -> void:
 	_send_motion("world.stop")
 
 func _send_motion(kind: String, target: Array = []) -> void:
-	if not world_ready or pve.active() or pve.pending(): return
+	if not world_ready or pve.active() or pve.pending() or duel.active() or team_active: return
 	_pending_motion = {"type": kind, "target": target.duplicate()}
 	_flush_motion()
 
 func _flush_motion() -> void:
+	if duel.active() or team_active: _pending_motion.clear(); return
 	var now := Time.get_unix_time_from_system()
 	if not world_ready or socket == null or socket.get_ready_state() != WebSocketPeer.STATE_OPEN or _pending_motion.is_empty() or now - _last_input_at < 0.1: return
 	var intent := _pending_motion

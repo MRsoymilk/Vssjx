@@ -1,10 +1,14 @@
 pub mod shop;
+pub mod social;
+pub mod team_rules;
+pub mod teams;
 pub mod skills;
 pub mod auth;
 pub mod attributes;
 pub mod announcements;
 pub mod characters;
 pub mod chat;
+mod chat_admin;
 pub mod config;
 pub mod logging;
 mod monitor;
@@ -16,6 +20,7 @@ pub mod population;
 pub mod ai_world;
 pub mod pve_rules;
 pub mod pve;
+pub mod duel;
 pub mod world;
 pub mod world_map;
 pub mod world_replication;
@@ -111,6 +116,8 @@ pub fn apps(
         .route("/api/v1/auth/logout", post(auth::logout))
         .route("/api/v1/world/ticket", post(world::ticket))
         .route("/api/v1/world/ws", get(world::upgrade))
+        .route("/api/v1/social", post(social::command))
+        .route("/api/v1/teams", post(teams::command))
         .route(
             "/api/v1/characters",
             get(characters::list).post(characters::create),
@@ -180,6 +187,7 @@ async fn server_info(State(state): State<Arc<AppState>>) -> impl axum::response:
                     "character_creation",
                     "shared_world",
                     "public_chat",
+                    "social_v1",
                 ]
             } else {
                 vec![]

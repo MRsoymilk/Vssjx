@@ -93,13 +93,14 @@ func _render(follow: bool = false) -> void:
 	history.clear()
 	var count := 0
 	for entry in entries:
-		if selected_filter != "all" and entry.channel != selected_filter: continue
+		var channel: String = "system" if entry.get("system", false) else entry.channel
+		if selected_filter != "all" and channel != selected_filter: continue
 		if count > 0: history.add_text("\n")
 		count += 1
-		history.push_color(Color("9470a6") if entry.channel == "public" else Color("af6a47"))
-		history.add_text("[%s] " % public_caption if entry.channel == "public" else "[系统] ")
+		history.push_color(Color("9470a6") if channel == "public" else Color("af6a47"))
+		history.add_text("[%s] " % public_caption if channel == "public" else "[系统] ")
 		history.pop()
-		if entry.channel == "public":
+		if channel == "public":
 			history.push_color(Color("597e7d"))
 			history.add_text(entry.display_name + "：")
 			history.pop()

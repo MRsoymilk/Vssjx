@@ -1,8 +1,14 @@
 # 公网 Docker 部署：Ubuntu/Debian，只有公网 IP
 
+[部署导航](README.md) · [服务端配置](../server/README.md) · [网页入口](WEB.md)
+
+本指南面向自行部署，示例 IP、目录和凭据占位须按环境替换。执行前核验备份恢复、候选版本兼容及 [资源许可](../docs/asset-provenance.md)；已有服务器先阅读更新与数据保留要求，不应从头覆盖配置。
+
 本方案部署游戏后端。PostgreSQL、Rust、Nginx和Certbot均在Docker中运行；宿主机只需要Docker Engine、Compose v2及定时任务。游戏客户端仍单独运行，Web游戏的静态导出另见`WEB.md`。
 
 适用于常规rootful Linux Docker Engine。游戏与Nginx使用host网络，Rust绑定127.0.0.1:8080，监控绑定127.0.0.1:9090，PostgreSQL仍通过现有Compose仅发布127.0.0.1:5432。Nginx对外提供80/443。host网络不使用ports映射，也不适用于未启用host网络支持的Docker Desktop或rootless Docker。
+
+基础方案只发布后端；需要网页时叠加 [网页覆盖配置](#同时迁移已有网页客户端)。部署始终保持单游戏写进程，不通过增加副本实现集群。
 
 来源：Docker [host网络](https://docs.docker.com/engine/network/drivers/host/)、[启动与健康依赖](https://docs.docker.com/compose/how-tos/startup-order/)。
 
@@ -177,4 +183,4 @@ python tests/check_public_deployment.py --nginx --context --openssl /usr/bin/ope
 
 检查仅使用独立临时配置、假数据库参数、测试证书与唯一名称的容器/镜像，不读取私有`.env`，不启动现有Compose服务、不请求公网证书、不修改系统信任。
 
-2026-10-18：25项检查通过，覆盖Compose合并与私有监听、三份真实Nginx配置解析、续期脚本语法、USTC构建参数，以及实际Docker构建上下文的白名单隔离。已在Ubuntu 22.04 x86_64服务器使用Debian基础镜像和USTC工具链完成Rust构建、数据库迁移、公网HTTPS与WebSocket检查，并通过证书模拟续期。迁移校验及运行记录见`../tests/public_server_migration.md`。
+2026-10-18 的 Compose、Nginx、续期与构建上下文检查，以及 Ubuntu 公网迁移和运行事实见 [公网迁移记录](../tests/public_server_migration.md)。历史结果只对应记录版本与环境，不表示当前候选版本已再次部署或通过容量验收。

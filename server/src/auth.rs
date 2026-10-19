@@ -276,6 +276,29 @@ impl AuthService {
         }
     }
 
+    pub(crate) fn admit_social(&self, account_id: Uuid) -> Result<(), AuthError> {
+        let mut limiter = self.limiter.lock().map_err(|_| busy())?;
+        if limiter.admit_keys(vec![(format!("social:{account_id}"), 60)]) {
+            Ok(())
+        } else {
+            Err(AuthError(StatusCode::TOO_MANY_REQUESTS, "RATE_LIMITED"))
+        }
+    }
+    pub(crate) fn admit_team(&self, ip:IpAddr,account:Option<Uuid>)->Result<(),AuthError>{
+        let keys=account.map_or_else(||vec![("team:global".into(),120000),(format!("team:ip:{ip}"),60000)],|id|vec![(format!("team:account:{id}"),240)]);
+        if self.limiter.lock().map_err(|_|busy())?.admit_keys(keys){Ok(())}else{Err(AuthError(StatusCode::TOO_MANY_REQUESTS,"RATE_LIMITED"))}
+    }
+
+    pub(crate) fn admit_social_peer(&self, ip: IpAddr) -> Result<(), AuthError> {
+        let mut limiter = self.limiter.lock().map_err(|_| busy())?;
+        // Polling behind one NAT/tunnel must not exhaust the stricter login budget.
+        if limiter.admit_keys(vec![("social:global".into(), 6000), (format!("social:ip:{ip}"), 600)]) {
+            Ok(())
+        } else {
+            Err(AuthError(StatusCode::TOO_MANY_REQUESTS, "RATE_LIMITED"))
+        }
+    }
+
     pub(crate) fn admit_http_audit(&self, account: Option<Uuid>) -> bool {
         let (key, limit) = account.map_or(("security-audit:global".to_owned(), 120), |id|(format!("security-audit:{id}"),20));
         self.limiter.lock().is_ok_and(|mut limiter|limiter.admit_keys(vec![(key,limit)]))

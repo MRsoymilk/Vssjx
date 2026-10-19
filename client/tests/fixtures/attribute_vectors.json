@@ -1,5 +1,5 @@
 [
-  {"job":1,"level":1,"equipped":true,"allocated":[1,0,3,1,0],"stats":{"hp":109,"mp":45,"attack":35,"defense":5},"physical_attack":35,"magic_attack":29,"recommended":[1,0,3,1,0],"available":0},
-  {"job":0,"level":3,"equipped":true,"allocated":[2,3,1,4,5],"stats":{"hp":174,"mp":76,"attack":37,"defense":26},"physical_attack":37,"magic_attack":41,"recommended":[2,3,1,4,5],"available":0},
-  {"job":2,"level":2,"equipped":false,"allocated":[1,2,1,1,0],"stats":{"hp":113,"mp":83,"attack":30,"defense":6},"physical_attack":28,"magic_attack":30,"recommended":[2,5,1,1,1],"available":5}
+  {"job":1,"level":1,"equipped":true,"allocated":[1,0,3,1,0],"stats":{"hp":109,"mp":45,"attack":35,"defense":5},"physical_attack":35,"magic_attack":29,"physical_crit":1,"magic_crit":1,"recommended":[1,0,3,1,0],"available":0},
+  {"job":0,"level":3,"equipped":true,"allocated":[2,3,1,4,5],"stats":{"hp":174,"mp":76,"attack":37,"defense":26},"physical_attack":37,"magic_attack":41,"physical_crit":4,"magic_crit":4,"recommended":[2,3,1,4,5],"available":0},
+  {"job":2,"level":2,"equipped":false,"allocated":[1,2,1,1,0],"stats":{"hp":113,"mp":83,"attack":30,"defense":6},"physical_attack":28,"magic_attack":30,"physical_crit":1,"magic_crit":1,"recommended":[2,5,1,1,1],"available":5}
 ]

@@ -1,5 +1,11 @@
 # 原包商城与完整物品接入
 
+[返回设计索引](README.md) · [数据工具](../docs/data-tools.md) · [装备制作流程](ai-equipment-art.md)
+
+性质：**当前商城规则与原包证据说明**。当前目录共 334 项：208 个原包图标对应的重建物品、6 个兼容物品，以及两系列各 60 件新装备。新增系列见 [骨甲幽光](boneglow-equipment.md) 和 [冥林异装](gravebloom-equipment.md)，不计入原包恢复数量。
+
+## 资源与重建边界
+
 原版证据见 `analysis/recovery/shop/native_shop.json`：`shop.str` 的商城标题和热卖、奇珍、炼制、仙丹页签，`gameonline.ext` 的两列商品、28×32 图标、112×38 单元格、五行可见区和调色板。游戏界面沿用该结构，增加分类、数量、装备及试穿操作。
 
 `client/assets/data/shop-v2.json` 覆盖 `original_items.json` 的全部 208 个原包图标（56 兵器、81 装备、71 其他），另保留旧存档的六个物品 ID。支持原版十个装备位置；药品分气血、灵力及双恢复，另分药材、宝石、配方、材料、特殊物品。材料目前可买入、堆叠及丢弃，尚无炼制配方执行功能。

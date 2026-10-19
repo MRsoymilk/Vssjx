@@ -25,8 +25,8 @@ border_width_right = 1
 border_width_top = 1
 border_width_bottom = 1
 [sub_resource type="StyleBoxFlat" id="Input"]
-content_margin_left = 3.0
-content_margin_right = 3.0
+content_margin_left = 5.0
+content_margin_right = 5.0
 content_margin_top = 1.0
 content_margin_bottom = 1.0
 bg_color = Color(0.160784, 0.301961, 0.454902, 1)
@@ -103,7 +103,7 @@ theme_override_styles/panel = SubResource("Blue")
 offset_left = 5.0
 offset_top = 2.0
 offset_right = 289.0
-offset_bottom = 30.0
+offset_bottom = 25.0
 theme_override_font_sizes/normal_font_size = 10
 theme_override_colors/default_color = Color(1, 0.960784, 0.862745, 1)
 bbcode_enabled = false
@@ -111,10 +111,13 @@ scroll_following = true
 selection_enabled = true
 
 [node name="ChatInput" type="LineEdit" parent="Chat"]
+anchor_top = 1.0
+anchor_bottom = 1.0
 offset_left = 5.0
-offset_top = 33.0
+offset_top = -28.0
 offset_right = 221.0
-offset_bottom = 52.0
+offset_bottom = -5.0
+grow_vertical = 0
 theme_override_font_sizes/font_size = 10
 theme_override_colors/font_color = Color(1, 0.972549, 0.772549, 1)
 theme_override_colors/caret_color = Color(1, 0.972549, 0.772549, 1)
@@ -124,10 +127,13 @@ placeholder_text = "公共频道：输入消息…"
 max_length = 120
 
 [node name="ChatSend" type="Button" parent="Chat"]
+anchor_top = 1.0
+anchor_bottom = 1.0
 offset_left = 269.0
-offset_top = 33.0
+offset_top = -28.0
 offset_right = 315.0
-offset_bottom = 52.0
+offset_bottom = -5.0
+grow_vertical = 0
 focus_mode = 0
 theme_override_font_sizes/font_size = 10
 theme_override_colors/font_color = Color(0.945098, 0.894118, 0.172549, 1)
@@ -138,10 +144,13 @@ theme_override_styles/focus = SubResource("Empty")
 text = "发送"
 
 [node name="ChatEmotes" type="Button" parent="Chat"]
+anchor_top = 1.0
+anchor_bottom = 1.0
 offset_left = 227.0
-offset_top = 33.0
+offset_top = -28.0
 offset_right = 265.0
-offset_bottom = 52.0
+offset_bottom = -5.0
+grow_vertical = 0
 focus_mode = 0
 tooltip_text = "选择内置表情"
 theme_override_font_sizes/font_size = 10
@@ -157,6 +166,7 @@ icon = ExtResource("Smile")
 [node name="EmotePicker" parent="Chat" instance=ExtResource("Emotes")]
 
 [node name="Expand" type="Button" parent="Chat"]
+texture_filter = 2
 offset_left = 294.0
 offset_top = 3.0
 offset_right = 316.0
@@ -164,8 +174,11 @@ offset_bottom = 25.0
 focus_mode = 0
 tooltip_text = "展开聊天"
 icon = ExtResource("ExpandArrow")
+icon_alignment = 1
+expand_icon = true
 theme_override_styles/normal = SubResource("ExpandButton")
 theme_override_styles/hover = SubResource("ExpandHover")
 theme_override_styles/pressed = SubResource("ExpandHover")
 theme_override_constants/h_separation = 0
+theme_override_constants/icon_max_width = 16
 [node name="ExpandedChat" parent="." instance=ExtResource("ExpandedChat")]

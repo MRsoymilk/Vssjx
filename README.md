@@ -7,7 +7,8 @@
 <p align="center">以经典像素剑侠世界为起点，用 Godot 与 Rust 重新构建的回合制 RPG。</p>
 
 <p align="center">
-  <a href="https://47.93.114.190/">网页体验</a> ·
+  <a href="https://47.93.114.190/">项目门户</a> ·
+  <a href="https://47.93.114.190/webgame/">网页体验</a> ·
   <a href="https://47.93.114.190/downloads/vssjx-arm64.apk">Android 预览版</a> ·
   <a href="#快速开始">快速开始</a> ·
   <a href="design/README.md">设计文档</a> ·
@@ -30,6 +31,8 @@
 - **开发工具**：独立桌面数据浏览器、世界总图和可重复执行的素材转换工具。
 
 以上为当前源码能力，不保证体验服已部署所有最新功能。网页与 ARM64 APK 的发布基线见 [2026-10-18 发布说明](tests/release_20261018.md)，后续网页聊天更新见 [聊天管理发布记录](tests/chat_moderation.md)。手机真机兼容、完整混合负载与公网长稳仍需分别验证，不将短时连接测试表述为千人完整玩法验收。
+
+2026-10-19 仅更新了门户和网页入口：游戏移至 `/webgame/`，原游戏包、APK、后端和数据库保持不变，见 [门户发布记录](tests/portal_release_20261019.md)。
 
 ## 快速开始
 

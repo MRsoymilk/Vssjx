@@ -12,7 +12,7 @@
 | 社交与多人战斗 | [社交](social.md)、[组队](teams.md)、[决斗](player_duels.md) |
 | 平台与网页 | [平台基础](platform_interface.md)、[主游戏 Web](web_game.md)、[浏览器存储](web_storage.md) |
 | 素材与桌面工具 | [数据浏览](data_browser.md)、[游戏导出边界](game_export.md) |
-| 公网历史发布 | [发布基线](release_20261018.md)、[后续聊天管理](chat_moderation.md) |
+| 公网历史发布 | [发布基线](release_20261018.md)、[后续聊天管理](chat_moderation.md)、[仅门户发布](portal_release_20261019.md) |
 
 文档变更可只运行相关静态检查，不要求启动数据库、导出产物或部署服务。以下保留各阶段的具体入口，选择与修改范围对应的回归。
 

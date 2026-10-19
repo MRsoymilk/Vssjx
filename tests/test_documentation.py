@@ -13,7 +13,7 @@ DOCUMENTS = [
     *sorted((ROOT / 'design').glob('*.md')),
     *sorted((ROOT / 'deploy').glob('*.md')),
     *(ROOT / 'tests' / name for name in (
-        'documentation.md', 'player_duels.md', 'social.md', 'teams.md', 'testing.md', 'portal_navigation.md',
+        'documentation.md', 'player_duels.md', 'social.md', 'teams.md', 'testing.md', 'portal_navigation.md', 'portal_release_20261019.md',
     )),
 ]
 

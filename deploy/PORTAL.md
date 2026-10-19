@@ -2,7 +2,7 @@
 
 [部署导航](README.md) · [设计说明](../design/portal-navigation.md) · [验证记录](../tests/portal_navigation.md)
 
-本指南为候选变更的操作说明，**不表示公网已经切换**。适用于已有公网 HTTPS + Web Compose 部署；需要另外取得部署授权后才在服务器执行。独立本机／LAN 模板不自动启用这些路由。
+本指南说明已有公网 HTTPS + Web Compose 部署的切换与回退。2026-10-19 已完成一次仅门户发布，事实与验收见 [发布记录](../tests/portal_release_20261019.md)；这不自动授权后续部署。独立本机／LAN 模板不自动启用这些路由。
 
 ## 1. 不改变的部分
 

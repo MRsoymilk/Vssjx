@@ -30,6 +30,9 @@ func _ready() -> void:
 	%Categories.item_selected.connect(_category_selected)
 	%Search.text_changed.connect(func(_text: String) -> void: _fill_list())
 	%StatusFilter.item_selected.connect(func(_index: int) -> void: _fill_list())
+	%EquipmentSlotFilter.item_selected.connect(func(_index: int) -> void: _fill_list())
+	for index in ShopRules.SLOTS.size():
+		%EquipmentSlotFilter.set_item_metadata(index + 1, ShopRules.SLOTS[index])
 	%Records.item_selected.connect(_record_selected)
 	%Refresh.pressed.connect(reload_data)
 	%Copy.pressed.connect(func() -> void:
@@ -112,6 +115,7 @@ func _category_selected(index: int) -> void:
 	category = %Categories.get_item_metadata(index)
 	%Search.text = ""
 	%StatusFilter.select(0)
+	%EquipmentSlotFilter.select(0)
 	_fill_list()
 
 func _fill_list(preferred_id: String = "") -> void:
@@ -132,7 +136,11 @@ func _fill_list(preferred_id: String = "") -> void:
 		%Context.text = "原包 %d 份特效动画，按原始序列播放；名称和技能对应关系尚未恢复，不等同于已接入技能。" % catalog.find("effects").size()
 	elif category == "archive":
 		%Context.text = "全部 %d 条：已解析 %d · 部分解析 %d · 未解析 %d · 解析失败 %d。只要有原始条目就保留，不因不能预览而省略。" % [catalog.find("archive").size(), catalog.find("archive", "", "已解析").size(), catalog.find("archive", "", "部分解析").size(), catalog.find("archive", "", "未解析").size(), catalog.find("archive", "", "解析失败").size()]
-	visible_entries = catalog.find(category, %Search.text, %StatusFilter.get_item_text(%StatusFilter.selected))
+	%EquipmentSlotFilter.visible = category in ["equipment", "appearance", "weapons", "items"]
+	var slot := ""
+	if %EquipmentSlotFilter.visible and %EquipmentSlotFilter.selected > 0:
+		slot = %EquipmentSlotFilter.get_item_metadata(%EquipmentSlotFilter.selected)
+	visible_entries = catalog.find(category, %Search.text, %StatusFilter.get_item_text(%StatusFilter.selected), slot)
 	%Count.text = "%d / %d 条" % [visible_entries.size(), catalog.find(category).size()]
 	%Records.clear()
 	var root: TreeItem = %Records.create_item()

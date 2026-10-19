@@ -324,11 +324,22 @@ func _read_json(path: String) -> Dictionary:
 func _add(category: String, id: String, title: String, summary: String, status: String, source: String, data: Dictionary, preview: Dictionary = {}) -> void:
 	entries.append({"category": category, "id": id, "name": title, "summary": summary, "status": status, "source": source, "data": data, "preview": preview})
 
-func find(category: String, query: String = "", status: String = "全部") -> Array[Dictionary]:
+func equipment_slot(entry: Dictionary) -> String:
+	# Original evidence keeps its unknown fields; classify using the current shop mapping.
+	var data: Dictionary = entry.get("data", {})
+	if data.has("槽位序号"):
+		var index := int(data["槽位序号"])
+		return ShopRules.SLOTS[index] if index >= 0 and index < ShopRules.SLOTS.size() else ""
+	var item := ShopRules.item(entry.get("preview", {}).get("equipment_id", ""))
+	var slot: String = item.get("slot", data.get("slot", ""))
+	return slot if slot in ShopRules.SLOTS else ""
+
+func find(category: String, query: String = "", status: String = "全部", slot: String = "") -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
 	var words := query.strip_edges().to_lower().split(" ", false)
 	for entry in entries:
 		if entry.category != category or (status != "全部" and entry.status != status): continue
+		if not slot.is_empty() and equipment_slot(entry) != slot: continue
 		if words.is_empty():
 			result.append(entry)
 			continue

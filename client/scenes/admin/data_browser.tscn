@@ -114,8 +114,43 @@ size_flags_horizontal = 3
 placeholder_text = "搜索名称、ID、属性…"
 clear_button_enabled = true
 
-[node name="StatusFilter" type="OptionButton" parent="Margin/Layout/Body/Split/Listing/SearchBar"]
+[node name="FilterBar" type="HBoxContainer" parent="Margin/Layout/Body/Split/Listing"]
+theme_override_constants/separation = 8
+
+[node name="EquipmentSlotFilter" type="OptionButton" parent="Margin/Layout/Body/Split/Listing/FilterBar"]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(112, 32)
+size_flags_horizontal = 3
+tooltip_text = "按当前装备规则筛选部位；原包资源沿用现行重建映射。可与关键词、状态组合筛选。"
+item_count = 11
+selected = 0
+popup/item_0/text = "全部部位"
+popup/item_0/id = 0
+popup/item_1/text = "武器"
+popup/item_1/id = 1
+popup/item_2/text = "腰佩"
+popup/item_2/id = 2
+popup/item_3/text = "衣服"
+popup/item_3/id = 3
+popup/item_4/text = "手腕"
+popup/item_4/id = 4
+popup/item_5/text = "腰带"
+popup/item_5/id = 5
+popup/item_6/text = "裤子"
+popup/item_6/id = 6
+popup/item_7/text = "鞋子"
+popup/item_7/id = 7
+popup/item_8/text = "戒指"
+popup/item_8/id = 8
+popup/item_9/text = "项链"
+popup/item_9/id = 9
+popup/item_10/text = "帽子"
+popup/item_10/id = 10
+
+[node name="StatusFilter" type="OptionButton" parent="Margin/Layout/Body/Split/Listing/FilterBar"]
+unique_name_in_owner = true
+size_flags_horizontal = 3
+tooltip_text = "按条目状态筛选"
 item_count = 14
 selected = 0
 popup/item_0/text = "全部"
@@ -160,7 +195,7 @@ hide_folding = true
 unique_name_in_owner = true
 visible = false
 size_flags_vertical = 3
-text = "没有匹配的数据\n试试其他关键词或状态筛选"
+text = "没有匹配的数据\n试试其他关键词、部位或状态"
 horizontal_alignment = 1
 vertical_alignment = 1
 

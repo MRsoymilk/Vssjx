@@ -1,8 +1,12 @@
 # 网页入口
 
+[部署导航](README.md) · [公网 Docker](PUBLIC.md) · [平台方案](../design/platform_interface.md)
+
+本指南分别覆盖本机回环、局域网 HTTPS 与公网同源部署。按一个目标环境操作；示例目录、IP、域名及工具路径需替换，不需要把所有方案依次执行。
+
 网页入口与已运行的 Rust 游戏服务分开部署。Nginx 只挂载 Web 导出的 `public/`，同源转发 `/api/v1/` 到游戏监听，支持 WebSocket 升级。数据库、`.env`、源代码、PC 管理页面和 9090 监控不发布。
 
-## 当前电脑
+## 本机开发
 
 用 Godot 4.7.2 及匹配模板生成本机测试包：
 
@@ -15,13 +19,13 @@ python tools/export_web.py --output work/builds/web-local --template work/web-to
 创建不提交的 `work/web-deploy.local.env`，按实际位置填写：
 
 ```dotenv
-SSJX_WEB_ROOT=F:/project/Vssjx/work/builds/web-local/public
+SSJX_WEB_ROOT=C:/workspace/Vssjx/work/builds/web-local/public
 SSJX_WEB_BIND_ADDR=127.0.0.1
 SSJX_WEB_PORT=8000
 SSJX_WEB_UPSTREAM=http://host.docker.internal:8080
 ```
 
-在服务端私有 `.env` 中将这两个来源合并到 `SSJX_WEB_DEV_ORIGINS`，保留已有来源：
+上例是 Windows Docker Desktop 路径与上游示例；按实际检出位置修改 `SSJX_WEB_ROOT`。Linux 宿主机上游可达性见公网部分，不照搬 `host.docker.internal` 与回环监听组合。在服务端私有 `.env` 中将这两个来源合并到 `SSJX_WEB_DEV_ORIGINS`，保留已有来源：
 
 ```dotenv
 SSJX_WEB_DEV_ORIGINS=http://127.0.0.1:8000,http://localhost:8000
@@ -45,7 +49,7 @@ docker compose --env-file work/web-deploy.local.env -f deploy/web.compose.yaml p
 先确认当前电脑的局域网 IPv4，例如 `192.168.1.6`，用 OpenSSL 生成仅本机持有的开发 CA 和 90 天服务端证书：
 
 ```powershell
-python tools/prepare_lan_https.py --ip 192.168.1.6 --output work/web-deploy/lan-cert --openssl F:/Git/usr/bin/openssl.exe
+python tools/prepare_lan_https.py --ip 192.168.1.6 --output work/web-deploy/lan-cert --openssl C:/Tools/Git/usr/bin/openssl.exe
 ```
 
 按本机实际 OpenSSL 路径调整。工具拒绝覆盖已有证书集；CA 私钥位于输出根目录，只有 `server/` 中的服务证书/私钥和 `public/` 中的公开证书/安装页会分别挂载到容器。保护 CA 私钥，仅让部署用户及系统读取，不能把输出目录提交 Git 或作为网页根目录。
@@ -54,7 +58,7 @@ python tools/prepare_lan_https.py --ip 192.168.1.6 --output work/web-deploy/lan-
 
 ```dotenv
 SSJX_LAN_IP=192.168.1.6
-SSJX_LAN_DIR=F:/project/Vssjx/work/web-deploy/lan-cert
+SSJX_LAN_DIR=C:/workspace/Vssjx/work/web-deploy/lan-cert
 SSJX_LAN_TLS_PORT=8443
 SSJX_LAN_SETUP_PORT=8001
 ```
@@ -89,7 +93,7 @@ Import-Certificate -FilePath work/web-deploy/lan-cert/public/vssjx-lan-ca.cer -C
 
 这里只部署单个游戏进程的网页入口，不构成集群或并发容量验收。
 
-WebSocket 配置依据 [Nginx 官方代理说明](https://nginx.org/en/docs/http/websocket.html)，缺失文件处理依据 [try_files 文档](https://nginx.org/en/docs/http/ngx_http_core_module.html#try_files)。本机检查记录见 `tests/web_deployment.md`。
+WebSocket 配置依据 [Nginx 官方代理说明](https://nginx.org/en/docs/http/websocket.html)，缺失文件处理依据 [try_files 文档](https://nginx.org/en/docs/http/ngx_http_core_module.html#try_files)。本机检查见 [网页部署验证](../tests/web_deployment.md)，公网历史事实见 [发布基线](../tests/release_20261018.md) 和 [后续聊天更新](../tests/chat_moderation.md)。
 
 ## 网页加载与静态资源缓存
 
@@ -100,7 +104,7 @@ WebSocket 配置依据 [Nginx 官方代理说明](https://nginx.org/en/docs/http
 Cloudflare 默认缓存扩展名不包含 `.wasm`、`.pck`，仅发送 Cache-Control 不能证明 CDN 已命中缓存。需在域名的 **缓存 → 缓存规则** 创建仅针对游戏静态目录的规则，例如：
 
 ```text
-(http.host eq "ssjx.soymilk.xin" and starts_with(http.request.uri.path, "/assets/"))
+(http.host eq "game.example.com" and starts_with(http.request.uri.path, "/assets/"))
 ```
 
 设置缓存资格为“符合缓存条件”，遵循源站 Cache-Control。不要将 `/api/v1/`、账号或 WebSocket 纳入此规则。通过响应 `CF-Cache-Status: HIT` 验证，不以本机测试代替公网命中结果。官方依据：[默认缓存扩展名](https://developers.cloudflare.com/cache/concepts/default-cache-behavior/)、[缓存规则](https://developers.cloudflare.com/cache/how-to/cache-rules/)。

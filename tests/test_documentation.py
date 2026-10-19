@@ -13,7 +13,7 @@ DOCUMENTS = [
     *sorted((ROOT / 'design').glob('*.md')),
     *sorted((ROOT / 'deploy').glob('*.md')),
     *(ROOT / 'tests' / name for name in (
-        'documentation.md', 'player_duels.md', 'social.md', 'teams.md',
+        'documentation.md', 'player_duels.md', 'social.md', 'teams.md', 'testing.md',
     )),
 ]
 
@@ -24,6 +24,21 @@ def links(text):
                   flags=re.MULTILINE | re.DOTALL)
     return (re.findall(r'\]\(([^\s)]+)(?:\s+[^)]*)?\)', text)
             + re.findall(r'(?:src|href)="([^"]+)"', text))
+
+
+def heading_ids(text):
+    """Heading slugs used by the simple ATX headings in these documents."""
+    text = re.sub(r'^```[^\n]*\n.*?^```[^\n]*$', '', text,
+                  flags=re.MULTILINE | re.DOTALL)
+    counts = {}
+    result = set()
+    for title in re.findall(r'^#{1,6}\s+(.+?)\s*#*$', text, re.MULTILINE):
+        slug = re.sub(r'[^\w\- ]', '', title.lower()).replace(' ', '-')
+        number = counts.get(slug, 0)
+        counts[slug] = number + 1
+        result.add(f'{slug}-{number}' if number else slug)
+    result.update(re.findall(r'\bid="([^"]+)"', text))
+    return result
 
 
 class DocumentationTests(unittest.TestCase):
@@ -42,6 +57,19 @@ class DocumentationTests(unittest.TestCase):
             with self.subTest(source=source.relative_to(ROOT)):
                 fences = re.findall(r'^```', source.read_text('utf-8'), re.MULTILINE)
                 self.assertEqual(len(fences) % 2, 0)
+
+    def test_local_markdown_fragments_resolve(self):
+        for source in DOCUMENTS:
+            for link in links(source.read_text('utf-8')):
+                url = urlsplit(link)
+                if url.scheme or url.netloc or not url.fragment:
+                    continue
+                target = source.parent / unquote(url.path) if url.path else source
+                if target.suffix != '.md' or not target.is_file():
+                    continue  # Missing paths are reported by the link check.
+                with self.subTest(source=source.relative_to(ROOT), link=link):
+                    self.assertIn(unquote(url.fragment),
+                                  heading_ids(target.read_text('utf-8')))
 
     def test_homepage_reuses_existing_icon(self):
         text = (ROOT / 'README.md').read_text('utf-8')

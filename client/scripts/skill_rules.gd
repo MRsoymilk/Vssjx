@@ -43,6 +43,7 @@ static func valid_view(view:Variant,character:Dictionary)->bool:
 
 static func valid_state(state:Variant)->bool:
 	if not state is Dictionary or not state.get("last_skill") is String or not state.get("last_enemy_acted") is bool:return false
+	if state.has("last_critical") and not state.last_critical is bool:return false
 	if not state.last_skill.is_empty() and (item(state.last_skill).is_empty() or not item(state.last_skill).active):return false
 	var expected:=new_state(0,0,1)
 	for key in expected:
@@ -62,11 +63,13 @@ static func new_state(job:int,school:int,level:int,enemy_level:int=1)->Dictionar
 	return state
 
 static func reset_turn(state:Dictionary)->void:
+	state.erase("last_critical")
 	for key in ["last_damage","last_incoming","last_reflected","last_healed"]:state[key]=0
 	state.last_enemy_acted=false;state.last_skill=""
 
 static func critical(state:Dictionary,damage:int,roll:int)->int:
-	return damage*3/2 if int(state.crit)>0 and roll<int(state.crit_chance) else damage
+	state.last_critical=damage>0 and int(state.crit)>0 and roll<int(state.crit_chance)
+	return damage*3/2 if state.last_critical else damage
 
 static func cast(skill:Dictionary,state:Dictionary,stats:Dictionary,hp:int,mp:int,enemy_defense:int,roll:int)->Dictionary:
 	state.last_skill=skill.id

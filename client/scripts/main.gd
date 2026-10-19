@@ -1126,7 +1126,8 @@ func _battle_turn(command: String, skill_id:String="") -> void:
 		if int(result.damage) > 0 and battle_enemy.sprite_frames.has_animation("hurt"):
 			battle_enemy.play("hurt")
 		battle_effects.play_action(command,int(Game.player.job),skill_id,battle_hero,battle_enemy)
-		if int(result.damage)>0:_damage_number(int(result.damage), battle_enemy.position + Vector2(-3, -53))
+		battle_effects.number(battle_enemy,int(battle.skills.last_damage),battle.skills.get("last_critical",false))
+		battle_effects.number(battle_hero,int(battle.skills.last_healed),false,true)
 	_refresh_battle()
 	if player_motion != null:
 		await player_motion.completed
@@ -1149,10 +1150,10 @@ func _battle_turn(command: String, skill_id:String="") -> void:
 		var response := battle.resolve_enemy()
 		_battle_lines(response.lines)
 		if int(response.incoming) > 0 and battle_hero.sprite_frames.has_animation("hurt"): battle_hero.play("hurt")
-		_damage_number(int(response.incoming), battle_hero.position + Vector2(-10, -53))
+		battle_effects.number(battle_hero,int(response.incoming))
 		if int(response.reflected) > 0:
 			battle_effects.play_reflection(int(Game.player.job),int(Game.player.school),int(Game.player.level),battle.skills,false,battle_hero,battle_enemy)
-			_damage_number(int(response.reflected), battle_enemy.position + Vector2(-3, -53))
+			battle_effects.number(battle_enemy,int(response.reflected))
 		_refresh_battle()
 		await enemy_motion.completed
 		if epoch != _ui_epoch or enemy_motion.cancelled or mode != "battle" or battle != active_battle: return
@@ -1186,15 +1187,6 @@ func _battle_lines(lines: Array) -> void:
 	for line in lines: all_lines.append("[系统] " + String(line))
 	while all_lines.size() > 3: all_lines.remove_at(0)
 	battle_log.text = "\n".join(all_lines)
-
-func _damage_number(damage: int, point: Vector2) -> void:
-	var label := _label(ui, "-%d" % damage, Rect2(point, Vector2(74, 23)), 16, Color("e42712"))
-	label.add_theme_constant_override("outline_size", 2)
-	label.add_theme_color_override("font_outline_color", Color("39180b"))
-	var tween := create_tween()
-	tween.tween_property(label, "position:y", point.y - 17, 0.55)
-	tween.parallel().tween_property(label, "modulate:a", 0.0, 0.55)
-	tween.tween_callback(label.queue_free)
 
 func _toggle_auto() -> void:
 	if battle.finished or modal != null: return

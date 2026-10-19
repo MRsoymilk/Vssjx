@@ -173,6 +173,8 @@ func _play(event:Dictionary)->void:
 	motion.impact.connect(func()->void:
 		for hit in group:
 			var receiver:Dictionary=actors[hit.target]
+			effects.number(receiver.sprite,int(hit.damage),hit.get("critical",false))
+			effects.number(a.sprite if hit.actor!=hit.target and SkillRules.item(hit.get("skill","")).get("target")!="all_allies" else receiver.sprite,int(hit.healed),false,true)
 			if hit.action=="skill":effects.play_binding(hit.skill,"cast_impact",receiver.sprite if SkillRules.item(hit.skill).get("target")=="all_allies" else a.sprite,receiver.sprite)
 			if int(hit.damage)>0 and receiver.sprite.sprite_frames.has_animation("hurt"):receiver.sprite.play("hurt")
 	)

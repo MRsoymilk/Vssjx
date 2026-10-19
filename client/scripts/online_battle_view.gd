@@ -156,6 +156,10 @@ func _cancel_motion() -> void:
 func _hero_impact() -> void:
 	if _hero_motion == null or _hero_motion.cancelled: return
 	effects.play_action(model.last_action,int(model.state.character.job),String(model.state.battle.get("skills",{}).get("last_skill","")),hero,enemy)
+	var status:Dictionary=model.state.battle.get("skills",{})
+	var next_hp:=int(model.state.battle.enemy_hp)+int(status.get("last_reflected",0))
+	effects.number(enemy,int(status.get("last_damage",maxi(0,_shown_enemy_hp-next_hp))),status.get("last_critical",false))
+	effects.number(hero,int(status.get("last_healed",0)),false,true)
 	_shown_enemy_hp = int(model.state.battle.enemy_hp)+int(model.state.battle.get("skills",{}).get("last_reflected",0))
 	if _enemy_took_damage and enemy.sprite_frames.has_animation("hurt"): enemy.play("hurt")
 	$Hud/BattleEnemyHp.value = _shown_enemy_hp
@@ -171,6 +175,9 @@ func _start_enemy_motion() -> void:
 	_enemy_motion.impact.connect(func() -> void:
 		if _enemy_motion.cancelled: return
 		var took_damage := int(model.state.battle.hp) < _shown_hero_hp
+		var status:Dictionary=model.state.battle.get("skills",{})
+		effects.number(hero,int(status.get("last_incoming",maxi(0,_shown_hero_hp-int(model.state.battle.hp)))))
+		effects.number(enemy,int(status.get("last_reflected",0)))
 		_shown_hero_hp = int(model.state.battle.hp)
 		_shown_enemy_hp = int(model.state.battle.enemy_hp)
 		var character:Dictionary=model.state.character

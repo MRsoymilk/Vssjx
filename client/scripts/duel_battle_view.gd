@@ -112,6 +112,8 @@ func choose(action:String)->void:
 
 func _hero_impact()->void:
 	if _hero_motion==null or _hero_motion.cancelled:return
+	effects.number(enemy,int(_playing.get("damage",0)),_playing.get("critical",false))
+	effects.number(hero,int(_playing.get("reflected",0)))
 	effects.play_action(model.last_action,int(model.state.character.job),_playing.get("skill",""),hero,enemy)
 	if _enemy_took_damage and enemy.sprite_frames.has_animation("hurt"):enemy.play("hurt")
 	_shown_hero_hp=int(model.state.battle.hp);_shown_enemy_hp=int(model.state.battle.enemy_hp)
@@ -128,6 +130,8 @@ func _start_enemy_motion()->void:
 	_enemy_motion=BattleActionPlayback.new()
 	_enemy_motion.impact.connect(func()->void:
 		if _enemy_motion.cancelled:return
+		effects.number(hero,int(event.get("damage",0)),event.get("critical",false))
+		effects.number(enemy,int(event.get("reflected",0)))
 		effects.play_action(event.action,int(opponent.job),event.skill,enemy,hero)
 		if int(model.state.battle.hp)<_shown_hero_hp and hero.sprite_frames.has_animation("hurt"):hero.play("hurt")
 		_shown_hero_hp=int(model.state.battle.hp);_shown_enemy_hp=int(model.state.battle.enemy_hp)

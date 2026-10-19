@@ -5,6 +5,7 @@ extends Node2D
 static var catalog:Dictionary=JSON.parse_string(FileAccess.get_file_as_string("res://assets/data/skill-effects-v1.json"))
 var _attachments:Array[Dictionary]=[]
 var _sounds:Array[AudioStreamPlayer]=[]
+var _numbers:Array[Node2D]=[]
 signal audio_played(id:String)
 
 func _init()->void:
@@ -56,6 +57,16 @@ func play_reflection(job:int,school:int,level:int,state:Dictionary,magical:bool,
 		if not skill.active and skill.effect==("reflect_magic" if magical else "reflect_physical"):
 			play_binding(skill.id,"magic_reflect" if magical else "physical_reflect",hero,enemy)
 
+func number(subject:Node2D,amount:int,critical:bool=false,healed:bool=false)->Node2D:
+	if amount<=0 or not is_instance_valid(subject) or not subject.is_inside_tree():return null
+	var popup:Node2D=preload("res://scenes/ui/battle_hit_number.tscn").instantiate()
+	add_child(popup,false,Node.INTERNAL_MODE_BACK)
+	popup.position=get_global_transform_with_canvas().affine_inverse()*subject.get_global_transform_with_canvas().origin+Vector2(0,-53)
+	_numbers.append(popup)
+	popup.tree_exiting.connect(func()->void:_numbers.erase(popup))
+	popup.present(amount,critical,healed)
+	return popup
+
 func attach(key:String,subject:Node2D,sequence:int=0,anchor_offset:Vector2=Vector2.ZERO)->AnimatedSprite2D:
 	if not is_instance_valid(subject) or not subject.is_inside_tree() or subject.is_queued_for_deletion():return null
 	var sprite:=OriginalArt.effect(key,sequence)
@@ -84,6 +95,9 @@ func _process(_delta:float)->void:
 		else:_follow(sprite,subject,entry.offset)
 
 func clear()->void:
+	for popup in _numbers.duplicate():
+		if is_instance_valid(popup):popup.hide();popup.queue_free()
+	_numbers.clear()
 	for sound in _sounds:
 		if is_instance_valid(sound):sound.stop();sound.queue_free()
 	_sounds.clear()

@@ -2,6 +2,9 @@
 
 [ext_resource type="PackedScene" path="res://scenes/ui/original_number.tscn" id="Number"]
 
+[ext_resource type="Texture2D" path="res://assets/ui/attribute_minus.svg" id="MinusIcon"]
+[ext_resource type="Texture2D" path="res://assets/ui/attribute_plus.svg" id="PlusIcon"]
+
 [sub_resource type="StyleBoxFlat" id="Slot"]
 bg_color = Color(0.97, 0.87, 0.57, 1)
 
@@ -610,42 +613,34 @@ horizontal_alignment = 1
 
 [node name="Minus0" type="Button" parent="."]
 layout_mode = 0
-offset_left = 204.0
-offset_top = 218.0
-offset_right = 227.0
+offset_left = 201.0
+offset_top = 219.0
+offset_right = 225.0
 offset_bottom = 246.0
 focus_mode = 0
-theme_override_colors/font_color = Color(1, 0.91, 0.6, 1)
-theme_override_colors/font_hover_color = Color(1, 1, 0.8, 1)
-theme_override_colors/font_disabled_color = Color(0.72, 0.38, 0.24, 1)
-theme_override_colors/font_outline_color = Color(0.55, 0.3, 0.12, 1)
-theme_override_constants/outline_size = 1
-theme_override_font_sizes/font_size = 21
 theme_override_styles/normal = SubResource("Empty")
 theme_override_styles/hover = SubResource("Empty")
 theme_override_styles/pressed = SubResource("Empty")
 theme_override_styles/disabled = SubResource("Empty")
-text = "◀"
+icon = ExtResource("MinusIcon")
+icon_alignment = 1
+theme_override_colors/icon_disabled_color = Color(0.72, 0.45, 0.30, 0.7)
 disabled = true
 
 [node name="Plus0" type="Button" parent="."]
 layout_mode = 0
-offset_left = 271.0
-offset_top = 218.0
-offset_right = 294.0
+offset_left = 268.0
+offset_top = 219.0
+offset_right = 292.0
 offset_bottom = 246.0
 focus_mode = 0
-theme_override_colors/font_color = Color(1, 0.91, 0.6, 1)
-theme_override_colors/font_hover_color = Color(1, 1, 0.8, 1)
-theme_override_colors/font_disabled_color = Color(0.72, 0.38, 0.24, 1)
-theme_override_colors/font_outline_color = Color(0.55, 0.3, 0.12, 1)
-theme_override_constants/outline_size = 1
-theme_override_font_sizes/font_size = 21
 theme_override_styles/normal = SubResource("Empty")
 theme_override_styles/hover = SubResource("Empty")
 theme_override_styles/pressed = SubResource("Empty")
 theme_override_styles/disabled = SubResource("Empty")
-text = "▶"
+icon = ExtResource("PlusIcon")
+icon_alignment = 1
+theme_override_colors/icon_disabled_color = Color(0.72, 0.45, 0.30, 0.7)
 disabled = true
 
 [node name="Attribute1" type="Label" parent="."]
@@ -684,42 +679,34 @@ horizontal_alignment = 1
 
 [node name="Minus1" type="Button" parent="."]
 layout_mode = 0
-offset_left = 204.0
-offset_top = 249.0
-offset_right = 227.0
+offset_left = 201.0
+offset_top = 250.0
+offset_right = 225.0
 offset_bottom = 277.0
 focus_mode = 0
-theme_override_colors/font_color = Color(1, 0.91, 0.6, 1)
-theme_override_colors/font_hover_color = Color(1, 1, 0.8, 1)
-theme_override_colors/font_disabled_color = Color(0.72, 0.38, 0.24, 1)
-theme_override_colors/font_outline_color = Color(0.55, 0.3, 0.12, 1)
-theme_override_constants/outline_size = 1
-theme_override_font_sizes/font_size = 21
 theme_override_styles/normal = SubResource("Empty")
 theme_override_styles/hover = SubResource("Empty")
 theme_override_styles/pressed = SubResource("Empty")
 theme_override_styles/disabled = SubResource("Empty")
-text = "◀"
+icon = ExtResource("MinusIcon")
+icon_alignment = 1
+theme_override_colors/icon_disabled_color = Color(0.72, 0.45, 0.30, 0.7)
 disabled = true
 
 [node name="Plus1" type="Button" parent="."]
 layout_mode = 0
-offset_left = 271.0
-offset_top = 249.0
-offset_right = 294.0
+offset_left = 268.0
+offset_top = 250.0
+offset_right = 292.0
 offset_bottom = 277.0
 focus_mode = 0
-theme_override_colors/font_color = Color(1, 0.91, 0.6, 1)
-theme_override_colors/font_hover_color = Color(1, 1, 0.8, 1)
-theme_override_colors/font_disabled_color = Color(0.72, 0.38, 0.24, 1)
-theme_override_colors/font_outline_color = Color(0.55, 0.3, 0.12, 1)
-theme_override_constants/outline_size = 1
-theme_override_font_sizes/font_size = 21
 theme_override_styles/normal = SubResource("Empty")
 theme_override_styles/hover = SubResource("Empty")
 theme_override_styles/pressed = SubResource("Empty")
 theme_override_styles/disabled = SubResource("Empty")
-text = "▶"
+icon = ExtResource("PlusIcon")
+icon_alignment = 1
+theme_override_colors/icon_disabled_color = Color(0.72, 0.45, 0.30, 0.7)
 disabled = true
 
 [node name="Attribute2" type="Label" parent="."]
@@ -758,42 +745,34 @@ horizontal_alignment = 1
 
 [node name="Minus2" type="Button" parent="."]
 layout_mode = 0
-offset_left = 204.0
-offset_top = 280.0
-offset_right = 227.0
+offset_left = 201.0
+offset_top = 281.0
+offset_right = 225.0
 offset_bottom = 308.0
 focus_mode = 0
-theme_override_colors/font_color = Color(1, 0.91, 0.6, 1)
-theme_override_colors/font_hover_color = Color(1, 1, 0.8, 1)
-theme_override_colors/font_disabled_color = Color(0.72, 0.38, 0.24, 1)
-theme_override_colors/font_outline_color = Color(0.55, 0.3, 0.12, 1)
-theme_override_constants/outline_size = 1
-theme_override_font_sizes/font_size = 21
 theme_override_styles/normal = SubResource("Empty")
 theme_override_styles/hover = SubResource("Empty")
 theme_override_styles/pressed = SubResource("Empty")
 theme_override_styles/disabled = SubResource("Empty")
-text = "◀"
+icon = ExtResource("MinusIcon")
+icon_alignment = 1
+theme_override_colors/icon_disabled_color = Color(0.72, 0.45, 0.30, 0.7)
 disabled = true
 
 [node name="Plus2" type="Button" parent="."]
 layout_mode = 0
-offset_left = 271.0
-offset_top = 280.0
-offset_right = 294.0
+offset_left = 268.0
+offset_top = 281.0
+offset_right = 292.0
 offset_bottom = 308.0
 focus_mode = 0
-theme_override_colors/font_color = Color(1, 0.91, 0.6, 1)
-theme_override_colors/font_hover_color = Color(1, 1, 0.8, 1)
-theme_override_colors/font_disabled_color = Color(0.72, 0.38, 0.24, 1)
-theme_override_colors/font_outline_color = Color(0.55, 0.3, 0.12, 1)
-theme_override_constants/outline_size = 1
-theme_override_font_sizes/font_size = 21
 theme_override_styles/normal = SubResource("Empty")
 theme_override_styles/hover = SubResource("Empty")
 theme_override_styles/pressed = SubResource("Empty")
 theme_override_styles/disabled = SubResource("Empty")
-text = "▶"
+icon = ExtResource("PlusIcon")
+icon_alignment = 1
+theme_override_colors/icon_disabled_color = Color(0.72, 0.45, 0.30, 0.7)
 disabled = true
 
 [node name="Attribute3" type="Label" parent="."]
@@ -832,42 +811,34 @@ horizontal_alignment = 1
 
 [node name="Minus3" type="Button" parent="."]
 layout_mode = 0
-offset_left = 204.0
-offset_top = 311.0
-offset_right = 227.0
+offset_left = 201.0
+offset_top = 312.0
+offset_right = 225.0
 offset_bottom = 339.0
 focus_mode = 0
-theme_override_colors/font_color = Color(1, 0.91, 0.6, 1)
-theme_override_colors/font_hover_color = Color(1, 1, 0.8, 1)
-theme_override_colors/font_disabled_color = Color(0.72, 0.38, 0.24, 1)
-theme_override_colors/font_outline_color = Color(0.55, 0.3, 0.12, 1)
-theme_override_constants/outline_size = 1
-theme_override_font_sizes/font_size = 21
 theme_override_styles/normal = SubResource("Empty")
 theme_override_styles/hover = SubResource("Empty")
 theme_override_styles/pressed = SubResource("Empty")
 theme_override_styles/disabled = SubResource("Empty")
-text = "◀"
+icon = ExtResource("MinusIcon")
+icon_alignment = 1
+theme_override_colors/icon_disabled_color = Color(0.72, 0.45, 0.30, 0.7)
 disabled = true
 
 [node name="Plus3" type="Button" parent="."]
 layout_mode = 0
-offset_left = 271.0
-offset_top = 311.0
-offset_right = 294.0
+offset_left = 268.0
+offset_top = 312.0
+offset_right = 292.0
 offset_bottom = 339.0
 focus_mode = 0
-theme_override_colors/font_color = Color(1, 0.91, 0.6, 1)
-theme_override_colors/font_hover_color = Color(1, 1, 0.8, 1)
-theme_override_colors/font_disabled_color = Color(0.72, 0.38, 0.24, 1)
-theme_override_colors/font_outline_color = Color(0.55, 0.3, 0.12, 1)
-theme_override_constants/outline_size = 1
-theme_override_font_sizes/font_size = 21
 theme_override_styles/normal = SubResource("Empty")
 theme_override_styles/hover = SubResource("Empty")
 theme_override_styles/pressed = SubResource("Empty")
 theme_override_styles/disabled = SubResource("Empty")
-text = "▶"
+icon = ExtResource("PlusIcon")
+icon_alignment = 1
+theme_override_colors/icon_disabled_color = Color(0.72, 0.45, 0.30, 0.7)
 disabled = true
 
 [node name="Attribute4" type="Label" parent="."]
@@ -906,42 +877,34 @@ horizontal_alignment = 1
 
 [node name="Minus4" type="Button" parent="."]
 layout_mode = 0
-offset_left = 204.0
-offset_top = 342.0
-offset_right = 227.0
+offset_left = 201.0
+offset_top = 343.0
+offset_right = 225.0
 offset_bottom = 370.0
 focus_mode = 0
-theme_override_colors/font_color = Color(1, 0.91, 0.6, 1)
-theme_override_colors/font_hover_color = Color(1, 1, 0.8, 1)
-theme_override_colors/font_disabled_color = Color(0.72, 0.38, 0.24, 1)
-theme_override_colors/font_outline_color = Color(0.55, 0.3, 0.12, 1)
-theme_override_constants/outline_size = 1
-theme_override_font_sizes/font_size = 21
 theme_override_styles/normal = SubResource("Empty")
 theme_override_styles/hover = SubResource("Empty")
 theme_override_styles/pressed = SubResource("Empty")
 theme_override_styles/disabled = SubResource("Empty")
-text = "◀"
+icon = ExtResource("MinusIcon")
+icon_alignment = 1
+theme_override_colors/icon_disabled_color = Color(0.72, 0.45, 0.30, 0.7)
 disabled = true
 
 [node name="Plus4" type="Button" parent="."]
 layout_mode = 0
-offset_left = 271.0
-offset_top = 342.0
-offset_right = 294.0
+offset_left = 268.0
+offset_top = 343.0
+offset_right = 292.0
 offset_bottom = 370.0
 focus_mode = 0
-theme_override_colors/font_color = Color(1, 0.91, 0.6, 1)
-theme_override_colors/font_hover_color = Color(1, 1, 0.8, 1)
-theme_override_colors/font_disabled_color = Color(0.72, 0.38, 0.24, 1)
-theme_override_colors/font_outline_color = Color(0.55, 0.3, 0.12, 1)
-theme_override_constants/outline_size = 1
-theme_override_font_sizes/font_size = 21
 theme_override_styles/normal = SubResource("Empty")
 theme_override_styles/hover = SubResource("Empty")
 theme_override_styles/pressed = SubResource("Empty")
 theme_override_styles/disabled = SubResource("Empty")
-text = "▶"
+icon = ExtResource("PlusIcon")
+icon_alignment = 1
+theme_override_colors/icon_disabled_color = Color(0.72, 0.45, 0.30, 0.7)
 disabled = true
 
 [node name="RemainingSlot" type="Panel" parent="."]

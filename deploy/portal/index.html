@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="color-scheme" content="dark">
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src 'self'; style-src 'self'; base-uri 'none'; form-action 'none'">
-  <meta name="description" content="蜀山剑侠 · 归来：像素剑侠、回合冒险与江湖交流。选择网页版游戏，或下载 Android ARM64 预览版。">
+  <meta name="description" content="蜀山剑侠 · 归来江湖驿站：游戏与社区的统一入口。选择网页游玩或 Android 预览版，与同道再续江湖。">
   <title>蜀山剑侠 · 归来 — 江湖驿站</title>
   <link rel="icon" type="image/webp" href="/navigation/app-icon.webp">
   <link rel="stylesheet" href="/navigation/portal.css">
@@ -19,9 +19,8 @@
         <span>蜀山剑侠<span class="brand-return"> · 归来</span><small>江湖驿站</small></span>
       </a>
       <nav aria-label="主要导航">
-        <a href="/webgame/">游戏</a>
+        <a href="#game">游戏</a>
         <a href="#community">论坛<span class="nav-note">筹备中</span></a>
-        <a href="#download">下载</a>
         <a class="source-link" href="https://github.com/MRsoymilk/Vssjx" target="_blank" rel="noopener noreferrer">开源 ↗</a>
       </nav>
     </header>
@@ -39,19 +38,29 @@
           <li>经典像素</li><li>回合冒险</li><li>本地 / 联机</li>
         </ul>
         <div class="hero-actions">
-          <a class="button button-primary" href="/webgame/">进入游戏 <span aria-hidden="true">→</span></a>
+          <a class="button button-primary" href="#game">开始游戏 <span aria-hidden="true">↓</span></a>
           <button class="button button-secondary" type="button" disabled aria-describedby="forum-status">论坛筹备中</button>
         </div>
-        <p class="entry-note">浏览器即可体验 · 首次进入游戏需下载引擎与资源</p>
+        <p class="entry-note">选择适合你的游玩方式，与同道再赴蜀山</p>
       </section>
 
       <section class="destinations" aria-label="江湖去处">
-        <article class="destination-card game-card">
+        <article class="destination-card game-card" id="game" aria-labelledby="game-title">
           <span class="card-number" aria-hidden="true">壹</span>
           <p class="section-label">仗剑出发</p>
-          <h2>江湖历练</h2>
+          <h2 id="game-title">蜀山剑侠 · 归来</h2>
           <p>创建你的剑侠，寻访山门、探索地图。选择本地冒险，或登录服务器与其他玩家相遇。</p>
-          <a class="text-link" href="/webgame/">前往网页版 <span aria-hidden="true">↗</span></a>
+          <div class="platform-options" aria-label="选择游戏版本">
+            <a class="platform-option" href="/webgame/">
+              <span>网页游玩 <span aria-hidden="true">↗</span></span>
+              <small>无需安装 · 首次需加载资源</small>
+            </a>
+            <a class="platform-option" href="/downloads/vssjx-arm64.apk">
+              <span>Android 预览版 <span aria-hidden="true">↓</span></span>
+              <small>ARM64 · 下载 APK</small>
+            </a>
+          </div>
+          <p class="platform-note">两种方式进入同一江湖，发布版本与设备兼容范围可能不同。</p>
         </article>
         <article class="destination-card community-card" id="community">
           <span class="card-number" aria-hidden="true">贰</span>
@@ -60,15 +69,6 @@
           <p>为攻略交流、江湖见闻与问题反馈留一席茶。论坛将在完成部署与验证后开放。</p>
           <p class="muted-link" id="forum-status">尚未开放，不影响游戏游玩</p>
         </article>
-      </section>
-
-      <section class="download-panel" id="download" aria-labelledby="download-title">
-        <div>
-          <p class="section-label">江湖随行</p>
-          <h2 id="download-title">Android 预览版</h2>
-          <p>ARM64 APK · 仅适用于兼容设备 · 与网页版可能存在版本差异</p>
-        </div>
-        <a class="button button-download" href="/downloads/vssjx-arm64.apk">下载 APK <span aria-hidden="true">↓</span></a>
       </section>
 
       <aside class="project-note" aria-label="项目与存档说明">

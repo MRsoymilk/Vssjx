@@ -25,6 +25,17 @@ python tools/prepare_portal.py --output work/portal-preview
 
 实际浏览器截图入口见 [导航测试](../tests/portal_navigation.md)。页面的 GitHub 文档链接需要相应提交已存在于所链接分支；本次本地提交不隐含推送授权。
 
+页面以“游戏／论坛”组织，主按钮先定位到游戏卡片，卡片内再并列选择网页游玩与 Android 预览版，不以网页版作为门户默认入口。
+
+仅查看布局时，也可另选一个新输出目录和空闲回环端口：
+
+```sh
+python tools/prepare_portal.py --output work/portal-site/navigation
+python -m http.server 8001 --bind 127.0.0.1 --directory work/portal-site
+```
+
+打开 `http://127.0.0.1:8001/navigation/index.html`。此静态预览不提供游戏、APK 或 API，相关按钮需在实际反向代理环境验证；不要将此开发服务器公开到公网。
+
 ## 3. 远程切换前只读核对
 
 先确认实际容器、静态目录和 Nginx 镜像版本，不根据历史记录猜测：

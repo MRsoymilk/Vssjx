@@ -33,10 +33,22 @@ class PortalPageTests(unittest.TestCase):
         links = [attrs['href'] for tag, attrs in self.page.elements if tag == 'a']
         self.assertIn('/webgame/', links)
         self.assertIn('/downloads/vssjx-arm64.apk', links)
+        self.assertIn('#game', links)
+        self.assertNotIn('#download', links)
         self.assertNotIn('/flarum/', links)
         self.assertTrue(any(tag == 'button' and 'disabled' in attrs
                             and attrs.get('aria-describedby') == 'forum-status'
                             for tag, attrs in self.page.elements))
+
+    def test_platforms_share_one_game_entry_without_web_first_navigation(self):
+        game = self.html.split('<article class="destination-card game-card"', 1)[1].split('</article>', 1)[0]
+        self.assertIn('id="game"', game)
+        self.assertIn('href="/webgame/"', game)
+        self.assertIn('href="/downloads/vssjx-arm64.apk"', game)
+        hero = self.html.split('<section class="hero"', 1)[1].split('</section>', 1)[0]
+        self.assertIn('href="#game"', hero)
+        self.assertNotIn('href="/webgame/"', hero)
+        self.assertNotIn('download-panel', self.html)
 
     def test_no_script_form_engine_or_automatic_game_fetch(self):
         self.assertFalse({'script', 'iframe', 'form', 'object', 'embed'} &

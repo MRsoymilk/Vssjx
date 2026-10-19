@@ -12,6 +12,9 @@ DOCUMENTS = [
     *sorted((ROOT / 'docs').glob('*.md')),
     *sorted((ROOT / 'design').glob('*.md')),
     *sorted((ROOT / 'deploy').glob('*.md')),
+    *(ROOT / 'tests' / name for name in (
+        'documentation.md', 'player_duels.md', 'social.md', 'teams.md',
+    )),
 ]
 
 
@@ -45,6 +48,28 @@ class DocumentationTests(unittest.TestCase):
         self.assertIn('src="client/assets/ui/app_icon.png"', text)
         self.assertIn('client/project.godot', text)
         self.assertIn('godot --path client', text)
+
+    def test_design_index_covers_every_topic(self):
+        index = ROOT / 'design/README.md'
+        destinations = {
+            (index.parent / unquote(urlsplit(link).path)).resolve()
+            for link in links(index.read_text('utf-8'))
+            if not urlsplit(link).scheme
+        }
+        for topic in (ROOT / 'design').glob('*.md'):
+            if topic == index:
+                continue
+            with self.subTest(topic=topic.name):
+                self.assertIn(topic.resolve(), destinations)
+
+    def test_design_topics_declare_status_and_navigation(self):
+        for topic in (ROOT / 'design').glob('*.md'):
+            if topic.name == 'README.md':
+                continue
+            text = topic.read_text('utf-8')
+            with self.subTest(topic=topic.name):
+                self.assertIn('[返回设计索引](README.md)', text)
+                self.assertRegex(text, r'性质：|状态核对：')
 
 
 if __name__ == '__main__':

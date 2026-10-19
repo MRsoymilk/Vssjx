@@ -1,5 +1,9 @@
 # 服务器地址与连接入口
 
+[返回设计索引](README.md) · [账号](auth.md) · [网页部署](../deploy/WEB.md)
+
+性质：**当前原生连接契约**。Web 使用构建控制的同源配置，不开放任意目标地址，见 [平台方案](platform_interface.md)。
+
 Rust HTTP基础服务和Godot地址输入、独立持久化、服务发现已实现。账号认证已在后续增量接入，见[auth.md](auth.md)；不更改已确认产品策略，不把本地角色资产接入线上。
 
 ## 用户流程
@@ -50,4 +54,4 @@ Rust HTTP基础服务和Godot地址输入、独立持久化、服务发现已实
 
 客户端核对服务标识、协议版本及名称类型/长度，拒绝普通网页、错误服务或不兼容协议。此接口是公开元数据，不发令牌、不创建会话、不加载角色。
 
-未配置数据库时使用上述`connection_only`结果；启用数据库后返回`stage=account_auth`、`capabilities=["account_auth","character_creation"]`，角色创建/读取契约见[characters.md](characters.md)。`/readyz`在账号模式查询真实数据库，故障返回503。连接检查仍不等于账号认证或进入世界；WSS及世界协议继续按[protocol.md](protocol.md)推进。
+未配置数据库时使用上述 `connection_only` 结果；启用数据库后 `stage=account_auth`，当前能力列表包含 `account_auth`、`character_creation`、`shared_world`、`public_chat`、`social_v1`。列表不是全部玩法能力清单，世界扩展仍经票据和握手协商。角色接口见 [characters.md](characters.md)，世界实现见 [shared_world.md](shared_world.md)。`/readyz` 在账号模式查询真实数据库，故障返回 503；发现成功不等于已经认证或进入世界。

@@ -7,6 +7,8 @@ from pathlib import Path
 from ai_world_layouts import build_layout
 from ai_world_monsters import roster,stats,sheet_records,NAMES
 from ai_world_npcs import roster as npc_roster
+from screenshot_map_profiles import reference as screenshot_reference
+from map_population_layout import arrange as arrange_population, write_review as write_population_review
 
 ROOT = Path(__file__).resolve().parents[1]
 BIOMES = {
@@ -135,6 +137,7 @@ def build():
             following=[v for v in m['neighbors'] if by_id[v]['original_map_id']>m['original_map_id']]
             m['neighbors']=[(following or m['neighbors'])[0]]
         occupied=[m['spawn'],*[r['cell'] for r in m['residents']]]
+        monster_cells=[r['cell'] for r in m['residents'] if r['kind']!='npc']
         m['exits']=[] if m['original_map_id']==21 else [dict(id='return_trail',cell=m['portal']['cell'],target_map='qingyun_trail',name='青云山道',source='AI生成连接')]
         occupied.append(m['portal']['cell'])
         for index,target in enumerate(m['neighbors']):
@@ -147,6 +150,8 @@ def build():
             for y in range(2,30):
                 for x in range(2,30):
                     if m['blocked'][y*32+x] or any(abs(x-v[0])+abs(y-v[1])<4 for v in occupied):continue
+                    # Arrival exits stay outside the monsters' two-cell patrol area.
+                    if any(abs(x-v[0])+abs(y-v[1])<9 for v in monster_cells):continue
                     if any(abs(x-p['x']//16)<=3 and 0<=p['y']//16-y<=6 for p in m['scenery']):continue
                     # Prefer outer road ends. Never dot the central living area
                     # with extra blue tiles just to satisfy a fixed portal count.
@@ -165,9 +170,13 @@ def build():
                     x=3 if gate['target_map']=='ai_022' else 29
                     gate.update(cell=[x,27],cells=[[x,y] for y in (26,27,28)],source='截图确认左右目标；坐标和碰撞为AI设计')
             m['screenshot_reference']={'files':['flower-sect-court.png','flower-sect-garden.png'],'directory':'analysis/references/map-screenshots','scope':'局部结构与NPC称谓确认；全图尺寸、NPC外形、碰撞和任务为AI设计','screenshot_exit_ids':{'秋兰竹亭':10022,'幻波池':10023},'native_exit_ids':{'秋兰竹亭':22,'幻波池':23}}
+            m['ssjx_pic_reference']={'files':['95.jpg'],'directory':'analysis/references/ssjx-pic','evidence':'五毒天王同名NPC；草地、棕榈和水岸可见','scope':'截图仅覆盖局部；沿用庭院、台阶和左右出口适配，怪物位置为设计补全，非原版恢复'}
         elif m['original_map_id'] in (22,23):
             m['screenshot_reference']={'files':['bamboo-waterfront.png'],'directory':'analysis/references/map-screenshots','scope':'竹林与水岸的环境参考；未能从截图确认整张地图名称，按相邻地域推定适配'}
-    return dict(version="ai-world-v1",label="AI生成·蜀山补全试验",layout_revision=4,npc_revision=2,monster_revision=1,portal_revision=3,seed=20261018,
+        ref=screenshot_reference(m['original_map_id'])
+        if ref:m['screenshot_reference']=ref
+        arrange_population(m)
+    return dict(version="ai-world-v1",label="AI生成·蜀山补全试验",layout_revision=5,npc_revision=2,monster_revision=2,portal_revision=4,seed=20261018,
                 disclaimer="地名、等级与总览坐标参考原包；场景布局、NPC布置、任务剧情与奖励均为AI生成。不是恢复出的原版内容。",maps=maps)
 
 def main():
@@ -175,6 +184,7 @@ def main():
     raw=json.dumps(data,ensure_ascii=False,separators=(",",":"))+"\n"
     for dest in ["shared/data/ai-world-v1.json","client/assets/data/ai-world-v1.json"]:
         (ROOT/dest).write_text(raw,encoding="utf-8",newline="\n")
+    write_population_review(ROOT,data)
     index=dict(version=data["version"],layout_revision=data["layout_revision"],source="AI生成",disclaimer=data["disclaimer"],
         catalog="shared/data/ai-world-v1.json",catalog_sha256=hashlib.sha256(raw.encode()).hexdigest(),
         map_count=len(data["maps"]),quest_count=sum(len(m["quests"]) for m in data["maps"]),
@@ -204,7 +214,7 @@ def main():
     runtime=dict(format_version=1,npc_revision=data['npc_revision'],runtime_enabled=True,
         asset_count=len({r['art'] for r in bindings}),resident_count=len(bindings),
         map_count=len({r['map_id'] for r in bindings}),bindings=bindings,
-        notice='静态修复外观已应用本地/联机共用地图；地图坐标、人物身份和任务不变。适配外观不等于恢复原NPC身份。')
+        notice='静态修复外观已应用本地/联机共用地图；坐标随地图布局生成，人物身份和任务不变。适配外观不等于恢复原NPC身份。')
     (ROOT/'analysis/recovery/ssjx-pic/npc-cutouts/runtime-bindings.json').write_text(json.dumps(runtime,ensure_ascii=False,indent=2)+'\n',encoding='utf8',newline='\n')
     print(f"AI maps: {len(data['maps'])}; quests: {sum(len(m['quests']) for m in data['maps'])}; sha256: {hashlib.sha256(raw.encode()).hexdigest()}")
 

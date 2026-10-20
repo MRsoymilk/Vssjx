@@ -7,23 +7,26 @@ import heapq
 import math
 import random
 from collections import deque
+import screenshot_map_profiles as screenshots
 
 SIZE=32
-SOLID={"water","void","lava","ice","hill","building","tree"}
+SOLID={"water","void","lava","ice","hill","sand_hill","building","tree"}
 FLOOR={"grass":13,"path":18,"water":91,"void":219,"lava":685,"ice":479,
        "hill":52,"rock":258,"volcanic":687,"snow":456,"paving":149,
-       "stone":258,"wood":138,"dark":544,"sand":325}
+       "stone":258,"wood":138,"dark":544,"sand":325,"dirt":394,"sand_hill":355,"sand_steps":373}
 HOUSES={
     "flower_hall":[[149,149,145,146,149,149,149],[150,141,142,142,142,143,154],[155,151,152,152,152,153,156],[165,170,171,172,173,174,166],[160,180,181,182,183,184,164]],
     "house":[[141,142,143],[151,152,153],[161,162,163]],
     "inn":[[141,142,142,142,143],[170,171,172,173,174],[180,181,182,183,184]],
     "shrine":[[190,191,192,193],[200,201,202,203],[210,211,212,213]],
+    "blue_house":[[590,591,592,593,594],[600,601,603,603,604],[610,611,612,613,614],[394,621,622,623,394]],
 }
 NAMES=dict(zip(
     ["market_town","canal_town","hamlet","monastery","mountain_shrine","ceremonial_court","arena","warcamp","cold_plateau","glacier_pass","frozen_lake","volcanic_island","lava_chasm","canyon_trail","ridge_trail","cave_chambers","demon_labyrinth","crypt","sealed_ruins","lake_ring","river_crossing","marsh_boardwalk","flower_garden","bamboo_avenue","river_valley","woodland_glade","terraced_hills"],
     ["集市街镇","临水街镇","山间村落","山门庭院","山顶祠院","礼仪庭院","演武擂场","驻守营地","寒地石台","冰谷栈桥","环冰湖岸","火山台地","熔岩裂谷","峡谷山道","盘山岭道","连环洞室","魔界迷廊","墓室甬道","封印遗院","环湖洲渚","曲河石桥","沼泽木栈","曲径花园","竹林夹道","河谷山路","林间幽谷","草坡台阶"]))
 
 def archetype(name,kind,num):
+    if num in screenshots.PROFILES:return screenshots.PROFILES[num][0]
     if num==21:return "flower_sect_court"
     if num in (22,23):return "bamboo_waterside"
     if any(k in name for k in ["擂台","群英会"]):return "arena"
@@ -101,7 +104,9 @@ class Layout:
     def compose(self):
         r=self.rng;n=self.num;t=self.type
         shift=r.randint(-2,2)
-        if n in (213,214):
+        if n in screenshots.PROFILES:
+            screenshots.compose(self)
+        elif n in (213,214):
             self.showcase_scene()
         elif t in ("flower_sect_court","bamboo_waterside"):
             self.reference_scene()
@@ -187,6 +192,11 @@ class Layout:
             if t=="sealed_ruins":
                 self.rect(17,20,11,8,"paving");self.building(20,20,"shrine")
             if t=="crypt":
+                if len(self.extra_roles)>=2:
+                    # Several table-recorded species need a battle chamber wide
+                    # enough to circle patrols; don't pack them into the doorway.
+                    self.rect(17,17,13,13,"rock")
+                    self.landmark("deep_combat_chamber",[17,17],[13,13])
                 for x,y in [(9,6),(22,7),(21,22)]:self.building(x,y,"shrine")
             self.landmark("chamber_network",[3,3],[26,26])
             self.sites=dict(guide=[7,20],courier=[9,9],survey=[26,11],mob=[16,7],boss=[24,26])
@@ -348,7 +358,9 @@ class Layout:
     def place_sites(self):
         occupied={tuple(self.spawn),tuple(self.portal)}
         people=[]
-        for role,want in self.sites.items():
+        # Settle NPCs first; hostile seeds must not displace service residents.
+        for role,want in list(self.sites.items()):
+            if role not in self.npc_roles:continue
             if self.num==1:
                 self.paint(*want,"grass");occupied.add(tuple(want));continue
             candidates=[]
@@ -360,6 +372,25 @@ class Layout:
                     candidates.append((score,[x,y]))
             point=min(candidates)[1];self.sites[role]=point;occupied.add(tuple(point))
             if role in self.npc_roles:people.append(point)
+        if self.num==1:return  # Preserve the already playable tutorial positions.
+        arrivals=[self.spawn,self.portal]
+        if self.num==21:arrivals += [[3,27],[29,27]]
+        monsters=[role for role in self.sites if role not in self.npc_roles]
+        monsters.sort(key=lambda role:role=="boss")
+        for role in monsters:
+            want=self.sites[role];candidates=[]
+            for y in range(3,30):
+                for x in range(3,30):
+                    if self.g[y][x] in SOLID:continue
+                    if any(abs(x-p[0])+abs(y-p[1])<7 for p in people):continue
+                    if any(abs(x-p[0])+abs(y-p[1])<9 for p in arrivals):continue
+                    if any(abs(x-p[0])+abs(y-p[1])<5 for p in occupied if list(p) not in people):continue
+                    open_area=sum(self.g[yy][xx] not in SOLID for yy in range(max(1,y-2),min(31,y+3)) for xx in range(max(1,x-2),min(31,x+3)))
+                    road=self.g[y][x] in ("path","paving","wood","sand_steps")
+                    score=(x-want[0])**2+(y-want[1])**2+road*45+(25-open_area)*3
+                    candidates.append((score,[x,y]))
+            if not candidates:raise ValueError((self.num,role,"no safe combat clearing"))
+            point=min(candidates)[1];self.sites[role]=point;occupied.add(tuple(point))
 
     def connect(self):
         # Minimal repairs only when terrain separates a quest district. No common
@@ -402,6 +433,7 @@ class Layout:
             return seen
         free=reachable()
         limit=28 if self.type in ("woodland_glade","bamboo_avenue","flower_garden") else (8 if self.type=="terraced_hills" else 15)
+        limit=screenshots.prop_limit(self.num) or limit
         clusters=[(self.rng.randint(3,28),self.rng.randint(5,29)) for _ in range(5)]
         for attempt in range(700):
             if len(points)>=limit:break
@@ -411,7 +443,7 @@ class Layout:
             else:x,y=self.rng.randint(2,29),self.rng.randint(4,29)
             if not (2<=x<=29 and 4<=y<=29):continue
             if (x,y) not in free:continue
-            if self.g[y][x] not in ("grass","snow","rock","volcanic","dark"):continue
+            if self.g[y][x] not in ("grass","snow","rock","volcanic","dark","sand","dirt"):continue
             if any(abs(x-p[0])+abs(y-p[1])<4 for p in sites):continue
             # A solid trunk can be several cells below a resident while its
             # tall canopy still covers the character and arrival marker.
@@ -423,7 +455,7 @@ class Layout:
             remaining=reachable()
             if len(remaining)!=len(free)-1:self.g[y][x]=previous;continue
             free=remaining
-            art=self.rng.choice(kinds[self.kind]);points.append((x,y))
+            art=self.rng.choice(screenshots.prop_kinds(self.num) or kinds[self.kind]);points.append((x,y))
             self.scenery.append({"art":"map/"+art,"x":x*16+8,"y":y*16+8})
             self.override[x,y]=FLOOR.get(previous,13)
         # Original canopies overhang naturally; only the foot cell collides.
@@ -439,12 +471,16 @@ class Layout:
         # 123 is a diagonal grass-bank corner, never a repeating water center.
         shores={0:91,1:81,2:92,4:101,8:90,9:80,3:82,12:100,6:102}
         hills={0:52,1:78,2:62,4:70,8:64,9:77,3:79,12:69,6:68}
+        sand_hills={0:355,1:345,2:356,4:365,8:354,9:344,3:346,12:364,6:366}
         for y in range(32):
             for x in range(32):
                 s=g[y][x];tile=FLOOR.get(s,13)
                 if s=="path":tile=roads.get(mask(x,y,lambda v:v in ("path","wood","paving")),18)
                 elif s=="water":tile=shores.get(mask(x,y,lambda v:v in ("water","wood")),91)
                 elif s=="hill":tile=hills.get(mask(x,y,lambda v:v=="hill"),52)
+                elif s=="sand_hill":tile=sand_hills.get(mask(x,y,lambda v:v=="sand_hill"),355)
+                elif s in ("sand","dirt") and self.rng.random()<.055:
+                    tile=self.rng.choice([333,334,329] if s=="sand" else [440,441,442,443,444,445])
                 elif s in ("rock","stone") and self.kind in ("cave","ruins","snow"):
                     tile=cliffs.get(mask(x,y,lambda v:v not in ("void","lava")),258)
                 elif s=="volcanic":tile=lava_edges.get(mask(x,y,lambda v:v not in ("void","lava")),687)
@@ -477,8 +513,9 @@ class Layout:
         return dict(tiles=tiles,blocked=blocked,scenery=self.scenery,spawn=self.spawn,portal_cell=self.portal,
                     sites=self.sites,layout_archetype=self.type,landmarks=self.landmarks,
                     layout_name=NAMES[self.type],
-                    terrain_reference=("用户截图局部参考：花涧派庭院/台阶/棕榈夹道；竹林清场/南侧水岸。未显示区域为AI补全，非原版全图恢复。" if self.num in (21,22,23) else "用户视频：01:40/03:40草地台阶、07:30石台崖壁、08:00/17:00熔岩岸线、27:40建筑庭院"))
+                    terrain_reference=(screenshots.reference(self.num) or {}).get("evidence") or ("用户截图局部参考：花涧派庭院/台阶/棕榈夹道；竹林清场/南侧水岸。未显示区域为AI补全，非原版全图恢复。" if self.num in (21,22,23) else "用户视频：01:40/03:40草地台阶、07:30石台崖壁、08:00/17:00熔岩岸线、27:40建筑庭院"))
 
 def build_layout(row,kind,extra_roles=(),npc_roles=()):return Layout(row,kind,extra_roles,npc_roles).compose()
 
 NAMES.update(flower_sect_court="花涧派·临水庭院",bamboo_waterside="竹林清场与水岸")
+NAMES.update(screenshots.NAMES)

@@ -1,0 +1,8138 @@
+{
+  "layout_revision": 5,
+  "monster_revision": 2,
+  "map_count": 214,
+  "rearranged_map_count": 213,
+  "monster_count": 454,
+  "resident_definition_sha256_excluding_cell": "4e76abe7a880a03afc7ad0946f88be04a195b96f065f01774eaeb566939cd4da",
+  "scope": "仅局部截图地貌参考；怪物坐标为设计补全，无原始全图或精确刷新点数据。教程地图保留。",
+  "screenshot_profiles": [
+    {
+      "map_id": "ai_007",
+      "name": "天化村",
+      "directory": "analysis/references/ssjx-pic",
+      "files": [
+        "87.jpg"
+      ],
+      "profile": "waterfront_village",
+      "evidence": "齐霞儿同名NPC；草地、水岸与疏林可见",
+      "scope": "截图局部地貌参考；全图尺寸、道路衔接、碰撞和怪物坐标均为设计补全，非原版恢复",
+      "file_hashes": {
+        "87.jpg": "102bec4e178cb23a1ef03801ebce6f5067ade0e57dc10ae80d2674168b043b14"
+      }
+    },
+    {
+      "map_id": "ai_012",
+      "name": "失落沼泽",
+      "directory": "analysis/references/ssjx-pic",
+      "files": [
+        "63.jpg",
+        "96.jpg"
+      ],
+      "profile": "wetland_glade",
+      "evidence": "同类湿地参考；花妖名称有差异，不能唯一确认地图",
+      "scope": "截图局部地貌参考；全图尺寸、道路衔接、碰撞和怪物坐标均为设计补全，非原版恢复",
+      "file_hashes": {
+        "63.jpg": "aec18c8d1b3e48819ed1f8be1033a7dd5789b2f76c43729d10318c59fab59034",
+        "96.jpg": "2769475665a4f1af0c7c971bea0cc366d4af18d4417fccf3f0a5c183af8bab0a"
+      }
+    },
+    {
+      "map_id": "ai_013",
+      "name": "卧云镇",
+      "directory": "analysis/references/ssjx-pic",
+      "files": [
+        "39.jpg",
+        "66.jpg",
+        "70.jpg"
+      ],
+      "profile": "earth_gate_town",
+      "evidence": "同类青瓦镇街参考；未唯一确认地图",
+      "scope": "截图局部地貌参考；全图尺寸、道路衔接、碰撞和怪物坐标均为设计补全，非原版恢复",
+      "file_hashes": {
+        "39.jpg": "3ea69443be1b44aa0ea4390b55c20ec265dcd169a7250404321c6988e39faae9",
+        "66.jpg": "d99c88b8da64f0959daedfdf461b2b603e2bbdd1582b185dc83c2be105b02c3a",
+        "70.jpg": "864dca20b149ea3720b41518ba189cdcfa7e7b309fb70d7fffe1850d5e9a81c9"
+      }
+    },
+    {
+      "map_id": "ai_021",
+      "name": "花涧派",
+      "files": [
+        "95.jpg"
+      ],
+      "directory": "analysis/references/ssjx-pic",
+      "evidence": "五毒天王同名NPC；草地、棕榈和水岸可见",
+      "scope": "截图仅覆盖局部；沿用庭院、台阶和左右出口适配，怪物位置为设计补全，非原版恢复",
+      "file_hashes": {
+        "95.jpg": "c163a90bfb82907bfc75aef21d850ee086a662afd2d24e9343da27e5eebfa3c7"
+      }
+    },
+    {
+      "map_id": "ai_028",
+      "name": "慈云寺北",
+      "directory": "analysis/references/ssjx-pic",
+      "files": [
+        "53.jpg",
+        "54.jpg"
+      ],
+      "profile": "earth_gate_temple",
+      "evidence": "博浪沙火鹤、诸有功与红发老祖同名NPC；黄土、门楼与崖阶可见",
+      "scope": "截图局部地貌参考；全图尺寸、道路衔接、碰撞和怪物坐标均为设计补全，非原版恢复",
+      "file_hashes": {
+        "53.jpg": "9ea4bd0fea396412aa1f31de04d9a19501174f689b30758fbeaf6e852b811154",
+        "54.jpg": "fc69ef51907a7f466a5d6dbac2600f72ee997901096433b0d04d65356509ab5e"
+      }
+    },
+    {
+      "map_id": "ai_029",
+      "name": "慈云寺",
+      "directory": "analysis/references/ssjx-pic",
+      "files": [
+        "53.jpg",
+        "54.jpg"
+      ],
+      "profile": "earth_gate_temple",
+      "evidence": "参照相邻慈云寺北的门院地貌；相邻区域为推定",
+      "scope": "截图局部地貌参考；全图尺寸、道路衔接、碰撞和怪物坐标均为设计补全，非原版恢复",
+      "file_hashes": {
+        "53.jpg": "9ea4bd0fea396412aa1f31de04d9a19501174f689b30758fbeaf6e852b811154",
+        "54.jpg": "fc69ef51907a7f466a5d6dbac2600f72ee997901096433b0d04d65356509ab5e"
+      }
+    },
+    {
+      "map_id": "ai_030",
+      "name": "慈云寺外围",
+      "directory": "analysis/references/ssjx-pic",
+      "files": [
+        "53.jpg",
+        "54.jpg"
+      ],
+      "profile": "earth_gate_temple",
+      "evidence": "参照相邻慈云寺北的黄土崖阶；相邻区域为推定",
+      "scope": "截图局部地貌参考；全图尺寸、道路衔接、碰撞和怪物坐标均为设计补全，非原版恢复",
+      "file_hashes": {
+        "53.jpg": "9ea4bd0fea396412aa1f31de04d9a19501174f689b30758fbeaf6e852b811154",
+        "54.jpg": "fc69ef51907a7f466a5d6dbac2600f72ee997901096433b0d04d65356509ab5e"
+      }
+    },
+    {
+      "map_id": "ai_032",
+      "name": "昆仑派",
+      "directory": "analysis/references/ssjx-pic",
+      "files": [
+        "97.webp",
+        "100.webp"
+      ],
+      "profile": "earth_gate_sect",
+      "evidence": "天池上人、隐名剑仙与门派日常；黄土青瓦庭院可见",
+      "scope": "截图局部地貌参考；全图尺寸、道路衔接、碰撞和怪物坐标均为设计补全，非原版恢复",
+      "file_hashes": {
+        "97.webp": "d7d9ea60c54b3e90c2a020033ea02648b5d8ad5272cd4588edb5c326ad38cb60",
+        "100.webp": "ce12f1f8bab16a13221ca960873d04c55ac5462945a2141b2a78a4ce8db30f44"
+      }
+    },
+    {
+      "map_id": "ai_041",
+      "name": "八旗镇",
+      "directory": "analysis/references/ssjx-pic",
+      "files": [
+        "61.jpg",
+        "79.jpg",
+        "83.jpg"
+      ],
+      "profile": "market_waterfront",
+      "evidence": "杂货店老板、车夫与集市铺地参考；不能仅凭通用服务NPC唯一确认地图",
+      "scope": "截图局部地貌参考；全图尺寸、道路衔接、碰撞和怪物坐标均为设计补全，非原版恢复",
+      "file_hashes": {
+        "61.jpg": "d726087a4a8f8348c0e781c591eeaf1c99b61a49074a4d8cd36ac9a57e12d724",
+        "79.jpg": "185afc1b1caeb98a9fee9717c7eb90fdf5b02af49e24b8e9f2aaf006f6483f9e",
+        "83.jpg": "6791ddf048350d97dcba944ee259580775f6cc524a414ec39d796530bdb68ab9"
+      }
+    },
+    {
+      "map_id": "ai_043",
+      "name": "沙丘",
+      "directory": "analysis/references/ssjx-pic",
+      "files": [
+        "57.jpg",
+        "58.jpg",
+        "88.jpg"
+      ],
+      "profile": "sand_terraces",
+      "evidence": "同类沙地、秋树和崖阶参考；未唯一确认地图",
+      "scope": "截图局部地貌参考；全图尺寸、道路衔接、碰撞和怪物坐标均为设计补全，非原版恢复",
+      "file_hashes": {
+        "57.jpg": "316fd9db6374b15c6dceca32dda63713231dd5ce57ae4a2bb07f51332ec2ec06",
+        "58.jpg": "7aedb8664fd5739bf0e010210d4fc350831b2dfa97b68327dab53502392047e9",
+        "88.jpg": "af078439a69e8c59be13b8d6832b2b7757a792e40d01fb430653c1464bc336d1"
+      }
+    },
+    {
+      "map_id": "ai_045",
+      "name": "沙漠荒野",
+      "directory": "analysis/references/ssjx-pic",
+      "files": [
+        "62.jpg",
+        "72.jpg",
+        "89.jpg"
+      ],
+      "profile": "sand_terraces",
+      "evidence": "同类沙地与岩壁参考；未唯一确认地图",
+      "scope": "截图局部地貌参考；全图尺寸、道路衔接、碰撞和怪物坐标均为设计补全，非原版恢复",
+      "file_hashes": {
+        "62.jpg": "e979977bdabb83414f2337699fe48744408e4aed3a53ad3867111364ad88ff10",
+        "72.jpg": "d6ba6ab508cbbf3c5f0e4d442ffa9a7a1dad3d0b9ed7ff35e956fdec02614f6e",
+        "89.jpg": "342e490b01e8af065bf066025ddb229ab52d7ae10cffe76f885de2fb8329bfb0"
+      }
+    },
+    {
+      "map_id": "ai_046",
+      "name": "流沙平原",
+      "directory": "analysis/references/ssjx-pic",
+      "files": [
+        "57.jpg",
+        "77.jpg",
+        "88.jpg"
+      ],
+      "profile": "sand_terraces",
+      "evidence": "同类沙地与岩壁参考；未唯一确认地图",
+      "scope": "截图局部地貌参考；全图尺寸、道路衔接、碰撞和怪物坐标均为设计补全，非原版恢复",
+      "file_hashes": {
+        "57.jpg": "316fd9db6374b15c6dceca32dda63713231dd5ce57ae4a2bb07f51332ec2ec06",
+        "77.jpg": "4239bf96ecbb7a0ca4d73bd774de126e8cbdc648c1ee7b58a7cac7e824aa5496",
+        "88.jpg": "af078439a69e8c59be13b8d6832b2b7757a792e40d01fb430653c1464bc336d1"
+      }
+    }
+  ],
+  "placements": [
+    {
+      "map_id": "ai_002",
+      "name": "百花谷",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_002_mob",
+          "name": "谷地花灵",
+          "level": 5,
+          "art": "monster/tm2",
+          "cell": [
+            24,
+            14
+          ]
+        },
+        {
+          "id": "ai_002_boss",
+          "name": "花谷毒妖",
+          "level": 7,
+          "art": "monster/xrz2",
+          "cell": [
+            27,
+            28
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_003",
+      "name": "黑刀峡",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_003_mob",
+          "name": "山地野猪",
+          "level": 5,
+          "art": "monster/xt2",
+          "cell": [
+            19,
+            8
+          ]
+        },
+        {
+          "id": "ai_003_boss",
+          "name": "三首妖犬",
+          "level": 7,
+          "art": "monster/dyq2",
+          "cell": [
+            23,
+            21
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_004",
+      "name": "峨眉派",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_004_mob",
+          "name": "守阵灵将",
+          "level": 10,
+          "art": "monster/nt1",
+          "cell": [
+            4,
+            27
+          ]
+        },
+        {
+          "id": "ai_004_boss",
+          "name": "破阵魔将",
+          "level": 12,
+          "art": "monster/nt3",
+          "cell": [
+            25,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_005",
+      "name": "凝碧崖",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_005_mob",
+          "name": "山林巨人",
+          "level": 10,
+          "art": "monster/sr2",
+          "cell": [
+            22,
+            8
+          ]
+        },
+        {
+          "id": "ai_005_boss",
+          "name": "山林熊王",
+          "level": 12,
+          "art": "monster/x3",
+          "cell": [
+            17,
+            24
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_006",
+      "name": "峨眉山",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_006_mob",
+          "name": "山狼",
+          "level": 11,
+          "art": "monster/langw",
+          "cell": [
+            21,
+            22
+          ]
+        },
+        {
+          "id": "ai_006_boss",
+          "name": "三首妖犬",
+          "level": 13,
+          "art": "monster/dyq2",
+          "cell": [
+            27,
+            27
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_007",
+      "name": "天化村",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_007_mob",
+          "name": "山地野猪",
+          "level": 10,
+          "art": "monster/xt2",
+          "cell": [
+            20,
+            7
+          ]
+        },
+        {
+          "id": "ai_007_boss",
+          "name": "劫道妖首",
+          "level": 12,
+          "art": "monster/nt2",
+          "cell": [
+            26,
+            28
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_008",
+      "name": "乱坟岗",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_008_mob",
+          "name": "古墓软泥",
+          "level": 13,
+          "art": "monster/wx2",
+          "cell": [
+            15,
+            5
+          ]
+        },
+        {
+          "id": "ai_008_boss",
+          "name": "冥府将军",
+          "level": 15,
+          "art": "monster/nt1",
+          "cell": [
+            23,
+            26
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_009",
+      "name": "野猪岭",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_009_mob",
+          "name": "食人花",
+          "level": 13,
+          "art": "monster/srh",
+          "cell": [
+            19,
+            8
+          ]
+        },
+        {
+          "id": "ai_009_boss",
+          "name": "野猪王",
+          "level": 11,
+          "art": "monster/xt4",
+          "cell": [
+            22,
+            24
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_010",
+      "name": "瘟疫猪巢",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_010_mob",
+          "name": "瘟疫野猪",
+          "level": 15,
+          "art": "monster/xt1",
+          "cell": [
+            14,
+            7
+          ]
+        },
+        {
+          "id": "ai_010_boss",
+          "name": "血魔之眼",
+          "level": 15,
+          "art": "monster/fq3",
+          "cell": [
+            24,
+            25
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_011",
+      "name": "平雁谷",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_011_mob",
+          "name": "魔人",
+          "level": 12,
+          "art": "monster/ls1",
+          "cell": [
+            15,
+            20
+          ]
+        },
+        {
+          "id": "ai_011_boss",
+          "name": "山林熊王",
+          "level": 19,
+          "art": "monster/x3",
+          "cell": [
+            27,
+            27
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_012",
+      "name": "失落沼泽",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_012_mob",
+          "name": "吸血花妖",
+          "level": 18,
+          "art": "monster/srh2",
+          "cell": [
+            23,
+            8
+          ]
+        },
+        {
+          "id": "ai_012_boss",
+          "name": "石头巨人头领",
+          "level": 19,
+          "art": "monster/ysg4",
+          "cell": [
+            24,
+            28
+          ]
+        },
+        {
+          "id": "ai_012_mob2",
+          "name": "石头巨人",
+          "level": 18,
+          "art": "monster/sr2",
+          "cell": [
+            12,
+            24
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_013",
+      "name": "卧云镇",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_013_mob",
+          "name": "叛逃弟子",
+          "level": 20,
+          "art": "monster/dz1",
+          "cell": [
+            27,
+            7
+          ]
+        },
+        {
+          "id": "ai_013_boss",
+          "name": "劫道妖首",
+          "level": 22,
+          "art": "monster/nt2",
+          "cell": [
+            27,
+            28
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_014",
+      "name": "卧云镇北",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_014_mob",
+          "name": "拦路魔徒",
+          "level": 20,
+          "art": "monster/dz5",
+          "cell": [
+            24,
+            19
+          ]
+        },
+        {
+          "id": "ai_014_boss",
+          "name": "叛军统领",
+          "level": 22,
+          "art": "monster/zbjl2",
+          "cell": [
+            19,
+            26
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_015",
+      "name": "跃阳湖",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_015_mob",
+          "name": "寒潭怨灵",
+          "level": 20,
+          "art": "monster/youling3",
+          "cell": [
+            28,
+            23
+          ]
+        },
+        {
+          "id": "ai_015_boss",
+          "name": "锁水蛇妖",
+          "level": 22,
+          "art": "monster/slzw",
+          "cell": [
+            11,
+            5
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_016",
+      "name": "莽苍山",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_016_mob",
+          "name": "妖道（待核名）",
+          "level": 23,
+          "art": "monster/smr",
+          "cell": [
+            17,
+            19
+          ]
+        },
+        {
+          "id": "ai_016_boss",
+          "name": "森林之王",
+          "level": 25,
+          "art": "monster/slzw",
+          "cell": [
+            27,
+            27
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_017",
+      "name": "金石峡",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_017_mob",
+          "name": "棕熊",
+          "level": 25,
+          "art": "monster/x1",
+          "cell": [
+            20,
+            6
+          ]
+        },
+        {
+          "id": "ai_017_boss",
+          "name": "山林熊王",
+          "level": 27,
+          "art": "monster/x3",
+          "cell": [
+            25,
+            19
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_018",
+      "name": "金水潭",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_018_mob",
+          "name": "马面怪（暂名）",
+          "level": 27,
+          "art": "monster/mm1",
+          "cell": [
+            26,
+            22
+          ]
+        },
+        {
+          "id": "ai_018_boss",
+          "name": "水府马面",
+          "level": 29,
+          "art": "monster/mm1",
+          "cell": [
+            10,
+            5
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_019",
+      "name": "天外神山",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_019_mob",
+          "name": "食人花",
+          "level": 28,
+          "art": "monster/srh",
+          "cell": [
+            19,
+            8
+          ]
+        },
+        {
+          "id": "ai_019_boss",
+          "name": "森林之王",
+          "level": 30,
+          "art": "monster/slzw",
+          "cell": [
+            27,
+            18
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_020",
+      "name": "封印祠",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_020_mob",
+          "name": "古墓软泥",
+          "level": 28,
+          "art": "monster/wx2",
+          "cell": [
+            15,
+            7
+          ]
+        },
+        {
+          "id": "ai_020_boss",
+          "name": "冥府将军",
+          "level": 30,
+          "art": "monster/nt1",
+          "cell": [
+            23,
+            28
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_021",
+      "name": "花涧派",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_021_mob",
+          "name": "花谷异兽",
+          "level": 10,
+          "art": "monster/fq2",
+          "cell": [
+            12,
+            19
+          ]
+        },
+        {
+          "id": "ai_021_boss",
+          "name": "噬香花妖",
+          "level": 12,
+          "art": "monster/srh2",
+          "cell": [
+            20,
+            19
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_022",
+      "name": "秋兰竹亭",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_022_mob",
+          "name": "采露花妖",
+          "level": 10,
+          "art": "monster/srh3",
+          "cell": [
+            9,
+            10
+          ]
+        },
+        {
+          "id": "ai_022_boss",
+          "name": "花谷毒妖",
+          "level": 12,
+          "art": "monster/xrz2",
+          "cell": [
+            25,
+            6
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_023",
+      "name": "幻波池",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_023_mob",
+          "name": "寒潭怨灵",
+          "level": 11,
+          "art": "monster/youling3",
+          "cell": [
+            10,
+            12
+          ]
+        },
+        {
+          "id": "ai_023_boss",
+          "name": "锁水蛇妖",
+          "level": 13,
+          "art": "monster/slzw",
+          "cell": [
+            25,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_024",
+      "name": "蛊苗村",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_024_mob",
+          "name": "劫道枪卫",
+          "level": 10,
+          "art": "monster/zb5",
+          "cell": [
+            24,
+            18
+          ]
+        },
+        {
+          "id": "ai_024_boss",
+          "name": "叛军统领",
+          "level": 12,
+          "art": "monster/zbjl2",
+          "cell": [
+            18,
+            27
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_025",
+      "name": "牵牛潭",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_025_mob",
+          "name": "瘟疫僵尸",
+          "level": 13,
+          "art": "monster/zb3",
+          "cell": [
+            27,
+            20
+          ]
+        },
+        {
+          "id": "ai_025_boss",
+          "name": "丧尸王",
+          "level": 15,
+          "art": "monster/zbjl1",
+          "cell": [
+            11,
+            5
+          ]
+        },
+        {
+          "id": "ai_025_mob2",
+          "name": "魔教丧尸",
+          "level": 14,
+          "art": "monster/zb2",
+          "cell": [
+            13,
+            25
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_026",
+      "name": "云灵山",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_026_mob",
+          "name": "山狼",
+          "level": 13,
+          "art": "monster/langw",
+          "cell": [
+            19,
+            28
+          ]
+        },
+        {
+          "id": "ai_026_boss",
+          "name": "山林熊王",
+          "level": 15,
+          "art": "monster/x3",
+          "cell": [
+            27,
+            27
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_027",
+      "name": "云灵山顶",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_027_mob",
+          "name": "棕熊",
+          "level": 15,
+          "art": "monster/x1",
+          "cell": [
+            19,
+            8
+          ]
+        },
+        {
+          "id": "ai_027_boss",
+          "name": "三首妖犬",
+          "level": 17,
+          "art": "monster/dyq2",
+          "cell": [
+            23,
+            23
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_028",
+      "name": "慈云寺北",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_028_mob",
+          "name": "守阵灵将",
+          "level": 30,
+          "art": "monster/nt1",
+          "cell": [
+            26,
+            7
+          ]
+        },
+        {
+          "id": "ai_028_boss",
+          "name": "破阵魔将",
+          "level": 32,
+          "art": "monster/nt3",
+          "cell": [
+            27,
+            28
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_029",
+      "name": "慈云寺",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_029_mob",
+          "name": "叛逃弟子",
+          "level": 31,
+          "art": "monster/dz1",
+          "cell": [
+            26,
+            7
+          ]
+        },
+        {
+          "id": "ai_029_boss",
+          "name": "劫道妖首",
+          "level": 33,
+          "art": "monster/nt2",
+          "cell": [
+            27,
+            28
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_030",
+      "name": "慈云寺外围",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_030_mob",
+          "name": "失心武僧",
+          "level": 30,
+          "art": "monster/hs2",
+          "cell": [
+            26,
+            7
+          ]
+        },
+        {
+          "id": "ai_030_boss",
+          "name": "破阵魔将",
+          "level": 32,
+          "art": "monster/nt3",
+          "cell": [
+            27,
+            28
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_031",
+      "name": "慈云寺密道",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_031_mob",
+          "name": "阵隙魔女",
+          "level": 33,
+          "art": "monster/njs1",
+          "cell": [
+            4,
+            27
+          ]
+        },
+        {
+          "id": "ai_031_boss",
+          "name": "入魔方丈",
+          "level": 35,
+          "art": "monster/hs4",
+          "cell": [
+            25,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_032",
+      "name": "昆仑派",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_032_mob",
+          "name": "寒谷怨灵",
+          "level": 10,
+          "art": "monster/youling3",
+          "cell": [
+            27,
+            7
+          ]
+        },
+        {
+          "id": "ai_032_boss",
+          "name": "封雪妖将",
+          "level": 12,
+          "art": "monster/mm3",
+          "cell": [
+            27,
+            28
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_033",
+      "name": "玄冰谷",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_033_mob",
+          "name": "雪原幽狼",
+          "level": 10,
+          "art": "monster/efw3",
+          "cell": [
+            19,
+            8
+          ]
+        },
+        {
+          "id": "ai_033_boss",
+          "name": "寒岭熊王",
+          "level": 12,
+          "art": "monster/x5",
+          "cell": [
+            18,
+            23
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_034",
+      "name": "玉泉关",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_034_mob",
+          "name": "水脉元魂",
+          "level": 11,
+          "art": "monster/yuanling4",
+          "cell": [
+            7,
+            6
+          ]
+        },
+        {
+          "id": "ai_034_boss",
+          "name": "水府马面",
+          "level": 13,
+          "art": "monster/mm1",
+          "cell": [
+            29,
+            28
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_035",
+      "name": "辟邪村",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_035_mob",
+          "name": "叛徒",
+          "level": 1,
+          "art": "monster/dz1",
+          "cell": [
+            27,
+            18
+          ]
+        },
+        {
+          "id": "ai_035_boss",
+          "name": "劫道妖首",
+          "level": 12,
+          "art": "monster/nt2",
+          "cell": [
+            18,
+            27
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_036",
+      "name": "梯田",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_036_mob",
+          "name": "山狼",
+          "level": 13,
+          "art": "monster/langw",
+          "cell": [
+            23,
+            23
+          ]
+        },
+        {
+          "id": "ai_036_boss",
+          "name": "三首妖犬",
+          "level": 15,
+          "art": "monster/dyq2",
+          "cell": [
+            27,
+            27
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_037",
+      "name": "风云宫",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_037_mob",
+          "name": "叛门剑徒",
+          "level": 13,
+          "art": "monster/dsn1",
+          "cell": [
+            6,
+            26
+          ]
+        },
+        {
+          "id": "ai_037_boss",
+          "name": "入魔方丈",
+          "level": 15,
+          "art": "monster/hs4",
+          "cell": [
+            25,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_038",
+      "name": "凌雪池",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_038_mob",
+          "name": "雪岭白熊",
+          "level": 15,
+          "art": "monster/x5",
+          "cell": [
+            19,
+            6
+          ]
+        },
+        {
+          "id": "ai_038_boss",
+          "name": "封雪妖将",
+          "level": 17,
+          "art": "monster/mm3",
+          "cell": [
+            25,
+            18
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_039",
+      "name": "幽林",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_039_mob",
+          "name": "食人花",
+          "level": 17,
+          "art": "monster/srh",
+          "cell": [
+            21,
+            22
+          ]
+        },
+        {
+          "id": "ai_039_boss",
+          "name": "三首妖犬",
+          "level": 19,
+          "art": "monster/dyq2",
+          "cell": [
+            27,
+            27
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_040",
+      "name": "卧龙潭",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_040_mob",
+          "name": "渡口魔卫",
+          "level": 17,
+          "art": "monster/zb4",
+          "cell": [
+            27,
+            21
+          ]
+        },
+        {
+          "id": "ai_040_boss",
+          "name": "水府马面",
+          "level": 19,
+          "art": "monster/mm1",
+          "cell": [
+            11,
+            5
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_041",
+      "name": "八旗镇",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_041_mob",
+          "name": "叛逃弟子",
+          "level": 20,
+          "art": "monster/dz1",
+          "cell": [
+            25,
+            7
+          ]
+        },
+        {
+          "id": "ai_041_boss",
+          "name": "劫道妖首",
+          "level": 22,
+          "art": "monster/nt2",
+          "cell": [
+            25,
+            28
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_042",
+      "name": "八旗镇西",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_042_mob",
+          "name": "拦路魔徒",
+          "level": 20,
+          "art": "monster/dz5",
+          "cell": [
+            24,
+            19
+          ]
+        },
+        {
+          "id": "ai_042_boss",
+          "name": "叛军统领",
+          "level": 22,
+          "art": "monster/zbjl2",
+          "cell": [
+            19,
+            27
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_043",
+      "name": "沙丘",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_043_mob",
+          "name": "山地野猪",
+          "level": 19,
+          "art": "monster/xt2",
+          "cell": [
+            26,
+            7
+          ]
+        },
+        {
+          "id": "ai_043_boss",
+          "name": "森林之王",
+          "level": 21,
+          "art": "monster/slzw",
+          "cell": [
+            27,
+            28
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_044",
+      "name": "金山绿水",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_044_mob",
+          "name": "渡口魔卫",
+          "level": 23,
+          "art": "monster/zb4",
+          "cell": [
+            7,
+            6
+          ]
+        },
+        {
+          "id": "ai_044_boss",
+          "name": "水府马面",
+          "level": 25,
+          "art": "monster/mm1",
+          "cell": [
+            28,
+            22
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_045",
+      "name": "沙漠荒野",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_045_mob",
+          "name": "山林巨人",
+          "level": 25,
+          "art": "monster/sr2",
+          "cell": [
+            26,
+            7
+          ]
+        },
+        {
+          "id": "ai_045_boss",
+          "name": "三首妖犬",
+          "level": 27,
+          "art": "monster/dyq2",
+          "cell": [
+            27,
+            28
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_046",
+      "name": "流沙平原",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_046_mob",
+          "name": "山狼",
+          "level": 27,
+          "art": "monster/langw",
+          "cell": [
+            26,
+            7
+          ]
+        },
+        {
+          "id": "ai_046_boss",
+          "name": "森林之王",
+          "level": 29,
+          "art": "monster/slzw",
+          "cell": [
+            27,
+            28
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_047",
+      "name": "火云窟",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_047_mob",
+          "name": "炎域恶狼",
+          "level": 28,
+          "art": "monster/efw2",
+          "cell": [
+            18,
+            8
+          ]
+        },
+        {
+          "id": "ai_047_boss",
+          "name": "熔岩巨人首领",
+          "level": 30,
+          "art": "monster/ysg3",
+          "cell": [
+            16,
+            23
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_048",
+      "name": "铸剑池",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_048_mob",
+          "name": "铸剑弟子",
+          "level": 28,
+          "art": "monster/dsn",
+          "cell": [
+            27,
+            22
+          ]
+        },
+        {
+          "id": "ai_048_boss",
+          "name": "水府马面",
+          "level": 30,
+          "art": "monster/mm1",
+          "cell": [
+            11,
+            5
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_049",
+      "name": "神剑峰",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_049_mob",
+          "name": "魔教死士",
+          "level": 31,
+          "art": "monster/dz8",
+          "cell": [
+            17,
+            19
+          ]
+        },
+        {
+          "id": "ai_049_boss",
+          "name": "魔教枪卫（暂名）",
+          "level": 30,
+          "art": "monster/zb5",
+          "cell": [
+            27,
+            28
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_050",
+      "name": "神剑湖",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_050_mob",
+          "name": "水脉元魂",
+          "level": 30,
+          "art": "monster/yuanling4",
+          "cell": [
+            27,
+            20
+          ]
+        },
+        {
+          "id": "ai_050_boss",
+          "name": "水府马面",
+          "level": 32,
+          "art": "monster/mm1",
+          "cell": [
+            11,
+            5
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_051",
+      "name": "雷崖",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_051_mob",
+          "name": "山狼",
+          "level": 32,
+          "art": "monster/langw",
+          "cell": [
+            21,
+            8
+          ]
+        },
+        {
+          "id": "ai_051_boss",
+          "name": "三首妖犬",
+          "level": 34,
+          "art": "monster/dyq2",
+          "cell": [
+            21,
+            20
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_052",
+      "name": "古道",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_052_mob",
+          "name": "棕熊",
+          "level": 32,
+          "art": "monster/x1",
+          "cell": [
+            18,
+            20
+          ]
+        },
+        {
+          "id": "ai_052_boss",
+          "name": "森林之王",
+          "level": 34,
+          "art": "monster/slzw",
+          "cell": [
+            27,
+            27
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_053",
+      "name": "仪凤窟",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_053_mob",
+          "name": "变异僵尸",
+          "level": 36,
+          "art": "monster/zb4",
+          "cell": [
+            21,
+            9
+          ]
+        },
+        {
+          "id": "ai_053_boss",
+          "name": "长枪鬼士",
+          "level": 36,
+          "art": "monster/zb5",
+          "cell": [
+            24,
+            26
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_054",
+      "name": "青螺峪",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_054_mob",
+          "name": "食人花",
+          "level": 35,
+          "art": "monster/srh",
+          "cell": [
+            25,
+            22
+          ]
+        },
+        {
+          "id": "ai_054_boss",
+          "name": "三首妖犬",
+          "level": 37,
+          "art": "monster/dyq2",
+          "cell": [
+            27,
+            27
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_055",
+      "name": "陷空岛",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_055_mob",
+          "name": "雪葬僵尸",
+          "level": 40,
+          "art": "monster/zb6",
+          "cell": [
+            18,
+            20
+          ]
+        },
+        {
+          "id": "ai_055_boss",
+          "name": "空气之魂",
+          "level": 40,
+          "art": "monster/yuanling1",
+          "cell": [
+            27,
+            27
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_056",
+      "name": "白骨之谷",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_056_mob",
+          "name": "山狼",
+          "level": 37,
+          "art": "monster/langw",
+          "cell": [
+            16,
+            22
+          ]
+        },
+        {
+          "id": "ai_056_boss",
+          "name": "山林熊王",
+          "level": 39,
+          "art": "monster/x3",
+          "cell": [
+            27,
+            27
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_057",
+      "name": "紫云宫",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_057_mob",
+          "name": "叛门剑徒",
+          "level": 37,
+          "art": "monster/dsn1",
+          "cell": [
+            7,
+            26
+          ]
+        },
+        {
+          "id": "ai_057_boss",
+          "name": "入魔方丈",
+          "level": 39,
+          "art": "monster/hs4",
+          "cell": [
+            25,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_058",
+      "name": "神碑禅经",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_058_mob",
+          "name": "山地野猪",
+          "level": 37,
+          "art": "monster/xt2",
+          "cell": [
+            18,
+            19
+          ]
+        },
+        {
+          "id": "ai_058_boss",
+          "name": "森林之王",
+          "level": 39,
+          "art": "monster/slzw",
+          "cell": [
+            27,
+            27
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_059",
+      "name": "戴家场",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_059_mob",
+          "name": "山地野猪",
+          "level": 40,
+          "art": "monster/xt2",
+          "cell": [
+            25,
+            18
+          ]
+        },
+        {
+          "id": "ai_059_boss",
+          "name": "劫道妖首",
+          "level": 42,
+          "art": "monster/nt2",
+          "cell": [
+            22,
+            28
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_060",
+      "name": "化血池",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_060_mob",
+          "name": "鲜血之魂",
+          "level": 45,
+          "art": "monster/yuanling3",
+          "cell": [
+            27,
+            22
+          ]
+        },
+        {
+          "id": "ai_060_boss",
+          "name": "血眼蛮士",
+          "level": 45,
+          "art": "monster/ls1",
+          "cell": [
+            11,
+            5
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_061",
+      "name": "屠龙谷",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_061_mob",
+          "name": "鬼府马面",
+          "level": 47,
+          "art": "monster/mm2",
+          "cell": [
+            18,
+            20
+          ]
+        },
+        {
+          "id": "ai_061_boss",
+          "name": "无面者",
+          "level": 49,
+          "art": "monster/wmrn4",
+          "cell": [
+            27,
+            27
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_062",
+      "name": "群雄大殿",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_062_mob",
+          "name": "失心武僧",
+          "level": 40,
+          "art": "monster/hs2",
+          "cell": [
+            5,
+            28
+          ]
+        },
+        {
+          "id": "ai_062_boss",
+          "name": "破阵魔将",
+          "level": 42,
+          "art": "monster/nt3",
+          "cell": [
+            25,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_063",
+      "name": "西方太乙",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_063_mob",
+          "name": "山地野猪",
+          "level": 46,
+          "art": "monster/xt2",
+          "cell": [
+            21,
+            22
+          ]
+        },
+        {
+          "id": "ai_063_boss",
+          "name": "三首妖犬",
+          "level": 48,
+          "art": "monster/dyq2",
+          "cell": [
+            27,
+            27
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_064",
+      "name": "金钟岛",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_064_mob",
+          "name": "熊",
+          "level": 41,
+          "art": "monster/x1",
+          "cell": [
+            18,
+            19
+          ]
+        },
+        {
+          "id": "ai_064_boss",
+          "name": "森林之王",
+          "level": 49,
+          "art": "monster/slzw",
+          "cell": [
+            27,
+            27
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_065",
+      "name": "修罗关",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_065_mob",
+          "name": "山林巨人",
+          "level": 49,
+          "art": "monster/sr2",
+          "cell": [
+            25,
+            27
+          ]
+        },
+        {
+          "id": "ai_065_boss",
+          "name": "山林熊王",
+          "level": 51,
+          "art": "monster/x3",
+          "cell": [
+            28,
+            25
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_066",
+      "name": "妖尸谷",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_066_mob",
+          "name": "厉鬼",
+          "level": 52,
+          "art": "monster/youling4",
+          "cell": [
+            25,
+            22
+          ]
+        },
+        {
+          "id": "ai_066_boss",
+          "name": "三首妖犬",
+          "level": 52,
+          "art": "monster/dyq2",
+          "cell": [
+            27,
+            27
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_067",
+      "name": "乌金障",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_067_mob",
+          "name": "棕熊",
+          "level": 52,
+          "art": "monster/x1",
+          "cell": [
+            18,
+            19
+          ]
+        },
+        {
+          "id": "ai_067_boss",
+          "name": "森林之王",
+          "level": 54,
+          "art": "monster/slzw",
+          "cell": [
+            27,
+            27
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_068",
+      "name": "行刑场",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_068_mob",
+          "name": "食人花",
+          "level": 54,
+          "art": "monster/srh",
+          "cell": [
+            20,
+            28
+          ]
+        },
+        {
+          "id": "ai_068_boss",
+          "name": "刽子手",
+          "level": 54,
+          "art": "monster/nt2",
+          "cell": [
+            27,
+            28
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_069",
+      "name": "碎心崖",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_069_mob",
+          "name": "云滴泪",
+          "level": 55,
+          "art": "monster/njs3",
+          "cell": [
+            23,
+            7
+          ]
+        },
+        {
+          "id": "ai_069_boss",
+          "name": "鬼府枪兵",
+          "level": 56,
+          "art": "monster/zb5",
+          "cell": [
+            22,
+            23
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_070",
+      "name": "如意山",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_070_mob",
+          "name": "山林巨人",
+          "level": 50,
+          "art": "monster/sr2",
+          "cell": [
+            18,
+            20
+          ]
+        },
+        {
+          "id": "ai_070_boss",
+          "name": "森林之王",
+          "level": 52,
+          "art": "monster/slzw",
+          "cell": [
+            27,
+            27
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_071",
+      "name": "玉京潭",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_071_mob",
+          "name": "苦行僧",
+          "level": 55,
+          "art": "monster/hs2",
+          "cell": [
+            28,
+            23
+          ]
+        },
+        {
+          "id": "ai_071_boss",
+          "name": "绿棕熊",
+          "level": 56,
+          "art": "monster/x4",
+          "cell": [
+            10,
+            5
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_072",
+      "name": "大河山川",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_072_mob",
+          "name": "蛮荒野人",
+          "level": 56,
+          "art": "monster/sr",
+          "cell": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "ai_072_boss",
+          "name": "雨林巨人首领",
+          "level": 57,
+          "art": "monster/ysg2",
+          "cell": [
+            28,
+            27
+          ]
+        },
+        {
+          "id": "ai_072_mob2",
+          "name": "雨林巨人",
+          "level": 56,
+          "art": "monster/ysg1",
+          "cell": [
+            12,
+            25
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_073",
+      "name": "迁流峭壁",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_073_mob",
+          "name": "深渊软泥",
+          "level": 58,
+          "art": "monster/wx3",
+          "cell": [
+            17,
+            19
+          ]
+        },
+        {
+          "id": "ai_073_boss",
+          "name": "森林之王",
+          "level": 60,
+          "art": "monster/slzw",
+          "cell": [
+            27,
+            27
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_074",
+      "name": "山顶洞",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_074_mob",
+          "name": "恐怖行尸",
+          "level": 58,
+          "art": "monster/zb3",
+          "cell": [
+            14,
+            7
+          ]
+        },
+        {
+          "id": "ai_074_boss",
+          "name": "千年毒妖",
+          "level": 58,
+          "art": "monster/xrz1",
+          "cell": [
+            24,
+            26
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_075",
+      "name": "万马阵",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_075_mob",
+          "name": "三目童子",
+          "level": 58,
+          "art": "monster/tw1",
+          "cell": [
+            21,
+            22
+          ]
+        },
+        {
+          "id": "ai_075_boss",
+          "name": "三首妖犬",
+          "level": 60,
+          "art": "monster/dyq2",
+          "cell": [
+            27,
+            27
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_076",
+      "name": "九宫阁",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_076_mob",
+          "name": "守阵灵将",
+          "level": 55,
+          "art": "monster/nt1",
+          "cell": [
+            7,
+            26
+          ]
+        },
+        {
+          "id": "ai_076_boss",
+          "name": "破阵魔将",
+          "level": 57,
+          "art": "monster/nt3",
+          "cell": [
+            25,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_077",
+      "name": "正派营地",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_077_mob",
+          "name": "叛门剑徒",
+          "level": 58,
+          "art": "monster/dsn1",
+          "cell": [
+            15,
+            18
+          ]
+        },
+        {
+          "id": "ai_077_boss",
+          "name": "入魔方丈",
+          "level": 60,
+          "art": "monster/hs4",
+          "cell": [
+            22,
+            12
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_078",
+      "name": "天下武场",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_078_mob",
+          "name": "山地野猪",
+          "level": 59,
+          "art": "monster/xt2",
+          "cell": [
+            24,
+            21
+          ]
+        },
+        {
+          "id": "ai_078_boss",
+          "name": "霸天大将",
+          "level": 59,
+          "art": "monster/nt3",
+          "cell": [
+            27,
+            27
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_079",
+      "name": "火礁祭坛",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_079_mob",
+          "name": "炎域恶狼",
+          "level": 8,
+          "art": "monster/efw2",
+          "cell": [
+            19,
+            8
+          ]
+        },
+        {
+          "id": "ai_079_boss",
+          "name": "熔岩巨人首领",
+          "level": 10,
+          "art": "monster/ysg3",
+          "cell": [
+            18,
+            25
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_080",
+      "name": "地狱",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_080_mob",
+          "name": "火脉元魂",
+          "level": 1,
+          "art": "monster/yuanling3",
+          "cell": [
+            20,
+            5
+          ]
+        },
+        {
+          "id": "ai_080_boss",
+          "name": "焚脉妖王",
+          "level": 3,
+          "art": "monster/hg2",
+          "cell": [
+            26,
+            25
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_081",
+      "name": "擂台",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_081_mob",
+          "name": "山狼",
+          "level": 10,
+          "art": "monster/langw",
+          "cell": [
+            15,
+            20
+          ]
+        },
+        {
+          "id": "ai_081_boss",
+          "name": "三首妖犬",
+          "level": 12,
+          "art": "monster/dyq2",
+          "cell": [
+            21,
+            12
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_082",
+      "name": "流放之地",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_082_mob",
+          "name": "棕熊",
+          "level": 1,
+          "art": "monster/x1",
+          "cell": [
+            18,
+            20
+          ]
+        },
+        {
+          "id": "ai_082_boss",
+          "name": "森林之王",
+          "level": 3,
+          "art": "monster/slzw",
+          "cell": [
+            26,
+            27
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_083",
+      "name": "莫言山",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_083_mob",
+          "name": "恐怖食人花",
+          "level": 20,
+          "art": "monster/srh",
+          "cell": [
+            17,
+            23
+          ]
+        },
+        {
+          "id": "ai_083_boss",
+          "name": "血染熊王",
+          "level": 20,
+          "art": "monster/x3",
+          "cell": [
+            27,
+            27
+          ]
+        },
+        {
+          "id": "ai_083_mob2",
+          "name": "森林幽狼",
+          "level": 20,
+          "art": "monster/efw1",
+          "cell": [
+            14,
+            20
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_084",
+      "name": "赤岩峡",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_084_mob",
+          "name": "焱精",
+          "level": 20,
+          "art": "monster/hg1",
+          "cell": [
+            19,
+            8
+          ]
+        },
+        {
+          "id": "ai_084_boss",
+          "name": "岩浆巨人",
+          "level": 20,
+          "art": "monster/ysg3",
+          "cell": [
+            23,
+            20
+          ]
+        },
+        {
+          "id": "ai_084_mob2",
+          "name": "森林幽狼",
+          "level": 20,
+          "art": "monster/efw1",
+          "cell": [
+            14,
+            22
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_085",
+      "name": "潭溪山",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_085_mob",
+          "name": "森林幽狼",
+          "level": 20,
+          "art": "monster/efw1",
+          "cell": [
+            27,
+            20
+          ]
+        },
+        {
+          "id": "ai_085_boss",
+          "name": "恐怖食人花",
+          "level": 20,
+          "art": "monster/srh",
+          "cell": [
+            10,
+            5
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_086",
+      "name": "莫言谷",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_086_mob",
+          "name": "山狼",
+          "level": 15,
+          "art": "monster/langw",
+          "cell": [
+            20,
+            27
+          ]
+        },
+        {
+          "id": "ai_086_boss",
+          "name": "森林之王",
+          "level": 20,
+          "art": "monster/slzw",
+          "cell": [
+            27,
+            28
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_087",
+      "name": "地宫大殿",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_087_mob",
+          "name": "慈云寺淫僧",
+          "level": 35,
+          "art": "monster/hs1",
+          "cell": [
+            15,
+            7
+          ]
+        },
+        {
+          "id": "ai_087_boss",
+          "name": "酒肉方丈悟信",
+          "level": 35,
+          "art": "monster/hs4",
+          "cell": [
+            24,
+            26
+          ]
+        },
+        {
+          "id": "ai_087_mob2",
+          "name": "黑魁罗汉",
+          "level": 35,
+          "art": "monster/hs3",
+          "cell": [
+            19,
+            21
+          ]
+        },
+        {
+          "id": "ai_087_mob3",
+          "name": "狂傲武僧",
+          "level": 35,
+          "art": "monster/hs2",
+          "cell": [
+            22,
+            19
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_088",
+      "name": "枉死路",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_088_mob",
+          "name": "震棺僵尸",
+          "level": 35,
+          "art": "monster/zb1",
+          "cell": [
+            12,
+            6
+          ]
+        },
+        {
+          "id": "ai_088_boss",
+          "name": "殉葬怨灵",
+          "level": 35,
+          "art": "monster/youling1",
+          "cell": [
+            24,
+            28
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_089",
+      "name": "墓道法阵",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_089_mob",
+          "name": "地宫骷髅",
+          "level": 35,
+          "art": "monster/klb3",
+          "cell": [
+            21,
+            10
+          ]
+        },
+        {
+          "id": "ai_089_boss",
+          "name": "冥府将军",
+          "level": 35,
+          "art": "monster/nt1",
+          "cell": [
+            24,
+            27
+          ]
+        },
+        {
+          "id": "ai_089_mob2",
+          "name": "震棺僵尸",
+          "level": 35,
+          "art": "monster/zb1",
+          "cell": [
+            19,
+            22
+          ]
+        },
+        {
+          "id": "ai_089_mob3",
+          "name": "殉葬怨灵",
+          "level": 35,
+          "art": "monster/youling1",
+          "cell": [
+            23,
+            19
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_090",
+      "name": "将军冢",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_090_mob",
+          "name": "地宫骷髅",
+          "level": 30,
+          "art": "monster/klb3",
+          "cell": [
+            20,
+            9
+          ]
+        },
+        {
+          "id": "ai_090_boss",
+          "name": "兵俑大帝",
+          "level": 35,
+          "art": "monster/bmy",
+          "cell": [
+            25,
+            26
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_091",
+      "name": "落雪池",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_091_mob",
+          "name": "勾魂姹女",
+          "level": 50,
+          "art": "monster/njs2",
+          "cell": [
+            20,
+            7
+          ]
+        },
+        {
+          "id": "ai_091_boss",
+          "name": "拜蛇教魔女",
+          "level": 50,
+          "art": "monster/njs1",
+          "cell": [
+            17,
+            25
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_092",
+      "name": "隐龙窟",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_092_mob",
+          "name": "勾魂姹女",
+          "level": 50,
+          "art": "monster/njs2",
+          "cell": [
+            16,
+            7
+          ]
+        },
+        {
+          "id": "ai_092_boss",
+          "name": "千年蛇妖",
+          "level": 50,
+          "art": "monster/slzw",
+          "cell": [
+            24,
+            25
+          ]
+        },
+        {
+          "id": "ai_092_mob2",
+          "name": "拜蛇教魔女",
+          "level": 50,
+          "art": "monster/njs1",
+          "cell": [
+            13,
+            24
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_093",
+      "name": "浴血崖",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_093_mob",
+          "name": "血魔魂媒",
+          "level": 50,
+          "art": "monster/njs4",
+          "cell": [
+            15,
+            7
+          ]
+        },
+        {
+          "id": "ai_093_boss",
+          "name": "赤火神倪",
+          "level": 50,
+          "art": "monster/xn4",
+          "cell": [
+            28,
+            25
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_094",
+      "name": "阴阳道",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_094_mob",
+          "name": "地宫骷髅",
+          "level": 60,
+          "art": "monster/klb3",
+          "cell": [
+            12,
+            5
+          ]
+        },
+        {
+          "id": "ai_094_boss",
+          "name": "冥府三头犬",
+          "level": 50,
+          "art": "monster/dyq3",
+          "cell": [
+            22,
+            28
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_095",
+      "name": "映波谷",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_095_mob",
+          "name": "麻头鬼王",
+          "level": 50,
+          "art": "monster/ls2",
+          "cell": [
+            24,
+            27
+          ]
+        },
+        {
+          "id": "ai_095_boss",
+          "name": "炽焰冷魂",
+          "level": 50,
+          "art": "monster/yuanling4",
+          "cell": [
+            28,
+            26
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_096",
+      "name": "祈星台",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_096_mob",
+          "name": "山狼",
+          "level": 60,
+          "art": "monster/langw",
+          "cell": [
+            21,
+            21
+          ]
+        },
+        {
+          "id": "ai_096_boss",
+          "name": "血魔化身",
+          "level": 50,
+          "art": "monster/hg2",
+          "cell": [
+            27,
+            27
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_097",
+      "name": "莫言山",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_097_mob",
+          "name": "恐怖食人花",
+          "level": 30,
+          "art": "monster/srh",
+          "cell": [
+            18,
+            20
+          ]
+        },
+        {
+          "id": "ai_097_boss",
+          "name": "血染熊王",
+          "level": 30,
+          "art": "monster/x3",
+          "cell": [
+            27,
+            27
+          ]
+        },
+        {
+          "id": "ai_097_mob2",
+          "name": "森林幽狼",
+          "level": 30,
+          "art": "monster/efw1",
+          "cell": [
+            14,
+            19
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_098",
+      "name": "赤岩峡",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_098_mob",
+          "name": "焱精",
+          "level": 30,
+          "art": "monster/hg1",
+          "cell": [
+            19,
+            7
+          ]
+        },
+        {
+          "id": "ai_098_boss",
+          "name": "岩浆巨人",
+          "level": 30,
+          "art": "monster/ysg3",
+          "cell": [
+            26,
+            19
+          ]
+        },
+        {
+          "id": "ai_098_mob2",
+          "name": "森林幽狼",
+          "level": 30,
+          "art": "monster/efw1",
+          "cell": [
+            13,
+            17
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_099",
+      "name": "潭溪山",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_099_mob",
+          "name": "森林幽狼",
+          "level": 30,
+          "art": "monster/efw1",
+          "cell": [
+            27,
+            22
+          ]
+        },
+        {
+          "id": "ai_099_boss",
+          "name": "恐怖食人花",
+          "level": 30,
+          "art": "monster/srh",
+          "cell": [
+            11,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_100",
+      "name": "莫言谷",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_100_mob",
+          "name": "山林巨人",
+          "level": 25,
+          "art": "monster/sr2",
+          "cell": [
+            18,
+            19
+          ]
+        },
+        {
+          "id": "ai_100_boss",
+          "name": "森林之王",
+          "level": 30,
+          "art": "monster/slzw",
+          "cell": [
+            26,
+            27
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_101",
+      "name": "地宫大殿",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_101_mob",
+          "name": "慈云寺淫僧",
+          "level": 45,
+          "art": "monster/hs1",
+          "cell": [
+            20,
+            9
+          ]
+        },
+        {
+          "id": "ai_101_boss",
+          "name": "酒肉方丈悟信",
+          "level": 45,
+          "art": "monster/hs4",
+          "cell": [
+            24,
+            27
+          ]
+        },
+        {
+          "id": "ai_101_mob2",
+          "name": "黑魁罗汉",
+          "level": 45,
+          "art": "monster/hs3",
+          "cell": [
+            19,
+            21
+          ]
+        },
+        {
+          "id": "ai_101_mob3",
+          "name": "狂傲武僧",
+          "level": 45,
+          "art": "monster/hs2",
+          "cell": [
+            22,
+            19
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_102",
+      "name": "枉死路",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_102_mob",
+          "name": "震棺僵尸",
+          "level": 45,
+          "art": "monster/zb1",
+          "cell": [
+            13,
+            7
+          ]
+        },
+        {
+          "id": "ai_102_boss",
+          "name": "殉葬怨灵",
+          "level": 45,
+          "art": "monster/youling1",
+          "cell": [
+            22,
+            28
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_103",
+      "name": "墓道法阵",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_103_mob",
+          "name": "地宫骷髅",
+          "level": 45,
+          "art": "monster/klb3",
+          "cell": [
+            15,
+            7
+          ]
+        },
+        {
+          "id": "ai_103_boss",
+          "name": "冥府将军",
+          "level": 45,
+          "art": "monster/nt1",
+          "cell": [
+            26,
+            27
+          ]
+        },
+        {
+          "id": "ai_103_mob2",
+          "name": "震棺僵尸",
+          "level": 45,
+          "art": "monster/zb1",
+          "cell": [
+            22,
+            21
+          ]
+        },
+        {
+          "id": "ai_103_mob3",
+          "name": "殉葬怨灵",
+          "level": 45,
+          "art": "monster/youling1",
+          "cell": [
+            23,
+            25
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_104",
+      "name": "将军冢",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_104_mob",
+          "name": "古墓软泥",
+          "level": 40,
+          "art": "monster/wx2",
+          "cell": [
+            15,
+            9
+          ]
+        },
+        {
+          "id": "ai_104_boss",
+          "name": "兵俑大帝",
+          "level": 45,
+          "art": "monster/bmy",
+          "cell": [
+            24,
+            27
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_105",
+      "name": "莫言山",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_105_mob",
+          "name": "恐怖食人花",
+          "level": 40,
+          "art": "monster/srh",
+          "cell": [
+            22,
+            25
+          ]
+        },
+        {
+          "id": "ai_105_boss",
+          "name": "血染熊王",
+          "level": 40,
+          "art": "monster/x3",
+          "cell": [
+            27,
+            27
+          ]
+        },
+        {
+          "id": "ai_105_mob2",
+          "name": "森林幽狼",
+          "level": 40,
+          "art": "monster/efw1",
+          "cell": [
+            13,
+            23
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_106",
+      "name": "赤岩峡",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_106_mob",
+          "name": "焱精",
+          "level": 40,
+          "art": "monster/hg1",
+          "cell": [
+            22,
+            7
+          ]
+        },
+        {
+          "id": "ai_106_boss",
+          "name": "岩浆巨人",
+          "level": 40,
+          "art": "monster/ysg3",
+          "cell": [
+            18,
+            25
+          ]
+        },
+        {
+          "id": "ai_106_mob2",
+          "name": "森林幽狼",
+          "level": 40,
+          "art": "monster/efw1",
+          "cell": [
+            17,
+            20
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_107",
+      "name": "潭溪山",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_107_mob",
+          "name": "森林幽狼",
+          "level": 40,
+          "art": "monster/efw1",
+          "cell": [
+            27,
+            21
+          ]
+        },
+        {
+          "id": "ai_107_boss",
+          "name": "恐怖食人花",
+          "level": 40,
+          "art": "monster/srh",
+          "cell": [
+            11,
+            5
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_108",
+      "name": "莫言谷",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_108_mob",
+          "name": "山地野猪",
+          "level": 35,
+          "art": "monster/xt2",
+          "cell": [
+            21,
+            22
+          ]
+        },
+        {
+          "id": "ai_108_boss",
+          "name": "森林之王",
+          "level": 40,
+          "art": "monster/slzw",
+          "cell": [
+            27,
+            27
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_109",
+      "name": "地宫大殿",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_109_mob",
+          "name": "慈云寺淫僧",
+          "level": 55,
+          "art": "monster/hs1",
+          "cell": [
+            20,
+            8
+          ]
+        },
+        {
+          "id": "ai_109_boss",
+          "name": "酒肉方丈悟信",
+          "level": 55,
+          "art": "monster/hs4",
+          "cell": [
+            24,
+            27
+          ]
+        },
+        {
+          "id": "ai_109_mob2",
+          "name": "黑魁罗汉",
+          "level": 55,
+          "art": "monster/hs3",
+          "cell": [
+            22,
+            21
+          ]
+        },
+        {
+          "id": "ai_109_mob3",
+          "name": "狂傲武僧",
+          "level": 55,
+          "art": "monster/hs2",
+          "cell": [
+            25,
+            23
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_110",
+      "name": "枉死路",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_110_mob",
+          "name": "震棺僵尸",
+          "level": 55,
+          "art": "monster/zb1",
+          "cell": [
+            15,
+            7
+          ]
+        },
+        {
+          "id": "ai_110_boss",
+          "name": "殉葬怨灵",
+          "level": 55,
+          "art": "monster/youling1",
+          "cell": [
+            20,
+            28
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_111",
+      "name": "墓道法阵",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_111_mob",
+          "name": "地宫骷髅",
+          "level": 55,
+          "art": "monster/klb3",
+          "cell": [
+            19,
+            8
+          ]
+        },
+        {
+          "id": "ai_111_boss",
+          "name": "冥府将军",
+          "level": 55,
+          "art": "monster/nt1",
+          "cell": [
+            24,
+            26
+          ]
+        },
+        {
+          "id": "ai_111_mob2",
+          "name": "震棺僵尸",
+          "level": 55,
+          "art": "monster/zb1",
+          "cell": [
+            19,
+            21
+          ]
+        },
+        {
+          "id": "ai_111_mob3",
+          "name": "殉葬怨灵",
+          "level": 55,
+          "art": "monster/youling1",
+          "cell": [
+            22,
+            16
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_112",
+      "name": "将军冢",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_112_mob",
+          "name": "古墓软泥",
+          "level": 50,
+          "art": "monster/wx2",
+          "cell": [
+            15,
+            9
+          ]
+        },
+        {
+          "id": "ai_112_boss",
+          "name": "兵俑大帝",
+          "level": 55,
+          "art": "monster/bmy",
+          "cell": [
+            22,
+            27
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_113",
+      "name": "莫言山",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_113_mob",
+          "name": "恐怖食人花",
+          "level": 50,
+          "art": "monster/srh",
+          "cell": [
+            17,
+            23
+          ]
+        },
+        {
+          "id": "ai_113_boss",
+          "name": "血染熊王",
+          "level": 50,
+          "art": "monster/x3",
+          "cell": [
+            27,
+            27
+          ]
+        },
+        {
+          "id": "ai_113_mob2",
+          "name": "森林幽狼",
+          "level": 50,
+          "art": "monster/efw1",
+          "cell": [
+            14,
+            20
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_114",
+      "name": "赤岩峡",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_114_mob",
+          "name": "焱精",
+          "level": 50,
+          "art": "monster/hg1",
+          "cell": [
+            21,
+            9
+          ]
+        },
+        {
+          "id": "ai_114_boss",
+          "name": "岩浆巨人",
+          "level": 50,
+          "art": "monster/ysg3",
+          "cell": [
+            22,
+            21
+          ]
+        },
+        {
+          "id": "ai_114_mob2",
+          "name": "森林幽狼",
+          "level": 50,
+          "art": "monster/efw1",
+          "cell": [
+            14,
+            22
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_115",
+      "name": "潭溪山",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_115_mob",
+          "name": "森林幽狼",
+          "level": 50,
+          "art": "monster/efw1",
+          "cell": [
+            27,
+            21
+          ]
+        },
+        {
+          "id": "ai_115_boss",
+          "name": "恐怖食人花",
+          "level": 50,
+          "art": "monster/srh",
+          "cell": [
+            11,
+            5
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_116",
+      "name": "莫言谷",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_116_mob",
+          "name": "山狼",
+          "level": 45,
+          "art": "monster/langw",
+          "cell": [
+            20,
+            28
+          ]
+        },
+        {
+          "id": "ai_116_boss",
+          "name": "森林之王",
+          "level": 50,
+          "art": "monster/slzw",
+          "cell": [
+            27,
+            27
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_117",
+      "name": "落雪池",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_117_mob",
+          "name": "勾魂姹女",
+          "level": 55,
+          "art": "monster/njs2",
+          "cell": [
+            21,
+            7
+          ]
+        },
+        {
+          "id": "ai_117_boss",
+          "name": "拜蛇教魔女",
+          "level": 55,
+          "art": "monster/njs1",
+          "cell": [
+            22,
+            23
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_118",
+      "name": "隐龙窟",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_118_mob",
+          "name": "勾魂姹女",
+          "level": 55,
+          "art": "monster/njs2",
+          "cell": [
+            15,
+            7
+          ]
+        },
+        {
+          "id": "ai_118_boss",
+          "name": "千年蛇妖",
+          "level": 55,
+          "art": "monster/slzw",
+          "cell": [
+            26,
+            25
+          ]
+        },
+        {
+          "id": "ai_118_mob2",
+          "name": "拜蛇教魔女",
+          "level": 55,
+          "art": "monster/njs1",
+          "cell": [
+            20,
+            23
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_119",
+      "name": "浴血崖",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_119_mob",
+          "name": "血魔魂媒",
+          "level": 55,
+          "art": "monster/njs4",
+          "cell": [
+            12,
+            5
+          ]
+        },
+        {
+          "id": "ai_119_boss",
+          "name": "赤火神倪",
+          "level": 55,
+          "art": "monster/xn4",
+          "cell": [
+            28,
+            25
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_120",
+      "name": "阴阳道",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_120_mob",
+          "name": "古墓软泥",
+          "level": 45,
+          "art": "monster/wx2",
+          "cell": [
+            14,
+            6
+          ]
+        },
+        {
+          "id": "ai_120_boss",
+          "name": "冥府三头犬",
+          "level": 55,
+          "art": "monster/dyq3",
+          "cell": [
+            21,
+            28
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_121",
+      "name": "映波谷",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_121_mob",
+          "name": "麻头鬼王",
+          "level": 55,
+          "art": "monster/ls2",
+          "cell": [
+            17,
+            19
+          ]
+        },
+        {
+          "id": "ai_121_boss",
+          "name": "炽焰冷魂",
+          "level": 55,
+          "art": "monster/yuanling4",
+          "cell": [
+            27,
+            27
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_122",
+      "name": "祈星台",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_122_mob",
+          "name": "棕熊",
+          "level": 45,
+          "art": "monster/x1",
+          "cell": [
+            17,
+            18
+          ]
+        },
+        {
+          "id": "ai_122_boss",
+          "name": "血魔化身",
+          "level": 55,
+          "art": "monster/hg2",
+          "cell": [
+            27,
+            27
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_123",
+      "name": "落雪池",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_123_mob",
+          "name": "勾魂姹女",
+          "level": 60,
+          "art": "monster/njs2",
+          "cell": [
+            19,
+            6
+          ]
+        },
+        {
+          "id": "ai_123_boss",
+          "name": "拜蛇教魔女",
+          "level": 60,
+          "art": "monster/njs1",
+          "cell": [
+            22,
+            23
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_124",
+      "name": "隐龙窟",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_124_mob",
+          "name": "勾魂姹女",
+          "level": 60,
+          "art": "monster/njs2",
+          "cell": [
+            13,
+            6
+          ]
+        },
+        {
+          "id": "ai_124_boss",
+          "name": "千年蛇妖",
+          "level": 60,
+          "art": "monster/slzw",
+          "cell": [
+            24,
+            26
+          ]
+        },
+        {
+          "id": "ai_124_mob2",
+          "name": "拜蛇教魔女",
+          "level": 60,
+          "art": "monster/njs1",
+          "cell": [
+            21,
+            24
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_125",
+      "name": "浴血崖",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_125_mob",
+          "name": "血魔魂媒",
+          "level": 60,
+          "art": "monster/njs4",
+          "cell": [
+            13,
+            7
+          ]
+        },
+        {
+          "id": "ai_125_boss",
+          "name": "赤火神倪",
+          "level": 60,
+          "art": "monster/xn4",
+          "cell": [
+            27,
+            22
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_126",
+      "name": "阴阳道",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_126_mob",
+          "name": "地宫骷髅",
+          "level": 50,
+          "art": "monster/klb3",
+          "cell": [
+            15,
+            7
+          ]
+        },
+        {
+          "id": "ai_126_boss",
+          "name": "冥府三头犬",
+          "level": 60,
+          "art": "monster/dyq3",
+          "cell": [
+            24,
+            28
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_127",
+      "name": "映波谷",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_127_mob",
+          "name": "麻头鬼王",
+          "level": 60,
+          "art": "monster/ls2",
+          "cell": [
+            18,
+            20
+          ]
+        },
+        {
+          "id": "ai_127_boss",
+          "name": "炽焰冷魂",
+          "level": 60,
+          "art": "monster/yuanling4",
+          "cell": [
+            27,
+            27
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_128",
+      "name": "祈星台",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_128_mob",
+          "name": "山地野猪",
+          "level": 50,
+          "art": "monster/xt2",
+          "cell": [
+            16,
+            23
+          ]
+        },
+        {
+          "id": "ai_128_boss",
+          "name": "血魔化身",
+          "level": 60,
+          "art": "monster/hg2",
+          "cell": [
+            27,
+            27
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_129",
+      "name": "百花谷",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_129_mob",
+          "name": "花谷异兽",
+          "level": 50,
+          "art": "monster/fq2",
+          "cell": [
+            23,
+            16
+          ]
+        },
+        {
+          "id": "ai_129_boss",
+          "name": "噬香花妖",
+          "level": 52,
+          "art": "monster/srh2",
+          "cell": [
+            28,
+            28
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_130",
+      "name": "魔界一层上",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_130_mob",
+          "name": "吞噬怪(魔)",
+          "level": 27,
+          "art": "monster/fq1",
+          "cell": [
+            14,
+            6
+          ]
+        },
+        {
+          "id": "ai_130_boss",
+          "name": "冥府三头犬",
+          "level": 22,
+          "art": "monster/dyq3",
+          "cell": [
+            23,
+            26
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_131",
+      "name": "魔界一层中",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_131_mob",
+          "name": "地宫骷髅",
+          "level": 20,
+          "art": "monster/klb3",
+          "cell": [
+            20,
+            9
+          ]
+        },
+        {
+          "id": "ai_131_boss",
+          "name": "洞府马面",
+          "level": 22,
+          "art": "monster/mm2",
+          "cell": [
+            24,
+            25
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_132",
+      "name": "魔界一层下",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_132_mob",
+          "name": "洞窟行尸",
+          "level": 20,
+          "art": "monster/zb2",
+          "cell": [
+            13,
+            7
+          ]
+        },
+        {
+          "id": "ai_132_boss",
+          "name": "吞噬妖王",
+          "level": 22,
+          "art": "monster/fq3",
+          "cell": [
+            24,
+            25
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_133",
+      "name": "魔界二层上",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_133_mob",
+          "name": "洞穴吞噬怪",
+          "level": 31,
+          "art": "monster/fq1",
+          "cell": [
+            21,
+            9
+          ]
+        },
+        {
+          "id": "ai_133_boss",
+          "name": "冥府三头犬",
+          "level": 33,
+          "art": "monster/dyq3",
+          "cell": [
+            24,
+            26
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_134",
+      "name": "魔界二层中",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_134_mob",
+          "name": "地穴软泥",
+          "level": 31,
+          "art": "monster/wx3",
+          "cell": [
+            13,
+            5
+          ]
+        },
+        {
+          "id": "ai_134_boss",
+          "name": "洞府马面",
+          "level": 33,
+          "art": "monster/mm2",
+          "cell": [
+            22,
+            26
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_135",
+      "name": "魔界二层下",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_135_mob",
+          "name": "地宫骷髅",
+          "level": 31,
+          "art": "monster/klb3",
+          "cell": [
+            14,
+            7
+          ]
+        },
+        {
+          "id": "ai_135_boss",
+          "name": "吞噬妖王",
+          "level": 33,
+          "art": "monster/fq3",
+          "cell": [
+            24,
+            24
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_136",
+      "name": "魔界三层上",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_136_mob",
+          "name": "洞窟行尸",
+          "level": 41,
+          "art": "monster/zb2",
+          "cell": [
+            15,
+            7
+          ]
+        },
+        {
+          "id": "ai_136_boss",
+          "name": "冥府三头犬",
+          "level": 43,
+          "art": "monster/dyq3",
+          "cell": [
+            24,
+            25
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_137",
+      "name": "魔界三层中",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_137_mob",
+          "name": "洞穴吞噬怪",
+          "level": 41,
+          "art": "monster/fq1",
+          "cell": [
+            21,
+            9
+          ]
+        },
+        {
+          "id": "ai_137_boss",
+          "name": "洞府马面",
+          "level": 43,
+          "art": "monster/mm2",
+          "cell": [
+            24,
+            27
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_138",
+      "name": "魔界三层下",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_138_mob",
+          "name": "地穴软泥",
+          "level": 41,
+          "art": "monster/wx3",
+          "cell": [
+            12,
+            5
+          ]
+        },
+        {
+          "id": "ai_138_boss",
+          "name": "吞噬妖王",
+          "level": 43,
+          "art": "monster/fq3",
+          "cell": [
+            24,
+            27
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_139",
+      "name": "魔界四层上",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_139_mob",
+          "name": "血眼战士(魔)",
+          "level": 54,
+          "art": "monster/ls1",
+          "cell": [
+            16,
+            7
+          ]
+        },
+        {
+          "id": "ai_139_boss",
+          "name": "血之怨灵(魔)",
+          "level": 54,
+          "art": "monster/youling2",
+          "cell": [
+            24,
+            26
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_140",
+      "name": "魔界四层中",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_140_mob",
+          "name": "剧毒吞噬怪(魔)",
+          "level": 54,
+          "art": "monster/fq4",
+          "cell": [
+            12,
+            6
+          ]
+        },
+        {
+          "id": "ai_140_boss",
+          "name": "沥血元魂(魔)",
+          "level": 54,
+          "art": "monster/yuanling3",
+          "cell": [
+            22,
+            26
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_141",
+      "name": "魔界四层下",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_141_mob",
+          "name": "洞穴吞噬怪",
+          "level": 51,
+          "art": "monster/fq1",
+          "cell": [
+            21,
+            9
+          ]
+        },
+        {
+          "id": "ai_141_boss",
+          "name": "吞噬妖王",
+          "level": 53,
+          "art": "monster/fq3",
+          "cell": [
+            24,
+            26
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_142",
+      "name": "旧卧云镇",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_142_mob",
+          "name": "拦路魔徒",
+          "level": 28,
+          "art": "monster/dz5",
+          "cell": [
+            22,
+            20
+          ]
+        },
+        {
+          "id": "ai_142_boss",
+          "name": "叛军统领",
+          "level": 30,
+          "art": "monster/zbjl2",
+          "cell": [
+            19,
+            27
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_143",
+      "name": "旧卧云镇北",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_143_mob",
+          "name": "山地野猪",
+          "level": 33,
+          "art": "monster/xt2",
+          "cell": [
+            23,
+            19
+          ]
+        },
+        {
+          "id": "ai_143_boss",
+          "name": "劫道妖首",
+          "level": 35,
+          "art": "monster/nt2",
+          "cell": [
+            20,
+            26
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_144",
+      "name": "旧八旗镇",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_144_mob",
+          "name": "劫道枪卫",
+          "level": 37,
+          "art": "monster/zb5",
+          "cell": [
+            24,
+            18
+          ]
+        },
+        {
+          "id": "ai_144_boss",
+          "name": "叛军统领",
+          "level": 39,
+          "art": "monster/zbjl2",
+          "cell": [
+            18,
+            27
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_145",
+      "name": "旧八旗镇西",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_145_mob",
+          "name": "叛逃弟子",
+          "level": 42,
+          "art": "monster/dz1",
+          "cell": [
+            27,
+            19
+          ]
+        },
+        {
+          "id": "ai_145_boss",
+          "name": "劫道妖首",
+          "level": 44,
+          "art": "monster/nt2",
+          "cell": [
+            19,
+            27
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_146",
+      "name": "旧慈云寺北",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_146_mob",
+          "name": "失心武僧",
+          "level": 46,
+          "art": "monster/hs2",
+          "cell": [
+            4,
+            28
+          ]
+        },
+        {
+          "id": "ai_146_boss",
+          "name": "破阵魔将",
+          "level": 48,
+          "art": "monster/nt3",
+          "cell": [
+            25,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_147",
+      "name": "旧慈云寺",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_147_mob",
+          "name": "阵隙魔女",
+          "level": 51,
+          "art": "monster/njs1",
+          "cell": [
+            5,
+            26
+          ]
+        },
+        {
+          "id": "ai_147_boss",
+          "name": "入魔方丈",
+          "level": 53,
+          "art": "monster/hs4",
+          "cell": [
+            25,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_148",
+      "name": "旧戴家场",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_148_mob",
+          "name": "山地野猪",
+          "level": 55,
+          "art": "monster/xt2",
+          "cell": [
+            18,
+            20
+          ]
+        },
+        {
+          "id": "ai_148_boss",
+          "name": "森林之王",
+          "level": 57,
+          "art": "monster/slzw",
+          "cell": [
+            27,
+            27
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_149",
+      "name": "旧群雄大殿",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_149_mob",
+          "name": "叛门剑徒",
+          "level": 60,
+          "art": "monster/dsn1",
+          "cell": [
+            5,
+            29
+          ]
+        },
+        {
+          "id": "ai_149_boss",
+          "name": "入魔方丈",
+          "level": 60,
+          "art": "monster/hs4",
+          "cell": [
+            25,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_150",
+      "name": "群英会主会场",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_150_mob",
+          "name": "山林巨人",
+          "level": 20,
+          "art": "monster/sr2",
+          "cell": [
+            15,
+            18
+          ]
+        },
+        {
+          "id": "ai_150_boss",
+          "name": "三首妖犬",
+          "level": 22,
+          "art": "monster/dyq2",
+          "cell": [
+            22,
+            12
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_151",
+      "name": "群英会分会场",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_151_mob",
+          "name": "山狼",
+          "level": 20,
+          "art": "monster/langw",
+          "cell": [
+            15,
+            20
+          ]
+        },
+        {
+          "id": "ai_151_boss",
+          "name": "森林之王",
+          "level": 22,
+          "art": "monster/slzw",
+          "cell": [
+            21,
+            12
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_152",
+      "name": "无尽之路",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_152_mob",
+          "name": "棕熊",
+          "level": 20,
+          "art": "monster/x1",
+          "cell": [
+            15,
+            22
+          ]
+        },
+        {
+          "id": "ai_152_boss",
+          "name": "山林熊王",
+          "level": 22,
+          "art": "monster/x3",
+          "cell": [
+            27,
+            27
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_153",
+      "name": "流云山顶",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_153_mob",
+          "name": "山地野猪",
+          "level": 50,
+          "art": "monster/xt2",
+          "cell": [
+            19,
+            8
+          ]
+        },
+        {
+          "id": "ai_153_boss",
+          "name": "三首妖犬",
+          "level": 52,
+          "art": "monster/dyq2",
+          "cell": [
+            16,
+            24
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_154",
+      "name": "乾坤道",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_154_mob",
+          "name": "食人花",
+          "level": 50,
+          "art": "monster/srh",
+          "cell": [
+            18,
+            24
+          ]
+        },
+        {
+          "id": "ai_154_boss",
+          "name": "森林之王",
+          "level": 52,
+          "art": "monster/slzw",
+          "cell": [
+            27,
+            27
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_155",
+      "name": "迷流河",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_155_mob",
+          "name": "寒潭怨灵",
+          "level": 50,
+          "art": "monster/youling3",
+          "cell": [
+            6,
+            6
+          ]
+        },
+        {
+          "id": "ai_155_boss",
+          "name": "锁水蛇妖",
+          "level": 52,
+          "art": "monster/slzw",
+          "cell": [
+            29,
+            29
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_156",
+      "name": "帮会擂台",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_156_mob",
+          "name": "山狼",
+          "level": 15,
+          "art": "monster/langw",
+          "cell": [
+            15,
+            19
+          ]
+        },
+        {
+          "id": "ai_156_boss",
+          "name": "三首妖犬",
+          "level": 17,
+          "art": "monster/dyq2",
+          "cell": [
+            21,
+            12
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_157",
+      "name": "红岭村",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_157_mob",
+          "name": "叛逃弟子",
+          "level": 10,
+          "art": "monster/dz1",
+          "cell": [
+            28,
+            19
+          ]
+        },
+        {
+          "id": "ai_157_boss",
+          "name": "劫道妖首",
+          "level": 12,
+          "art": "monster/nt2",
+          "cell": [
+            20,
+            28
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_158",
+      "name": "神秘仙境",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_158_mob",
+          "name": "山地野猪",
+          "level": 1,
+          "art": "monster/xt2",
+          "cell": [
+            19,
+            28
+          ]
+        },
+        {
+          "id": "ai_158_boss",
+          "name": "山林熊王",
+          "level": 3,
+          "art": "monster/x3",
+          "cell": [
+            27,
+            27
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_159",
+      "name": "帮会战斗一",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_159_mob",
+          "name": "食人花",
+          "level": 15,
+          "art": "monster/srh",
+          "cell": [
+            22,
+            21
+          ]
+        },
+        {
+          "id": "ai_159_boss",
+          "name": "三首妖犬",
+          "level": 17,
+          "art": "monster/dyq2",
+          "cell": [
+            27,
+            27
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_160",
+      "name": "帮会战斗二",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_160_mob",
+          "name": "山林巨人",
+          "level": 15,
+          "art": "monster/sr2",
+          "cell": [
+            18,
+            19
+          ]
+        },
+        {
+          "id": "ai_160_boss",
+          "name": "森林之王",
+          "level": 17,
+          "art": "monster/slzw",
+          "cell": [
+            27,
+            27
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_161",
+      "name": "帮会战斗三",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_161_mob",
+          "name": "山狼",
+          "level": 15,
+          "art": "monster/langw",
+          "cell": [
+            16,
+            20
+          ]
+        },
+        {
+          "id": "ai_161_boss",
+          "name": "山林熊王",
+          "level": 17,
+          "art": "monster/x3",
+          "cell": [
+            27,
+            27
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_162",
+      "name": "帮会领奖一",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_162_mob",
+          "name": "棕熊",
+          "level": 15,
+          "art": "monster/x1",
+          "cell": [
+            22,
+            23
+          ]
+        },
+        {
+          "id": "ai_162_boss",
+          "name": "三首妖犬",
+          "level": 17,
+          "art": "monster/dyq2",
+          "cell": [
+            27,
+            27
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_163",
+      "name": "帮会领奖二",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_163_mob",
+          "name": "山地野猪",
+          "level": 15,
+          "art": "monster/xt2",
+          "cell": [
+            18,
+            20
+          ]
+        },
+        {
+          "id": "ai_163_boss",
+          "name": "森林之王",
+          "level": 17,
+          "art": "monster/slzw",
+          "cell": [
+            27,
+            27
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_164",
+      "name": "帮会领奖三",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_164_mob",
+          "name": "食人花",
+          "level": 15,
+          "art": "monster/srh",
+          "cell": [
+            16,
+            22
+          ]
+        },
+        {
+          "id": "ai_164_boss",
+          "name": "山林熊王",
+          "level": 17,
+          "art": "monster/x3",
+          "cell": [
+            27,
+            27
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_165",
+      "name": "帮会战斗一",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_165_mob",
+          "name": "山林巨人",
+          "level": 15,
+          "art": "monster/sr2",
+          "cell": [
+            21,
+            21
+          ]
+        },
+        {
+          "id": "ai_165_boss",
+          "name": "三首妖犬",
+          "level": 17,
+          "art": "monster/dyq2",
+          "cell": [
+            27,
+            27
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_166",
+      "name": "帮会领奖一",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_166_mob",
+          "name": "山狼",
+          "level": 15,
+          "art": "monster/langw",
+          "cell": [
+            17,
+            19
+          ]
+        },
+        {
+          "id": "ai_166_boss",
+          "name": "森林之王",
+          "level": 17,
+          "art": "monster/slzw",
+          "cell": [
+            27,
+            28
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_167",
+      "name": "帮会战斗二",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_167_mob",
+          "name": "棕熊",
+          "level": 15,
+          "art": "monster/x1",
+          "cell": [
+            16,
+            23
+          ]
+        },
+        {
+          "id": "ai_167_boss",
+          "name": "山林熊王",
+          "level": 17,
+          "art": "monster/x3",
+          "cell": [
+            27,
+            27
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_168",
+      "name": "帮会领奖二",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_168_mob",
+          "name": "山地野猪",
+          "level": 15,
+          "art": "monster/xt2",
+          "cell": [
+            23,
+            24
+          ]
+        },
+        {
+          "id": "ai_168_boss",
+          "name": "三首妖犬",
+          "level": 17,
+          "art": "monster/dyq2",
+          "cell": [
+            27,
+            27
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_169",
+      "name": "帮会战斗三",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_169_mob",
+          "name": "食人花",
+          "level": 15,
+          "art": "monster/srh",
+          "cell": [
+            18,
+            19
+          ]
+        },
+        {
+          "id": "ai_169_boss",
+          "name": "森林之王",
+          "level": 17,
+          "art": "monster/slzw",
+          "cell": [
+            27,
+            27
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_170",
+      "name": "帮会领奖三",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_170_mob",
+          "name": "山林巨人",
+          "level": 15,
+          "art": "monster/sr2",
+          "cell": [
+            15,
+            22
+          ]
+        },
+        {
+          "id": "ai_170_boss",
+          "name": "山林熊王",
+          "level": 17,
+          "art": "monster/x3",
+          "cell": [
+            27,
+            27
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_171",
+      "name": "帮会战斗一",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_171_mob",
+          "name": "山狼",
+          "level": 15,
+          "art": "monster/langw",
+          "cell": [
+            22,
+            22
+          ]
+        },
+        {
+          "id": "ai_171_boss",
+          "name": "三首妖犬",
+          "level": 17,
+          "art": "monster/dyq2",
+          "cell": [
+            27,
+            27
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_172",
+      "name": "帮会领奖一",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_172_mob",
+          "name": "棕熊",
+          "level": 15,
+          "art": "monster/x1",
+          "cell": [
+            18,
+            19
+          ]
+        },
+        {
+          "id": "ai_172_boss",
+          "name": "森林之王",
+          "level": 17,
+          "art": "monster/slzw",
+          "cell": [
+            27,
+            27
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_173",
+      "name": "帮会战斗二",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_173_mob",
+          "name": "山地野猪",
+          "level": 15,
+          "art": "monster/xt2",
+          "cell": [
+            17,
+            21
+          ]
+        },
+        {
+          "id": "ai_173_boss",
+          "name": "山林熊王",
+          "level": 17,
+          "art": "monster/x3",
+          "cell": [
+            27,
+            27
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_174",
+      "name": "帮会领奖二",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_174_mob",
+          "name": "食人花",
+          "level": 15,
+          "art": "monster/srh",
+          "cell": [
+            23,
+            24
+          ]
+        },
+        {
+          "id": "ai_174_boss",
+          "name": "三首妖犬",
+          "level": 17,
+          "art": "monster/dyq2",
+          "cell": [
+            27,
+            27
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_175",
+      "name": "帮会战斗三",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_175_mob",
+          "name": "山林巨人",
+          "level": 15,
+          "art": "monster/sr2",
+          "cell": [
+            16,
+            19
+          ]
+        },
+        {
+          "id": "ai_175_boss",
+          "name": "森林之王",
+          "level": 17,
+          "art": "monster/slzw",
+          "cell": [
+            27,
+            27
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_176",
+      "name": "帮会领奖三",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_176_mob",
+          "name": "山狼",
+          "level": 15,
+          "art": "monster/langw",
+          "cell": [
+            22,
+            27
+          ]
+        },
+        {
+          "id": "ai_176_boss",
+          "name": "山林熊王",
+          "level": 17,
+          "art": "monster/x3",
+          "cell": [
+            27,
+            27
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_177",
+      "name": "备战区",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_177_mob",
+          "name": "棕熊",
+          "level": 20,
+          "art": "monster/x1",
+          "cell": [
+            15,
+            18
+          ]
+        },
+        {
+          "id": "ai_177_boss",
+          "name": "三首妖犬",
+          "level": 22,
+          "art": "monster/dyq2",
+          "cell": [
+            21,
+            12
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_178",
+      "name": "仙派营地",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_178_mob",
+          "name": "失心武僧",
+          "level": 20,
+          "art": "monster/hs2",
+          "cell": [
+            15,
+            18
+          ]
+        },
+        {
+          "id": "ai_178_boss",
+          "name": "破阵魔将",
+          "level": 22,
+          "art": "monster/nt3",
+          "cell": [
+            18,
+            6
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_179",
+      "name": "侠派营地",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_179_mob",
+          "name": "阵隙魔女",
+          "level": 20,
+          "art": "monster/njs1",
+          "cell": [
+            15,
+            18
+          ]
+        },
+        {
+          "id": "ai_179_boss",
+          "name": "入魔方丈",
+          "level": 22,
+          "art": "monster/hs4",
+          "cell": [
+            19,
+            6
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_180",
+      "name": "资源战场",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_180_mob",
+          "name": "山林巨人",
+          "level": 20,
+          "art": "monster/sr2",
+          "cell": [
+            18,
+            22
+          ]
+        },
+        {
+          "id": "ai_180_boss",
+          "name": "三首妖犬",
+          "level": 22,
+          "art": "monster/dyq2",
+          "cell": [
+            25,
+            12
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_181",
+      "name": "备战区",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_181_mob",
+          "name": "山狼",
+          "level": 20,
+          "art": "monster/langw",
+          "cell": [
+            15,
+            18
+          ]
+        },
+        {
+          "id": "ai_181_boss",
+          "name": "森林之王",
+          "level": 22,
+          "art": "monster/slzw",
+          "cell": [
+            21,
+            6
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_182",
+      "name": "仙派营地",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_182_mob",
+          "name": "失心武僧",
+          "level": 20,
+          "art": "monster/hs2",
+          "cell": [
+            15,
+            18
+          ]
+        },
+        {
+          "id": "ai_182_boss",
+          "name": "破阵魔将",
+          "level": 22,
+          "art": "monster/nt3",
+          "cell": [
+            19,
+            5
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_183",
+      "name": "侠派营地",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_183_mob",
+          "name": "阵隙魔女",
+          "level": 20,
+          "art": "monster/njs1",
+          "cell": [
+            15,
+            18
+          ]
+        },
+        {
+          "id": "ai_183_boss",
+          "name": "入魔方丈",
+          "level": 22,
+          "art": "monster/hs4",
+          "cell": [
+            21,
+            12
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_184",
+      "name": "资源战场",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_184_mob",
+          "name": "食人花",
+          "level": 20,
+          "art": "monster/srh",
+          "cell": [
+            14,
+            22
+          ]
+        },
+        {
+          "id": "ai_184_boss",
+          "name": "森林之王",
+          "level": 22,
+          "art": "monster/slzw",
+          "cell": [
+            22,
+            13
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_185",
+      "name": "备战区",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_185_mob",
+          "name": "山林巨人",
+          "level": 20,
+          "art": "monster/sr2",
+          "cell": [
+            15,
+            18
+          ]
+        },
+        {
+          "id": "ai_185_boss",
+          "name": "山林熊王",
+          "level": 22,
+          "art": "monster/x3",
+          "cell": [
+            26,
+            10
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_186",
+      "name": "仙派营地",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_186_mob",
+          "name": "失心武僧",
+          "level": 20,
+          "art": "monster/hs2",
+          "cell": [
+            15,
+            18
+          ]
+        },
+        {
+          "id": "ai_186_boss",
+          "name": "破阵魔将",
+          "level": 22,
+          "art": "monster/nt3",
+          "cell": [
+            20,
+            6
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_187",
+      "name": "侠派营地",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_187_mob",
+          "name": "阵隙魔女",
+          "level": 20,
+          "art": "monster/njs1",
+          "cell": [
+            15,
+            18
+          ]
+        },
+        {
+          "id": "ai_187_boss",
+          "name": "入魔方丈",
+          "level": 22,
+          "art": "monster/hs4",
+          "cell": [
+            21,
+            7
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_188",
+      "name": "资源战场",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_188_mob",
+          "name": "山地野猪",
+          "level": 20,
+          "art": "monster/xt2",
+          "cell": [
+            15,
+            18
+          ]
+        },
+        {
+          "id": "ai_188_boss",
+          "name": "山林熊王",
+          "level": 22,
+          "art": "monster/x3",
+          "cell": [
+            21,
+            7
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_189",
+      "name": "备战区",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_189_mob",
+          "name": "食人花",
+          "level": 20,
+          "art": "monster/srh",
+          "cell": [
+            15,
+            18
+          ]
+        },
+        {
+          "id": "ai_189_boss",
+          "name": "三首妖犬",
+          "level": 22,
+          "art": "monster/dyq2",
+          "cell": [
+            23,
+            5
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_190",
+      "name": "仙派营地",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_190_mob",
+          "name": "失心武僧",
+          "level": 20,
+          "art": "monster/hs2",
+          "cell": [
+            15,
+            18
+          ]
+        },
+        {
+          "id": "ai_190_boss",
+          "name": "破阵魔将",
+          "level": 22,
+          "art": "monster/nt3",
+          "cell": [
+            27,
+            8
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_191",
+      "name": "侠派营地",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_191_mob",
+          "name": "阵隙魔女",
+          "level": 20,
+          "art": "monster/njs1",
+          "cell": [
+            15,
+            18
+          ]
+        },
+        {
+          "id": "ai_191_boss",
+          "name": "入魔方丈",
+          "level": 22,
+          "art": "monster/hs4",
+          "cell": [
+            20,
+            6
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_192",
+      "name": "资源战场",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_192_mob",
+          "name": "棕熊",
+          "level": 20,
+          "art": "monster/x1",
+          "cell": [
+            15,
+            18
+          ]
+        },
+        {
+          "id": "ai_192_boss",
+          "name": "三首妖犬",
+          "level": 22,
+          "art": "monster/dyq2",
+          "cell": [
+            19,
+            5
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_193",
+      "name": "普通礼堂",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_193_mob",
+          "name": "叛逃弟子",
+          "level": 1,
+          "art": "monster/dz1",
+          "cell": [
+            5,
+            26
+          ]
+        },
+        {
+          "id": "ai_193_boss",
+          "name": "劫道妖首",
+          "level": 3,
+          "art": "monster/nt2",
+          "cell": [
+            25,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_194",
+      "name": "漂亮礼堂",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_194_mob",
+          "name": "拦路魔徒",
+          "level": 1,
+          "art": "monster/dz5",
+          "cell": [
+            4,
+            28
+          ]
+        },
+        {
+          "id": "ai_194_boss",
+          "name": "叛军统领",
+          "level": 3,
+          "art": "monster/zbjl2",
+          "cell": [
+            25,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_195",
+      "name": "华丽礼堂",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_195_mob",
+          "name": "山地野猪",
+          "level": 1,
+          "art": "monster/xt2",
+          "cell": [
+            4,
+            28
+          ]
+        },
+        {
+          "id": "ai_195_boss",
+          "name": "劫道妖首",
+          "level": 3,
+          "art": "monster/nt2",
+          "cell": [
+            25,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_196",
+      "name": "奢侈礼堂",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_196_mob",
+          "name": "劫道枪卫",
+          "level": 1,
+          "art": "monster/zb5",
+          "cell": [
+            5,
+            27
+          ]
+        },
+        {
+          "id": "ai_196_boss",
+          "name": "叛军统领",
+          "level": 3,
+          "art": "monster/zbjl2",
+          "cell": [
+            25,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_197",
+      "name": "攻方基地",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_197_mob",
+          "name": "棕熊",
+          "level": 15,
+          "art": "monster/x1",
+          "cell": [
+            14,
+            22
+          ]
+        },
+        {
+          "id": "ai_197_boss",
+          "name": "山林熊王",
+          "level": 17,
+          "art": "monster/x3",
+          "cell": [
+            23,
+            18
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_198",
+      "name": "进攻区日",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_198_mob",
+          "name": "山地野猪",
+          "level": 15,
+          "art": "monster/xt2",
+          "cell": [
+            15,
+            18
+          ]
+        },
+        {
+          "id": "ai_198_boss",
+          "name": "三首妖犬",
+          "level": 17,
+          "art": "monster/dyq2",
+          "cell": [
+            20,
+            7
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_199",
+      "name": "进攻区月",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_199_mob",
+          "name": "食人花",
+          "level": 15,
+          "art": "monster/srh",
+          "cell": [
+            15,
+            18
+          ]
+        },
+        {
+          "id": "ai_199_boss",
+          "name": "森林之王",
+          "level": 17,
+          "art": "monster/slzw",
+          "cell": [
+            23,
+            6
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_200",
+      "name": "进攻区星",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_200_mob",
+          "name": "山林巨人",
+          "level": 15,
+          "art": "monster/sr2",
+          "cell": [
+            15,
+            18
+          ]
+        },
+        {
+          "id": "ai_200_boss",
+          "name": "山林熊王",
+          "level": 17,
+          "art": "monster/x3",
+          "cell": [
+            19,
+            13
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_201",
+      "name": "进攻区天",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_201_mob",
+          "name": "山狼",
+          "level": 15,
+          "art": "monster/langw",
+          "cell": [
+            15,
+            18
+          ]
+        },
+        {
+          "id": "ai_201_boss",
+          "name": "三首妖犬",
+          "level": 17,
+          "art": "monster/dyq2",
+          "cell": [
+            19,
+            10
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_202",
+      "name": "进攻区地",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_202_mob",
+          "name": "棕熊",
+          "level": 15,
+          "art": "monster/x1",
+          "cell": [
+            15,
+            18
+          ]
+        },
+        {
+          "id": "ai_202_boss",
+          "name": "森林之王",
+          "level": 17,
+          "art": "monster/slzw",
+          "cell": [
+            21,
+            6
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_203",
+      "name": "精华源日",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_203_mob",
+          "name": "山地野猪",
+          "level": 15,
+          "art": "monster/xt2",
+          "cell": [
+            15,
+            18
+          ]
+        },
+        {
+          "id": "ai_203_boss",
+          "name": "山林熊王",
+          "level": 17,
+          "art": "monster/x3",
+          "cell": [
+            19,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_204",
+      "name": "精华源月",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_204_mob",
+          "name": "食人花",
+          "level": 15,
+          "art": "monster/srh",
+          "cell": [
+            14,
+            22
+          ]
+        },
+        {
+          "id": "ai_204_boss",
+          "name": "三首妖犬",
+          "level": 17,
+          "art": "monster/dyq2",
+          "cell": [
+            27,
+            14
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_205",
+      "name": "精华源星",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_205_mob",
+          "name": "山林巨人",
+          "level": 15,
+          "art": "monster/sr2",
+          "cell": [
+            15,
+            18
+          ]
+        },
+        {
+          "id": "ai_205_boss",
+          "name": "森林之王",
+          "level": 17,
+          "art": "monster/slzw",
+          "cell": [
+            21,
+            12
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_206",
+      "name": "精华源天",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_206_mob",
+          "name": "山狼",
+          "level": 15,
+          "art": "monster/langw",
+          "cell": [
+            15,
+            18
+          ]
+        },
+        {
+          "id": "ai_206_boss",
+          "name": "山林熊王",
+          "level": 17,
+          "art": "monster/x3",
+          "cell": [
+            19,
+            7
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_207",
+      "name": "精华源地",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_207_mob",
+          "name": "棕熊",
+          "level": 15,
+          "art": "monster/x1",
+          "cell": [
+            15,
+            18
+          ]
+        },
+        {
+          "id": "ai_207_boss",
+          "name": "三首妖犬",
+          "level": 17,
+          "art": "monster/dyq2",
+          "cell": [
+            21,
+            12
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_208",
+      "name": "防守区日",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_208_mob",
+          "name": "山地野猪",
+          "level": 15,
+          "art": "monster/xt2",
+          "cell": [
+            15,
+            18
+          ]
+        },
+        {
+          "id": "ai_208_boss",
+          "name": "森林之王",
+          "level": 17,
+          "art": "monster/slzw",
+          "cell": [
+            20,
+            12
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_209",
+      "name": "防守区月",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_209_mob",
+          "name": "食人花",
+          "level": 15,
+          "art": "monster/srh",
+          "cell": [
+            15,
+            18
+          ]
+        },
+        {
+          "id": "ai_209_boss",
+          "name": "山林熊王",
+          "level": 17,
+          "art": "monster/x3",
+          "cell": [
+            27,
+            8
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_210",
+      "name": "防守区星",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_210_mob",
+          "name": "山林巨人",
+          "level": 15,
+          "art": "monster/sr2",
+          "cell": [
+            15,
+            18
+          ]
+        },
+        {
+          "id": "ai_210_boss",
+          "name": "三首妖犬",
+          "level": 17,
+          "art": "monster/dyq2",
+          "cell": [
+            21,
+            12
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_211",
+      "name": "防守区天",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_211_mob",
+          "name": "山狼",
+          "level": 15,
+          "art": "monster/langw",
+          "cell": [
+            15,
+            18
+          ]
+        },
+        {
+          "id": "ai_211_boss",
+          "name": "森林之王",
+          "level": 17,
+          "art": "monster/slzw",
+          "cell": [
+            28,
+            8
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_212",
+      "name": "防守区地",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_212_mob",
+          "name": "棕熊",
+          "level": 15,
+          "art": "monster/x1",
+          "cell": [
+            15,
+            18
+          ]
+        },
+        {
+          "id": "ai_212_boss",
+          "name": "山林熊王",
+          "level": 17,
+          "art": "monster/x3",
+          "cell": [
+            20,
+            13
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_213",
+      "name": "守方基地",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_213_mob",
+          "name": "山地野猪",
+          "level": 15,
+          "art": "monster/xt2",
+          "cell": [
+            4,
+            28
+          ]
+        },
+        {
+          "id": "ai_213_boss",
+          "name": "三首妖犬",
+          "level": 17,
+          "art": "monster/dyq2",
+          "cell": [
+            28,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "map_id": "ai_214",
+      "name": "仙灵幻界",
+      "policy": {
+        "source": "截图地貌参考 + 设计补全",
+        "npc_buffer_cells": 7,
+        "arrival_buffer_cells": 9,
+        "monster_spacing_cells": 5,
+        "patrol_radius_cells": 2,
+        "distance_metric": "Manhattan",
+        "service_routes_avoid_patrols": true,
+        "notice": "缓冲距离针对刷新点；巡游范围为原有切比雪夫半径2格。怪物身份、数量、等级和任务目标保持不变。"
+      },
+      "monsters": [
+        {
+          "id": "ai_214_mob",
+          "name": "食人花",
+          "level": 60,
+          "art": "monster/srh",
+          "cell": [
+            12,
+            14
+          ]
+        },
+        {
+          "id": "ai_214_boss",
+          "name": "森林之王",
+          "level": 60,
+          "art": "monster/slzw",
+          "cell": [
+            24,
+            23
+          ]
+        }
+      ]
+    }
+  ]
+}

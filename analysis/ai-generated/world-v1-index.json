@@ -1,13 +1,13 @@
 {
   "version": "ai-world-v1",
-  "layout_revision": 4,
+  "layout_revision": 5,
   "source": "AI生成",
   "disclaimer": "地名、等级与总览坐标参考原包；场景布局、NPC布置、任务剧情与奖励均为AI生成。不是恢复出的原版内容。",
   "catalog": "shared/data/ai-world-v1.json",
-  "catalog_sha256": "b9f4d91c58b7c75874fc3eebd86fff3eec7d69b0c38a71161a796a50f6005ba9",
+  "catalog_sha256": "08064507d2f9272128111f9e33df491ae0e562f9caa09bd7ed5234bcd4d0fd2f",
   "map_count": 214,
   "quest_count": 642,
-  "layout_count": 28,
+  "layout_count": 33,
   "monster_count": 454,
   "monster_art_count": 76,
   "npc_count": 1138,
@@ -57,7 +57,7 @@
           "id": "exit_ai_002",
           "cell": [
             29,
-            24
+            28
           ],
           "target_map": "ai_002",
           "name": "百花谷",
@@ -167,8 +167,8 @@
         {
           "id": "exit_ai_079",
           "cell": [
-            23,
-            8
+            25,
+            2
           ],
           "target_map": "ai_079",
           "name": "火礁祭坛",
@@ -201,20 +201,20 @@
           "id": "ai_002_npc03",
           "cell": [
             6,
-            12
+            11
           ]
         },
         {
           "id": "ai_002_npc04",
           "cell": [
             7,
-            23
+            22
           ]
         },
         {
           "id": "ai_002_npc05",
           "cell": [
-            23,
+            22,
             19
           ]
         },
@@ -222,13 +222,13 @@
           "id": "ai_002_mob",
           "cell": [
             24,
-            16
+            14
           ]
         },
         {
           "id": "ai_002_boss",
           "cell": [
-            26,
+            27,
             28
           ]
         }
@@ -291,8 +291,8 @@
         {
           "id": "exit_ai_004",
           "cell": [
-            19,
-            26
+            29,
+            13
           ],
           "target_map": "ai_004",
           "name": "峨眉派",
@@ -324,7 +324,7 @@
         {
           "id": "ai_003_npc03",
           "cell": [
-            8,
+            9,
             23
           ]
         },
@@ -339,7 +339,7 @@
           "id": "ai_003_boss",
           "cell": [
             23,
-            24
+            21
           ]
         }
       ],
@@ -433,7 +433,7 @@
           "id": "exit_ai_005",
           "cell": [
             6,
-            12
+            5
           ],
           "target_map": "ai_005",
           "name": "凝碧崖",
@@ -473,14 +473,14 @@
           "id": "ai_004_npc04",
           "cell": [
             5,
-            17
+            18
           ]
         },
         {
           "id": "ai_004_npc05",
           "cell": [
             28,
-            19
+            18
           ]
         },
         {
@@ -493,15 +493,15 @@
         {
           "id": "ai_004_mob",
           "cell": [
-            5,
+            4,
             27
           ]
         },
         {
           "id": "ai_004_boss",
           "cell": [
-            26,
-            5
+            25,
+            4
           ]
         }
       ],
@@ -564,8 +564,8 @@
         {
           "id": "exit_ai_006",
           "cell": [
-            28,
-            11
+            23,
+            16
           ],
           "target_map": "ai_006",
           "name": "峨眉山",
@@ -597,36 +597,36 @@
         {
           "id": "ai_005_npc03",
           "cell": [
-            7,
+            8,
             24
           ]
         },
         {
           "id": "ai_005_npc04",
           "cell": [
-            21,
+            22,
             21
           ]
         },
         {
           "id": "ai_005_npc05",
           "cell": [
-            12,
-            27
+            11,
+            28
           ]
         },
         {
           "id": "ai_005_mob",
           "cell": [
-            19,
-            7
+            22,
+            8
           ]
         },
         {
           "id": "ai_005_boss",
           "cell": [
-            22,
-            23
+            17,
+            24
           ]
         }
       ],
@@ -688,8 +688,8 @@
         {
           "id": "exit_ai_007",
           "cell": [
-            29,
-            16
+            28,
+            2
           ],
           "target_map": "ai_007",
           "name": "天化村",
@@ -721,21 +721,21 @@
         {
           "id": "ai_006_npc03",
           "cell": [
-            7,
+            8,
             21
           ]
         },
         {
           "id": "ai_006_mob",
           "cell": [
-            22,
+            21,
             22
           ]
         },
         {
           "id": "ai_006_boss",
           "cell": [
-            28,
+            27,
             27
           ]
         }
@@ -759,33 +759,33 @@
       "biome": "town",
       "level_min": 10,
       "level_max": 15,
-      "layout_archetype": "hamlet",
-      "layout_name": "山间村落",
+      "layout_archetype": "waterfront_village",
+      "layout_name": "天化村·临水草地",
       "spawn": [
-        3,
-        17
+        4,
+        18
       ],
       "portal": [
-        2,
-        17
+        3,
+        18
       ],
       "landmarks": [
         {
-          "kind": "inn",
+          "kind": "curved_waterfront",
           "cell": [
-            7,
-            4
+            25,
+            1
           ],
           "size": [
-            5,
-            3
+            6,
+            29
           ]
         },
         {
           "kind": "house",
           "cell": [
-            22,
-            7
+            5,
+            5
           ],
           "size": [
             3,
@@ -795,8 +795,8 @@
         {
           "kind": "inn",
           "cell": [
-            8,
-            23
+            14,
+            4
           ],
           "size": [
             5,
@@ -804,14 +804,14 @@
           ]
         },
         {
-          "kind": "village_pond",
+          "kind": "grass_service_glade",
           "cell": [
-            21,
-            21
+            5,
+            10
           ],
           "size": [
-            7,
-            7
+            18,
+            15
           ]
         }
       ],
@@ -819,8 +819,8 @@
         {
           "id": "return_trail",
           "cell": [
-            2,
-            17
+            3,
+            18
           ],
           "target_map": "qingyun_trail",
           "name": "青云山道",
@@ -841,71 +841,71 @@
         {
           "id": "ai_007_guide",
           "cell": [
-            16,
-            14
+            10,
+            12
           ]
         },
         {
           "id": "ai_007_courier",
           "cell": [
-            6,
-            10
+            16,
+            12
           ]
         },
         {
           "id": "ai_007_survey",
           "cell": [
-            24,
-            12
+            9,
+            17
           ]
         },
         {
           "id": "ai_007_npc03",
           "cell": [
-            11,
-            8
+            17,
+            18
           ]
         },
         {
           "id": "ai_007_npc04",
           "cell": [
-            23,
-            16
+            9,
+            25
           ]
         },
         {
           "id": "ai_007_npc05",
           "cell": [
-            10,
-            28
+            16,
+            25
           ]
         },
         {
           "id": "ai_007_npc06",
           "cell": [
-            8,
-            22
+            22,
+            12
           ]
         },
         {
           "id": "ai_007_npc07",
           "cell": [
             22,
-            22
+            19
           ]
         },
         {
           "id": "ai_007_mob",
           "cell": [
-            24,
-            19
+            20,
+            7
           ]
         },
         {
           "id": "ai_007_boss",
           "cell": [
-            19,
-            27
+            26,
+            28
           ]
         }
       ],
@@ -1002,8 +1002,8 @@
         {
           "id": "exit_ai_009",
           "cell": [
-            25,
-            29
+            16,
+            24
           ],
           "target_map": "ai_009",
           "name": "野猪岭",
@@ -1035,14 +1035,14 @@
         {
           "id": "ai_008_mob",
           "cell": [
-            16,
-            7
+            15,
+            5
           ]
         },
         {
           "id": "ai_008_boss",
           "cell": [
-            24,
+            23,
             26
           ]
         }
@@ -1102,8 +1102,8 @@
         {
           "id": "exit_ai_010",
           "cell": [
-            23,
-            7
+            6,
+            29
           ],
           "target_map": "ai_010",
           "name": "瘟疫猪巢",
@@ -1142,14 +1142,14 @@
         {
           "id": "ai_009_mob",
           "cell": [
-            18,
+            19,
             8
           ]
         },
         {
           "id": "ai_009_boss",
           "cell": [
-            24,
+            22,
             24
           ]
         }
@@ -1210,8 +1210,8 @@
         {
           "id": "exit_ai_009",
           "cell": [
-            24,
-            3
+            23,
+            13
           ],
           "target_map": "ai_009",
           "name": "野猪岭",
@@ -1243,15 +1243,15 @@
         {
           "id": "ai_010_mob",
           "cell": [
-            17,
-            6
+            14,
+            7
           ]
         },
         {
           "id": "ai_010_boss",
           "cell": [
             24,
-            26
+            25
           ]
         }
       ],
@@ -1310,8 +1310,8 @@
         {
           "id": "exit_ai_012",
           "cell": [
-            23,
-            10
+            29,
+            16
           ],
           "target_map": "ai_012",
           "name": "失落沼泽",
@@ -1343,15 +1343,15 @@
         {
           "id": "ai_011_npc03",
           "cell": [
-            8,
-            21
+            7,
+            22
           ]
         },
         {
           "id": "ai_011_npc04",
           "cell": [
-            24,
-            25
+            23,
+            24
           ]
         },
         {
@@ -1364,14 +1364,14 @@
         {
           "id": "ai_011_mob",
           "cell": [
-            22,
-            24
+            15,
+            20
           ]
         },
         {
           "id": "ai_011_boss",
           "cell": [
-            28,
+            27,
             27
           ]
         }
@@ -1397,26 +1397,37 @@
       "biome": "marsh",
       "level_min": 17,
       "level_max": 19,
-      "layout_archetype": "marsh_boardwalk",
-      "layout_name": "沼泽木栈",
+      "layout_archetype": "wetland_glade",
+      "layout_name": "湿地·花妖水岸",
       "spawn": [
         4,
-        19
+        18
       ],
       "portal": [
         3,
-        19
+        18
       ],
       "landmarks": [
         {
-          "kind": "river_bridge",
+          "kind": "curved_waterfront",
           "cell": [
-            10,
-            14
+            25,
+            1
           ],
           "size": [
-            14,
+            6,
+            29
+          ]
+        },
+        {
+          "kind": "flower_bank",
+          "cell": [
+            19,
             3
+          ],
+          "size": [
+            6,
+            23
           ]
         }
       ],
@@ -1425,7 +1436,7 @@
           "id": "return_trail",
           "cell": [
             3,
-            19
+            18
           ],
           "target_map": "qingyun_trail",
           "name": "青云山道",
@@ -1434,8 +1445,8 @@
         {
           "id": "exit_ai_013",
           "cell": [
-            29,
-            9
+            25,
+            17
           ],
           "target_map": "ai_013",
           "name": "卧云镇",
@@ -1446,50 +1457,50 @@
         {
           "id": "ai_012_guide",
           "cell": [
-            6,
-            18
+            9,
+            14
           ]
         },
         {
           "id": "ai_012_courier",
           "cell": [
-            24,
-            8
+            15,
+            13
           ]
         },
         {
           "id": "ai_012_survey",
           "cell": [
-            25,
-            25
+            9,
+            20
           ]
         },
         {
           "id": "ai_012_npc03",
           "cell": [
-            7,
-            23
+            15,
+            20
           ]
         },
         {
           "id": "ai_012_mob",
           "cell": [
-            8,
-            4
+            23,
+            8
           ]
         },
         {
           "id": "ai_012_boss",
           "cell": [
-            27,
-            27
+            24,
+            28
           ]
         },
         {
           "id": "ai_012_mob2",
           "cell": [
             12,
-            21
+            24
           ]
         }
       ],
@@ -1512,81 +1523,81 @@
       "biome": "town",
       "level_min": 20,
       "level_max": 25,
-      "layout_archetype": "canal_town",
-      "layout_name": "临水街镇",
+      "layout_archetype": "earth_gate_town",
+      "layout_name": "黄土青瓦街镇",
       "spawn": [
-        3,
-        16
+        4,
+        18
       ],
       "portal": [
-        2,
-        16
+        3,
+        18
       ],
       "landmarks": [
         {
-          "kind": "inn",
+          "kind": "blue_house",
           "cell": [
-            6,
+            5,
             6
           ],
           "size": [
             5,
-            3
-          ]
-        },
-        {
-          "kind": "house",
-          "cell": [
-            12,
-            3
-          ],
-          "size": [
-            3,
-            3
-          ]
-        },
-        {
-          "kind": "inn",
-          "cell": [
-            22,
             4
+          ]
+        },
+        {
+          "kind": "blue_house",
+          "cell": [
+            20,
+            6
           ],
           "size": [
             5,
-            3
+            4
           ]
         },
         {
-          "kind": "house",
+          "kind": "blue_house",
           "cell": [
-            4,
-            23
+            6,
+            22
           ],
           "size": [
-            3,
-            3
+            5,
+            4
           ]
         },
         {
-          "kind": "inn",
+          "kind": "earth_service_court",
+          "cell": [
+            5,
+            10
+          ],
+          "size": [
+            20,
+            12
+          ]
+        },
+        {
+          "kind": "northern_rock_steps",
+          "cell": [
+            13,
+            2
+          ],
+          "size": [
+            6,
+            2
+          ]
+        },
+        {
+          "kind": "outer_patrol",
           "cell": [
             23,
-            25
+            24
           ],
           "size": [
-            5,
-            3
-          ]
-        },
-        {
-          "kind": "canal",
-          "cell": [
-            8,
-            1
-          ],
-          "size": [
-            4,
-            30
+            7,
+            6
           ]
         }
       ],
@@ -1594,8 +1605,8 @@
         {
           "id": "return_trail",
           "cell": [
-            2,
-            16
+            3,
+            18
           ],
           "target_map": "qingyun_trail",
           "name": "青云山道",
@@ -1604,8 +1615,8 @@
         {
           "id": "exit_ai_014",
           "cell": [
-            15,
-            3
+            16,
+            2
           ],
           "target_map": "ai_014",
           "name": "卧云镇北",
@@ -1616,71 +1627,71 @@
         {
           "id": "ai_013_guide",
           "cell": [
-            17,
-            14
+            8,
+            12
           ]
         },
         {
           "id": "ai_013_courier",
           "cell": [
-            6,
-            10
+            15,
+            12
           ]
         },
         {
           "id": "ai_013_survey",
           "cell": [
-            24,
-            12
+            10,
+            18
           ]
         },
         {
           "id": "ai_013_npc03",
           "cell": [
-            6,
-            14
+            17,
+            18
           ]
         },
         {
           "id": "ai_013_npc04",
           "cell": [
-            13,
-            8
+            9,
+            27
           ]
         },
         {
           "id": "ai_013_npc05",
           "cell": [
-            25,
-            8
+            16,
+            25
           ]
         },
         {
           "id": "ai_013_npc06",
           "cell": [
-            5,
-            28
+            22,
+            11
           ]
         },
         {
           "id": "ai_013_npc07",
           "cell": [
-            25,
-            28
+            22,
+            18
           ]
         },
         {
           "id": "ai_013_mob",
           "cell": [
-            23,
-            19
+            27,
+            7
           ]
         },
         {
           "id": "ai_013_boss",
           "cell": [
-            20,
-            27
+            27,
+            28
           ]
         }
       ],
@@ -1832,7 +1843,7 @@
         {
           "id": "ai_014_npc03",
           "cell": [
-            6,
+            5,
             14
           ]
         },
@@ -1860,15 +1871,15 @@
         {
           "id": "ai_014_npc07",
           "cell": [
-            26,
+            24,
             28
           ]
         },
         {
           "id": "ai_014_npc08",
           "cell": [
-            6,
-            23
+            10,
+            22
           ]
         },
         {
@@ -1882,7 +1893,7 @@
           "id": "ai_014_boss",
           "cell": [
             19,
-            27
+            26
           ]
         }
       ],
@@ -1947,7 +1958,7 @@
         {
           "id": "exit_ai_014",
           "cell": [
-            19,
+            13,
             26
           ],
           "target_map": "ai_014",
@@ -1980,21 +1991,21 @@
         {
           "id": "ai_015_npc03",
           "cell": [
-            9,
+            8,
             25
           ]
         },
         {
           "id": "ai_015_mob",
           "cell": [
-            26,
-            21
+            28,
+            23
           ]
         },
         {
           "id": "ai_015_boss",
           "cell": [
-            12,
+            11,
             5
           ]
         }
@@ -2056,7 +2067,7 @@
           "id": "exit_ai_017",
           "cell": [
             2,
-            26
+            8
           ],
           "target_map": "ai_017",
           "name": "金石峡",
@@ -2088,7 +2099,7 @@
         {
           "id": "ai_016_npc03",
           "cell": [
-            7,
+            8,
             22
           ]
         },
@@ -2096,14 +2107,14 @@
           "id": "ai_016_npc04",
           "cell": [
             21,
-            23
+            22
           ]
         },
         {
           "id": "ai_016_mob",
           "cell": [
-            22,
-            21
+            17,
+            19
           ]
         },
         {
@@ -2204,7 +2215,7 @@
         {
           "id": "ai_017_npc03",
           "cell": [
-            8,
+            9,
             24
           ]
         },
@@ -2225,15 +2236,15 @@
         {
           "id": "ai_017_mob",
           "cell": [
-            18,
-            8
+            20,
+            6
           ]
         },
         {
           "id": "ai_017_boss",
           "cell": [
-            23,
-            24
+            25,
+            19
           ]
         }
       ],
@@ -2296,7 +2307,7 @@
           "id": "exit_ai_019",
           "cell": [
             28,
-            12
+            15
           ],
           "target_map": "ai_019",
           "name": "天外神山",
@@ -2329,20 +2340,20 @@
           "id": "ai_018_npc03",
           "cell": [
             11,
-            22
+            23
           ]
         },
         {
           "id": "ai_018_mob",
           "cell": [
-            27,
-            19
+            26,
+            22
           ]
         },
         {
           "id": "ai_018_boss",
           "cell": [
-            11,
+            10,
             5
           ]
         }
@@ -2444,7 +2455,7 @@
           "id": "ai_019_npc04",
           "cell": [
             22,
-            21
+            23
           ]
         },
         {
@@ -2457,8 +2468,8 @@
         {
           "id": "ai_019_boss",
           "cell": [
-            23,
-            23
+            27,
+            18
           ]
         }
       ],
@@ -2531,7 +2542,7 @@
           "id": "exit_ai_028",
           "cell": [
             27,
-            27
+            20
           ],
           "target_map": "ai_028",
           "name": "慈云寺北",
@@ -2563,15 +2574,15 @@
         {
           "id": "ai_020_mob",
           "cell": [
-            16,
+            15,
             7
           ]
         },
         {
           "id": "ai_020_boss",
           "cell": [
-            24,
-            26
+            23,
+            28
           ]
         }
       ],
@@ -2731,15 +2742,15 @@
         {
           "id": "ai_021_mob",
           "cell": [
-            13,
-            28
+            12,
+            19
           ]
         },
         {
           "id": "ai_021_boss",
           "cell": [
-            23,
-            28
+            20,
+            19
           ]
         }
       ],
@@ -2843,7 +2854,7 @@
         {
           "id": "ai_022_npc03",
           "cell": [
-            7,
+            8,
             24
           ]
         },
@@ -2857,8 +2868,8 @@
         {
           "id": "ai_022_mob",
           "cell": [
-            10,
-            9
+            9,
+            10
           ]
         },
         {
@@ -2977,8 +2988,8 @@
         {
           "id": "ai_023_npc04",
           "cell": [
-            22,
-            23
+            21,
+            22
           ]
         },
         {
@@ -2992,14 +3003,14 @@
           "id": "ai_023_mob",
           "cell": [
             10,
-            10
+            12
           ]
         },
         {
           "id": "ai_023_boss",
           "cell": [
-            24,
-            5
+            25,
+            3
           ]
         }
       ],
@@ -3116,7 +3127,7 @@
         {
           "id": "exit_ai_025",
           "cell": [
-            9,
+            4,
             29
           ],
           "target_map": "ai_025",
@@ -3150,14 +3161,14 @@
           "id": "ai_024_npc03",
           "cell": [
             12,
-            10
+            11
           ]
         },
         {
           "id": "ai_024_npc04",
           "cell": [
-            15,
-            6
+            14,
+            7
           ]
         },
         {
@@ -3170,7 +3181,7 @@
         {
           "id": "ai_024_npc06",
           "cell": [
-            6,
+            7,
             28
           ]
         },
@@ -3178,13 +3189,13 @@
           "id": "ai_024_mob",
           "cell": [
             24,
-            19
+            18
           ]
         },
         {
           "id": "ai_024_boss",
           "cell": [
-            19,
+            18,
             27
           ]
         }
@@ -3248,8 +3259,8 @@
         {
           "id": "exit_ai_026",
           "cell": [
-            28,
-            21
+            17,
+            2
           ],
           "target_map": "ai_026",
           "name": "云灵山",
@@ -3295,8 +3306,8 @@
         {
           "id": "ai_025_mob",
           "cell": [
-            26,
-            19
+            27,
+            20
           ]
         },
         {
@@ -3310,7 +3321,7 @@
           "id": "ai_025_mob2",
           "cell": [
             13,
-            22
+            25
           ]
         }
       ],
@@ -3371,8 +3382,8 @@
         {
           "id": "exit_ai_027",
           "cell": [
-            28,
-            9
+            19,
+            2
           ],
           "target_map": "ai_027",
           "name": "云灵山顶",
@@ -3404,14 +3415,14 @@
         {
           "id": "ai_026_npc03",
           "cell": [
-            7,
+            8,
             21
           ]
         },
         {
           "id": "ai_026_npc04",
           "cell": [
-            24,
+            22,
             24
           ]
         },
@@ -3425,14 +3436,14 @@
         {
           "id": "ai_026_mob",
           "cell": [
-            21,
-            24
+            19,
+            28
           ]
         },
         {
           "id": "ai_026_boss",
           "cell": [
-            28,
+            27,
             27
           ]
         }
@@ -3495,8 +3506,8 @@
         {
           "id": "exit_ai_026",
           "cell": [
-            26,
-            7
+            12,
+            28
           ],
           "target_map": "ai_026",
           "name": "云灵山",
@@ -3528,7 +3539,7 @@
         {
           "id": "ai_027_npc03",
           "cell": [
-            9,
+            8,
             25
           ]
         },
@@ -3566,22 +3577,22 @@
       "biome": "temple",
       "level_min": 30,
       "level_max": 33,
-      "layout_archetype": "monastery",
-      "layout_name": "山门庭院",
+      "layout_archetype": "earth_gate_temple",
+      "layout_name": "慈云寺·黄土门院",
       "spawn": [
-        17,
-        27
+        4,
+        18
       ],
       "portal": [
-        17,
-        28
+        3,
+        18
       ],
       "landmarks": [
         {
           "kind": "shrine",
           "cell": [
-            15,
-            5
+            5,
+            6
           ],
           "size": [
             4,
@@ -3590,35 +3601,57 @@
         },
         {
           "kind": "shrine",
+          "cell": [
+            20,
+            6
+          ],
+          "size": [
+            4,
+            3
+          ]
+        },
+        {
+          "kind": "blue_house",
           "cell": [
             6,
-            13
+            22
           ],
           "size": [
-            4,
-            3
+            5,
+            4
           ]
         },
         {
-          "kind": "shrine",
+          "kind": "earth_service_court",
+          "cell": [
+            5,
+            10
+          ],
+          "size": [
+            20,
+            12
+          ]
+        },
+        {
+          "kind": "northern_rock_steps",
+          "cell": [
+            13,
+            2
+          ],
+          "size": [
+            6,
+            2
+          ]
+        },
+        {
+          "kind": "outer_patrol",
           "cell": [
             23,
-            13
+            24
           ],
           "size": [
-            4,
-            3
-          ]
-        },
-        {
-          "kind": "main_court",
-          "cell": [
-            8,
-            8
-          ],
-          "size": [
-            17,
-            15
+            7,
+            6
           ]
         }
       ],
@@ -3626,8 +3659,8 @@
         {
           "id": "return_trail",
           "cell": [
-            17,
-            28
+            3,
+            18
           ],
           "target_map": "qingyun_trail",
           "name": "青云山道",
@@ -3636,8 +3669,8 @@
         {
           "id": "exit_ai_029",
           "cell": [
-            26,
-            16
+            16,
+            29
           ],
           "target_map": "ai_029",
           "name": "慈云寺",
@@ -3648,64 +3681,64 @@
         {
           "id": "ai_028_guide",
           "cell": [
-            17,
-            10
+            8,
+            12
           ]
         },
         {
           "id": "ai_028_courier",
           "cell": [
-            10,
-            18
+            15,
+            12
           ]
         },
         {
           "id": "ai_028_survey",
           "cell": [
-            23,
+            9,
             17
           ]
         },
         {
           "id": "ai_028_npc03",
           "cell": [
-            17,
-            14
+            16,
+            18
           ]
         },
         {
           "id": "ai_028_npc04",
           "cell": [
-            5,
-            18
+            9,
+            26
           ]
         },
         {
           "id": "ai_028_npc05",
           "cell": [
-            24,
-            21
+            17,
+            25
           ]
         },
         {
           "id": "ai_028_npc06",
           "cell": [
-            7,
-            22
+            22,
+            11
           ]
         },
         {
           "id": "ai_028_mob",
           "cell": [
-            5,
-            26
+            26,
+            7
           ]
         },
         {
           "id": "ai_028_boss",
           "cell": [
-            26,
-            7
+            27,
+            28
           ]
         }
       ],
@@ -3731,59 +3764,81 @@
       "biome": "town",
       "level_min": 31,
       "level_max": 34,
-      "layout_archetype": "hamlet",
-      "layout_name": "山间村落",
+      "layout_archetype": "earth_gate_temple",
+      "layout_name": "慈云寺·黄土门院",
       "spawn": [
-        3,
-        19
+        4,
+        18
       ],
       "portal": [
-        2,
-        19
+        3,
+        18
       ],
       "landmarks": [
         {
-          "kind": "inn",
+          "kind": "shrine",
           "cell": [
-            7,
+            5,
             6
           ],
           "size": [
-            5,
+            4,
             3
           ]
         },
         {
-          "kind": "house",
+          "kind": "shrine",
           "cell": [
-            21,
-            7
+            20,
+            6
           ],
           "size": [
-            3,
+            4,
             3
           ]
         },
         {
-          "kind": "inn",
+          "kind": "blue_house",
           "cell": [
-            8,
-            25
+            6,
+            22
           ],
           "size": [
             5,
-            3
+            4
           ]
         },
         {
-          "kind": "village_pond",
+          "kind": "earth_service_court",
           "cell": [
-            21,
-            21
+            5,
+            10
+          ],
+          "size": [
+            20,
+            12
+          ]
+        },
+        {
+          "kind": "northern_rock_steps",
+          "cell": [
+            13,
+            2
+          ],
+          "size": [
+            6,
+            2
+          ]
+        },
+        {
+          "kind": "outer_patrol",
+          "cell": [
+            23,
+            24
           ],
           "size": [
             7,
-            7
+            6
           ]
         }
       ],
@@ -3791,8 +3846,8 @@
         {
           "id": "return_trail",
           "cell": [
-            2,
-            19
+            3,
+            18
           ],
           "target_map": "qingyun_trail",
           "name": "青云山道",
@@ -3801,8 +3856,8 @@
         {
           "id": "exit_ai_030",
           "cell": [
-            12,
-            29
+            2,
+            27
           ],
           "target_map": "ai_030",
           "name": "慈云寺外围",
@@ -3813,78 +3868,78 @@
         {
           "id": "ai_029_guide",
           "cell": [
-            16,
-            15
+            10,
+            12
           ]
         },
         {
           "id": "ai_029_courier",
           "cell": [
-            8,
-            10
+            16,
+            13
           ]
         },
         {
           "id": "ai_029_survey",
           "cell": [
-            24,
-            12
+            9,
+            17
           ]
         },
         {
           "id": "ai_029_npc03",
           "cell": [
-            8,
-            14
+            15,
+            19
           ]
         },
         {
           "id": "ai_029_npc04",
           "cell": [
-            19,
-            11
+            9,
+            26
           ]
         },
         {
           "id": "ai_029_npc05",
           "cell": [
-            9,
-            28
+            16,
+            24
           ]
         },
         {
           "id": "ai_029_npc06",
           "cell": [
-            9,
-            23
+            21,
+            11
           ]
         },
         {
           "id": "ai_029_npc07",
           "cell": [
-            21,
-            22
+            22,
+            19
           ]
         },
         {
           "id": "ai_029_npc08",
           "cell": [
-            14,
-            26
+            3,
+            9
           ]
         },
         {
           "id": "ai_029_mob",
           "cell": [
-            24,
-            19
+            26,
+            7
           ]
         },
         {
           "id": "ai_029_boss",
           "cell": [
-            19,
-            26
+            27,
+            28
           ]
         }
       ],
@@ -3912,22 +3967,22 @@
       "biome": "temple",
       "level_min": 30,
       "level_max": 31,
-      "layout_archetype": "monastery",
-      "layout_name": "山门庭院",
+      "layout_archetype": "earth_gate_temple",
+      "layout_name": "慈云寺·黄土门院",
       "spawn": [
-        14,
-        27
+        4,
+        18
       ],
       "portal": [
-        14,
-        28
+        3,
+        18
       ],
       "landmarks": [
         {
           "kind": "shrine",
           "cell": [
-            12,
-            5
+            5,
+            6
           ],
           "size": [
             4,
@@ -3936,35 +3991,57 @@
         },
         {
           "kind": "shrine",
+          "cell": [
+            20,
+            6
+          ],
+          "size": [
+            4,
+            3
+          ]
+        },
+        {
+          "kind": "blue_house",
           "cell": [
             6,
-            13
+            22
           ],
           "size": [
-            4,
-            3
+            5,
+            4
           ]
         },
         {
-          "kind": "shrine",
+          "kind": "earth_service_court",
+          "cell": [
+            5,
+            10
+          ],
+          "size": [
+            20,
+            12
+          ]
+        },
+        {
+          "kind": "northern_rock_steps",
+          "cell": [
+            13,
+            2
+          ],
+          "size": [
+            6,
+            2
+          ]
+        },
+        {
+          "kind": "outer_patrol",
           "cell": [
             23,
-            13
+            24
           ],
           "size": [
-            4,
-            3
-          ]
-        },
-        {
-          "kind": "main_court",
-          "cell": [
-            8,
-            8
-          ],
-          "size": [
-            17,
-            15
+            7,
+            6
           ]
         }
       ],
@@ -3972,8 +4049,8 @@
         {
           "id": "return_trail",
           "cell": [
-            14,
-            28
+            3,
+            18
           ],
           "target_map": "qingyun_trail",
           "name": "青云山道",
@@ -3982,8 +4059,8 @@
         {
           "id": "exit_ai_029",
           "cell": [
-            26,
-            12
+            29,
+            16
           ],
           "target_map": "ai_029",
           "name": "慈云寺",
@@ -3994,57 +4071,57 @@
         {
           "id": "ai_030_guide",
           "cell": [
-            14,
-            10
+            8,
+            11
           ]
         },
         {
           "id": "ai_030_courier",
+          "cell": [
+            16,
+            12
+          ]
+        },
+        {
+          "id": "ai_030_survey",
           "cell": [
             10,
             18
           ]
         },
         {
-          "id": "ai_030_survey",
-          "cell": [
-            22,
-            18
-          ]
-        },
-        {
           "id": "ai_030_npc03",
           "cell": [
-            15,
-            14
+            17,
+            18
           ]
         },
         {
           "id": "ai_030_npc04",
           "cell": [
-            5,
-            18
+            8,
+            26
           ]
         },
         {
           "id": "ai_030_npc05",
           "cell": [
-            27,
-            17
+            17,
+            25
           ]
         },
         {
           "id": "ai_030_mob",
           "cell": [
-            5,
-            26
+            26,
+            7
           ]
         },
         {
           "id": "ai_030_boss",
           "cell": [
-            24,
-            6
+            27,
+            28
           ]
         }
       ],
@@ -4172,43 +4249,43 @@
         {
           "id": "ai_031_npc03",
           "cell": [
-            13,
-            11
+            16,
+            14
           ]
         },
         {
           "id": "ai_031_npc04",
           "cell": [
             5,
-            18
+            19
           ]
         },
         {
           "id": "ai_031_npc05",
           "cell": [
             27,
-            19
+            18
           ]
         },
         {
           "id": "ai_031_npc06",
           "cell": [
             7,
-            22
+            23
           ]
         },
         {
           "id": "ai_031_mob",
           "cell": [
-            5,
-            26
+            4,
+            27
           ]
         },
         {
           "id": "ai_031_boss",
           "cell": [
             25,
-            7
+            4
           ]
         }
       ],
@@ -4234,26 +4311,81 @@
       "biome": "snow",
       "level_min": 10,
       "level_max": 15,
-      "layout_archetype": "glacier_pass",
-      "layout_name": "冰谷栈桥",
+      "layout_archetype": "earth_gate_sect",
+      "layout_name": "昆仑派·青瓦门院",
       "spawn": [
-        5,
-        19
+        4,
+        18
       ],
       "portal": [
-        4,
-        19
+        3,
+        18
       ],
       "landmarks": [
         {
-          "kind": "bridged_chasm",
+          "kind": "blue_house",
+          "cell": [
+            5,
+            6
+          ],
+          "size": [
+            5,
+            4
+          ]
+        },
+        {
+          "kind": "blue_house",
+          "cell": [
+            20,
+            6
+          ],
+          "size": [
+            5,
+            4
+          ]
+        },
+        {
+          "kind": "blue_house",
+          "cell": [
+            6,
+            22
+          ],
+          "size": [
+            5,
+            4
+          ]
+        },
+        {
+          "kind": "earth_service_court",
+          "cell": [
+            5,
+            10
+          ],
+          "size": [
+            20,
+            12
+          ]
+        },
+        {
+          "kind": "northern_rock_steps",
           "cell": [
             13,
-            3
+            2
           ],
           "size": [
             6,
-            27
+            2
+          ]
+        },
+        {
+          "kind": "outer_patrol",
+          "cell": [
+            23,
+            24
+          ],
+          "size": [
+            7,
+            6
           ]
         }
       ],
@@ -4261,8 +4393,8 @@
         {
           "id": "return_trail",
           "cell": [
-            4,
-            19
+            3,
+            18
           ],
           "target_map": "qingyun_trail",
           "name": "青云山道",
@@ -4271,8 +4403,8 @@
         {
           "id": "exit_ai_033",
           "cell": [
-            20,
-            26
+            29,
+            16
           ],
           "target_map": "ai_033",
           "name": "玄冰谷",
@@ -4284,56 +4416,56 @@
           "id": "ai_032_guide",
           "cell": [
             9,
-            20
+            12
           ]
         },
         {
           "id": "ai_032_courier",
           "cell": [
-            10,
-            7
+            17,
+            13
           ]
         },
         {
           "id": "ai_032_survey",
           "cell": [
-            25,
-            12
+            9,
+            19
           ]
         },
         {
           "id": "ai_032_npc03",
           "cell": [
-            8,
-            24
+            16,
+            18
           ]
         },
         {
           "id": "ai_032_npc04",
           "cell": [
-            21,
-            21
+            11,
+            24
           ]
         },
         {
           "id": "ai_032_npc05",
           "cell": [
-            13,
-            27
+            16,
+            25
           ]
         },
         {
           "id": "ai_032_mob",
           "cell": [
-            19,
-            9
+            27,
+            7
           ]
         },
         {
           "id": "ai_032_boss",
           "cell": [
-            23,
-            23
+            27,
+            28
           ]
         }
       ],
@@ -4428,21 +4560,21 @@
         {
           "id": "ai_033_npc03",
           "cell": [
-            9,
+            8,
             24
           ]
         },
         {
           "id": "ai_033_mob",
           "cell": [
-            20,
-            7
+            19,
+            8
           ]
         },
         {
           "id": "ai_033_boss",
           "cell": [
-            23,
+            18,
             23
           ]
         }
@@ -4503,8 +4635,8 @@
         {
           "id": "exit_ai_035",
           "cell": [
-            29,
-            8
+            27,
+            12
           ],
           "target_map": "ai_035",
           "name": "辟邪村",
@@ -4550,14 +4682,14 @@
         {
           "id": "ai_034_mob",
           "cell": [
-            8,
+            7,
             6
           ]
         },
         {
           "id": "ai_034_boss",
           "cell": [
-            27,
+            29,
             28
           ]
         }
@@ -4686,13 +4818,13 @@
           "id": "ai_035_npc03",
           "cell": [
             12,
-            9
+            8
           ]
         },
         {
           "id": "ai_035_npc04",
           "cell": [
-            22,
+            23,
             15
           ]
         },
@@ -4706,29 +4838,29 @@
         {
           "id": "ai_035_npc06",
           "cell": [
-            9,
-            23
+            8,
+            21
           ]
         },
         {
           "id": "ai_035_npc07",
           "cell": [
-            22,
+            21,
             22
           ]
         },
         {
           "id": "ai_035_npc08",
           "cell": [
-            14,
-            24
+            13,
+            23
           ]
         },
         {
           "id": "ai_035_mob",
           "cell": [
-            23,
-            19
+            27,
+            18
           ]
         },
         {
@@ -4800,8 +4932,8 @@
         {
           "id": "exit_ai_037",
           "cell": [
-            29,
-            16
+            28,
+            9
           ],
           "target_map": "ai_037",
           "name": "风云宫",
@@ -4833,21 +4965,21 @@
         {
           "id": "ai_036_npc03",
           "cell": [
-            8,
-            22
+            7,
+            21
           ]
         },
         {
           "id": "ai_036_mob",
           "cell": [
-            21,
+            23,
             23
           ]
         },
         {
           "id": "ai_036_boss",
           "cell": [
-            28,
+            27,
             27
           ]
         }
@@ -4992,8 +5124,8 @@
         {
           "id": "ai_037_npc04",
           "cell": [
-            5,
-            18
+            8,
+            21
           ]
         },
         {
@@ -5006,14 +5138,14 @@
         {
           "id": "ai_037_npc06",
           "cell": [
-            15,
-            24
+            16,
+            23
           ]
         },
         {
           "id": "ai_037_mob",
           "cell": [
-            5,
+            6,
             26
           ]
         },
@@ -5021,7 +5153,7 @@
           "id": "ai_037_boss",
           "cell": [
             25,
-            6
+            4
           ]
         }
       ],
@@ -5084,8 +5216,8 @@
         {
           "id": "exit_ai_039",
           "cell": [
-            28,
-            19
+            24,
+            26
           ],
           "target_map": "ai_039",
           "name": "幽林",
@@ -5124,29 +5256,29 @@
         {
           "id": "ai_038_npc04",
           "cell": [
-            21,
+            22,
             22
           ]
         },
         {
           "id": "ai_038_npc05",
           "cell": [
-            11,
-            28
+            13,
+            27
           ]
         },
         {
           "id": "ai_038_mob",
           "cell": [
             19,
-            8
+            6
           ]
         },
         {
           "id": "ai_038_boss",
           "cell": [
-            23,
-            23
+            25,
+            18
           ]
         }
       ],
@@ -5241,7 +5373,7 @@
         {
           "id": "ai_039_npc03",
           "cell": [
-            8,
+            7,
             21
           ]
         },
@@ -5255,8 +5387,8 @@
         {
           "id": "ai_039_boss",
           "cell": [
-            28,
-            26
+            27,
+            27
           ]
         }
       ],
@@ -5363,8 +5495,8 @@
         {
           "id": "ai_040_mob",
           "cell": [
-            26,
-            20
+            27,
+            21
           ]
         },
         {
@@ -5395,33 +5527,33 @@
       "biome": "town",
       "level_min": 20,
       "level_max": 25,
-      "layout_archetype": "hamlet",
-      "layout_name": "山间村落",
+      "layout_archetype": "market_waterfront",
+      "layout_name": "集市·草岸街巷",
       "spawn": [
-        3,
+        4,
         18
       ],
       "portal": [
-        2,
+        3,
         18
       ],
       "landmarks": [
         {
-          "kind": "inn",
+          "kind": "curved_waterfront",
           "cell": [
-            7,
-            4
+            25,
+            1
           ],
           "size": [
-            5,
-            3
+            6,
+            29
           ]
         },
         {
           "kind": "house",
           "cell": [
-            22,
-            8
+            5,
+            5
           ],
           "size": [
             3,
@@ -5429,25 +5561,36 @@
           ]
         },
         {
-          "kind": "inn",
+          "kind": "house",
           "cell": [
-            8,
-            23
+            15,
+            5
           ],
           "size": [
-            5,
+            3,
             3
           ]
         },
         {
-          "kind": "village_pond",
+          "kind": "house",
           "cell": [
-            21,
-            21
+            5,
+            24
           ],
           "size": [
-            7,
-            7
+            3,
+            3
+          ]
+        },
+        {
+          "kind": "market_lanes",
+          "cell": [
+            6,
+            9
+          ],
+          "size": [
+            16,
+            15
           ]
         }
       ],
@@ -5455,7 +5598,7 @@
         {
           "id": "return_trail",
           "cell": [
-            2,
+            3,
             18
           ],
           "target_map": "qingyun_trail",
@@ -5465,8 +5608,8 @@
         {
           "id": "exit_ai_042",
           "cell": [
-            15,
-            29
+            6,
+            10
           ],
           "target_map": "ai_042",
           "name": "八旗镇西",
@@ -5477,77 +5620,77 @@
         {
           "id": "ai_041_guide",
           "cell": [
-            16,
-            14
+            9,
+            11
           ]
         },
         {
           "id": "ai_041_courier",
           "cell": [
-            7,
-            10
+            16,
+            12
           ]
         },
         {
           "id": "ai_041_survey",
           "cell": [
-            24,
-            11
+            9,
+            18
           ]
         },
         {
           "id": "ai_041_npc03",
           "cell": [
-            12,
-            9
+            16,
+            18
           ]
         },
         {
           "id": "ai_041_npc04",
           "cell": [
-            23,
-            15
+            10,
+            25
           ]
         },
         {
           "id": "ai_041_npc05",
           "cell": [
-            9,
-            28
+            16,
+            25
           ]
         },
         {
           "id": "ai_041_npc06",
           "cell": [
-            8,
-            22
+            22,
+            11
           ]
         },
         {
           "id": "ai_041_npc07",
           "cell": [
-            21,
-            21
+            22,
+            18
           ]
         },
         {
           "id": "ai_041_npc08",
           "cell": [
-            14,
-            26
+            3,
+            9
           ]
         },
         {
           "id": "ai_041_mob",
           "cell": [
-            23,
-            19
+            25,
+            7
           ]
         },
         {
           "id": "ai_041_boss",
           "cell": [
-            19,
+            25,
             28
           ]
         }
@@ -5668,8 +5811,8 @@
         {
           "id": "exit_ai_044",
           "cell": [
-            5,
-            27
+            10,
+            28
           ],
           "target_map": "ai_044",
           "name": "金山绿水",
@@ -5701,28 +5844,28 @@
         {
           "id": "ai_042_npc03",
           "cell": [
-            8,
-            14
-          ]
-        },
-        {
-          "id": "ai_042_npc04",
-          "cell": [
             12,
             9
           ]
         },
         {
+          "id": "ai_042_npc04",
+          "cell": [
+            14,
+            5
+          ]
+        },
+        {
           "id": "ai_042_npc05",
           "cell": [
-            22,
+            23,
             8
           ]
         },
         {
           "id": "ai_042_npc06",
           "cell": [
-            8,
+            6,
             28
           ]
         },
@@ -5730,14 +5873,14 @@
           "id": "ai_042_mob",
           "cell": [
             24,
-            18
+            19
           ]
         },
         {
           "id": "ai_042_boss",
           "cell": [
             19,
-            28
+            27
           ]
         }
       ],
@@ -5763,26 +5906,26 @@
       "biome": "forest",
       "level_min": 19,
       "level_max": 21,
-      "layout_archetype": "woodland_glade",
-      "layout_name": "林间幽谷",
+      "layout_archetype": "sand_terraces",
+      "layout_name": "沙地·崖阶缓坡",
       "spawn": [
         4,
-        15
+        18
       ],
       "portal": [
         3,
-        15
+        18
       ],
       "landmarks": [
         {
-          "kind": "woodland_pond",
+          "kind": "sandstone_terraces",
           "cell": [
-            18,
-            3
+            1,
+            2
           ],
           "size": [
-            11,
-            9
+            29,
+            28
           ]
         }
       ],
@@ -5791,7 +5934,7 @@
           "id": "return_trail",
           "cell": [
             3,
-            15
+            18
           ],
           "target_map": "qingyun_trail",
           "name": "青云山道",
@@ -5801,7 +5944,7 @@
           "id": "exit_ai_041",
           "cell": [
             2,
-            24
+            7
           ],
           "target_map": "ai_041",
           "name": "八旗镇",
@@ -5813,49 +5956,49 @@
           "id": "ai_043_guide",
           "cell": [
             9,
-            15
+            13
           ]
         },
         {
           "id": "ai_043_courier",
           "cell": [
-            27,
-            5
+            17,
+            11
           ]
         },
         {
           "id": "ai_043_survey",
           "cell": [
-            7,
-            26
+            9,
+            18
           ]
         },
         {
           "id": "ai_043_npc03",
           "cell": [
-            8,
-            21
+            16,
+            17
           ]
         },
         {
           "id": "ai_043_npc04",
           "cell": [
-            23,
-            23
+            10,
+            25
           ]
         },
         {
           "id": "ai_043_mob",
           "cell": [
-            21,
-            22
+            26,
+            7
           ]
         },
         {
           "id": "ai_043_boss",
           "cell": [
             27,
-            27
+            28
           ]
         }
       ],
@@ -5949,22 +6092,22 @@
         {
           "id": "ai_044_npc03",
           "cell": [
-            8,
-            23
+            7,
+            22
           ]
         },
         {
           "id": "ai_044_npc04",
           "cell": [
-            21,
-            22
+            22,
+            21
           ]
         },
         {
           "id": "ai_044_npc05",
           "cell": [
             13,
-            26
+            28
           ]
         },
         {
@@ -5978,7 +6121,7 @@
           "id": "ai_044_boss",
           "cell": [
             28,
-            26
+            22
           ]
         }
       ],
@@ -6003,26 +6146,26 @@
       "biome": "forest",
       "level_min": 25,
       "level_max": 28,
-      "layout_archetype": "river_valley",
-      "layout_name": "河谷山路",
+      "layout_archetype": "sand_terraces",
+      "layout_name": "沙地·崖阶缓坡",
       "spawn": [
         4,
-        15
+        18
       ],
       "portal": [
         3,
-        15
+        18
       ],
       "landmarks": [
         {
-          "kind": "meandering_river",
+          "kind": "sandstone_terraces",
           "cell": [
-            13,
-            1
+            1,
+            2
           ],
           "size": [
-            8,
-            30
+            29,
+            28
           ]
         }
       ],
@@ -6031,7 +6174,7 @@
           "id": "return_trail",
           "cell": [
             3,
-            15
+            18
           ],
           "target_map": "qingyun_trail",
           "name": "青云山道",
@@ -6040,7 +6183,7 @@
         {
           "id": "exit_ai_046",
           "cell": [
-            28,
+            2,
             9
           ],
           "target_map": "ai_046",
@@ -6052,43 +6195,43 @@
         {
           "id": "ai_045_guide",
           "cell": [
-            8,
-            15
+            9,
+            13
           ]
         },
         {
           "id": "ai_045_courier",
+          "cell": [
+            15,
+            12
+          ]
+        },
+        {
+          "id": "ai_045_survey",
+          "cell": [
+            9,
+            18
+          ]
+        },
+        {
+          "id": "ai_045_npc03",
+          "cell": [
+            16,
+            18
+          ]
+        },
+        {
+          "id": "ai_045_mob",
           "cell": [
             26,
             7
           ]
         },
         {
-          "id": "ai_045_survey",
-          "cell": [
-            7,
-            25
-          ]
-        },
-        {
-          "id": "ai_045_npc03",
-          "cell": [
-            8,
-            21
-          ]
-        },
-        {
-          "id": "ai_045_mob",
-          "cell": [
-            21,
-            21
-          ]
-        },
-        {
           "id": "ai_045_boss",
           "cell": [
             27,
-            26
+            28
           ]
         }
       ],
@@ -6111,8 +6254,8 @@
       "biome": "forest",
       "level_min": 27,
       "level_max": 30,
-      "layout_archetype": "woodland_glade",
-      "layout_name": "林间幽谷",
+      "layout_archetype": "sand_terraces",
+      "layout_name": "沙地·崖阶缓坡",
       "spawn": [
         4,
         18
@@ -6123,14 +6266,14 @@
       ],
       "landmarks": [
         {
-          "kind": "woodland_pond",
+          "kind": "sandstone_terraces",
           "cell": [
-            18,
-            3
+            1,
+            2
           ],
           "size": [
-            11,
-            9
+            29,
+            28
           ]
         }
       ],
@@ -6160,43 +6303,43 @@
         {
           "id": "ai_046_guide",
           "cell": [
-            10,
-            15
+            9,
+            12
           ]
         },
         {
           "id": "ai_046_courier",
           "cell": [
-            28,
-            9
+            15,
+            12
           ]
         },
         {
           "id": "ai_046_survey",
           "cell": [
-            8,
-            26
+            9,
+            18
           ]
         },
         {
           "id": "ai_046_npc03",
           "cell": [
-            8,
-            21
+            15,
+            17
           ]
         },
         {
           "id": "ai_046_npc04",
           "cell": [
-            23,
-            21
+            9,
+            25
           ]
         },
         {
           "id": "ai_046_mob",
           "cell": [
-            21,
-            23
+            26,
+            7
           ]
         },
         {
@@ -6264,8 +6407,8 @@
         {
           "id": "exit_ai_048",
           "cell": [
-            9,
-            29
+            2,
+            11
           ],
           "target_map": "ai_048",
           "name": "铸剑池",
@@ -6297,35 +6440,35 @@
         {
           "id": "ai_047_npc03",
           "cell": [
-            9,
+            7,
             24
           ]
         },
         {
           "id": "ai_047_npc04",
           "cell": [
-            24,
-            22
+            23,
+            21
           ]
         },
         {
           "id": "ai_047_npc05",
           "cell": [
             12,
-            28
+            27
           ]
         },
         {
           "id": "ai_047_mob",
           "cell": [
-            19,
+            18,
             8
           ]
         },
         {
           "id": "ai_047_boss",
           "cell": [
-            22,
+            16,
             23
           ]
         }
@@ -6389,7 +6532,7 @@
           "id": "exit_ai_047",
           "cell": [
             28,
-            13
+            14
           ],
           "target_map": "ai_047",
           "name": "火云窟",
@@ -6421,15 +6564,15 @@
         {
           "id": "ai_048_npc03",
           "cell": [
-            7,
+            8,
             25
           ]
         },
         {
           "id": "ai_048_mob",
           "cell": [
-            26,
-            20
+            27,
+            22
           ]
         },
         {
@@ -6496,7 +6639,7 @@
         {
           "id": "exit_ai_050",
           "cell": [
-            18,
+            20,
             2
           ],
           "target_map": "ai_050",
@@ -6536,22 +6679,22 @@
         {
           "id": "ai_049_npc04",
           "cell": [
-            23,
-            23
+            21,
+            22
           ]
         },
         {
           "id": "ai_049_mob",
           "cell": [
-            21,
-            22
+            17,
+            19
           ]
         },
         {
           "id": "ai_049_boss",
           "cell": [
             27,
-            27
+            28
           ]
         }
       ],
@@ -6612,8 +6755,8 @@
         {
           "id": "exit_ai_051",
           "cell": [
-            28,
-            13
+            27,
+            9
           ],
           "target_map": "ai_051",
           "name": "雷崖",
@@ -6645,7 +6788,7 @@
         {
           "id": "ai_050_npc03",
           "cell": [
-            7,
+            9,
             25
           ]
         },
@@ -6659,8 +6802,8 @@
         {
           "id": "ai_050_npc05",
           "cell": [
-            12,
-            27
+            14,
+            28
           ]
         },
         {
@@ -6673,7 +6816,7 @@
         {
           "id": "ai_050_boss",
           "cell": [
-            10,
+            11,
             5
           ]
         }
@@ -6736,8 +6879,8 @@
         {
           "id": "exit_ai_052",
           "cell": [
-            28,
-            8
+            15,
+            5
           ],
           "target_map": "ai_052",
           "name": "古道",
@@ -6776,15 +6919,15 @@
         {
           "id": "ai_051_mob",
           "cell": [
-            19,
-            9
+            21,
+            8
           ]
         },
         {
           "id": "ai_051_boss",
           "cell": [
             21,
-            24
+            20
           ]
         }
       ],
@@ -6844,7 +6987,7 @@
         {
           "id": "exit_ai_053",
           "cell": [
-            24,
+            22,
             2
           ],
           "target_map": "ai_053",
@@ -6884,15 +7027,15 @@
         {
           "id": "ai_052_npc04",
           "cell": [
-            23,
-            22
+            22,
+            23
           ]
         },
         {
           "id": "ai_052_mob",
           "cell": [
-            21,
-            21
+            18,
+            20
           ]
         },
         {
@@ -6960,8 +7103,8 @@
         {
           "id": "exit_ai_054",
           "cell": [
-            29,
-            8
+            25,
+            3
           ],
           "target_map": "ai_054",
           "name": "青螺峪",
@@ -7000,15 +7143,15 @@
         {
           "id": "ai_053_mob",
           "cell": [
-            16,
-            7
+            21,
+            9
           ]
         },
         {
           "id": "ai_053_boss",
           "cell": [
             24,
-            25
+            26
           ]
         }
       ],
@@ -7068,8 +7211,8 @@
         {
           "id": "exit_ai_055",
           "cell": [
-            25,
-            9
+            2,
+            24
           ],
           "target_map": "ai_055",
           "name": "陷空岛",
@@ -7102,13 +7245,13 @@
           "id": "ai_054_npc03",
           "cell": [
             8,
-            21
+            22
           ]
         },
         {
           "id": "ai_054_mob",
           "cell": [
-            19,
+            25,
             22
           ]
         },
@@ -7116,7 +7259,7 @@
           "id": "ai_054_boss",
           "cell": [
             27,
-            28
+            27
           ]
         }
       ],
@@ -7177,7 +7320,7 @@
           "id": "exit_ai_056",
           "cell": [
             29,
-            15
+            7
           ],
           "target_map": "ai_056",
           "name": "白骨之谷",
@@ -7209,8 +7352,8 @@
         {
           "id": "ai_055_npc03",
           "cell": [
-            8,
-            22
+            7,
+            21
           ]
         },
         {
@@ -7223,8 +7366,8 @@
         {
           "id": "ai_055_mob",
           "cell": [
-            21,
-            23
+            18,
+            20
           ]
         },
         {
@@ -7292,8 +7435,8 @@
         {
           "id": "exit_ai_058",
           "cell": [
-            28,
-            9
+            16,
+            2
           ],
           "target_map": "ai_058",
           "name": "神碑禅经",
@@ -7325,7 +7468,7 @@
         {
           "id": "ai_056_npc03",
           "cell": [
-            8,
+            9,
             21
           ]
         },
@@ -7346,8 +7489,8 @@
         {
           "id": "ai_056_mob",
           "cell": [
-            19,
-            23
+            16,
+            22
           ]
         },
         {
@@ -7493,7 +7636,7 @@
         {
           "id": "ai_057_npc03",
           "cell": [
-            16,
+            15,
             14
           ]
         },
@@ -7508,21 +7651,21 @@
           "id": "ai_057_npc05",
           "cell": [
             26,
-            18
+            19
           ]
         },
         {
           "id": "ai_057_mob",
           "cell": [
-            6,
-            27
+            7,
+            26
           ]
         },
         {
           "id": "ai_057_boss",
           "cell": [
             25,
-            7
+            4
           ]
         }
       ],
@@ -7584,7 +7727,7 @@
         {
           "id": "exit_ai_056",
           "cell": [
-            13,
+            16,
             29
           ],
           "target_map": "ai_056",
@@ -7617,22 +7760,22 @@
         {
           "id": "ai_058_npc03",
           "cell": [
-            9,
-            21
+            7,
+            22
           ]
         },
         {
           "id": "ai_058_npc04",
           "cell": [
-            20,
-            21
+            22,
+            22
           ]
         },
         {
           "id": "ai_058_mob",
           "cell": [
-            22,
-            22
+            18,
+            19
           ]
         },
         {
@@ -7733,8 +7876,8 @@
         {
           "id": "exit_ai_060",
           "cell": [
-            9,
-            27
+            14,
+            29
           ],
           "target_map": "ai_060",
           "name": "化血池",
@@ -7780,42 +7923,42 @@
         {
           "id": "ai_059_npc05",
           "cell": [
-            12,
+            11,
             28
           ]
         },
         {
           "id": "ai_059_npc06",
           "cell": [
-            8,
-            22
+            9,
+            21
           ]
         },
         {
           "id": "ai_059_npc07",
           "cell": [
-            22,
-            21
+            21,
+            22
           ]
         },
         {
           "id": "ai_059_npc08",
           "cell": [
-            15,
-            24
+            16,
+            27
           ]
         },
         {
           "id": "ai_059_mob",
           "cell": [
-            24,
-            19
+            25,
+            18
           ]
         },
         {
           "id": "ai_059_boss",
           "cell": [
-            19,
+            22,
             28
           ]
         }
@@ -7881,8 +8024,8 @@
         {
           "id": "exit_ai_061",
           "cell": [
-            16,
-            4
+            28,
+            14
           ],
           "target_map": "ai_061",
           "name": "屠龙谷",
@@ -7914,15 +8057,15 @@
         {
           "id": "ai_060_npc03",
           "cell": [
-            8,
+            7,
             26
           ]
         },
         {
           "id": "ai_060_mob",
           "cell": [
-            26,
-            20
+            27,
+            22
           ]
         },
         {
@@ -7989,7 +8132,7 @@
         {
           "id": "exit_ai_072",
           "cell": [
-            18,
+            11,
             2
           ],
           "target_map": "ai_072",
@@ -8022,7 +8165,7 @@
         {
           "id": "ai_061_npc03",
           "cell": [
-            9,
+            7,
             21
           ]
         },
@@ -8036,8 +8179,8 @@
         {
           "id": "ai_061_mob",
           "cell": [
-            21,
-            21
+            18,
+            20
           ]
         },
         {
@@ -8149,7 +8292,7 @@
         {
           "id": "exit_ai_064",
           "cell": [
-            19,
+            11,
             5
           ],
           "target_map": "ai_064",
@@ -8190,7 +8333,7 @@
           "id": "ai_062_npc04",
           "cell": [
             5,
-            18
+            19
           ]
         },
         {
@@ -8203,7 +8346,7 @@
         {
           "id": "ai_062_npc06",
           "cell": [
-            17,
+            16,
             23
           ]
         },
@@ -8217,15 +8360,15 @@
         {
           "id": "ai_062_mob",
           "cell": [
-            7,
-            26
+            5,
+            28
           ]
         },
         {
           "id": "ai_062_boss",
           "cell": [
             25,
-            5
+            4
           ]
         }
       ],
@@ -8289,8 +8432,8 @@
         {
           "id": "exit_ai_064",
           "cell": [
-            2,
-            27
+            25,
+            9
           ],
           "target_map": "ai_064",
           "name": "金钟岛",
@@ -8329,15 +8472,15 @@
         {
           "id": "ai_063_mob",
           "cell": [
-            22,
-            23
+            21,
+            22
           ]
         },
         {
           "id": "ai_063_boss",
           "cell": [
             27,
-            26
+            27
           ]
         }
       ],
@@ -8397,7 +8540,7 @@
         {
           "id": "exit_ai_062",
           "cell": [
-            16,
+            12,
             29
           ],
           "target_map": "ai_062",
@@ -8430,28 +8573,28 @@
         {
           "id": "ai_064_npc03",
           "cell": [
-            8,
+            7,
             22
           ]
         },
         {
           "id": "ai_064_npc04",
           "cell": [
-            24,
-            21
-          ]
-        },
-        {
-          "id": "ai_064_mob",
-          "cell": [
             22,
             22
           ]
         },
         {
+          "id": "ai_064_mob",
+          "cell": [
+            18,
+            19
+          ]
+        },
+        {
           "id": "ai_064_boss",
           "cell": [
-            28,
+            27,
             27
           ]
         }
@@ -8553,7 +8696,7 @@
         {
           "id": "ai_065_npc04",
           "cell": [
-            19,
+            21,
             24
           ]
         },
@@ -8567,15 +8710,15 @@
         {
           "id": "ai_065_mob",
           "cell": [
-            22,
-            24
+            25,
+            27
           ]
         },
         {
           "id": "ai_065_boss",
           "cell": [
-            27,
-            28
+            28,
+            25
           ]
         }
       ],
@@ -8671,20 +8814,20 @@
           "id": "ai_066_npc03",
           "cell": [
             8,
-            21
+            22
           ]
         },
         {
           "id": "ai_066_mob",
           "cell": [
-            23,
+            25,
             22
           ]
         },
         {
           "id": "ai_066_boss",
           "cell": [
-            28,
+            27,
             27
           ]
         }
@@ -8745,8 +8888,8 @@
         {
           "id": "exit_ai_068",
           "cell": [
-            29,
-            19
+            25,
+            2
           ],
           "target_map": "ai_068",
           "name": "行刑场",
@@ -8778,22 +8921,22 @@
         {
           "id": "ai_067_npc03",
           "cell": [
-            8,
-            21
+            7,
+            22
           ]
         },
         {
           "id": "ai_067_npc04",
           "cell": [
-            23,
-            23
+            22,
+            22
           ]
         },
         {
           "id": "ai_067_mob",
           "cell": [
-            21,
-            22
+            18,
+            19
           ]
         },
         {
@@ -8916,7 +9059,7 @@
           "id": "ai_068_mob",
           "cell": [
             20,
-            24
+            28
           ]
         },
         {
@@ -9025,15 +9168,15 @@
         {
           "id": "ai_069_mob",
           "cell": [
-            20,
-            10
+            23,
+            7
           ]
         },
         {
           "id": "ai_069_boss",
           "cell": [
-            23,
-            24
+            22,
+            23
           ]
         }
       ],
@@ -9133,15 +9276,15 @@
         {
           "id": "ai_070_npc04",
           "cell": [
-            22,
-            23
+            23,
+            22
           ]
         },
         {
           "id": "ai_070_mob",
           "cell": [
-            20,
-            22
+            18,
+            20
           ]
         },
         {
@@ -9209,7 +9352,7 @@
         {
           "id": "exit_ai_072",
           "cell": [
-            16,
+            17,
             26
           ],
           "target_map": "ai_072",
@@ -9242,8 +9385,8 @@
         {
           "id": "ai_071_npc03",
           "cell": [
-            12,
-            23
+            8,
+            26
           ]
         },
         {
@@ -9257,20 +9400,20 @@
           "id": "ai_071_npc05",
           "cell": [
             13,
-            27
+            26
           ]
         },
         {
           "id": "ai_071_mob",
           "cell": [
-            26,
-            20
+            28,
+            23
           ]
         },
         {
           "id": "ai_071_boss",
           "cell": [
-            11,
+            10,
             5
           ]
         }
@@ -9373,22 +9516,22 @@
         {
           "id": "ai_072_mob",
           "cell": [
-            7,
-            7
+            6,
+            6
           ]
         },
         {
           "id": "ai_072_boss",
           "cell": [
             28,
-            28
+            27
           ]
         },
         {
           "id": "ai_072_mob2",
           "cell": [
             12,
-            22
+            25
           ]
         }
       ],
@@ -9448,7 +9591,7 @@
         {
           "id": "exit_ai_075",
           "cell": [
-            14,
+            22,
             2
           ],
           "target_map": "ai_075",
@@ -9481,28 +9624,28 @@
         {
           "id": "ai_073_npc03",
           "cell": [
-            8,
+            9,
             21
           ]
         },
         {
           "id": "ai_073_npc04",
           "cell": [
-            23,
+            21,
             22
           ]
         },
         {
           "id": "ai_073_mob",
           "cell": [
-            21,
-            21
+            17,
+            19
           ]
         },
         {
           "id": "ai_073_boss",
           "cell": [
-            28,
+            27,
             27
           ]
         }
@@ -9564,8 +9707,8 @@
         {
           "id": "exit_ai_075",
           "cell": [
-            2,
-            20
+            4,
+            9
           ],
           "target_map": "ai_075",
           "name": "万马阵",
@@ -9597,7 +9740,7 @@
         {
           "id": "ai_074_mob",
           "cell": [
-            15,
+            14,
             7
           ]
         },
@@ -9664,8 +9807,8 @@
         {
           "id": "exit_ai_076",
           "cell": [
-            29,
-            5
+            28,
+            9
           ],
           "target_map": "ai_076",
           "name": "九宫阁",
@@ -9697,7 +9840,7 @@
         {
           "id": "ai_075_npc03",
           "cell": [
-            8,
+            7,
             22
           ]
         },
@@ -9705,7 +9848,7 @@
           "id": "ai_075_mob",
           "cell": [
             21,
-            21
+            22
           ]
         },
         {
@@ -9849,7 +9992,7 @@
         {
           "id": "ai_076_npc03",
           "cell": [
-            16,
+            15,
             13
           ]
         },
@@ -9871,21 +10014,21 @@
           "id": "ai_076_npc06",
           "cell": [
             16,
-            22
+            23
           ]
         },
         {
           "id": "ai_076_mob",
           "cell": [
-            5,
+            7,
             26
           ]
         },
         {
           "id": "ai_076_boss",
           "cell": [
-            26,
-            6
+            25,
+            4
           ]
         }
       ],
@@ -10033,27 +10176,27 @@
           "id": "ai_077_npc04",
           "cell": [
             27,
-            9
+            10
           ]
         },
         {
           "id": "ai_077_npc05",
           "cell": [
-            6,
+            7,
             28
           ]
         },
         {
           "id": "ai_077_npc06",
           "cell": [
-            25,
+            24,
             28
           ]
         },
         {
           "id": "ai_077_npc07",
           "cell": [
-            8,
+            7,
             20
           ]
         },
@@ -10172,15 +10315,15 @@
         {
           "id": "ai_078_mob",
           "cell": [
-            22,
+            24,
             21
           ]
         },
         {
           "id": "ai_078_boss",
           "cell": [
-            28,
-            26
+            27,
+            27
           ]
         }
       ],
@@ -10240,7 +10383,7 @@
         {
           "id": "exit_ai_002",
           "cell": [
-            16,
+            12,
             28
           ],
           "target_map": "ai_002",
@@ -10273,7 +10416,7 @@
         {
           "id": "ai_079_npc03",
           "cell": [
-            8,
+            9,
             25
           ]
         },
@@ -10287,15 +10430,15 @@
         {
           "id": "ai_079_mob",
           "cell": [
-            20,
+            19,
             8
           ]
         },
         {
           "id": "ai_079_boss",
           "cell": [
-            23,
-            24
+            18,
+            25
           ]
         }
       ],
@@ -10357,7 +10500,7 @@
           "id": "exit_ai_081",
           "cell": [
             29,
-            16
+            13
           ],
           "target_map": "ai_081",
           "name": "擂台",
@@ -10389,15 +10532,15 @@
         {
           "id": "ai_080_npc03",
           "cell": [
-            8,
+            9,
             24
           ]
         },
         {
           "id": "ai_080_npc04",
           "cell": [
-            21,
-            21
+            22,
+            22
           ]
         },
         {
@@ -10410,15 +10553,15 @@
         {
           "id": "ai_080_mob",
           "cell": [
-            19,
-            7
+            20,
+            5
           ]
         },
         {
           "id": "ai_080_boss",
           "cell": [
-            23,
-            24
+            26,
+            25
           ]
         }
       ],
@@ -10524,8 +10667,8 @@
         {
           "id": "exit_ai_082",
           "cell": [
-            25,
-            13
+            23,
+            26
           ],
           "target_map": "ai_082",
           "name": "流放之地",
@@ -10558,21 +10701,21 @@
           "id": "ai_081_npc03",
           "cell": [
             4,
-            7
+            9
           ]
         },
         {
           "id": "ai_081_mob",
           "cell": [
             15,
-            17
+            20
           ]
         },
         {
           "id": "ai_081_boss",
           "cell": [
             21,
-            11
+            12
           ]
         }
       ],
@@ -10633,7 +10776,7 @@
           "id": "exit_ai_083",
           "cell": [
             29,
-            8
+            12
           ],
           "target_map": "ai_083",
           "name": "莫言山",
@@ -10665,29 +10808,29 @@
         {
           "id": "ai_082_npc03",
           "cell": [
-            7,
+            8,
             22
           ]
         },
         {
           "id": "ai_082_npc04",
           "cell": [
-            23,
-            21
+            22,
+            23
           ]
         },
         {
           "id": "ai_082_mob",
           "cell": [
-            21,
-            22
+            18,
+            20
           ]
         },
         {
           "id": "ai_082_boss",
           "cell": [
-            27,
-            26
+            26,
+            27
           ]
         }
       ],
@@ -10748,8 +10891,8 @@
         {
           "id": "exit_ai_084",
           "cell": [
-            24,
-            10
+            29,
+            16
           ],
           "target_map": "ai_084",
           "name": "赤岩峡",
@@ -10795,29 +10938,29 @@
         {
           "id": "ai_083_npc05",
           "cell": [
-            14,
+            13,
             26
           ]
         },
         {
           "id": "ai_083_mob",
           "cell": [
-            20,
-            24
+            17,
+            23
           ]
         },
         {
           "id": "ai_083_boss",
           "cell": [
-            28,
+            27,
             27
           ]
         },
         {
           "id": "ai_083_mob2",
           "cell": [
-            13,
-            23
+            14,
+            20
           ]
         }
       ],
@@ -10879,8 +11022,8 @@
         {
           "id": "exit_ai_085",
           "cell": [
-            29,
-            11
+            11,
+            28
           ],
           "target_map": "ai_085",
           "name": "潭溪山",
@@ -10919,21 +11062,21 @@
         {
           "id": "ai_084_mob",
           "cell": [
-            18,
-            9
+            19,
+            8
           ]
         },
         {
           "id": "ai_084_boss",
           "cell": [
-            22,
-            23
+            23,
+            20
           ]
         },
         {
           "id": "ai_084_mob2",
           "cell": [
-            12,
+            14,
             22
           ]
         }
@@ -11034,21 +11177,21 @@
         {
           "id": "ai_085_npc04",
           "cell": [
-            21,
+            22,
             22
           ]
         },
         {
           "id": "ai_085_mob",
           "cell": [
-            26,
-            19
+            27,
+            20
           ]
         },
         {
           "id": "ai_085_boss",
           "cell": [
-            11,
+            10,
             5
           ]
         }
@@ -11143,8 +11286,8 @@
         {
           "id": "ai_086_npc03",
           "cell": [
-            9,
-            22
+            8,
+            21
           ]
         },
         {
@@ -11164,15 +11307,15 @@
         {
           "id": "ai_086_mob",
           "cell": [
-            19,
-            24
+            20,
+            27
           ]
         },
         {
           "id": "ai_086_boss",
           "cell": [
             27,
-            26
+            28
           ]
         }
       ],
@@ -11208,6 +11351,17 @@
         28
       ],
       "landmarks": [
+        {
+          "kind": "deep_combat_chamber",
+          "cell": [
+            17,
+            17
+          ],
+          "size": [
+            13,
+            13
+          ]
+        },
         {
           "kind": "shrine",
           "cell": [
@@ -11268,7 +11422,7 @@
           "id": "exit_ai_088",
           "cell": [
             28,
-            14
+            6
           ],
           "target_map": "ai_088",
           "name": "枉死路",
@@ -11279,15 +11433,15 @@
         {
           "id": "ai_087_guide",
           "cell": [
-            7,
-            19
+            8,
+            21
           ]
         },
         {
           "id": "ai_087_courier",
           "cell": [
-            10,
-            9
+            9,
+            10
           ]
         },
         {
@@ -11301,13 +11455,13 @@
           "id": "ai_087_npc03",
           "cell": [
             11,
-            13
+            14
           ]
         },
         {
           "id": "ai_087_mob",
           "cell": [
-            16,
+            15,
             7
           ]
         },
@@ -11315,21 +11469,21 @@
           "id": "ai_087_boss",
           "cell": [
             24,
-            27
+            26
           ]
         },
         {
           "id": "ai_087_mob2",
           "cell": [
-            12,
-            22
+            19,
+            21
           ]
         },
         {
           "id": "ai_087_mob3",
           "cell": [
-            23,
-            17
+            22,
+            19
           ]
         }
       ],
@@ -11400,8 +11554,8 @@
         {
           "id": "exit_ai_089",
           "cell": [
-            22,
-            27
+            27,
+            20
           ],
           "target_map": "ai_089",
           "name": "墓道法阵",
@@ -11433,15 +11587,15 @@
         {
           "id": "ai_088_mob",
           "cell": [
-            16,
-            8
+            12,
+            6
           ]
         },
         {
           "id": "ai_088_boss",
           "cell": [
-            25,
-            26
+            24,
+            28
           ]
         }
       ],
@@ -11474,6 +11628,17 @@
         3
       ],
       "landmarks": [
+        {
+          "kind": "deep_combat_chamber",
+          "cell": [
+            17,
+            17
+          ],
+          "size": [
+            13,
+            13
+          ]
+        },
         {
           "kind": "shrine",
           "cell": [
@@ -11533,8 +11698,8 @@
         {
           "id": "exit_ai_090",
           "cell": [
-            26,
-            29
+            27,
+            6
           ],
           "target_map": "ai_090",
           "name": "将军冢",
@@ -11545,57 +11710,57 @@
         {
           "id": "ai_089_guide",
           "cell": [
-            6,
+            8,
             20
           ]
         },
         {
           "id": "ai_089_courier",
           "cell": [
-            9,
+            10,
             9
           ]
         },
         {
           "id": "ai_089_survey",
           "cell": [
-            26,
-            10
+            27,
+            11
           ]
         },
         {
           "id": "ai_089_npc03",
           "cell": [
-            9,
+            11,
             13
           ]
         },
         {
           "id": "ai_089_mob",
           "cell": [
-            16,
-            7
+            21,
+            10
           ]
         },
         {
           "id": "ai_089_boss",
           "cell": [
-            23,
-            26
+            24,
+            27
           ]
         },
         {
           "id": "ai_089_mob2",
           "cell": [
-            11,
-            21
+            19,
+            22
           ]
         },
         {
           "id": "ai_089_mob3",
           "cell": [
             23,
-            15
+            19
           ]
         }
       ],
@@ -11688,8 +11853,8 @@
         {
           "id": "exit_ai_091",
           "cell": [
-            27,
-            28
+            28,
+            5
           ],
           "target_map": "ai_091",
           "name": "落雪池",
@@ -11721,14 +11886,14 @@
         {
           "id": "ai_090_mob",
           "cell": [
-            16,
-            7
+            20,
+            9
           ]
         },
         {
           "id": "ai_090_boss",
           "cell": [
-            24,
+            25,
             26
           ]
         }
@@ -11788,8 +11953,8 @@
         {
           "id": "exit_ai_092",
           "cell": [
-            28,
-            6
+            11,
+            29
           ],
           "target_map": "ai_092",
           "name": "隐龙窟",
@@ -11821,29 +11986,29 @@
         {
           "id": "ai_091_npc03",
           "cell": [
-            9,
+            8,
             23
           ]
         },
         {
           "id": "ai_091_npc04",
           "cell": [
-            22,
-            22
+            23,
+            23
           ]
         },
         {
           "id": "ai_091_mob",
           "cell": [
             20,
-            8
+            7
           ]
         },
         {
           "id": "ai_091_boss",
           "cell": [
-            23,
-            24
+            17,
+            25
           ]
         }
       ],
@@ -11944,14 +12109,14 @@
         {
           "id": "ai_092_boss",
           "cell": [
-            25,
-            26
+            24,
+            25
           ]
         },
         {
           "id": "ai_092_mob2",
           "cell": [
-            12,
+            13,
             24
           ]
         }
@@ -12022,8 +12187,8 @@
         {
           "id": "exit_ai_094",
           "cell": [
-            27,
-            26
+            19,
+            27
           ],
           "target_map": "ai_094",
           "name": "阴阳道",
@@ -12055,21 +12220,21 @@
         {
           "id": "ai_093_npc03",
           "cell": [
-            21,
-            25
+            22,
+            26
           ]
         },
         {
           "id": "ai_093_mob",
           "cell": [
-            17,
+            15,
             7
           ]
         },
         {
           "id": "ai_093_boss",
           "cell": [
-            24,
+            28,
             25
           ]
         }
@@ -12142,7 +12307,7 @@
           "id": "exit_ai_095",
           "cell": [
             27,
-            27
+            20
           ],
           "target_map": "ai_095",
           "name": "映波谷",
@@ -12174,15 +12339,15 @@
         {
           "id": "ai_094_mob",
           "cell": [
-            16,
-            7
+            12,
+            5
           ]
         },
         {
           "id": "ai_094_boss",
           "cell": [
-            24,
-            26
+            22,
+            28
           ]
         }
       ],
@@ -12241,8 +12406,8 @@
         {
           "id": "exit_ai_096",
           "cell": [
-            28,
-            9
+            29,
+            16
           ],
           "target_map": "ai_096",
           "name": "祈星台",
@@ -12281,29 +12446,29 @@
         {
           "id": "ai_095_npc04",
           "cell": [
-            23,
-            25
+            20,
+            24
           ]
         },
         {
           "id": "ai_095_npc05",
           "cell": [
             13,
-            26
+            25
           ]
         },
         {
           "id": "ai_095_mob",
           "cell": [
-            20,
-            24
+            24,
+            27
           ]
         },
         {
           "id": "ai_095_boss",
           "cell": [
-            27,
-            27
+            28,
+            26
           ]
         }
       ],
@@ -12398,7 +12563,7 @@
         {
           "id": "ai_096_npc03",
           "cell": [
-            8,
+            7,
             22
           ]
         },
@@ -12406,14 +12571,14 @@
           "id": "ai_096_mob",
           "cell": [
             21,
-            22
+            21
           ]
         },
         {
           "id": "ai_096_boss",
           "cell": [
-            28,
-            26
+            27,
+            27
           ]
         }
       ],
@@ -12473,8 +12638,8 @@
         {
           "id": "exit_ai_098",
           "cell": [
-            29,
-            16
+            25,
+            2
           ],
           "target_map": "ai_098",
           "name": "赤岩峡",
@@ -12513,15 +12678,15 @@
         {
           "id": "ai_097_npc04",
           "cell": [
-            22,
-            21
+            23,
+            22
           ]
         },
         {
           "id": "ai_097_mob",
           "cell": [
-            21,
-            23
+            18,
+            20
           ]
         },
         {
@@ -12534,8 +12699,8 @@
         {
           "id": "ai_097_mob2",
           "cell": [
-            13,
-            21
+            14,
+            19
           ]
         }
       ],
@@ -12596,8 +12761,8 @@
         {
           "id": "exit_ai_099",
           "cell": [
-            29,
-            16
+            28,
+            8
           ],
           "target_map": "ai_099",
           "name": "潭溪山",
@@ -12629,43 +12794,43 @@
         {
           "id": "ai_098_npc03",
           "cell": [
-            9,
+            7,
             25
           ]
         },
         {
           "id": "ai_098_npc04",
           "cell": [
-            22,
-            21
+            21,
+            22
           ]
         },
         {
           "id": "ai_098_npc05",
           "cell": [
-            16,
-            27
+            12,
+            26
           ]
         },
         {
           "id": "ai_098_mob",
           "cell": [
             19,
-            9
+            7
           ]
         },
         {
           "id": "ai_098_boss",
           "cell": [
-            23,
-            24
+            26,
+            19
           ]
         },
         {
           "id": "ai_098_mob2",
           "cell": [
             13,
-            22
+            17
           ]
         }
       ],
@@ -12767,15 +12932,15 @@
         {
           "id": "ai_099_mob",
           "cell": [
-            26,
-            21
+            27,
+            22
           ]
         },
         {
           "id": "ai_099_boss",
           "cell": [
-            12,
-            6
+            11,
+            4
           ]
         }
       ],
@@ -12836,7 +13001,7 @@
           "id": "exit_ai_101",
           "cell": [
             29,
-            3
+            11
           ],
           "target_map": "ai_101",
           "name": "地宫大殿",
@@ -12869,27 +13034,27 @@
           "id": "ai_100_npc03",
           "cell": [
             7,
-            21
+            22
           ]
         },
         {
           "id": "ai_100_npc04",
           "cell": [
             22,
-            21
+            22
           ]
         },
         {
           "id": "ai_100_mob",
           "cell": [
-            21,
-            23
+            18,
+            19
           ]
         },
         {
           "id": "ai_100_boss",
           "cell": [
-            28,
+            26,
             27
           ]
         }
@@ -12925,6 +13090,17 @@
         3
       ],
       "landmarks": [
+        {
+          "kind": "deep_combat_chamber",
+          "cell": [
+            17,
+            17
+          ],
+          "size": [
+            13,
+            13
+          ]
+        },
         {
           "kind": "shrine",
           "cell": [
@@ -12984,8 +13160,8 @@
         {
           "id": "exit_ai_102",
           "cell": [
-            28,
-            9
+            29,
+            22
           ],
           "target_map": "ai_102",
           "name": "枉死路",
@@ -12996,8 +13172,8 @@
         {
           "id": "ai_101_guide",
           "cell": [
-            7,
-            21
+            6,
+            20
           ]
         },
         {
@@ -13011,7 +13187,7 @@
           "id": "ai_101_survey",
           "cell": [
             25,
-            11
+            12
           ]
         },
         {
@@ -13024,29 +13200,29 @@
         {
           "id": "ai_101_mob",
           "cell": [
-            16,
-            7
+            20,
+            9
           ]
         },
         {
           "id": "ai_101_boss",
           "cell": [
             24,
-            26
+            27
           ]
         },
         {
           "id": "ai_101_mob2",
           "cell": [
-            11,
+            19,
             21
           ]
         },
         {
           "id": "ai_101_mob3",
           "cell": [
-            24,
-            16
+            22,
+            19
           ]
         }
       ],
@@ -13118,7 +13294,7 @@
           "id": "exit_ai_103",
           "cell": [
             27,
-            27
+            20
           ],
           "target_map": "ai_103",
           "name": "墓道法阵",
@@ -13150,15 +13326,15 @@
         {
           "id": "ai_102_mob",
           "cell": [
-            16,
+            13,
             7
           ]
         },
         {
           "id": "ai_102_boss",
           "cell": [
-            24,
-            26
+            22,
+            28
           ]
         }
       ],
@@ -13191,6 +13367,17 @@
         28
       ],
       "landmarks": [
+        {
+          "kind": "deep_combat_chamber",
+          "cell": [
+            17,
+            17
+          ],
+          "size": [
+            13,
+            13
+          ]
+        },
         {
           "kind": "shrine",
           "cell": [
@@ -13250,8 +13437,8 @@
         {
           "id": "exit_ai_104",
           "cell": [
-            25,
-            19
+            27,
+            7
           ],
           "target_map": "ai_104",
           "name": "将军冢",
@@ -13269,42 +13456,42 @@
         {
           "id": "ai_103_courier",
           "cell": [
-            10,
+            8,
             9
           ]
         },
         {
           "id": "ai_103_survey",
           "cell": [
-            25,
-            11
+            26,
+            12
           ]
         },
         {
           "id": "ai_103_npc03",
           "cell": [
-            11,
+            10,
             13
           ]
         },
         {
           "id": "ai_103_mob",
           "cell": [
-            16,
+            15,
             7
           ]
         },
         {
           "id": "ai_103_boss",
           "cell": [
-            24,
+            26,
             27
           ]
         },
         {
           "id": "ai_103_mob2",
           "cell": [
-            11,
+            22,
             21
           ]
         },
@@ -13312,7 +13499,7 @@
           "id": "ai_103_mob3",
           "cell": [
             23,
-            17
+            25
           ]
         }
       ],
@@ -13438,14 +13625,14 @@
         {
           "id": "ai_104_mob",
           "cell": [
-            16,
-            8
+            15,
+            9
           ]
         },
         {
           "id": "ai_104_boss",
           "cell": [
-            23,
+            24,
             27
           ]
         }
@@ -13505,8 +13692,8 @@
         {
           "id": "exit_ai_106",
           "cell": [
-            28,
-            9
+            29,
+            6
           ],
           "target_map": "ai_106",
           "name": "赤岩峡",
@@ -13539,14 +13726,14 @@
           "id": "ai_105_npc03",
           "cell": [
             8,
-            20
+            21
           ]
         },
         {
           "id": "ai_105_mob",
           "cell": [
-            21,
-            22
+            22,
+            25
           ]
         },
         {
@@ -13560,7 +13747,7 @@
           "id": "ai_105_mob2",
           "cell": [
             13,
-            22
+            23
           ]
         }
       ],
@@ -13620,8 +13807,8 @@
         {
           "id": "exit_ai_107",
           "cell": [
-            23,
-            15
+            29,
+            10
           ],
           "target_map": "ai_107",
           "name": "潭溪山",
@@ -13653,36 +13840,36 @@
         {
           "id": "ai_106_npc03",
           "cell": [
-            8,
+            7,
             24
           ]
         },
         {
           "id": "ai_106_npc04",
           "cell": [
-            21,
+            22,
             22
           ]
         },
         {
           "id": "ai_106_mob",
           "cell": [
-            20,
+            22,
             7
           ]
         },
         {
           "id": "ai_106_boss",
           "cell": [
-            24,
-            23
+            18,
+            25
           ]
         },
         {
           "id": "ai_106_mob2",
           "cell": [
-            11,
-            21
+            17,
+            20
           ]
         }
       ],
@@ -13744,7 +13931,7 @@
           "id": "exit_ai_108",
           "cell": [
             28,
-            13
+            11
           ],
           "target_map": "ai_108",
           "name": "莫言谷",
@@ -13776,29 +13963,29 @@
         {
           "id": "ai_107_npc03",
           "cell": [
-            12,
-            22
+            9,
+            26
           ]
         },
         {
           "id": "ai_107_npc04",
           "cell": [
-            22,
+            21,
             23
           ]
         },
         {
           "id": "ai_107_npc05",
           "cell": [
-            12,
+            14,
             27
           ]
         },
         {
           "id": "ai_107_mob",
           "cell": [
-            26,
-            20
+            27,
+            21
           ]
         },
         {
@@ -13900,14 +14087,14 @@
         {
           "id": "ai_108_npc03",
           "cell": [
-            9,
+            8,
             23
           ]
         },
         {
           "id": "ai_108_mob",
           "cell": [
-            20,
+            21,
             22
           ]
         },
@@ -13915,7 +14102,7 @@
           "id": "ai_108_boss",
           "cell": [
             27,
-            28
+            27
           ]
         }
       ],
@@ -13949,6 +14136,17 @@
         3
       ],
       "landmarks": [
+        {
+          "kind": "deep_combat_chamber",
+          "cell": [
+            17,
+            17
+          ],
+          "size": [
+            13,
+            13
+          ]
+        },
         {
           "kind": "shrine",
           "cell": [
@@ -14009,7 +14207,7 @@
           "id": "exit_ai_110",
           "cell": [
             28,
-            7
+            6
           ],
           "target_map": "ai_110",
           "name": "枉死路",
@@ -14020,7 +14218,7 @@
         {
           "id": "ai_109_guide",
           "cell": [
-            8,
+            7,
             20
           ]
         },
@@ -14035,7 +14233,7 @@
           "id": "ai_109_survey",
           "cell": [
             26,
-            12
+            11
           ]
         },
         {
@@ -14048,29 +14246,29 @@
         {
           "id": "ai_109_mob",
           "cell": [
-            16,
-            7
+            20,
+            8
           ]
         },
         {
           "id": "ai_109_boss",
           "cell": [
             24,
-            26
+            27
           ]
         },
         {
           "id": "ai_109_mob2",
           "cell": [
-            12,
+            22,
             21
           ]
         },
         {
           "id": "ai_109_mob3",
           "cell": [
-            23,
-            15
+            25,
+            23
           ]
         }
       ],
@@ -14142,7 +14340,7 @@
           "id": "exit_ai_111",
           "cell": [
             27,
-            26
+            20
           ],
           "target_map": "ai_111",
           "name": "墓道法阵",
@@ -14174,15 +14372,15 @@
         {
           "id": "ai_110_mob",
           "cell": [
-            16,
+            15,
             7
           ]
         },
         {
           "id": "ai_110_boss",
           "cell": [
-            24,
-            25
+            20,
+            28
           ]
         }
       ],
@@ -14215,6 +14413,17 @@
         28
       ],
       "landmarks": [
+        {
+          "kind": "deep_combat_chamber",
+          "cell": [
+            17,
+            17
+          ],
+          "size": [
+            13,
+            13
+          ]
+        },
         {
           "kind": "shrine",
           "cell": [
@@ -14274,8 +14483,8 @@
         {
           "id": "exit_ai_112",
           "cell": [
-            25,
-            29
+            28,
+            11
           ],
           "target_map": "ai_112",
           "name": "将军冢",
@@ -14287,7 +14496,7 @@
           "id": "ai_111_guide",
           "cell": [
             6,
-            20
+            21
           ]
         },
         {
@@ -14300,8 +14509,8 @@
         {
           "id": "ai_111_survey",
           "cell": [
-            26,
-            11
+            25,
+            12
           ]
         },
         {
@@ -14314,8 +14523,8 @@
         {
           "id": "ai_111_mob",
           "cell": [
-            16,
-            6
+            19,
+            8
           ]
         },
         {
@@ -14328,14 +14537,14 @@
         {
           "id": "ai_111_mob2",
           "cell": [
-            12,
-            22
+            19,
+            21
           ]
         },
         {
           "id": "ai_111_mob3",
           "cell": [
-            24,
+            22,
             16
           ]
         }
@@ -14429,8 +14638,8 @@
         {
           "id": "exit_ai_113",
           "cell": [
-            24,
-            29
+            23,
+            10
           ],
           "target_map": "ai_113",
           "name": "莫言山",
@@ -14462,15 +14671,15 @@
         {
           "id": "ai_112_mob",
           "cell": [
-            16,
-            7
+            15,
+            9
           ]
         },
         {
           "id": "ai_112_boss",
           "cell": [
-            24,
-            25
+            22,
+            27
           ]
         }
       ],
@@ -14562,14 +14771,14 @@
         {
           "id": "ai_113_npc03",
           "cell": [
-            7,
+            8,
             21
           ]
         },
         {
           "id": "ai_113_npc04",
           "cell": [
-            24,
+            23,
             24
           ]
         },
@@ -14583,7 +14792,7 @@
         {
           "id": "ai_113_mob",
           "cell": [
-            21,
+            17,
             23
           ]
         },
@@ -14598,7 +14807,7 @@
           "id": "ai_113_mob2",
           "cell": [
             14,
-            22
+            20
           ]
         }
       ],
@@ -14661,7 +14870,7 @@
           "id": "exit_ai_115",
           "cell": [
             29,
-            16
+            14
           ],
           "target_map": "ai_115",
           "name": "潭溪山",
@@ -14693,29 +14902,29 @@
         {
           "id": "ai_114_npc03",
           "cell": [
-            8,
+            9,
             24
           ]
         },
         {
           "id": "ai_114_mob",
           "cell": [
-            19,
-            8
+            21,
+            9
           ]
         },
         {
           "id": "ai_114_boss",
           "cell": [
-            23,
-            23
+            22,
+            21
           ]
         },
         {
           "id": "ai_114_mob2",
           "cell": [
-            12,
-            23
+            14,
+            22
           ]
         }
       ],
@@ -14776,7 +14985,7 @@
           "id": "exit_ai_116",
           "cell": [
             28,
-            13
+            11
           ],
           "target_map": "ai_116",
           "name": "莫言谷",
@@ -14809,27 +15018,27 @@
           "id": "ai_115_npc03",
           "cell": [
             8,
-            18
+            26
           ]
         },
         {
           "id": "ai_115_npc04",
           "cell": [
-            23,
-            22
+            22,
+            23
           ]
         },
         {
           "id": "ai_115_mob",
           "cell": [
             27,
-            20
+            21
           ]
         },
         {
           "id": "ai_115_boss",
           "cell": [
-            10,
+            11,
             5
           ]
         }
@@ -14891,8 +15100,8 @@
         {
           "id": "exit_ai_117",
           "cell": [
-            29,
-            16
+            24,
+            10
           ],
           "target_map": "ai_117",
           "name": "落雪池",
@@ -14931,28 +15140,28 @@
         {
           "id": "ai_116_npc04",
           "cell": [
-            24,
+            23,
             24
           ]
         },
         {
           "id": "ai_116_npc05",
           "cell": [
-            13,
+            12,
             26
           ]
         },
         {
           "id": "ai_116_mob",
           "cell": [
-            21,
-            24
+            20,
+            28
           ]
         },
         {
           "id": "ai_116_boss",
           "cell": [
-            26,
+            27,
             27
           ]
         }
@@ -15055,14 +15264,14 @@
         {
           "id": "ai_117_mob",
           "cell": [
-            18,
+            21,
             7
           ]
         },
         {
           "id": "ai_117_boss",
           "cell": [
-            21,
+            22,
             23
           ]
         }
@@ -15123,8 +15332,8 @@
         {
           "id": "exit_ai_119",
           "cell": [
-            29,
-            6
+            10,
+            24
           ],
           "target_map": "ai_119",
           "name": "浴血崖",
@@ -15156,22 +15365,22 @@
         {
           "id": "ai_118_mob",
           "cell": [
-            16,
-            6
+            15,
+            7
           ]
         },
         {
           "id": "ai_118_boss",
           "cell": [
-            24,
-            26
+            26,
+            25
           ]
         },
         {
           "id": "ai_118_mob2",
           "cell": [
-            12,
-            24
+            20,
+            23
           ]
         }
       ],
@@ -15281,15 +15490,15 @@
         {
           "id": "ai_119_mob",
           "cell": [
-            15,
-            7
+            12,
+            5
           ]
         },
         {
           "id": "ai_119_boss",
           "cell": [
-            25,
-            26
+            28,
+            25
           ]
         }
       ],
@@ -15361,7 +15570,7 @@
           "id": "exit_ai_121",
           "cell": [
             27,
-            26
+            20
           ],
           "target_map": "ai_121",
           "name": "映波谷",
@@ -15393,15 +15602,15 @@
         {
           "id": "ai_120_mob",
           "cell": [
-            16,
-            7
+            14,
+            6
           ]
         },
         {
           "id": "ai_120_boss",
           "cell": [
-            24,
-            25
+            21,
+            28
           ]
         }
       ],
@@ -15460,8 +15669,8 @@
         {
           "id": "exit_ai_122",
           "cell": [
-            29,
-            15
+            24,
+            2
           ],
           "target_map": "ai_122",
           "name": "祈星台",
@@ -15493,28 +15702,28 @@
         {
           "id": "ai_121_npc03",
           "cell": [
-            8,
+            7,
             22
           ]
         },
         {
           "id": "ai_121_npc04",
           "cell": [
-            23,
-            21
-          ]
-        },
-        {
-          "id": "ai_121_mob",
-          "cell": [
             21,
             22
           ]
         },
         {
+          "id": "ai_121_mob",
+          "cell": [
+            17,
+            19
+          ]
+        },
+        {
           "id": "ai_121_boss",
           "cell": [
-            26,
+            27,
             27
           ]
         }
@@ -15576,8 +15785,8 @@
         {
           "id": "exit_ai_123",
           "cell": [
-            28,
-            9
+            29,
+            16
           ],
           "target_map": "ai_123",
           "name": "落雪池",
@@ -15609,36 +15818,36 @@
         {
           "id": "ai_122_npc03",
           "cell": [
-            8,
-            22
+            7,
+            21
           ]
         },
         {
           "id": "ai_122_npc04",
-          "cell": [
-            22,
-            24
-          ]
-        },
-        {
-          "id": "ai_122_npc05",
-          "cell": [
-            13,
-            25
-          ]
-        },
-        {
-          "id": "ai_122_mob",
           "cell": [
             20,
             22
           ]
         },
         {
+          "id": "ai_122_npc05",
+          "cell": [
+            12,
+            25
+          ]
+        },
+        {
+          "id": "ai_122_mob",
+          "cell": [
+            17,
+            18
+          ]
+        },
+        {
           "id": "ai_122_boss",
           "cell": [
             27,
-            28
+            27
           ]
         }
       ],
@@ -15701,7 +15910,7 @@
           "id": "exit_ai_124",
           "cell": [
             29,
-            16
+            15
           ],
           "target_map": "ai_124",
           "name": "隐龙窟",
@@ -15733,7 +15942,7 @@
         {
           "id": "ai_123_npc03",
           "cell": [
-            7,
+            8,
             24
           ]
         },
@@ -15741,14 +15950,14 @@
           "id": "ai_123_mob",
           "cell": [
             19,
-            7
+            6
           ]
         },
         {
           "id": "ai_123_boss",
           "cell": [
-            23,
-            25
+            22,
+            23
           ]
         }
       ],
@@ -15841,22 +16050,22 @@
         {
           "id": "ai_124_mob",
           "cell": [
-            16,
-            7
+            13,
+            6
           ]
         },
         {
           "id": "ai_124_boss",
           "cell": [
-            25,
+            24,
             26
           ]
         },
         {
           "id": "ai_124_mob2",
           "cell": [
-            12,
-            21
+            21,
+            24
           ]
         }
       ],
@@ -15926,7 +16135,7 @@
         {
           "id": "exit_ai_126",
           "cell": [
-            27,
+            19,
             27
           ],
           "target_map": "ai_126",
@@ -15959,22 +16168,22 @@
         {
           "id": "ai_125_npc03",
           "cell": [
-            22,
+            21,
             25
           ]
         },
         {
           "id": "ai_125_mob",
           "cell": [
-            15,
+            13,
             7
           ]
         },
         {
           "id": "ai_125_boss",
           "cell": [
-            24,
-            26
+            27,
+            22
           ]
         }
       ],
@@ -16046,7 +16255,7 @@
           "id": "exit_ai_127",
           "cell": [
             27,
-            27
+            20
           ],
           "target_map": "ai_127",
           "name": "映波谷",
@@ -16078,7 +16287,7 @@
         {
           "id": "ai_126_mob",
           "cell": [
-            16,
+            15,
             7
           ]
         },
@@ -16086,7 +16295,7 @@
           "id": "ai_126_boss",
           "cell": [
             24,
-            26
+            28
           ]
         }
       ],
@@ -16185,22 +16394,22 @@
         {
           "id": "ai_127_npc04",
           "cell": [
-            23,
+            22,
             23
           ]
         },
         {
           "id": "ai_127_mob",
           "cell": [
-            21,
-            22
+            18,
+            20
           ]
         },
         {
           "id": "ai_127_boss",
           "cell": [
             27,
-            26
+            27
           ]
         }
       ],
@@ -16261,8 +16470,8 @@
         {
           "id": "exit_ai_129",
           "cell": [
-            28,
-            9
+            29,
+            16
           ],
           "target_map": "ai_129",
           "name": "百花谷",
@@ -16294,15 +16503,15 @@
         {
           "id": "ai_128_npc03",
           "cell": [
-            7,
+            8,
             22
           ]
         },
         {
           "id": "ai_128_npc04",
           "cell": [
-            19,
-            23
+            22,
+            24
           ]
         },
         {
@@ -16315,15 +16524,15 @@
         {
           "id": "ai_128_mob",
           "cell": [
-            22,
-            24
+            16,
+            23
           ]
         },
         {
           "id": "ai_128_boss",
           "cell": [
             27,
-            26
+            27
           ]
         }
       ],
@@ -16396,8 +16605,8 @@
         {
           "id": "exit_ai_130",
           "cell": [
-            23,
-            8
+            29,
+            9
           ],
           "target_map": "ai_130",
           "name": "魔界一层上",
@@ -16429,7 +16638,7 @@
         {
           "id": "ai_129_npc03",
           "cell": [
-            8,
+            9,
             13
           ]
         },
@@ -16437,13 +16646,13 @@
           "id": "ai_129_mob",
           "cell": [
             23,
-            15
+            16
           ]
         },
         {
           "id": "ai_129_boss",
           "cell": [
-            27,
+            28,
             28
           ]
         }
@@ -16537,14 +16746,14 @@
         {
           "id": "ai_130_mob",
           "cell": [
-            15,
-            7
+            14,
+            6
           ]
         },
         {
           "id": "ai_130_boss",
           "cell": [
-            24,
+            23,
             26
           ]
         }
@@ -16604,8 +16813,8 @@
         {
           "id": "exit_ai_132",
           "cell": [
-            28,
-            27
+            25,
+            16
           ],
           "target_map": "ai_132",
           "name": "魔界一层下",
@@ -16637,22 +16846,22 @@
         {
           "id": "ai_131_npc03",
           "cell": [
-            8,
+            9,
             24
           ]
         },
         {
           "id": "ai_131_mob",
           "cell": [
-            17,
-            7
+            20,
+            9
           ]
         },
         {
           "id": "ai_131_boss",
           "cell": [
             24,
-            26
+            25
           ]
         }
       ],
@@ -16745,7 +16954,7 @@
         {
           "id": "ai_132_mob",
           "cell": [
-            15,
+            13,
             7
           ]
         },
@@ -16753,7 +16962,7 @@
           "id": "ai_132_boss",
           "cell": [
             24,
-            26
+            25
           ]
         }
       ],
@@ -16845,21 +17054,21 @@
         {
           "id": "ai_133_npc03",
           "cell": [
-            9,
+            8,
             24
           ]
         },
         {
           "id": "ai_133_mob",
           "cell": [
-            17,
-            7
+            21,
+            9
           ]
         },
         {
           "id": "ai_133_boss",
           "cell": [
-            23,
+            24,
             26
           ]
         }
@@ -16920,8 +17129,8 @@
         {
           "id": "exit_ai_135",
           "cell": [
-            22,
-            29
+            15,
+            24
           ],
           "target_map": "ai_135",
           "name": "魔界二层下",
@@ -16953,15 +17162,15 @@
         {
           "id": "ai_134_mob",
           "cell": [
-            15,
-            7
+            13,
+            5
           ]
         },
         {
           "id": "ai_134_boss",
           "cell": [
-            24,
-            27
+            22,
+            26
           ]
         }
       ],
@@ -17021,7 +17230,7 @@
           "id": "exit_ai_136",
           "cell": [
             29,
-            27
+            6
           ],
           "target_map": "ai_136",
           "name": "魔界三层上",
@@ -17054,21 +17263,21 @@
           "id": "ai_135_npc03",
           "cell": [
             12,
-            21
+            22
           ]
         },
         {
           "id": "ai_135_mob",
           "cell": [
-            17,
+            14,
             7
           ]
         },
         {
           "id": "ai_135_boss",
           "cell": [
-            25,
-            26
+            24,
+            24
           ]
         }
       ],
@@ -17128,8 +17337,8 @@
         {
           "id": "exit_ai_137",
           "cell": [
-            29,
-            27
+            25,
+            15
           ],
           "target_map": "ai_137",
           "name": "魔界三层中",
@@ -17168,8 +17377,8 @@
         {
           "id": "ai_136_boss",
           "cell": [
-            23,
-            26
+            24,
+            25
           ]
         }
       ],
@@ -17268,15 +17477,15 @@
         {
           "id": "ai_137_mob",
           "cell": [
-            16,
-            7
+            21,
+            9
           ]
         },
         {
           "id": "ai_137_boss",
           "cell": [
             24,
-            25
+            27
           ]
         }
       ],
@@ -17369,15 +17578,15 @@
         {
           "id": "ai_138_mob",
           "cell": [
-            16,
-            6
+            12,
+            5
           ]
         },
         {
           "id": "ai_138_boss",
           "cell": [
             24,
-            25
+            27
           ]
         }
       ],
@@ -17437,7 +17646,7 @@
           "id": "exit_ai_140",
           "cell": [
             28,
-            16
+            15
           ],
           "target_map": "ai_140",
           "name": "魔界四层中",
@@ -17577,14 +17786,14 @@
         {
           "id": "ai_140_mob",
           "cell": [
-            16,
-            7
+            12,
+            6
           ]
         },
         {
           "id": "ai_140_boss",
           "cell": [
-            24,
+            22,
             26
           ]
         }
@@ -17645,7 +17854,7 @@
           "id": "exit_ai_142",
           "cell": [
             29,
-            13
+            15
           ],
           "target_map": "ai_142",
           "name": "旧卧云镇",
@@ -17677,22 +17886,22 @@
         {
           "id": "ai_141_npc03",
           "cell": [
-            9,
+            8,
             23
           ]
         },
         {
           "id": "ai_141_mob",
           "cell": [
-            16,
-            6
+            21,
+            9
           ]
         },
         {
           "id": "ai_141_boss",
           "cell": [
             24,
-            27
+            26
           ]
         }
       ],
@@ -17808,7 +18017,7 @@
           "id": "exit_ai_143",
           "cell": [
             29,
-            16
+            25
           ],
           "target_map": "ai_143",
           "name": "旧卧云镇北",
@@ -17840,21 +18049,21 @@
         {
           "id": "ai_142_npc03",
           "cell": [
-            6,
+            7,
             13
           ]
         },
         {
           "id": "ai_142_npc04",
           "cell": [
-            13,
-            10
+            11,
+            9
           ]
         },
         {
           "id": "ai_142_npc05",
           "cell": [
-            22,
+            24,
             15
           ]
         },
@@ -17875,14 +18084,14 @@
         {
           "id": "ai_142_mob",
           "cell": [
-            24,
-            18
+            22,
+            20
           ]
         },
         {
           "id": "ai_142_boss",
           "cell": [
-            18,
+            19,
             27
           ]
         }
@@ -18003,7 +18212,7 @@
           "id": "exit_ai_144",
           "cell": [
             29,
-            15
+            26
           ],
           "target_map": "ai_144",
           "name": "旧八旗镇",
@@ -18049,21 +18258,21 @@
         {
           "id": "ai_143_npc05",
           "cell": [
-            26,
+            25,
             14
           ]
         },
         {
           "id": "ai_143_npc06",
           "cell": [
-            5,
+            6,
             28
           ]
         },
         {
           "id": "ai_143_npc07",
           "cell": [
-            27,
+            26,
             28
           ]
         },
@@ -18071,20 +18280,20 @@
           "id": "ai_143_npc08",
           "cell": [
             8,
-            21
+            23
           ]
         },
         {
           "id": "ai_143_mob",
           "cell": [
             23,
-            18
+            19
           ]
         },
         {
           "id": "ai_143_boss",
           "cell": [
-            19,
+            20,
             26
           ]
         }
@@ -18238,7 +18447,7 @@
         {
           "id": "ai_144_npc03",
           "cell": [
-            9,
+            8,
             14
           ]
         },
@@ -18266,14 +18475,14 @@
         {
           "id": "ai_144_mob",
           "cell": [
-            23,
-            19
+            24,
+            18
           ]
         },
         {
           "id": "ai_144_boss",
           "cell": [
-            19,
+            18,
             27
           ]
         }
@@ -18370,8 +18579,8 @@
         {
           "id": "exit_ai_146",
           "cell": [
-            17,
-            29
+            16,
+            3
           ],
           "target_map": "ai_146",
           "name": "旧慈云寺北",
@@ -18404,13 +18613,13 @@
           "id": "ai_145_npc03",
           "cell": [
             11,
-            10
+            9
           ]
         },
         {
           "id": "ai_145_npc04",
           "cell": [
-            22,
+            23,
             15
           ]
         },
@@ -18424,22 +18633,22 @@
         {
           "id": "ai_145_npc06",
           "cell": [
-            8,
+            7,
             22
           ]
         },
         {
           "id": "ai_145_npc07",
           "cell": [
-            21,
-            23
+            22,
+            21
           ]
         },
         {
           "id": "ai_145_mob",
           "cell": [
-            24,
-            18
+            27,
+            19
           ]
         },
         {
@@ -18543,8 +18752,8 @@
         {
           "id": "exit_ai_147",
           "cell": [
-            25,
-            12
+            12,
+            5
           ],
           "target_map": "ai_147",
           "name": "旧慈云寺",
@@ -18583,22 +18792,22 @@
         {
           "id": "ai_146_npc04",
           "cell": [
-            5,
-            17
+            8,
+            21
           ]
         },
         {
           "id": "ai_146_npc05",
           "cell": [
             28,
-            18
+            19
           ]
         },
         {
           "id": "ai_146_npc06",
           "cell": [
-            7,
-            22
+            8,
+            25
           ]
         },
         {
@@ -18611,15 +18820,15 @@
         {
           "id": "ai_146_mob",
           "cell": [
-            5,
-            26
+            4,
+            28
           ]
         },
         {
           "id": "ai_146_boss",
           "cell": [
             25,
-            6
+            4
           ]
         }
       ],
@@ -18717,7 +18926,7 @@
           "id": "exit_ai_148",
           "cell": [
             26,
-            20
+            19
           ],
           "target_map": "ai_148",
           "name": "旧戴家场",
@@ -18750,35 +18959,35 @@
           "id": "ai_147_npc03",
           "cell": [
             14,
-            10
+            9
           ]
         },
         {
           "id": "ai_147_npc04",
           "cell": [
             5,
-            17
+            19
           ]
         },
         {
           "id": "ai_147_npc05",
           "cell": [
             28,
-            18
+            17
           ]
         },
         {
           "id": "ai_147_mob",
           "cell": [
-            6,
-            25
+            5,
+            26
           ]
         },
         {
           "id": "ai_147_boss",
           "cell": [
             25,
-            5
+            4
           ]
         }
       ],
@@ -18840,8 +19049,8 @@
         {
           "id": "exit_ai_149",
           "cell": [
-            29,
-            28
+            25,
+            2
           ],
           "target_map": "ai_149",
           "name": "旧群雄大殿",
@@ -18873,29 +19082,29 @@
         {
           "id": "ai_148_npc03",
           "cell": [
-            7,
-            21
+            8,
+            22
           ]
         },
         {
           "id": "ai_148_npc04",
           "cell": [
             23,
-            21
+            22
           ]
         },
         {
           "id": "ai_148_mob",
           "cell": [
-            21,
-            22
+            18,
+            20
           ]
         },
         {
           "id": "ai_148_boss",
           "cell": [
             27,
-            26
+            27
           ]
         }
       ],
@@ -19033,7 +19242,7 @@
         {
           "id": "ai_149_npc03",
           "cell": [
-            14,
+            13,
             13
           ]
         },
@@ -19061,22 +19270,22 @@
         {
           "id": "ai_149_npc07",
           "cell": [
-            6,
-            23
+            7,
+            24
           ]
         },
         {
           "id": "ai_149_mob",
           "cell": [
-            6,
-            26
+            5,
+            29
           ]
         },
         {
           "id": "ai_149_boss",
           "cell": [
-            26,
-            6
+            25,
+            4
           ]
         }
       ],
@@ -19184,7 +19393,7 @@
         {
           "id": "exit_ai_151",
           "cell": [
-            16,
+            17,
             6
           ],
           "target_map": "ai_151",
@@ -19217,21 +19426,21 @@
         {
           "id": "ai_150_npc03",
           "cell": [
-            8,
+            7,
             12
           ]
         },
         {
           "id": "ai_150_mob",
           "cell": [
-            14,
-            19
+            15,
+            18
           ]
         },
         {
           "id": "ai_150_boss",
           "cell": [
-            21,
+            22,
             12
           ]
         }
@@ -19336,7 +19545,7 @@
         {
           "id": "exit_ai_152",
           "cell": [
-            15,
+            16,
             8
           ],
           "target_map": "ai_152",
@@ -19376,7 +19585,7 @@
         {
           "id": "ai_151_npc04",
           "cell": [
-            27,
+            28,
             8
           ]
         },
@@ -19384,13 +19593,13 @@
           "id": "ai_151_mob",
           "cell": [
             15,
-            19
+            20
           ]
         },
         {
           "id": "ai_151_boss",
           "cell": [
-            20,
+            21,
             12
           ]
         }
@@ -19452,8 +19661,8 @@
         {
           "id": "exit_ai_153",
           "cell": [
-            25,
-            9
+            28,
+            2
           ],
           "target_map": "ai_153",
           "name": "流云山顶",
@@ -19492,8 +19701,8 @@
         {
           "id": "ai_152_npc04",
           "cell": [
-            19,
-            22
+            21,
+            24
           ]
         },
         {
@@ -19506,15 +19715,15 @@
         {
           "id": "ai_152_mob",
           "cell": [
-            21,
-            24
+            15,
+            22
           ]
         },
         {
           "id": "ai_152_boss",
           "cell": [
             27,
-            28
+            27
           ]
         }
       ],
@@ -19616,15 +19825,15 @@
         {
           "id": "ai_153_mob",
           "cell": [
-            18,
+            19,
             8
           ]
         },
         {
           "id": "ai_153_boss",
           "cell": [
-            22,
-            22
+            16,
+            24
           ]
         }
       ],
@@ -19724,22 +19933,22 @@
         {
           "id": "ai_154_npc04",
           "cell": [
-            24,
-            22
+            22,
+            21
           ]
         },
         {
           "id": "ai_154_mob",
           "cell": [
-            22,
-            21
+            18,
+            24
           ]
         },
         {
           "id": "ai_154_boss",
           "cell": [
             27,
-            26
+            27
           ]
         }
       ],
@@ -19801,7 +20010,7 @@
           "id": "exit_ai_156",
           "cell": [
             29,
-            9
+            8
           ],
           "target_map": "ai_156",
           "name": "帮会擂台",
@@ -19834,35 +20043,35 @@
           "id": "ai_155_npc03",
           "cell": [
             8,
-            22
+            23
           ]
         },
         {
           "id": "ai_155_npc04",
           "cell": [
-            21,
+            22,
             21
           ]
         },
         {
           "id": "ai_155_npc05",
           "cell": [
-            11,
-            28
+            12,
+            27
           ]
         },
         {
           "id": "ai_155_mob",
           "cell": [
-            7,
-            5
+            6,
+            6
           ]
         },
         {
           "id": "ai_155_boss",
           "cell": [
-            27,
-            27
+            29,
+            29
           ]
         }
       ],
@@ -19969,7 +20178,7 @@
           "id": "exit_ai_157",
           "cell": [
             25,
-            16
+            17
           ],
           "target_map": "ai_157",
           "name": "红岭村",
@@ -20008,8 +20217,8 @@
         {
           "id": "ai_156_mob",
           "cell": [
-            16,
-            18
+            15,
+            19
           ]
         },
         {
@@ -20109,8 +20318,8 @@
         {
           "id": "exit_ai_158",
           "cell": [
-            29,
-            16
+            19,
+            3
           ],
           "target_map": "ai_158",
           "name": "神秘仙境",
@@ -20163,29 +20372,29 @@
         {
           "id": "ai_157_npc06",
           "cell": [
-            8,
-            21
+            7,
+            22
           ]
         },
         {
           "id": "ai_157_npc07",
           "cell": [
             21,
-            21
+            22
           ]
         },
         {
           "id": "ai_157_mob",
           "cell": [
-            24,
-            18
+            28,
+            19
           ]
         },
         {
           "id": "ai_157_boss",
           "cell": [
-            19,
-            27
+            20,
+            28
           ]
         }
       ],
@@ -20249,8 +20458,8 @@
         {
           "id": "exit_ai_044",
           "cell": [
-            17,
-            29
+            24,
+            10
           ],
           "target_map": "ai_044",
           "name": "金山绿水",
@@ -20289,7 +20498,7 @@
         {
           "id": "ai_158_npc04",
           "cell": [
-            24,
+            22,
             24
           ]
         },
@@ -20303,14 +20512,14 @@
         {
           "id": "ai_158_mob",
           "cell": [
-            21,
-            24
+            19,
+            28
           ]
         },
         {
           "id": "ai_158_boss",
           "cell": [
-            26,
+            27,
             27
           ]
         }
@@ -20373,8 +20582,8 @@
         {
           "id": "exit_ai_160",
           "cell": [
-            29,
-            16
+            28,
+            9
           ],
           "target_map": "ai_160",
           "name": "帮会战斗二",
@@ -20406,14 +20615,14 @@
         {
           "id": "ai_159_npc03",
           "cell": [
-            8,
-            21
+            7,
+            22
           ]
         },
         {
           "id": "ai_159_mob",
           "cell": [
-            21,
+            22,
             21
           ]
         },
@@ -20481,8 +20690,8 @@
         {
           "id": "exit_ai_161",
           "cell": [
-            29,
-            21
+            25,
+            2
           ],
           "target_map": "ai_161",
           "name": "帮会战斗三",
@@ -20514,29 +20723,29 @@
         {
           "id": "ai_160_npc03",
           "cell": [
-            9,
+            8,
             21
           ]
         },
         {
           "id": "ai_160_npc04",
           "cell": [
-            23,
-            22
+            21,
+            23
           ]
         },
         {
           "id": "ai_160_mob",
           "cell": [
-            20,
-            22
+            18,
+            19
           ]
         },
         {
           "id": "ai_160_boss",
           "cell": [
             27,
-            28
+            27
           ]
         }
       ],
@@ -20631,28 +20840,28 @@
           "id": "ai_161_npc03",
           "cell": [
             8,
-            21
+            20
           ]
         },
         {
           "id": "ai_161_npc04",
           "cell": [
-            22,
-            24
+            20,
+            23
           ]
         },
         {
           "id": "ai_161_npc05",
           "cell": [
-            13,
+            12,
             25
           ]
         },
         {
           "id": "ai_161_mob",
           "cell": [
-            20,
-            23
+            16,
+            20
           ]
         },
         {
@@ -20722,7 +20931,7 @@
           "id": "exit_ai_163",
           "cell": [
             29,
-            16
+            17
           ],
           "target_map": "ai_163",
           "name": "帮会领奖二",
@@ -20754,21 +20963,21 @@
         {
           "id": "ai_162_npc03",
           "cell": [
-            8,
+            7,
             22
           ]
         },
         {
           "id": "ai_162_mob",
           "cell": [
-            21,
-            22
+            22,
+            23
           ]
         },
         {
           "id": "ai_162_boss",
           "cell": [
-            26,
+            27,
             27
           ]
         }
@@ -20863,28 +21072,28 @@
           "id": "ai_163_npc03",
           "cell": [
             8,
-            22
+            21
           ]
         },
         {
           "id": "ai_163_npc04",
           "cell": [
-            24,
-            21
+            23,
+            22
           ]
         },
         {
           "id": "ai_163_mob",
           "cell": [
-            22,
-            22
+            18,
+            20
           ]
         },
         {
           "id": "ai_163_boss",
           "cell": [
             27,
-            28
+            27
           ]
         }
       ],
@@ -20945,8 +21154,8 @@
         {
           "id": "exit_ai_165",
           "cell": [
-            29,
-            16
+            28,
+            9
           ],
           "target_map": "ai_165",
           "name": "帮会战斗一",
@@ -20978,15 +21187,15 @@
         {
           "id": "ai_164_npc03",
           "cell": [
-            7,
-            21
+            8,
+            20
           ]
         },
         {
           "id": "ai_164_npc04",
           "cell": [
-            19,
-            23
+            21,
+            24
           ]
         },
         {
@@ -20999,8 +21208,8 @@
         {
           "id": "ai_164_mob",
           "cell": [
-            21,
-            24
+            16,
+            22
           ]
         },
         {
@@ -21069,8 +21278,8 @@
         {
           "id": "exit_ai_166",
           "cell": [
-            25,
-            9
+            28,
+            2
           ],
           "target_map": "ai_166",
           "name": "帮会领奖一",
@@ -21103,20 +21312,20 @@
           "id": "ai_165_npc03",
           "cell": [
             8,
-            22
+            21
           ]
         },
         {
           "id": "ai_165_mob",
           "cell": [
             21,
-            23
+            21
           ]
         },
         {
           "id": "ai_165_boss",
           "cell": [
-            26,
+            27,
             27
           ]
         }
@@ -21178,7 +21387,7 @@
           "id": "exit_ai_167",
           "cell": [
             29,
-            20
+            4
           ],
           "target_map": "ai_167",
           "name": "帮会战斗二",
@@ -21210,29 +21419,29 @@
         {
           "id": "ai_166_npc03",
           "cell": [
-            8,
+            9,
             21
           ]
         },
         {
           "id": "ai_166_npc04",
           "cell": [
-            24,
+            21,
             22
           ]
         },
         {
           "id": "ai_166_mob",
           "cell": [
-            21,
-            22
+            17,
+            19
           ]
         },
         {
           "id": "ai_166_boss",
           "cell": [
             27,
-            27
+            28
           ]
         }
       ],
@@ -21293,8 +21502,8 @@
         {
           "id": "exit_ai_168",
           "cell": [
-            28,
-            9
+            23,
+            10
           ],
           "target_map": "ai_168",
           "name": "帮会领奖二",
@@ -21333,28 +21542,28 @@
         {
           "id": "ai_167_npc04",
           "cell": [
-            23,
+            22,
             24
           ]
         },
         {
           "id": "ai_167_npc05",
           "cell": [
-            11,
+            12,
             26
           ]
         },
         {
           "id": "ai_167_mob",
           "cell": [
-            20,
-            24
+            16,
+            23
           ]
         },
         {
           "id": "ai_167_boss",
           "cell": [
-            28,
+            27,
             27
           ]
         }
@@ -21451,14 +21660,14 @@
           "id": "ai_168_npc03",
           "cell": [
             8,
-            21
+            22
           ]
         },
         {
           "id": "ai_168_mob",
           "cell": [
-            21,
-            21
+            23,
+            24
           ]
         },
         {
@@ -21526,7 +21735,7 @@
           "id": "exit_ai_170",
           "cell": [
             29,
-            28
+            16
           ],
           "target_map": "ai_170",
           "name": "帮会领奖三",
@@ -21558,7 +21767,7 @@
         {
           "id": "ai_169_npc03",
           "cell": [
-            7,
+            9,
             21
           ]
         },
@@ -21566,20 +21775,20 @@
           "id": "ai_169_npc04",
           "cell": [
             22,
-            21
+            22
           ]
         },
         {
           "id": "ai_169_mob",
           "cell": [
-            20,
-            23
+            18,
+            19
           ]
         },
         {
           "id": "ai_169_boss",
           "cell": [
-            26,
+            27,
             27
           ]
         }
@@ -21641,8 +21850,8 @@
         {
           "id": "exit_ai_171",
           "cell": [
-            24,
-            10
+            29,
+            16
           ],
           "target_map": "ai_171",
           "name": "帮会战斗一",
@@ -21675,13 +21884,13 @@
           "id": "ai_170_npc03",
           "cell": [
             8,
-            21
+            22
           ]
         },
         {
           "id": "ai_170_npc04",
           "cell": [
-            24,
+            22,
             24
           ]
         },
@@ -21695,14 +21904,14 @@
         {
           "id": "ai_170_mob",
           "cell": [
-            21,
-            24
+            15,
+            22
           ]
         },
         {
           "id": "ai_170_boss",
           "cell": [
-            26,
+            27,
             27
           ]
         }
@@ -21765,8 +21974,8 @@
         {
           "id": "exit_ai_172",
           "cell": [
-            24,
-            10
+            29,
+            13
           ],
           "target_map": "ai_172",
           "name": "帮会领奖一",
@@ -21798,14 +22007,14 @@
         {
           "id": "ai_171_npc03",
           "cell": [
-            9,
-            22
+            7,
+            21
           ]
         },
         {
           "id": "ai_171_mob",
           "cell": [
-            21,
+            22,
             22
           ]
         },
@@ -21874,7 +22083,7 @@
           "id": "exit_ai_173",
           "cell": [
             29,
-            19
+            13
           ],
           "target_map": "ai_173",
           "name": "帮会战斗二",
@@ -21913,22 +22122,22 @@
         {
           "id": "ai_172_npc04",
           "cell": [
-            20,
-            23
-          ]
-        },
-        {
-          "id": "ai_172_mob",
-          "cell": [
             22,
             22
           ]
         },
         {
+          "id": "ai_172_mob",
+          "cell": [
+            18,
+            19
+          ]
+        },
+        {
           "id": "ai_172_boss",
           "cell": [
-            28,
-            26
+            27,
+            27
           ]
         }
       ],
@@ -21989,8 +22198,8 @@
         {
           "id": "exit_ai_174",
           "cell": [
-            29,
-            16
+            28,
+            9
           ],
           "target_map": "ai_174",
           "name": "帮会领奖二",
@@ -22022,14 +22231,14 @@
         {
           "id": "ai_173_npc03",
           "cell": [
-            7,
+            8,
             22
           ]
         },
         {
           "id": "ai_173_npc04",
           "cell": [
-            23,
+            21,
             24
           ]
         },
@@ -22043,14 +22252,14 @@
         {
           "id": "ai_173_mob",
           "cell": [
-            20,
-            23
+            17,
+            21
           ]
         },
         {
           "id": "ai_173_boss",
           "cell": [
-            28,
+            27,
             27
           ]
         }
@@ -22113,8 +22322,8 @@
         {
           "id": "exit_ai_175",
           "cell": [
-            28,
-            9
+            29,
+            16
           ],
           "target_map": "ai_175",
           "name": "帮会战斗三",
@@ -22146,21 +22355,21 @@
         {
           "id": "ai_174_npc03",
           "cell": [
-            8,
+            7,
             22
           ]
         },
         {
           "id": "ai_174_mob",
           "cell": [
-            21,
-            22
+            23,
+            24
           ]
         },
         {
           "id": "ai_174_boss",
           "cell": [
-            26,
+            27,
             27
           ]
         }
@@ -22222,7 +22431,7 @@
           "id": "exit_ai_176",
           "cell": [
             29,
-            16
+            20
           ],
           "target_map": "ai_176",
           "name": "帮会领奖三",
@@ -22254,22 +22463,22 @@
         {
           "id": "ai_175_npc03",
           "cell": [
-            8,
-            21
+            7,
+            22
           ]
         },
         {
           "id": "ai_175_npc04",
           "cell": [
-            23,
+            21,
             22
           ]
         },
         {
           "id": "ai_175_mob",
           "cell": [
-            21,
-            21
+            16,
+            19
           ]
         },
         {
@@ -22337,8 +22546,8 @@
         {
           "id": "exit_ai_177",
           "cell": [
-            29,
-            16
+            24,
+            10
           ],
           "target_map": "ai_177",
           "name": "备战区",
@@ -22370,15 +22579,15 @@
         {
           "id": "ai_176_npc03",
           "cell": [
-            7,
+            9,
             21
           ]
         },
         {
           "id": "ai_176_npc04",
           "cell": [
-            22,
-            25
+            19,
+            23
           ]
         },
         {
@@ -22391,14 +22600,14 @@
         {
           "id": "ai_176_mob",
           "cell": [
-            19,
-            23
+            22,
+            27
           ]
         },
         {
           "id": "ai_176_boss",
           "cell": [
-            26,
+            27,
             27
           ]
         }
@@ -22546,7 +22755,7 @@
           "id": "ai_177_npc04",
           "cell": [
             24,
-            9
+            8
           ]
         },
         {
@@ -22567,14 +22776,14 @@
           "id": "ai_177_mob",
           "cell": [
             15,
-            17
+            18
           ]
         },
         {
           "id": "ai_177_boss",
           "cell": [
             21,
-            13
+            12
           ]
         }
       ],
@@ -22681,8 +22890,8 @@
         {
           "id": "exit_ai_179",
           "cell": [
-            27,
-            8
+            25,
+            10
           ],
           "target_map": "ai_179",
           "name": "侠派营地",
@@ -22722,7 +22931,7 @@
           "id": "ai_178_npc04",
           "cell": [
             22,
-            11
+            12
           ]
         },
         {
@@ -22735,7 +22944,7 @@
         {
           "id": "ai_178_npc06",
           "cell": [
-            26,
+            25,
             27
           ]
         },
@@ -22749,8 +22958,8 @@
         {
           "id": "ai_178_boss",
           "cell": [
-            21,
-            13
+            18,
+            6
           ]
         }
       ],
@@ -22857,8 +23066,8 @@
         {
           "id": "exit_ai_180",
           "cell": [
-            17,
-            4
+            29,
+            16
           ],
           "target_map": "ai_180",
           "name": "资源战场",
@@ -22890,14 +23099,14 @@
         {
           "id": "ai_179_npc03",
           "cell": [
-            7,
+            8,
             12
           ]
         },
         {
           "id": "ai_179_npc04",
           "cell": [
-            25,
+            24,
             10
           ]
         },
@@ -22905,13 +23114,13 @@
           "id": "ai_179_npc05",
           "cell": [
             4,
-            25
+            26
           ]
         },
         {
           "id": "ai_179_npc06",
           "cell": [
-            26,
+            25,
             28
           ]
         },
@@ -22926,14 +23135,14 @@
           "id": "ai_179_mob",
           "cell": [
             15,
-            17
+            18
           ]
         },
         {
           "id": "ai_179_boss",
           "cell": [
-            21,
-            12
+            19,
+            6
           ]
         }
       ],
@@ -23074,35 +23283,35 @@
         {
           "id": "ai_180_npc03",
           "cell": [
-            8,
-            13
+            5,
+            10
           ]
         },
         {
           "id": "ai_180_npc04",
           "cell": [
             22,
-            9
+            8
           ]
         },
         {
           "id": "ai_180_npc05",
           "cell": [
             8,
-            28
+            27
           ]
         },
         {
           "id": "ai_180_mob",
           "cell": [
-            15,
-            17
+            18,
+            22
           ]
         },
         {
           "id": "ai_180_boss",
           "cell": [
-            22,
+            25,
             12
           ]
         }
@@ -23209,7 +23418,7 @@
         {
           "id": "exit_ai_182",
           "cell": [
-            17,
+            15,
             28
           ],
           "target_map": "ai_182",
@@ -23243,14 +23452,14 @@
           "id": "ai_181_npc03",
           "cell": [
             5,
-            8
+            9
           ]
         },
         {
           "id": "ai_181_npc04",
           "cell": [
-            25,
-            12
+            27,
+            10
           ]
         },
         {
@@ -23264,7 +23473,7 @@
           "id": "ai_181_npc06",
           "cell": [
             28,
-            26
+            27
           ]
         },
         {
@@ -23278,7 +23487,7 @@
           "id": "ai_181_boss",
           "cell": [
             21,
-            13
+            6
           ]
         }
       ],
@@ -23418,8 +23627,8 @@
         {
           "id": "ai_182_npc03",
           "cell": [
-            8,
-            13
+            9,
+            12
           ]
         },
         {
@@ -23433,35 +23642,35 @@
           "id": "ai_182_npc05",
           "cell": [
             3,
-            28
+            27
           ]
         },
         {
           "id": "ai_182_npc06",
           "cell": [
-            26,
+            25,
             28
           ]
         },
         {
           "id": "ai_182_npc07",
           "cell": [
-            7,
+            8,
             22
           ]
         },
         {
           "id": "ai_182_mob",
           "cell": [
-            16,
+            15,
             18
           ]
         },
         {
           "id": "ai_182_boss",
           "cell": [
-            20,
-            12
+            19,
+            5
           ]
         }
       ],
@@ -23569,8 +23778,8 @@
         {
           "id": "exit_ai_184",
           "cell": [
-            28,
-            16
+            24,
+            5
           ],
           "target_map": "ai_184",
           "name": "资源战场",
@@ -23609,14 +23818,14 @@
         {
           "id": "ai_183_npc04",
           "cell": [
-            26,
-            10
+            28,
+            11
           ]
         },
         {
           "id": "ai_183_npc05",
           "cell": [
-            7,
+            8,
             28
           ]
         },
@@ -23624,14 +23833,14 @@
           "id": "ai_183_mob",
           "cell": [
             15,
-            17
+            18
           ]
         },
         {
           "id": "ai_183_boss",
           "cell": [
             21,
-            11
+            12
           ]
         }
       ],
@@ -23737,8 +23946,8 @@
         {
           "id": "exit_ai_185",
           "cell": [
-            17,
-            28
+            28,
+            16
           ],
           "target_map": "ai_185",
           "name": "备战区",
@@ -23770,7 +23979,7 @@
         {
           "id": "ai_184_npc03",
           "cell": [
-            9,
+            10,
             13
           ]
         },
@@ -23778,7 +23987,7 @@
           "id": "ai_184_npc04",
           "cell": [
             26,
-            9
+            10
           ]
         },
         {
@@ -23791,14 +24000,14 @@
         {
           "id": "ai_184_mob",
           "cell": [
-            15,
-            18
+            14,
+            22
           ]
         },
         {
           "id": "ai_184_boss",
           "cell": [
-            20,
+            22,
             13
           ]
         }
@@ -23905,8 +24114,8 @@
         {
           "id": "exit_ai_186",
           "cell": [
-            28,
-            17
+            24,
+            19
           ],
           "target_map": "ai_186",
           "name": "仙派营地",
@@ -23938,21 +24147,21 @@
         {
           "id": "ai_185_npc03",
           "cell": [
-            9,
-            13
+            8,
+            14
           ]
         },
         {
           "id": "ai_185_npc04",
           "cell": [
-            22,
+            21,
             8
           ]
         },
         {
           "id": "ai_185_npc05",
           "cell": [
-            8,
+            9,
             28
           ]
         },
@@ -23960,7 +24169,7 @@
           "id": "ai_185_npc06",
           "cell": [
             28,
-            24
+            25
           ]
         },
         {
@@ -23973,8 +24182,8 @@
         {
           "id": "ai_185_boss",
           "cell": [
-            21,
-            13
+            26,
+            10
           ]
         }
       ],
@@ -24081,7 +24290,7 @@
         {
           "id": "exit_ai_187",
           "cell": [
-            17,
+            15,
             28
           ],
           "target_map": "ai_187",
@@ -24114,22 +24323,22 @@
         {
           "id": "ai_186_npc03",
           "cell": [
-            7,
-            13
+            4,
+            10
           ]
         },
         {
           "id": "ai_186_npc04",
           "cell": [
-            25,
+            24,
             11
           ]
         },
         {
           "id": "ai_186_npc05",
           "cell": [
-            4,
-            26
+            6,
+            28
           ]
         },
         {
@@ -24143,7 +24352,7 @@
           "id": "ai_186_boss",
           "cell": [
             20,
-            12
+            6
           ]
         }
       ],
@@ -24283,7 +24492,7 @@
           "id": "ai_187_npc03",
           "cell": [
             5,
-            10
+            11
           ]
         },
         {
@@ -24303,7 +24512,7 @@
         {
           "id": "ai_187_npc06",
           "cell": [
-            26,
+            25,
             28
           ]
         },
@@ -24317,8 +24526,8 @@
         {
           "id": "ai_187_boss",
           "cell": [
-            22,
-            12
+            21,
+            7
           ]
         }
       ],
@@ -24458,15 +24667,15 @@
         {
           "id": "ai_188_npc03",
           "cell": [
-            8,
+            7,
             12
           ]
         },
         {
           "id": "ai_188_npc04",
           "cell": [
-            26,
-            11
+            27,
+            10
           ]
         },
         {
@@ -24480,14 +24689,14 @@
           "id": "ai_188_mob",
           "cell": [
             15,
-            19
+            18
           ]
         },
         {
           "id": "ai_188_boss",
           "cell": [
             21,
-            12
+            7
           ]
         }
       ],
@@ -24593,8 +24802,8 @@
         {
           "id": "exit_ai_190",
           "cell": [
-            28,
-            17
+            17,
+            28
           ],
           "target_map": "ai_190",
           "name": "仙派营地",
@@ -24626,43 +24835,43 @@
         {
           "id": "ai_189_npc03",
           "cell": [
-            5,
-            8
+            4,
+            10
           ]
         },
         {
           "id": "ai_189_npc04",
           "cell": [
             24,
-            14
+            13
           ]
         },
         {
           "id": "ai_189_npc05",
           "cell": [
             3,
-            24
+            25
           ]
         },
         {
           "id": "ai_189_npc06",
           "cell": [
-            27,
+            25,
             28
           ]
         },
         {
           "id": "ai_189_mob",
           "cell": [
-            16,
+            15,
             18
           ]
         },
         {
           "id": "ai_189_boss",
           "cell": [
-            22,
-            13
+            23,
+            5
           ]
         }
       ],
@@ -24769,8 +24978,8 @@
         {
           "id": "exit_ai_191",
           "cell": [
-            17,
-            4
+            16,
+            28
           ],
           "target_map": "ai_191",
           "name": "侠派营地",
@@ -24809,36 +25018,36 @@
         {
           "id": "ai_190_npc04",
           "cell": [
-            24,
+            23,
             12
           ]
         },
         {
           "id": "ai_190_npc05",
           "cell": [
-            3,
-            27
+            5,
+            28
           ]
         },
         {
           "id": "ai_190_npc06",
           "cell": [
-            26,
+            25,
             28
           ]
         },
         {
           "id": "ai_190_mob",
           "cell": [
-            16,
-            19
+            15,
+            18
           ]
         },
         {
           "id": "ai_190_boss",
           "cell": [
-            21,
-            11
+            27,
+            8
           ]
         }
       ],
@@ -24945,8 +25154,8 @@
         {
           "id": "exit_ai_192",
           "cell": [
-            23,
-            16
+            28,
+            15
           ],
           "target_map": "ai_192",
           "name": "资源战场",
@@ -24979,34 +25188,34 @@
           "id": "ai_191_npc03",
           "cell": [
             6,
-            10
+            9
           ]
         },
         {
           "id": "ai_191_npc04",
           "cell": [
             23,
-            10
+            11
           ]
         },
         {
           "id": "ai_191_npc05",
           "cell": [
-            6,
+            7,
             28
           ]
         },
         {
           "id": "ai_191_npc06",
           "cell": [
-            24,
+            23,
             28
           ]
         },
         {
           "id": "ai_191_npc07",
           "cell": [
-            9,
+            8,
             20
           ]
         },
@@ -25020,8 +25229,8 @@
         {
           "id": "ai_191_boss",
           "cell": [
-            22,
-            12
+            20,
+            6
           ]
         }
       ],
@@ -25129,8 +25338,8 @@
         {
           "id": "exit_ai_193",
           "cell": [
-            16,
-            27
+            17,
+            28
           ],
           "target_map": "ai_193",
           "name": "普通礼堂",
@@ -25169,7 +25378,7 @@
         {
           "id": "ai_192_npc04",
           "cell": [
-            26,
+            25,
             12
           ]
         },
@@ -25177,7 +25386,7 @@
           "id": "ai_192_npc05",
           "cell": [
             13,
-            28
+            27
           ]
         },
         {
@@ -25190,8 +25399,8 @@
         {
           "id": "ai_192_boss",
           "cell": [
-            20,
-            12
+            19,
+            5
           ]
         }
       ],
@@ -25326,22 +25535,22 @@
         {
           "id": "ai_193_npc04",
           "cell": [
-            8,
-            21
+            5,
+            17
           ]
         },
         {
           "id": "ai_193_npc05",
           "cell": [
             27,
-            18
+            19
           ]
         },
         {
           "id": "ai_193_npc06",
           "cell": [
-            7,
-            25
+            8,
+            21
           ]
         },
         {
@@ -25361,8 +25570,8 @@
         {
           "id": "ai_193_boss",
           "cell": [
-            26,
-            5
+            25,
+            4
           ]
         }
       ],
@@ -25459,8 +25668,8 @@
         {
           "id": "exit_ai_195",
           "cell": [
-            25,
-            12
+            26,
+            20
           ],
           "target_map": "ai_195",
           "name": "华丽礼堂",
@@ -25492,7 +25701,7 @@
         {
           "id": "ai_194_npc03",
           "cell": [
-            18,
+            17,
             14
           ]
         },
@@ -25507,14 +25716,14 @@
           "id": "ai_194_npc05",
           "cell": [
             27,
-            18
+            17
           ]
         },
         {
           "id": "ai_194_npc06",
           "cell": [
             7,
-            22
+            23
           ]
         },
         {
@@ -25534,15 +25743,15 @@
         {
           "id": "ai_194_mob",
           "cell": [
-            5,
-            26
+            4,
+            28
           ]
         },
         {
           "id": "ai_194_boss",
           "cell": [
-            26,
-            6
+            25,
+            4
           ]
         }
       ],
@@ -25673,7 +25882,7 @@
         {
           "id": "ai_195_npc03",
           "cell": [
-            15,
+            13,
             14
           ]
         },
@@ -25688,28 +25897,28 @@
           "id": "ai_195_npc05",
           "cell": [
             27,
-            18
+            17
           ]
         },
         {
           "id": "ai_195_npc06",
           "cell": [
             7,
-            23
+            24
           ]
         },
         {
           "id": "ai_195_mob",
           "cell": [
-            6,
-            27
+            4,
+            28
           ]
         },
         {
           "id": "ai_195_boss",
           "cell": [
-            26,
-            6
+            25,
+            4
           ]
         }
       ],
@@ -25806,7 +26015,7 @@
           "id": "exit_ai_197",
           "cell": [
             26,
-            20
+            12
           ],
           "target_map": "ai_197",
           "name": "攻方基地",
@@ -25846,7 +26055,7 @@
           "id": "ai_196_npc04",
           "cell": [
             5,
-            18
+            17
           ]
         },
         {
@@ -25866,7 +26075,7 @@
         {
           "id": "ai_196_npc07",
           "cell": [
-            22,
+            21,
             22
           ]
         },
@@ -25874,14 +26083,14 @@
           "id": "ai_196_mob",
           "cell": [
             5,
-            25
+            27
           ]
         },
         {
           "id": "ai_196_boss",
           "cell": [
             25,
-            5
+            4
           ]
         }
       ],
@@ -25989,8 +26198,8 @@
         {
           "id": "exit_ai_198",
           "cell": [
-            17,
-            28
+            4,
+            21
           ],
           "target_map": "ai_198",
           "name": "进攻区日",
@@ -26029,8 +26238,8 @@
         {
           "id": "ai_197_npc04",
           "cell": [
-            24,
-            13
+            22,
+            12
           ]
         },
         {
@@ -26043,22 +26252,22 @@
         {
           "id": "ai_197_npc06",
           "cell": [
-            27,
+            26,
             28
           ]
         },
         {
           "id": "ai_197_mob",
           "cell": [
-            15,
-            18
+            14,
+            22
           ]
         },
         {
           "id": "ai_197_boss",
           "cell": [
-            21,
-            13
+            23,
+            18
           ]
         }
       ],
@@ -26205,14 +26414,14 @@
         {
           "id": "ai_198_npc04",
           "cell": [
-            24,
+            26,
             10
           ]
         },
         {
           "id": "ai_198_npc05",
           "cell": [
-            7,
+            6,
             28
           ]
         },
@@ -26226,8 +26435,8 @@
         {
           "id": "ai_198_boss",
           "cell": [
-            21,
-            13
+            20,
+            7
           ]
         }
       ],
@@ -26333,8 +26542,8 @@
         {
           "id": "exit_ai_200",
           "cell": [
-            28,
-            17
+            16,
+            4
           ],
           "target_map": "ai_200",
           "name": "进攻区星",
@@ -26366,7 +26575,7 @@
         {
           "id": "ai_199_npc03",
           "cell": [
-            8,
+            9,
             14
           ]
         },
@@ -26387,7 +26596,7 @@
         {
           "id": "ai_199_npc06",
           "cell": [
-            25,
+            24,
             28
           ]
         },
@@ -26401,8 +26610,8 @@
         {
           "id": "ai_199_boss",
           "cell": [
-            21,
-            12
+            23,
+            6
           ]
         }
       ],
@@ -26542,7 +26751,7 @@
         {
           "id": "ai_200_npc03",
           "cell": [
-            9,
+            8,
             13
           ]
         },
@@ -26550,28 +26759,28 @@
           "id": "ai_200_npc04",
           "cell": [
             24,
-            10
+            11
           ]
         },
         {
           "id": "ai_200_npc05",
           "cell": [
-            11,
+            9,
             28
           ]
         },
         {
           "id": "ai_200_mob",
           "cell": [
-            16,
+            15,
             18
           ]
         },
         {
           "id": "ai_200_boss",
           "cell": [
-            21,
-            11
+            19,
+            13
           ]
         }
       ],
@@ -26711,42 +26920,42 @@
           "id": "ai_201_npc03",
           "cell": [
             5,
-            10
+            11
           ]
         },
         {
           "id": "ai_201_npc04",
           "cell": [
-            25,
-            11
+            24,
+            12
           ]
         },
         {
           "id": "ai_201_npc05",
           "cell": [
-            8,
+            9,
             28
           ]
         },
         {
           "id": "ai_201_npc06",
           "cell": [
-            25,
-            27
+            27,
+            28
           ]
         },
         {
           "id": "ai_201_mob",
           "cell": [
             15,
-            19
+            18
           ]
         },
         {
           "id": "ai_201_boss",
           "cell": [
-            21,
-            13
+            19,
+            10
           ]
         }
       ],
@@ -26893,8 +27102,8 @@
         {
           "id": "ai_202_npc04",
           "cell": [
-            26,
-            10
+            28,
+            9
           ]
         },
         {
@@ -26907,7 +27116,7 @@
         {
           "id": "ai_202_mob",
           "cell": [
-            14,
+            15,
             18
           ]
         },
@@ -26915,7 +27124,7 @@
           "id": "ai_202_boss",
           "cell": [
             21,
-            12
+            6
           ]
         }
       ],
@@ -27061,21 +27270,21 @@
         {
           "id": "ai_203_npc04",
           "cell": [
-            24,
-            12
+            23,
+            13
           ]
         },
         {
           "id": "ai_203_npc05",
           "cell": [
-            7,
+            9,
             28
           ]
         },
         {
           "id": "ai_203_npc06",
           "cell": [
-            22,
+            21,
             28
           ]
         },
@@ -27083,14 +27292,14 @@
           "id": "ai_203_mob",
           "cell": [
             15,
-            19
+            18
           ]
         },
         {
           "id": "ai_203_boss",
           "cell": [
-            21,
-            11
+            19,
+            4
           ]
         }
       ],
@@ -27197,8 +27406,8 @@
         {
           "id": "exit_ai_205",
           "cell": [
-            24,
-            16
+            21,
+            5
           ],
           "target_map": "ai_205",
           "name": "精华源星",
@@ -27230,36 +27439,36 @@
         {
           "id": "ai_204_npc03",
           "cell": [
-            8,
+            10,
             15
           ]
         },
         {
           "id": "ai_204_npc04",
           "cell": [
-            23,
-            9
+            24,
+            10
           ]
         },
         {
           "id": "ai_204_npc05",
           "cell": [
-            9,
+            10,
             28
           ]
         },
         {
           "id": "ai_204_mob",
           "cell": [
-            15,
-            17
+            14,
+            22
           ]
         },
         {
           "id": "ai_204_boss",
           "cell": [
-            21,
-            12
+            27,
+            14
           ]
         }
       ],
@@ -27399,20 +27608,20 @@
           "id": "ai_205_npc03",
           "cell": [
             6,
-            8
+            9
           ]
         },
         {
           "id": "ai_205_npc04",
           "cell": [
             28,
-            12
+            13
           ]
         },
         {
           "id": "ai_205_npc05",
           "cell": [
-            11,
+            10,
             28
           ]
         },
@@ -27433,7 +27642,7 @@
         {
           "id": "ai_205_boss",
           "cell": [
-            20,
+            21,
             12
           ]
         }
@@ -27581,29 +27790,29 @@
         {
           "id": "ai_206_npc04",
           "cell": [
-            24,
-            10
+            23,
+            11
           ]
         },
         {
           "id": "ai_206_npc05",
           "cell": [
-            7,
+            8,
             28
           ]
         },
         {
           "id": "ai_206_mob",
           "cell": [
-            14,
+            15,
             18
           ]
         },
         {
           "id": "ai_206_boss",
           "cell": [
-            21,
-            13
+            19,
+            7
           ]
         }
       ],
@@ -27709,8 +27918,8 @@
         {
           "id": "exit_ai_208",
           "cell": [
-            24,
-            16
+            17,
+            4
           ],
           "target_map": "ai_208",
           "name": "防守区日",
@@ -27743,7 +27952,7 @@
           "id": "ai_207_npc03",
           "cell": [
             5,
-            9
+            8
           ]
         },
         {
@@ -27756,7 +27965,7 @@
         {
           "id": "ai_207_npc05",
           "cell": [
-            7,
+            6,
             28
           ]
         },
@@ -27771,14 +27980,14 @@
           "id": "ai_207_mob",
           "cell": [
             15,
-            17
+            18
           ]
         },
         {
           "id": "ai_207_boss",
           "cell": [
             21,
-            13
+            12
           ]
         }
       ],
@@ -27885,8 +28094,8 @@
         {
           "id": "exit_ai_209",
           "cell": [
-            24,
-            16
+            17,
+            28
           ],
           "target_map": "ai_209",
           "name": "防守区月",
@@ -27918,7 +28127,7 @@
         {
           "id": "ai_208_npc03",
           "cell": [
-            8,
+            10,
             12
           ]
         },
@@ -27926,13 +28135,13 @@
           "id": "ai_208_npc04",
           "cell": [
             26,
-            12
+            13
           ]
         },
         {
           "id": "ai_208_npc05",
           "cell": [
-            8,
+            7,
             28
           ]
         },
@@ -27940,13 +28149,13 @@
           "id": "ai_208_mob",
           "cell": [
             15,
-            19
+            18
           ]
         },
         {
           "id": "ai_208_boss",
           "cell": [
-            21,
+            20,
             12
           ]
         }
@@ -28086,15 +28295,15 @@
         {
           "id": "ai_209_npc03",
           "cell": [
-            5,
-            11
+            7,
+            13
           ]
         },
         {
           "id": "ai_209_npc04",
           "cell": [
-            23,
-            12
+            22,
+            11
           ]
         },
         {
@@ -28121,8 +28330,8 @@
         {
           "id": "ai_209_boss",
           "cell": [
-            20,
-            12
+            27,
+            8
           ]
         }
       ],
@@ -28270,13 +28479,13 @@
           "id": "ai_210_npc04",
           "cell": [
             24,
-            9
+            8
           ]
         },
         {
           "id": "ai_210_npc05",
           "cell": [
-            5,
+            4,
             28
           ]
         },
@@ -28284,14 +28493,14 @@
           "id": "ai_210_mob",
           "cell": [
             15,
-            19
+            18
           ]
         },
         {
           "id": "ai_210_boss",
           "cell": [
-            20,
-            13
+            21,
+            12
           ]
         }
       ],
@@ -28397,8 +28606,8 @@
         {
           "id": "exit_ai_212",
           "cell": [
-            26,
-            5
+            28,
+            17
           ],
           "target_map": "ai_212",
           "name": "防守区地",
@@ -28437,8 +28646,8 @@
         {
           "id": "ai_211_npc04",
           "cell": [
-            24,
-            11
+            22,
+            12
           ]
         },
         {
@@ -28465,8 +28674,8 @@
         {
           "id": "ai_211_boss",
           "cell": [
-            22,
-            12
+            28,
+            8
           ]
         }
       ],
@@ -28573,8 +28782,8 @@
         {
           "id": "exit_ai_213",
           "cell": [
-            26,
-            13
+            28,
+            15
           ],
           "target_map": "ai_213",
           "name": "守方基地",
@@ -28614,14 +28823,14 @@
           "id": "ai_212_npc04",
           "cell": [
             25,
-            10
+            11
           ]
         },
         {
           "id": "ai_212_npc05",
           "cell": [
-            7,
-            28
+            4,
+            25
           ]
         },
         {
@@ -28634,7 +28843,7 @@
         {
           "id": "ai_212_boss",
           "cell": [
-            21,
+            20,
             13
           ]
         }
@@ -28763,8 +28972,8 @@
         {
           "id": "exit_ai_214",
           "cell": [
-            26,
-            10
+            29,
+            28
           ],
           "target_map": "ai_214",
           "name": "仙灵幻界",
@@ -28796,7 +29005,7 @@
         {
           "id": "ai_213_npc03",
           "cell": [
-            7,
+            8,
             24
           ]
         },
@@ -28804,35 +29013,35 @@
           "id": "ai_213_npc04",
           "cell": [
             19,
-            23
+            24
           ]
         },
         {
           "id": "ai_213_npc05",
           "cell": [
             14,
-            24
+            23
           ]
         },
         {
           "id": "ai_213_npc06",
           "cell": [
-            11,
-            8
+            9,
+            7
           ]
         },
         {
           "id": "ai_213_mob",
           "cell": [
-            5,
-            26
+            4,
+            28
           ]
         },
         {
           "id": "ai_213_boss",
           "cell": [
             28,
-            6
+            3
           ]
         }
       ],
@@ -28940,28 +29149,28 @@
           "id": "ai_214_npc03",
           "cell": [
             12,
-            26
+            28
           ]
         },
         {
           "id": "ai_214_npc04",
           "cell": [
             6,
-            12
+            13
           ]
         },
         {
           "id": "ai_214_mob",
           "cell": [
-            11,
-            10
+            12,
+            14
           ]
         },
         {
           "id": "ai_214_boss",
           "cell": [
-            23,
-            26
+            24,
+            23
           ]
         }
       ],

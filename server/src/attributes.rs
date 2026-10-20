@@ -10,11 +10,19 @@ pub struct BalanceStats {
     pub level:i32,pub physical_attack:i32,pub magic_attack:i32,
     pub physical_defense:i32,pub magic_defense:i32,
     pub ratings:[i32;2],
+    #[serde(default)] pub crit_bonus:[i32;2],
+    #[serde(default)] pub hit_bonus:[i32;2],
+    #[serde(default)] pub evade_bonus:[i32;2],
+    #[serde(default)] pub crit_damage_bp:i32,
+    #[serde(default)] pub increased_bp:i32,
+    #[serde(default)] pub dot_bp:i32,
+    #[serde(default)] pub penetration_bp:i32,
+    #[serde(default)] pub reduction_bp:i32,
 }
 pub fn balanced_stats(job:i16,level:i32,equipped:bool,a:[i32;5])->Stats{
     let p=crate::combat_balance::profile(job as i64,level as i64,a.map(i64::from)).expect("validated character attributes");
     let mut s=Stats{hp:p.hp as i32,mp:p.mp as i32,attack:if job==2{p.magic_attack}else{p.physical_attack} as i32,defense:p.physical_defense as i32,attributes:a,
-        balance:Some(BalanceStats{skills_revision:1,level,physical_attack:p.physical_attack as i32,magic_attack:p.magic_attack as i32,physical_defense:p.physical_defense as i32,magic_defense:p.magic_defense as i32,ratings:[a[3],a[4]]})};
+        balance:Some(BalanceStats{skills_revision:1,level,physical_attack:p.physical_attack as i32,magic_attack:p.magic_attack as i32,physical_defense:p.physical_defense as i32,magic_defense:p.magic_defense as i32,ratings:[a[3],a[4]],crit_bonus:[0;2],hit_bonus:[0;2],evade_bonus:[0;2],crit_damage_bp:0,increased_bp:0,dot_bp:0,penetration_bp:0,reduction_bp:0})};
     if equipped{gear_bonus(&mut s,5,0);}
     s
 }
@@ -29,8 +37,8 @@ pub fn profile_for(s:Stats,job:i16,level:i32,a:[i32;5])->Value{
     let b=s.balance.expect("balanced profile");
     json!({"version":VERSION,"formula_revision":3,"allocated":a,"available":available(level,a),"recommended":balanced_recommended(job,level,a),
         "combat":{"hp":s.hp,"mp":s.mp,"physical_attack":b.physical_attack,"magic_attack":b.magic_attack,
-        "physical_defense":b.physical_defense,"magic_defense":b.magic_defense,"physical_crit":b.ratings[0],"magic_crit":b.ratings[1],
-        "physical_hit":100+b.ratings[0],"magic_hit":100+b.ratings[1],"physical_evasion":b.ratings[0],"magic_evasion":b.ratings[1],"damage_reduction":0}})
+        "physical_defense":b.physical_defense,"magic_defense":b.magic_defense,"physical_crit":b.ratings[0]+b.crit_bonus[0],"magic_crit":b.ratings[1]+b.crit_bonus[1],
+        "physical_hit":b.ratings[0]+b.hit_bonus[0],"magic_hit":b.ratings[1]+b.hit_bonus[1],"physical_evasion":b.ratings[0]+b.evade_bonus[0],"magic_evasion":b.ratings[1]+b.evade_bonus[1],"damage_reduction":b.reduction_bp.min(2500)/100}})
 }
 pub fn balanced_recommended(job:i16,level:i32,a:[i32;5])->[i32;5]{
     let mut result=a;let pattern=crate::combat_balance::RULES.recommended_patterns[job as usize];
@@ -39,11 +47,11 @@ pub fn balanced_recommended(job:i16,level:i32,a:[i32;5])->[i32;5]{
 pub fn defense(s:Stats,magical:bool)->i32{s.balance.map_or(s.defense,|b|if magical{b.magic_defense}else{b.physical_defense})}
 pub fn direct_damage(s:Stats,defense:i32,coefficient_bp:i32,variance:i32)->i32{
     if let Some(b)=s.balance{
-        crate::combat_balance::damage(&crate::combat_balance::Hit{attack:(s.attack+variance).max(0) as i64,defense:defense.max(0) as i64,level:b.level as i64,coefficient_bp:coefficient_bp as i64,..Default::default()}).expect("bounded combat inputs").damage as i32
+        crate::combat_balance::damage(&crate::combat_balance::Hit{attack:(s.attack+variance).max(0) as i64,defense:defense.max(0) as i64,level:b.level as i64,coefficient_bp:coefficient_bp as i64,increased_bp:b.increased_bp as i64,penetration_bp:b.penetration_bp as i64,..Default::default()}).expect("bounded combat inputs").damage as i32
     }else{(s.attack*coefficient_bp/10000-defense+variance).max(1)}
 }
 pub fn incoming(attack:i32,level:i32,defender:Stats,magical:bool,variance:i32)->i32{
-    if defender.balance.is_some(){crate::combat_balance::damage(&crate::combat_balance::Hit{attack:(attack+variance).max(0) as i64,defense:defense(defender,magical).max(0) as i64,level:level.clamp(1,60) as i64,..Default::default()}).expect("bounded monster").damage as i32}
+    if let Some(b)=defender.balance{crate::combat_balance::damage(&crate::combat_balance::Hit{attack:(attack+variance).max(0) as i64,defense:defense(defender,magical).max(0) as i64,level:level.clamp(1,60) as i64,extra_reduction_bp:b.reduction_bp as i64,..Default::default()}).expect("bounded monster").damage as i32}
     else{(attack-defender.defense+variance).max(1)}
 }
 pub const VERSION: &str = "attributes-v1";
@@ -98,7 +106,7 @@ pub fn for_attack(mut s: Stats, job: i16, magical: bool) -> Stats {
 pub fn hit_chance(attacker: Option<Stats>, defender: Option<Stats>, magical: bool) -> i32 {
     if attacker.is_some_and(|s|s.balance.is_some())||defender.is_some_and(|s|s.balance.is_some()){
         let i=usize::from(magical);let a=attacker.and_then(|s|s.balance);let d=defender.and_then(|s|s.balance);
-        return crate::combat_balance::hit_chance(a.or(d).unwrap().level as i64,a.map_or(0,|b|b.ratings[i]) as i64,d.map_or(0,|b|b.ratings[i]) as i64).unwrap() as i32;
+        return crate::combat_balance::hit_chance(a.or(d).unwrap().level as i64,a.map_or(0,|b|b.ratings[i]+b.hit_bonus[i]) as i64,d.map_or(0,|b|b.ratings[i]+b.evade_bonus[i]) as i64).unwrap() as i32;
     }
     let i = if magical { 4 } else { 3 };
     let hit = attacker.map_or(0, |s| s.attributes[i]);
@@ -121,10 +129,10 @@ pub fn critical_at(
     } else {
         0
     };
-    let chance = if let Some(b)=s.balance{crate::combat_balance::critical_chance(b.level as i64,b.ratings[usize::from(magical)] as i64,buff as i64).unwrap() as i32}else{(rating * 10 + buff).clamp(0, 7_500)};
+    let chance = if let Some(b)=s.balance{crate::combat_balance::critical_chance(b.level as i64,(b.ratings[usize::from(magical)]+b.crit_bonus[usize::from(magical)]) as i64,buff as i64).unwrap() as i32}else{(rating * 10 + buff).clamp(0, 7_500)};
     effects.last_critical = damage > 0 && roll < chance;
     if effects.last_critical {
-        damage * 3 / 2
+        if let Some(b)=s.balance{(i64::from(damage)*i64::from((15000+b.crit_damage_bp).min(22500))/10000) as i32}else{damage * 3 / 2}
     } else {
         damage
     }

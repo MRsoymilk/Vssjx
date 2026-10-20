@@ -631,7 +631,7 @@ impl WorldHub {
                     let id = id.as_str().expect("item");
                     (id.to_owned(),shop["slots"].as_object().is_some_and(|slots|slots.values().any(|value|value==id)))
                 }).collect();
-                let look = crate::shop::appearance(&gear);
+                let look = result["state"]["loot"]["appearance"].as_array().and_then(|a|serde_json::from_value::<[i32;3]>(json!(a)).ok()).unwrap_or_else(||crate::shop::appearance(&gear));
                 appearance_changed = actor.appearance != look;
                 actor.appearance = look;
             }

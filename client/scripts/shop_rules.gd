@@ -131,6 +131,7 @@ static func _store(player: Dictionary, gear: Dictionary) -> void:
 	player.equipped=gear.slots.weapon!=null
 
 static func apply_local(player: Dictionary, action: String, id: String, count: int=1, limits: Dictionary={}) -> String:
+	if player.get("corpse") is Dictionary:return "SOUL_STATE"
 	var gear := local_state(player)
 	var entry := item(id)
 	if entry.is_empty(): return "INVALID_EQUIPMENT"

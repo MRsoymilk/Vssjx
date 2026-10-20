@@ -35,6 +35,9 @@ func pending() -> bool:
 func active() -> bool:
 	return state.get("battle") is Dictionary and state.battle.get("outcome") == "active"
 
+func is_soul() -> bool:
+	return state.get("character",{}).get("corpse") is Dictionary
+
 static func integer(value: Variant, low: int, high: int) -> bool:
 	return (value is int or value is float) and is_finite(float(value)) and float(value) == floor(float(value)) and value >= low and value <= high
 
@@ -172,6 +175,8 @@ func unavailable_monsters() -> Array:
 
 func submit(action: String, target: String = "", points: Array = [], count: int=1) -> bool:
 	if not ready or pending(): return false
+	if is_soul() and action!="revive":return false
+	if action=="revive" and (not is_soul() or target!=state.character.corpse.id):return false
 	if action=="school_join" and (active() or int(state.character.school)!=SchoolRules.UNJOINED or SchoolRules.index(target)<0):return false
 	if action=="skill" and not target.is_empty():
 		if not active() or not state.has("skills") or not target in state.skills.available:return false
@@ -201,7 +206,7 @@ func submit(action: String, target: String = "", points: Array = [], count: int=
 	if action == "allocate":
 		command.attributes = normalized_points(points)
 		command.expected_revision = state.character.state_revision
-	elif action in ["buy", "equip", "unequip", "use", "discard","school_join"]:
+	elif action in ["buy", "equip", "unequip", "use", "discard","school_join","revive"]:
 		command.target = target
 		if count!=1: command.quantity=count
 		command.expected_revision = state.character.state_revision
@@ -234,6 +239,8 @@ func quest_text() -> String:
 	return "古剑遗迹 · 已完成\n妖气已散，可返回青云山道恢复元气，或继续探索遗迹。"
 
 static func error_text(code: String) -> String:
+	var souls:={"SOUL_STATE":"灵魂状态下只能移动和寻回尸体，请先到自己的坟堆旁复活。","CORPSE_NOT_FOUND":"这不是你的尸体，或已经复活。","NO_CORPSE":"当前没有可寻回的尸体。","CORPSE_TOO_FAR":"请靠近自己的坟堆后复活。","STALE_CORPSE":"灵魂状态已更新，请重新同步后再试。"}
+	if souls.has(code):return souls[code]
 	var schools:={"INVALID_SCHOOL":"请选择有效门派。","SCHOOL_ALREADY_JOINED":"已正式入派，不能重复加入其他门派。","STALE_SCHOOL":"角色状态已变化，请重新与清微道人交谈。","INVALID_SCHOOL_NPC":"请在青云山道找清微道人办理入派。"}
 	if schools.has(code):return schools[code]
 	var ai := {"AI_INVALID_TARGET":"AI生成目标不属于当前地图。", "AI_QUEST_LIMIT":"最多同时接取三个AI生成任务。", "AI_LEVEL_REQUIRED":"等级不足，请先完成较低等级区域。", "AI_PREREQUISITE":"请先完成本地图的前章任务。", "AI_NO_OBJECTIVE":"先接取任务，并按目标顺序调查。", "AI_SAME_MAP":"已经在当前地图。"}

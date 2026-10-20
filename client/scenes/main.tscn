@@ -1,9 +1,10 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://scripts/interface/adapters/common/cjk_system_font.gd" id="BundledCjk"]
 
 [ext_resource type="Script" path="res://scripts/main.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/ui/announcement_banner.tscn" id="Announcements"]
+[ext_resource type="PackedScene" path="res://scenes/ui/soul_overlay.tscn" id="Soul"]
 
 [sub_resource type="SystemFont" id="SystemFont_shared"]
 script = ExtResource("BundledCjk")
@@ -36,3 +37,5 @@ mouse_filter = 2
 layer = 20
 
 [node name="Banner" parent="Announcements" instance=ExtResource("Announcements")]
+
+[node name="SoulOverlay" parent="." instance=ExtResource("Soul")]

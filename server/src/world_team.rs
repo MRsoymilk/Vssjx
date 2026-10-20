@@ -13,7 +13,7 @@ pub(crate) struct Member {
 }
 
 #[derive(Clone)]
-struct Exit {
+pub(super) struct Exit {
     from: String,
     to: String,
     cell: [i32; 2],
@@ -23,9 +23,9 @@ struct Exit {
 }
 #[derive(Default)]
 pub(super) struct Following {
-    revision: u64,
+    pub(super) revision: u64,
     members: HashMap<Uuid, Member>,
-    exits: HashMap<Uuid, VecDeque<Exit>>,
+    pub(super) exits: HashMap<Uuid, VecDeque<Exit>>,
 }
 pub(crate) async fn roster(
     tx: &mut sqlx::Transaction<'_, sqlx::Postgres>,
@@ -102,6 +102,7 @@ impl WorldHub {
         Ok(())
     }
     pub(super) fn following(s: &StateData, id: Uuid) -> bool {
+        if s.actors.get(&id).is_some_and(|a|a.soul){return false;}
         s.following
             .members
             .get(&id)
@@ -122,7 +123,7 @@ impl WorldHub {
             let ahead = previous.get(&m.team).copied().unwrap_or(m.leader);
             let available = |id| {
                 s.actors.get(&id).filter(|a| {
-                    a.connected && !a.in_battle && !s.team_busy.contains(&id) && !s.duels.active(id)
+                    a.connected && !a.soul && !a.in_battle && !s.team_busy.contains(&id) && !s.duels.active(id)
                 })
             };
             let Some(leader) = available(m.leader) else {

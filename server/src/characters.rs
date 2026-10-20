@@ -80,8 +80,9 @@ pub(crate) struct Character {
     pub(crate) cell_x: i32,
     pub(crate) cell_y: i32,
     pub(crate) state_revision: String,
+    pub(crate) corpse: Option<DbJson<crate::soul::Corpse>>,
 }
-pub(crate) const CHARACTER_COLUMNS: &str = "id, display_name, name_rules_version, rules_version, job, gender, school, level, xp, gold, hp, mp, quest_stage, map_id, cell_x, cell_y, state_revision::text";
+pub(crate) const CHARACTER_COLUMNS: &str = "id, display_name, name_rules_version, rules_version, job, gender, school, level, xp, gold, hp, mp, quest_stage, map_id, cell_x, cell_y, state_revision::text, corpse";
 
 fn database_error(error: sqlx::Error) -> AuthError {
     crate::observability::database_error(&error, "characters");

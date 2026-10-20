@@ -70,6 +70,7 @@ pub struct Entity {
 }
 struct CharacterActor {
     business: Arc<AsyncMutex<()>>,
+    soul: bool,
     in_battle: bool,
     duel_enabled: bool,
     appearance: [i32;3],
@@ -433,7 +434,7 @@ impl WorldHub {
                 return Err(error(503, "WORLD_FULL"));
             }
         }
-        let row=sqlx::query("UPDATE characters c SET owner_epoch=owner_epoch+1,position_revision=0 WHERE c.id=$1 AND (map_id='qingyun_trail' OR ($3>=1 AND map_id='ancient_ruins') OR ($3>=2 AND map_id LIKE 'ai_%')) AND owner_epoch<9223372036854775807 AND EXISTS(SELECT 1 FROM sessions s JOIN accounts a ON a.id=s.account_id WHERE s.id=$2 AND s.account_id=c.account_id AND NOT a.disabled AND s.revoked_at IS NULL AND s.access_expires_at>clock_timestamp() AND s.refresh_expires_at>clock_timestamp()) RETURNING display_name,job,gender,cell_x,cell_y,owner_epoch,active_battle_id,map_id")
+        let row=sqlx::query("UPDATE characters c SET owner_epoch=owner_epoch+1,position_revision=0 WHERE c.id=$1 AND (map_id='qingyun_trail' OR ($3>=1 AND map_id='ancient_ruins') OR ($3>=2 AND map_id LIKE 'ai_%')) AND owner_epoch<9223372036854775807 AND EXISTS(SELECT 1 FROM sessions s JOIN accounts a ON a.id=s.account_id WHERE s.id=$2 AND s.account_id=c.account_id AND NOT a.disabled AND s.revoked_at IS NULL AND s.access_expires_at>clock_timestamp() AND s.refresh_expires_at>clock_timestamp()) RETURNING display_name,job,gender,cell_x,cell_y,owner_epoch,active_battle_id,map_id,corpse IS NOT NULL AS soul")
             .bind(id).bind(session).bind(maps_version as i32).fetch_optional(auth.pool()).await.map_err(db_error)?.ok_or(error(403,"WORLD_UNAVAILABLE"))?;
         let cell = [row.get("cell_x"), row.get("cell_y")];
         let teaming:bool=sqlx::query_scalar("SELECT EXISTS(SELECT 1 FROM team_members m JOIN team_battles b ON b.team_id=m.team_id AND b.active WHERE m.character_id=$1 AND b.state->'fighters' @> jsonb_build_array(jsonb_build_object('id',m.character_id)))").bind(id).fetch_one(auth.pool()).await.map_err(db_error)?;
@@ -459,6 +460,7 @@ impl WorldHub {
             .ok_or(error(503, "WORLD_ID_EXHAUSTED"))?;
         let actor = CharacterActor {
             business: business.clone(),
+            soul: row.get("soul"),
             in_battle: row.get::<Option<Uuid>,_>("active_battle_id").is_some(),
             duel_enabled: false,
             map_id,
@@ -592,8 +594,17 @@ impl WorldHub {
     fn pve_applied(&self, owner: &Ownership, result: &Value) {
         let mut state = self.data.lock().expect("world state");
         let mut appearance_changed = false;
+        let mut soul_changed=false;
         if let Some(actor)=state.actors.get_mut(&owner.id).filter(|a|Self::owned(a,owner)) {
             let character = &result["state"]["character"];
+            let soul=character.get("corpse").is_some_and(|value|!value.is_null());
+            soul_changed=actor.soul!=soul;
+            if soul&&!actor.soul {
+                let revision=actor.motion.revision+1;
+                actor.motion=Motion::new([character["cell_x"].as_i64().expect("cell") as i32,character["cell_y"].as_i64().expect("cell") as i32]);
+                actor.motion.revision=revision;
+            }
+            actor.soul=soul;
             if let Some(map_id) = character["map_id"].as_str() && actor.map_id != map_id {
                 let revision = actor.motion.revision + 1;
                 actor.map_id = map_id.to_owned();
@@ -619,6 +630,7 @@ impl WorldHub {
             if actor.in_battle { actor.motion.stop(); }
         }
         if appearance_changed { state.appearance_revision += 1; }
+        if soul_changed {state.revision+=1;state.appearance_revision+=1;state.following.revision+=1;state.following.exits.remove(&owner.id);}
     }
     async fn disconnect(&self, auth: &AuthService, owner: &Ownership, leave: bool) {
         let _gate = self.admissions.lock().await;

@@ -327,7 +327,10 @@ static func _valid_character(value: Variant) -> bool:
 		if not look is Array or look.size() != 2: return false
 		for i in 2:
 			if not (look[i] is int or look[i] is float) or not is_finite(float(look[i])) or float(look[i]) != floor(float(look[i])) or look[i] < 0 or look[i] > (3 if i == 0 else 2): return false
-	if value.level < 1 or value.hp < 1 or not SharedWorldMap.exists(value.get("map_id")): return false
+	if value.level < 1 or not SharedWorldMap.exists(value.get("map_id")): return false
+	if value.get("corpse")!=null:
+		if not SoulRules.valid_corpse(value.corpse) or value.corpse.map_id!=value.map_id or value.hp!=0:return false
+	elif value.hp<1:return false
 	return true
 
 func _process(_delta: float) -> void:

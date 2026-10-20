@@ -14,6 +14,7 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/npc_dialog.tscn" id="Npc"]
 [ext_resource type="PackedScene" path="res://scenes/ui/map_transition.tscn" id="MapTransition"]
 [ext_resource type="PackedScene" path="res://scenes/ui/duel_battle_view.tscn" id="DuelBattle"]
+[ext_resource type="PackedScene" path="res://scenes/ui/soul_overlay.tscn" id="Soul"]
 
 [node name="OnlineWorldView" type="Control"]
 offset_right = 320.0
@@ -65,3 +66,5 @@ script = ExtResource("Network")
 visible = false
 z_index = 15
 online_mode = true
+
+[node name="SoulOverlay" parent="." instance=ExtResource("Soul")]

@@ -8,6 +8,7 @@ var shared_map: Dictionary = {}
 var shared_entities: Dictionary = {}
 var shared_population: Dictionary = {}
 var shared_character_id := ""
+var shared_corpse: Dictionary = {}
 
 func set_shared_world(data: Dictionary, entities: Dictionary, character_id: String) -> void:
 	shared_map = data
@@ -60,6 +61,13 @@ func _draw() -> void:
 			if local and world.astar.is_point_solid(point): fill = fill.darkened(0.35)
 			draw_rect(Rect2(origin + Vector2(point) * scale_value, Vector2.ONE * scale_value), fill)
 	var map_id: String = world.map_id if local else String(shared_map.map_id)
+	var spawn:=SoulRules.resurrection_point(map_id)
+	draw_circle(origin+Vector2(spawn)*scale_value,2,Color("e5e5e5"),false,1)
+	var corpse:Dictionary=Game.player.corpse if local and Game.is_soul() else shared_corpse
+	if not corpse.is_empty() and corpse.get("map_id")==map_id:
+		var grave_point:=origin+Vector2(corpse.cell[0],corpse.cell[1])*scale_value
+		draw_line(grave_point-Vector2(2,0),grave_point+Vector2(2,0),Color.WHITE,1)
+		draw_line(grave_point-Vector2(0,2),grave_point+Vector2(0,2),Color.WHITE,1)
 	for gate in SharedWorldMap.exits(map_id):
 		draw_rect(Rect2(origin+Vector2(gate.cell[0],gate.cell[1])*scale_value,Vector2(3,3)),Color("59e3d7"))
 	if not local:

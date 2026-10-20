@@ -39,6 +39,7 @@ func _init(opponent: Dictionary) -> void:
 	rng.randomize()
 
 func begin_action(command: String, skill_id:String="") -> Dictionary:
+	if Game.is_soul():return {"ok":false,"lines":[OnlinePve.error_text("SOUL_STATE")]}
 	if finished:
 		return {"ok": false, "lines": ["战斗已经结束"]}
 	if phase != "select":
@@ -128,7 +129,7 @@ func resolve_enemy() -> Dictionary:
 	if reflected>0:lines.append("反伤造成 %d 点伤害。"%reflected)
 	if hp == 0:
 		finished = true
-		lines.append("你力竭倒下，被道人送回山门。")
+		lines.append("你力竭倒下，灵魂将从本地图复活点醒来。")
 	elif enemy_hp == 0:
 		finished = true
 		victory = true
@@ -170,9 +171,6 @@ func commit() -> bool:
 	if victory:
 		leveled = Game.finish_enemy(enemy)
 	elif not escaped:
-		Game.restore()
-		Game.player.zone = 0
-		Game.player.ai_map = ""
-		Game.player.cell = [Game.START_CELL.x, Game.START_CELL.y]
+		Game.become_soul()
 	save_result = await Game.save_game()
 	return leveled

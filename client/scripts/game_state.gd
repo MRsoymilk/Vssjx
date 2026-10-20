@@ -147,7 +147,8 @@ func new_player(nickname: String, job: int, school: int, gender: int = 0) -> voi
 		"equipped": false, "zone": 0, "cell": [START_CELL.x, START_CELL.y],
 		"defeated": [], "enemy_respawns": {}, "signature": "", "title": "",
 		"ingots": 0, "guild_contribution": 0, "essence": 0,
-		"allocated_attributes": [0,0,0,0,0], "attribute_rules_revision": 2
+		"allocated_attributes": [0,0,0,0,0], "attribute_rules_revision": 2,
+		"corpse":null
 	}
 	if String(player.name).is_empty():
 		player.name = "青衫客"
@@ -181,6 +182,7 @@ func bag_items() -> Array[Dictionary]:
 	return items
 
 func bag_buy_potion() -> bool:
+	if is_soul():return false
 	if int(player.gold) < 8: return false
 	# An unequipped sword also occupies one of the sixty inventory slots.
 	var gear := ShopRules.local_state(player)
@@ -217,6 +219,7 @@ func appearance_key() -> String:
 	return ShopRules.actor_key(int(player.get("job",0)),int(player.get("gender",0)),ShopRules.appearance(ShopRules.local_state(player)))
 
 func shop_command(action: String, id: String, count: int=1) -> PlatformResult:
+	if is_soul():return PlatformResult.new(PlatformResult.Status.INVALID_DATA,"SOUL_STATE",OnlinePve.error_text("SOUL_STATE"))
 	if storage_busy or _local_roster_busy: return PlatformResult.new(PlatformResult.Status.TEMPORARY_FAILURE,"STORAGE_BUSY","正在保存，请稍候")
 	var before := player.duplicate(true)
 	var generation := _player_generation
@@ -229,6 +232,7 @@ func shop_command(action: String, id: String, count: int=1) -> PlatformResult:
 
 
 func allocate_attributes(points: Array) -> PlatformResult:
+	if is_soul():return PlatformResult.new(PlatformResult.Status.INVALID_DATA,"SOUL_STATE",OnlinePve.error_text("SOUL_STATE"))
 	if storage_busy or _local_roster_busy: return PlatformResult.new(PlatformResult.Status.TEMPORARY_FAILURE,"STORAGE_BUSY","正在保存，请稍候")
 	if player.is_empty() or not ATTRIBUTE_RULES.valid_points(points,int(player.get("level",1)),allocated_attributes()):
 		return PlatformResult.new(PlatformResult.Status.INVALID_DATA,"INVALID_ATTRIBUTES","属性点格式或剩余点数无效，已保存的点数不能减少。")
@@ -247,11 +251,37 @@ func allocate_attributes(points: Array) -> PlatformResult:
 	return result
 
 func restore() -> void:
+	if is_soul():return
 	var values := stats()
 	player.hp = values.hp
 	player.mp = values.mp
 
+func is_soul() -> bool:
+	return player.get("corpse") is Dictionary
+
+func become_soul() -> void:
+	if is_soul():return
+	var map_id:=AIWorld.local_map_id()
+	player.corpse=SoulRules.create(map_id,Vector2i(player.cell[0],player.cell[1]))
+	player.hp=0;player.mp=0
+	var spawn:=SoulRules.resurrection_point(map_id)
+	player.cell=[spawn.x,spawn.y]
+
+func recover_corpse(id: String, cell: Vector2i) -> PlatformResult:
+	if storage_busy or _local_roster_busy:return PlatformResult.new(PlatformResult.Status.TEMPORARY_FAILURE,"STORAGE_BUSY","正在保存，请稍候。")
+	if not is_soul() or player.corpse.id!=id:return PlatformResult.new(PlatformResult.Status.INVALID_DATA,"CORPSE_NOT_FOUND",OnlinePve.error_text("CORPSE_NOT_FOUND"))
+	if cell!=Vector2i(player.cell[0],player.cell[1]) or not SoulRules.nearby(player.corpse,AIWorld.local_map_id(),cell):return PlatformResult.new(PlatformResult.Status.INVALID_DATA,"CORPSE_TOO_FAR",OnlinePve.error_text("CORPSE_TOO_FAR"))
+	var before:=player.duplicate(true)
+	var generation:=_player_generation
+	var path:=save_path
+	player.corpse=null
+	restore()
+	var result:=await save_game()
+	if not result.ok and generation==_player_generation and path==save_path:player=before
+	return result
+
 func join_local_school(school: int) -> PlatformResult:
+	if is_soul():return PlatformResult.new(PlatformResult.Status.INVALID_DATA,"SOUL_STATE",OnlinePve.error_text("SOUL_STATE"))
 	if storage_busy or _local_roster_busy:return PlatformResult.new(PlatformResult.Status.TEMPORARY_FAILURE,"STORAGE_BUSY","正在保存，请稍候。")
 	if school<0 or school>2:return PlatformResult.new(PlatformResult.Status.INVALID_DATA,"INVALID_SCHOOL","请选择有效门派。")
 	if int(player.get("school",SchoolRules.UNJOINED))!=SchoolRules.UNJOINED:
@@ -304,6 +334,7 @@ func add_rewards(gold: int, xp: int) -> bool:
 	return leveled
 
 func quest_text() -> String:
+	if is_soul():return SoulRules.hint(player.corpse)
 	if not AIWorld.map_data(AIWorld.local_map_id()).is_empty(): return AIWorld.quest_hint(AIWorld.local_map_id(),AIWorld.progress(),int(player.level))
 	match int(player.get("quest", 0)):
 		0: return "拜访石桥旁的清微道人"
@@ -452,6 +483,11 @@ func valid_save(data: Variant) -> bool:
 		return false
 	if data.has("ai_map") and (not data.ai_map is String or (not data.ai_map.is_empty() and AIWorld.map_data(data.ai_map).is_empty())): return false
 	if data.has("ai_progress") and not AIWorld.valid_progress(data.ai_progress): return false
+	if data.get("corpse")!=null:
+		if not SoulRules.valid_corpse(data.corpse) or data.get("hp")!=0:return false
+		var current_map:String=data.get("ai_map","")
+		if current_map.is_empty():current_map="qingyun_trail" if data.get("zone")==0 else "ancient_ruins"
+		if data.corpse.map_id!=current_map:return false
 	if data.has("local_characters") and not _valid_local_roster(data): return false
 	for key in ["version", "name", "job", "school", "level", "xp", "gold", "potions", "hp", "mp", "quest", "kills", "equipped", "zone", "cell", "defeated"]:
 		if not data.has(key): return false

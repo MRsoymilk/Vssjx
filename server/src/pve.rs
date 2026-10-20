@@ -71,6 +71,9 @@ async fn load_character(tx:&mut Transaction<'_,Postgres>,character_id:Uuid,accou
         return Err(AuthError(StatusCode::CONFLICT, "SESSION_REPLACED"));
     }
     let character = Character::from_row(&row).map_err(database)?;
+    if character.corpse.as_ref().is_some_and(|corpse|!corpse.0.valid()||corpse.0.map_id!=character.map_id||character.hp!=0) {
+        return Err(unavailable());
+    }
     let Json(respawns) = row.get::<Json<Value>, _>("monster_respawns");
     let respawns: BTreeMap<String, i64> =
         serde_json::from_value(respawns).map_err(|_| unavailable())?;
@@ -181,6 +184,7 @@ impl Loaded {
         Ok(())
     }
     fn restore(&mut self) {
+        if self.character.corpse.is_some() { return; }
         let stats = self.stats();
         self.character.hp = stats.hp;
         self.character.mp = stats.mp;
@@ -192,6 +196,17 @@ impl Loaded {
         if context.moving {
             return Err("PLAYER_MOVING");
         }
+        if let Some(corpse)=self.character.corpse.as_ref() {
+            if command.action!=Action::Revive { return Err("SOUL_STATE"); }
+            if command.battle_id.is_some()||command.attributes.is_some()||command.quantity.is_some(){return Err("INVALID_PVE_COMMAND");}
+            if command.expected_revision.as_deref()!=Some(&self.character.state_revision){return Err("STALE_CORPSE");}
+            if command.target.as_deref()!=Some(corpse.0.id.to_string().as_str()){return Err("CORPSE_NOT_FOUND");}
+            if !corpse.0.can_recover(&context.map_id,context.cell){return Err("CORPSE_TOO_FAR");}
+            self.character.corpse=None;
+            self.restore();
+            return Ok(vec!["你寻回了自己的尸体，灵魂与肉身重新合一，气血与灵力恢复。".into()]);
+        }
+        if command.action==Action::Revive {return Err("NO_CORPSE");}
         if command.action==Action::SchoolJoin {
             if self.battle.is_some(){return Err("BATTLE_ACTIVE");}
             if command.battle_id.is_some()||command.attributes.is_some()||command.quantity.is_some(){return Err("INVALID_PVE_COMMAND");}
@@ -456,11 +471,21 @@ impl Loaded {
                     self.rewards(gold, xp)?;
                     lines.push(format!("获得{gold}铜钱、{xp}修为。"));
                 } else if battle.outcome == "defeat" {
-                    self.restore();
+                    self.die(context.cell)?;
+                    lines.push("你在本地图复活点化为灵魂，请返回坟堆寻回尸体。".into());
                 }
                 Ok(lines)
             }
         }
+    }
+    fn die(&mut self, cell:[i32;2])->Result<(),&'static str>{
+        if self.character.corpse.is_some(){return Err("SOUL_STATE");}
+        let corpse=crate::soul::Corpse::new(&self.character.map_id,cell)?;
+        let map=crate::world_map::WorldMap::load(&self.character.map_id).ok_or("INVALID_CORPSE_POSITION")?;
+        self.character.corpse=Some(Json(corpse));
+        self.character.hp=0;self.character.mp=0;
+        self.character.cell_x=map.spawn[0];self.character.cell_y=map.spawn[1];
+        Ok(())
     }
 }
 pub async fn snapshot(auth: &AuthService, context: &Context) -> Result<Value, AuthError> {
@@ -476,7 +501,7 @@ pub async fn execute(
     command: &Command,
 ) -> Result<Value, AuthError> {
     if command.operation_id.get_version_num() != 4
-        || command.target.as_ref().is_some_and(|id| id.len() > 32)
+        || command.target.as_ref().is_some_and(|id| id.len() > if command.action==Action::Revive{36}else{32})
     {
         return Err(AuthError(StatusCode::BAD_REQUEST, "INVALID_PVE_COMMAND"));
     }
@@ -517,6 +542,7 @@ pub async fn execute(
     let previous_gear = loaded.gear.clone();
     let previous_quantities=loaded.quantities.clone();
     let original = loaded.clone();
+    let was_soul=original.character.corpse.is_some();
     let before = crate::security::state_summary(&original.state());
     let team_active:bool=sqlx::query_scalar("SELECT EXISTS(SELECT 1 FROM team_members m JOIN team_battles b ON b.team_id=m.team_id AND b.active WHERE m.character_id=$1)").bind(context.character).fetch_one(&mut *tx).await.map_err(database)?;
     let in_team:bool=sqlx::query_scalar("SELECT EXISTS(SELECT 1 FROM team_members WHERE character_id=$1)").bind(context.character).fetch_one(&mut *tx).await.map_err(database)?;
@@ -537,7 +563,7 @@ pub async fn execute(
                     .bind(context.character).bind(uuids).bind(&ids).bind(counts).bind(flags).execute(&mut *tx).await.map_err(database)?;
             }
         }
-        if loaded.character.map_id != context.map_id {
+        if loaded.character.map_id != context.map_id || (!was_soul&&loaded.character.corpse.is_some()) {
             sqlx::query("UPDATE characters SET map_id=$2,cell_x=$3,cell_y=$4,position_revision=$5 WHERE id=$1 AND owner_epoch=$6")
                 .bind(context.character).bind(&loaded.character.map_id).bind(loaded.character.cell_x).bind(loaded.character.cell_y)
                 .bind((context.position_revision + 1) as i64).bind(context.owner)
@@ -554,9 +580,9 @@ pub async fn execute(
         }
         let character_id = loaded.character.id;
         let c = &loaded.character;
-        let revision:i64=sqlx::query_scalar("UPDATE characters SET level=$2,xp=$3,gold=$4,hp=$5,mp=$6,quest_stage=$7,defeated_mask=$8,active_battle_id=$9,allocated_attributes=$10,monster_respawns=$11,ai_progress=$12,school=$13,state_revision=state_revision+1 WHERE id=$1 RETURNING state_revision")
+        let revision:i64=sqlx::query_scalar("UPDATE characters SET level=$2,xp=$3,gold=$4,hp=$5,mp=$6,quest_stage=$7,defeated_mask=$8,active_battle_id=$9,allocated_attributes=$10,monster_respawns=$11,ai_progress=$12,school=$13,corpse=$14,state_revision=state_revision+1 WHERE id=$1 RETURNING state_revision")
             .bind(c.id).bind(c.level).bind(c.xp).bind(c.gold).bind(c.hp).bind(c.mp).bind(c.quest_stage).bind(loaded.defeated).bind(active).bind(loaded.allocated.to_vec()).bind(Json(&loaded.respawns))
-            .bind(Json(&loaded.ai)).bind(c.school).fetch_one(&mut *tx).await.map_err(database)?;
+            .bind(Json(&loaded.ai)).bind(c.school).bind(&c.corpse).fetch_one(&mut *tx).await.map_err(database)?;
         loaded.character.state_revision = revision.to_string();
         if loaded.potions == 0 {
             sqlx::query(
@@ -588,8 +614,12 @@ pub async fn execute(
 /// Uses the same character, equipment, skill and respawn rules as solo PvE.
 pub(crate) async fn team_fighter(tx:&mut Transaction<'_,Postgres>,context:&Context)->Result<(crate::team_rules::Fighter,std::collections::HashSet<String>),AuthError>{
     let a=load(tx,context).await?;
+    if a.character.corpse.is_some(){return Err(AuthError(StatusCode::CONFLICT,"SOUL_STATE"));}
     if a.battle.is_some()||context.duel_active{return Err(AuthError(StatusCode::CONFLICT,"TEAM_BUSY"));}
     if context.map_id!=a.character.map_id||context.moving{return Err(AuthError(StatusCode::CONFLICT,"TEAM_NOT_READY"));}
+    // Freeze the actual encounter origin, not an older periodic position save.
+    sqlx::query("UPDATE characters SET cell_x=$2,cell_y=$3,position_revision=$4 WHERE id=$1 AND owner_epoch=$5 AND map_id=$6 AND position_revision<=$4")
+        .bind(a.character.id).bind(context.cell[0]).bind(context.cell[1]).bind(context.position_revision as i64).bind(context.owner).bind(&context.map_id).execute(&mut **tx).await.map_err(database)?;
     if crate::ai_world::map(&context.map_id).is_none()&&a.character.quest_stage==0{return Err(AuthError(StatusCode::CONFLICT,"QUEST_REQUIRED"));}
     let c=&a.character;
     let unavailable=a.respawns.iter().chain(a.ai.respawns.iter()).filter(|(_,t)|**t>unix_ms()).map(|(id,_)|id.clone()).collect();
@@ -613,9 +643,13 @@ pub(crate) async fn team_save(tx:&mut Transaction<'_,Postgres>,f:&crate::team_ru
         let total_gold:i32=b.enemies.iter().map(|e|e.definition.gold).sum();
         let total_xp:i32=b.enemies.iter().map(|e|e.definition.xp).sum();
         a.rewards(total_gold/n+i32::from(index<total_gold%n),total_xp/n+i32::from(index<total_xp%n)).map_err(|c|AuthError(StatusCode::CONFLICT,c))?;
-    }else if settle&&b.outcome=="defeat"{a.restore();}
-    sqlx::query("UPDATE characters SET hp=$2,mp=$3,level=$4,xp=$5,gold=$6,quest_stage=$7,defeated_mask=$8,monster_respawns=$9,ai_progress=$10,state_revision=state_revision+1 WHERE id=$1")
-        .bind(f.id).bind(a.character.hp).bind(a.character.mp).bind(a.character.level).bind(a.character.xp).bind(a.character.gold).bind(a.character.quest_stage).bind(a.defeated).bind(Json(a.respawns)).bind(Json(a.ai)).execute(&mut **tx).await.map_err(database)?;
+    }
+    if settle&&f.hp==0&&a.character.corpse.is_none(){
+        let point=[a.character.cell_x,a.character.cell_y];
+        a.die(point).map_err(|code|AuthError(StatusCode::CONFLICT,code))?;
+    }
+    sqlx::query("UPDATE characters SET hp=$2,mp=$3,level=$4,xp=$5,gold=$6,quest_stage=$7,defeated_mask=$8,monster_respawns=$9,ai_progress=$10,position_revision=position_revision+CASE WHEN corpse IS NULL AND $11::jsonb IS NOT NULL THEN 1 ELSE 0 END,corpse=$11,cell_x=$12,cell_y=$13,state_revision=state_revision+1 WHERE id=$1")
+        .bind(f.id).bind(a.character.hp).bind(a.character.mp).bind(a.character.level).bind(a.character.xp).bind(a.character.gold).bind(a.character.quest_stage).bind(a.defeated).bind(Json(a.respawns)).bind(Json(a.ai)).bind(a.character.corpse).bind(a.character.cell_x).bind(a.character.cell_y).execute(&mut **tx).await.map_err(database)?;
     if a.potions==0{sqlx::query("DELETE FROM inventory_items WHERE character_id=$1 AND definition_id='potion'").bind(f.id).execute(&mut **tx).await.map_err(database)?;}
     else{sqlx::query("INSERT INTO inventory_items(id,character_id,definition_id,quantity) VALUES($1,$2,'potion',$3) ON CONFLICT(character_id,definition_id) DO UPDATE SET quantity=EXCLUDED.quantity").bind(Uuid::new_v4()).bind(f.id).bind(a.potions).execute(&mut **tx).await.map_err(database)?;}
     Ok(())

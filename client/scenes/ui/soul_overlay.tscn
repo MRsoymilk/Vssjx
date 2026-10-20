@@ -1,0 +1,32 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Shader" path="res://shaders/soul_grayscale.gdshader" id="1"]
+[sub_resource type="ShaderMaterial" id="Gray"]
+shader = ExtResource("1")
+
+[node name="SoulOverlay" type="CanvasLayer"]
+layer = 80
+visible = false
+
+[node name="Gray" type="ColorRect" parent="."]
+material = SubResource("Gray")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Hint" type="Label" parent="."]
+offset_left = 6.0
+offset_top = 55.0
+offset_right = 314.0
+offset_bottom = 85.0
+theme_override_colors/font_color = Color(0.95, 0.95, 0.95, 1)
+theme_override_colors/font_outline_color = Color(0.05, 0.05, 0.05, 1)
+theme_override_constants/outline_size = 2
+theme_override_font_sizes/font_size = 11
+text = "灵魂状态 · 寻回自己的尸体"
+horizontal_alignment = 1
+autowrap_mode = 2
+mouse_filter = 2

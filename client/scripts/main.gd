@@ -70,6 +70,7 @@ var _storage_notice: Label
 var _ui_process_mode: ProcessMode
 var _closing := false
 var map_transition: OriginalMapTransition
+@onready var soul_overlay: CanvasLayer = $SoulOverlay
 
 func _exit_tree() -> void:
 	_ui_epoch += 1
@@ -263,6 +264,7 @@ func _button(parent: Node, text_value: String, rect: Rect2, callback: Callable, 
 	return button
 
 func _clear_ui() -> void:
+	soul_overlay.hide()
 	if is_instance_valid(battle_effects):battle_effects.clear()
 	battle_effects=null
 	_ui_epoch += 1
@@ -479,7 +481,7 @@ func _continue(character_id: String = "") -> void:
 	var result := await Game.load_game() if character_id.is_empty() else await Game.select_local_character(character_id)
 	if epoch != _ui_epoch or result.status == PlatformResult.Status.CANCELLED or _closing: return
 	if result.ok:
-		if int(Game.player.hp) == 0: Game.restore()
+		if int(Game.player.hp) == 0 and not Game.is_soul(): Game.restore()
 		_enter_world()
 	else:
 		if mode == "local_select" and is_instance_valid(character_selection):
@@ -575,6 +577,8 @@ func _refresh_hud() -> void:
 	if mode != "world" or hud_name == null or not is_instance_valid(hud_name): return
 	hud_name.text = "%s  Lv.%d  ·  %s%s" % [Game.player.name, int(Game.player.level), SchoolRules.label(int(Game.player.school)), Game.JOBS[int(Game.player.job)]]
 	world.refresh_appearance()
+	soul_overlay.visible=Game.is_soul()
+	if Game.is_soul():soul_overlay.get_node("Hint").text=SoulRules.hint(Game.player.corpse)
 	var values := Game.stats()
 	hud_stats.text = ""
 	world_identity.text = "等级 %d\n%s" % [int(Game.player.level), SchoolRules.label(int(Game.player.school))]
@@ -588,6 +592,14 @@ func _world_interaction(kind: String, data: Dictionary) -> void:
 	if Game.storage_busy or _closing: return
 	if is_instance_valid(map_transition) and map_transition.blocking: return
 	if mode == "battle_loading": return
+	if kind=="corpse":
+		if world.next_cell.x>=0:return
+		world.pause_moving()
+		var result:=await Game.recover_corpse(String(data.get("id","")),world.cell)
+		_refresh_hud()
+		if not result.ok:_message("寻回尸体",result.message)
+		return
+	if Game.is_soul() and kind!="hint":_message("灵魂状态",OnlinePve.error_text("SOUL_STATE"));return
 	match kind:
 		"map_exit":
 			if data.get("legacy",false):_world_interaction("portal",data)
@@ -614,6 +626,7 @@ func _world_interaction(kind: String, data: Dictionary) -> void:
 		"hint": _message("交互", String(data.text))
 
 func _travel_local(kind: String, target: String = "") -> void:
+	if Game.is_soul():return
 	_release_local_chat_input()
 	world.pause_moving()
 	var before := Game.player.duplicate(true)
@@ -670,6 +683,7 @@ func _open_ai_npc(id: String) -> void:
 	dialog.present_ai(id,resident,AIWorld.progress(),int(Game.player.level))
 
 func _local_npc_action(action: String, target: String) -> void:
+	if Game.is_soul():return
 	if Game.storage_busy or _closing or mode!="world" or not modal is OriginalNpcDialog:return
 	var dialog: OriginalNpcDialog=modal
 	if not dialog.allows(action,target):return
@@ -758,6 +772,7 @@ func _save_feedback() -> void:
 		_message("保存失败", result.message)
 
 func _rest() -> void:
+	if Game.is_soul():_message("灵魂状态",OnlinePve.error_text("SOUL_STATE"));return
 	var panel := _modal_panel("凝神调息")
 	_label(panel, "花费 5 铜钱，恢复全部生命与灵力。\n\n清微道人也可免费为你恢复元气。", Rect2(18, 58, 248, 110), 12)
 	var button := _button(panel, "调息 · 5 铜钱", Rect2(18, 184, 148, 32), func() -> void:
@@ -938,6 +953,7 @@ func _encounter_failed(explanation: String = "本地战斗资源未能准备完�
 	_message("无法进入战斗", explanation + "\n当前角色资源没有扣除。")
 
 func _encounter_battle(enemy: Dictionary) -> void:
+	if Game.is_soul():return
 	if mode != "world" or modal != null or not is_instance_valid(world): return
 	world.pause_moving()
 	world.enabled = false
@@ -1243,7 +1259,7 @@ func _battle_result() -> void:
 	var leveled := await battle.commit()
 	if epoch != _ui_epoch or current != battle or _closing: return
 	var outcome := "victory" if battle.victory else ("fled" if battle.escaped else "defeat")
-	var description := "战斗结束，你获得了胜利。\n获得 %d 铜钱、%d 修为。" % [int(battle.enemy.gold), int(battle.enemy.xp)] if battle.victory else ("战斗结束，你撤离了战场。" if battle.escaped else "战斗结束，你战败了。\n道人送你回到山门，元气已经恢复。")
+	var description := "战斗结束，你获得了胜利。\n获得 %d 铜钱、%d 修为。" % [int(battle.enemy.gold), int(battle.enemy.xp)] if battle.victory else ("战斗结束，你撤离了战场。" if battle.escaped else "战斗结束，你战败了。\n灵魂在本地图复活点醒来，请到坟堆旁寻回尸体。")
 	if leveled: description += "\n境界提升！生命与灵力已恢复。"
 	if battle.save_result != null and not battle.save_result.ok: description += "\n保存未确认：" + battle.save_result.message
 	battle_log.text="[系统] "+description.replace("\n","\n[系统] ")

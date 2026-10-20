@@ -141,6 +141,7 @@ static func event(kind: String, target: String) -> bool:
 	return changed
 
 static func apply_local(action: String, target: String) -> String:
+	if Game.is_soul():return OnlinePve.error_text("SOUL_STATE")
 	if action not in ["ai_travel", "ai_accept", "ai_claim", "ai_restore", "ai_interact"]: return "未知操作。"
 	if action in ["ai_accept", "ai_claim"] and quest(target).is_empty(): return "未知任务。"
 	if action == "ai_restore" and not target.ends_with("_guide"): return "请找巡山发布人调息。"

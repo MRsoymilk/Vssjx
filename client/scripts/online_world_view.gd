@@ -75,6 +75,10 @@ var team_notice_text:Label
 var team_confirm:Button
 var team_reject:Button
 const SocialChrome = preload("res://scripts/social_chrome.gd")
+var soul_markers: SoulMarkers
+@onready var soul_overlay: CanvasLayer = $SoulOverlay
+var _soul_transition_id := ""
+var _soul_snap_pending := false
 
 func _ready() -> void:
 	team.bind_character(character_id)
@@ -412,6 +416,9 @@ func _advance_map_transition() -> void:
 
 func _build_map() -> void:
 	SharedWorldMap.build($Viewport/Scene/Terrain, _motion_grid, map_data)
+	soul_markers=preload("res://scenes/actors/soul_markers.tscn").instantiate()
+	actor_layer.add_child(soul_markers)
+	soul_markers.display(String(map_data.map_id))
 	SharedWorldMap.add_scenery(actor_layer, map_data)
 	var gate: Dictionary = SharedWorldMap.exits(String(map_data.map_id))[0]
 	portal_marker = Node2D.new()
@@ -518,6 +525,10 @@ func _snapshot(values: Dictionary) -> void:
 		var look: Array = network.appearances.get(id,[1,0])
 		OriginalArt.apply_appearance(actors[id].sprite,ShopRules.actor_key(int(entity.job),int(entity.gender),look))
 		actors[id].target = point
+		if id==character_id and _soul_snap_pending and network.pve.is_soul():
+			var character:Dictionary=network.pve.state.character
+			if Vector2i(entity.cell[0],entity.cell[1])==Vector2i(character.cell_x,character.cell_y):
+				actors[id].motion=OnlineActorMotion.new();_soul_snap_pending=false
 		actors[id].motion.receive(entity, _motion_grid)
 		actors[id].root.position = actors[id].motion.position
 	if not duel_invitation.selected.is_empty() and not values.has(duel_invitation.selected): duel_invitation.selected = ""
@@ -613,6 +624,7 @@ func _update_chat_controls() -> void:
 		if emote_button.disabled: emote_picker.hide()
 
 func _process(delta: float) -> void:
+	_update_soul_visuals()
 	var social_available:=network.world_ready and OnlineAccount.is_logged_in() and not OnlineAccount.busy and not OnlineAccount.network_suspended
 	if Platform.context.lifecycle.suspended:social_available=false
 	if OS.has_feature("web") and (not Platform.context.lifecycle.focused or Platform.context.lifecycle.suspended):social_available=false
@@ -692,6 +704,14 @@ func _map_input(event: InputEvent) -> void:
 	Platform.context.text_input.release_focus(chat_input)
 	_was_keyboard = false
 	var world_point := camera.get_screen_center_position() + point - Vector2(viewport.size) / 2.0
+	if network.pve.is_soul():
+		if soul_markers.hit(world_point):
+			_resident_action("revive",network.pve.state.character.corpse.id)
+			return
+		_cancel_approach()
+		var destination:=Vector2i(floori(world_point.x/16.0),floori(world_point.y/16.0))
+		if _motion_grid.region.has_point(destination) and not _motion_grid.is_point_solid(destination):network.move_to(destination);_mark_destination(destination)
+		return
 	for id in actors:
 		if id == character_id: continue
 		var actor: Dictionary = actors[id]
@@ -780,6 +800,10 @@ func _unhandled_key_input(event: InputEvent) -> void:
 
 func _pve_changed() -> void:
 	var model := network.pve
+	if model.is_soul() and model.state.character.corpse.id!=_soul_transition_id:
+		_soul_transition_id=model.state.character.corpse.id;_soul_snap_pending=true
+		network._pending_motion.clear();move_target.clear();_cancel_approach()
+	elif not model.is_soul():_soul_transition_id="";_soul_snap_pending=false
 	if not model.ready or model.active(): move_target.clear()
 	if model.active():
 		if social_panel.visible:social_panel.dismiss()
@@ -814,8 +838,21 @@ func _pve_changed() -> void:
 	if _loading_battle.is_empty(): _refresh_interaction_wait()
 	npc_dialog.refresh()
 	battle_view.refresh()
+	_update_soul_visuals()
+
+func _update_soul_visuals() -> void:
+	if network==null or soul_overlay==null:return
+	var spirit:=network.pve.is_soul()
+	soul_overlay.visible=spirit and not battle_view.visible and (team_battle==null or not team_battle.visible)
+	if spirit:
+		soul_overlay.get_node("Hint").text=SoulRules.hint(network.pve.state.character.corpse)
+		network.team_following=false
+	screen.hud.get_node("Minimap").shared_corpse=network.pve.state.character.corpse if spirit else {}
+	if is_instance_valid(soul_markers):soul_markers.display(String(map_data.map_id),network.pve.state.character.corpse if spirit else {})
+	if actors.has(character_id):actors[character_id].sprite.modulate=Color(0.8,0.9,1.0,0.5) if spirit else Color.WHITE
 
 func _select_resident(id: String) -> void:
+	if network.pve.is_soul():chat_status.text=OnlinePve.error_text("SOUL_STATE");return
 	if team.active():return
 	if not team.party().is_empty() and not team.party().get("leader",false) and network.population.entities.get(id,{}).get("kind")!="npc":
 		chat_status.text="组队时请由队长发起战斗。";return
@@ -836,6 +873,7 @@ func _cancel_approach() -> void:
 		npc_dialog.refresh()
 
 func _follow_transfer()->bool:
+	if network.pve.is_soul():return false
 	if not network.team_following:
 		_follow_trip=""
 		return false
@@ -852,6 +890,7 @@ func _follow_transfer()->bool:
 	return true
 
 func _auto_transfer() -> bool:
+	if network.pve.is_soul():return false
 	if not network.pve.ready or not network.entities.has(character_id): return false
 	var own: Dictionary=network.entities[character_id]
 	if own.next_cell!=null:
@@ -880,6 +919,7 @@ func _npc_action_chosen(action: String, target: String) -> void:
 
 func _resident_action(action: String, target: String) -> void:
 	if not network.pve.ready or network.pve.pending(): return
+	if network.pve.is_soul() and action!="revive":return
 	_approach = {"action": action, "target": target, "deadline": Time.get_unix_time_from_system() + 30.0, "stopped": true}
 	network.stop_moving()
 
@@ -894,14 +934,16 @@ func _advance_approach() -> void:
 		return
 	var transfer: bool = _approach.action == "transfer"
 	var ai_travel: bool = _approach.action == "ai_travel"
+	var recovering:bool=_approach.action=="revive"
 	var resident_id: String = "qingwei" if _approach.action=="school_join" else String(AIWorld.quest(_approach.target).get("giver",_approach.target))
-	if (not transfer and not ai_travel and not network.population.entities.has(resident_id)) or not network.entities.has(character_id):
+	if (not recovering and not transfer and not ai_travel and not network.population.entities.has(resident_id)) or not network.entities.has(character_id):
 		_cancel_approach()
 		return
 	var own: Dictionary = network.entities[character_id]
 	if own.next_cell != null or not network._pending_motion.is_empty() or int(own.last_input_seq) < network._input_seq: return
 	var cell := Vector2i(own.cell[0], own.cell[1])
-	var resident: Dictionary = SharedWorldMap.portal(String(map_data.map_id)) if transfer else ({"cell":[AIWorld.station(String(map_data.map_id)).x,AIWorld.station(String(map_data.map_id)).y]} if ai_travel else network.population.entities[resident_id])
+	if recovering and (not network.pve.is_soul() or _approach.target!=network.pve.state.character.corpse.id):_cancel_approach();return
+	var resident: Dictionary = network.pve.state.character.corpse if recovering else (SharedWorldMap.portal(String(map_data.map_id)) if transfer else ({"cell":[AIWorld.station(String(map_data.map_id)).x,AIWorld.station(String(map_data.map_id)).y]} if ai_travel else network.population.entities[resident_id]))
 	var target := Vector2i(resident.cell[0], resident.cell[1])
 	# Moving wolves can cross a cell while the challenge is in flight.
 	var reach := 1 if resident.get("kind") == "wolf" else 2

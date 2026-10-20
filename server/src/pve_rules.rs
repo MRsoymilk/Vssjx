@@ -8,6 +8,7 @@ pub const RULES: &str = "qingyun-pve-v1";
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "snake_case")]
 pub enum Action {
+    Revive,
     SchoolJoin,
     AiAccept,
     AiClaim,
@@ -262,7 +263,7 @@ impl Battle {
         self.skills.end_turn();
         if self.hp == 0 {
             self.outcome = "defeat".into();
-            lines.push("道人护持，你恢复元气，试炼进度保留。".into());
+            lines.push("你力竭倒下，试炼进度保留，请以灵魂寻回尸体。".into());
         } else if self.enemy_hp == 0 {
             self.outcome = "victory".into();
             lines.push(format!("{}被击败！", self.enemy.name));

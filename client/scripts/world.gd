@@ -46,6 +46,7 @@ var walk_distance := 0.0
 var portal_marker: Node2D
 var move_target: WorldMoveTarget
 var quest_marker: NpcQuestMarker
+var soul_markers: SoulMarkers
 
 func _ready() -> void:
 	zone = int(Game.player.zone)
@@ -80,6 +81,9 @@ func _ready() -> void:
 	actors.add_child(hero)
 	_name_tag(hero, String(Game.player.name), Color("fff4c9"))
 	hero.add_child(preload("res://scenes/actors/player_ring.tscn").instantiate())
+	soul_markers=preload("res://scenes/actors/soul_markers.tscn").instantiate()
+	actors.add_child(soul_markers)
+	refresh_soul()
 	if not AIWorld.map_data(map_id).is_empty():
 		for definition in SharedWorldMap.population(map_id):
 			if definition.kind != "npc": continue
@@ -127,6 +131,11 @@ func _ready() -> void:
 func refresh_appearance() -> void:
 	if not is_instance_valid(hero): return
 	OriginalArt.apply_appearance(hero,Game.appearance_key())
+	refresh_soul()
+
+func refresh_soul() -> void:
+	if is_instance_valid(hero):hero.modulate=Color(0.8,0.9,1.0,0.5) if Game.is_soul() else Color.WHITE
+	if is_instance_valid(soul_markers):soul_markers.display(map_id,Game.player.corpse if Game.is_soul() else {})
 
 func refresh_quest_marker() -> void:
 	if not AIWorld.map_data(map_id).is_empty():
@@ -261,6 +270,7 @@ func _route_to(target: Vector2i) -> Array[Vector2i]:
 	return route
 
 func target_at_pixel(point: Vector2) -> Dictionary:
+	if Game.is_soul():return soul_markers.target() if soul_markers.hit(point) else {}
 	for target in _ai_targets():
 		if target.kind=="map_exit":
 			if Rect2(cell_center(target.cell)-Vector2(8,8),Vector2(16,16)).has_point(point):return target
@@ -277,6 +287,9 @@ func target_at_pixel(point: Vector2) -> Dictionary:
 	return {}
 
 func target_at(target: Vector2i) -> Dictionary:
+	if Game.is_soul():
+		var corpse_target:=soul_markers.target()
+		return corpse_target if not corpse_target.is_empty() and corpse_target.cell==target else {}
 	for value in _ai_targets():
 		if value.kind=="map_exit":
 			if target==value.cell:return value
@@ -294,6 +307,7 @@ func target_at(target: Vector2i) -> Dictionary:
 	return {}
 
 func _walk_to(target: Dictionary) -> void:
+	if Game.is_soul() and target.get("kind")!="corpse":return
 	if target.kind == "enemy" and enemy_nodes.has(target.data.id):
 		target = target.duplicate()
 		target.cell = _enemy_cell(enemy_nodes[target.data.id])
@@ -325,6 +339,11 @@ func _walk_to(target: Dictionary) -> void:
 
 func interact_nearest() -> void:
 	if not enabled: return
+	if Game.is_soul():
+		var target:=soul_markers.target()
+		if not target.is_empty() and cell.distance_to(target.cell)<3.5:_walk_to(target)
+		else:interaction.emit("hint",{"text":SoulRules.hint(Game.player.corpse)})
+		return
 	var nearest: Dictionary = {}
 	var distance := 3.5
 	var targets: Array[Dictionary] = []
@@ -380,7 +399,7 @@ func _process(delta: float) -> void:
 			next_cell = Vector2i(-1, -1)
 			_save_position()
 			var exit := SharedWorldMap.exit_at(map_id,cell)
-			if not exit.is_empty():
+			if not exit.is_empty() and not Game.is_soul():
 				_idle_hero();_enter_exit(exit);return
 			if path.is_empty() and not pending.is_empty():
 				_idle_hero()

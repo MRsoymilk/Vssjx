@@ -20,6 +20,8 @@ use uuid::Uuid;
 #[serde(deny_unknown_fields)]
 pub struct Command {
     pub character_id: Uuid,
+    #[serde(default,skip_serializing_if="Option::is_none")]
+    pub encounter_version: Option<u8>,
     pub action: String,
     #[serde(default)]
     pub operation_id: Option<Uuid>,
@@ -126,6 +128,7 @@ pub(crate) async fn command(
     auth.admit_team(auth::peer_ip(None), Some(account.id))?;
     let Json(c) = body.map_err(|_| AuthError(StatusCode::BAD_REQUEST, "INVALID_REQUEST"))?;
     if (!ACTIONS.contains(&c.action.as_str()) && !matches!(c.action.as_str(), "potion" | "flee"))
+        || c.encounter_version.is_some_and(|v|v!=2 || c.action!="challenge")
         || c.target.as_ref().is_some_and(|s| s.len() > 64)
         || c.skill.as_ref().is_some_and(|s| s.len() > 32)
         || c.action != "snapshot" && c.operation_id.is_none_or(|id| id.get_version_num() != 4)
@@ -594,7 +597,10 @@ async fn apply(
             for i in 1..n {
                 sources.push(pool.get((i-1) % pool.len().max(1)).unwrap_or(&enemy).clone());
             }
-            let b = Battle::new(context.map_id, fighters, sources, now);
+            let elite=crate::pve::team_hunt(tx,&fighters.iter().map(|f|f.id).collect::<Vec<_>>(),&context.map_id,&enemy.art).await?;
+            if elite && c.encounter_version!=Some(2){return Err(err("CLIENT_UPDATE_REQUIRED"));}
+            let mut b = Battle::new(context.map_id, fighters, sources, now);
+            if elite {b.empower_hunt();}
             save_battle(tx, team, &b, false).await?;
             return Ok(true);
         }

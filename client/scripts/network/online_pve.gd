@@ -81,6 +81,7 @@ func valid(value: Variant) -> bool:
 		if not progress.get("respawns") is Dictionary or progress.respawns.size() > 6: return false
 		for id in progress.respawns:
 			if not seen.has(id) or not integer(progress.respawns[id], 0, mini(253402300799999, int(value.server_time_ms) + 30000)): return false
+	if value.has("hunt_pressure") and not MonsterCombat.pressure_valid(value.hunt_pressure):return false
 	if not value.has("battle"): return false
 	var battle: Variant = value.battle
 	if battle == null: return true
@@ -96,11 +97,12 @@ func valid(value: Variant) -> bool:
 	if not AIWorld.resident(enemy.id).is_empty():
 		var definition := AIWorld.resident(enemy.id)
 		if SkillBalance.revised(value.stats):definition=SkillBalance.monster(definition)
+		if battle.get("formation") is Dictionary and battle.formation.get("monster_revision")==2:definition=MonsterCombat.empower(definition,1)
 		for key in ["art", "kind", "hp", "attack", "defense", "level", "gold", "xp"]:
 			if enemy.get(key) != definition[key]: return false
 		if not OriginalArt.has_actor(definition.art): return false
 	elif not enemy.get("art") in ["monster/langw", "monster/hs1", "monster/xt1", "monster/nt1"]: return false
-	if not integer(enemy.get("hp"), 1, 10000) or not integer(enemy.get("level"), 1, 60): return false
+	if not integer(enemy.get("hp"), 1, 100000) or not integer(enemy.get("level"), 1, 60): return false
 	if not integer(battle.get("hp"), 0, int(value.stats.hp)) or not integer(battle.get("mp"), 0, int(value.stats.mp)) or not integer(battle.get("enemy_hp"), 0, int(enemy.hp)) or not integer(battle.get("potions"), 0, 99): return false
 	if battle.has("formation"):
 		var group:Variant=battle.formation
@@ -231,7 +233,7 @@ func submit(action: String, target: String = "", points: Array = [], count: int=
 	elif active():
 		command.battle_id = state.battle.id
 		command.expected_revision = state.battle.revision
-	if action=="challenge":command.encounter_version=1
+	if action=="challenge":command.encounter_version=2
 	if not enemy_slot.is_empty():command.enemy_slot=enemy_slot
 	OnlineAccount.pending_pve = {"realm": realm, "character": character_id, "command": command}
 	retry()
@@ -254,6 +256,7 @@ func quest_text() -> String:
 	return "古剑遗迹 · 已完成\n妖气已散，可返回青云山道恢复元气，或继续探索遗迹。"
 
 static func error_text(code: String) -> String:
+	if code=="CLIENT_UPDATE_REQUIRED":return "连续挑战已触发精英，请更新客户端后继续。"
 	if code=="SKILL_COOLDOWN":return "技能尚在冷却，请选择其他指令。"
 	var souls:={"SOUL_STATE":"灵魂状态下只能移动和寻回尸体，请先到自己的坟堆旁复活。","CORPSE_NOT_FOUND":"这不是你的尸体，或已经复活。","NO_CORPSE":"当前没有可寻回的尸体。","CORPSE_TOO_FAR":"请靠近自己的坟堆后复活。","STALE_CORPSE":"灵魂状态已更新，请重新同步后再试。"}
 	if souls.has(code):return souls[code]

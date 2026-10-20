@@ -127,7 +127,7 @@ func present()->void:
 			_display(f.id,f.name+" Lv."+str(int(f.level)),int(f.hp),int(f.stats.hp))
 			actors[f.id].mp.max_value=f.stats.mp;actors[f.id].mp.value=f.mp
 	for e in b.enemies:
-		if updating:_display(e.slot,e.definition.name+" Lv."+str(int(e.definition.level)),int(e.hp),int(e.definition.hp))
+		if updating:_display(e.slot,MonsterCombat.enemy_name(e)+" Lv."+str(int(e.definition.level)),int(e.hp),int(e.definition.hp))
 	if not actors.has(selected) or actors[selected].dead:
 		for e in b.enemies:
 			if e.hp>0:selected=e.slot;break
@@ -143,10 +143,12 @@ func _choose(action:String)->void:
 	if action=="inspect":
 		for e in model.battle().enemies:
 			if e.slot==selected:
-				inspect_panel.get_node("NameValue").text=e.definition.name
+				inspect_panel.get_node("NameValue").text=MonsterCombat.enemy_name(e)
 				inspect_panel.get_node("Hp").text="气血 %d / %d"%[int(e.hp),int(e.definition.hp)]
 				inspect_panel.get_node("Secondary").text="攻击 %d　防御 %d"%[int(e.definition.attack),int(e.definition.defense)]
-				inspect_panel.get_node("Tertiary").text=("组队强化" if model.battle().fighters.size()>1 else "独自迎战")+" · Lv.%d"%int(e.definition.level);inspect_panel.show();return
+				inspect_panel.get_node("Tertiary").text=("组队强化" if model.battle().fighters.size()>1 else "独自迎战")+" · Lv.%d"%int(e.definition.level);
+				if e.has("elite"):inspect_panel.get_node("Tertiary").text="连击·暴击·流血　复活%d次"%int(e.elite.revives_left)
+				inspect_panel.show();return
 	if action=="skill":
 		for f in model.battle().fighters:
 			if f.id==model.character_id:picker.present(int(f.job),int(f.school),int(f.level),int(f.mp),[],false,f.stats,f.effects);picker.show();return
@@ -158,7 +160,7 @@ func _refresh_controls()->void:
 	var b:Dictionary=model.battle()
 	if b.is_empty():return
 	var executing:=motion!=null or not queue.is_empty() or not _effect_wait.is_empty()
-	caption.text=("单人遭遇" if b.fighters.size()==1 else "队伍战斗")+" · 第%d回合 · %d名敌人"%[maxi(1,int(b.round)-(1 if executing and (b.has("commands") or b.get("solo",false)) else 0)),b.enemies.size()]
+	caption.text=("精英遭遇" if int(b.get("monster_revision",0))==2 else ("单人遭遇" if b.fighters.size()==1 else "队伍战斗"))+" · 第%d回合 · %d名敌人"%[maxi(1,int(b.round)-(1 if executing and (b.has("commands") or b.get("solo",false)) else 0)),b.enemies.size()]
 	var left:=maxi(0,ceili((int(b.deadline_ms)-model.server_time-(Time.get_ticks_msec()-model.received_at))/1000.0))
 	var message:="等待确认" if model.pending() else ("轮到你行动" if model.my_turn() else "等待队友")
 	if b.has("commands"):
@@ -195,13 +197,19 @@ func _process(delta:float)->void:
 	if not _effect_wait.is_empty():
 		if effects.has_skill_effects(_effect_wait):return
 		_effect_wait=""
+		_start_deaths()
 	if motion!=null:
 		motion.advance(delta)
 		if not motion.active:
 			if playing.get("action")=="skill" and effects.has_skill_effects(playing.get("skill","")):_effect_wait=playing.skill
 			motion=null
 			if _effect_wait.is_empty():_start_deaths()
-	elif not queue.is_empty():_play(queue.pop_front())
+	elif not queue.is_empty():
+		var waiting:=false
+		if queue[0].action=="revive":
+			for death in deaths:
+				if death.actor==actors[queue[0].actor].sprite and death.active:waiting=true
+		if not waiting:_play(queue.pop_front())
 	else:
 		_sync_final_resources()
 		_start_deaths()
@@ -230,7 +238,7 @@ func _sync_final_resources()->void:
 	for f in b.fighters:
 		_display(f.id,f.name+" Lv."+str(int(f.level)),int(f.hp),int(f.stats.hp))
 		actors[f.id].mp.max_value=f.stats.mp;actors[f.id].mp.value=f.mp
-	for e in b.enemies:_display(e.slot,e.definition.name+" Lv."+str(int(e.definition.level)),int(e.hp),int(e.definition.hp))
+	for e in b.enemies:_display(e.slot,MonsterCombat.enemy_name(e)+" Lv."+str(int(e.definition.level)),int(e.hp),int(e.definition.hp))
 	if not actors.has(selected) or actors[selected].dead:
 		for e in b.enemies:
 			if int(e.hp)>0:selected=e.slot;break
@@ -241,6 +249,14 @@ func _start_deaths()->void:
 func _play(event:Dictionary)->void:
 	if not actors.has(event.actor) or not actors.has(event.target):return
 	var a:Dictionary=actors[event.actor];var target:Dictionary=actors[event.target]
+	if event.action=="revive":
+		for death in deaths.duplicate():
+			if death.actor==a.sprite:death.cancel();deaths.erase(death)
+		a.sprite.show();a.sprite.play("idle");a.dead=false;a.hp.value=int(event.healed)
+		effects.number(a.sprite,int(event.healed),false,true);effects.attach("effect/flash",a.sprite)
+		motion=BattleActionPlayback.new();motion.start(a.sprite,OriginalArt.actor_info(a.key),a.sprite.global_position,&"idle",a.sprite)
+		playing=event;move_callout.present_for("妖躯复生",a.sprite,motion.duration)
+		return
 	if not a.sprite.visible:return
 	if event.action not in ["attack","skill","guard","potion","dot","regen"]:return
 	playing=event

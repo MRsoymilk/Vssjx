@@ -326,6 +326,21 @@ func respec_attributes()->PlatformResult:
 	if not result.ok and generation==_player_generation and path==save_path:player=before
 	return result
 
+## Persist before entering an actual local encounter; a failed write cannot count a fight.
+func record_local_hunt(map_id:String,species:String)->PlatformResult:
+	if storage_busy or _local_roster_busy:return PlatformResult.new(PlatformResult.Status.TEMPORARY_FAILURE,"STORAGE_BUSY","正在保存，请稍候。")
+	var before:=player.duplicate(true)
+	var generation:=_player_generation
+	var path:=save_path
+	player.hunt_pressure=MonsterCombat.note_pressure(player.get("hunt_pressure",{}),map_id,species)
+	var elite:=int(player.hunt_pressure.count)==int(MonsterCombat.rules.hunt_threshold)
+	var result:=await save_game()
+	if not result.ok:
+		if generation==_player_generation and path==save_path:player=before
+		return result
+	if generation!=_player_generation or path!=save_path:return PlatformResult.new(PlatformResult.Status.TEMPORARY_FAILURE,"STALE_PLAYER","角色已切换。")
+	return PlatformResult.success({"elite":elite})
+
 ## Offline test helper. Only LocalWorldChat exposes this; no network protocol hook.
 func set_local_test_level(level: int) -> PlatformResult:
 	if is_soul():return PlatformResult.new(PlatformResult.Status.INVALID_DATA,"SOUL_STATE",OnlinePve.error_text("SOUL_STATE"))
@@ -584,6 +599,7 @@ func valid_save(data: Variant) -> bool:
 	if not data.defeated is Array or data.defeated.size() > 20: return false
 	for value in data.defeated:
 		if not value is String: return false
+	if not MonsterCombat.pressure_valid(data.get("hunt_pressure",{})):return false
 	var respawns: Variant = data.get("enemy_respawns", {})
 	if not respawns is Dictionary or respawns.size() > 20: return false
 	for id in respawns:

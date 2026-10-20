@@ -37,6 +37,7 @@ pub struct Context {
 }
 #[derive(Clone)]
 struct Loaded {
+    hunt_pressure: crate::monster_combat::HuntPressure,
     ai: crate::ai_world::Progress,
     character: Character,
     defeated: i32,
@@ -65,7 +66,7 @@ async fn load(tx: &mut Transaction<'_, Postgres>, context: &Context) -> Result<L
     load_character(tx,context.character,account,Some(context.owner)).await
 }
 async fn load_character(tx:&mut Transaction<'_,Postgres>,character_id:Uuid,account:Uuid,owner:Option<i64>)->Result<Loaded,AuthError>{
-    let row=sqlx::query(&format!("SELECT {CHARACTER_COLUMNS},loot_state,ai_progress,defeated_mask,monster_respawns,active_battle_id,owner_epoch,allocated_attributes FROM characters WHERE id=$1 AND account_id=$2 FOR UPDATE"))
+    let row=sqlx::query(&format!("SELECT {CHARACTER_COLUMNS},loot_state,ai_progress,defeated_mask,monster_respawns,active_battle_id,owner_epoch,allocated_attributes,hunt_pressure FROM characters WHERE id=$1 AND account_id=$2 FOR UPDATE"))
         .bind(character_id).bind(account).fetch_optional(&mut **tx).await.map_err(database)?
         .ok_or(AuthError(StatusCode::FORBIDDEN,"FORBIDDEN"))?;
     if owner.is_some_and(|owner|row.get::<i64, _>("owner_epoch") != owner) {
@@ -108,6 +109,7 @@ async fn load_character(tx:&mut Transaction<'_,Postgres>,character_id:Uuid,accou
     let ai:crate::ai_world::Progress=serde_json::from_value(row.get::<Json<Value>,_>("ai_progress").0).map_err(|_|unavailable())?;
     if !ai.valid(){return Err(unavailable());}
     let mut loaded = Loaded {
+        hunt_pressure:serde_json::from_value(row.get::<Json<Value>,_>("hunt_pressure").0).map_err(|_|unavailable())?,
         loot:serde_json::from_value(row.get::<Json<Value>,_>("loot_state").0).map_err(|_|unavailable())?,
         ai,
         gear,
@@ -124,6 +126,7 @@ async fn load_character(tx:&mut Transaction<'_,Postgres>,character_id:Uuid,accou
             .try_into()
             .map_err(|_| unavailable())?,
     };
+    if !loaded.hunt_pressure.valid(){return Err(unavailable());}
     if !loaded.loot.valid(loaded.character.job,loaded.character.gender){return Err(unavailable());}
     let previous_loot=loaded.loot.clone();
     loaded.loot.sync_legacy(&loaded.gear,loaded.character.job,loaded.character.gender);
@@ -180,7 +183,7 @@ impl Loaded {
         if self.stats().balance.is_some(){profile=crate::attributes::profile_for(self.stats(),self.character.job,self.character.level,self.allocated);}
         json!({"rules_version":pve_rules::RULES,"character":self.character,"potions":self.potions,
             "equipment":{"version":"equipment-v1","weapon_owned":self.weapon_owned,"weapon":if self.equipped {Some("sword")} else {None}},
-            "stats":self.stats(),
+            "stats":self.stats(),"hunt_pressure":self.hunt_pressure,
             "loot":self.loot.view(crate::shop::appearance(&self.gear)),
             "attributes":profile,"shop":crate::shop::view(&self.gear,&self.quantities,self.potions),
             "skills":crate::skills::view(self.character.job,self.character.school,self.character.level),
@@ -219,7 +222,7 @@ impl Loaded {
         if context.moving {
             return Err("PLAYER_MOVING");
         }
-        if command.encounter_version.is_some() && (command.encounter_version!=Some(1)||command.action!=Action::Challenge){return Err("INVALID_PVE_COMMAND");}
+        if command.encounter_version.is_some() && (!matches!(command.encounter_version,Some(1|2))||command.action!=Action::Challenge){return Err("INVALID_PVE_COMMAND");}
         if command.enemy_slot.is_some() && (!matches!(command.action,Action::Attack|Action::Skill) || self.battle.as_ref().is_none_or(|b|b.formation.is_none())){return Err("INVALID_BATTLE_TARGET");}
         if let Some(corpse)=self.character.corpse.as_ref() {
             if command.action!=Action::Revive { return Err("SOUL_STATE"); }
@@ -428,6 +431,8 @@ impl Loaded {
                     if self.character.quest_stage == 0 && crate::ai_world::map(&context.map_id).is_none() {
                         return Err("QUEST_REQUIRED");
                     }
+                    let elite=self.hunt_pressure.note(&context.map_id,&definition.art);
+                    if elite && command.encounter_version!=Some(2) {return Err("CLIENT_UPDATE_REQUIRED");}
                     let name = definition.name.clone();
                     let frozen=self.stats();
                     // Clients must opt into formation rendering; old clients retain solo-v1.
@@ -447,7 +452,14 @@ impl Loaded {
                     while sources.len()<count&&!pool.is_empty(){sources.push(pool.choose(&mut rand::thread_rng()).unwrap().clone());}
                     let c=&self.character;
                     let fighter=crate::team_rules::Fighter{id:c.id,name:c.display_name.clone(),job:c.job,gender:c.gender,school:c.school,level:c.level,appearance:self.loot.look(crate::shop::appearance(&self.gear)),stats:frozen,hp:c.hp,mp:c.mp,potions:self.potions,effects:crate::skills::State::new(c.job,c.school,c.level,c.level),guarding:false};
-                    self.battle=Some(Battle::new_formation(context.map_id.clone(),fighter,sources,unix_ms()));
+                    let mut battle=Battle::new_formation(context.map_id.clone(),fighter,sources,unix_ms());
+                    if elite {
+                        let arena=battle.formation.as_mut().unwrap();arena.empower_hunt();
+                        crate::monster_combat::empower(&mut battle.enemy,1);battle.enemy_hp=arena.enemies[0].hp;
+                    }
+                    let lines=battle.formation.as_ref().unwrap().lines.clone();
+                    self.battle=Some(battle);
+                    if elite {return Ok(lines);}
                     return Ok(vec![format!("与{name}的遭遇战开始。")]);
                 }
                 if command.target.as_deref() != Some("qingwei") {
@@ -514,6 +526,9 @@ impl Loaded {
                 self.character.mp = battle.mp;
                 self.potions = battle.potions;
                 if battle.outcome == "victory" {
+                    if let Some(arena)=battle.formation.as_ref().filter(|a|a.elite_hunt()) {
+                        self.hunt_pressure.cleared(&arena.map_id,&arena.enemies[0].definition.art);
+                    }
                     let defeated=battle.defeated_enemies();
                     let gold=defeated.iter().map(|d|d.gold).sum();let xp=defeated.iter().map(|d|d.xp).sum();
                     let killed_boss=defeated.iter().any(|d|d.id=="boss");
@@ -616,6 +631,7 @@ pub async fn execute(
     }
     if applied.is_ok() {
         loaded.loot.sync_legacy(&loaded.gear,loaded.character.job,loaded.character.gender);
+        if !loaded.hunt_pressure.valid(){return Err(unavailable());}
         if !loaded.loot.valid(loaded.character.job,loaded.character.gender){return Err(unavailable());}
         sqlx::query("UPDATE characters SET loot_state=$2 WHERE id=$1").bind(context.character).bind(Json(&loaded.loot)).execute(&mut *tx).await.map_err(database)?;
         if loaded.gear!=previous_gear||loaded.quantities!=previous_quantities {
@@ -630,6 +646,7 @@ pub async fn execute(
                     .bind(context.character).bind(uuids).bind(&ids).bind(counts).bind(flags).execute(&mut *tx).await.map_err(database)?;
             }
         }
+        if loaded.character.map_id != context.map_id {loaded.hunt_pressure=Default::default();}
         if loaded.character.map_id != context.map_id || (!was_soul&&loaded.character.corpse.is_some()) {
             sqlx::query("UPDATE characters SET map_id=$2,cell_x=$3,cell_y=$4,position_revision=$5 WHERE id=$1 AND owner_epoch=$6")
                 .bind(context.character).bind(&loaded.character.map_id).bind(loaded.character.cell_x).bind(loaded.character.cell_y)
@@ -647,9 +664,9 @@ pub async fn execute(
         }
         let character_id = loaded.character.id;
         let c = &loaded.character;
-        let revision:i64=sqlx::query_scalar("UPDATE characters SET level=$2,xp=$3,gold=$4,hp=$5,mp=$6,quest_stage=$7,defeated_mask=$8,active_battle_id=$9,allocated_attributes=$10,monster_respawns=$11,ai_progress=$12,school=$13,corpse=$14,balance_respec_available=$15,state_revision=state_revision+1 WHERE id=$1 RETURNING state_revision")
+        let revision:i64=sqlx::query_scalar("UPDATE characters SET level=$2,xp=$3,gold=$4,hp=$5,mp=$6,quest_stage=$7,defeated_mask=$8,active_battle_id=$9,allocated_attributes=$10,monster_respawns=$11,ai_progress=$12,school=$13,corpse=$14,balance_respec_available=$15,hunt_pressure=$16,state_revision=state_revision+1 WHERE id=$1 RETURNING state_revision")
             .bind(c.id).bind(c.level).bind(c.xp).bind(c.gold).bind(c.hp).bind(c.mp).bind(c.quest_stage).bind(loaded.defeated).bind(active).bind(loaded.allocated.to_vec()).bind(Json(&loaded.respawns))
-            .bind(Json(&loaded.ai)).bind(c.school).bind(&c.corpse).bind(c.balance_respec_available).fetch_one(&mut *tx).await.map_err(database)?;
+            .bind(Json(&loaded.ai)).bind(c.school).bind(&c.corpse).bind(c.balance_respec_available).bind(Json(&loaded.hunt_pressure)).fetch_one(&mut *tx).await.map_err(database)?;
         loaded.character.state_revision = revision.to_string();
         if loaded.potions == 0 {
             sqlx::query(
@@ -697,6 +714,7 @@ pub(crate) async fn team_save(tx:&mut Transaction<'_,Postgres>,f:&crate::team_ru
     let mut a=load_character(tx,f.id,account,None).await?;
     a.character.hp=f.hp.max(1).min(a.stats().hp);a.character.mp=f.mp.min(a.stats().mp);a.potions=f.potions;
     if settle&&b.outcome=="victory"{
+        if b.elite_hunt(){a.hunt_pressure.cleared(&b.map_id,&b.enemies[0].definition.art);}
         let mut ids=std::collections::HashSet::new();
         for e in &b.enemies{
             if !ids.insert(e.definition.id.clone()){continue;}
@@ -715,9 +733,22 @@ pub(crate) async fn team_save(tx:&mut Transaction<'_,Postgres>,f:&crate::team_ru
         let point=[a.character.cell_x,a.character.cell_y];
         a.die(point).map_err(|code|AuthError(StatusCode::CONFLICT,code))?;
     }
-    sqlx::query("UPDATE characters SET hp=$2,mp=$3,level=$4,xp=$5,gold=$6,quest_stage=$7,defeated_mask=$8,monster_respawns=$9,ai_progress=$10,position_revision=position_revision+CASE WHEN corpse IS NULL AND $11::jsonb IS NOT NULL THEN 1 ELSE 0 END,corpse=$11,cell_x=$12,cell_y=$13,state_revision=state_revision+1 WHERE id=$1")
-        .bind(f.id).bind(a.character.hp).bind(a.character.mp).bind(a.character.level).bind(a.character.xp).bind(a.character.gold).bind(a.character.quest_stage).bind(a.defeated).bind(Json(a.respawns)).bind(Json(a.ai)).bind(a.character.corpse).bind(a.character.cell_x).bind(a.character.cell_y).execute(&mut **tx).await.map_err(database)?;
+    sqlx::query("UPDATE characters SET hp=$2,mp=$3,level=$4,xp=$5,gold=$6,quest_stage=$7,defeated_mask=$8,monster_respawns=$9,ai_progress=$10,position_revision=position_revision+CASE WHEN corpse IS NULL AND $11::jsonb IS NOT NULL THEN 1 ELSE 0 END,corpse=$11,cell_x=$12,cell_y=$13,hunt_pressure=$14,state_revision=state_revision+1 WHERE id=$1")
+        .bind(f.id).bind(a.character.hp).bind(a.character.mp).bind(a.character.level).bind(a.character.xp).bind(a.character.gold).bind(a.character.quest_stage).bind(a.defeated).bind(Json(a.respawns)).bind(Json(a.ai)).bind(a.character.corpse).bind(a.character.cell_x).bind(a.character.cell_y).bind(Json(&a.hunt_pressure)).execute(&mut **tx).await.map_err(database)?;
     if a.potions==0{sqlx::query("DELETE FROM inventory_items WHERE character_id=$1 AND definition_id='potion'").bind(f.id).execute(&mut **tx).await.map_err(database)?;}
     else{sqlx::query("INSERT INTO inventory_items(id,character_id,definition_id,quantity) VALUES($1,$2,'potion',$3) ON CONFLICT(character_id,definition_id) DO UPDATE SET quantity=EXCLUDED.quantity").bind(Uuid::new_v4()).bind(f.id).bind(a.potions).execute(&mut **tx).await.map_err(database)?;}
     Ok(())
+}
+
+/// Called only after actual participants are validated and locked, inside the battle transaction.
+pub(crate) async fn team_hunt(tx:&mut Transaction<'_,Postgres>,ids:&[Uuid],map:&str,species:&str)->Result<bool,AuthError>{
+    let mut elite=false;
+    for id in ids {
+        let value:Json<Value>=sqlx::query_scalar("SELECT hunt_pressure FROM characters WHERE id=$1 FOR UPDATE").bind(id).fetch_one(&mut **tx).await.map_err(database)?;
+        let mut pressure:crate::monster_combat::HuntPressure=serde_json::from_value(value.0).map_err(|_|unavailable())?;
+        if !pressure.valid(){return Err(unavailable());}
+        elite|=pressure.note(map,species);
+        sqlx::query("UPDATE characters SET hunt_pressure=$2 WHERE id=$1").bind(id).bind(Json(pressure)).execute(&mut **tx).await.map_err(database)?;
+    }
+    Ok(elite)
 }

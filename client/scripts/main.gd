@@ -499,6 +499,7 @@ func _continue(character_id: String = "") -> void:
 		_message("无法读取", result.message if result.code != "NOT_FOUND" else "尚无本地存档。")
 
 func _enter_world() -> void:
+	if Game.player.get("hunt_pressure",{}).get("map",AIWorld.local_map_id())!=AIWorld.local_map_id():Game.player.hunt_pressure={}
 	mode = "world"
 	_clear_ui()
 	_dispose_world()
@@ -648,6 +649,7 @@ func _travel_local(kind: String, target: String = "") -> void:
 		var error := AIWorld.apply_local(kind, target)
 		if not error.is_empty(): _message("驿路", error); return
 	else:
+		Game.player.hunt_pressure={}
 		Game.player.zone = 1 - int(Game.player.zone)
 		Game.player.cell = [10, 16] if int(Game.player.zone) == 0 else [5, 16]
 	world.enabled = false
@@ -1030,11 +1032,18 @@ func _encounter_battle(enemy: Dictionary) -> void:
 	battle_transition.set_progress(1.0, "准备就绪")
 	await get_tree().create_timer(0.16).timeout
 	if not _encounter_current(epoch, world_id): return
-	_start_local_encounter(opponents)
+	_start_local_encounter(opponents,true)
 
-func _start_local_encounter(opponents:Array)->void:
+func _start_local_encounter(opponents:Array,record_hunt:bool=false)->void:
+	var elite:=false
+	if record_hunt:
+		var epoch:=_ui_epoch
+		var result:=await Game.record_local_hunt(AIWorld.local_map_id(),String(opponents[0].art))
+		if epoch!=_ui_epoch:return
+		if not result.ok:_encounter_failed(result.message);return
+		elite=result.value.elite
 	world.pause_moving();mode="local_encounter";_clear_ui()
-	local_encounter=SoloEncounter.new();local_encounter.start(opponents)
+	local_encounter=SoloEncounter.new();local_encounter.start(opponents,elite)
 	chrome=preload("res://scenes/ui/battle_chrome.tscn").instantiate();ui.add_child(chrome)
 	chrome.log_label.text="[系统] 遭遇%d名敌人，点击目标选择指令。"%opponents.size()
 	local_encounter_view=preload("res://scenes/ui/team_battle_view.tscn").instantiate();local_encounter_view.model=local_encounter;ui.add_child(local_encounter_view)
@@ -1045,6 +1054,7 @@ func _start_local_encounter(opponents:Array)->void:
 	)
 	local_encounter_view.dismissed.connect(_enter_world)
 	local_encounter_view.present()
+	if elite:chrome.log_label.text="[系统] "+String(local_encounter.state.lines[0])
 	chrome.update_header(local_encounter.engine.hp,local_encounter.engine.mp,0)
 
 func _start_battle(enemy: Dictionary) -> void:

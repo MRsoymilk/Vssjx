@@ -29,6 +29,8 @@ pub struct Fighter {
 }
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Enemy {
+    #[serde(default, skip_serializing_if="Option::is_none")]
+    pub elite: Option<crate::monster_combat::Elite>,
     pub slot: String,
     pub definition: ResidentDefinition,
     pub hp: i32,
@@ -97,6 +99,7 @@ impl Battle {
                     d.defense = (d.defense * (100 + 10 * extra) + 99) / 100;
                 }
                 Enemy {
+                    elite: None,
                     slot: format!("m{i}"),
                     hp: d.hp,
                     effects: skills::State {
@@ -134,6 +137,29 @@ impl Battle {
             selection_starts_ms: now,
             monster_revision: 1,
             wounds: BTreeMap::new(),
+        }
+    }
+    pub fn empower_hunt(&mut self) {
+        let party=self.fighters.len();
+        let e=&mut self.enemies[0];
+        crate::monster_combat::empower(&mut e.definition,party);e.hp=e.definition.hp;
+        e.elite=Some(crate::monster_combat::Elite {party_size:party,revives_left:crate::monster_combat::elite_n(party,"revives")});
+        self.monster_revision=2;
+        self.lines.push("同图同种怪连续挑战达到5场，精英现身！警惕连击、暴击、流血与妖躯复生。".into());
+    }
+    pub fn elite_hunt(&self)->bool {self.enemies.iter().any(|e|e.elite.is_some())}
+    fn revive_fallen(&mut self) {
+        if self.fighters.iter().all(|f|f.hp==0) {return;}
+        for e in &mut self.enemies {
+            if let Some(elite)=e.elite.as_mut() {
+                if e.hp==0 && elite.revives_left>0 {
+                    elite.revives_left-=1;
+                    e.hp=(e.definition.hp*crate::monster_combat::elite_n(elite.party_size,"revive_bp")/10000).max(1);
+                    e.effects=skills::State {enemy_mp:30+e.definition.level*2,..Default::default()};e.dots.clear();
+                    self.events.push(Event {actor:e.slot.clone(),target:e.slot.clone(),action:"revive".into(),skill:"monster_rebirth".into(),damage:0,healed:e.hp,critical:false});
+                    self.lines.push(format!("精英·{}妖躯复生，剩余{}次复活。",e.definition.name,elite.revives_left));
+                }
+            }
         }
     }
     pub fn active(&self) -> bool {
@@ -304,6 +330,7 @@ impl Battle {
                 command = default;
             }
             self.execute_actor(i, &command, (roll + i as i32 * 17) % 100);
+            self.revive_fallen();
             if self.enemies.iter().all(|e| e.hp == 0) {
                 self.finish("victory");
                 break;
@@ -535,7 +562,7 @@ impl Battle {
                 break;
             }
             let magical=balanced&&crate::skill_balance::monster_magical(&e.definition,self.round,e.effects.enemy_mp,e.effects.enemy_silence>0);
-            let plan=crate::monster_combat::plan(&e.definition, if self.monster_revision>0 {(roll+n as i32*31).rem_euclid(100)}else{99},magical,e.effects.enemy_silence>0);
+            let plan=crate::monster_combat::elite_plan(e.elite.as_ref(),&e.definition, if self.monster_revision>0 {(roll+n as i32*31).rem_euclid(100)}else{99},magical,e.effects.enemy_silence>0);
             if plan.magical{e.effects.enemy_mp-=10;}
             let chosen = alive[((roll.max(0) as usize) + n + self.round as usize) % alive.len()];
             let targets = if plan.all {alive} else {vec![chosen]};
@@ -547,7 +574,7 @@ impl Battle {
                     if a.hp<=0 || e.hp<=0 {continue;}
                     let landed=crate::attributes::lands(None,Some(a.stats),plan.magical);
                     let raw=if landed{crate::attributes::incoming(e.definition.attack,e.definition.level,a.stats,plan.magical,0)*plan.coefficient/10000}else{0};
-                    let (incoming,critical)=if self.monster_revision>0{crate::monster_combat::critical(&e.definition,raw,(roll*37+n as i32*19+hit as i32*43+i as i32*11).rem_euclid(100))}else{(raw,false)};
+                    let (incoming,critical)=if self.monster_revision>0{crate::monster_combat::elite_critical(e.elite.as_ref(),&e.definition,raw,(roll*37+n as i32*19+hit as i32*43+i as i32*11).rem_euclid(100))}else{(raw,false)};
                     let incoming=if landed&&a.guarding{(incoming/2).max(1)}else{incoming};
                     let (incoming,reflected)=if landed{a.effects.enemy_hit(incoming.max(1),plan.magical)}else{(0,0)};
                     let reflected=(reflected+if landed&&a.job==0&&a.guarding{6}else{0}).min(e.hp);
@@ -583,6 +610,7 @@ impl Battle {
             e.effects.tick_balance();
             e.effects.enemy_silence=(e.effects.enemy_silence-1).max(0);
         }
+        self.revive_fallen();
         if self.fighters.iter().all(|a| a.hp == 0) {
             self.finish("defeat");
         } else if self.enemies.iter().all(|e| e.hp == 0) {

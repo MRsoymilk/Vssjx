@@ -1,7 +1,15 @@
 {
   "version": "monster-combat-v1",
-  "solo_counts": [60, 88, 100],
-  "strong_kinds": ["boss", "guardian", "elite"],
+  "solo_counts": [
+    60,
+    88,
+    100
+  ],
+  "strong_kinds": [
+    "boss",
+    "guardian",
+    "elite"
+  ],
   "strong_level": 10,
   "combo_chance": 25,
   "sweep_chance": 20,
@@ -13,5 +21,30 @@
   "bleed_rounds": 3,
   "normal_crit": 8,
   "strong_crit": 15,
-  "crit_bp": 15000
+  "crit_bp": 15000,
+  "hunt_threshold": 5,
+  "elite_solo": {
+    "hp_bp": 20000,
+    "attack_bp": 14000,
+    "defense_bp": 12000,
+    "combo_chance": 60,
+    "hits": 3,
+    "combo_bp": 6500,
+    "crit": 35,
+    "crit_bp": 17500,
+    "revives": 1,
+    "revive_bp": 5000
+  },
+  "elite_party": {
+    "hp_bp": 25000,
+    "attack_bp": 17000,
+    "defense_bp": 13000,
+    "combo_chance": 65,
+    "hits": 4,
+    "combo_bp": 6500,
+    "crit": 45,
+    "crit_bp": 20000,
+    "revives": 2,
+    "revive_bp": 6000
+  }
 }

@@ -13,7 +13,7 @@ var received_at:=0
 var server_time:=0
 var supported:=true
 const ROUND_ERRORS:={"TEAM_COMMAND_LOCKED":"本轮指令已锁定，等待全员提交。","TEAM_PLAYBACK_ACTIVE":"正在逐个执行行动，请等待下一轮指令窗口。","TEAM_ROUND_EXPIRED":"本轮30秒已结束，未提交者自动防御。","TEAM_NOT_PARTICIPATING":"你已倒下或未参战，不能提交本轮指令。","SOUL_STATE":"灵魂状态，请先寻回自己的尸体。"}
-const ERRORS:={"TEAM_MEMBER_REQUIRED":"队长负责带队，无需跟随。","TEAM_NOT_READY":"在线跟随队员尚未准备，请停稳后在队伍窗口准备。","TEAM_NOT_TOGETHER":"请参战队员在同一地图、队长附近集合并停稳。","TEAM_LEADER_REQUIRED":"只能由队长进行此操作。","TEAM_LEADER_MUST_TRANSFER":"请先移交队长，或解散队伍。","TEAM_PLAYER_OFFLINE":"队友已离线，请等待重连或调整队伍。","TEAM_BUSY":"有队员正在单人战斗或决斗中。","TEAM_FULL":"队伍最多5人。","TEAM_NEEDS_MEMBERS":"至少两人组队才能共同战斗。","TEAM_BATTLE_ACTIVE":"正在组队战斗，不能更改队伍。","TEAM_NOT_YOUR_TURN":"请等待当前队友行动。","INVALID_BATTLE_TARGET":"目标已倒下，请重新选择。","TEAM_INVITE_EXPIRED":"邀请已过期或已被处理。","TEAM_INVITE_PENDING":"已发送邀请，请等待对方确认。","TEAM_INVITE_COOLDOWN":"对方已拒绝，请5分钟后再邀请。","ALREADY_IN_TEAM":"你或对方已加入队伍。","MONSTER_RESPAWNING":"有队员的怪物尚未刷新，请稍候。","RESIDENT_TOO_FAR":"请队长靠近怪物。","QUEST_REQUIRED":"有队员尚未领取入门任务，请先找清微道人。","STALE_BATTLE":"战场已更新，请重新选择指令。","NO_ACTIVE_BATTLE":"战斗已经结束。","NOT_IN_TEAM":"尚未加入队伍。","MP_INSUFFICIENT":"灵力不足。","NO_POTION":"没有回春散。","HP_FULL":"气血已满。","NOT_FOUND":"服务尚未支持组队，需要更新游戏服务。","RATE_LIMITED":"操作过快，请稍候。","SESSION_REPLACED":"当前角色已在另一会话进入游戏。"}
+const ERRORS:={"TEAM_MEMBER_REQUIRED":"队长负责带队，无需跟随。","CLIENT_UPDATE_REQUIRED":"连续挑战已触发精英，请更新客户端后继续。","TEAM_NOT_READY":"在线跟随队员尚未准备，请停稳后在队伍窗口准备。","TEAM_NOT_TOGETHER":"请参战队员在同一地图、队长附近集合并停稳。","TEAM_LEADER_REQUIRED":"只能由队长进行此操作。","TEAM_LEADER_MUST_TRANSFER":"请先移交队长，或解散队伍。","TEAM_PLAYER_OFFLINE":"队友已离线，请等待重连或调整队伍。","TEAM_BUSY":"有队员正在单人战斗或决斗中。","TEAM_FULL":"队伍最多5人。","TEAM_NEEDS_MEMBERS":"至少两人组队才能共同战斗。","TEAM_BATTLE_ACTIVE":"正在组队战斗，不能更改队伍。","TEAM_NOT_YOUR_TURN":"请等待当前队友行动。","INVALID_BATTLE_TARGET":"目标已倒下，请重新选择。","TEAM_INVITE_EXPIRED":"邀请已过期或已被处理。","TEAM_INVITE_PENDING":"已发送邀请，请等待对方确认。","TEAM_INVITE_COOLDOWN":"对方已拒绝，请5分钟后再邀请。","ALREADY_IN_TEAM":"你或对方已加入队伍。","MONSTER_RESPAWNING":"有队员的怪物尚未刷新，请稍候。","RESIDENT_TOO_FAR":"请队长靠近怪物。","QUEST_REQUIRED":"有队员尚未领取入门任务，请先找清微道人。","STALE_BATTLE":"战场已更新，请重新选择指令。","NO_ACTIVE_BATTLE":"战斗已经结束。","NOT_IN_TEAM":"尚未加入队伍。","MP_INSUFFICIENT":"灵力不足。","NO_POTION":"没有回春散。","HP_FULL":"气血已满。","NOT_FOUND":"服务尚未支持组队，需要更新游戏服务。","RATE_LIMITED":"操作过快，请稍候。","SESSION_REPLACED":"当前角色已在另一会话进入游戏。"}
 func bind_character(id:String)->void:
 	character_id=id;request={};queued_command={};inflight=false;next_poll=0;state={"team":null,"incoming":[]}
 	var saved:Dictionary=OnlineAccount.pending_team
@@ -39,6 +39,7 @@ func submit(action:String,target:String="",skill:String="",ready:Variant=null)->
 	if bytes.size()!=16:return false
 	bytes[6]=(bytes[6]&15)|64;bytes[8]=(bytes[8]&63)|128;var hex:=bytes.hex_encode()
 	var command:Dictionary={"character_id":character_id,"action":action,"operation_id":"%s-%s-%s-%s-%s"%[hex.substr(0,8),hex.substr(8,4),hex.substr(12,4),hex.substr(16,4),hex.substr(20,12)]}
+	if action=="challenge":command.encounter_version=2
 	if not target.is_empty():command.target=target
 	if not skill.is_empty():command.skill=skill
 	if ready is bool:command.ready=ready
@@ -125,7 +126,7 @@ static func valid_battle(b:Variant,character_id:String,ids:Dictionary)->bool:
 			if intent.action=="skill":
 				if not intent.get("skill") is String or not SkillRules.item(intent.skill).get("active",false):return false
 			elif intent.get("skill")!=null:return false
-	if b.has("monster_revision") and not OnlinePve.integer(b.monster_revision,0,1):return false
+	if b.has("monster_revision") and not OnlinePve.integer(b.monster_revision,0,2):return false
 	if b.has("wounds"):
 		if not b.wounds is Dictionary or b.wounds.size()>fighters.size():return false
 		for id in b.wounds:
@@ -134,6 +135,7 @@ static func valid_battle(b:Variant,character_id:String,ids:Dictionary)->bool:
 	var enemies:={}
 	for e in b.enemies:
 		if not e is Dictionary or not e.get("slot") is String or e.slot not in ["m0","m1","m2","m3","m4"] or enemies.has(e.slot) or not e.get("definition") is Dictionary or not e.definition.get("art") is String:return false
+		if e.has("elite") and (int(b.get("monster_revision",0))!=2 or e.slot!="m0" or not MonsterCombat.elite_valid(e.elite,b.fighters.size())):return false
 		var d:Dictionary=e.definition
 		var original:Dictionary=AIWorld.resident(d.get("id",""))
 		if original.is_empty():
@@ -143,9 +145,11 @@ static func valid_battle(b:Variant,character_id:String,ids:Dictionary)->bool:
 			if not OnlinePve.integer(d.get(k),0,100000):return false
 		if not OnlinePve.integer(e.get("hp"),0,int(d.hp)):return false
 		enemies[e.slot]=true
+	if int(b.get("monster_revision",0))==2 and not b.enemies[0].has("elite"):return false
 	for event in b.events:
 		if event is Dictionary and event.has("critical") and not event.critical is bool:return false
-		if not event is Dictionary or not (fighters.has(event.get("actor")) or enemies.has(event.get("actor"))) or not (fighters.has(event.get("target")) or enemies.has(event.get("target"))) or event.get("action") not in ["attack","skill","potion","guard","dot","regen"] or not event.get("skill") is String or not OnlinePve.integer(event.get("damage"),0,100000) or not OnlinePve.integer(event.get("healed"),0,100000):return false
+		if not event is Dictionary or not (fighters.has(event.get("actor")) or enemies.has(event.get("actor"))) or not (fighters.has(event.get("target")) or enemies.has(event.get("target"))) or event.get("action") not in ["attack","skill","potion","guard","dot","regen","revive"] or not event.get("skill") is String or not OnlinePve.integer(event.get("damage"),0,100000) or not OnlinePve.integer(event.get("healed"),0,100000):return false
+		if event.action=="revive" and (event.actor!=event.target or not enemies.has(event.actor) or event.skill!="monster_rebirth" or int(event.damage)!=0 or int(event.healed)<1 or not b.enemies.any(func(e:Dictionary)->bool:return e.slot==event.actor and e.has("elite"))):return false
 	return true
 
 static func valid_look(look:Array)->bool:

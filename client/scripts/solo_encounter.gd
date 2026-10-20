@@ -43,7 +43,7 @@ func auto_command()->Dictionary:
 		var id:=engine.selected_skill
 		if not id.is_empty() and engine.mp>=SkillBalance.cost(SkillRules.item(id),engine.frozen_stats) and SkillRules.remaining(engine.skills,id)==0:return {"action":"skill","skill":id}
 	return {"action":"attack","skill":""}
-func start(opponents:Array)->void:
+func start(opponents:Array,elite:bool=false)->void:
 	sources=opponents.duplicate(true);rng.randomize();engine=ShushanBattle.new(sources[0])
 	var enemies:Array=[]
 	for i in sources.size():
@@ -60,8 +60,12 @@ func start(opponents:Array)->void:
 					var allotted:=left if i==enemies.size()-1 else int(enemies[i].hp)*budget/total
 					enemies[i].hp=maxi(1,allotted);enemies[i].definition.hp=enemies[i].hp;left-=allotted
 				break
+	if elite:
+		enemies[0].definition=MonsterCombat.empower(enemies[0].definition,1);enemies[0].hp=enemies[0].definition.hp
+		enemies[0].elite={"party_size":1,"revives_left":MonsterCombat.elite_n(1,"revives")}
 	var f:Dictionary={"id":character_id,"name":Game.player.name,"job":Game.player.job,"gender":Game.player.gender,"school":Game.player.school,"level":Game.player.level,"appearance":ShopRules.appearance(ShopRules.local_state(Game.player)),"stats":engine.frozen_stats,"hp":engine.hp,"mp":engine.mp,"potions":engine.potions,"effects":engine.skills}
-	state={"id":"local-%d"%Time.get_ticks_usec(),"solo":true,"fighters":[f],"enemies":enemies,"turn":0,"round":1,"revision":0,"events_revision":0,"deadline_ms":0,"outcome":"active","events":[],"lines":[],"wounds":{},"monster_revision":1}
+	state={"id":"local-%d"%Time.get_ticks_usec(),"solo":true,"fighters":[f],"enemies":enemies,"turn":0,"round":1,"revision":0,"events_revision":0,"deadline_ms":0,"outcome":"active","events":[],"lines":[],"wounds":{},"monster_revision":2 if elite else 1}
+	if elite:state.lines.append("同图同种怪连续挑战达到5场，精英现身！警惕连击、暴击、流血与妖躯复生。")
 	_sync()
 func _sync()->void:
 	var f:Dictionary=state.fighters[0];f.hp=engine.hp;f.mp=engine.mp;f.potions=engine.potions;f.effects=engine.skills
@@ -98,6 +102,7 @@ func submit(action:String,target:String="",skill:String="")->bool:
 		var resolved:=engine.resolve_player();state.lines.append_array(resolved.lines);e.hp=engine.enemy_hp;_copy_enemy(engine.skills,e.effects)
 		var receiver:String=character_id if action in ["guard","potion"] or used.get("target") in ["self","all_allies"] else e.slot
 		_event(character_id,receiver,action,skill,int(engine.skills.last_damage),maxi(0,engine.hp-old_hp),engine.skills.get("last_critical",false))
+	if action!="flee":_revive_fallen()
 	if action=="flee":state.outcome="fled"
 	elif state.enemies.all(func(e:Dictionary)->bool:return int(e.hp)==0):state.outcome="victory"
 	else:_enemy_round()
@@ -111,13 +116,13 @@ func _enemy_round()->void:
 		if int(e.hp)<=0 or engine.hp<=0:continue
 		if int(e.effects.enemy_sleep)>0:state.lines.append("%s处于睡眠，无法行动。"%e.definition.name);continue
 		var magical:=SkillBalance.monster_magical(e.definition,int(state.round),int(e.effects.enemy_mp),int(e.effects.enemy_silence)>0)
-		var plan:=MonsterCombat.plan(e.definition,rng.randi_range(0,99),magical,int(e.effects.enemy_silence)>0)
+		var plan:=MonsterCombat.elite_plan(e,rng.randi_range(0,99),magical,int(e.effects.enemy_silence)>0)
 		if plan.magical:e.effects.enemy_mp=int(e.effects.enemy_mp)-10
 		for hit in int(plan.hits):
 			if int(e.hp)<=0 or engine.hp<=0:break
 			var landed:=rng.randi_range(0,9999)<CharacterAttributeRules.hit_chance({},engine.frozen_stats,plan.magical)
 			var raw:=CharacterAttributeRules.incoming(int(e.definition.attack),int(e.definition.level),engine.frozen_stats,plan.magical,0)*int(plan.coefficient)/10000 if landed else 0
-			var crit:=MonsterCombat.critical(e.definition,raw,rng.randi_range(0,99));var damage:=int(crit.damage)
+			var crit:=MonsterCombat.elite_critical(e,raw,rng.randi_range(0,99));var damage:=int(crit.damage)
 			if engine.guarding and landed:damage=maxi(1,damage/2)
 			var taken:=SkillRules.enemy_hit(engine.skills,maxi(1,damage),plan.magical) if landed else Vector2i.ZERO
 			var reflected:=mini(int(e.hp),taken.y+(6 if landed and int(Game.player.job)==0 and engine.guarding else 0))
@@ -139,13 +144,26 @@ func _enemy_round()->void:
 		var tail:=SkillRules.end_balance_round(e.effects,0,0);var damage:=mini(int(e.hp),int(tail.damage));e.hp=int(e.hp)-damage
 		if damage>0:_event(e.slot,e.slot,"dot","",damage)
 		SkillRules.end_turn(e.effects)
+	_revive_fallen()
 	if engine.hp==0:state.outcome="defeat"
 	elif state.enemies.all(func(e:Dictionary)->bool:return int(e.hp)==0):state.outcome="victory"
+func _revive_fallen()->void:
+	if engine.hp<=0:return
+	for e in state.enemies:
+		if int(e.hp)==0 and e.has("elite") and int(e.elite.revives_left)>0:
+			e.elite.revives_left=int(e.elite.revives_left)-1
+			e.hp=maxi(1,int(e.definition.hp)*MonsterCombat.elite_n(int(e.elite.party_size),"revive_bp")/10000)
+			e.effects=SkillRules.new_state(0,3,1,int(e.definition.level));SkillRules.activate(e.effects,engine.frozen_stats)
+			_event(e.slot,e.slot,"revive","monster_rebirth",0,int(e.hp))
+			state.lines.append("%s妖躯复生，剩余%d次复活。"%[MonsterCombat.enemy_name(e),int(e.elite.revives_left)])
 func _commit()->void:
 	if committed:return
 	committed=true;saving=true
 	Game.player.hp=engine.hp;Game.player.mp=engine.mp;Game.player.potions=engine.potions
 	if state.outcome=="victory":
+		if state.enemies[0].has("elite"):
+			var pressure:Dictionary=Game.player.get("hunt_pressure",{})
+			if pressure.get("map")==AIWorld.local_map_id() and pressure.get("species")==sources[0].art and int(pressure.get("count",0))==int(MonsterCombat.rules.hunt_threshold):Game.player.hunt_pressure={}
 		var gold:=0;var xp:=0;var recorded:={}
 		for d in sources:
 			gold+=int(d.gold);xp+=int(d.xp)

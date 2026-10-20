@@ -158,6 +158,7 @@ static func apply_local(action: String, target: String) -> String:
 	if not at_exit and absi(current.x-point.x)+absi(current.y-point.y)>2: return "请先靠近目标。"
 	if action == "ai_travel":
 		if (target != "qingyun_trail" and map_data(target).is_empty()) or target == map_id: return "请选择其他目的地。"
+		Game.player.hunt_pressure = {}
 		Game.player.ai_map = target if not map_data(target).is_empty() else ""
 		Game.player.zone = 1 if target == "ancient_ruins" else 0
 		Game.player.cell = SharedWorldMap.load_data(target).spawn.duplicate()

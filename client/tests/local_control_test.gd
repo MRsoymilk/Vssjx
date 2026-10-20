@@ -55,6 +55,31 @@ func _run() -> void:
 	check(Game.player.level==60,"Upper bound and repeated spaces are supported")
 	chat.input.text="普通本地消息";await chat.send()
 	check(chat.messages[-1].channel=="public" and chat.messages[-1].text=="普通本地消息","Ordinary local chat remains unchanged")
+	var resources:=Game.player.duplicate(true)
+	chat.input.text="/control hp 1";await chat.send()
+	check(Game.player.hp==1 and screen.chrome.hp_bar.value==1,"HP command sets absolute health to one and refreshes HUD")
+	check(Game.player.mp==resources.mp and Game.player.gold==resources.gold and Game.player.level==resources.level and Game.player.xp==resources.xp,"HP control changes no other resource")
+	check((await Game.load_game()).ok and Game.player.hp==1,"One HP survives actual disk reload")
+	var starting_gold:int=Game.player.gold
+	chat.input.text="/control money 1";await chat.send()
+	check(Game.player.gold==starting_gold+1 and Game.player.hp==1,"Money command adds one copper rather than setting the total to one")
+	chat.input.text="/control money 1";await chat.send()
+	check(Game.player.gold==starting_gold+2,"Repeated money commands add independently once each")
+	check((await Game.load_game()).ok and Game.player.gold==starting_gold+2,"Added copper survives actual disk reload")
+	if not capture.is_empty() and DisplayServer.get_name()!="headless":
+		await get_tree().process_frame;RenderingServer.force_draw()
+		get_viewport().get_texture().get_image().save_png(capture.get_basename()+"-hp-money.png")
+	before=Game.player.duplicate(true)
+	for invalid in ["/control hp 0","/control hp -1","/control hp 1000000","/control hp 1.5","/control hp x","/control hp 1 extra","/control money 0","/control money -1","/control money 1.5","/control money x","/control money 1000000001","/control money 1 extra"]:
+		chat.input.text=invalid;await chat.send();check(Game.player==before,"Invalid resource control leaves save unchanged: "+invalid)
+	Game.player.gold=1000000000
+	chat.input.text="/control money 1";await chat.send()
+	check(Game.player.gold==1000000000,"Copper addition cannot exceed the save-format cap")
+	Game.player=before.duplicate(true)
+	Game.become_soul();var soul:=Game.player.duplicate(true)
+	for command in ["/control hp 1","/control money 1","/control lv 50"]:
+		chat.input.text=command;await chat.send();check(Game.player==soul,"Resource controls cannot bypass soul recovery: "+command)
+	Game.player=before.duplicate(true)
 	var original:=Platform.context
 	var storage:=DELAYED.new()
 	Platform.context=PlatformContext.new("local-control-test",storage,original.runtime_config,original.display,original.lifecycle,original.resource_loader,original.text_input,original.system_actions)
@@ -65,9 +90,16 @@ func _run() -> void:
 	check(storage.operations.size()==1 and Game.player.level==50,"Repeated submit cannot enqueue another level mutation while saving")
 	storage.complete(PlatformResult.new(PlatformResult.Status.TEMPORARY_FAILURE,"SYNC_FAILED","测试保存失败"))
 	check(Game.player==before and not chat._control_busy and chat.messages[-1].text.contains("未生效"),"Save failure rolls back the entire character and reports failure")
+	for command in ["/control hp 2","/control money 1"]:
+		chat.input.text=command;chat.send()
+		check(Game.storage_busy and chat._control_busy,"Resource control waits for durable storage: "+command)
+		storage.complete(PlatformResult.new(PlatformResult.Status.TEMPORARY_FAILURE,"SYNC_FAILED","测试保存失败"))
+		check(Game.player==before and not chat._control_busy and chat.messages[-1].text.contains("未生效"),"Failed resource save rolls back without changing another field: "+command)
 	screen.online_mode=true
 	chat.input.text="/control lv 10";await chat.send()
 	check(Game.player==before and storage.operations.is_empty(),"Online screen cannot dispatch local controls")
+	for command in ["/control hp 1","/control money 1"]:
+		chat.input.text=command;await chat.send();check(Game.player==before and storage.operations.is_empty(),"Online screen cannot invoke resource controls: "+command)
 	screen.online_mode=false
 	# A remote chat channel carries literal text and has no local mutation hook.
 	var remote:=OnlinePublicChat.new();remote.enabled=true;remote.connected=true
@@ -80,6 +112,8 @@ func _run() -> void:
 	storage.complete(PlatformResult.success({"written":true,"durability":"native_file","bytes":12}))
 	check(Game.player==next_character and chat.messages[-1].text.contains("未生效"),"A stale save completion cannot overwrite a different local character")
 	Platform.context=original
+	# Let chat's deferred scroll restoration finish before destroying the test UI.
+	for frame in 3:await get_tree().process_frame
 	app.free()
 	if FileAccess.file_exists(Game.save_path):DirAccess.remove_absolute(Game.save_path)
 	Game.save_path=old_path;Game.player=old_player

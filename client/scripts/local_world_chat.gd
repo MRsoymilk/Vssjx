@@ -5,7 +5,7 @@ const LIMIT := 100
 var messages: Array[Dictionary] = []
 var _sequence := 0
 var _control_busy := false
-const CONTROL_HELP := "本地测试指令：/control lv <1～60>，例如 /control lv 50。仅修改当前本地角色。"
+const CONTROL_HELP := "本地测试指令：/control lv <1～60>；/control hp <血量>（设置）；/control money <正整数>（增加铜币）。例如 /control hp 1、/control money 1。仅修改当前本地角色并保存。"
 @onready var screen: Control = get_parent()
 @onready var panel: Panel = screen.get_node("Chat")
 @onready var input: LineEdit = screen.get_node("Chat/ChatInput")
@@ -111,8 +111,19 @@ func _control(words: PackedStringArray) -> void:
 	if words.size()==1 or (words.size()==2 and words[1].to_lower()=="help"):
 		_control_message(CONTROL_HELP)
 		return
-	if words.size()!=3 or words[1].to_lower()!="lv" or not words[2].is_valid_int():
+	if words.size()!=3 or words[1].to_lower() not in ["lv","hp","money"] or not words[2].is_valid_int():
 		_control_message(CONTROL_HELP)
+		return
+	var kind:=words[1].to_lower()
+	if kind!="lv":
+		_control_busy=true
+		var value:=words[2].to_int()
+		var changed:=await Game.set_local_test_value(kind,value)
+		if not is_inside_tree():return
+		_control_busy=false
+		if changed.ok:
+			_control_message("本地测试：血量已设置为%d。已保存。"%value if kind=="hp" else "本地测试：增加铜币%d，当前铜币%d。已保存。"%[value,int(Game.player.gold)])
+		else:_control_message("本地测试未生效："+changed.message)
 		return
 	var level := words[2].to_int()
 	if level<1 or level>60:

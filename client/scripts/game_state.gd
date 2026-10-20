@@ -303,6 +303,7 @@ func _migrate_school_membership(data: Dictionary) -> void:
 
 ## Offline test helper. Only LocalWorldChat exposes this; no network protocol hook.
 func set_local_test_level(level: int) -> PlatformResult:
+	if is_soul():return PlatformResult.new(PlatformResult.Status.INVALID_DATA,"SOUL_STATE",OnlinePve.error_text("SOUL_STATE"))
 	if storage_busy or _local_roster_busy:
 		return PlatformResult.new(PlatformResult.Status.TEMPORARY_FAILURE,"STORAGE_BUSY","正在保存，请稍候。")
 	if player.is_empty() or level < 1 or level > 60:
@@ -320,6 +321,26 @@ func set_local_test_level(level: int) -> PlatformResult:
 		if generation == _player_generation and path == save_path: player = before
 		return result
 	return PlatformResult.success({"level":level,"reset_attributes":reset_points})
+
+## Local-only debug controls: HP is absolute; money is an additive positive amount.
+func set_local_test_value(kind: String, value: int) -> PlatformResult:
+	if storage_busy or _local_roster_busy:
+		return PlatformResult.new(PlatformResult.Status.TEMPORARY_FAILURE,"STORAGE_BUSY","正在保存，请稍候。")
+	if player.is_empty() or kind not in ["hp","money"]:
+		return PlatformResult.new(PlatformResult.Status.INVALID_DATA,"INVALID_LOCAL_CONTROL","没有可修改的本地角色。")
+	if is_soul():return PlatformResult.new(PlatformResult.Status.INVALID_DATA,"SOUL_STATE",OnlinePve.error_text("SOUL_STATE"))
+	if kind=="hp" and (value<1 or value>int(stats().hp)):
+		return PlatformResult.new(PlatformResult.Status.INVALID_DATA,"INVALID_TEST_HP","血量必须为1～%d。"%int(stats().hp))
+	if kind=="money" and (value<1 or value>1000000000 or int(player.gold)>1000000000-value):
+		return PlatformResult.new(PlatformResult.Status.INVALID_DATA,"INVALID_TEST_MONEY","增加的铜币必须为正整数，增加后总额不能超过1000000000。")
+	var before:=player.duplicate(true)
+	var generation:=_player_generation
+	var path:=save_path
+	if kind=="hp":player.hp=value
+	else:player.gold=int(player.gold)+value
+	var result:=await save_game()
+	if not result.ok and generation==_player_generation and path==save_path:player=before
+	return result
 
 func add_rewards(gold: int, xp: int) -> bool:
 	player.gold = int(player.gold) + gold

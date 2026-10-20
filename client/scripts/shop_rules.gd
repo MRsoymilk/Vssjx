@@ -100,6 +100,7 @@ static func bag_item(id: String, job: int=1) -> Dictionary:
 static func description(id: String) -> String:
 	var entry := item(id)
 	if entry.is_empty(): return ""
+	if entry.get("effect")=="reset_attributes": return "返还全部属性点；耗1颗，保留气血灵力比例。"
 	if is_equipment(entry): return ("攻击 +%d"%int(entry.attack)) if entry.slot=="weapon" else ("防御 +%d"%int(entry.defense))
 	if entry.slot=="consumable":
 		var parts: Array[String] = []
@@ -107,6 +108,15 @@ static func description(id: String) -> String:
 		if int(entry.restore_mp)>0: parts.append("恢复%d点灵力"%int(entry.restore_mp))
 		return " / ".join(parts)
 	return "%s，可购买并存入背包"%entry.category
+
+static func use_error(entry: Dictionary, player: Dictionary, limits: Dictionary, points: Array=[]) -> String:
+	if player.get("corpse") is Dictionary: return "SOUL_STATE"
+	if entry.get("slot")!="consumable" or limits.is_empty(): return "ITEM_NOT_USABLE"
+	if entry.get("effect")=="reset_attributes":
+		var allocated:Array=points if not points.is_empty() else player.get("allocated_attributes",[0,0,0,0,0])
+		return "" if allocated.any(func(value:Variant)->bool:return int(value)>0) else "NO_ALLOCATED_ATTRIBUTES"
+	if (int(entry.restore_hp)==0 or int(player.hp)>=int(limits.hp)) and (int(entry.restore_mp)==0 or int(player.mp)>=int(limits.mp)): return "HP_FULL"
+	return ""
 
 static func quantity(gear: Dictionary, id: String) -> int:
 	return int(gear.get("quantities",{}).get(id,1 if gear.get("owned",[]).has(id) else 0))
@@ -150,10 +160,14 @@ static func apply_local(player: Dictionary, action: String, id: String, count: i
 		return ""
 	if quantity(gear,id)<count: return "WEAPON_NOT_OWNED"
 	if action=="use":
-		if entry.slot!="consumable" or count!=1 or limits.is_empty(): return "ITEM_NOT_USABLE"
-		if (int(entry.restore_hp)==0 or int(player.hp)>=int(limits.hp)) and (int(entry.restore_mp)==0 or int(player.mp)>=int(limits.mp)): return "HP_FULL"
-		player.hp=mini(int(limits.hp),int(player.hp)+int(entry.restore_hp))
-		player.mp=mini(int(limits.mp),int(player.mp)+int(entry.restore_mp))
+		if count!=1: return "INVALID_QUANTITY"
+		var error:=use_error(entry,player,limits)
+		if not error.is_empty(): return error
+		if entry.get("effect")=="reset_attributes":
+			CharacterAttributeRules.reset_allocation(player,limits)
+		else:
+			player.hp=mini(int(limits.hp),int(player.hp)+int(entry.restore_hp))
+			player.mp=mini(int(limits.mp),int(player.mp)+int(entry.restore_mp))
 	if action in ["use","discard"]:
 		if id=="potion": player.potions=int(player.potions)-count
 		else:

@@ -5,6 +5,13 @@ use sha2::{Digest,Sha256};
 use std::{collections::BTreeMap,sync::LazyLock};
 pub const SLOTS: [&str;10] = ["weapon","pendant","armor","wrist","belt","pants","boots","ring","necklace","hat"];
 const DATA: &str = include_str!("../../client/assets/data/shop-v2.json");
+#[derive(Clone,Copy,Default,Deserialize,PartialEq,Eq,Debug)]
+#[serde(rename_all="snake_case")]
+pub enum ItemEffect {
+    #[default]
+    None,
+    ResetAttributes,
+}
 #[derive(Deserialize)]
 pub struct Item {
     pub id:String, pub name:String, pub slot:String, pub price:i32,
@@ -12,6 +19,8 @@ pub struct Item {
     pub job:i16, pub restore_hp:i32, pub restore_mp:i32,
     #[serde(default="any_gender")]
     pub gender:i16,
+    #[serde(default)]
+    pub effect:ItemEffect,
 }
 fn any_gender()->i16{-1}
 impl Item {
@@ -104,7 +113,7 @@ mod tests {
             gear.insert(format!("ai/boneglow/{stem}/hat"),true);
             assert_eq!(appearance(&gear),[34+index as i32,18+index as i32,10+index as i32]);
         }
-        assert_eq!(ITEMS.len(),395);
+        assert_eq!(ITEMS.len(),396);
     }
     #[test]
     fn eva01_sets_preserve_role_restrictions_and_mix_with_previous_families(){
@@ -141,6 +150,17 @@ mod tests {
         assert_eq!(appearance(&gear),[46,13,17]);
         assert_eq!(bonus(&gear),(20,6));
         assert_eq!(view(&gear,&BTreeMap::new(),0)["weapon"],id);
+    }
+    #[test]
+    fn original_named_rebirth_pill_is_a_typed_consumable(){
+        let entry=item("restored/rebirth_pill").unwrap();
+        assert_eq!(entry.name,"重生再造丹");
+        assert_eq!(entry.slot,"consumable");
+        assert_eq!(entry.price,200);
+        assert_eq!(entry.effect,ItemEffect::ResetAttributes);
+        assert_eq!((entry.restore_hp,entry.restore_mp),(0,0));
+        assert!(!entry.equipment());
+        assert_eq!(item("potion").unwrap().effect,ItemEffect::None);
     }
     #[test]
     fn legacy_wire_response_never_rewrites_full_receipt_or_exposes_unknown_items(){

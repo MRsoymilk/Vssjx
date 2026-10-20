@@ -14,6 +14,18 @@ static func valid_points(value: Variant, level: int, minimum: Array = []) -> boo
 		spent += int(n)
 	return spent <= level * 5
 
+static func reset_allocation(player: Dictionary, current: Dictionary) -> void:
+	var points:Array=player.get("allocated_attributes",[0,0,0,0,0])
+	var job:=int(player.job);var level:=int(player.level)
+	var old:=balanced_stats(job,level,false,points) if player.get("balance_revision",0)==1 else stats(job,level,false,points)
+	var next:=balanced_stats(job,level,false,[0,0,0,0,0]) if player.get("balance_revision",0)==1 else stats(job,level,false,[0,0,0,0,0])
+	# Preserve any equipment contribution in the provided authoritative local totals.
+	var next_hp:=int(current.hp)+int(next.hp)-int(old.hp)
+	var next_mp:=int(current.mp)+int(next.mp)-int(old.mp)
+	player.allocated_attributes=[0,0,0,0,0]
+	player.hp=clampi(int(player.hp)*next_hp/int(current.hp),1,next_hp)
+	player.mp=clampi(int(player.mp)*next_mp/int(current.mp),0,next_mp)
+
 static func stats(job: int, level: int, equipped: bool, a: Array) -> Dictionary:
 	var result := {
 		"hp": [120,95,85][job] + (level-1)*18 + int(a[0])*8,

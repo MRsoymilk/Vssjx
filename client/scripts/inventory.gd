@@ -112,7 +112,7 @@ func _online_changed() -> void:
 	if not online_model.ready: description.text = "连接中断，正在同步装备……"
 	elif online_model.pending(): description.text = "正在确认装备操作……"
 	elif not online_model.state.has("equipment"): description.text = "当前服务器尚未开放装备功能"
-	elif online_model.last_action in ["equip", "unequip"] and not online_model.last_code.is_empty(): description.text = OnlinePve.error_text(online_model.last_code)
+	elif online_model.last_action in ["equip", "unequip", "use", "discard"] and not online_model.last_code.is_empty(): description.text = OnlinePve.error_text(online_model.last_code)
 
 func _grid_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.pressed and event.button_index in [MOUSE_BUTTON_WHEEL_UP, MOUSE_BUTTON_WHEEL_DOWN]:
@@ -241,7 +241,7 @@ func open_menu() -> void:
 		if button.text=="使用":
 			var stats := _display_stats()
 			var player := _display_player()
-			button.disabled=button.disabled or ((int(item.restore_hp)==0 or int(player.hp)>=int(stats.hp)) and (int(item.restore_mp)==0 or int(player.mp)>=int(stats.mp)))
+			button.disabled=button.disabled or not ShopRules.use_error(item,player,stats,_allocated_points()).is_empty()
 		if button.text=="装备" and int(item.get("job",-1))>=0 and int(item.job)!=int(_display_player().job): button.disabled=true
 		if button.text.begins_with("购药"): button.disabled = int(Game.player.gold) < 8
 	item_menu.size.y = 6 + actions.size() * 26
@@ -264,14 +264,33 @@ func show_item() -> void:
 func use_item() -> void:
 	var item := _selected()
 	if item.is_empty() or item.get("slot")!="consumable": return
-	var stats := _display_stats()
-	var player := _display_player()
-	if (int(item.restore_hp)==0 or int(player.hp)>=int(stats.hp)) and (int(item.restore_mp)==0 or int(player.mp)>=int(stats.mp)): return
+	var code:=ShopRules.use_error(item,_display_player(),_display_stats(),_allocated_points())
+	if not code.is_empty(): description.text=OnlinePve.error_text(code);return
+	if item.get("effect")=="reset_attributes":
+		close_menu()
+		item_menu=_box(Rect2(59,248,203,119),Color("fff2af"),Color("765322"),1)
+		item_menu.mouse_filter=Control.MOUSE_FILTER_STOP
+		_text("使用%s？\n返还全部已分配属性点，消耗1颗。"%item.name,Rect2(8,7,187,65),12,Color("705321"),false,item_menu).autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+		var yes:=_button("确定",Rect2(18,86,64,24),true,item_menu)
+		yes.name="ConfirmAttributeReset"
+		yes.pressed.connect(_use_item_id.bind(String(item.id)))
+		_button("取消",Rect2(121,86,64,24),true,item_menu).pressed.connect(close_menu)
+		return
+	await _use_item_id(item.id)
+
+func _allocated_points() -> Array:
+	return Game.allocated_attributes() if online_model==null else online_model.state.get("attributes",{}).get("allocated",[0,0,0,0,0])
+
+func _use_item_id(id: String) -> void:
+	var item:=ShopRules.item(id)
+	if item.is_empty(): return
+	var code:=ShopRules.use_error(item,_display_player(),_display_stats(),_allocated_points())
+	if not code.is_empty(): description.text=OnlinePve.error_text(code);return
 	if online_model!=null:
-		if online_model.state.get("shop",{}).get("version")=="shop-v2": online_model.submit("use",item.id)
+		if online_model.state.get("shop",{}).get("version")=="shop-v2": online_model.submit("use",id)
 		return
 	if Game.storage_busy: return
-	var result := await Game.shop_command("use",item.id)
+	var result := await Game.shop_command("use",id)
 	if not is_inside_tree(): return
 	close_menu();refresh()
 	if not result.ok: description.text=result.message

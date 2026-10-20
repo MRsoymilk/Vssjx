@@ -256,6 +256,7 @@ func quest_text() -> String:
 	return "古剑遗迹 · 已完成\n妖气已散，可返回青云山道恢复元气，或继续探索遗迹。"
 
 static func error_text(code: String) -> String:
+	if code=="NO_ALLOCATED_ATTRIBUTES": return "尚未分配属性点，无需使用重生再造丹；道具未消耗。"
 	if code=="CLIENT_UPDATE_REQUIRED":return "连续挑战已触发精英，请更新客户端后继续。"
 	if code=="SKILL_COOLDOWN":return "技能尚在冷却，请选择其他指令。"
 	var souls:={"SOUL_STATE":"灵魂状态下只能移动和寻回尸体，请先到自己的坟堆旁复活。","CORPSE_NOT_FOUND":"这不是你的尸体，或已经复活。","NO_CORPSE":"当前没有可寻回的尸体。","CORPSE_TOO_FAR":"请靠近自己的坟堆后复活。","STALE_CORPSE":"灵魂状态已更新，请重新同步后再试。"}

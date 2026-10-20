@@ -326,10 +326,17 @@ impl Loaded {
             if matches!(command.action,Action::Use|Action::Discard) {
                 if command.action==Action::Use {
                     if item.slot!="consumable"{return Err("ITEM_NOT_USABLE");}
-                    let limits=self.stats();
-                    if (item.restore_hp==0||self.character.hp>=limits.hp)&&(item.restore_mp==0||self.character.mp>=limits.mp){return Err("HP_FULL");}
-                    self.character.hp=(self.character.hp+item.restore_hp).min(limits.hp);
-                    self.character.mp=(self.character.mp+item.restore_mp).min(limits.mp);
+                    if item.effect==crate::shop::ItemEffect::ResetAttributes {
+                        if crate::attributes::unallocated(&self.allocated){return Err("NO_ALLOCATED_ATTRIBUTES");}
+                        let before=self.stats();self.allocated=[0;5];let next=self.stats();
+                        self.character.hp=(i64::from(self.character.hp)*i64::from(next.hp)/i64::from(before.hp)).clamp(1,i64::from(next.hp)) as i32;
+                        self.character.mp=(i64::from(self.character.mp)*i64::from(next.mp)/i64::from(before.mp)).clamp(0,i64::from(next.mp)) as i32;
+                    }else{
+                        let limits=self.stats();
+                        if (item.restore_hp==0||self.character.hp>=limits.hp)&&(item.restore_mp==0||self.character.mp>=limits.mp){return Err("HP_FULL");}
+                        self.character.hp=(self.character.hp+item.restore_hp).min(limits.hp);
+                        self.character.mp=(self.character.mp+item.restore_mp).min(limits.mp);
+                    }
                 }
                 if id=="potion"{self.potions-=count;}else if current==count{self.quantities.remove(id);self.gear.remove(id);}else{self.quantities.insert(id.into(),current-count);}
                 self.equipped=self.gear.get("sword")==Some(&true);self.weapon_owned=self.gear.contains_key("sword");

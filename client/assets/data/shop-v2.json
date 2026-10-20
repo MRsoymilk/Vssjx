@@ -9797,6 +9797,31 @@
       "art_source": "AI生成",
       "rules_basis": "用户确认破天斧图；参考表记载力士、51级。当前与重建商城一致不设等级门槛，售价250铜钱、攻击20为重建规则。",
       "appearance_basis": "使用用户确认的斧头图片，按原版力士握持点适配两帧；男女力士共用，可与原版及新增衣服、头饰混穿。"
+    },
+    {
+      "id": "restored/rebirth_pill",
+      "name": "重生再造丹",
+      "slot": "consumable",
+      "category": "药品",
+      "price": 200,
+      "attack": 0,
+      "defense": 0,
+      "visual": 0,
+      "head_visual": 0,
+      "level": 1,
+      "job": -1,
+      "gender": -1,
+      "restore_hp": 0,
+      "restore_mp": 0,
+      "effect": "reset_attributes",
+      "icon": "res://assets/items/original/ix64.png",
+      "sections": [
+        "hot",
+        "elixir"
+      ],
+      "art_source": "原包图标",
+      "rules_basis": "名称及重新分配属性点用途据原版tips0.txt第006条；售价200铜钱及消耗规则为重建玩法。",
+      "appearance_basis": "复用原包ix64丹丸状图标作为重建映射，尚未确认此图标就是原版重生再造丹。"
     }
   ]
 }

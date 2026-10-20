@@ -189,7 +189,7 @@ func refresh() -> void:
 	if int(entry.get("gender",-1))>=0:summary.text+=" · "+("男" if int(entry.gender)==0 else "女")
 	total.text="物品总价：%d铜钱"%(int(entry.price)*amount)
 	OriginalArt.apply_appearance(preview,_appearance())
-	var version_locked: bool=online_model!=null and gear.get("version")!="shop-v2" and (selected.begins_with("original/") or selected.begins_with("ai/"))
+	var version_locked: bool=online_model!=null and gear.get("version")!="shop-v2" and selected not in ["potion","sword","weapon_2","weapon_3","armor_2","armor_3"]
 	buy_button.disabled=locked or version_locked or gold<int(entry.price)*amount or (equipment and count>0) or (not equipment and count+amount>99)
 	var incompatible := not ShopRules.equipment_error(entry,int(character.get("job",0)),int(character.get("gender",0))).is_empty()
 	equip_button.disabled=locked or version_locked or not equipment or count==0 or incompatible

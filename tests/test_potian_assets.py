@@ -1,6 +1,7 @@
 """Approved bitmap provenance, native packing, and standalone weapon registration."""
 import hashlib
 import json
+import re
 from pathlib import Path
 import unittest
 from PIL import Image
@@ -45,8 +46,9 @@ class PotianAssets(unittest.TestCase):
         catalog = json.loads((ROOT/'client/assets/data/shop-v2.json').read_text('utf8'))
         sql = (ROOT/'server/migrations/0027_potian_equipment.sql').read_text('utf8')
         whitelist = sql.split('CHECK(definition_id IN (',1)[1].split('));',1)[0]
-        for row in catalog['items']:
-            self.assertIn("'"+row['id']+"'",whitelist)
+        # A historical migration should remain valid as newer consumables appear.
+        self.assertTrue(set(re.findall(r"'([^']*)'",whitelist)) <= {row['id'] for row in catalog['items']})
+        self.assertIn("'ai/legendary/potian_axe'",whitelist)
         self.assertIn('CREATE UNIQUE INDEX one_equipped_per_slot',sql)
         self.assertNotIn('DELETE FROM',sql)
 

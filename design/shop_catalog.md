@@ -2,7 +2,7 @@
 
 [返回设计索引](README.md) · [数据工具](../docs/data-tools.md) · [装备制作流程](ai-equipment-art.md)
 
-性质：**当前商城规则与原包证据说明**。当前目录共 394 项：208 个原包图标对应的重建物品、6 个兼容物品，以及三系列各 60 件新装备。新增系列见 [骨甲幽光](boneglow-equipment.md)、[冥林异装](gravebloom-equipment.md) 和 [初号机参考套装](eva01-equipment.md)，不计入原包恢复数量。
+性质：**当前商城规则与原包证据说明**。当前目录共 396 项：208 个原包图标对应的重建物品、6 个兼容物品、三系列各 60 件新装备、破天斧及重生再造丹。新增系列见 [骨甲幽光](boneglow-equipment.md)、[冥林异装](gravebloom-equipment.md) 和 [初号机参考套装](eva01-equipment.md)，不计入原包恢复数量。
 
 ## 资源与重建边界
 
@@ -28,6 +28,16 @@
 - 药品可从地图背包使用；战斗原有补血指令保持现有逻辑，尚未扩展为战斗中任选全部药品。
 
 ## 重建与验证
+
+### 原版洗点道具：重生再造丹
+
+`analysis/decoded_text/ssjx/tips0.txt` 第006条明确记载“重生再造丹”可以重新分配属性点，因此使用原名，不新增“洗心革面丹”。玩家资料中的“洗髓丹”描述为重置技能等级，与属性点道具分开。
+
+商城“热卖”和“仙丹”页的“药品”分类提供 `restored/rebirth_pill`，重建售价为200铜钱，可堆叠99颗。复用原包 `ix64.png` 丹丸状图标，但尚未恢复原物品与图标的精确对应，目录中明确记录此映射为重建。背包选择“使用”后先确认，每次消耗1颗，五项已分配加点清零，全部点数重新可用。等级、职业、门派、技能、装备及免费重置资格保留，气血和灵力按新上限保留比例。没有已分配点数不消耗；战斗及灵魂状态不能使用。
+
+本地失败存档回滚；联机通过现有权威 `use` 指令执行，只接受物品ID和角色版本，客户端不能提供重置后的属性值。扣除道具、返还点数及回执在同一事务中保存，重放回执不重复扣除。数据库迁移 `0029_rebirth_pill.sql` 只扩展物品ID白名单，不改已有库存和装备槽。
+
+新增验证：`python tests/test_rebirth_pill.py`、Godot `res://tests/rebirth_pill_test.tscn`、隔离服务端 `python tests/run_rebirth_pill.py`。后者使用临时 PostgreSQL，覆盖购买、伪造及过期请求、事务回滚、重复请求、战斗限制、再次加点后重复使用、重启持久化。其快照写入 `work/rebirth-review/live-fixtures.json`，可通过 `SSJX_REBIRTH_FIXTURE` 提供给客户端协议验证；`SSJX_REBIRTH_CAPTURE` 保存真实界面截图。
 
 ```sh
 python tools/build_full_shop_catalog.py

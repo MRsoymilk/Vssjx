@@ -2,7 +2,7 @@
 
 [返回设计索引](README.md) · [数据工具](../docs/data-tools.md) · [装备制作流程](ai-equipment-art.md)
 
-性质：**当前商城规则与原包证据说明**。当前目录共 334 项：208 个原包图标对应的重建物品、6 个兼容物品，以及两系列各 60 件新装备。新增系列见 [骨甲幽光](boneglow-equipment.md) 和 [冥林异装](gravebloom-equipment.md)，不计入原包恢复数量。
+性质：**当前商城规则与原包证据说明**。当前目录共 394 项：208 个原包图标对应的重建物品、6 个兼容物品，以及三系列各 60 件新装备。新增系列见 [骨甲幽光](boneglow-equipment.md)、[冥林异装](gravebloom-equipment.md) 和 [初号机参考套装](eva01-equipment.md)，不计入原包恢复数量。
 
 ## 资源与重建边界
 

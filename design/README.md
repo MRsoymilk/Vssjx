@@ -70,6 +70,7 @@
 | [装备美术规范](ai-equipment-style-spec.md) | 人物比例、头部、握持、像素密度与审阅 |
 | [骨甲幽光](boneglow-equipment.md) | 六套正式资源、编码与维护 |
 | [冥林异装](gravebloom-equipment.md) | 六套正式资源、多样武器与头部 |
+| [初号机参考套装](eva01-equipment.md) | 六角色紫黑／荧绿装甲、独角盔、十槽与实际离屏渲染；未部署 |
 | [图集采样](atlas-sampling.md) | 像素对齐、边缘串帧及原动画保留边界 |
 
 ## 产品决策索引

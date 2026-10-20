@@ -6,6 +6,8 @@ var messages: Array[Dictionary] = []
 var _sequence := 0
 var _control_busy := false
 const CONTROL_HELP := "本地测试指令：/control lv <1～60>；/control hp <血量>（设置）；/control money <正整数>（增加铜币）。例如 /control hp 1、/control money 1。仅修改当前本地角色并保存。"
+static func control_help_text()->String:
+	return "控制指令（仅本地模式）\n在地图底部聊天框输入后发送。\n\n/control 或 /control help\n查看指令用法。\n\n/control lv <1～60>\n设置等级，经验清零，气血与灵力回满。\n示例：/control lv 50\n\n/control hp <血量>\n设置当前气血，范围为1～角色气血上限。\n示例：/control hp 1\n\n/control money <正整数>\n增加铜币，增加后总额不超过1000000000。\n示例：/control money 1000\n\n修改后自动保存当前本地角色。\n灵魂状态请先寻回尸体。\n联机模式不执行这些指令。"
 @onready var screen: Control = get_parent()
 @onready var panel: Panel = screen.get_node("Chat")
 @onready var input: LineEdit = screen.get_node("Chat/ChatInput")

@@ -57,7 +57,7 @@ theme_override_styles/pressed = SubResource("Empty")
 theme_override_styles/focus = SubResource("Empty")
 [node name="Panel" type="PanelContainer" parent="."]
 offset_left = 2.0
-offset_top = 184.0
+offset_top = 154.0
 offset_right = 66.0
 offset_bottom = 458.0
 mouse_filter = 0
@@ -119,3 +119,9 @@ layout_mode = 2
 focus_mode = 0
 toggle_mode = true
 text = "系统"
+[node name="Help" type="Button" parent="Panel/Rows"]
+custom_minimum_size = Vector2(60, 30)
+layout_mode = 2
+focus_mode = 0
+toggle_mode = true
+text = "帮助"

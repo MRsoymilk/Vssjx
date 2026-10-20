@@ -573,6 +573,11 @@ func _scene_action(action: String) -> void:
 		"guild": _message("帮派", "帮派在联机模式开放。\n进入联机后，可创建帮派、申请入帮，并查看成员与公告。")
 		"team": _message("队伍", "组队在联机模式开放。\n点击玩家资料邀请组队，全员准备后由队长发起共同战斗。")
 		"system": _system_menu()
+		"help":
+			_close_modal()
+			if is_instance_valid(world):world.pause_moving();world.enabled=false
+			var help:ControlHelp=preload("res://scenes/ui/control_help.tscn").instantiate()
+			modal=help;ui.add_child(help);help.dismissed.connect(_close_modal)
 		"shop": _shop()
 		"craft", "trade":
 			var titles := {"shop": "商城", "craft": "炼制", "team": "队伍", "guild": "帮会", "trade": "交易"}

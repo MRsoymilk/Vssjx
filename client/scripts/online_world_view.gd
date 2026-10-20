@@ -71,6 +71,7 @@ var team:RefCounted=preload("res://scripts/network/online_team.gd").new()
 var team_panel:Control
 var solo_model:=SoloEncounter.new()
 var solo_battle:Control
+var help_panel:ControlHelp
 var team_battle:Control
 var team_notice:Panel
 var team_notice_text:Label
@@ -234,6 +235,7 @@ func _leave_world() -> void:
 func _scene_action(action: String) -> void:
 	if map_transition.blocking: return
 	if network.duel.active() or duel_battle.visible or team.active() or team_battle.visible: return
+	_close_help()
 	if team_panel.visible:team_panel.dismiss()
 	if social_panel.visible: social_panel.dismiss()
 	_close_inventory()
@@ -253,6 +255,13 @@ func _scene_action(action: String) -> void:
 		else: menu.open()
 		return
 	menu.hide()
+	if action=="help":
+		details.hide();emote_picker.hide();Platform.context.text_input.release_focus(chat_input)
+		if network.world_ready:network.stop_moving()
+		_was_keyboard=false
+		help_panel=preload("res://scenes/ui/control_help.tscn").instantiate();help_panel.online_mode=true;add_child(help_panel)
+		help_panel.dismissed.connect(_close_help)
+		return
 	if action == "social":
 		_toggle_chat()
 		return
@@ -289,6 +298,10 @@ func _scene_action(action: String) -> void:
 	elif action == "mail": body = "暂无邮件。"
 	$Menu/Panel/Body.text = body
 	details.show()
+
+func _close_help()->void:
+	if is_instance_valid(help_panel):remove_child(help_panel);help_panel.queue_free()
+	help_panel=null
 
 func _status_changed(text_value: String) -> void:
 	status.text = text_value
@@ -676,7 +689,7 @@ func _process(delta: float) -> void:
 	if OS.has_feature("web") and (not Platform.context.lifecycle.focused or Platform.context.lifecycle.suspended): return
 	if _follow_transfer():return
 	_advance_approach()
-	if team_panel.visible or social_panel.visible or bag_overlay != null or chat_input.has_focus() or menu.visible or details.visible or npc_dialog.visible or emote_picker.visible or encounter.visible or (battle_view.visible or solo_battle.visible) or expanded_chat.visible or attributes.visible or world_map.visible or network.pve.pending() or network.pve.active():
+	if is_instance_valid(help_panel) or team_panel.visible or social_panel.visible or bag_overlay != null or chat_input.has_focus() or menu.visible or details.visible or npc_dialog.visible or emote_picker.visible or encounter.visible or (battle_view.visible or solo_battle.visible) or expanded_chat.visible or attributes.visible or world_map.visible or network.pve.pending() or network.pve.active():
 		_was_keyboard = false
 		return
 	if network.team_following: return
@@ -704,7 +717,7 @@ func _map_input(event: InputEvent) -> void:
 	if _battle_load_failed:
 		if (event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed) or (event is InputEventScreenTouch and event.pressed): _pve_changed()
 		return
-	if social_panel.visible or bag_overlay != null or not network.world_ready or menu.visible or details.visible or npc_dialog.visible or encounter.visible or (battle_view.visible or solo_battle.visible) or expanded_chat.visible or attributes.visible or world_map.visible or network.pve.pending() or network.pve.active(): return
+	if is_instance_valid(help_panel) or social_panel.visible or bag_overlay != null or not network.world_ready or menu.visible or details.visible or npc_dialog.visible or encounter.visible or (battle_view.visible or solo_battle.visible) or expanded_chat.visible or attributes.visible or world_map.visible or network.pve.pending() or network.pve.active(): return
 	var point := Vector2.ZERO
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed: point = event.position
 	elif event is InputEventScreenTouch and event.pressed: point = event.position
@@ -751,6 +764,9 @@ func _map_input(event: InputEvent) -> void:
 		chat_status.text = "目标不可达，已停止原路线。"
 
 func _unhandled_key_input(event: InputEvent) -> void:
+	if is_instance_valid(help_panel):
+		if event is InputEventKey and event.pressed and event.keycode==KEY_ESCAPE:_close_help();get_viewport().set_input_as_handled()
+		return
 	if map_transition.blocking: return
 	if network.duel.active() or duel_battle.visible or team.active() or team_battle.visible: return
 	if not event is InputEventKey or not event.pressed: return

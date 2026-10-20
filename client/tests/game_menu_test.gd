@@ -1,9 +1,9 @@
 extends "res://tests/shared_interface_test.gd"
 ## Menu routing in both real game UI instances, with isolated local state.
-const LABELS := ["商城", "人物", "炼制", "社交", "任务", "队伍", "帮会", "交易", "系统"]
+const LABELS := ["商城", "人物", "炼制", "社交", "任务", "队伍", "帮会", "交易", "系统", "帮助"]
 
 func check_rows(popup: OriginalGameMenu) -> void:
-	check(popup.scene_file_path == "res://scenes/ui/game_menu.tscn" and popup.rows.size() == 9, "Both modes use the authored nine-row menu")
+	check(popup.scene_file_path == "res://scenes/ui/game_menu.tscn" and popup.rows.size() == 10, "Both modes use the authored menu with help last")
 	for index in LABELS.size():
 		check(popup.rows[index].text == LABELS[index], "Unnumbered menu row matches the requested order: " + LABELS[index])
 	check(not popup.has_node("Panel/Rows/Recharge"), "Recharge entry is removed")
@@ -26,7 +26,7 @@ func _run() -> void:
 	check_rows(popup)
 	check(popup.visible and not app.world.enabled, "Local toolbar opens compact menu and pauses movement")
 	await get_tree().process_frame
-	check(popup.get_node("Panel").get_rect() == Rect2(2, 184, 64, 274), "Menu stays narrow at the bottom-left above the toolbar")
+	check(popup.get_node("Panel").get_rect() == Rect2(2, 154, 64, 304), "Ten-row menu stays narrow at the bottom-left above the toolbar")
 	check(popup.rows[0].button_pressed, "Opening menu highlights the first entry")
 	await capture("01_local_menu")
 	popup.rows[3].mouse_entered.emit()
@@ -68,8 +68,18 @@ func _run() -> void:
 		app._menu()
 		popup = app.modal
 		popup.rows[index].pressed.emit()
-		check(app.modal.find_child("Title", true, false).text == LABELS[index] and Game.player == before, "Unavailable local entry reports its state without changing assets: " + LABELS[index])
+		check(app.modal.find_child("Title", true, false).text == ("帮派" if index==6 else LABELS[index]) and Game.player == before, "Local entry reports its current state without changing assets: " + LABELS[index])
 		app._close_modal()
+	app._menu();app.modal.get_node("Panel/Rows/Help").pressed.emit()
+	check(app.modal is ControlHelp and not app.world.enabled,"Last local menu row opens a themed help page and pauses movement")
+	for command in ["/control help","/control lv","/control hp","/control money"]:
+		check(app.modal.body.text.contains(command),"Help lists an implemented control command: "+command)
+	check(app.modal.body.scroll_active and Game.player==before,"Help can scroll through long instructions without changing the character")
+	await capture("04_local_help")
+	app.modal.get_node("Panel/Back").pressed.emit()
+	check(app.modal==null and app.world.enabled,"Closing local help restores map control")
+	app._menu();app.modal.get_node("Panel/Rows/Help").pressed.emit();key.keycode=KEY_ESCAPE;app._unhandled_key_input(key)
+	check(app.modal==null and app.world.enabled,"Escape closes local help and restores movement")
 	app._menu()
 	app.modal.get_node("Panel/Rows/System").pressed.emit()
 	check(app.modal.scene_file_path == "res://scenes/ui/system_menu.tscn" and not app.world.enabled, "System entry opens an authored settings page")
@@ -104,12 +114,17 @@ func _run() -> void:
 	view._scene_action("menu")
 	view.menu.get_node("Panel/Rows/Social").pressed.emit()
 	await get_tree().process_frame
-	check(view.chat_input.has_focus() and not view.menu.visible and not view.details.visible, "Online Social entry focuses the existing inline chat")
+	check(view.social_panel.visible and view.social_panel.section=="friends" and not view.menu.visible and not view.details.visible, "Online Social entry opens the current friends panel")
 	for index in [0, 2, 4, 5, 6, 7]:
 		view._scene_action("menu")
 		view.menu.rows[index].pressed.emit()
-		check(view.details.visible and view.details.get_node("Panel/Title").text == LABELS[index], "Online menu entry routes to its current feature state: " + LABELS[index])
-		view.get_node("Menu/Panel/Continue").pressed.emit()
+		if index==5:
+			check(view.team_panel.visible,"Online Team entry opens its implemented team panel");view.team_panel.dismiss()
+		elif index==6:
+			check(view.social_panel.visible and view.social_panel.section=="guild","Online Guild entry opens its implemented guild panel");view.social_panel.dismiss()
+		else:
+			check(view.details.visible and view.details.get_node("Panel/Title").text == LABELS[index], "Online menu entry routes to its current feature state: " + LABELS[index])
+			view.get_node("Menu/Panel/Continue").pressed.emit()
 	view._scene_action("menu")
 	view.menu.get_node("Panel/Rows/System").pressed.emit()
 	check(view.details.visible and view.details.get_node("Panel/Title").text == "系统", "Online System retains return-to-login controls")
@@ -122,6 +137,16 @@ func _run() -> void:
 	view._scene_action("menu")
 	view.menu.get_node("Dismiss").pressed.emit()
 	check(not view.menu.visible, "Online outside click dismisses the popup")
+	view._scene_action("menu");view.menu.get_node("Panel/Rows/Help").pressed.emit()
+	check(is_instance_valid(view.help_panel) and view.help_panel.online_mode and not view.menu.visible,"Online menu opens the same help page")
+	check(view.help_panel.body.text.contains("当前为联机模式") and view.help_panel.body.text.contains("/control money"),"Online help explains the local-only command boundary")
+	var paused_timer:=view._key_timer;view._process(0.2)
+	check(view._key_timer==paused_timer,"Help blocks background keyboard movement")
+	await capture("05_online_help")
+	view.help_panel.get_node("Panel/Back").pressed.emit()
+	check(view.help_panel==null,"Online help return only closes the help page")
+	view._scene_action("help");key.keycode=KEY_ESCAPE;view._unhandled_key_input(key)
+	check(view.help_panel==null and not view.menu.visible,"Escape closes online help without reopening the menu")
 	check(Game.player == before and FileAccess.get_file_as_string(Game.save_path) == saved, "All online menu actions preserve the local character and save")
 	app.queue_free()
 	await get_tree().process_frame

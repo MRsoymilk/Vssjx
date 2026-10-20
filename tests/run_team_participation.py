@@ -103,6 +103,9 @@ def main():
                 for _ in range(90):
                     if battle['outcome'] != 'active':
                         break
+                    if battle.get('selection_starts_ms',0)>int(time.time()*1000):
+                        # Owned fixture only: skip presentation, retain the complete input-window invariant.
+                        db.query("UPDATE team_battles SET state=jsonb_set(jsonb_set(state,'{selection_starts_ms}',to_jsonb((extract(epoch FROM statement_timestamp())*1000)::bigint-1)),'{deadline_ms}',to_jsonb((extract(epoch FROM statement_timestamp())*1000)::bigint+29999)),deadline_ms=(extract(epoch FROM statement_timestamp())*1000)::bigint+29999 WHERE active")
                     who = next(p for p in participants if p[1] == battle['fighters'][battle['turn']]['id'])
                     result, request = send(who, 'attack', battle_id=battle['id'], expected_revision=battle['revision'],
                                            target=next(e['slot'] for e in battle['enemies'] if e['hp'] > 0))
@@ -138,7 +141,7 @@ def main():
             cb.move([22, 10])
             wait(lambda: any(v.get('code') in ('TEAM_FOLLOWING', 'TEAM_BATTLE_ACTIVE') for v in cb.events), 'Reconnect movement ownership checked')
             check(any(v.get('code') == 'TEAM_FOLLOWING' for v in cb.events), 'Reloaded nonparticipant has the ordinary follow gate, not a false combat fence')
-            send(b, 'guard', 'TEAM_NOT_YOUR_TURN', battle_id=battle['id'], expected_revision=battle['revision'])
+            send(b, 'guard', 'TEAM_NOT_PARTICIPATING', battle_id=battle['id'], expected_revision=battle['revision'])
             completed, _ = win(a, [a, c])
             check(resources(b) == absent, 'Absent member gets no costs, recovery, quest progress or rewards')
             check(not party(b)['battle_active'], 'Nonparticipant sees that the encounter has ended')

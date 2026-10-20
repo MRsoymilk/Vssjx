@@ -194,6 +194,15 @@ impl WorldHub {
         for id in ids{
             if battle.is_some_and(|b|b.active()&&b.fighters.iter().any(|f|f.id==*id)){s.team_busy.insert(*id);if let Some(a)=s.actors.get_mut(id){a.motion.stop();}}
             else{s.team_busy.remove(id);}
+            // Publish the death teleport before releasing the movement fence, not a later socket poll.
+            if battle.is_some_and(|b|!b.active()&&b.fighters.iter().any(|f|f.id==*id&&f.hp==0)) {
+                if let Some(a)=s.actors.get_mut(id).filter(|a|!a.soul) {
+                    let spawn=WorldMap::load(&a.map_id).expect("battle map").spawn;
+                    let revision=a.motion.revision+1;
+                    a.motion=Motion::new(spawn);a.motion.revision=revision;a.soul=true;
+                    s.revision+=1;s.following.revision+=1;s.following.exits.remove(id);
+                }
+            }
             if dirty{s.team_dirty.insert(*id);}
         }
     }

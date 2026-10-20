@@ -9,9 +9,28 @@ python -X utf8 tests/run_team_follow.py
 python -X utf8 tests/run_team_participation.py
 ```
 
-集成脚本使用独立临时数据库，覆盖双方确认、角色／队长权限、准备限制、共享战场、强化怪物、多目标、逐人回合、群攻消耗、禁止单人旁路、审计失败回滚、重复胜利回执及重启恢复。
+集成脚本使用独立临时数据库，覆盖双方确认、角色／队长权限、准备限制、共享战场、强化怪物、多目标、整轮共用30秒收集并逐人执行、群攻消耗、禁止单人旁路、审计失败回滚、重复胜利回执及重启恢复。
 
 还覆盖活跃战场重启、超时防御审计、提交失败回滚和后续快照解除保守移动锁。设置 `GODOT_BIN` 时由真实客户端与独立网络队友接受邀请、准备、轮流行动及播放胜利返回。
+
+## 整轮30秒与逐人播放（本地源码，未部署）
+
+- `team_rules`：14项规则测试，包含任意队员先选、全员提交前不扣资源、共同截止时间不重置、重复指令锁定、超时全员默认防御、逐只怪物行动、倒下者跳过、目标被击败后重选、队列JSON重读、技能群攻／辅助和独立播放预算。
+- `run_teams.py`：真实等待完整30秒，确认期间不提前结算、截止后一次执行全部指令、跨轮旧指令拒绝；另测同快照修订并发提交、已选指令与截止时间随服务重启保留、团灭后各自留坟／出生，以及灵魂队员独立行走。仅本脚本新建数据库的部分后续回合跳过播放预算来缩短验收，不修改生产时钟或数据。
+- `res://tests/team_round_test.tscn`：5人5怪同时显示，指令确认不扣血、不播放，依次检查10个原生动作无重叠、血条命中更新、重复事件修订不重播、新轮完整30秒。`SSJX_TEAM_ROUND_FIXTURES` 可输入实际服务端快照 `work/soul-recovery/team-server-fixtures.json`。
+- 实际OpenGL ES离屏截图位于忽略目录 `work/soul-recovery/round-*.png`；`SSJX_TEAM_CAPTURE` 指定输出目录。
+
+2026-10-20本轮结果：Rust全量111项通过（其中组队规则14项）；真实服务端／PostgreSQL／WebSocket组队122项通过，包含真实Godot客户端11项；跟随回归35项、参战范围回归48项通过。Xvfb + Mesa实际离屏新回合64项、原组队界面回归81项通过，已人工检查选择窗口、玩家行动和怪物行动截图。新回合64项包含本轮真实服务端快照校验，而非仅手造数据。
+
+```sh
+GODOT_BIN=godot python tests/run_teams.py
+XVFB_BIN=/tmp/opencode/vssjx-eva01-xvfb/run-xvfb \
+SSJX_TEAM_CAPTURE="$PWD/work/soul-recovery" \
+SSJX_TEAM_ROUND_FIXTURES="$PWD/work/soul-recovery/team-server-fixtures.json" \
+LIBGL_ALWAYS_SOFTWARE=1 python tests/run_offscreen.py --path client \
+  --rendering-method gl_compatibility --rendering-driver opengl3_es \
+  res://tests/team_round_test.tscn
+```
 
 `res://tests/team_test.tscn` 覆盖多角色布局、原版指令／查看面板、选敌、技能、一次施法、重试、墓碑和本地角色隔离；`SSJX_TEAM_CAPTURE` 指定实际渲染截图目录。
 

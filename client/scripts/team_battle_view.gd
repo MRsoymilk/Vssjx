@@ -4,6 +4,7 @@ var model:RefCounted
 var actors:Dictionary={}
 var battle_id:=""
 var revision:=-1
+var events_revision:=-1
 var selected:="m0"
 var actors_layer:Node2D
 var menu:Control
@@ -82,24 +83,28 @@ func present()->void:
 		for a in actors.values():
 			a.tag.queue_free();a.hp.queue_free();a.hit.queue_free()
 			if a.mp!=null:a.mp.queue_free()
-		_clear();battle_id=b.id;revision=-1;result.reset();selected="m0";menu.hide();inspect_panel.hide();picker.hide()
+		_clear();battle_id=b.id;revision=-1;events_revision=int(b.get("events_revision",b.revision));result.reset();selected="m0";menu.hide();inspect_panel.hide();picker.hide()
 		for i in b.fighters.size():
 			var f:Dictionary=b.fighters[i]
 			_actor(f.id,ShopRules.actor_key(int(f.job),int(f.gender),f.appearance),Vector2(220+(i%2)*53,96+floori(float(i)/2)*78+(i%2)*30),false)
 		for i in b.enemies.size():
 			var e:Dictionary=b.enemies[i]
 			_actor(e.slot,e.definition.art,Vector2(44+(i%2)*56,96+floori(float(i)/2)*78+(i%2)*30),true)
-	if revision!=int(b.revision):
+	var packet_events:=int(b.get("events_revision",b.revision))
+	if events_revision!=packet_events:
 		if revision>=0:
 			# Play already-authoritative events; never compute damage locally.
 			for event in b.events:
-				var item:Dictionary=event.duplicate(true);item["packet"]=b.revision;queue.append(item)
-			effects.clear()
-		revision=int(b.revision)
+				var item:Dictionary=event.duplicate(true);item["packet"]=packet_events;queue.append(item)
+		events_revision=packet_events
+	revision=int(b.revision)
+	var updating:=motion==null and queue.is_empty()
 	for f in b.fighters:
-		_display(f.id,f.name+" Lv."+str(int(f.level)),int(f.hp),int(f.stats.hp))
-		actors[f.id].mp.max_value=f.stats.mp;actors[f.id].mp.value=f.mp
-	for e in b.enemies:_display(e.slot,e.definition.name+" Lv."+str(int(e.definition.level)),int(e.hp),int(e.definition.hp))
+		if updating:
+			_display(f.id,f.name+" Lv."+str(int(f.level)),int(f.hp),int(f.stats.hp))
+			actors[f.id].mp.max_value=f.stats.mp;actors[f.id].mp.value=f.mp
+	for e in b.enemies:
+		if updating:_display(e.slot,e.definition.name+" Lv."+str(int(e.definition.level)),int(e.hp),int(e.definition.hp))
 	if not actors.has(selected) or actors[selected].dead:
 		for e in b.enemies:
 			if e.hp>0:selected=e.slot;break
@@ -129,9 +134,17 @@ func _send(action:String,skill:String="")->void:
 func _refresh_controls()->void:
 	var b:Dictionary=model.battle()
 	if b.is_empty():return
-	caption.text="队伍战斗 · 第%d回合 · %d名敌人"%[int(b.round),b.enemies.size()]
+	var executing:=motion!=null or not queue.is_empty()
+	caption.text="队伍战斗 · 第%d回合 · %d名敌人"%[maxi(1,int(b.round)-(1 if executing and b.has("commands") else 0)),b.enemies.size()]
 	var left:=maxi(0,ceili((int(b.deadline_ms)-model.server_time-(Time.get_ticks_msec()-model.received_at))/1000.0))
-	hint.text="目标：%s · %s · %d秒"%[actors[selected].tag.text if actors.has(selected) else "无","等待确认" if model.pending() else ("轮到你行动" if model.my_turn() else "等待%s"%b.fighters[int(b.turn)].name),left]
+	var message:="等待确认" if model.pending() else ("轮到你行动" if model.my_turn() else "等待队友")
+	if b.has("commands"):
+		var alive:=0
+		for f in b.fighters:
+			if f.hp>0:alive+=1
+		message="已提交 %d/%d · %s"%[b.commands.size(),alive,"请选择指令" if model.my_turn() else ("已锁定，等待队友" if b.commands.has(model.character_id) else "等待指令窗口")]
+		if motion!=null or not queue.is_empty() or model.server_time+Time.get_ticks_msec()-model.received_at<int(b.selection_starts_ms):message="逐个执行中 · 下轮指令共用30秒";left=0
+	hint.text=message if left==0 and b.has("commands") else "%s · %d秒"%[message,left]
 	for i in action_buttons.size():action_buttons[i].disabled=not model.active() or model.pending() or model.inflight or motion!=null or not queue.is_empty() or (not model.my_turn() if i<4 else (not model.party().get("leader",false) if i==5 else false))
 	command_toggle.disabled=not model.active() or model.pending() or motion!=null or not queue.is_empty()
 	if not model.active():menu.hide();inspect_panel.hide();picker.hide()
@@ -145,12 +158,11 @@ func _process(delta:float)->void:
 	if not visible:return
 	if motion!=null:
 		motion.advance(delta)
-		if not motion.active:motion=null
+		if not motion.active:motion=null;_start_deaths()
 	elif not queue.is_empty():_play(queue.pop_front())
 	else:
-		for a in actors.values():
-			if a.dead and a.sprite.visible:
-				var death:=BattleDeathPlayback.new();death.start(a.sprite);deaths.append(death)
+		_sync_final_resources()
+		_start_deaths()
 		if not model.active() and not model.battle().is_empty():result.present(model.battle().outcome,"队伍共享结算，奖励已由服务器保存。",true)
 	for death in deaths:death.advance(delta)
 	for a in actors.values():
@@ -159,21 +171,36 @@ func _process(delta:float)->void:
 	target_marker.visible=actors.has(selected) and not actors[selected].dead
 	if target_marker.visible:target_marker.position=actors[selected].sprite.position+Vector2(0,4)
 	_refresh_controls()
+func _sync_final_resources()->void:
+	var b:Dictionary=model.battle()
+	if b.is_empty():return
+	for f in b.fighters:
+		_display(f.id,f.name+" Lv."+str(int(f.level)),int(f.hp),int(f.stats.hp))
+		actors[f.id].mp.max_value=f.stats.mp;actors[f.id].mp.value=f.mp
+	for e in b.enemies:_display(e.slot,e.definition.name+" Lv."+str(int(e.definition.level)),int(e.hp),int(e.definition.hp))
+func _start_deaths()->void:
+	for a in actors.values():
+		if a.dead and a.sprite.visible:
+			var death:=BattleDeathPlayback.new();death.start(a.sprite);deaths.append(death)
 func _play(event:Dictionary)->void:
 	if not actors.has(event.actor) or not actors.has(event.target):return
 	var a:Dictionary=actors[event.actor];var target:Dictionary=actors[event.target]
 	if not a.sprite.visible:return
-	if event.action not in ["attack","skill"]:return
+	if event.action not in ["attack","skill","guard","potion"]:return
 	playing=event
 	var group:Array=[event]
 	while event.action=="skill" and not queue.is_empty() and queue[0].actor==event.actor and queue[0].skill==event.skill and queue[0].get("packet")==event.get("packet"):
 		group.append(queue.pop_front())
 	var mode:StringName=&"cast" if event.action=="skill" and a.sprite.sprite_frames.has_animation("cast") else &"attack"
+	if event.action in ["guard","potion"]:mode=&"idle"
 	if event.action=="skill" and SkillRules.item(event.skill).get("damage_percent",0)==0:mode=&"cast" if a.sprite.sprite_frames.has_animation("cast") else &"idle"
 	motion=BattleActionPlayback.new()
 	motion.impact.connect(func()->void:
 		for hit in group:
 			var receiver:Dictionary=actors[hit.target]
+			receiver.hp.value=maxf(0,receiver.hp.value-int(hit.damage));receiver.dead=receiver.hp.value<=0
+			var healer:Dictionary=a if hit.actor!=hit.target and SkillRules.item(hit.get("skill","")).get("target")!="all_allies" else receiver
+			healer.hp.value=minf(healer.hp.max_value,healer.hp.value+int(hit.healed));healer.dead=healer.hp.value<=0
 			effects.number(receiver.sprite,int(hit.damage),hit.get("critical",false))
 			effects.number(a.sprite if hit.actor!=hit.target and SkillRules.item(hit.get("skill","")).get("target")!="all_allies" else receiver.sprite,int(hit.healed),false,true)
 			if hit.action=="skill":effects.play_binding(hit.skill,"cast_impact",receiver.sprite if SkillRules.item(hit.skill).get("target")=="all_allies" else a.sprite,receiver.sprite)

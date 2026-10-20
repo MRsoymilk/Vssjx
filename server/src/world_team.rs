@@ -117,7 +117,7 @@ impl WorldHub {
                 previous.insert(m.team, m.id);
                 continue;
             }
-            if !m.following {
+            if !m.following || s.actors.get(&m.id).is_some_and(|a|a.soul) {
                 continue;
             }
             let ahead = previous.get(&m.team).copied().unwrap_or(m.leader);

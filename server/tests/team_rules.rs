@@ -33,22 +33,48 @@ fn encounter() -> Battle {
         1000,
     )
 }
+fn complete(b: &mut Battle, now: i64) {
+    let ids: Vec<_> = b
+        .fighters
+        .iter()
+        .filter(|f| f.hp > 0 && !b.commands.contains_key(&f.id))
+        .map(|f| f.id)
+        .collect();
+    for id in ids {
+        b.act(id, "guard", None, None, now, 99).unwrap();
+    }
+}
 #[test]
 fn lone_participant_keeps_base_stats_and_can_complete_rounds() {
     let f = fighter(1, 20);
-    let original = population::definitions().into_iter().find(|d| d.kind != "npc").unwrap();
-    let mut b = Battle::new("qingyun_trail".into(), vec![f], vec![original.clone()], 1000);
+    let original = population::definitions()
+        .into_iter()
+        .find(|d| d.kind != "npc")
+        .unwrap();
+    let mut b = Battle::new(
+        "qingyun_trail".into(),
+        vec![f],
+        vec![original.clone()],
+        1000,
+    );
     assert_eq!(b.enemies.len(), 1);
-    assert_eq!((b.enemies[0].hp, b.enemies[0].definition.attack, b.enemies[0].definition.defense),
-               (original.hp, original.attack, original.defense));
+    assert_eq!(
+        (
+            b.enemies[0].hp,
+            b.enemies[0].definition.attack,
+            b.enemies[0].definition.defense
+        ),
+        (original.hp, original.attack, original.defense)
+    );
     let me = b.fighters[0].id;
     b.act(me, "guard", None, None, 2000, 99).unwrap();
     assert_eq!(b.turn, 0);
     assert_eq!(b.round, 2);
-    assert_eq!(b.events.len(), 1);
-    assert_eq!(b.events[0].target, me.to_string());
+    assert_eq!(b.events.len(), 2);
+    assert_eq!(b.events[1].target, me.to_string());
     b.enemies[0].hp = 1;
-    b.act(me, "attack", Some("m0"), None, 3000, 99).unwrap();
+    b.act(me, "attack", Some("m0"), None, b.selection_starts_ms, 99)
+        .unwrap();
     assert_eq!(b.outcome, "victory");
     assert_eq!(b.events.len(), 1);
 }
@@ -76,12 +102,12 @@ fn each_player_acts_before_monsters() {
     assert!(b.fighters.iter().map(|f| f.hp).sum::<i32>() < hp.iter().sum());
 }
 #[test]
-fn foreign_turn_and_dead_targets_cannot_spend_mana() {
+fn outsiders_and_dead_targets_cannot_spend_mana() {
     let mut b = encounter();
     let before = serde_json::to_value(&b).unwrap();
     assert_eq!(
-        b.act(b.fighters[1].id, "attack", Some("m0"), None, 2000, 0),
-        Err("TEAM_NOT_YOUR_TURN")
+        b.act(Uuid::new_v4(), "attack", Some("m0"), None, 2000, 0),
+        Err("TEAM_NOT_PARTICIPATING")
     );
     assert_eq!(serde_json::to_value(&b).unwrap(), before);
     assert!(
@@ -101,12 +127,19 @@ fn area_skill_hits_every_living_enemy_for_one_mana_cost() {
     let mp = b.fighters[0].mp;
     b.act(id, "skill", Some("m1"), Some("sheet_004"), 2000, 99)
         .unwrap();
+    complete(&mut b, 3000);
     assert!(b.enemies.iter().all(|e| e.hp < 1000));
     assert_eq!(
         b.fighters[0].mp,
         mp - skills::item("sheet_004").unwrap().mp_cost
     );
-    assert_eq!(b.events.len(), 3);
+    assert_eq!(
+        b.events
+            .iter()
+            .filter(|e| e.actor == id.to_string())
+            .count(),
+        3
+    );
 }
 #[test]
 fn failures_and_potions_are_authoritative() {
@@ -116,8 +149,13 @@ fn failures_and_potions_are_authoritative() {
     b.fighters[0].hp -= 50;
     let count = b.fighters[0].potions;
     b.act(id, "potion", None, None, 2000, 0).unwrap();
+    complete(&mut b, 3000);
     assert_eq!(b.fighters[0].potions, count - 1);
-    assert_eq!(b.fighters[0].hp, b.fighters[0].stats.hp - 5);
+    assert!(
+        b.events
+            .iter()
+            .any(|e| e.actor == id.to_string() && e.action == "potion" && e.healed == 45)
+    );
 }
 #[test]
 fn killed_monsters_never_take_a_turn() {
@@ -127,8 +165,9 @@ fn killed_monsters_never_take_a_turn() {
     b.enemies[2].hp = 0;
     b.act(b.fighters[0].id, "guard", None, None, 2000, 99)
         .unwrap();
+    complete(&mut b, 3000);
     assert_eq!(b.outcome, "victory");
-    assert!(b.events.is_empty());
+    assert!(b.events.iter().all(|e| !e.actor.starts_with('m')));
 }
 #[test]
 fn group_support_buffs_living_allies_and_charges_only_caster() {
@@ -140,13 +179,17 @@ fn group_support_buffs_living_allies_and_charges_only_caster() {
     let before = b.fighters.iter().map(|f| f.mp).collect::<Vec<_>>();
     b.act(b.fighters[0].id, "skill", None, Some("sheet_041"), 2000, 99)
         .unwrap();
+    complete(&mut b, 3000);
     assert!(b.fighters.iter().all(|f| f.effects.regen > 0));
     assert_eq!(
         b.fighters[0].mp,
         before[0] - skills::item("sheet_041").unwrap().mp_cost
     );
-    assert_eq!(b.fighters[1].mp, before[1]);
-    assert_eq!(b.events.len(), 2);
+    assert_eq!(
+        b.fighters[1].mp,
+        (before[1] + 5).min(b.fighters[1].stats.mp)
+    );
+    assert_eq!(b.events.iter().filter(|e| e.action == "skill").count(), 2);
 }
 #[test]
 fn enemy_debuffs_remain_on_the_selected_monster() {
@@ -162,9 +205,97 @@ fn enemy_debuffs_remain_on_the_selected_monster() {
     }
     b.act(b.fighters[0].id, "skill", Some("m1"), Some(&s.id), 2000, 0)
         .unwrap();
-    assert!(b.enemies[1].effects.enemy_bleed > 0);
+    b.act(b.fighters[1].id, "guard", None, None, 3000, 0)
+        .unwrap();
+    assert_eq!(b.enemies[1].effects.enemy_bleed, (s.duration - 1).max(0));
+    assert!(b.enemies[1].effects.bleed_damage > 0);
     assert_eq!(b.enemies[0].effects.enemy_bleed, 0);
     assert_eq!(b.fighters[0].effects.enemy_bleed, 0);
+}
+#[test]
+fn whole_round_uses_one_deadline_and_accepts_any_player_first() {
+    let mut b = encounter();
+    let deadline = b.deadline_ms;
+    let hp = b.enemies[0].hp;
+    b.act(b.fighters[1].id, "attack", Some("m0"), None, 2000, 99)
+        .unwrap();
+    assert_eq!(b.deadline_ms, deadline);
+    assert_eq!(b.enemies[0].hp, hp);
+    assert!(b.events.is_empty());
+    assert_eq!(
+        b.act(b.fighters[1].id, "guard", None, None, 3000, 99),
+        Err("TEAM_COMMAND_LOCKED")
+    );
+    b.act(b.fighters[0].id, "guard", None, None, 4000, 99)
+        .unwrap();
+    assert_eq!(b.round, 2);
+    assert!(b.commands.is_empty());
+    assert_eq!(b.events[0].actor, b.fighters[0].id.to_string());
+    assert_eq!(b.events[1].actor, b.fighters[1].id.to_string());
+    assert!(b.events[2..].iter().all(|e| e.actor.starts_with('m')));
+    assert_eq!(b.deadline_ms - b.selection_starts_ms, 30_000);
+    assert_eq!(
+        b.act(b.fighters[0].id, "guard", None, None, 4001, 99),
+        Err("TEAM_PLAYBACK_ACTIVE")
+    );
+}
+#[test]
+fn timeout_executes_every_missing_player_and_monster_once() {
+    let mut b = encounter();
+    b.act(b.fighters[1].id, "attack", Some("m0"), None, 2000, 99)
+        .unwrap();
+    assert!(!b.expire(b.deadline_ms - 1, 99));
+    assert_eq!(
+        b.act(b.fighters[0].id, "guard", None, None, b.deadline_ms, 99),
+        Err("TEAM_ROUND_EXPIRED")
+    );
+    assert!(b.expire(b.deadline_ms, 99));
+    assert_eq!(b.round, 2);
+    assert_eq!(b.events[0].action, "guard");
+    assert_eq!(b.events[1].action, "attack");
+    assert_eq!(
+        b.events.iter().filter(|e| e.actor.starts_with('m')).count(),
+        3
+    );
+    assert!(!b.expire(b.selection_starts_ms, 99));
+}
+#[test]
+fn dead_participants_do_not_hold_collection_and_queued_targets_retarget() {
+    let mut b = encounter();
+    b.enemies[0].hp = 1;
+    let id = b.fighters[1].id;
+    b.act(id, "attack", Some("m0"), None, 2000, 99).unwrap();
+    b.act(b.fighters[0].id, "attack", Some("m0"), None, 3000, 99)
+        .unwrap();
+    assert_eq!(b.events[1].target, "m1");
+    b.fighters[1].hp = 0;
+    assert_eq!(
+        b.act(id, "guard", None, None, b.selection_starts_ms, 99),
+        Err("TEAM_NOT_PARTICIPATING")
+    );
+    b.act(
+        b.fighters[0].id,
+        "guard",
+        None,
+        None,
+        b.selection_starts_ms,
+        99,
+    )
+    .unwrap();
+    assert_eq!(b.round, 3);
+}
+#[test]
+fn queued_intents_and_deadline_survive_serialization() {
+    let mut b = encounter();
+    b.act(b.fighters[1].id, "guard", None, None, 2000, 99)
+        .unwrap();
+    let mut restored: Battle = serde_json::from_value(serde_json::to_value(&b).unwrap()).unwrap();
+    assert_eq!(restored.deadline_ms, b.deadline_ms);
+    assert_eq!(restored.commands.len(), 1);
+    restored
+        .act(restored.fighters[0].id, "guard", None, None, 3000, 99)
+        .unwrap();
+    assert_eq!(restored.round, 2);
 }
 #[test]
 fn defense_does_not_expire_before_the_enemy_phase() {

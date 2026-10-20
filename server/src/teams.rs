@@ -158,11 +158,6 @@ pub(crate) async fn command(
     if !owned {
         return Err(AuthError(StatusCode::FORBIDDEN, "FORBIDDEN"));
     }
-    let now: i64 =
-        sqlx::query_scalar("SELECT (extract(epoch FROM clock_timestamp())*1000)::bigint")
-            .fetch_one(&mut *tx)
-            .await
-            .map_err(db)?;
     sqlx::query("DELETE FROM team_invites WHERE expires_at<=clock_timestamp()")
         .execute(&mut *tx)
         .await
@@ -194,6 +189,8 @@ pub(crate) async fn command(
     ids.sort();
     ids.dedup();
     let _gates = hub.team_guards(&ids).await;
+    let now:i64=sqlx::query_scalar("SELECT (extract(epoch FROM clock_timestamp())*1000)::bigint")
+        .fetch_one(&mut *tx).await.map_err(db)?;
     let mut current = if let Some(t) = team {
         battle(&mut tx, t).await?
     } else {
@@ -205,20 +202,7 @@ pub(crate) async fn command(
         .filter(|b| b.active() && b.deadline_ms <= now)
     {
         let actor = b.fighters[b.turn].id;
-        if now - b.last_action_ms >= 120_000 {
-            b.finish("fled");
-            b.revision += 1;
-        } else {
-            b.act(
-                b.fighters[b.turn].id,
-                "guard",
-                None,
-                None,
-                now,
-                rand::random::<u8>() as i32 % 100,
-            )
-            .map_err(err)?;
-        }
+        b.expire(now,rand::random::<u8>() as i32 % 100);
         save_battle(&mut tx, team.unwrap(), b, !b.active()).await?;
         crate::security::append(&mut *tx,crate::security::Event{account:None,character:Some(actor),session:None,operation:None,action:"team.timeout",outcome:"accepted",code:if b.active(){"AUTO_GUARD"}else{"BATTLE_ENDED"},details:json!({"battle_id":b.id,"revision":b.revision,"requested_by":c.character_id})}).await.map_err(db)?;
         dirty = true;
@@ -329,7 +313,7 @@ async fn apply(
             ) {
                 return Err(err("TEAM_BATTLE_ACTIVE"));
             }
-            if c.battle_id != Some(b.id) || c.expected_revision != Some(b.revision) {
+            if c.battle_id != Some(b.id) || !c.expected_revision.is_some_and(|r|r>=b.round_revision&&r<=b.revision) {
                 return Err(err("STALE_BATTLE"));
             }
             let mut b = b;

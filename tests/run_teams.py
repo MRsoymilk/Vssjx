@@ -18,8 +18,8 @@ class TeamPlayer(Player):
         super().move(target)
 
 def main():
-    binary=os.environ.get('SSJX_TEST_SERVER_BIN',str(ROOT/'work/duels/target/debug/vssjx-server.exe'))
-    checks=[];players=[]
+    binary=os.environ.get('SSJX_TEST_SERVER_BIN',str(ROOT/'server/target/debug/vssjx-server'))
+    checks=[];players=[];fixtures=[]
     def check(ok,label):
         assert ok,label
         checks.append(label)
@@ -86,7 +86,10 @@ def main():
             turn=battle['fighters'][battle['turn']]['id']
             actor=a if turn==a[1] else b;other=b if actor==a else a
             fields=dict(battle_id=battle['id'],expected_revision=battle['revision'],target='m0')
-            send(other,'attack','TEAM_NOT_YOUR_TURN',**fields)
+            early,_=send(other,'attack',**fields)
+            fixtures.append(early)
+            check(early['state']['team']['battle']['enemies']==battle['enemies'] and early['state']['team']['battle']['deadline_ms']==battle['deadline_ms'],'Any teammate may submit first without damage or deadline reset')
+            send(other,'guard','TEAM_COMMAND_LOCKED',battle_id=battle['id'],expected_revision=battle['revision'])
             send(c,'attack','NO_ACTIVE_BATTLE',**fields)
             send(actor,'kick','TEAM_BATTLE_ACTIVE',target=other[1])
             send(b,'follow','TEAM_BATTLE_ACTIVE',ready=False)
@@ -101,9 +104,12 @@ def main():
             for _ in range(60):
                 battle=send(a,'snapshot')[0]['state']['team']['battle']
                 if battle['outcome']!='active':break
+                if battle['selection_starts_ms']>int(time.time()*1000):
+                    db.query("UPDATE team_battles SET state=jsonb_set(jsonb_set(state,'{selection_starts_ms}',to_jsonb((extract(epoch FROM statement_timestamp())*1000)::bigint-1)),'{deadline_ms}',to_jsonb((extract(epoch FROM statement_timestamp())*1000)::bigint+29999)),deadline_ms=(extract(epoch FROM statement_timestamp())*1000)::bigint+29999 WHERE active")
                 actor=next(who for who in [a,b] if who[1]==battle['fighters'][battle['turn']]['id'])
                 target=next(e['slot'] for e in battle['enemies'] if e['hp']>0)
                 result,cmd=send(actor,'attack',battle_id=battle['id'],expected_revision=battle['revision'],target=target)
+                fixtures.append(result)
                 if result['state']['team']['battle']['outcome']=='victory':victory_request=actor,cmd;break
             check(victory_request is not None,'Cooperative encounter finishes with team victory')
             totals=db.query('SELECT id,hp,mp,gold,xp,quest_stage FROM characters ORDER BY id')
@@ -114,16 +120,20 @@ def main():
             db.query("UPDATE characters SET monster_respawns='{}'::jsonb")
             again,_=send(a,'challenge',target='spirit')
             active=again['state']['team']['battle']
+            queued,_=send(b,'guard',battle_id=active['id'],expected_revision=active['revision'])
+            active=queued['state']['team']['battle']
             for p in players:p.close()
             players.clear();stop(process);process,base=start()
             for who in [a,b]:players.append(TeamPlayer(base,who[0],who[1]))
             resumed,_=send(a,'snapshot')
             check(resumed['state']['team']['battle']['id']==active['id'] and resumed['state']['team']['battle']['outcome']=='active','Active encounter survives service restart')
+            check(resumed['state']['team']['battle']['commands']==active['commands'] and resumed['state']['team']['battle']['deadline_ms']==active['deadline_ms'],'Submitted intent and common deadline survive a real service restart')
             send(a,'attack','STALE_BATTLE',battle_id=active['id'],expected_revision=999,target='m0')
             db.query("UPDATE team_battles SET state=jsonb_set(state,'{deadline_ms}',to_jsonb((extract(epoch FROM clock_timestamp())*1000)::bigint-100)),deadline_ms=(extract(epoch FROM clock_timestamp())*1000)::bigint-100 WHERE active")
             timed,_=send(a,'snapshot');active=timed['state']['team']['battle']
-            check(active['revision']==1 and active['turn']==1,'Expired player turn automatically defends and advances once')
+            check(active['round']==2 and len([e for e in active['events'] if e['action']=='guard'])==2 and len([e for e in active['events'] if e['actor'].startswith('m')])>=2,'Shared deadline guards every missing player and executes all living monsters exactly once')
             check(int(db.query("SELECT count(*) FROM security_audit WHERE action='team.timeout'"))==1,'Automatic defense is recorded in the security audit')
+            fixtures.append(timed)
             resources=db.query('SELECT id,gold,xp FROM characters ORDER BY id')
             send(a,'flee',battle_id=active['id'],expected_revision=active['revision'])
             check(db.query('SELECT id,gold,xp FROM characters ORDER BY id')==resources,'Retreat cannot award victory resources')
@@ -134,6 +144,54 @@ def main():
                 own=players[0].ws.entities.get(a[1],{});follower=players[0].ws.entities.get(b[1],{})
                 if own.get('cell')==[22,11] and follower.get('cell') not in (None,[22,9]) and follower['next_cell'] is None:break
             check(follower.get('cell') not in (None,[22,9]),'Following resumes after the shared battle ends')
+            # Exercise a real 30-second collection window, not a synthetic clock jump.
+            players[0].approach('spirit')
+            time.sleep(1)  # Let the ordinary-speed follower finish its last segment before preparing.
+            send(a,'ready',ready=True);send(b,'ready',ready=True)
+            real,_=send(a,'challenge',target='spirit')
+            real_battle=real['state']['team']['battle'];deadline=real_battle['deadline_ms']
+            submitted,_=send(b,'guard',battle_id=real_battle['id'],expected_revision=real_battle['revision'])
+            check(submitted['state']['team']['battle']['deadline_ms']==deadline,'Late teammate submission cannot extend the common 30 seconds')
+            while int(time.time()*1000)<deadline-150:
+                current=send(a,'snapshot')[0]['state']['team']['battle']
+                check(current['round']==1 and not current['events'],'No damage executes before all intents or the real common deadline')
+                time.sleep(min(2,max(0,(deadline-150)/1000-time.time())))
+            time.sleep(max(0,(deadline+50)/1000-time.time()))
+            expired,_=send(a,'snapshot');finished_round=expired['state']['team']['battle'];fixtures.append(expired)
+            check(finished_round['round']==2 and [e['action'] for e in finished_round['events'][:2]]==['guard','guard'],'Real 30-second timeout executes submitted and missing-player defense together')
+            check(finished_round['deadline_ms']-finished_round['selection_starts_ms']==30000,'Next collection window retains a full 30 seconds outside playback')
+            rejected,_=send(a,'attack','STALE_BATTLE',battle_id=real_battle['id'],expected_revision=real_battle['revision'],target='m0')
+            send(a,'flee',battle_id=finished_round['id'],expected_revision=finished_round['revision'])
+            # Actual team defeat must leave each player's own corpse and release soul motion.
+            db.query(f"UPDATE characters SET hp=1,monster_respawns='{{}}'::jsonb WHERE id IN ('{a[1]}','{b[1]}')")
+            send(a,'ready',ready=True);send(b,'ready',ready=True)
+            doomed,_=send(a,'challenge',target='spirit');doomed=doomed['state']['team']['battle']
+            origins=json.loads(db.query(f"SELECT jsonb_object_agg(id::text,jsonb_build_array(cell_x,cell_y)) FROM characters WHERE id IN ('{a[1]}','{b[1]}')"))
+            for _ in range(5):
+                # Both players use the same pre-collection revision; concurrent clients need no refresh between submissions.
+                from concurrent.futures import ThreadPoolExecutor
+                fields=dict(battle_id=doomed['id'],expected_revision=doomed['revision'])
+                def intent(who):
+                    return api(base,'/api/v1/teams',dict(character_id=who[1],operation_id=str(uuid4()),action='guard',**fields),who[0]['access_token'])
+                with ThreadPoolExecutor(max_workers=2) as pool:results=list(pool.map(intent,[a,b]))
+                check(all(status==200 and value['ok'] for status,value in results),'Concurrent same-round revisions accept independent player intents')
+                doomed=send(a,'snapshot')[0]['state']['team']['battle']
+                if doomed['outcome']!='active':break
+                db.query("UPDATE team_battles SET state=jsonb_set(jsonb_set(state,'{selection_starts_ms}',to_jsonb((extract(epoch FROM statement_timestamp())*1000)::bigint-1)),'{deadline_ms}',to_jsonb((extract(epoch FROM statement_timestamp())*1000)::bigint+29999)),deadline_ms=(extract(epoch FROM statement_timestamp())*1000)::bigint+29999 WHERE active")
+            check(doomed['outcome']=='defeat','Shared combat can end in an authoritative full-party defeat')
+            for index,who in enumerate([a,b]):
+                player=players[index]
+                player.ws.send({'type':'ping'})
+                soul=player.until('pve.state')['state']
+                while not soul['character'].get('corpse'):soul=player.until('pve.state')['state']
+                player.state=soul
+                check(soul['character']['hp']==0 and soul['character']['corpse']['cell']==origins[who[1]],'Each defeated team member retains their own actual encounter-origin corpse')
+                check([soul['character']['cell_x'],soul['character']['cell_y']]==[10,16],'Every defeated member independently respawns as a soul on the same map')
+            players[1].move([11,16])
+            for _ in range(150):
+                players[1].until('world.delta')
+                if players[1].ws.entities[b[1]]['cell']==[11,16]:break
+            check(players[1].ws.entities[b[1]]['cell']==[11,16],'Dead follower may walk independently to their corpse instead of being dragged by the leader')
             send(a,'transfer',target=b[1]);send(a,'disband','TEAM_LEADER_REQUIRED')
             send(b,'kick',target=a[1])
             check(send(a,'snapshot')[0]['state']['team'] is None,'Kicked member loses team membership')
@@ -168,7 +226,7 @@ def main():
                                 if len(party['members'])==2 and not next(m for m in party['members'] if m['id']==ub[1])['ready'] and fight is None:
                                     send(ub,'ready',ready=True)
                                 elif fight is None and len(party['members'])==2 and all(m['ready'] for m in party['members']):send(ub,'challenge',target='spirit')
-                                elif fight and fight['outcome']=='active' and fight['fighters'][fight['turn']]['id']==ub[1]:
+                                elif fight and fight['outcome']=='active' and ub[1] not in fight['commands'] and int(time.time()*1000)>=fight['selection_starts_ms']:
                                     send(ub,'attack',battle_id=fight['id'],expected_revision=fight['revision'],target=next(e['slot'] for e in fight['enemies'] if e['hp']>0))
                                 elif fight and fight['outcome']=='victory':return
                             time.sleep(.5)
@@ -180,6 +238,11 @@ def main():
                 print(result.stdout)
                 if result.stderr:print(result.stderr)
                 check(result.returncode==0 and '0 failures' in result.stdout and 'SCRIPT ERROR' not in result.stderr and not errors,'Real Godot client and independent peer complete team battle')
+            output=ROOT/'work/soul-recovery/team-server-fixtures.json'
+            output.parent.mkdir(parents=True,exist_ok=True)
+            # Fixture consumers validate snapshots, not an operation outbox.
+            for fixture in fixtures:fixture['operation_id']=None
+            output.write_text(json.dumps(fixtures,ensure_ascii=False,indent=2))
             print(f'TEAMS: {len(checks)} checks passed')
         finally:
             for p in players:p.close()

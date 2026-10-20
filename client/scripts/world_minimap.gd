@@ -61,10 +61,10 @@ func _draw() -> void:
 			if local and world.astar.is_point_solid(point): fill = fill.darkened(0.35)
 			draw_rect(Rect2(origin + Vector2(point) * scale_value, Vector2.ONE * scale_value), fill)
 	var map_id: String = world.map_id if local else String(shared_map.map_id)
-	var spawn:=SoulRules.resurrection_point(map_id)
-	draw_circle(origin+Vector2(spawn)*scale_value,2,Color("e5e5e5"),false,1)
-	var corpse:Dictionary=Game.player.corpse if local and Game.is_soul() else shared_corpse
+	var corpse:Dictionary=(Game.player.corpse if Game.is_soul() else {}) if local else shared_corpse
 	if not corpse.is_empty() and corpse.get("map_id")==map_id:
+		var spawn:=SoulRules.resurrection_point(map_id)
+		draw_circle(origin+Vector2(spawn)*scale_value,2,Color("e5e5e5"),false,1)
 		var grave_point:=origin+Vector2(corpse.cell[0],corpse.cell[1])*scale_value
 		draw_line(grave_point-Vector2(2,0),grave_point+Vector2(2,0),Color.WHITE,1)
 		draw_line(grave_point-Vector2(0,2),grave_point+Vector2(0,2),Color.WHITE,1)

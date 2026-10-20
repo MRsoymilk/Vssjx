@@ -25,6 +25,17 @@ func _run()->void:
 	var old_hash:=FileAccess.get_sha256(old_path) if FileAccess.file_exists(old_path) else ""
 	var pending:=OnlineAccount.pending_pve.duplicate(true)
 	Game.save_path="user://soul_test_%d.json"%Time.get_ticks_usec()
+	var markers: SoulMarkers=load("res://scenes/actors/soul_markers.tscn").instantiate()
+	check(not markers.get_node("ResurrectionPoint").visible,"Resurrection point is hidden before the first state snapshot")
+	add_child(markers)
+	check(not markers.spawn_marker.visible and not markers.grave.visible,"Living state hides resurrection point and corpse by default")
+	markers.display("qingyun_trail",SoulRules.create("qingyun_trail",Vector2i(22,9)))
+	check(markers.spawn_marker.visible and markers.grave.visible,"Death reveals the shared local/online resurrection markers")
+	markers.display("ancient_ruins",markers.corpse)
+	check(not markers.spawn_marker.visible and not markers.grave.visible,"A different map cannot show stale death markers")
+	markers.display("qingyun_trail")
+	check(not markers.spawn_marker.visible and not markers.grave.visible,"Clearing the authoritative death state hides both markers again")
+	markers.queue_free();await get_tree().process_frame
 	AIWorld.prepare()
 	var maps:Array=SharedWorldMap.MAPS.keys()+AIWorld.maps.keys()
 	for map_id in maps:
@@ -58,7 +69,7 @@ func _run()->void:
 	check(not Game.valid_save(forged),"Invalid corpse coordinates are rejected")
 	var app=load("res://scenes/main.tscn").instantiate();add_child(app);app._enter_world()
 	check(app.world.soul_markers.grave.visible and app.world.hero.modulate.a<1,"Map has a native gravestone and translucent soul actor")
-	check(app.world.soul_markers.spawn_marker.position==Vector2(168,264),"Visible resurrection marker matches the shared spawn definition")
+	check(app.world.soul_markers.spawn_marker.visible and app.world.soul_markers.spawn_marker.position==Vector2(168,264),"Death reveals the resurrection marker at the shared spawn definition")
 	await capture("soul-spawn")
 	var target:Dictionary=app.world.soul_markers.target()
 	var near:Vector2i=target.cell+Vector2i.DOWN
@@ -74,7 +85,7 @@ func _run()->void:
 	check(not failure.ok and Game.is_soul() and Game.player.hp==0,"Failed durable save rolls recovery back to soul state")
 	await app._world_interaction("corpse",corpse)
 	check(not Game.is_soul() and Game.player.hp==Game.stats().hp and Game.player.mp==Game.stats().mp,"Nearby corpse interaction restores full health and mana")
-	check(not app.world.soul_markers.grave.visible and not app.soul_overlay.visible and app.world.hero.modulate==Color.WHITE,"Revival clears grave, gray UI and spirit transparency")
+	check(not app.world.soul_markers.spawn_marker.visible and not app.world.soul_markers.grave.visible and not app.soul_overlay.visible and app.world.hero.modulate==Color.WHITE,"Revival clears resurrection marker, grave, gray UI and spirit transparency")
 	await capture("revived")
 	check((await Game.load_game()).ok and not Game.is_soul(),"Revived state survives disk reload")
 	check(not (await Game.recover_corpse(corpse.id,app.world.cell)).ok,"Duplicate recovery cannot create another restore")
@@ -93,7 +104,7 @@ func _run()->void:
 			online.camera.position=online.actors[c.id].root.position
 			online._update_soul_visuals()
 			var spirit:bool=c.get("corpse") is Dictionary
-			check(online.soul_overlay.visible==spirit and online.soul_markers.grave.visible==spirit,"Production online view renders and removes the private corpse from actual server snapshots")
+			check(online.soul_overlay.visible==spirit and online.soul_markers.grave.visible==spirit and online.soul_markers.spawn_marker.visible==spirit,"Production online view reveals resurrection markers only in authoritative soul state")
 			check((online.actors[c.id].sprite.modulate.a<1)==spirit,"Online actor transparency follows authoritative soul state")
 			await capture("online-soul" if spirit else "online-revived")
 			online.queue_free();await get_tree().process_frame

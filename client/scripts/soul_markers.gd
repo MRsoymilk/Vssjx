@@ -25,6 +25,7 @@ func display(id: String, value: Dictionary = {}) -> void:
 	if not is_node_ready():return
 	spawn_marker.position=Vector2(SoulRules.resurrection_point(id)*16)+Vector2(8,8)
 	grave.visible=not corpse.is_empty() and corpse.get("map_id")==id
+	spawn_marker.visible=grave.visible
 	if grave.visible:grave.position=Vector2(int(corpse.cell[0])*16+8,int(corpse.cell[1])*16+8)
 
 func target() -> Dictionary:

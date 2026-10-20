@@ -1,5 +1,7 @@
 # 寻尸复活验收
 
+2026-10-20复活点显示调整：场景初始、正常角色及复活后隐藏世界复活点和小地图标记；死亡时显示，错地图的旧尸体状态不显示。本地／联机共享标记场景，实际OpenGL寻尸检查467项通过，包含默认隐藏、死亡出现、跨图清理、复活移除和存档保留；截图在`work/soul-marker-visibility/`。本次未重新导出或部署。
+
 - `tests/run_soul_recovery.py`：独占临时 PostgreSQL / Rust 服务 / WebSocket，18 项通过。实际战败、原地坟堆、同图 spawn、资产保留、灵魂操作限制、错误尸体／距离拒绝、真实进程重启、失败事务回滚、成功复活和回执重放。
 - `client/tests/soul_recovery_test.tscn`：所有现有地图复活点／尸体格式验证、本地战败落盘与重读、恢复限制、寻路返回坟堆、保存失败回滚、复活去灰／删除坟堆、真实服务端快照验证。
 - Xvfb + Mesa llvmpipe 实际 OpenGL ES 离屏渲染，472 项通过。截图及日志：`work/soul-recovery/`（忽略目录）。`soul-spawn.png`、`corpse-nearby.png`、`revived.png` 已人工检查；逐像素抽样验证灵魂全屏灰度及复活后恢复彩色。还将真实服务端死亡／复活快照注入正式联机界面，校验坟堆、灰色界面和人物半透明的显示／撤销，截图 `online-soul.png`、`online-revived.png`。

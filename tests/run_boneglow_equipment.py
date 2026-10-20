@@ -75,7 +75,7 @@ def main(family='boneglow'):
                     command(actor,'equip',entry['id'])
                     check(actor.state['shop']['slots'][entry['slot']]==entry['id'],'authoritative slot')
                 look = [definition['weapon_code'],definition['clothing_code'],definition['head_code']]
-                check(actor.state['stats']['defense']==base_defense+27 and actor.state['stats']['attack']==base_attack+(14 if family=='gravebloom' else 12),'all set stats')
+                check(actor.state['stats']['defense']==base_defense+27 and actor.state['stats']['attack']==base_attack+(12 if family=='boneglow' else 14),'all set stats')
                 check(int(db.query(f"SELECT COUNT(*) FROM inventory_items WHERE character_id='{actor.id}' AND equipped"))==10,'ten database slots')
                 expected_hash = hashlib.sha256((ROOT/'client/assets/data/shop-v2.json').read_text('utf8').encode()).hexdigest()
                 check(actor.state['shop']['catalog_sha256']==expected_hash,'matching client/server catalog')
@@ -86,7 +86,7 @@ def main(family='boneglow'):
                 command(actor,'buy',wrong_job)
                 check(command(actor,'equip',wrong_job,False)['code']=='WRONG_JOB','server rejects another job')
                 check(command(actor,'buy',f'ai/{family}/fake/weapon',False)['code']=='INVALID_EQUIPMENT','unknown item refused')
-                if family=='gravebloom':
+                if family!='boneglow':
                     old_hat=f"ai/boneglow/{definition['stem']}/hat"
                     command(actor,'buy',old_hat)
                     command(actor,'equip',old_hat)

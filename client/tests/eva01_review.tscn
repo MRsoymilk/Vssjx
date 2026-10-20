@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="PackedScene" path="res://tests/boneglow_review.tscn" id="1"]
+
+[node name="Eva01Review" instance=ExtResource("1")]
+family = "eva01"

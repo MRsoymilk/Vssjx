@@ -52,7 +52,7 @@ func _run() -> void:
 		var look := [int(definition.weapon_code),int(definition.clothing_code),int(definition.head_code)]
 		var gear := ShopRules.local_state(Game.player)
 		check(ShopRules.appearance(gear)==look and ShopRules.valid_gear(gear),"Full set produces valid authoritative gear and codes")
-		check(Game.stats().attack==base_stats.attack+(14 if family=="gravebloom" else 12) and Game.stats().defense==base_stats.defense+27,"All ten slots contribute the defined stats")
+		check(Game.stats().attack==base_stats.attack+(12 if family=="boneglow" else 14) and Game.stats().defense==base_stats.defense+27,"All ten slots contribute the defined stats")
 		check((await Game.load_game()).ok and ShopRules.appearance(ShopRules.local_state(Game.player))==look,"Purchase and full loadout survive disk reload")
 		var key := ShopRules.actor_key(int(definition.job),int(definition.gender),look)
 		var native := OriginalArt.actor_info("hero/"+definition.stem)
@@ -89,7 +89,8 @@ func _run() -> void:
 	app._scene_action("shop")
 	var game_shop: ShopPanel = app.modal.get_child(1)
 	game_shop.category=family_name+" · 本角色"
-	game_shop.category_box.select(17 if family=="boneglow" else 18)
+	for category_index in game_shop.category_box.item_count:
+		if game_shop.category_box.get_item_text(category_index)==family_name+" · 本角色": game_shop.category_box.select(category_index)
 	game_shop._filter()
 	check(game_shop.goods.size()==10,"Game menu reaches the real themed shop category")
 	await capture("shop")

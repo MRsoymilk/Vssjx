@@ -5,6 +5,7 @@ Requires Xvfb and an OpenGL driver (Mesa software rendering works).
 GODOT_BIN / XVFB_BIN can override the executable paths. No desktop is touched.
 """
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -14,10 +15,14 @@ def main():
     xvfb = os.environ.get('XVFB_BIN') or shutil.which('Xvfb')
     if not xvfb:
         raise SystemExit('Install Xvfb or set XVFB_BIN; --headless only tests logic')
+    screen = os.environ.get('SSJX_OFFSCREEN_SCREEN', '640x960x24')
+    dimensions = re.fullmatch(r'([0-9]{3,4})x([0-9]{3,4})x24', screen)
+    if not dimensions or not all(320 <= int(value) <= 8192 for value in dimensions.groups()):
+        raise SystemExit('SSJX_OFFSCREEN_SCREEN must be WIDTHxHEIGHTx24 (320..8192)')
     read_fd, write_fd = os.pipe()
     try:
         server = subprocess.Popen([xvfb, '-displayfd', str(write_fd), '-screen', '0',
-                                   '640x960x24', '-nolisten', 'tcp', '-ac'],
+                                   screen, '-nolisten', 'tcp', '-ac'],
                                   pass_fds=(write_fd,))
     except OSError:
         os.close(read_fd)

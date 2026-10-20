@@ -3,7 +3,8 @@ extends RefCounted
 ## Data-driven native-layer registry for all additional equipment families.
 const FAMILIES := [
 	{"id":"boneglow","name":"骨甲幽光","path":"res://assets/data/boneglow-equipment.json"},
-	{"id":"gravebloom","name":"冥林异装","path":"res://assets/data/gravebloom-equipment.json"}
+	{"id":"gravebloom","name":"冥林异装","path":"res://assets/data/gravebloom-equipment.json"},
+	{"id":"eva01","name":"初号机","path":"res://assets/data/eva01-equipment.json"}
 ]
 const NATIVE_LIMITS := [27,11,9]
 static var _data: Dictionary = {}

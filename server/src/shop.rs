@@ -104,7 +104,28 @@ mod tests {
             gear.insert(format!("ai/boneglow/{stem}/hat"),true);
             assert_eq!(appearance(&gear),[34+index as i32,18+index as i32,10+index as i32]);
         }
-        assert_eq!(ITEMS.len(),334);
+        assert_eq!(ITEMS.len(),394);
+    }
+    #[test]
+    fn eva01_sets_preserve_role_restrictions_and_mix_with_previous_families(){
+        for (index,stem) in ["mzs","wzs","mck","wck","mfs","wfs"].iter().enumerate(){
+            let mut gear=BTreeMap::new();
+            for slot in SLOTS {
+                let id=format!("ai/eva01/{stem}/{slot}");
+                let entry=item(&id).expect("every EVA slot is catalogued");
+                assert_eq!(entry.slot,slot);
+                assert_eq!(entry.equip_error((index/2) as i16,(index%2) as i16),None);
+                assert_eq!(entry.equip_error((index/2) as i16,1-(index%2) as i16),Some("WRONG_GENDER"));
+                assert_eq!(entry.equip_error(((index/2+1)%3) as i16,(index%2) as i16),Some("WRONG_JOB"));
+                gear.insert(id,true);
+            }
+            assert_eq!(appearance(&gear),[40+index as i32,24+index as i32,22+index as i32]);
+            assert_eq!(bonus(&gear),(14,27));
+            gear.insert(format!("ai/eva01/{stem}/hat"),false);
+            gear.insert(format!("ai/gravebloom/{stem}/hat"),true);
+            assert_eq!(appearance(&gear),[40+index as i32,24+index as i32,16+index as i32]);
+        }
+        assert!(item("ai/eva01/unknown/weapon").is_none());
     }
     #[test]
     fn legacy_wire_response_never_rewrites_full_receipt_or_exposes_unknown_items(){

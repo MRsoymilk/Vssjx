@@ -3,6 +3,7 @@ import hashlib
 import importlib.util
 import json
 from pathlib import Path
+import re
 import unittest
 
 from PIL import Image
@@ -89,6 +90,18 @@ class Eva01Assets(unittest.TestCase):
             for item in rows:
                 self.assertEqual((item['job'],item['gender']),(index//2,index%2))
                 self.assertTrue((ROOT/'client'/item['icon'][6:]).is_file())
+
+    def test_catalog_and_migration_preserve_existing_items_and_slot_constraints(self):
+        catalog=json.loads((ROOT/'client/assets/data/shop-v2.json').read_text())['items']
+        self.assertEqual(len(catalog),394)
+        self.assertEqual([i for i in catalog if i['id'].startswith('ai/eva01/')],builder.equipment_items())
+        sql=(ROOT/'server/migrations/0023_eva01_equipment.sql').read_text()
+        whitelist=re.search(r'definition_id IN \((.*?)\)\)',sql)[1]
+        self.assertEqual(set(re.findall("'([^']+)'",whitelist)),{i['id'] for i in catalog})
+        for ids,slot in re.findall(r"WHEN definition_id IN \((.*?)\) THEN '([^']+)'",sql):
+            self.assertEqual(set(re.findall("'([^']+)'",ids)),{i['id'] for i in catalog if i['slot']==slot})
+        self.assertIn('CREATE UNIQUE INDEX one_equipped_per_slot',sql)
+        self.assertNotIn('DELETE FROM',sql.upper())
 
 
 if __name__ == '__main__':

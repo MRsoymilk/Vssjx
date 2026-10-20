@@ -1,0 +1,17 @@
+{
+  "version": "monster-combat-v1",
+  "solo_counts": [60, 88, 100],
+  "strong_kinds": ["boss", "guardian", "elite"],
+  "strong_level": 10,
+  "combo_chance": 25,
+  "sweep_chance": 20,
+  "rend_chance": 20,
+  "combo_bp": 7000,
+  "sweep_bp": 8000,
+  "rend_bp": 11000,
+  "bleed_bp": 2000,
+  "bleed_rounds": 3,
+  "normal_crit": 8,
+  "strong_crit": 15,
+  "crit_bp": 15000
+}

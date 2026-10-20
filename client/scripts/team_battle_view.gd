@@ -14,6 +14,8 @@ var hint:Label
 var caption:Label
 var picker:SkillPicker
 var effects:BattleEffects
+var move_callout:BattleMoveCallout
+var _effect_wait:=""
 var result:BattleResultView
 var queue:Array=[]
 var motion:BattleActionPlayback
@@ -30,6 +32,7 @@ func _ready()->void:
 		var part:=Sprite2D.new();part.texture=load("res://assets/ui/select_%d.png"%i);part.position=[Vector2(0,-9),Vector2(0,8),Vector2(-15,0),Vector2(15,0)][i];target_marker.add_child(part)
 	actors_layer=Node2D.new();add_child(actors_layer)
 	effects=BattleEffects.new();add_child(effects)
+	move_callout=preload("res://scenes/ui/battle_move_callout.tscn").instantiate();add_child(move_callout)
 	caption=OriginalSceneChrome.label(self,"",Rect2(4,3,312,25),12,Color("654518"))
 	hint=OriginalSceneChrome.label(self,"",Rect2(4,286,312,29),11,Color("654518"));hint.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
 	var original_hud:Control=preload("res://scenes/ui/battle_hud.tscn").instantiate()
@@ -51,6 +54,8 @@ func _ready()->void:
 func _dismiss()->void:
 	_closed=battle_id;_cancel();hide();dismissed.emit()
 func _cancel()->void:
+	_effect_wait=""
+	if is_instance_valid(move_callout):move_callout.clear()
 	if is_instance_valid(effects):effects.clear()
 	if motion!=null:motion.cancel()
 	motion=null;queue=[]
@@ -114,7 +119,7 @@ func _display(id:String,text:String,hp:int,max_hp:int)->void:
 	var a:Dictionary=actors[id];a.tag.text=text;a.hp.max_value=max_hp;a.hp.value=hp;a.hp.tooltip_text="%s %d/%d"%[text,hp,max_hp]
 	a.dead=hp==0
 func _choose(action:String)->void:
-	if motion!=null or not queue.is_empty() or model.pending() or not model.active():return
+	if motion!=null or not queue.is_empty() or not _effect_wait.is_empty() or model.pending() or not model.active():return
 	if action not in ["inspect","flee"] and not model.my_turn():return
 	menu.hide()
 	if action=="inspect":
@@ -134,8 +139,8 @@ func _send(action:String,skill:String="")->void:
 func _refresh_controls()->void:
 	var b:Dictionary=model.battle()
 	if b.is_empty():return
-	var executing:=motion!=null or not queue.is_empty()
-	caption.text="队伍战斗 · 第%d回合 · %d名敌人"%[maxi(1,int(b.round)-(1 if executing and b.has("commands") else 0)),b.enemies.size()]
+	var executing:=motion!=null or not queue.is_empty() or not _effect_wait.is_empty()
+	caption.text=("单人遭遇" if b.fighters.size()==1 else "队伍战斗")+" · 第%d回合 · %d名敌人"%[maxi(1,int(b.round)-(1 if executing and b.has("commands") else 0)),b.enemies.size()]
 	var left:=maxi(0,ceili((int(b.deadline_ms)-model.server_time-(Time.get_ticks_msec()-model.received_at))/1000.0))
 	var message:="等待确认" if model.pending() else ("轮到你行动" if model.my_turn() else "等待队友")
 	if b.has("commands"):
@@ -143,10 +148,11 @@ func _refresh_controls()->void:
 		for f in b.fighters:
 			if f.hp>0:alive+=1
 		message="已提交 %d/%d · %s"%[b.commands.size(),alive,"请选择指令" if model.my_turn() else ("已锁定，等待队友" if b.commands.has(model.character_id) else "等待指令窗口")]
-		if motion!=null or not queue.is_empty() or model.server_time+Time.get_ticks_msec()-model.received_at<int(b.selection_starts_ms):message="逐个执行中 · 下轮指令共用30秒";left=0
+		if motion!=null or not queue.is_empty() or not _effect_wait.is_empty() or model.server_time+Time.get_ticks_msec()-model.received_at<int(b.selection_starts_ms):message="逐个执行中 · 下轮指令共用30秒";left=0
 	hint.text=message if left==0 and b.has("commands") else "%s · %d秒"%[message,left]
-	for i in action_buttons.size():action_buttons[i].disabled=not model.active() or not model.can_submit() or motion!=null or not queue.is_empty() or (not model.my_turn() if i<4 else (not model.party().get("leader",false) if i==5 else false))
-	command_toggle.disabled=not model.active() or model.pending() or motion!=null or not queue.is_empty()
+	if b.get("wounds",{}).has(model.character_id):hint.text+=" · 流血%d回合"%int(b.wounds[model.character_id][0])
+	for i in action_buttons.size():action_buttons[i].disabled=not model.active() or not model.can_submit() or motion!=null or not queue.is_empty() or not _effect_wait.is_empty() or (not model.my_turn() if i<4 else (not model.party().get("leader",false) if i==5 else false))
+	command_toggle.disabled=not model.active() or model.pending() or motion!=null or not queue.is_empty() or not _effect_wait.is_empty()
 	if not model.active():menu.hide();inspect_panel.hide();picker.hide()
 
 func _unhandled_key_input(event:InputEvent)->void:
@@ -156,9 +162,16 @@ func _unhandled_key_input(event:InputEvent)->void:
 	elif event.keycode==KEY_ESCAPE:menu.hide();inspect_panel.hide();get_viewport().set_input_as_handled()
 func _process(delta:float)->void:
 	if not visible:return
+	move_callout.update_anchor()
+	if not _effect_wait.is_empty():
+		if effects.has_skill_effects(_effect_wait):return
+		_effect_wait=""
 	if motion!=null:
 		motion.advance(delta)
-		if not motion.active:motion=null;_start_deaths()
+		if not motion.active:
+			if playing.get("action")=="skill" and effects.has_skill_effects(playing.get("skill","")):_effect_wait=playing.skill
+			motion=null
+			if _effect_wait.is_empty():_start_deaths()
 	elif not queue.is_empty():_play(queue.pop_front())
 	else:
 		_sync_final_resources()
@@ -189,11 +202,11 @@ func _play(event:Dictionary)->void:
 	if event.action not in ["attack","skill","guard","potion","dot","regen"]:return
 	playing=event
 	var group:Array=[event]
-	while event.action=="skill" and not queue.is_empty() and queue[0].actor==event.actor and queue[0].skill==event.skill and queue[0].get("packet")==event.get("packet"):
+	while event.action=="skill" and not queue.is_empty() and queue[0].actor==event.actor and queue[0].target!=event.target and queue[0].skill==event.skill and queue[0].get("packet")==event.get("packet"):
 		group.append(queue.pop_front())
 	var mode:StringName=&"cast" if event.action=="skill" and a.sprite.sprite_frames.has_animation("cast") else &"attack"
 	if event.action in ["guard","potion","dot","regen"]:mode=&"idle"
-	if event.action=="skill" and SkillRules.item(event.skill).get("damage_percent",0)==0:mode=&"cast" if a.sprite.sprite_frames.has_animation("cast") else &"idle"
+	if event.action=="skill" and not SkillRules.item(event.skill).is_empty() and SkillRules.item(event.skill).get("damage_percent",0)==0:mode=&"cast" if a.sprite.sprite_frames.has_animation("cast") else &"idle"
 	motion=BattleActionPlayback.new()
 	motion.impact.connect(func()->void:
 		for hit in group:
@@ -207,3 +220,5 @@ func _play(event:Dictionary)->void:
 			if int(hit.damage)>0 and receiver.sprite.sprite_frames.has_animation("hurt"):receiver.sprite.play("hurt")
 	)
 	motion.start(a.sprite,OriginalArt.actor_info(a.key),target.sprite.global_position,mode,target.sprite)
+	if String(event.skill).begins_with("monster_"):move_callout.present_for("流血" if event.skill=="monster_bleed" else MonsterCombat.action_name(event.skill),a.sprite,motion.duration)
+	elif event.action=="skill":move_callout.present_for(SkillRules.item(event.skill).get("name",""),a.sprite,motion.duration)

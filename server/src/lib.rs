@@ -1,6 +1,7 @@
 pub mod shop;
 pub mod combat_balance;
 pub mod skill_balance;
+pub mod monster_combat;
 pub mod loot;
 pub mod soul;
 pub mod social;

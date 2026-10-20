@@ -69,6 +69,10 @@ pub struct Battle {
     pub events_revision: u64,
     #[serde(default)]
     pub selection_starts_ms: i64,
+    #[serde(default)]
+    pub monster_revision: u8,
+    #[serde(default, skip_serializing_if="BTreeMap::is_empty")]
+    pub wounds: BTreeMap<String, (i32, i32)>,
 }
 impl Battle {
     pub fn new(
@@ -128,6 +132,8 @@ impl Battle {
             round_revision: 0,
             events_revision: 0,
             selection_starts_ms: now,
+            monster_revision: 1,
+            wounds: BTreeMap::new(),
         }
     }
     pub fn active(&self) -> bool {
@@ -526,50 +532,48 @@ impl Battle {
             if alive.is_empty() {
                 break;
             }
-            let i = alive[((roll.max(0) as usize) + n + self.round as usize) % alive.len()];
-            let a = &mut self.fighters[i];
             let magical=balanced&&crate::skill_balance::monster_magical(&e.definition,self.round,e.effects.enemy_mp,e.effects.enemy_silence>0);
-            if magical{e.effects.enemy_mp-=10;}
-            let landed = crate::attributes::lands(None, Some(a.stats), magical);
-            let incoming = if landed {
-                crate::attributes::incoming(e.definition.attack,e.definition.level,a.stats,magical,0)
-            } else {
-                0
-            };
-            let incoming = if a.guarding && landed {
-                (incoming / 2).max(1)
-            } else {
-                incoming
-            };
-            let (incoming, reflected) = if landed {
-                a.effects.enemy_hit(incoming, magical)
-            } else {
-                (0, 0)
-            };
-            let reflected = reflected
-                + if landed && a.job == 0 && a.guarding {
-                    6
-                } else {
-                    0
-                };
-            a.hp = (a.hp - incoming).max(0);
-            e.hp = (e.hp - reflected).max(0);
-            self.events.push(Event {
-                actor: e.slot.clone(),
-                target: a.id.to_string(),
-                action: "attack".into(),
-                skill: String::new(),
-                damage: incoming,
-                healed: 0,
-                critical: false,
-            });
+            let plan=crate::monster_combat::plan(&e.definition, if self.monster_revision>0 {(roll+n as i32*31).rem_euclid(100)}else{99},magical,e.effects.enemy_silence>0);
+            if plan.magical{e.effects.enemy_mp-=10;}
+            let chosen = alive[((roll.max(0) as usize) + n + self.round as usize) % alive.len()];
+            let targets = if plan.all {alive} else {vec![chosen]};
+            if !plan.skill.is_empty(){self.lines.push(format!("{}施展{}！",e.definition.name,crate::monster_combat::name(&plan.skill)));}
+            for hit in 0..plan.hits {
+                if e.hp<=0 {break;}
+                for &i in &targets {
+                    let a=&mut self.fighters[i];
+                    if a.hp<=0 || e.hp<=0 {continue;}
+                    let landed=crate::attributes::lands(None,Some(a.stats),plan.magical);
+                    let raw=if landed{crate::attributes::incoming(e.definition.attack,e.definition.level,a.stats,plan.magical,0)*plan.coefficient/10000}else{0};
+                    let (incoming,critical)=if self.monster_revision>0{crate::monster_combat::critical(&e.definition,raw,(roll*37+n as i32*19+hit as i32*43+i as i32*11).rem_euclid(100))}else{(raw,false)};
+                    let incoming=if landed&&a.guarding{(incoming/2).max(1)}else{incoming};
+                    let (incoming,reflected)=if landed{a.effects.enemy_hit(incoming.max(1),plan.magical)}else{(0,0)};
+                    let reflected=(reflected+if landed&&a.job==0&&a.guarding{6}else{0}).min(e.hp);
+                    let damage=incoming.min(a.hp);
+                    a.hp=(a.hp-incoming).max(0);e.hp-=reflected;
+                    self.events.push(Event{actor:e.slot.clone(),target:a.id.to_string(),action:if plan.skill.is_empty(){"attack"}else{"skill"}.into(),skill:plan.skill.clone(),damage,healed:0,critical});
+                    if reflected>0{self.events.push(Event{actor:a.id.to_string(),target:e.slot.clone(),action:"dot".into(),skill:String::new(),damage:reflected,healed:0,critical:false});}
+                    if plan.bleed&&damage>0&&a.hp>0{
+                        let amount=(incoming*crate::monster_combat::n("bleed_bp")/10000).max(1);
+                        let wound=self.wounds.entry(a.id.to_string()).or_insert((0,0));
+                        wound.0=crate::monster_combat::n("bleed_rounds");wound.1=wound.1.max(amount);
+                        self.lines.push(format!("{}受到撕裂，流血{}回合。",a.name,wound.0));
+                    }
+                }
+            }
         }
         for ally in &mut self.fighters {
             if ally.hp>0{let before=ally.hp;ally.effects.end_balance_round(&mut ally.hp,ally.stats.hp);
                 if ally.hp>before{self.events.push(Event{actor:ally.id.to_string(),target:ally.id.to_string(),action:"regen".into(),skill:String::new(),damage:0,healed:ally.hp-before,critical:false});}
             }
+            if let Some((ticks,amount))=self.wounds.get_mut(&ally.id.to_string()){
+                if *ticks>0&&ally.hp>0{let damage=(*amount).min(ally.hp);ally.hp-=damage;*ticks-=1;
+                    self.events.push(Event{actor:ally.id.to_string(),target:ally.id.to_string(),action:"dot".into(),skill:"monster_bleed".into(),damage,healed:0,critical:false});
+                }
+            }
             ally.effects.end_turn();
         }
+        self.wounds.retain(|_,(ticks,_)|*ticks>0);
         for e in &mut self.enemies{
             if !e.dots.is_empty(){let mut total=0;for (ticks,amount) in e.dots.values_mut(){if *ticks>0{total+=*amount;*ticks-=1;}}let dealt=total.min(e.hp);e.hp=(e.hp-total).max(0);e.dots.retain(|_,(ticks,_)|*ticks>0);
                 if dealt>0{self.events.push(Event{actor:e.slot.clone(),target:e.slot.clone(),action:"dot".into(),skill:String::new(),damage:dealt,healed:0,critical:false});}

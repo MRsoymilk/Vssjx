@@ -100,7 +100,7 @@ func valid(v:Dictionary)->bool:
 		if not offer is Dictionary or not OnlineWorldClient._uuid(offer.get("id")) or not OnlineAccount.valid_nickname(offer.get("name","")):return false
 	var b:Variant=p.battle
 	if b==null:return true
-	if not b is Dictionary or not OnlineWorldClient._uuid(b.get("id")) or b.get("outcome") not in ["active","victory","defeat","fled"] or not b.get("fighters") is Array or b.fighters.is_empty() or b.fighters.size()>5 or not b.get("enemies") is Array or b.enemies.is_empty() or b.enemies.size()>5 or not b.get("events") is Array or b.events.size()>40 or not b.get("lines") is Array:return false
+	if not b is Dictionary or not OnlineWorldClient._uuid(b.get("id")) or b.get("outcome") not in ["active","victory","defeat","fled"] or not b.get("fighters") is Array or b.fighters.is_empty() or b.fighters.size()>5 or not b.get("enemies") is Array or b.enemies.is_empty() or b.enemies.size()>5 or not b.get("events") is Array or b.events.size()>128 or not b.get("lines") is Array:return false
 	if not OnlinePve.integer(b.get("turn"),0,b.fighters.size()-1) or not OnlinePve.integer(b.get("revision"),0,1000) or not OnlinePve.integer(b.get("round"),1,61) or not OnlinePve.integer(b.get("deadline_ms"),0,253402300799999):return false
 	var fighters:={}
 	for f in b.fighters:

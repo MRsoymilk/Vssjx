@@ -42,7 +42,7 @@ class SmtpTests(unittest.TestCase):
 
     def test_wrong_host_sender_tls_or_control_characters_are_rejected(self):
         for key, value in [('host', 'untrusted.example'), ('encryption', ''), ('port', True),
-                           ('password', 'secret\nvalue'), ('from_address', 'different@qq.com')]:
+                           ('password', 'secret\nvalue'), ('password', 'secret value'), ('from_address', 'different@qq.com')]:
             with self.subTest(key=key):
                 original = self.config[key]
                 self.config[key] = value
@@ -60,6 +60,7 @@ class SmtpTests(unittest.TestCase):
         self.assertNotIn(self.config['password'], str(output.call_args))
         self.assertNotIn("'allow_sign_up' => '1'", smtp.PHP)
         self.assertIn("'mail_smtp_verify_peer' => '1'", smtp.PHP)
+        self.assertIn('instanceof Flarum\\Mail\\SmtpDriver', smtp.PHP)
 
     def test_transport_output_is_not_exposed_on_failure(self):
         result = subprocess.CompletedProcess([], 1, '', 'fixture-secret sensitive debug')

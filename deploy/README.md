@@ -11,7 +11,7 @@
 | Ubuntu／Debian 公网 IP、Docker 与 TLS | [公网服务部署](PUBLIC.md) |
 | 导航首页与 `/webgame/` 兼容切换 | [导航切换说明](PORTAL.md)、[2026-10-19 门户发布](../tests/portal_release_20261019.md) |
 | 私有访问统计与 APK 文件管理 | [本地运行与未来启用](PORTAL_STATS.md)，当前未部署 |
-| 独立 Flarum 中文论坛 | [部署与维护](FLARUM.md)、[2026-10-20 发布](../tests/flarum_release_20261020.md)，注册暂关闭 |
+| 独立 Flarum 中文论坛 | [部署与维护](FLARUM.md)、[首次发布](../tests/flarum_release_20261020.md)、[SMTP 与注册开放](../tests/flarum_registration_20261020.md) |
 
 当前世界仅支持**一个游戏写进程**。多个进程连接同一数据库不构成世界集群；网页代理、容器健康和配置的人数上限也不代表容量验收。
 

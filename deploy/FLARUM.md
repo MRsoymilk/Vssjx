@@ -1,6 +1,6 @@
 # Flarum 论坛部署与维护
 
-[部署导航](README.md) · [门户路由](PORTAL.md) · [2026-10-20 发布与验证](../tests/flarum_release_20261020.md)
+[部署导航](README.md) · [门户路由](PORTAL.md) · [首次发布](../tests/flarum_release_20261020.md) · [邮件与注册开放](../tests/flarum_registration_20261020.md)
 
 ## 当前状态
 
@@ -8,7 +8,7 @@
 
 - 论坛：`https://47.93.114.190/flarum/`；管理页：`https://47.93.114.190/flarum/admin`。
 - 门户已经开放论坛链接；游戏入口和原 APK 不变。
-- **公开注册关闭**，邮件为 `log`，尚无可用 SMTP。不要把当前状态当作完整开放运营。
+- **公开注册已开放**，后续按用户授权接入 QQ SMTP；测试邮件已被用户确认收到。保留原有邮箱验证和发帖权限，不将短时验证当作完整运营验收。
 - 游戏与论坛账号独立，论坛没有 PostgreSQL、游戏凭据或 Docker socket 挂载。
 - 本轮没有部署私有统计、APK 管理，也没有推送 Git。
 
@@ -44,7 +44,11 @@ ssh ssjx@47.93.114.190 'cat /home/ssjx/services/vssjx-forum/bootstrap/admin-cred
 
 首次登录后改为本人邮箱并修改密码；`admin@example.invalid` 只是占位地址。之后按凭据管理规则处理初始凭据文件，不把它放进 Git 或公开备份。临时 `install.json` 已移除。
 
-开放注册前需要另外配置 SMTP、实际验证注册／验证邮件／找回密码，并审查发帖权限、防垃圾注册和上传策略。不要在 `log` 邮件模式下开放公众注册，也不要借用游戏密码做论坛单点登录。
+首次部署时使用 `log` 并关闭注册；随后按用户授权接入 `smtp.qq.com:465` 隐式 TLS，用户确认收到测试邮件后才开启注册。证书校验保持开启，不跳过邮箱验证，也不借用游戏密码做单点登录。真实用户的注册激活／找回密码仍需按实际使用验证，测试期间未创建生产测试账号。
+
+SMTP 输入文件为 `/home/ssjx/services/vssjx-forum/smtp.json`，属主须为执行维护工具的用户、权限 0600，拒绝符号链接。字段为 `host`、`port`、`encryption`、`username`、`password`、`from_address`、`from_name`；QQ 使用 465／`ssl` 和独立授权码，不用 QQ 登录密码。**不要打印、提交或下载该文件**。实际论坛邮件显示名沿用论坛标题，测试邮件使用输入的 `from_name`。
+
+维护工具为 `tools/configure_flarum_smtp.py`（先保持注册关闭，配置并通过真实应用邮件服务向发件邮箱发一封测试邮件）和 `tools/set_flarum_registration.py --confirm-smtp-receipt`（操作人确认收件后才开放）。前者失败时尝试恢复原邮件设置，所有错误仅输出固定摘要；超时或恢复异常需核对私有设置，不能盲目重试。后续换邮箱／授权码时先暂停注册、备份并重新测试，不直接绕过这一确认流程。
 
 ## 镜像准备与升级边界
 
@@ -80,6 +84,8 @@ python3 /home/ssjx/services/vssjx-forum/release/backup_flarum.py --directory /ho
 
 使用 SQLite 在线备份 API 生成一致的数据库快照，再与 `config.php`、assets 一起归档；不会直接复制活跃 WAL 主文件，不归档会话或初始明文密码。初始备份已检查 SQLite 完整性。assets 是在线复制，若需严格对应大量并发上传，应安排仅论坛维护窗口。
 
+**启用 SMTP 后，论坛数据库及其备份包含明文 SMTP 授权码设置。** 所有相关目录与归档必须保持私有，不上传公共存储、不进入 Git；轮换授权码后旧备份仍含旧值，恢复后需重新核对。
+
 **尚未配置每日自动备份、异机备份或自动清理**，也未完成停服恢复演练。备份包含论坛私有数据，应限制读取并监控磁盘；不要将备份放入静态目录。恢复必须先停论坛写入，将归档中的 `.backup-<时间>.sqlite` 恢复为 `forum.sqlite` 并配套恢复配置／assets、权限与版本；不要向运行中的数据库覆盖文件，不操作游戏 PostgreSQL。
 
 ## Nginx 与门户维护
@@ -95,6 +101,8 @@ python3 /home/ssjx/services/vssjx-forum/release/backup_flarum.py --directory /ho
 ## 已知限制
 
 - 当前是低流量试运行，空闲论坛实测约 95 MiB，不代表峰值或并发容量保证。
-- 未做真实邮件、公众注册、真实用户上传、高并发或长稳验收；管理员登录／管理页只用本地临时夹具验证。
+- 真实测试邮件已送达并由用户确认；公网已验证注册表单，未提交测试账号。未做完整注册激活／找回密码、真实用户上传、高并发或长稳验收；管理员登录／管理页只用本地临时夹具验证。
 - 论坛默认表情可能按需访问其配置的第三方 CDN；初次页面加载实测没有第三方请求，不等于所有交互都完全离线。
 - 新插件、扩容、邮件及公开注册应单独评审，不自动延伸本次授权。
+
+当前开放状态的只读验证：`python tests/check_flarum.py https://47.93.114.190/flarum --registration open`。首次部署时的关闭注册检查默认值保留，避免新安装被意外开放。

@@ -27,6 +27,8 @@ def read_config(path):
         raise ValueError('SMTP_CONFIG_VALUES_INVALID')
     if config['username'] != config['from_address'] or not config['username'].lower().endswith('@qq.com'):
         raise ValueError('QQ_SENDER_ACCOUNT_MISMATCH')
+    if any(any(char.isspace() for char in config[key]) for key in ('username', 'password', 'from_address')):
+        raise ValueError('SMTP_CREDENTIALS_MUST_NOT_CONTAIN_WHITESPACE')
     return config
 
 
@@ -53,6 +55,9 @@ try {
         foreach ($values as $key => $value) { $settings->set($key, $value); }
     });
     $changed = true;
+    if (!($container->make(Flarum\Mail\DriverInterface::class) instanceof Flarum\Mail\SmtpDriver)) {
+        throw new RuntimeException('SMTP_DRIVER_VALIDATION_FAILED');
+    }
     // Do not put transport exceptions (which may include SMTP debug) in logs.
     $container->instance(Psr\Log\LoggerInterface::class, new Psr\Log\NullLogger());
     $mailer = $container->make(Illuminate\Contracts\Mail\Mailer::class);

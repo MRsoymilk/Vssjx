@@ -35,7 +35,7 @@
 
 2026-10-19 仅更新了门户和网页入口：游戏移至 `/webgame/`，原游戏包、APK、后端和数据库保持不变，见 [门户发布记录](tests/portal_release_20261019.md)。
 
-2026-10-20 独立部署了 [Flarum 中文论坛](deploy/FLARUM.md)，门户已开放入口，暂不开放注册；不连接游戏账号或数据库，见 [论坛发布记录](tests/flarum_release_20261020.md)。
+2026-10-20 独立部署了 [Flarum 中文论坛](deploy/FLARUM.md)，门户已开放入口；后续接入 QQ SMTP、确认测试投递后[开放注册](tests/flarum_registration_20261020.md)，保留邮箱验证，不连接游戏账号或数据库。首次部署基线见 [论坛发布记录](tests/flarum_release_20261020.md)。
 
 ## 快速开始
 

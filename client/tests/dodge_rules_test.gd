@@ -31,6 +31,8 @@ func _run()->void:
 	var flags:=SkillRules.new_state(1,3,60);flags.last_missed=true;flags.last_enemy_missed=true
 	check(SkillRules.valid_state(flags),"Optional miss flags coexist with legacy skill states")
 	SkillRules.reset_turn(flags);check(not flags.has("last_missed") and not flags.has("last_enemy_missed"),"Miss flags reset each turn")
+	flags.last_critical=true;SkillRules.miss(SkillRules.item("sheet_010"),flags,Game.stats(),int(Game.stats().mp))
+	check(flags.last_missed and not flags.get("last_critical",false),"A missed skill cannot inherit the previous target critical flag")
 	flags.last_missed="bad";check(not SkillRules.valid_state(flags),"Malformed legacy miss flag is rejected")
 	Game.player=old;Game.save_path=path
 	print("DODGE RULES: %d checks, %d failures"%[checks,failures]);get_tree().quit(0 if failures==0 else 1)

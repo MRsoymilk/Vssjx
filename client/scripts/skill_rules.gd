@@ -81,7 +81,7 @@ static func activate(state:Dictionary,stats:Dictionary)->void:
 	if SkillBalance.revised(stats) and not state.has("balance"):state.balance={"cooldowns":{},"targets":1,"control_protection":0,"last_enemy_magical":false}
 static func remaining(state:Dictionary,id:String)->int:return int(state.get("balance",{}).get("cooldowns",{}).get(id,0))
 static func miss(skill:Dictionary,state:Dictionary,stats:Dictionary,mp:int)->int:
-	activate(state,stats);state.last_missed=true;state.last_skill=skill.id;state.balance.cooldowns[skill.id]=SkillBalance.cooldown(skill)+1
+	activate(state,stats);state.erase("last_critical");state.last_missed=true;state.last_skill=skill.id;state.balance.cooldowns[skill.id]=SkillBalance.cooldown(skill)+1
 	return mp-SkillBalance.cost(skill,stats)
 static func end_balance_round(state:Dictionary,hp:int,max_hp:int)->Dictionary:
 	if not state.has("balance"):return {"damage":0,"hp":hp}

@@ -34,6 +34,7 @@ func verify_skill(id:String)->void:
 			sprites.append(entry.sprite);entry.sprite.pause()
 	check(sprites.size()==BattleEffects.binding(id).layers.size(),"Impact starts every matching native skill layer: "+id)
 	player.advance(player.duration)
+	app.battle_effects.advance_reactions(BattleDodgePlayback.DURATION) # The app clock is intentionally disabled in this test.
 	for frame in 3:await get_tree().process_frame
 	check(app.battle_stage=="player" and not app.battle.skills.last_enemy_acted,"Enemy cannot act while the skill effect is still playing: "+id)
 	if sprites.size()>1:

@@ -112,10 +112,11 @@ func choose(action:String)->void:
 
 func _hero_impact()->void:
 	if _hero_motion==null or _hero_motion.cancelled:return
+	if _playing.get("missed",false):effects.dodge(enemy,hero)
 	effects.number(enemy,int(_playing.get("damage",0)),_playing.get("critical",false))
 	effects.number(hero,int(_playing.get("reflected",0)))
-	effects.play_action(model.last_action,int(model.state.character.job),_playing.get("skill",""),hero,enemy)
-	if _enemy_took_damage and enemy.sprite_frames.has_animation("hurt"):enemy.play("hurt")
+	if model.last_action=="skill" or not _playing.get("missed",false):effects.play_action(model.last_action,int(model.state.character.job),_playing.get("skill",""),hero,enemy)
+	if _enemy_took_damage and not _playing.get("missed",false) and enemy.sprite_frames.has_animation("hurt"):enemy.play("hurt")
 	_shown_hero_hp=int(model.state.battle.hp);_shown_enemy_hp=int(model.state.battle.enemy_hp)
 	effects.play_reflection(int(opponent.job),int(opponent.school),int(opponent.level),opponent.effects,model.last_action=="skill" and int(model.state.character.job)==2,enemy,hero)
 
@@ -130,15 +131,16 @@ func _start_enemy_motion()->void:
 	_enemy_motion=BattleActionPlayback.new()
 	_enemy_motion.impact.connect(func()->void:
 		if _enemy_motion.cancelled:return
+		if event.get("missed",false):effects.dodge(hero,enemy)
 		effects.number(hero,int(event.get("damage",0)),event.get("critical",false))
 		effects.number(enemy,int(event.get("reflected",0)))
-		effects.play_action(event.action,int(opponent.job),event.skill,enemy,hero)
-		if int(model.state.battle.hp)<_shown_hero_hp and hero.sprite_frames.has_animation("hurt"):hero.play("hurt")
+		if event.action=="skill" or not event.get("missed",false):effects.play_action(event.action,int(opponent.job),event.skill,enemy,hero)
+		if int(model.state.battle.hp)<_shown_hero_hp and not event.get("missed",false) and hero.sprite_frames.has_animation("hurt"):hero.play("hurt")
 		_shown_hero_hp=int(model.state.battle.hp);_shown_enemy_hp=int(model.state.battle.enemy_hp)
 		var me:Dictionary=event.fighters[0] if event.fighters[0].id==channel.character_id else event.fighters[1]
 		effects.play_reflection(int(me.job),int(me.school),int(me.level),me.effects,event.action=="skill" and int(opponent.job)==2,hero,enemy)
 	)
-	_enemy_motion.completed.connect(func()->void:if not _enemy_motion.cancelled:_start_death())
+	_enemy_motion.completed.connect(func()->void:if not _enemy_motion.cancelled:_after_reactions(_start_death))
 	_enemy_motion.start(enemy,OriginalArt.actor_info(model.state.battle.enemy.art),enemy.global_position if support else hero.global_position,animation,enemy if support else hero)
 	move_callout.present_for(ShushanBattle.action_name(event.action,int(opponent.job),event.skill),enemy,_enemy_motion.duration)
 	animation_time=_enemy_motion.duration

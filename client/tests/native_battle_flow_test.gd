@@ -60,10 +60,16 @@ func run() -> void:
 			var response: BattleActionPlayback = app.battle_playback
 			check(response != null and response.actor == app.battle_enemy, "Enemy counterattack uses the same native playback")
 			check(not app.battle_move_callout.visible, "Player move bubble clears before enemy retaliation")
+			# This fixture verifies native hurt/recoil. Keep the enemy roll below
+			# the hit floor; explicit misses are covered by dodge_presentation_test.
+			var probe:=RandomNumberGenerator.new()
+			for seed_value in 1024:
+				probe.seed=seed_value;probe.randi_range(-2,2)
+				if probe.randi_range(0,9999)<500:app.battle.rng.seed=seed_value;break
 			response.advance(response.impact_time + 0.001)
 			check(app.battle_hero.animation == "hurt" and app.battle_enemy.get_index() > app.battle_hero.get_index(), "Native acting team draws the retaliating monster in front")
 			app.battle_hero.set_frame_and_progress(2, 0.0)
-			var hero_info := OriginalArt.actor_info(Game.actor_key())
+			var hero_info := OriginalArt.actor_info(Game.appearance_key())
 			check(app.battle_hero.offset.x == float(hero_info.origin[0]) + float(hero_info.native_battle.pose_x.hurt[2]), "Actual battle restores native state-6 recoil")
 			if job == 1 and gender == 1: await screenshot("-hero-hurt")
 			response.advance(response.remaining())
@@ -103,5 +109,6 @@ func run() -> void:
 	if FileAccess.file_exists(Game.save_path): DirAccess.remove_absolute(Game.save_path)
 	Game.save_path = save_path
 	Game.player = saved
+	await get_tree().create_timer(0.25).timeout
 	print("NATIVE BATTLE FLOW: %d checks, %d failures" % [checks, failures])
 	get_tree().quit(1 if failures else 0)

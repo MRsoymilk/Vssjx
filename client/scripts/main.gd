@@ -138,6 +138,7 @@ func _process(delta: float) -> void:
 	if Game.storage_busy or _closing: return
 	if is_instance_valid(map_transition) and map_transition.blocking: return
 	if OS.has_feature("web") and (not Platform.context.lifecycle.focused or Platform.context.lifecycle.suspended): return
+	if is_instance_valid(battle_effects):battle_effects.advance_reactions(delta)
 	if battle_playback != null: battle_playback.advance(delta)
 	if battle_death != null: battle_death.advance(delta)
 	clock_timer += delta
@@ -1192,9 +1193,10 @@ func _battle_turn(command: String, skill_id:String="") -> void:
 	var result := battle.resolve_player()
 	_battle_lines(result.lines)
 	if command in ["attack", "skill"]:
-		if int(result.damage) > 0 and battle_enemy.sprite_frames.has_animation("hurt"):
+		if int(result.damage) > 0 and not battle.skills.get("last_missed",false) and battle_enemy.sprite_frames.has_animation("hurt"):
 			battle_enemy.play("hurt")
-		battle_effects.play_action(command,int(Game.player.job),skill_id,battle_hero,battle_enemy)
+		if battle.skills.get("last_missed",false):battle_effects.dodge(battle_enemy,battle_hero)
+		if command=="skill" or not battle.skills.get("last_missed",false):battle_effects.play_action(command,int(Game.player.job),skill_id,battle_hero,battle_enemy)
 		battle_effects.number(battle_enemy,int(battle.skills.last_damage),battle.skills.get("last_critical",false))
 		battle_effects.number(battle_hero,int(battle.skills.last_healed),false,true)
 	_refresh_battle()
@@ -1210,6 +1212,9 @@ func _battle_turn(command: String, skill_id:String="") -> void:
 		while is_instance_valid(battle_effects) and battle_effects.has_skill_effects(skill_id):
 			await get_tree().process_frame
 			if epoch != _ui_epoch or mode != "battle" or battle != active_battle:return
+	while is_instance_valid(battle_effects) and battle_effects.has_reactions():
+		await get_tree().process_frame
+		if epoch!=_ui_epoch or mode!="battle" or battle!=active_battle:return
 	battle_playback = null
 	battle_move_callout.clear()
 	if battle.phase=="enemy" and int(battle.skills.enemy_sleep)>0:
@@ -1225,6 +1230,7 @@ func _battle_turn(command: String, skill_id:String="") -> void:
 		var response := battle.resolve_enemy()
 		_battle_lines(response.lines)
 		if int(response.incoming) > 0 and battle_hero.sprite_frames.has_animation("hurt"): battle_hero.play("hurt")
+		if battle.skills.get("last_enemy_missed",false):battle_effects.dodge(battle_hero,battle_enemy)
 		battle_effects.number(battle_hero,int(response.incoming))
 		if int(response.reflected) > 0:
 			battle_effects.play_reflection(int(Game.player.job),int(Game.player.school),int(Game.player.level),battle.skills,bool(battle.skills.get("balance",{}).get("last_enemy_magical",false)),battle_hero,battle_enemy)
@@ -1232,6 +1238,9 @@ func _battle_turn(command: String, skill_id:String="") -> void:
 		_refresh_battle()
 		await enemy_motion.completed
 		if epoch != _ui_epoch or enemy_motion.cancelled or mode != "battle" or battle != active_battle: return
+		while is_instance_valid(battle_effects) and battle_effects.has_reactions():
+			await get_tree().process_frame
+			if epoch!=_ui_epoch or mode!="battle" or battle!=active_battle:return
 		battle_playback = null
 	if battle.hp == 0 or battle.victory:
 		battle_stage = "settlement"

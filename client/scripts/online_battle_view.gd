@@ -17,6 +17,7 @@ var _hero_motion: BattleActionPlayback
 var _enemy_motion: BattleActionPlayback
 var _hero_death: BattleDeathPlayback
 var _enemy_death: BattleDeathPlayback
+var _reaction_next:Callable
 var _hero_key := ""
 var _shown_hero_hp := 0
 var _shown_enemy_hp := 0
@@ -30,6 +31,9 @@ var buttons: Array[Button] = []
 var skill_picker:SkillPicker
 var move_callout:BattleMoveCallout
 var effects:BattleEffects
+@onready var _hero_hp_home:Vector2=$Hud/BattleHeroHp.position
+@onready var _hero_mp_home:Vector2=$Hud/BattleHeroMp.position
+@onready var _enemy_hp_home:Vector2=$Hud/BattleEnemyHp.position
 @onready var _hero_level_home: Vector2 = $Hud/Level.position
 @onready var _enemy_level_home: Vector2 = $EnemyLevel.position
 const ACTIONS := ["attack", "skill", "guard", "potion", "inspect", "flee"]
@@ -113,7 +117,7 @@ func present(pve: OnlinePve) -> void:
 				_hero_motion = BattleActionPlayback.new()
 				_hero_motion.impact.connect(_hero_impact)
 				_hero_motion.completed.connect(func() -> void:
-					if not _hero_motion.cancelled: _start_enemy_motion()
+					if not _hero_motion.cancelled: _after_reactions(_start_enemy_motion)
 				)
 				_hero_motion.start(hero, OriginalArt.actor_info(_hero_key), hero.global_position if support else enemy.global_position, animation, hero if support else enemy)
 				move_callout.present_for(ShushanBattle.action_name(model.last_action,int(c.job),used_id),hero,_hero_motion.duration)
@@ -140,6 +144,7 @@ func present(pve: OnlinePve) -> void:
 	refresh()
 
 func _cancel_motion() -> void:
+	_reaction_next=Callable()
 	if is_instance_valid(effects):effects.clear()
 	if is_instance_valid(move_callout):move_callout.clear()
 	if _hero_death != null: _hero_death.cancel()
@@ -153,15 +158,20 @@ func _cancel_motion() -> void:
 	_enemy_attack_delay = 0.0
 	animation_time = 0.0
 
+func _after_reactions(next:Callable)->void:
+	if effects.has_reactions():_reaction_next=next
+	else:next.call()
+
 func _hero_impact() -> void:
 	if _hero_motion == null or _hero_motion.cancelled: return
-	effects.play_action(model.last_action,int(model.state.character.job),String(model.state.battle.get("skills",{}).get("last_skill","")),hero,enemy)
 	var status:Dictionary=model.state.battle.get("skills",{})
+	if status.get("last_missed",false):effects.dodge(enemy,hero)
+	if model.last_action=="skill" or not status.get("last_missed",false):effects.play_action(model.last_action,int(model.state.character.job),String(status.get("last_skill","")),hero,enemy)
 	var next_hp:=int(model.state.battle.enemy_hp)+int(status.get("last_reflected",0))
 	effects.number(enemy,int(status.get("last_damage",maxi(0,_shown_enemy_hp-next_hp))),status.get("last_critical",false))
 	effects.number(hero,int(status.get("last_healed",0)),false,true)
 	_shown_enemy_hp = int(model.state.battle.enemy_hp)+int(model.state.battle.get("skills",{}).get("last_reflected",0))
-	if _enemy_took_damage and enemy.sprite_frames.has_animation("hurt"): enemy.play("hurt")
+	if _enemy_took_damage and not status.get("last_missed",false) and enemy.sprite_frames.has_animation("hurt"): enemy.play("hurt")
 	$Hud/BattleEnemyHp.value = _shown_enemy_hp
 
 func _start_enemy_motion() -> void:
@@ -171,18 +181,19 @@ func _start_enemy_motion() -> void:
 		return
 	_enemy_motion = BattleActionPlayback.new()
 	_enemy_motion.completed.connect(func() -> void:
-		if not _enemy_motion.cancelled: _start_death())
+		if not _enemy_motion.cancelled: _after_reactions(_start_death))
 	_enemy_motion.impact.connect(func() -> void:
 		if _enemy_motion.cancelled: return
 		var took_damage := int(model.state.battle.hp) < _shown_hero_hp
 		var status:Dictionary=model.state.battle.get("skills",{})
+		if status.get("last_enemy_missed",false):effects.dodge(hero,enemy)
 		effects.number(hero,int(status.get("last_incoming",maxi(0,_shown_hero_hp-int(model.state.battle.hp)))))
 		effects.number(enemy,int(status.get("last_reflected",0)))
 		_shown_hero_hp = int(model.state.battle.hp)
 		_shown_enemy_hp = int(model.state.battle.enemy_hp)
 		var character:Dictionary=model.state.character
 		effects.play_reflection(int(character.job),int(character.school),int(character.level),model.state.battle.get("skills",{}),bool(model.state.battle.get("skills",{}).get("balance",{}).get("last_enemy_magical",false)),hero,enemy)
-		if took_damage and hero.sprite_frames.has_animation("hurt"): hero.play("hurt")
+		if took_damage and not status.get("last_enemy_missed",false) and hero.sprite_frames.has_animation("hurt"): hero.play("hurt")
 		$Hud/BattleHeroHp.value = _shown_hero_hp
 		$Hud/BattleEnemyHp.value = _shown_enemy_hp
 	)
@@ -230,6 +241,9 @@ func _follow_level(label: Control, actor: Node2D, station: Node2D, home: Vector2
 
 func refresh() -> void:
 	if model == null or not model.state.get("battle") is Dictionary: return
+	_follow_level($Hud/BattleHeroHp,hero,$Hero,_hero_hp_home)
+	_follow_level($Hud/BattleHeroMp,hero,$Hero,_hero_mp_home)
+	_follow_level($Hud/BattleEnemyHp,enemy,$Enemy,_enemy_hp_home)
 	_follow_level($Hud/Level, hero, $Hero, _hero_level_home)
 	_follow_level($EnemyLevel, enemy, $Enemy, _enemy_level_home)
 	if model.ready and animation_time <= 0:
@@ -340,6 +354,9 @@ func _process(delta: float) -> void:
 	if not model.ready:
 		_cancel_motion()
 	else:
+		effects.advance_reactions(delta)
+		if _reaction_next.is_valid() and not effects.has_reactions():
+			var next:=_reaction_next;_reaction_next=Callable();next.call()
 		var remaining_delta := delta
 		if _hero_motion != null and _hero_motion.active:
 			var player_delta := minf(remaining_delta, _hero_motion.remaining())
@@ -357,6 +374,7 @@ func _process(delta: float) -> void:
 		animation_time = (_hero_motion.remaining() if _hero_motion != null else 0.0) + (_enemy_motion.remaining() if _enemy_motion != null else 0.0)
 		if _hero_death != null: animation_time += _hero_death.remaining()
 		if _enemy_death != null: animation_time += _enemy_death.remaining()
+		animation_time=maxf(animation_time,effects.reaction_remaining())
 	if was_animating and animation_time == 0 and model.active() and not automatic: _open_menu()
 	if model.ready and model.active() and not model.pending() and animation_time == 0:
 		countdown = maxf(0.0, countdown - delta)

@@ -140,7 +140,7 @@ func _display(id:String,text:String,hp:int,max_hp:int)->void:
 	var a:Dictionary=actors[id];a.tag.text=text;a.hp.max_value=max_hp;a.hp.value=hp;a.hp.tooltip_text="%s %d/%d"%[text,hp,max_hp]
 	a.dead=hp==0
 func _choose(action:String)->void:
-	if motion!=null or not queue.is_empty() or not _effect_wait.is_empty() or model.pending() or not model.active():return
+	if motion!=null or not queue.is_empty() or not _effect_wait.is_empty() or effects.has_reactions() or model.pending() or not model.active():return
 	if action not in ["inspect","flee"] and not model.my_turn():return
 	menu.hide()
 	if action=="inspect":
@@ -162,7 +162,7 @@ func _send(action:String,skill:String="")->void:
 func _refresh_controls()->void:
 	var b:Dictionary=model.battle()
 	if b.is_empty():return
-	var executing:=motion!=null or not queue.is_empty() or not _effect_wait.is_empty()
+	var executing:=motion!=null or not queue.is_empty() or not _effect_wait.is_empty() or effects.has_reactions()
 	caption.text=("精英遭遇" if int(b.get("monster_revision",0))==2 else ("单人遭遇" if b.fighters.size()==1 else "队伍战斗"))+" · 第%d回合 · %d名敌人"%[maxi(1,int(b.round)-(1 if executing and (b.has("commands") or b.get("solo",false)) else 0)),b.enemies.size()]
 	var left:=maxi(0,ceili((int(b.deadline_ms)-model.server_time-(Time.get_ticks_msec()-model.received_at))/1000.0))
 	var message:="等待确认" if model.pending() else ("轮到你行动" if model.my_turn() else "等待队友")
@@ -171,12 +171,12 @@ func _refresh_controls()->void:
 		for f in b.fighters:
 			if f.hp>0:alive+=1
 		message="已提交 %d/%d · %s"%[b.commands.size(),alive,"请选择指令" if model.my_turn() else ("已锁定，等待队友" if b.commands.has(model.character_id) else "等待指令窗口")]
-		if motion!=null or not queue.is_empty() or not _effect_wait.is_empty() or model.server_time+Time.get_ticks_msec()-model.received_at<int(b.selection_starts_ms):message="逐个执行中 · 下轮指令共用30秒";left=0
+		if motion!=null or not queue.is_empty() or not _effect_wait.is_empty() or effects.has_reactions() or model.server_time+Time.get_ticks_msec()-model.received_at<int(b.selection_starts_ms):message="逐个执行中 · 下轮指令共用30秒";left=0
 	hint.text=message if left==0 and b.has("commands") else "%s · %d秒"%[message,left]
 	if b.get("solo",false):hint.text="逐个行动中" if executing else ("等待确认" if model.pending() else "点击敌人选定目标，再选择指令")
 	if b.get("wounds",{}).has(model.character_id):hint.text+=" · 流血%d回合"%int(b.wounds[model.character_id][0])
-	for i in action_buttons.size():action_buttons[i].disabled=not model.active() or not model.can_submit() or motion!=null or not queue.is_empty() or not _effect_wait.is_empty() or (not model.my_turn() if i<4 else (not model.party().get("leader",false) if i==5 else false))
-	command_toggle.disabled=not model.active() or model.pending() or motion!=null or not queue.is_empty() or not _effect_wait.is_empty()
+	for i in action_buttons.size():action_buttons[i].disabled=not model.active() or not model.can_submit() or motion!=null or not queue.is_empty() or not _effect_wait.is_empty() or effects.has_reactions() or (not model.my_turn() if i<4 else (not model.party().get("leader",false) if i==5 else false))
+	command_toggle.disabled=not model.active() or model.pending() or motion!=null or not queue.is_empty() or not _effect_wait.is_empty() or effects.has_reactions()
 	auto_button.visible=b.get("solo",false) and model.active()
 	command_toggle.position.x=84 if b.get("solo",false) else 124
 	auto_button.text="手动战斗" if automatic else "自动战斗"
@@ -196,6 +196,7 @@ func _unhandled_key_input(event:InputEvent)->void:
 func _process(delta:float)->void:
 	if not visible:return
 	if model.has_method("connected") and not model.connected():_cancel();hint.text="连接中断，正在恢复战斗……";return
+	effects.advance_reactions(delta)
 	move_callout.update_anchor()
 	_refresh_actor_anchors()
 	if not _effect_wait.is_empty():
@@ -208,13 +209,13 @@ func _process(delta:float)->void:
 			if playing.get("action")=="skill" and effects.has_skill_effects(playing.get("skill","")):_effect_wait=playing.skill
 			motion=null
 			if _effect_wait.is_empty():_start_deaths()
-	elif not queue.is_empty():
+	elif not queue.is_empty() and not effects.has_reactions():
 		var waiting:=false
 		if queue[0].action=="revive":
 			for death in deaths:
 				if death.actor==actors[queue[0].actor].sprite and death.active:waiting=true
 		if not waiting:_play(queue.pop_front())
-	else:
+	elif not effects.has_reactions():
 		_sync_final_resources()
 		_start_deaths()
 		if not model.active() and not model.battle().is_empty() and not model.pending() and deaths.all(func(d:BattleDeathPlayback)->bool:return not d.active):
@@ -225,7 +226,7 @@ func _process(delta:float)->void:
 	for death in deaths:death.advance(delta)
 	_refresh_actor_anchors()
 	_refresh_controls()
-	if model.battle().get("solo",false) and model.my_turn() and motion==null and queue.is_empty() and _effect_wait.is_empty() and not picker.visible:
+	if model.battle().get("solo",false) and model.my_turn() and motion==null and queue.is_empty() and _effect_wait.is_empty() and not effects.has_reactions() and not picker.visible:
 		solo_countdown=maxf(0,solo_countdown-delta);auto_elapsed+=delta
 		if automatic and auto_elapsed>=1.4:
 			auto_elapsed=0
@@ -289,10 +290,11 @@ func _play(event:Dictionary)->void:
 			receiver.hp.value=maxf(0,receiver.hp.value-int(hit.damage));receiver.dead=receiver.hp.value<=0
 			var healer:Dictionary=a if hit.actor!=hit.target and SkillRules.item(hit.get("skill","")).get("target")!="all_allies" else receiver
 			healer.hp.value=minf(healer.hp.max_value,healer.hp.value+int(hit.healed));healer.dead=healer.hp.value<=0
+			if hit.get("missed",false):effects.dodge(receiver.sprite,a.sprite)
 			effects.number(receiver.sprite,int(hit.damage),hit.get("critical",false))
 			effects.number(a.sprite if hit.actor!=hit.target and SkillRules.item(hit.get("skill","")).get("target")!="all_allies" else receiver.sprite,int(hit.healed),false,true)
 			if hit.action=="skill":effects.play_binding(hit.skill,"cast_impact",receiver.sprite if SkillRules.item(hit.skill).get("target")=="all_allies" else a.sprite,receiver.sprite,hit==group[0])
-			elif hit.action=="attack":effects.attach("effect/flash",receiver.sprite)
+			elif hit.action=="attack" and not hit.get("missed",false):effects.attach("effect/flash",receiver.sprite)
 			if int(hit.damage)>0 and receiver.sprite.sprite_frames.has_animation("hurt"):receiver.sprite.play("hurt")
 	)
 	motion.start(a.sprite,OriginalArt.actor_info(a.key),target.sprite.global_position,mode,target.sprite)

@@ -6,6 +6,7 @@ static var catalog:Dictionary=JSON.parse_string(FileAccess.get_file_as_string("r
 var _attachments:Array[Dictionary]=[]
 var _sounds:Array[AudioStreamPlayer]=[]
 var _numbers:Array[Node2D]=[]
+var _dodges:Array[BattleDodgePlayback]=[]
 var _critical_flash:CanvasLayer
 signal audio_played(id:String)
 
@@ -64,6 +65,31 @@ func play_reflection(job:int,school:int,level:int,state:Dictionary,magical:bool,
 		if not skill.active and skill.effect==("reflect_magic" if magical else "reflect_physical"):
 			play_binding(skill.id,"magic_reflect" if magical else "physical_reflect",hero,enemy)
 
+func dodge(subject:Node2D,attacker:Node2D)->Node2D:
+	if not is_instance_valid(subject) or not subject.is_inside_tree() or not subject.visible:return null
+	for reaction in _dodges.duplicate():
+		if reaction.actor==subject:reaction.cancel();_dodges.erase(reaction)
+	var reaction:=BattleDodgePlayback.new();reaction.start(subject,attacker);_dodges.append(reaction)
+	var popup:Node2D=preload("res://scenes/ui/battle_dodge_popup.tscn").instantiate()
+	var point:=Vector2.ZERO
+	if subject is AnimatedSprite2D and subject.get_meta("native_ground_anchor",false):
+		var info:=OriginalArt.actor_info(subject.get_meta("art_key",""))
+		point.x=subject.offset.x-float(info.origin[0])+float(info.get("anchor_x",0))
+	add_child(popup,false,Node.INTERNAL_MODE_BACK)
+	popup.position=get_global_transform_with_canvas().affine_inverse()*(subject.get_global_transform_with_canvas()*point)+Vector2(0,-64)
+	popup.present()
+	popup.set_meta("feedback","dodge");_numbers.append(popup)
+	popup.tree_exiting.connect(func()->void:_numbers.erase(popup))
+	return popup
+func advance_reactions(delta:float)->void:
+	for reaction in _dodges.duplicate():
+		reaction.advance(delta)
+		if not reaction.active:_dodges.erase(reaction)
+func reaction_remaining()->float:
+	var seconds:=0.0
+	for reaction in _dodges:seconds=maxf(seconds,reaction.remaining())
+	return seconds
+func has_reactions()->bool:return not _dodges.is_empty()
 func number(subject:Node2D,amount:int,critical:bool=false,healed:bool=false)->Node2D:
 	if amount<=0 or not is_instance_valid(subject) or not subject.is_inside_tree():return null
 	var popup:Node2D=preload("res://scenes/ui/battle_hit_number.tscn").instantiate()
@@ -107,6 +133,8 @@ func _process(_delta:float)->void:
 		else:_follow(sprite,subject,entry.offset)
 
 func clear()->void:
+	for reaction in _dodges:reaction.cancel()
+	_dodges.clear()
 	if is_instance_valid(_critical_flash):_critical_flash.clear()
 	for popup in _numbers.duplicate():
 		if is_instance_valid(popup):popup.hide();popup.queue_free()

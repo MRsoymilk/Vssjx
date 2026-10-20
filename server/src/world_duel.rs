@@ -41,6 +41,7 @@ impl WorldHub {
         owner: &Ownership,
         c: &Command,
     ) -> Value {
+        let started=Instant::now();
         let response = |ok: bool, code: &str, retry: u64| json!({"type":"duel.result","request_id":c.request_id,"ok":ok,"code":code,"retry_after_ms":retry});
         if !c.valid() {
             return response(false, "INVALID_DUEL_COMMAND", 0);
@@ -124,7 +125,8 @@ impl WorldHub {
             .expect("world state")
             .duels
             .remember(owner.id, c, result.clone());
-        crate::security::connection_event(auth,owner.session,owner.id,&format!("duel.{}",c.action),result["code"].as_str().unwrap_or("OK"),json!({"request_id":c.request_id,"target":c.target,"invite_id":c.invite_id,"battle_id":c.battle_id,"accepted":result["ok"]})).await;
+        let progress={let state=self.data.lock().expect("world state");state.duels.slots.get(&owner.id).and_then(|id|state.duels.battles.get(id)).map(|b|json!({"round":b.round,"revision":b.revision,"resolved_round":b.resolved_round,"phase":if b.ended.is_some(){"finished"}else if b.resume_at.is_some(){"resolving"}else{"planning"}}))};
+        crate::security::connection_event(auth,owner.session,owner.id,&format!("duel.{}",c.action),result["code"].as_str().unwrap_or("OK"),json!({"request_id":c.request_id,"target":c.target,"invite_id":c.invite_id,"battle_id":c.battle_id,"accepted":result["ok"],"duration_ms":started.elapsed().as_millis().min(u64::MAX as u128) as u64,"progress":progress})).await;
         result
     }
 }

@@ -824,7 +824,8 @@ impl ObservedSocket {
                 .fetch_add(1, Ordering::Relaxed);
             self.metrics
                 .event("websocket", "WORLD_SEND_FAILED", self.id);
-            tracing::warn!("world socket send failed or timed out");
+            let code=if result.is_err(){"WORLD_SEND_TIMEOUT"}else{"WORLD_SEND_FAILED"};
+            tracing::warn!(code, bytes, "world socket send failed");
             Err(())
         }
     }
@@ -1086,7 +1087,17 @@ async fn connection(socket: WebSocket, auth: AuthService, hub: Arc<WorldHub>, an
                         Err(e)=>{fail(&mut socket,e.1).await;break;}
                     }
                 }
-                else {match hub.command(&owner,&input) { Ok(())=>{move_accepted+=1;},Err(e)=>{move_rejected+=1;last_move_code=e.1;fail(&mut socket,e.1).await;} }}
+                else {match hub.command(&owner,&input) {
+                    Ok(())=>{move_accepted+=1;},
+                    Err(e)=>{
+                        // Keep every response/metric and the 10s audit counts, but do not
+                        // flood WARN on each input while a delayed client keeps moving.
+                        socket.metrics.event("websocket",e.1,socket.id);
+                        if move_rejected==0||last_move_code!=e.1{tracing::warn!(code=e.1,"world movement rejected");}
+                        move_rejected+=1;last_move_code=e.1;
+                        if send(&mut socket,json!({"type":"error","code":e.1})).await.is_err(){break;}
+                    }
+                }}
             },
             _=pulse.tick()=>{
                 if team_version==1 {

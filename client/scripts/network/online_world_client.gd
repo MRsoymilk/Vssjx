@@ -49,8 +49,10 @@ var _retry_at := 0.0
 var _attempts := 0
 var _input_seq := 0
 var _seq := 0
-var _last_input_at := 0.0
+var _last_input_at := -100
 var _pending_motion: Dictionary = {}
+var _motion_waiting := 0
+var _motion_retry_at := 0
 var _snapshot: Dictionary = {}
 var _records: Dictionary = {}
 var _digest: HashingContext
@@ -213,6 +215,9 @@ func _process(_delta: float) -> void:
 		_state = "syncing"
 		_seq = 0
 		_input_seq = 0
+		_motion_waiting = 0
+		_motion_retry_at = 0
+		_last_input_at = -100
 		stream = ""
 		world_stream = ""
 		_world_seq = 0
@@ -301,12 +306,16 @@ func _entity(value: Variant) -> bool:
 func _receive(data: Dictionary, raw: PackedByteArray) -> void:
 	var kind: Variant = data.get("type")
 	if kind in ["duel.state", "duel.result"]:
-		if not world_ready or _duel_version != 2 or not duel.receive(data): _failed("INVALID_DUEL")
+		if not world_ready or _duel_version != 2 or not duel.receive(data):
+			push_warning("Rejected duel packet: "+String(kind))
+			_failed("INVALID_DUEL",true)
 		return
 	if kind == "error":
 		var code := String(data.get("code", "SERVER_ERROR"))
 		if code in ["INVALID_TARGET", "STALE_INPUT", "RATE_LIMITED", "BATTLE_ACTIVE","TEAM_BATTLE_ACTIVE","TEAM_FOLLOWING"]:
-			if code in ["TEAM_BATTLE_ACTIVE","TEAM_FOLLOWING"]:_pending_motion.clear()
+			_motion_waiting=0
+			if code=="RATE_LIMITED":_motion_retry_at=Time.get_ticks_msec()+250
+			if code in ["BATTLE_ACTIVE","TEAM_BATTLE_ACTIVE","TEAM_FOLLOWING"]:_pending_motion.clear();movement_cancelled.emit()
 			status_changed.emit("跟随中由队长控制移动，可在队伍界面暂离。" if code=="TEAM_FOLLOWING" else "战斗中暂不能移动。" if code in ["BATTLE_ACTIVE","TEAM_BATTLE_ACTIVE"] else "目标不可达或操作过快，请重试。")
 		else: _failed(code, code in ["DATABASE_UNAVAILABLE", "SERVER_BUSY", "WORLD_STREAM_LAGGED"])
 		return
@@ -497,13 +506,20 @@ func _send_motion(kind: String, target: Array = []) -> void:
 	_flush_motion()
 
 func _flush_motion() -> void:
-	if duel.active() or team_active or (team_following and _pending_motion.get("type")=="world.move_to"): _pending_motion.clear(); return
-	var now := Time.get_unix_time_from_system()
-	if not world_ready or socket == null or socket.get_ready_state() != WebSocketPeer.STATE_OPEN or _pending_motion.is_empty() or now - _last_input_at < 0.1: return
+	if pve.active() or pve.pending() or duel.active() or team_active or (team_following and _pending_motion.get("type")=="world.move_to"): _pending_motion.clear(); return
+	# Only one motion packet may be awaiting authority. A slow/mobile link can
+	# otherwise deliver regularly-spaced inputs as a burst and trip the 80ms gate.
+	if _motion_waiting>0:
+		if int(entities.get(character_id,{}).get("last_input_seq","0"))<_motion_waiting:return
+		_motion_waiting=0
+	if Time.get_ticks_msec()<_motion_retry_at:return
+	var now := Time.get_ticks_msec()
+	if not world_ready or socket == null or socket.get_ready_state() != WebSocketPeer.STATE_OPEN or _pending_motion.is_empty() or now - _last_input_at < 100: return
 	var intent := _pending_motion
 	_pending_motion = {}
 	_last_input_at = now
 	_input_seq += 1
+	_motion_waiting=_input_seq
 	var message := {"type": intent.type, "game_session_id": game_session, "connection_epoch": connection_epoch, "world_epoch": world_epoch, "input_seq": str(_input_seq)}
 	if intent.type == "world.move_to": message.target = intent.target
 	if socket.send_text(JSON.stringify(message)) != OK: _failed("SEND_FAILED", true)

@@ -6,6 +6,7 @@ var character_id:=""
 var state:Dictionary={"team":null,"incoming":[]}
 var request:Dictionary={}
 var inflight:=false
+var queued_command:Dictionary={}
 var next_poll:=0
 var received_at:=0
 var server_time:=0
@@ -13,13 +14,14 @@ var supported:=true
 const ROUND_ERRORS:={"TEAM_COMMAND_LOCKED":"本轮指令已锁定，等待全员提交。","TEAM_PLAYBACK_ACTIVE":"正在逐个执行行动，请等待下一轮指令窗口。","TEAM_ROUND_EXPIRED":"本轮30秒已结束，未提交者自动防御。","TEAM_NOT_PARTICIPATING":"你已倒下或未参战，不能提交本轮指令。","SOUL_STATE":"灵魂状态，请先寻回自己的尸体。"}
 const ERRORS:={"TEAM_MEMBER_REQUIRED":"队长负责带队，无需跟随。","TEAM_NOT_READY":"在线跟随队员尚未准备，请停稳后在队伍窗口准备。","TEAM_NOT_TOGETHER":"请参战队员在同一地图、队长附近集合并停稳。","TEAM_LEADER_REQUIRED":"只能由队长进行此操作。","TEAM_LEADER_MUST_TRANSFER":"请先移交队长，或解散队伍。","TEAM_PLAYER_OFFLINE":"队友已离线，请等待重连或调整队伍。","TEAM_BUSY":"有队员正在单人战斗或决斗中。","TEAM_FULL":"队伍最多5人。","TEAM_NEEDS_MEMBERS":"至少两人组队才能共同战斗。","TEAM_BATTLE_ACTIVE":"正在组队战斗，不能更改队伍。","TEAM_NOT_YOUR_TURN":"请等待当前队友行动。","INVALID_BATTLE_TARGET":"目标已倒下，请重新选择。","TEAM_INVITE_EXPIRED":"邀请已过期或已被处理。","TEAM_INVITE_PENDING":"已发送邀请，请等待对方确认。","TEAM_INVITE_COOLDOWN":"对方已拒绝，请5分钟后再邀请。","ALREADY_IN_TEAM":"你或对方已加入队伍。","MONSTER_RESPAWNING":"有队员的怪物尚未刷新，请稍候。","RESIDENT_TOO_FAR":"请队长靠近怪物。","QUEST_REQUIRED":"有队员尚未领取入门任务，请先找清微道人。","STALE_BATTLE":"战场已更新，请重新选择指令。","NO_ACTIVE_BATTLE":"战斗已经结束。","NOT_IN_TEAM":"尚未加入队伍。","MP_INSUFFICIENT":"灵力不足。","NO_POTION":"没有回春散。","HP_FULL":"气血已满。","NOT_FOUND":"服务尚未支持组队，需要更新游戏服务。","RATE_LIMITED":"操作过快，请稍候。","SESSION_REPLACED":"当前角色已在另一会话进入游戏。"}
 func bind_character(id:String)->void:
-	character_id=id;request={};inflight=false;next_poll=0;state={"team":null,"incoming":[]}
+	character_id=id;request={};queued_command={};inflight=false;next_poll=0;state={"team":null,"incoming":[]}
 	var saved:Dictionary=OnlineAccount.pending_team
 	if saved.get("server")==OnlineAccount.server_address and saved.get("session")==OnlineAccount.login_session_id and saved.get("request",{}).get("character_id")==id:request=saved.request.duplicate(true)
 func party()->Dictionary:return state.team if state.get("team") is Dictionary else {}
 func battle()->Dictionary:return party().get("battle",{}) if party().get("battle") is Dictionary else {}
 func active()->bool:return battle().get("outcome")=="active"
-func pending()->bool:return not request.is_empty() and request.action!="snapshot"
+func pending()->bool:return not queued_command.is_empty() or (not request.is_empty() and request.action!="snapshot")
+func can_submit()->bool:return not pending() and (not inflight or request.get("action")=="snapshot")
 func my_turn()->bool:
 	if not active():return false
 	var b:=battle()
@@ -30,20 +32,22 @@ func my_turn()->bool:
 		if f.id==character_id:return f.hp>0
 	return false
 func submit(action:String,target:String="",skill:String="",ready:Variant=null)->bool:
-	if pending() or inflight:return false
+	if not can_submit():return false
 	if action not in ["follow","create","invite","accept","reject","cancel","leave","kick","transfer","disband","ready","challenge","attack","skill","guard","potion","flee"]:return false
 	var bytes:=Crypto.new().generate_random_bytes(16)
 	if bytes.size()!=16:return false
 	bytes[6]=(bytes[6]&15)|64;bytes[8]=(bytes[8]&63)|128;var hex:=bytes.hex_encode()
-	request={"character_id":character_id,"action":action,"operation_id":"%s-%s-%s-%s-%s"%[hex.substr(0,8),hex.substr(8,4),hex.substr(12,4),hex.substr(16,4),hex.substr(20,12)]}
-	if not target.is_empty():request.target=target
-	if not skill.is_empty():request.skill=skill
-	if ready is bool:request.ready=ready
+	var command:Dictionary={"character_id":character_id,"action":action,"operation_id":"%s-%s-%s-%s-%s"%[hex.substr(0,8),hex.substr(8,4),hex.substr(12,4),hex.substr(16,4),hex.substr(20,12)]}
+	if not target.is_empty():command.target=target
+	if not skill.is_empty():command.skill=skill
+	if ready is bool:command.ready=ready
 	if action in ["attack","skill","guard","potion","flee"]:
-		if not active():request={};return false
-		if action!="flee" and not my_turn():request={};return false
-		request.battle_id=battle().id;request.expected_revision=int(battle().revision)
-	OnlineAccount.pending_team={"server":OnlineAccount.server_address,"session":OnlineAccount.login_session_id,"request":request.duplicate(true)}
+		if not active():return false
+		if action!="flee" and not my_turn():return false
+		command.battle_id=battle().id;command.expected_revision=int(battle().revision)
+	if inflight:queued_command=command
+	else:request=command
+	OnlineAccount.pending_team={"server":OnlineAccount.server_address,"session":OnlineAccount.login_session_id,"request":command.duplicate(true)}
 	next_poll=0;supported=true;changed.emit();return true
 func refresh()->void:
 	if not pending() and not inflight:request={"character_id":character_id,"action":"snapshot"};next_poll=0;supported=true
@@ -54,20 +58,28 @@ func tick(available:bool)->void:
 func receive(result:Dictionary)->bool:
 	if not inflight:return false
 	inflight=false
+	# A queued write is not the response being acknowledged by this read.
+	var wrote:bool=not request.is_empty() and request.action!="snapshot"
 	if result.get("version")!="team-v1" or not valid(result):
 		var code:String=result.get("code","INVALID_RESPONSE")
-		if pending() and code not in ["INVALID_REQUEST","INVALID_TEAM_TARGET","FORBIDDEN","UNAUTHORIZED","IDEMPOTENCY_CONFLICT","NOT_FOUND"]:message.emit("操作结果未确认，将按原编号重试。")
+		if wrote and code not in ["INVALID_REQUEST","INVALID_TEAM_TARGET","FORBIDDEN","UNAUTHORIZED","IDEMPOTENCY_CONFLICT","NOT_FOUND"]:message.emit("操作结果未确认，将按原编号重试。")
 		else:
 			if code=="NOT_FOUND":supported=false
-			request={};OnlineAccount.pending_team={};message.emit(ERRORS.get(code,"组队请求失败，请刷新后重试。"))
-		next_poll=Time.get_ticks_msec()+5000;changed.emit();return false
-	var wrote:=pending()
+			request={}
+			if code in ["FORBIDDEN","UNAUTHORIZED","NOT_FOUND"]:queued_command={}
+			if queued_command.is_empty():OnlineAccount.pending_team={}
+			message.emit(ERRORS.get(code,"组队请求失败，请刷新后重试。"))
+		_promote_queued()
+		next_poll=0 if pending() and not wrote else Time.get_ticks_msec()+5000
+		changed.emit();return false
 	state=result.state.duplicate(true);server_time=int(result.server_time_ms);received_at=Time.get_ticks_msec()
 	if wrote:OnlineAccount.pending_team={}
-	request={};next_poll=received_at+(1000 if active() else 5000)
+	request={};_promote_queued();next_poll=0 if pending() else received_at+(1000 if active() else 5000)
 	if not result.ok:message.emit(ROUND_ERRORS.get(result.code,ERRORS.get(result.code,"组队操作未完成。")))
 	elif wrote:message.emit("队伍状态已更新。")
 	changed.emit();return true
+func _promote_queued()->void:
+	if request.is_empty() and not queued_command.is_empty():request=queued_command;queued_command={}
 func valid(v:Dictionary)->bool:
 	if v.get("character_id")!=character_id or v.get("operation_id")!=request.get("operation_id") or not v.get("ok") is bool or not v.get("code") is String or not v.get("replayed") is bool or not OnlinePve.integer(v.get("server_time_ms"),0,253402300799999):return false
 	var s:Variant=v.get("state")

@@ -54,7 +54,7 @@ func _actions(actions:Array,parent:Node=null)->void:
 	var h:=HBoxContainer.new();(rows if parent==null else parent).add_child(h)
 	h.size_flags_horizontal=SIZE_EXPAND_FILL
 	for a in actions:
-		var b:=_button(h,a[0]);b.size_flags_horizontal=SIZE_EXPAND_FILL;b.disabled=model.pending() or model.inflight;b.pressed.connect(a[1])
+		var b:=_button(h,a[0]);b.size_flags_horizontal=SIZE_EXPAND_FILL;b.disabled=not model.can_submit();b.pressed.connect(a[1])
 func open()->void:show();model.refresh();refresh()
 func dismiss()->void:confirmation={};hide();dismissed.emit()
 func confirm(action:String,id:String,text:String)->void:confirmation={"action":action,"id":id,"text":text};refresh()

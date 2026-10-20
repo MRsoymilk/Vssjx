@@ -166,6 +166,7 @@ def main():
             check(b.duel_state['battle']['winner']==ib,'Surrender ends both views with the same winner')
             a.move([11,16]); a.until('world.delta')
             check(db.query("SELECT COUNT(*) FROM security_audit WHERE action LIKE 'duel.%'") != '0', 'Duel actions are attributable in the audit log')
+            check(db.query("SELECT COUNT(*) FROM security_audit WHERE action='duel.attack' AND jsonb_typeof(details->'duration_ms')='number' AND details->'progress'->>'phase' IN ('planning','resolving','finished') AND details->'progress'->>'round' IS NOT NULL")!='0','Duel audit distinguishes authoritative round progress and business duration without logging packet bodies')
             # A legacy client must never be forced into a battle it cannot display.
             c.close(); time.sleep(.3); c = DuelPlayer(base, sc, ic, supported=False)
             value, _ = a.duel('invite', ok=False, target=ic); check(value['code'] == 'DUEL_PLAYER_OFFLINE', 'Unsupported clients are protected from duel invitations')
@@ -173,6 +174,10 @@ def main():
 
             if os.environ.get('GODOT_BIN'):
                 _, ui_a = create('duel_ui_a', 0, 0); _, ui_b = create('duel_ui_b', 1, 1)
+                # Spend only these owned level-8 fixtures' forty legal points.
+                # The revised isolated PvP HP/reduction is deliberately slower
+                # than the legacy unallocated fight used by the old 65s UI bound.
+                db.query(f"UPDATE characters SET allocated_attributes=ARRAY[8,0,32,0,0] WHERE id IN ('{ui_a}','{ui_b}')")
                 # Exercise each UI role against an independent socket peer so its
                 # startup and opponent input are controlled separately.
                 for role in ['a','b']:

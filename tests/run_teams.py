@@ -74,7 +74,9 @@ def main():
             initial,request=send(a,'challenge',request=failed_start)
             battle=initial['state']['team']['battle']
             check(len(battle['fighters'])==2 and len(battle['enemies'])>=2,'Both players share one multi-monster encounter')
-            check(battle['enemies'][0]['definition']['hp']>next(d for d in json.loads((ROOT/'shared/data/qingyun-population-v1.json').read_text()) if d['id']=='spirit')['hp'],'Monster HP is stronger in a party')
+            original=next(d for d in json.loads((ROOT/'shared/data/qingyun-population-v1.json').read_text()) if d['id']=='spirit')
+            modern=all(f['stats'].get('balance',{}).get('skills_revision',0)>=1 for f in battle['fighters'])
+            check((battle['enemies'][0]['definition']['hp']==original['hp'] and battle['enemies'][0]['definition']['defense']==original['defense']*4) if modern else battle['enemies'][0]['definition']['hp']>original['hp'],'Party encounter uses its frozen rule version rather than mixing legacy multipliers')
             check(send(b,'snapshot')[0]['state']['team']['battle']['id']==battle['id'],'Teammate receives the identical authoritative battle')
             retried,_=send(a,'challenge',request=request)
             check(retried['replayed'] and retried['state']['team']['battle']['id']==battle['id'],'Retry cannot create another battle')

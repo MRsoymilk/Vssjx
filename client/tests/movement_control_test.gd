@@ -61,6 +61,8 @@ func socket_intents() -> void:
 	client.set_process(false)
 	client.socket = socket
 	client.world_ready = true
+	client.character_id=SELF
+	client.entities={SELF:{"last_input_seq":"0"}}
 	client.move_to(Vector2i(18, 17))
 	var first := await packet(socket, remote)
 	check(first.get("type") == "world.move_to" and first.get("target") == [18.0, 17.0], "First target is sent through the actual socket")
@@ -69,14 +71,23 @@ func socket_intents() -> void:
 	check(client._pending_motion.get("target") == [20, 17], "Rapid retarget keeps only the newest unsent click")
 	await get_tree().create_timer(0.12).timeout
 	client._flush_motion()
+	check(client._input_seq==1 and client._pending_motion.get("target")==[20,17],"Delayed authority coalesces targets without adding in-flight movement packets")
+	client.entities[SELF].last_input_seq="1"
+	client._flush_motion()
 	var last := await packet(socket, remote)
 	check(last.get("target") == [20.0, 17.0] and last.get("input_seq") == "2", "Newest target is transmitted after the rate window instead of discarded")
 	client.stop_moving()
 	check(client._pending_motion.get("type") == "world.stop", "A quick release retains its stop command")
 	await get_tree().create_timer(0.12).timeout
+	client.entities[SELF].last_input_seq="2"
 	client._flush_motion()
 	var stop := await packet(socket, remote)
 	check(stop.get("type") == "world.stop" and stop.get("input_seq") == "3", "Stop is delivered once when the rate window opens")
+	client._pending_motion={"type":"world.move_to","target":[21,17]}
+	client._receive({"type":"error","code":"BATTLE_ACTIVE"},PackedByteArray())
+	check(client._pending_motion.is_empty() and client._motion_waiting==0,"Battle fencing discards queued movement and releases only its local acknowledgement gate")
+	client._receive({"type":"error","code":"RATE_LIMITED"},PackedByteArray())
+	check(client._motion_retry_at>Time.get_ticks_msec(),"Rate rejection imposes a monotonic backoff instead of immediate resubmission")
 	client.move_to(Vector2i(21, 17))
 	client._failed("DISCONNECTED")
 	check(client._pending_motion.is_empty(), "Disconnect discards old movement intent instead of replaying after reconnect")

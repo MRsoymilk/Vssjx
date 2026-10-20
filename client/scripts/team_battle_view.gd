@@ -145,7 +145,7 @@ func _refresh_controls()->void:
 		message="已提交 %d/%d · %s"%[b.commands.size(),alive,"请选择指令" if model.my_turn() else ("已锁定，等待队友" if b.commands.has(model.character_id) else "等待指令窗口")]
 		if motion!=null or not queue.is_empty() or model.server_time+Time.get_ticks_msec()-model.received_at<int(b.selection_starts_ms):message="逐个执行中 · 下轮指令共用30秒";left=0
 	hint.text=message if left==0 and b.has("commands") else "%s · %d秒"%[message,left]
-	for i in action_buttons.size():action_buttons[i].disabled=not model.active() or model.pending() or model.inflight or motion!=null or not queue.is_empty() or (not model.my_turn() if i<4 else (not model.party().get("leader",false) if i==5 else false))
+	for i in action_buttons.size():action_buttons[i].disabled=not model.active() or not model.can_submit() or motion!=null or not queue.is_empty() or (not model.my_turn() if i<4 else (not model.party().get("leader",false) if i==5 else false))
 	command_toggle.disabled=not model.active() or model.pending() or motion!=null or not queue.is_empty()
 	if not model.active():menu.hide();inspect_panel.hide();picker.hide()
 

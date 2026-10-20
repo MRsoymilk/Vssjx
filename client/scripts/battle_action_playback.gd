@@ -30,8 +30,14 @@ func start(subject: AnimatedSprite2D, info: Dictionary, target_position: Vector2
 	cancelled = false
 	elapsed = 0.0
 	duration = 0.0
+	impact_time = 0.0
 	_durations.clear()
+	_x = []
 	var frames := actor.sprite_frames
+	# A missing/empty animation must not leave a permanent active playback token.
+	if frames==null or not frames.has_animation(action) or frames.get_frame_count(action)==0:
+		action=&"idle"
+	if frames==null or not frames.has_animation(action) or frames.get_frame_count(action)==0 or frames.get_animation_speed(action)<=0:return
 	for index in frames.get_frame_count(action):
 		var seconds := frames.get_frame_duration(action, index) / frames.get_animation_speed(action)
 		_durations.append(seconds)
@@ -42,7 +48,7 @@ func start(subject: AnimatedSprite2D, info: Dictionary, target_position: Vector2
 	impact_time = duration * 0.5 # Unrecovered skill payload: existing single-result presentation only.
 	if not hits.is_empty():
 		impact_time = 0.0
-		for index in int(hits[0]): impact_time += _durations[index]
+		for index in mini(int(hits[0]),_durations.size()): impact_time += _durations[index]
 	actor.play(action)
 	actor.pause()
 	_layer_attacker(receiver)
@@ -75,6 +81,8 @@ func advance(delta: float) -> void:
 		cancel()
 		return
 	elapsed = minf(duration, elapsed + maxf(0.0, delta))
+	# Some engine/platform scalar paths round the clamped sum below duration.
+	if elapsed>=duration-0.000001:elapsed=duration
 	if not impacted and elapsed >= impact_time:
 		_sample(impact_time)
 		impacted = true
@@ -87,6 +95,7 @@ func advance(delta: float) -> void:
 		completed.emit()
 
 func _sample(at: float = -1.0) -> void:
+	if _durations.is_empty():return
 	var time := elapsed if at < 0 else at
 	var step := 0
 	while step < _durations.size() - 1 and time >= _durations[step]:
@@ -110,7 +119,7 @@ func _restore(restore_order: bool = false) -> void:
 	_front_index = -1
 	if is_instance_valid(actor):
 		actor.position = home
-		actor.play("idle")
+		if actor.sprite_frames!=null and actor.sprite_frames.has_animation("idle"):actor.play("idle")
 
 func cancel() -> void:
 	if not active: return

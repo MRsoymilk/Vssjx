@@ -32,6 +32,7 @@ static func check(id:String,job:int,_school:int,level:int)->String:
 	return ""
 
 static func valid_view(view:Variant,character:Dictionary)->bool:
+	if view is Dictionary and view.has("balance_sha256") and view.balance_sha256!=SkillBalance.catalog_hash:return false
 	if not view is Dictionary or view.get("version")!="skills-v1" or view.get("catalog_sha256")!=catalog_hash or not view.get("available") is Array:return false
 	var expected:Array=list_for(int(character.job),int(character.school),int(character.level)).map(func(s:Dictionary)->String:return s.id)
 	if expected.size()!=view.available.size():return false
@@ -50,8 +51,13 @@ static func valid_state(state:Variant)->bool:
 		if key in ["last_skill","last_enemy_acted"]:continue
 		var value:Variant=state.get(key)
 		if not OnlinePve.integer(value,0,1000000):return false
+	if state.has("balance"):
+		var b:Variant=state.balance
+		if not b is Dictionary or not b.get("cooldowns") is Dictionary or b.cooldowns.size()>33 or not OnlinePve.integer(b.get("targets"),0,5) or not OnlinePve.integer(b.get("control_protection"),0,3) or not b.get("last_enemy_magical") is bool:return false
+		for id in b.cooldowns:
+			if not id is String or item(id).is_empty() or not OnlinePve.integer(b.cooldowns[id],0,4):return false
 	for key in TIMERS+["enemy_bleed","enemy_poison","regen"]:
-		if int(state[key])>2:return false
+		if int(state[key])>(3 if state.has("balance") else 2):return false
 	return true
 
 static func new_state(job:int,school:int,level:int,enemy_level:int=1)->Dictionary:
@@ -63,9 +69,25 @@ static func new_state(job:int,school:int,level:int,enemy_level:int=1)->Dictionar
 	return state
 
 static func reset_turn(state:Dictionary)->void:
+	if state.has("balance"):state.balance.last_enemy_magical=false
 	state.erase("last_critical")
 	for key in ["last_damage","last_incoming","last_reflected","last_healed"]:state[key]=0
 	state.last_enemy_acted=false;state.last_skill=""
+
+static func activate(state:Dictionary,stats:Dictionary)->void:
+	if SkillBalance.revised(stats) and not state.has("balance"):state.balance={"cooldowns":{},"targets":1,"control_protection":0,"last_enemy_magical":false}
+static func remaining(state:Dictionary,id:String)->int:return int(state.get("balance",{}).get("cooldowns",{}).get(id,0))
+static func miss(skill:Dictionary,state:Dictionary,stats:Dictionary,mp:int)->int:
+	activate(state,stats);state.last_skill=skill.id;state.balance.cooldowns[skill.id]=SkillBalance.cooldown(skill)+1
+	return mp-SkillBalance.cost(skill,stats)
+static func end_balance_round(state:Dictionary,hp:int,max_hp:int)->Dictionary:
+	if not state.has("balance"):return {"damage":0,"hp":hp}
+	var damage:=0
+	for status in ["bleed","poison"]:
+		if int(state["enemy_"+status])>0:damage+=int(state[status+"_damage"]);state["enemy_"+status]=int(state["enemy_"+status])-1
+	if int(state.regen)>0 and hp>0:
+		var heal:=mini(int(state.regen_amount),max_hp-hp);hp+=heal;state.last_healed=int(state.last_healed)+heal;state.regen=int(state.regen)-1
+	return {"damage":damage,"hp":hp}
 
 static func critical(state:Dictionary,damage:int,roll:int)->int:
 	state.last_critical=damage>0 and int(state.crit)>0 and roll<int(state.crit_chance)
@@ -73,8 +95,12 @@ static func critical(state:Dictionary,damage:int,roll:int)->int:
 
 static func cast(skill:Dictionary,state:Dictionary,stats:Dictionary,hp:int,mp:int,enemy_defense:int,roll:int)->Dictionary:
 	state.last_skill=skill.id
-	mp-=int(skill.mp_cost)
-	var damage:=CharacterAttributeRules.direct_damage(stats,enemy_defense,int(skill.damage_percent)*100) if int(skill.damage_percent)>0 else 0
+	var revised:=SkillBalance.revised(stats)
+	activate(state,stats)
+	mp-=SkillBalance.cost(skill,stats)
+	if revised:state.balance.cooldowns[skill.id]=SkillBalance.cooldown(skill)+1
+	var coefficient:=SkillBalance.coefficient(skill,int(state.balance.targets)) if revised else int(skill.damage_percent)*100
+	var damage:=CharacterAttributeRules.direct_damage(stats,enemy_defense,coefficient) if int(skill.damage_percent)>0 else 0
 	var healed:=mini(int(skill.legacy_heal),int(stats.hp)-hp)
 	hp+=healed
 	var value:=int(skill.value);var duration:=int(skill.duration)
@@ -82,10 +108,12 @@ static func cast(skill:Dictionary,state:Dictionary,stats:Dictionary,hp:int,mp:in
 	if damage>0:state.enemy_sleep=0
 	match String(skill.effect):
 		"bleed","poison":
-			state["enemy_"+skill.effect]=duration
-			state[skill.effect+"_damage"]=maxi(1,int(stats.attack)*value/100)
+			state["enemy_"+skill.effect]=int(SkillBalance.rules.dot_ticks) if revised else duration
+			state[skill.effect+"_damage"]=CharacterAttributeRules.direct_damage(stats,enemy_defense,int(SkillBalance.rules.dot_tick_bp)) if revised else maxi(1,int(stats.attack)*value/100)
 		"sleep","silence":
-			if roll<int(skill.chance):state["enemy_"+skill.effect]=duration
+			if roll<(int(SkillBalance.rules.control_chance) if revised else int(skill.chance)) and int(state.get("balance",{}).get("control_protection",0))==0:
+				state["enemy_"+skill.effect]=int(SkillBalance.rules.control_duration) if revised else duration
+				if state.has("balance"):state.balance.control_protection=int(SkillBalance.rules.control_protection)
 		"regen":state.regen=duration;state.regen_amount=maxi(1,int(stats.hp)*value/100)
 		"defense":state.defense=duration;state.defense_percent=value
 		"crit":state.crit=duration;state.crit_chance=value
@@ -98,6 +126,7 @@ static func cast(skill:Dictionary,state:Dictionary,stats:Dictionary,hp:int,mp:in
 	return {"damage":damage,"hp":hp,"mp":mp}
 
 static func after_player(state:Dictionary,hp:int,max_hp:int)->Dictionary:
+	if state.has("balance"):return {"damage":0,"hp":hp}
 	var damage:=0
 	for status in ["bleed","poison"]:
 		if int(state["enemy_"+status])>0:
@@ -114,6 +143,11 @@ static func enemy_hit(state:Dictionary,incoming:int,magical:bool=false)->Vector2
 	return Vector2i(incoming,incoming*percent/100)
 
 static func end_turn(state:Dictionary)->void:
+	if state.has("balance"):
+		for id in state.balance.cooldowns.keys():
+			state.balance.cooldowns[id]=maxi(0,int(state.balance.cooldowns[id])-1)
+			if state.balance.cooldowns[id]==0:state.balance.cooldowns.erase(id)
+		state.balance.control_protection=maxi(0,int(state.balance.control_protection)-1)
 	for key in TIMERS:state[key]=maxi(0,int(state[key])-1)
 
 static func status_text(state:Dictionary)->String:

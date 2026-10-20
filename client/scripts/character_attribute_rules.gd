@@ -45,9 +45,20 @@ const RATING_HELP := "新版评级随等级递减，基础暴击5%、最高50%�
 static func balanced_stats(job:int,level:int,equipped:bool,a:Array)->Dictionary:
 	var p:Dictionary=CombatBalance.profile(job,level,a).value
 	var result:Dictionary={"hp":p.hp,"mp":p.mp,"attack":p.magic_attack if job==2 else p.physical_attack,"defense":p.physical_defense,"attributes":a.duplicate(),
-		"balance":{"level":level,"physical_attack":p.physical_attack,"magic_attack":p.magic_attack,"physical_defense":p.physical_defense,"magic_defense":p.magic_defense,"ratings":[int(a[3]),int(a[4])]}}
+		"balance":{"skills_revision":1,"level":level,"physical_attack":p.physical_attack,"magic_attack":p.magic_attack,"physical_defense":p.physical_defense,"magic_defense":p.magic_defense,"ratings":[int(a[3]),int(a[4])]}}
 	if equipped:gear_bonus(result,5,0)
 	return result
+
+static func valid_balance(stats:Dictionary)->bool:
+	if not stats.has("balance"):return true
+	var b:Variant=stats.balance
+	if not b is Dictionary or not OnlinePve.integer(b.get("level"),1,60) or not OnlinePve.integer(b.get("skills_revision",0),0,1):return false
+	if not b.get("ratings") is Array or b.ratings.size()!=2:return false
+	for rating in b.ratings:
+		if not OnlinePve.integer(rating,0,1000000):return false
+	for key in ["physical_attack","magic_attack","physical_defense","magic_defense"]:
+		if not OnlinePve.integer(b.get(key),0,1000000):return false
+	return b.physical_defense==stats.get("defense")
 
 static func gear_bonus(s:Dictionary,attack:int,defense:int)->void:
 	s.attack+=attack;s.defense+=defense
@@ -58,6 +69,10 @@ static func gear_bonus(s:Dictionary,attack:int,defense:int)->void:
 static func profile_for(s:Dictionary,job:int,level:int,a:Array)->Dictionary:
 	var p:=profile(job,level,false,a)
 	p.formula_revision=3
+	var recommended:Array=a.duplicate();var spent:=0
+	for value in a:spent+=int(value)
+	for i in level*5-spent:recommended[int(CombatBalance.rules.recommended_patterns[job][i%5])]+=1
+	p.recommended=recommended
 	for key in ["hp","mp"]:p.combat[key]=s[key]
 	for key in ["physical_attack","magic_attack","physical_defense","magic_defense"]:p.combat[key]=s.balance[key]
 	return p

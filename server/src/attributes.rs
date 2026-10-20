@@ -5,6 +5,8 @@ use serde_json::{Value, json};
 use serde::{Serialize,Deserialize};
 #[derive(Clone,Copy,Debug,Serialize,Deserialize)]
 pub struct BalanceStats {
+    #[serde(default)]
+    pub skills_revision:u8,
     pub level:i32,pub physical_attack:i32,pub magic_attack:i32,
     pub physical_defense:i32,pub magic_defense:i32,
     pub ratings:[i32;2],
@@ -12,7 +14,7 @@ pub struct BalanceStats {
 pub fn balanced_stats(job:i16,level:i32,equipped:bool,a:[i32;5])->Stats{
     let p=crate::combat_balance::profile(job as i64,level as i64,a.map(i64::from)).expect("validated character attributes");
     let mut s=Stats{hp:p.hp as i32,mp:p.mp as i32,attack:if job==2{p.magic_attack}else{p.physical_attack} as i32,defense:p.physical_defense as i32,attributes:a,
-        balance:Some(BalanceStats{level,physical_attack:p.physical_attack as i32,magic_attack:p.magic_attack as i32,physical_defense:p.physical_defense as i32,magic_defense:p.magic_defense as i32,ratings:[a[3],a[4]]})};
+        balance:Some(BalanceStats{skills_revision:1,level,physical_attack:p.physical_attack as i32,magic_attack:p.magic_attack as i32,physical_defense:p.physical_defense as i32,magic_defense:p.magic_defense as i32,ratings:[a[3],a[4]]})};
     if equipped{gear_bonus(&mut s,5,0);}
     s
 }
@@ -25,10 +27,14 @@ pub fn balanced_profile(job:i16,level:i32,equipped:bool,a:[i32;5])->Value{
 }
 pub fn profile_for(s:Stats,job:i16,level:i32,a:[i32;5])->Value{
     let b=s.balance.expect("balanced profile");
-    json!({"version":VERSION,"formula_revision":3,"allocated":a,"available":available(level,a),"recommended":recommended(job,level,a),
+    json!({"version":VERSION,"formula_revision":3,"allocated":a,"available":available(level,a),"recommended":balanced_recommended(job,level,a),
         "combat":{"hp":s.hp,"mp":s.mp,"physical_attack":b.physical_attack,"magic_attack":b.magic_attack,
         "physical_defense":b.physical_defense,"magic_defense":b.magic_defense,"physical_crit":b.ratings[0],"magic_crit":b.ratings[1],
         "physical_hit":100+b.ratings[0],"magic_hit":100+b.ratings[1],"physical_evasion":b.ratings[0],"magic_evasion":b.ratings[1],"damage_reduction":0}})
+}
+pub fn balanced_recommended(job:i16,level:i32,a:[i32;5])->[i32;5]{
+    let mut result=a;let pattern=crate::combat_balance::RULES.recommended_patterns[job as usize];
+    for i in 0..available(level,a){result[pattern[i as usize%5]]+=1;}result
 }
 pub fn defense(s:Stats,magical:bool)->i32{s.balance.map_or(s.defense,|b|if magical{b.magic_defense}else{b.physical_defense})}
 pub fn direct_damage(s:Stats,defense:i32,coefficient_bp:i32,variance:i32)->i32{

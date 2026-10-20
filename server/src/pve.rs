@@ -404,6 +404,7 @@ impl Loaded {
                     if self.character.quest_stage == 0 && crate::ai_world::map(&context.map_id).is_none() {
                         return Err("QUEST_REQUIRED");
                     }
+                    let definition=if self.character.balance_revision==1{crate::skill_balance::monster(definition)}else{definition};
                     let name = definition.name.clone();
                     let frozen=self.stats();
                     self.battle = Some(Battle::new(

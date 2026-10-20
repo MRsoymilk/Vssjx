@@ -126,7 +126,7 @@ func _choose(action:String)->void:
 				inspect_panel.get_node("Tertiary").text=("组队强化" if model.battle().fighters.size()>1 else "独自迎战")+" · Lv.%d"%int(e.definition.level);inspect_panel.show();return
 	if action=="skill":
 		for f in model.battle().fighters:
-			if f.id==model.character_id:picker.present(int(f.job),int(f.school),int(f.level),int(f.mp));picker.show();return
+			if f.id==model.character_id:picker.present(int(f.job),int(f.school),int(f.level),int(f.mp),[],false,f.stats,f.effects);picker.show();return
 	_send(action)
 func _send(action:String,skill:String="")->void:
 	if action!="flee" and not model.my_turn():return
@@ -186,13 +186,13 @@ func _play(event:Dictionary)->void:
 	if not actors.has(event.actor) or not actors.has(event.target):return
 	var a:Dictionary=actors[event.actor];var target:Dictionary=actors[event.target]
 	if not a.sprite.visible:return
-	if event.action not in ["attack","skill","guard","potion"]:return
+	if event.action not in ["attack","skill","guard","potion","dot","regen"]:return
 	playing=event
 	var group:Array=[event]
 	while event.action=="skill" and not queue.is_empty() and queue[0].actor==event.actor and queue[0].skill==event.skill and queue[0].get("packet")==event.get("packet"):
 		group.append(queue.pop_front())
 	var mode:StringName=&"cast" if event.action=="skill" and a.sprite.sprite_frames.has_animation("cast") else &"attack"
-	if event.action in ["guard","potion"]:mode=&"idle"
+	if event.action in ["guard","potion","dot","regen"]:mode=&"idle"
 	if event.action=="skill" and SkillRules.item(event.skill).get("damage_percent",0)==0:mode=&"cast" if a.sprite.sprite_frames.has_animation("cast") else &"idle"
 	motion=BattleActionPlayback.new()
 	motion.impact.connect(func()->void:

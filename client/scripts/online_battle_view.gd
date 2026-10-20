@@ -181,7 +181,7 @@ func _start_enemy_motion() -> void:
 		_shown_hero_hp = int(model.state.battle.hp)
 		_shown_enemy_hp = int(model.state.battle.enemy_hp)
 		var character:Dictionary=model.state.character
-		effects.play_reflection(int(character.job),int(character.school),int(character.level),model.state.battle.get("skills",{}),false,hero,enemy)
+		effects.play_reflection(int(character.job),int(character.school),int(character.level),model.state.battle.get("skills",{}),bool(model.state.battle.get("skills",{}).get("balance",{}).get("last_enemy_magical",false)),hero,enemy)
 		if took_damage and hero.sprite_frames.has_animation("hurt"): hero.play("hurt")
 		$Hud/BattleHeroHp.value = _shown_hero_hp
 		$Hud/BattleEnemyHp.value = _shown_enemy_hp
@@ -241,7 +241,7 @@ func refresh() -> void:
 	skill_picker.locked = locked or not model.active()
 	for button in buttons: button.disabled = locked or not model.active()
 	if not locked and model.active():
-		buttons[1].disabled = not SkillPicker.has_usable(int(model.state.character.job),int(model.state.character.school),int(model.state.character.level),int(model.state.battle.mp),model.state.get("skills",{}).get("available",[]),not model.state.has("skills"))
+		buttons[1].disabled = not SkillPicker.has_usable(int(model.state.character.job),int(model.state.character.school),int(model.state.character.level),int(model.state.battle.mp),model.state.get("skills",{}).get("available",[]),not model.state.has("skills"),model.state.stats,model.state.battle.get("skills",{}))
 		buttons[3].disabled = int(model.state.potions) == 0 or int(model.state.battle.hp) >= int(model.state.stats.hp)
 	$Choice/Use.disabled = locked
 	$Hud/AutoButton.disabled = not model.ready or not model.active()
@@ -281,7 +281,7 @@ func choose(action: String) -> void:
 	if action=="skill":
 		$Hud/ActionMenu.hide();$Inspect.hide();$Choice.hide()
 		var c:Dictionary=model.state.character
-		skill_picker.present(int(c.job),int(c.school),int(c.level),int(model.state.battle.mp),model.state.get("skills",{}).get("available",[]),not model.state.has("skills"))
+		skill_picker.present(int(c.job),int(c.school),int(c.level),int(model.state.battle.mp),model.state.get("skills",{}).get("available",[]),not model.state.has("skills"),model.state.stats,model.state.battle.get("skills",{}))
 		return
 	if action == "potion":
 		choice_action = action

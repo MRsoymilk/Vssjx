@@ -88,6 +88,7 @@ func _fighter(fighter:Variant)->bool:
 	if not fighter is Dictionary or not OnlineWorldClient._uuid(fighter.get("id")) or not OnlineAccount.valid_nickname(fighter.get("name","")):return false
 	if not OnlineWorldClient._integer(fighter.get("job"),0,2) or not OnlineWorldClient._integer(fighter.get("gender"),0,1) or not OnlineWorldClient._integer(fighter.get("school"),0,3) or not OnlineWorldClient._integer(fighter.get("level"),1,60) or not OnlineWorldClient._integer(fighter.get("speed"),100,400):return false
 	if not fighter.get("stats") is Dictionary or not fighter.get("effects") is Dictionary or not fighter.get("appearance") is Array or fighter.appearance.size()!=3 or not fighter.get("guarding") is bool:return false
+	if not CharacterAttributeRules.valid_balance(fighter.stats):return false
 	if not SkillRules.valid_state(fighter.effects):return false
 	for key in ["hp","mp","attack","defense"]:
 		if not OnlineWorldClient._integer(fighter.stats.get(key),0 if key=="mp" else 1,100000):return false

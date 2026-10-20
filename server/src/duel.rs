@@ -105,7 +105,7 @@ impl Fighter {
                 .map(|v| v as i32)
                 .ok_or("DUEL_PROFILE_UNAVAILABLE")
         };
-        let stats = Stats {
+        let mut stats = Stats {
             hp: stat("hp")?,
             mp: stat("mp")?,
             attack: stat("attack")?,
@@ -119,6 +119,8 @@ impl Fighter {
             number("school")? as i16,
             number("level")? as i32,
         );
+        if crate::skill_balance::revised(stats){stats.hp=stats.hp*crate::skill_balance::n("pvp_hp_bp")/10000;}
+        let mut effects=skills::State::new(job,school,level,level);effects.activate(stats);
         Ok(Self {
             id: serde_json::from_value(c["id"].clone()).map_err(|_| "DUEL_PROFILE_UNAVAILABLE")?,
             name: c["display_name"]
@@ -138,7 +140,7 @@ impl Fighter {
             appearance,
             hp: stats.hp,
             mp: stats.mp,
-            effects: skills::State::new(job, school, level, level),
+            effects,
             guarding: false,
         })
     }
@@ -245,9 +247,10 @@ impl Battle {
                 f.school,
                 f.level,
             )?;
-            if f.mp < skill.mp_cost {
+            if f.mp < crate::skill_balance::cost(skill,f.stats) {
                 return Err("MP_INSUFFICIENT");
             }
+            if f.effects.remaining(&skill.id)>0{return Err("SKILL_COOLDOWN");}
         }
         self.choices[me] = Some(Choice {
             action: c.action.clone(),
@@ -302,7 +305,8 @@ impl Battle {
             } else {
                 (&mut b[0], &mut a[0])
             };
-            let dot = (if enemy.effects.enemy_bleed > 0 {
+            let balanced=crate::skill_balance::revised(actor.stats);
+            let dot = if balanced{0}else{(if enemy.effects.enemy_bleed > 0 {
                 enemy.effects.bleed_damage
             } else {
                 0
@@ -310,9 +314,9 @@ impl Battle {
                 enemy.effects.poison_damage
             } else {
                 0
-            });
-            enemy.effects.enemy_bleed = (enemy.effects.enemy_bleed - 1).max(0);
-            enemy.effects.enemy_poison = (enemy.effects.enemy_poison - 1).max(0);
+            })};
+            if !balanced{enemy.effects.enemy_bleed = (enemy.effects.enemy_bleed - 1).max(0);
+            enemy.effects.enemy_poison = (enemy.effects.enemy_poison - 1).max(0);}
             actor.hp = (actor.hp - dot).max(0);
             let mut action = choice.action.clone();
             let mut used = String::new();
@@ -328,7 +332,7 @@ impl Battle {
                 action = "sleep".into();
                 self.lines.push(format!("{}沉睡中，跳过行动。", actor.name));
             } else if choice.action == "skill"
-                && (enemy.effects.enemy_silence > 0 || skill.is_none_or(|s| actor.mp < s.mp_cost))
+                && (enemy.effects.enemy_silence > 0 || skill.is_none_or(|s| actor.mp < crate::skill_balance::cost(s,actor.stats)))
             {
                 action = "fizzle".into();
                 self.lines
@@ -337,6 +341,7 @@ impl Battle {
                 let roll = rolls[1 + me];
                 let raw = match choice.action.as_str() {
                     "attack" => {
+                        actor.mp=(actor.mp+crate::skill_balance::recovery(actor.stats,"basic_restore_bp",0)).min(actor.stats.mp);
                         if crate::attributes::lands(Some(actor.stats), Some(enemy.stats), actor.job==2&&actor.stats.balance.is_some()) {
                             actor.effects.enemy_sleep = 0;
                             let power = crate::attributes::for_attack(actor.stats, actor.job, actor.job==2&&actor.stats.balance.is_some());
@@ -355,7 +360,8 @@ impl Battle {
                         let magical = actor.job == 2;
                         let directed = matches!(s.target.as_str(), "enemy" | "all_enemies");
                         if directed && !crate::attributes::lands(Some(actor.stats), Some(enemy.stats), magical) {
-                            actor.mp -= s.mp_cost;
+                            actor.mp -= crate::skill_balance::cost(s,actor.stats);
+                            if balanced{actor.effects.mark(s);}
                             actor.effects.last_skill = s.id.clone();
                             0
                         } else {
@@ -374,11 +380,12 @@ impl Battle {
                         }
                     }
                     "guard" => {
-                        actor.mp = (actor.mp + 5).min(actor.stats.mp);
+                        actor.mp = (actor.mp + crate::skill_balance::recovery(actor.stats,"guard_restore_bp",5)).min(actor.stats.mp);
                         0
                     }
                     _ => 0,
                 };
+                let raw=if balanced{raw*crate::skill_balance::n("pvp_damage_bp")/10000}else{raw};
                 let incoming = if enemy.guarding { raw / 2 } else { raw };
                 (damage, reflected) = if incoming > 0 {
                     enemy
@@ -423,8 +430,14 @@ impl Battle {
             }
         }
         if self.ended.is_none() {
+            let mut dots=[0;2];
+            for (i,f) in self.fighters.iter_mut().enumerate(){
+                if crate::skill_balance::revised(f.stats){let before=f.hp;dots[i]=f.effects.end_balance_round(&mut f.hp,f.stats.hp)*crate::skill_balance::n("pvp_damage_bp")/10000;f.hp=before+(f.hp-before)*crate::skill_balance::n("pvp_heal_bp")/10000;f.effects.tick_balance();}
+            }
+            self.fighters[0].hp=(self.fighters[0].hp-dots[1]).max(0);
+            self.fighters[1].hp=(self.fighters[1].hp-dots[0]).max(0);
             for f in &mut self.fighters {
-                if f.effects.regen > 0 {
+                if f.effects.balance.is_none()&&f.effects.regen > 0 {
                     let heal = f.effects.regen_amount.min(f.stats.hp - f.hp);
                     f.hp += heal;
                     f.effects.regen -= 1;
@@ -448,6 +461,7 @@ impl Battle {
             if let Some(e) = self.events.last_mut() {
                 e.fighters = self.fighters.clone();
             }
+            if self.check_end(now){self.revision+=1;return;}
             if self.round >= MAX_ROUNDS {
                 self.finish(None, "round_limit", now);
             } else {

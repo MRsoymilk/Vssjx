@@ -3,6 +3,7 @@
   "basis": 10000,
   "max_level": 60,
   "points_per_level": 5,
+  "recommended_patterns": [[0,0,2,2,3],[0,2,2,2,3],[0,1,1,1,4]],
   "max_value": 1000000,
   "hp_base": [120, 95, 85],
   "hp_growth": [22, 18, 16],

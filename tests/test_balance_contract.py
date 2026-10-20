@@ -7,6 +7,8 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class BalanceContract(unittest.TestCase):
+    def test_skill_budget_mirror(self):
+        self.assertEqual((ROOT/'shared/data/skill-balance-v1.json').read_bytes(),(ROOT/'client/assets/data/skill-balance-v1.json').read_bytes())
     def test_runtime_mirror(self):
         self.assertEqual((ROOT/'shared/data/balance-v1.json').read_bytes(),(ROOT/'client/assets/data/balance-v1.json').read_bytes())
 

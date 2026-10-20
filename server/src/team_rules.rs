@@ -33,6 +33,8 @@ pub struct Enemy {
     pub definition: ResidentDefinition,
     pub hp: i32,
     pub effects: skills::State,
+    #[serde(default,skip_serializing_if="BTreeMap::is_empty")]
+    pub dots:BTreeMap<String,(i32,i32)>,
 }
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Event {
@@ -71,18 +73,20 @@ pub struct Battle {
 impl Battle {
     pub fn new(
         map_id: String,
-        fighters: Vec<Fighter>,
+        mut fighters: Vec<Fighter>,
         source: Vec<ResidentDefinition>,
         now: i64,
     ) -> Self {
         assert!((1..=MAX_MEMBERS).contains(&fighters.len()) && !source.is_empty());
         let extra = fighters.len() as i32 - 1;
         let balanced=fighters.iter().all(|f|f.stats.balance.is_some());
-        let enemies = source
+        for f in &mut fighters{f.effects.activate(f.stats);}
+        let mut enemies:Vec<Enemy> = source
             .into_iter()
             .take(5)
             .enumerate()
             .map(|(i, mut d)| {
+                if balanced{d=crate::skill_balance::monster(d);}
                 if !balanced{
                     d.hp = (d.hp * (100 + 35 * extra) + 99) / 100;
                     d.attack = (d.attack * (100 + 15 * extra) + 99) / 100;
@@ -96,9 +100,17 @@ impl Battle {
                         ..Default::default()
                     },
                     definition: d,
+                    dots:BTreeMap::new(),
                 }
             })
             .collect();
+        if balanced{
+            if let Some(boss)=enemies.iter().find(|e|e.definition.kind=="boss"||e.definition.id=="boss"){
+                let budget=crate::combat_balance::boss_hp(boss.definition.hp as i64,fighters.len() as i64).unwrap() as i32;
+                let total:i64=enemies.iter().map(|e|e.hp as i64).sum();let mut left=budget;let count=enemies.len();
+                for (i,e) in enemies.iter_mut().enumerate(){let hp=if i+1==count{left}else{((e.hp as i64*budget as i64)/total) as i32};e.hp=hp.max(1);e.definition.hp=e.hp;left-=hp;}
+            }
+        }
         Self {
             id: Uuid::new_v4(),
             map_id,
@@ -222,9 +234,10 @@ impl Battle {
             None
         };
         let actor = &self.fighters[i];
-        if selected.is_some_and(|s| actor.mp < s.mp_cost) {
+        if selected.is_some_and(|s| actor.mp < crate::skill_balance::cost(s,actor.stats)) {
             return Err("MP_INSUFFICIENT");
         }
+        if selected.is_some_and(|s|actor.effects.remaining(&s.id)>0){return Err("SKILL_COOLDOWN");}
         if action == "potion" && (actor.potions == 0 || actor.hp >= actor.stats.hp) {
             return Err(if actor.potions == 0 {
                 "NO_POTION"
@@ -320,12 +333,14 @@ impl Battle {
         let who = self.fighters[i].id;
         let action = command.action.as_str();
         let selected = command.skill.as_deref().and_then(skills::item);
+        let cost=selected.map_or(0,|s|crate::skill_balance::cost(s,self.fighters[i].stats));
         let mode = selected.map_or("enemy", |s| s.target.as_str());
         let target_index = self
             .enemies
             .iter()
             .position(|e| Some(e.slot.as_str()) == command.target.as_deref() && e.hp > 0);
         self.fighters[i].effects.reset_turn();
+        if let Some(b)=self.fighters[i].effects.balance.as_mut(){b.targets=self.enemies.iter().filter(|e|e.hp>0).count() as i32;}
         self.fighters[i].guarding = false;
         if let Some(s) = selected {
             let targets: Vec<usize> = if mode == "all_enemies" {
@@ -339,12 +354,14 @@ impl Battle {
                 vec![target_index.unwrap_or(0)]
             };
             if mode == "all_allies" {
-                self.fighters[i].mp -= s.mp_cost;
+                self.fighters[i].mp -= cost;
                 for ally in self.fighters.iter_mut().filter(|a| a.hp > 0) {
-                    let mut temporary_mp = s.mp_cost;
+                    let mut temporary_mp = crate::skill_balance::cost(s,ally.stats);
+                    let cooldowns=ally.effects.balance.as_ref().map(|b|b.cooldowns.clone());
                     let old = ally.hp;
                     ally.effects
                         .cast(s, ally.stats, &mut ally.hp, &mut temporary_mp, 0, roll);
+                    if ally.id!=who{if let Some(b)=ally.effects.balance.as_mut(){b.cooldowns=cooldowns.unwrap_or_default();}}
                     self.events.push(Event {
                         actor: who.to_string(),
                         target: ally.id.to_string(),
@@ -363,16 +380,17 @@ impl Battle {
                     // Enemy debuffs belong to each enemy, self buffs to each ally.
                     Self::enemy_effects(&enemy.effects, &mut actor.effects);
                     if n > 0 {
-                        actor.mp += s.mp_cost;
+                        actor.mp += cost;
                     }
-                    let damage = actor.effects.cast(
+                    let missed=crate::skill_balance::revised(actor.stats)&&s.damage_percent>0&&matches!(mode,"enemy"|"all_enemies")&&!crate::attributes::lands(Some(actor.stats),None,actor.job==2);
+                    let damage = if missed{actor.effects.miss(s,actor.stats,&mut actor.mp);0}else{actor.effects.cast(
                         s,
                         crate::attributes::for_attack(actor.stats, actor.job, actor.job == 2),
                         &mut actor.hp,
                         &mut actor.mp,
                         enemy.definition.defense,
                         roll,
-                    );
+                    )};
                     let damage = crate::attributes::critical(
                         actor.stats,
                         actor.job == 2,
@@ -384,6 +402,11 @@ impl Battle {
                     Self::enemy_effects(&actor.effects, &mut enemy.effects);
                     Self::enemy_effects(&skills::State::default(), &mut actor.effects);
                     enemy.hp -= damage;
+                    if !missed&&crate::skill_balance::revised(actor.stats)&&matches!(s.effect.as_str(),"bleed"|"poison"){
+                        let ticks=if s.effect=="bleed"{enemy.effects.enemy_bleed}else{enemy.effects.enemy_poison};
+                        let amount=if s.effect=="bleed"{enemy.effects.bleed_damage}else{enemy.effects.poison_damage};
+                        enemy.dots.insert(format!("{who}/{}",s.effect),(ticks,amount));
+                    }
                     self.events.push(Event {
                         actor: who.to_string(),
                         target: if mode == "self" {
@@ -405,14 +428,15 @@ impl Battle {
         } else if action == "attack" {
             let e = &mut self.enemies[target_index.unwrap()];
             let a = &mut self.fighters[i];
+            a.mp=(a.mp+crate::skill_balance::recovery(a.stats,"basic_restore_bp",0)).min(a.stats.mp);
             let power = crate::attributes::for_attack(a.stats, a.job, a.job==2&&a.stats.balance.is_some());
-            let damage = crate::attributes::critical(
+            let damage = if crate::skill_balance::revised(a.stats)&&!crate::attributes::lands(Some(a.stats),None,a.job==2){0}else{crate::attributes::critical(
                 a.stats,
                 a.job==2&&a.stats.balance.is_some(),
                 &mut a.effects,
                 crate::attributes::direct_damage(power,e.definition.defense,10000,0),
                 roll,
-            )
+            )}
             .min(e.hp);
             e.hp -= damage;
             e.effects.enemy_sleep = 0;
@@ -428,7 +452,7 @@ impl Battle {
         } else if action == "guard" {
             self.fighters[i].guarding = true;
             let a = &mut self.fighters[i];
-            a.mp = (a.mp + 5).min(a.stats.mp);
+            a.mp = (a.mp + crate::skill_balance::recovery(a.stats,"guard_restore_bp",5)).min(a.stats.mp);
             self.events.push(Event {
                 actor: who.to_string(),
                 target: who.to_string(),
@@ -441,7 +465,7 @@ impl Battle {
         } else {
             let a = &mut self.fighters[i];
             a.potions -= 1;
-            let healed = 45.min(a.stats.hp - a.hp);
+            let healed = crate::skill_balance::potion(a.stats).min(a.stats.hp - a.hp);
             a.hp += healed;
             self.events.push(Event {
                 actor: who.to_string(),
@@ -457,6 +481,8 @@ impl Battle {
         a.effects.after_player(&mut a.hp, a.stats.hp);
     }
     fn enemy_effects(from: &skills::State, to: &mut skills::State) {
+        if from.balance.is_none(){if let Some(b)=to.balance.as_mut(){b.control_protection=0;}}
+        if let Some(b)=from.balance.as_ref(){to.balance.get_or_insert_with(Default::default).control_protection=b.control_protection;}
         to.enemy_mp = from.enemy_mp;
         to.enemy_bleed = from.enemy_bleed;
         to.bleed_damage = from.bleed_damage;
@@ -470,15 +496,16 @@ impl Battle {
             if e.hp <= 0 {
                 continue;
             }
-            let dot = if e.effects.enemy_bleed > 0 {
+            let balanced=self.fighters.iter().any(|f|crate::skill_balance::revised(f.stats));
+            let dot = if balanced{0}else{(if e.effects.enemy_bleed > 0 {
                 e.effects.bleed_damage
             } else {
                 0
-            } + if e.effects.enemy_poison > 0 {
+            }) + if e.effects.enemy_poison > 0 {
                 e.effects.poison_damage
             } else {
                 0
-            };
+            }};
             e.hp = (e.hp - dot).max(0);
             e.effects.enemy_bleed = (e.effects.enemy_bleed - 1).max(0);
             e.effects.enemy_poison = (e.effects.enemy_poison - 1).max(0);
@@ -501,9 +528,11 @@ impl Battle {
             }
             let i = alive[((roll.max(0) as usize) + n + self.round as usize) % alive.len()];
             let a = &mut self.fighters[i];
-            let landed = crate::attributes::lands(None, Some(a.stats), false);
+            let magical=balanced&&crate::skill_balance::monster_magical(&e.definition,self.round,e.effects.enemy_mp,e.effects.enemy_silence>0);
+            if magical{e.effects.enemy_mp-=10;}
+            let landed = crate::attributes::lands(None, Some(a.stats), magical);
             let incoming = if landed {
-                crate::attributes::incoming(e.definition.attack,e.definition.level,a.stats,false,0)
+                crate::attributes::incoming(e.definition.attack,e.definition.level,a.stats,magical,0)
             } else {
                 0
             };
@@ -513,7 +542,7 @@ impl Battle {
                 incoming
             };
             let (incoming, reflected) = if landed {
-                a.effects.enemy_hit(incoming, false)
+                a.effects.enemy_hit(incoming, magical)
             } else {
                 (0, 0)
             };
@@ -536,7 +565,17 @@ impl Battle {
             });
         }
         for ally in &mut self.fighters {
+            if ally.hp>0{let before=ally.hp;ally.effects.end_balance_round(&mut ally.hp,ally.stats.hp);
+                if ally.hp>before{self.events.push(Event{actor:ally.id.to_string(),target:ally.id.to_string(),action:"regen".into(),skill:String::new(),damage:0,healed:ally.hp-before,critical:false});}
+            }
             ally.effects.end_turn();
+        }
+        for e in &mut self.enemies{
+            if !e.dots.is_empty(){let mut total=0;for (ticks,amount) in e.dots.values_mut(){if *ticks>0{total+=*amount;*ticks-=1;}}let dealt=total.min(e.hp);e.hp=(e.hp-total).max(0);e.dots.retain(|_,(ticks,_)|*ticks>0);
+                if dealt>0{self.events.push(Event{actor:e.slot.clone(),target:e.slot.clone(),action:"dot".into(),skill:String::new(),damage:dealt,healed:0,critical:false});}
+            }
+            e.effects.tick_balance();
+            e.effects.enemy_silence=(e.effects.enemy_silence-1).max(0);
         }
         if self.fighters.iter().all(|a| a.hp == 0) {
             self.finish("defeat");

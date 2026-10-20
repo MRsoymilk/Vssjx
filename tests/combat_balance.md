@@ -51,3 +51,27 @@ LIBGL_ALWAYS_SOFTWARE=1 python tests/run_offscreen.py --path client \
 ```
 
 A2尚不宣称完成A3的技能冷却/预算、法术怪AI、六流派胜率或装备经济。旧PVE回执仍按原有版本读取，不改写已提交回执；`attributes-v1` 通过 `formula_revision=3` 表示新版，战斗快照携带可选 `balance` 对象；新客户端同时支持旧快照。源码更新不代表线上或已有APK已更新。
+
+## A3 技能预算、完整回合与怪物
+
+2026-10-20：Rust全量123项通过；Python镜像契约4项通过；真实Rust/PostgreSQL/WebSocket技能联调10项通过；实际离屏205项通过，包含33技能×两个目标规模共66组完整Rust/Godot结果及状态一致性、真实服务端快照和正式技能选择器的费用/冷却拒绝。旧技能向量回归376项通过。截图 `work/combat-balance-v1/skills.png` 已人工检查。
+
+专项覆盖：冷却随战斗持久化、进程重启、拒绝不扣费/不推进、回执重放、冷却结束可再次施放、术法怪确实在第3轮施法、封印抑制、多人DOT来源不覆盖、首领整场预算和PvP虚拟气血不影响世界属性。
+
+`balance_sweep` 使用固定种子执行30,000场同级基准战斗，验证生存与回合数范围。仅代表固定装备、推荐加点与单体基准策略，不是最终流派或掉落经济验收。报告在 `work/combat-balance-v1/sweep.json`。
+
+```sh
+python tools/sync_balance_data.py
+cargo build --offline --manifest-path server/Cargo.toml
+python tests/run_skill_balance.py
+cargo run --offline --manifest-path server/Cargo.toml --example balance_skill_vectors \
+  > work/combat-balance-v1/skill-vectors.json
+cargo run --offline --manifest-path server/Cargo.toml --example balance_sweep \
+  > work/combat-balance-v1/sweep.json
+SSJX_BALANCE_SKILL_VECTORS="$PWD/work/combat-balance-v1/skill-vectors.json" \
+SSJX_BALANCE_SKILL_FIXTURES="$PWD/work/combat-balance-v1/skill-server-fixtures.json" \
+SSJX_BALANCE_CAPTURE="$PWD/work/combat-balance-v1/skills.png" \
+XVFB_BIN=/tmp/opencode/vssjx-eva01-xvfb/run-xvfb LIBGL_ALWAYS_SOFTWARE=1 \
+python tests/run_offscreen.py --path client --rendering-method gl_compatibility \
+  --rendering-driver opengl3_es res://tests/skill_balance_test.tscn
+```

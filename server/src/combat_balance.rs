@@ -9,6 +9,7 @@ pub struct Rules {
     pub basis: i64,
     pub max_level: i64,
     pub points_per_level: i64,
+    pub recommended_patterns: [[usize;5];3],
     pub max_value: i64,
     pub hp_base: [i64; 3],
     pub hp_growth: [i64; 3],

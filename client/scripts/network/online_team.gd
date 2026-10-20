@@ -94,6 +94,7 @@ func valid(v:Dictionary)->bool:
 	for f in b.fighters:
 		if not f is Dictionary or not OnlineWorldClient._uuid(f.get("id")) or fighters.has(f.id) or not OnlineAccount.valid_nickname(f.get("name","")) or not OnlinePve.integer(f.get("job"),0,2) or not OnlinePve.integer(f.get("gender"),0,1) or not OnlinePve.integer(f.get("school"),0,3) or not OnlinePve.integer(f.get("level"),1,60) or not f.get("stats") is Dictionary or not SkillRules.valid_state(f.get("effects",{})) or not f.get("appearance") is Array or f.appearance.size()!=3:return false
 		fighters[f.id]=true
+		if not CharacterAttributeRules.valid_balance(f.stats):return false
 		if not valid_look(f.appearance):return false
 		for stat in ["hp","mp","attack","defense"]:
 			if not OnlinePve.integer(f.stats.get(stat),0,100000):return false
@@ -123,7 +124,7 @@ func valid(v:Dictionary)->bool:
 		enemies[e.slot]=true
 	for event in b.events:
 		if event is Dictionary and event.has("critical") and not event.critical is bool:return false
-		if not event is Dictionary or not (fighters.has(event.get("actor")) or enemies.has(event.get("actor"))) or not (fighters.has(event.get("target")) or enemies.has(event.get("target"))) or event.get("action") not in ["attack","skill","potion","guard"] or not event.get("skill") is String or not OnlinePve.integer(event.get("damage"),0,100000) or not OnlinePve.integer(event.get("healed"),0,100000):return false
+		if not event is Dictionary or not (fighters.has(event.get("actor")) or enemies.has(event.get("actor"))) or not (fighters.has(event.get("target")) or enemies.has(event.get("target"))) or event.get("action") not in ["attack","skill","potion","guard","dot","regen"] or not event.get("skill") is String or not OnlinePve.integer(event.get("damage"),0,100000) or not OnlinePve.integer(event.get("healed"),0,100000):return false
 	return true
 
 static func valid_look(look:Array)->bool:

@@ -3,12 +3,14 @@ extends Control
 ## Native eba0..ed16: compact name/rank list above a separate description.
 var items:Array=[]
 var level:=1
+var balanced:=false
 var selected_index:=0
 @onready var rows:VBoxContainer=$SkillCatalog/Rows
 @onready var detail:Label=$Description
 
 func present(player:Dictionary,martial:bool)->void:
 	level=int(player.level)
+	balanced=player.get("balance_revision",0)==1
 	items=SkillRules.list_for(int(player.job),int(player.school),level,true).filter(func(s:Dictionary)->bool:return bool(s.active)==martial)
 	var unlocked:=items.filter(func(skill:Dictionary)->bool:return level>=int(skill.unlock_level)).size()
 	$Provenance.text="%d级 · 已解锁%d项 · 门派不限"%[level,unlocked]
@@ -33,7 +35,13 @@ func select_skill(index:int)->void:
 	var skill:Dictionary=items[selected_index]
 	$SkillName.text=skill.name
 	detail.text=String(skill.description)
-	if int(skill.mp_cost)>0:detail.text+="\n（消耗灵力%d）"%int(skill.mp_cost)
+	if balanced and skill.active:
+		if SkillBalance.kind(skill)=="dot":detail.text+=" · 首击80%＋每轮30%，共3次"
+		elif skill.target=="all_enemies":detail.text+=" · 群攻总倍率最多240%"
+		elif SkillBalance.kind(skill)=="control":detail.text+=" · 65%概率控制1轮，之后保护2轮"
+		elif int(skill.damage_percent)>0:detail.text+=" · 威力160%"
+	if balanced and skill.active:detail.text+="\n消耗最大灵力%d%% · 冷却%d轮"%[int(SkillBalance.rules.cost_bp[SkillBalance.kind(skill)])/100,SkillBalance.cooldown(skill)]
+	elif int(skill.mp_cost)>0:detail.text+="\n（消耗灵力%d）"%int(skill.mp_cost)
 	detail.text+="\n%d级解锁"%int(skill.unlock_level) if level<int(skill.unlock_level) else ("\n已生效" if not skill.active else "\n已解锁 · %d级可用"%int(skill.unlock_level))
 	for i in rows.get_child_count():
 		var row:Button=rows.get_child(i)

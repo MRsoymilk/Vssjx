@@ -4,6 +4,15 @@ use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
 use std::sync::LazyLock;
+use std::collections::BTreeMap;
+#[derive(Clone,Debug,Default,Serialize,Deserialize)]
+#[serde(default)]
+pub struct BalanceState{
+    pub cooldowns:BTreeMap<String,i32>,
+    pub targets:i32,
+    pub control_protection:i32,
+    pub last_enemy_magical:bool,
+}
 const DATA: &str = include_str!("../../client/assets/data/skills-v1.json");
 #[derive(Deserialize)]
 pub struct Skill {
@@ -55,11 +64,13 @@ pub fn check(id: &str, job: i16, _school: i16, level: i32) -> Result<&'static Sk
     Ok(s)
 }
 pub fn view(job: i16, school: i16, level: i32) -> Value {
-    json!({"version":"skills-v1","catalog_sha256":*HASH,"available":ITEMS.iter().filter(|s|eligible(s,job,school,level)).map(|s|&s.id).collect::<Vec<_>>()})
+    json!({"version":"skills-v1","catalog_sha256":*HASH,"balance_sha256":format!("{:x}",Sha256::digest(include_bytes!("../../shared/data/skill-balance-v1.json"))),"available":ITEMS.iter().filter(|s|eligible(s,job,school,level)).map(|s|&s.id).collect::<Vec<_>>()})
 }
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 #[serde(default)]
 pub struct State {
+    #[serde(default,skip_serializing_if="Option::is_none")]
+    pub balance:Option<BalanceState>,
     #[serde(skip_serializing_if = "not_critical")]
     pub last_critical: bool,
     pub last_skill: String,
@@ -92,6 +103,19 @@ fn not_critical(value: &bool) -> bool {
     !*value
 }
 impl State {
+    pub fn miss(&mut self,s:&Skill,stats:Stats,mp:&mut i32){self.activate(stats);self.last_skill=s.id.clone();*mp-=crate::skill_balance::cost(s,stats);self.mark(s);self.last_critical=false;}
+    pub fn activate(&mut self,stats:Stats){if crate::skill_balance::revised(stats)&&self.balance.is_none(){self.balance=Some(BalanceState{targets:1,..Default::default()});}}
+    pub fn remaining(&self,id:&str)->i32{self.balance.as_ref().and_then(|b|b.cooldowns.get(id)).copied().unwrap_or(0)}
+    pub fn mark(&mut self,s:&Skill){if let Some(b)=self.balance.as_mut(){b.cooldowns.insert(s.id.clone(),crate::skill_balance::cooldown(s)+1);}}
+    pub fn tick_balance(&mut self){if let Some(b)=self.balance.as_mut(){for v in b.cooldowns.values_mut(){*v=(*v-1).max(0);}b.cooldowns.retain(|_,v|*v>0);b.control_protection=(b.control_protection-1).max(0);}}
+    pub fn end_balance_round(&mut self,hp:&mut i32,max_hp:i32)->i32{
+        if self.balance.is_none(){return 0;}
+        let mut damage=0;
+        if self.enemy_bleed>0{damage+=self.bleed_damage;self.enemy_bleed-=1;}
+        if self.enemy_poison>0{damage+=self.poison_damage;self.enemy_poison-=1;}
+        if self.regen>0&&*hp>0{let healed=self.regen_amount.min(max_hp-*hp);*hp+=healed;self.last_healed+=healed;self.regen-=1;}
+        damage
+    }
     pub fn new(job: i16, school: i16, level: i32, enemy_level: i32) -> Self {
         let mut state = Self {
             enemy_mp: 30 + enemy_level * 2,
@@ -110,6 +134,7 @@ impl State {
         state
     }
     pub fn reset_turn(&mut self) {
+        if let Some(b)=self.balance.as_mut(){b.last_enemy_magical=false;}
         self.last_critical = false;
         self.last_skill.clear();
         self.last_enemy_acted = false;
@@ -136,9 +161,12 @@ impl State {
         roll: i32,
     ) -> i32 {
         self.last_skill = s.id.clone();
-        *mp -= s.mp_cost;
+        let revised=crate::skill_balance::revised(stats);
+        self.activate(stats);
+        *mp -= crate::skill_balance::cost(s,stats);
+        if revised{self.mark(s);}
         let damage = if s.damage_percent > 0 {
-            crate::attributes::direct_damage(stats,enemy_defense,s.damage_percent*100,0)
+            crate::attributes::direct_damage(stats,enemy_defense,if revised{crate::skill_balance::coefficient(s,self.balance.as_ref().unwrap().targets)}else{s.damage_percent*100},0)
         } else {
             0
         };
@@ -150,21 +178,23 @@ impl State {
         }
         match s.effect.as_str() {
             "bleed" => {
-                self.enemy_bleed = s.duration;
-                self.bleed_damage = (stats.attack * s.value / 100).max(1);
+                self.enemy_bleed = if revised{crate::skill_balance::n("dot_ticks")}else{s.duration};
+                self.bleed_damage = if revised{crate::attributes::direct_damage(stats,enemy_defense,crate::skill_balance::n("dot_tick_bp"),0)}else{(stats.attack * s.value / 100).max(1)};
             }
             "poison" => {
-                self.enemy_poison = s.duration;
-                self.poison_damage = (stats.attack * s.value / 100).max(1);
+                self.enemy_poison = if revised{crate::skill_balance::n("dot_ticks")}else{s.duration};
+                self.poison_damage = if revised{crate::attributes::direct_damage(stats,enemy_defense,crate::skill_balance::n("dot_tick_bp"),0)}else{(stats.attack * s.value / 100).max(1)};
             }
             "sleep" => {
-                if roll < s.chance {
-                    self.enemy_sleep = s.duration;
+                if roll < if revised{crate::skill_balance::n("control_chance")}else{s.chance} && self.balance.as_ref().is_none_or(|b|b.control_protection==0) {
+                    self.enemy_sleep = if revised{crate::skill_balance::n("control_duration")}else{s.duration};
+                    if let Some(b)=self.balance.as_mut(){b.control_protection=crate::skill_balance::n("control_protection");}
                 }
             }
             "silence" => {
-                if roll < s.chance {
-                    self.enemy_silence = s.duration;
+                if roll < if revised{crate::skill_balance::n("control_chance")}else{s.chance} && self.balance.as_ref().is_none_or(|b|b.control_protection==0) {
+                    self.enemy_silence = if revised{crate::skill_balance::n("control_duration")}else{s.duration};
+                    if let Some(b)=self.balance.as_mut(){b.control_protection=crate::skill_balance::n("control_protection");}
                 }
             }
             "regen" => {
@@ -197,6 +227,7 @@ impl State {
         damage
     }
     pub fn after_player(&mut self, hp: &mut i32, max_hp: i32) -> i32 {
+        if self.balance.is_some(){return 0;}
         let mut damage = 0;
         if self.enemy_bleed > 0 {
             damage += self.bleed_damage;
@@ -237,6 +268,7 @@ impl State {
         (incoming, incoming * percent / 100)
     }
     pub fn end_turn(&mut self) {
+        self.tick_balance();
         for n in [
             &mut self.defense,
             &mut self.crit,

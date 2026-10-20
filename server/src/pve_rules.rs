@@ -165,9 +165,10 @@ impl Battle {
         if action != Action::Skill && skill_id.is_some() {
             return Err("INVALID_PVE_COMMAND");
         }
-        if selected.is_some_and(|s| self.mp < s.mp_cost) {
+        if selected.is_some_and(|s| self.mp < crate::skill_balance::cost(s,stats)) {
             return Err("MP_INSUFFICIENT");
         }
+        if selected.is_some_and(|s|self.skills.remaining(&s.id)>0){return Err("SKILL_COOLDOWN");}
         if action == Action::Potion && self.potions < 1 {
             return Err("NO_POTION");
         }
@@ -184,20 +185,25 @@ impl Battle {
             self.skills.passive_magic = current.passive_magic;
         }
         self.skills.reset_turn();
+        self.skills.activate(stats);
         self.round += 1;
         self.revision += 1;
         let mut lines = vec![format!("第{}回合", self.round)];
         let mut damage = match action {
             Action::Attack => {
+                self.mp=(self.mp+crate::skill_balance::recovery(stats,"basic_restore_bp",0)).min(stats.mp);
+                if crate::skill_balance::revised(stats)&&!crate::attributes::lands(Some(stats),None,job==2){lines.push("你的攻击落空了。".into());0}else{
                 self.skills.enemy_sleep = 0;
                 let magical=job==2&&stats.balance.is_some();
                 let power = crate::attributes::for_attack(stats, job, magical);
                 crate::attributes::critical(stats, magical, &mut self.skills,
                     crate::attributes::direct_damage(power,self.enemy.defense,10000,player_roll.clamp(-2,2)), effect_roll)
+                }
             }
             Action::Skill => {
                 let skill = selected.expect("selected skill");
                 lines.push(format!("你施展{}。", skill.name));
+                if crate::skill_balance::revised(stats)&&skill.damage_percent>0&&matches!(skill.target.as_str(),"enemy"|"all_enemies")&&!crate::attributes::lands(Some(stats),None,job==2){self.skills.miss(skill,stats,&mut self.mp);lines.push("法招未能命中，未施加目标状态。".into());0}else{
                 let damage = self.skills.cast(
                     skill,
                     crate::attributes::for_attack(stats, job, job == 2),
@@ -207,15 +213,17 @@ impl Battle {
                     effect_roll,
                 );
                 crate::attributes::critical(stats, job == 2, &mut self.skills, damage, effect_roll)
+                }
             }
             Action::Guard => {
-                self.mp = (self.mp + 5).min(stats.mp);
-                lines.push("凝神防御，恢复5点灵力。".into());
+                let recovery=crate::skill_balance::recovery(stats,"guard_restore_bp",5);
+                self.mp = (self.mp + recovery).min(stats.mp);
+                lines.push(format!("凝神防御，恢复{recovery}点灵力。"));
                 0
             }
             Action::Potion => {
                 self.potions -= 1;
-                self.hp = (self.hp + 45).min(stats.hp);
+                self.hp = (self.hp + crate::skill_balance::potion(stats)).min(stats.hp);
                 lines.push("服用回春散，恢复元气。".into());
                 0
             }
@@ -242,19 +250,24 @@ impl Battle {
         if self.enemy_hp == 0 {
             self.outcome = "victory".into();
             lines.push(format!("{}被击败！", self.enemy.name));
+            self.skills.end_balance_round(&mut self.hp,stats.hp);
             self.skills.end_turn();
             return Ok(lines);
         }
         if self.skills.enemy_sleep > 0 {
             lines.push(format!("{}处于睡眠，无法行动。", self.enemy.name));
         } else {
-            let mut incoming = crate::attributes::incoming(self.enemy.attack,self.enemy.level,stats,false,enemy_roll.clamp(-2,2));
-            let landed = crate::attributes::lands(None, Some(stats), false);
+            let magical=crate::skill_balance::revised(stats)&&crate::skill_balance::monster_magical(&self.enemy,self.round as i32,self.skills.enemy_mp,self.skills.enemy_silence>0);
+            if magical{self.skills.enemy_mp-=10;lines.push(format!("{}施展法术。",self.enemy.name));}
+            if crate::skill_balance::revised(stats)&&(self.round as i32+1)%crate::skill_balance::n("cast_period")==0{lines.push("妖物正在蓄势，下一轮留意防御或封印。".into());}
+            if let Some(b)=self.skills.balance.as_mut(){b.last_enemy_magical=magical;}
+            let mut incoming = crate::attributes::incoming(self.enemy.attack,self.enemy.level,stats,magical,enemy_roll.clamp(-2,2));
+            let landed = crate::attributes::lands(None, Some(stats), magical);
             if !landed { incoming = 0; }
             if action == Action::Guard {
                 incoming = if landed { (incoming / 2).max(1) } else { 0 };
             }
-            let (incoming, mut reflected) = if landed { self.skills.enemy_hit(incoming, false) } else { (0, 0) };
+            let (incoming, mut reflected) = if landed { self.skills.enemy_hit(incoming, magical) } else { (0, 0) };
             self.skills.last_enemy_acted = true;
             self.skills.last_incoming = incoming;
             self.hp = (self.hp - incoming).max(0);
@@ -269,6 +282,8 @@ impl Battle {
                 lines.push(format!("反伤造成{reflected}点伤害。"));
             }
         }
+        let dot=self.skills.end_balance_round(&mut self.hp,stats.hp);
+        if dot>0{self.enemy_hp=(self.enemy_hp-dot).max(0);self.skills.last_damage+=dot;lines.push(format!("回合末持续伤害{dot}点。"));}
         self.skills.end_turn();
         if self.hp == 0 {
             self.outcome = "defeat".into();

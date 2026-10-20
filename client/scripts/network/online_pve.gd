@@ -52,6 +52,7 @@ func valid(value: Variant) -> bool:
 	if not OnlineAccount._valid_character(value.get("character")) or value.character.id != character_id or value.character.quest_stage > 4: return false
 	if not integer(value.get("potions"), 0, 99): return false
 	if not value.get("stats") is Dictionary: return false
+	if not CharacterAttributeRules.valid_balance(value.stats):return false
 	for key in ["hp", "mp", "attack", "defense"]:
 		if not integer(value.stats.get(key), 1, 10000): return false
 	if value.character.hp > value.stats.hp or value.character.mp > value.stats.mp: return false
@@ -94,6 +95,7 @@ func valid(value: Variant) -> bool:
 	if (not enemy.get("id") in ["wolf_a", "wolf_b", "wolf_c", "spirit", "guardian", "boss"] and AIWorld.resident(enemy.get("id", "")).is_empty()) or not enemy.get("name") is String or enemy.name.length() > 24: return false
 	if not AIWorld.resident(enemy.id).is_empty():
 		var definition := AIWorld.resident(enemy.id)
+		if SkillBalance.revised(value.stats):definition=SkillBalance.monster(definition)
 		for key in ["art", "kind", "hp", "attack", "defense", "level", "gold", "xp"]:
 			if enemy.get(key) != definition[key]: return false
 		if not OriginalArt.has_actor(definition.art): return false
@@ -242,6 +244,7 @@ func quest_text() -> String:
 	return "古剑遗迹 · 已完成\n妖气已散，可返回青云山道恢复元气，或继续探索遗迹。"
 
 static func error_text(code: String) -> String:
+	if code=="SKILL_COOLDOWN":return "技能尚在冷却，请选择其他指令。"
 	var souls:={"SOUL_STATE":"灵魂状态下只能移动和寻回尸体，请先到自己的坟堆旁复活。","CORPSE_NOT_FOUND":"这不是你的尸体，或已经复活。","NO_CORPSE":"当前没有可寻回的尸体。","CORPSE_TOO_FAR":"请靠近自己的坟堆后复活。","STALE_CORPSE":"灵魂状态已更新，请重新同步后再试。"}
 	if souls.has(code):return souls[code]
 	var schools:={"INVALID_SCHOOL":"请选择有效门派。","SCHOOL_ALREADY_JOINED":"已正式入派，不能重复加入其他门派。","STALE_SCHOOL":"角色状态已变化，请重新与清微道人交谈。","INVALID_SCHOOL_NPC":"请在青云山道找清微道人办理入派。"}

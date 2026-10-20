@@ -147,7 +147,7 @@ func _process(delta: float) -> void:
 			var command := "attack"
 			if battle.hp < int(Game.stats().hp) / 3 and battle.potions > 0:
 				command = "potion"
-			elif battle.mp >= int(SkillRules.item(battle.selected_skill).mp_cost):
+			elif battle.mp >= SkillBalance.cost(SkillRules.item(battle.selected_skill),battle.frozen_stats) and SkillRules.remaining(battle.skills,battle.selected_skill)==0:
 				command = "skill"
 			_battle_turn(command,SkillRules.default_id(int(Game.player.job),int(Game.player.school),int(Game.player.level)) if command=="skill" else "")
 	if mode == "world":
@@ -1117,7 +1117,7 @@ func _battle_skills()->void:
 	var picker:=SkillPicker.new();modal.add_child(picker)
 	picker.dismissed.connect(func()->void:_close_modal();_battle_menu())
 	picker.chosen.connect(func(id:String)->void:_close_modal();battle.selected_skill=id;_battle_turn("skill",id))
-	picker.present(int(Game.player.job),int(Game.player.school),int(Game.player.level),battle.mp)
+	picker.present(int(Game.player.job),int(Game.player.school),int(Game.player.level),battle.mp,[],false,battle.frozen_stats,battle.skills)
 
 func _battle_turn(command: String, skill_id:String="") -> void:
 	if mode != "battle" or battle.phase != "select" or modal != null: return
@@ -1178,7 +1178,7 @@ func _battle_turn(command: String, skill_id:String="") -> void:
 		if int(response.incoming) > 0 and battle_hero.sprite_frames.has_animation("hurt"): battle_hero.play("hurt")
 		battle_effects.number(battle_hero,int(response.incoming))
 		if int(response.reflected) > 0:
-			battle_effects.play_reflection(int(Game.player.job),int(Game.player.school),int(Game.player.level),battle.skills,false,battle_hero,battle_enemy)
+			battle_effects.play_reflection(int(Game.player.job),int(Game.player.school),int(Game.player.level),battle.skills,bool(battle.skills.get("balance",{}).get("last_enemy_magical",false)),battle_hero,battle_enemy)
 			battle_effects.number(battle_enemy,int(response.reflected))
 		_refresh_battle()
 		await enemy_motion.completed
@@ -1195,7 +1195,14 @@ func _battle_turn(command: String, skill_id:String="") -> void:
 	_refresh_battle()
 	await get_tree().create_timer(0.35).timeout
 	if epoch != _ui_epoch or mode != "battle" or battle != active_battle: return
-	_battle_lines(battle.finish_round().lines)
+	var final_round:=battle.finish_round()
+	_battle_lines(final_round.lines)
+	if int(final_round.get("dot_damage",0))>0:
+		battle_effects.number(battle_enemy,int(final_round.dot_damage))
+		if battle.finished and battle_death==null:
+			battle_death=BattleDeathPlayback.new();battle_death.start(battle_enemy if battle.victory else battle_hero)
+			await battle_death.completed
+			if epoch!=_ui_epoch or mode!="battle" or battle!=active_battle:return
 	battle_stage = battle.phase
 	auto_timer = 0.0
 	_refresh_battle()
@@ -1250,7 +1257,7 @@ func _refresh_battle() -> void:
 	battle_enemy_status.visible = not moving_enemy and not dead_enemy
 	if battle_buttons.size() == 6:
 		for button in battle_buttons: button.disabled = battle.phase != "select"
-		battle_buttons[1].disabled = battle.phase != "select" or not SkillPicker.has_usable(int(Game.player.job),int(Game.player.school),int(Game.player.level),battle.mp)
+		battle_buttons[1].disabled = battle.phase != "select" or not SkillPicker.has_usable(int(Game.player.job),int(Game.player.school),int(Game.player.level),battle.mp,[],false,battle.frozen_stats,battle.skills)
 		battle_buttons[3].disabled = battle.phase != "select" or battle.potions < 1 or battle.hp >= int(values.hp)
 
 func _battle_result() -> void:

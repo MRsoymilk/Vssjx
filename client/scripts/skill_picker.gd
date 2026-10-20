@@ -11,6 +11,8 @@ var choices: Array = []
 var current_mp := 0
 var submitted := false
 var locked := false
+var combat_stats:Dictionary={}
+var combat_effects:Dictionary={}
 const INK := Color("643019")
 const ROW_HEIGHT := 19
 
@@ -50,12 +52,16 @@ static func usable_choices(job: int, school: int, level: int, available: Array =
 	return SkillRules.list_for(job,school,level).filter(func(skill: Dictionary) -> bool:
 		return skill.active and (not legacy_only or String(skill.id).begins_with("legacy_")) and (available.is_empty() or skill.id in available))
 
-static func has_usable(job: int, school: int, level: int, mp: int, available: Array = [], legacy_only: bool = false) -> bool:
-	return usable_choices(job,school,level,available,legacy_only).any(func(skill: Dictionary) -> bool: return mp >= int(skill.mp_cost))
+static func has_usable(job: int, school: int, level: int, mp: int, available: Array = [], legacy_only: bool = false, stats:Dictionary={}, effects:Dictionary={}) -> bool:
+	return usable_choices(job,school,level,available,legacy_only).any(func(skill: Dictionary) -> bool: return mp >= SkillBalance.cost(skill,stats) and SkillRules.remaining(effects,skill.id)==0)
 
-func present(job: int, school: int, level: int, mp: int, available: Array = [], legacy_only: bool = false) -> void:
+func present(job: int, school: int, level: int, mp: int, available: Array = [], legacy_only: bool = false, stats:Dictionary={}, effects:Dictionary={}) -> void:
 	current_mp = mp; selected_id = ""; submitted = false; locked = false
-	choices = usable_choices(job,school,level,available,legacy_only)
+	combat_stats=stats;combat_effects=effects
+	choices = usable_choices(job,school,level,available,legacy_only).duplicate(true)
+	for skill in choices:
+		skill.mp_cost=SkillBalance.cost(skill,stats)
+		if SkillBalance.revised(stats):skill.description+=" · 冷却%d轮"%SkillBalance.cooldown(skill)
 	for child in rows.get_children(): rows.remove_child(child); child.queue_free()
 	for skill in choices:
 		var button := Button.new()
@@ -76,8 +82,9 @@ func present(job: int, school: int, level: int, mp: int, available: Array = [], 
 func _select(id: String) -> void:
 	if choices.find_custom(func(skill: Dictionary) -> bool: return skill.id == id) < 0: return
 	selected_id = id
-	var skill := SkillRules.item(id)
-	description.text = String(skill.description) + ("（灵力不足）" if current_mp < int(skill.mp_cost) else "")
+	var skill:Dictionary=choices[choices.find_custom(func(s:Dictionary)->bool:return s.id==id)]
+	var remaining:=SkillRules.remaining(combat_effects,id)
+	description.text = String(skill.description) + ("（尚余%d轮）"%remaining if remaining>0 else ("（灵力不足）" if current_mp < int(skill.mp_cost) else ""))
 	description.tooltip_text = description.text
 	for index in rows.get_child_count():
 		var row: Button = rows.get_child(index)
@@ -87,7 +94,7 @@ func _select(id: String) -> void:
 		for state in ["normal","hover","pressed","focus","disabled"]:
 			row.add_theme_stylebox_override(state,_paper(Color("a33d2f") if selected else Color("fff6bc")))
 		for label in row.get_children():
-			var unavailable: bool=current_mp < int(choices[index].mp_cost)
+			var unavailable: bool=current_mp < int(choices[index].mp_cost) or SkillRules.remaining(combat_effects,choices[index].id)>0
 			label.add_theme_color_override("font_color",(Color("e5c59d") if selected else Color("808080")) if unavailable else (Color("fdf10a") if selected else INK))
 		if selected: scroll.ensure_control_visible(row)
 
@@ -95,7 +102,7 @@ func activate(id: String) -> void:
 	if not is_visible_in_tree() or locked or submitted: return
 	if choices.find_custom(func(skill: Dictionary) -> bool: return skill.id == id) < 0: return
 	_select(id)
-	if current_mp < int(SkillRules.item(id).mp_cost): return
+	if current_mp < SkillBalance.cost(SkillRules.item(id),combat_stats) or SkillRules.remaining(combat_effects,id)>0:return
 	submitted = true
 	chosen.emit(id)
 

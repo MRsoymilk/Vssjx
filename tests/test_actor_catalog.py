@@ -3,6 +3,7 @@ import hashlib
 import base64
 import importlib.util
 import json
+import re
 from pathlib import Path
 import tempfile
 import unittest
@@ -99,7 +100,11 @@ class ActorCatalogTests(unittest.TestCase):
         parsed, errors = self.importer.read_animations()
         self.assertEqual(errors, [])
         rebuilt = self.importer.build_actor_catalog(parsed, write_textures=False)
-        self.assertEqual(canonical(rebuilt), canonical(self.actors))
+        # Equipment variants are published separately by import_shop_assets;
+        # the base importer must reproduce every shard it owns, including NPCs.
+        extra = self.actors.keys() - rebuilt.keys()
+        self.assertTrue(all(re.fullmatch(r'hero/[mw](?:zs|fs|ck)_w\d+_c\d+', key) for key in extra))
+        self.assertEqual(canonical(rebuilt), canonical({key: self.actors[key] for key in rebuilt}))
 
     def test_export_is_deterministic_and_does_not_delete_unrelated_files(self):
         with tempfile.TemporaryDirectory(prefix='vssjx-actor-data-') as folder:

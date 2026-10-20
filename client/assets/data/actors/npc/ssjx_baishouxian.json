@@ -1,0 +1,55 @@
+{
+  "texture": "res://assets/actors/npc_ssjx_baishouxian.png",
+  "width": 35,
+  "height": 60,
+  "columns": 1,
+  "count": 1,
+  "origin": [
+    -18,
+    -58
+  ],
+  "anchor_x": 0,
+  "sequences": [
+    [
+      [
+        0,
+        1
+      ]
+    ]
+  ],
+  "playback": {
+    "idle": [
+      [
+        0,
+        1
+      ]
+    ],
+    "walk": [
+      [
+        0,
+        1
+      ]
+    ],
+    "attack": [
+      [
+        0,
+        1
+      ]
+    ]
+  },
+  "provenance": {
+    "source": "ssjx_pic截图 + AI辅助抠图/补全",
+    "source_asset": "client/assets/recovered/ssjx_pic/npcs/baishouxian.png",
+    "source_sha256": "753fc5c60d76c8bde9f71704d50aba14c9702b2a0f0c13755e77f803e79be019",
+    "asset_id": "baishouxian",
+    "repair_type": "background_removal",
+    "alpha_bounds": [
+      152,
+      60,
+      923,
+      1440
+    ],
+    "preparation": "alpha>=16 bounds; nearest-neighbor resize; 2px padding; feet at y=0",
+    "original_animation_recovered": false
+  }
+}

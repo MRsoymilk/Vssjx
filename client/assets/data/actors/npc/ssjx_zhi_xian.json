@@ -1,0 +1,55 @@
+{
+  "texture": "res://assets/actors/npc_ssjx_zhi_xian.png",
+  "width": 38,
+  "height": 56,
+  "columns": 1,
+  "count": 1,
+  "origin": [
+    -19,
+    -54
+  ],
+  "anchor_x": 0,
+  "sequences": [
+    [
+      [
+        0,
+        1
+      ]
+    ]
+  ],
+  "playback": {
+    "idle": [
+      [
+        0,
+        1
+      ]
+    ],
+    "walk": [
+      [
+        0,
+        1
+      ]
+    ],
+    "attack": [
+      [
+        0,
+        1
+      ]
+    ]
+  },
+  "provenance": {
+    "source": "ssjx_pic截图 + AI辅助抠图/补全",
+    "source_asset": "client/assets/recovered/ssjx_pic/npcs/zhi-xian.png",
+    "source_sha256": "0eb0e1371fd261b13ca2f7c7653cfcbf3e94ee74b17e84f4b68d95473e4f293a",
+    "asset_id": "zhi-xian",
+    "repair_type": "background_removal",
+    "alpha_bounds": [
+      43,
+      25,
+      980,
+      1470
+    ],
+    "preparation": "alpha>=16 bounds; nearest-neighbor resize; 2px padding; feet at y=0",
+    "original_animation_recovered": false
+  }
+}

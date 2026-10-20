@@ -1,5 +1,6 @@
 """Evidence-aware social population. Locations/dialogue/art assignments are AI authored."""
 import re
+from npc_screenshot_bindings import apply_appearance
 
 HEROES=['mfs','wfs','mck','wck','mzs','wzs']
 PEOPLE=['沈砚舟','温照雪','唐云笙','陆清和','孟长风','柳知秋','顾青岚','苏映月','陈守一','梁怀川','叶听澜','姜少衡','岳临川','洛青禾','凌青霜','宋闻笛','林望舒','谢归鸿','宁见山','秦暮云','楚怀玉','江问尘','白疏桐','方照水']
@@ -84,4 +85,5 @@ def roster(row,kind,sheet):
             source=value.get('source','AI生成'),appearance_status='原包图像临时匹配，非原NPC造型恢复',
             dialogue=dialogue(row,group,service,i),
             dialogue_source='AI生成',placement='按地形与职责安排，AI设计')
+        apply_appearance(num, i, kind, value)
     return result,excluded

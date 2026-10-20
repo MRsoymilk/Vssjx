@@ -1,7 +1,7 @@
 {
   "format_version": 1,
   "source": "用户ssjx_pic截图 + built-in image_gen编辑",
-  "status": "静态透明人物修复稿，供审阅；未绑定运行NPC",
+  "status": "静态透明人物修复稿；小尺寸派生图已应用共用地图",
   "summary": {
     "appearance_assets": 20,
     "covered_npc_observations": 27,
@@ -15,7 +15,9 @@
     "rgba_verified": 20,
     "original_crops_preserved": true,
     "image_bytes": 14918564,
-    "original_gameplay_bindings_changed": 0
+    "original_gameplay_bindings_changed": 0,
+    "runtime_maps": 213,
+    "runtime_residents": 1100
   },
   "records": [
     {
@@ -60,7 +62,7 @@
       "exact_original_pixels": false,
       "original_animation_recovered": false,
       "frames": 1,
-      "runtime_enabled": false,
+      "runtime_enabled": true,
       "source_crop": "analysis/recovery/ssjx-pic/crops/npc/budai-xianren.png",
       "source_crop_sha256": "5450cf0947334fa2d955ab22573d8e08d06061deb95702bd04d8455ba4b3baae",
       "source_region_ids": [
@@ -80,7 +82,9 @@
           ],
           "name_confidence": "not_separately_assessed"
         }
-      ]
+      ],
+      "runtime_actor": "npc/ssjx_budai_xianren",
+      "runtime_resident_count": 22
     },
     {
       "id": "fashion-vendor",
@@ -124,7 +128,7 @@
       "exact_original_pixels": false,
       "original_animation_recovered": false,
       "frames": 1,
-      "runtime_enabled": false,
+      "runtime_enabled": true,
       "source_crop": "analysis/recovery/ssjx-pic/crops/npc/fashion-vendor.png",
       "source_crop_sha256": "dd84e5f0cc944dc4abcb6bdf19c8479beac775193d047a3edbe917ece865aa59",
       "source_region_ids": [
@@ -144,7 +148,9 @@
           ],
           "name_confidence": "not_separately_assessed"
         }
-      ]
+      ],
+      "runtime_actor": "npc/ssjx_fashion_vendor",
+      "runtime_resident_count": 25
     },
     {
       "id": "baishouxian",
@@ -188,7 +194,7 @@
       "exact_original_pixels": false,
       "original_animation_recovered": false,
       "frames": 1,
-      "runtime_enabled": false,
+      "runtime_enabled": true,
       "source_crop": "analysis/recovery/ssjx-pic/crops/npc/baishouxian.png",
       "source_crop_sha256": "c128daf6e02aca8c6384c9280f73ac53fa7fb139f98e93ddf7cd0cbf2c779187",
       "source_region_ids": [
@@ -208,7 +214,9 @@
           ],
           "name_confidence": "not_separately_assessed"
         }
-      ]
+      ],
+      "runtime_actor": "npc/ssjx_baishouxian",
+      "runtime_resident_count": 4
     },
     {
       "id": "crane-daren",
@@ -252,7 +260,7 @@
       "exact_original_pixels": false,
       "original_animation_recovered": false,
       "frames": 1,
-      "runtime_enabled": false,
+      "runtime_enabled": true,
       "source_crop": "analysis/recovery/ssjx-pic/crops/npc/crane-daren.png",
       "source_crop_sha256": "24f26cfbf98117832d8cfff294754dcaeed2b433f93b1b730f0fe3dc5e095a52",
       "source_region_ids": [
@@ -286,7 +294,9 @@
           ],
           "name_confidence": "not_separately_assessed"
         }
-      ]
+      ],
+      "runtime_actor": "npc/ssjx_crane_daren",
+      "runtime_resident_count": 2
     },
     {
       "id": "tan-chang",
@@ -330,7 +340,7 @@
       "exact_original_pixels": false,
       "original_animation_recovered": false,
       "frames": 1,
-      "runtime_enabled": false,
+      "runtime_enabled": true,
       "source_crop": "analysis/recovery/ssjx-pic/crops/npc/tan-chang.png",
       "source_crop_sha256": "f6638f550ee24d70fb8980a5c32b017f4487d757c2d2f1bcc87f919617dfec5e",
       "source_region_ids": [
@@ -350,7 +360,9 @@
           ],
           "name_confidence": "medium"
         }
-      ]
+      ],
+      "runtime_actor": "npc/ssjx_tan_chang",
+      "runtime_resident_count": 39
     },
     {
       "id": "zhu-liang",
@@ -394,7 +406,7 @@
       "exact_original_pixels": false,
       "original_animation_recovered": false,
       "frames": 1,
-      "runtime_enabled": false,
+      "runtime_enabled": true,
       "source_crop": "analysis/recovery/ssjx-pic/crops/npc/zhu-liang.png",
       "source_crop_sha256": "ae93fc8b86f82e3b8de21d6646937c1b790e81b668c07451e922cafeb4c9ee2c",
       "source_region_ids": [
@@ -414,7 +426,9 @@
           ],
           "name_confidence": "not_separately_assessed"
         }
-      ]
+      ],
+      "runtime_actor": "npc/ssjx_zhu_liang",
+      "runtime_resident_count": 43
     },
     {
       "id": "jiang-xier",
@@ -458,7 +472,7 @@
       "exact_original_pixels": false,
       "original_animation_recovered": false,
       "frames": 1,
-      "runtime_enabled": false,
+      "runtime_enabled": true,
       "source_crop": "analysis/recovery/ssjx-pic/crops/npc/jiang-xier.png",
       "source_crop_sha256": "a20c0e20f440fb9751330e0e1e2f4e342a7debb4b83deca1e751a947692bbf8a",
       "source_region_ids": [
@@ -492,7 +506,9 @@
           ],
           "name_confidence": "low"
         }
-      ]
+      ],
+      "runtime_actor": "npc/ssjx_jiang_xier",
+      "runtime_resident_count": 24
     },
     {
       "id": "yi-zhou",
@@ -536,7 +552,7 @@
       "exact_original_pixels": false,
       "original_animation_recovered": false,
       "frames": 1,
-      "runtime_enabled": false,
+      "runtime_enabled": true,
       "source_crop": "analysis/recovery/ssjx-pic/crops/npc/yi-zhou.png",
       "source_crop_sha256": "eebd8a460a0b981df4437da623fa631b63a501d2625f73eec9de8bf72fc17fff",
       "source_region_ids": [
@@ -556,7 +572,9 @@
           ],
           "name_confidence": "not_separately_assessed"
         }
-      ]
+      ],
+      "runtime_actor": "npc/ssjx_yi_zhou",
+      "runtime_resident_count": 45
     },
     {
       "id": "yi-jing",
@@ -600,7 +618,7 @@
       "exact_original_pixels": false,
       "original_animation_recovered": false,
       "frames": 1,
-      "runtime_enabled": false,
+      "runtime_enabled": true,
       "source_crop": "analysis/recovery/ssjx-pic/crops/npc/yi-jing.png",
       "source_crop_sha256": "2e7e5c3eb5e6ec4d93905b743d1b2db6ba05b0335b4e306ac12e46a741b61621",
       "source_region_ids": [
@@ -634,7 +652,9 @@
           ],
           "name_confidence": "not_separately_assessed"
         }
-      ]
+      ],
+      "runtime_actor": "npc/ssjx_yi_jing",
+      "runtime_resident_count": 7
     },
     {
       "id": "zhou-qingyun",
@@ -678,7 +698,7 @@
       "exact_original_pixels": false,
       "original_animation_recovered": false,
       "frames": 1,
-      "runtime_enabled": false,
+      "runtime_enabled": true,
       "source_crop": "analysis/recovery/ssjx-pic/crops/npc/zhou-qingyun.png",
       "source_crop_sha256": "04df6367ed4f24b553d8ed5a4b9969fb74811f98a332011a4e8722dd3a15a07d",
       "source_region_ids": [
@@ -698,7 +718,9 @@
           ],
           "name_confidence": "not_separately_assessed"
         }
-      ]
+      ],
+      "runtime_actor": "npc/ssjx_zhou_qingyun",
+      "runtime_resident_count": 132
     },
     {
       "id": "jingji-envoy",
@@ -742,7 +764,7 @@
       "exact_original_pixels": false,
       "original_animation_recovered": false,
       "frames": 1,
-      "runtime_enabled": false,
+      "runtime_enabled": true,
       "source_crop": "analysis/recovery/ssjx-pic/crops/npc/jingji-envoy.png",
       "source_crop_sha256": "3a4dfca86899842c443c55f2b78aadabae369b412acb0a3d212a4b1f31e06d80",
       "source_region_ids": [
@@ -776,7 +798,9 @@
           ],
           "name_confidence": "unknown"
         }
-      ]
+      ],
+      "runtime_actor": "npc/ssjx_jingji_envoy",
+      "runtime_resident_count": 47
     },
     {
       "id": "brown-mask-full",
@@ -820,7 +844,7 @@
       "exact_original_pixels": false,
       "original_animation_recovered": false,
       "frames": 1,
-      "runtime_enabled": false,
+      "runtime_enabled": true,
       "source_crop": "analysis/recovery/ssjx-pic/crops/npc/brown-mask-full.png",
       "source_crop_sha256": "1367e5389001cf25478bae64f286bb574e4b717f342699a9a305a20c938eaf55",
       "source_region_ids": [
@@ -854,7 +878,9 @@
           ],
           "name_confidence": "low"
         }
-      ]
+      ],
+      "runtime_actor": "npc/ssjx_brown_mask_full",
+      "runtime_resident_count": 23
     },
     {
       "id": "grocery-boss",
@@ -898,7 +924,7 @@
       "exact_original_pixels": false,
       "original_animation_recovered": false,
       "frames": 1,
-      "runtime_enabled": false,
+      "runtime_enabled": true,
       "source_crop": "analysis/recovery/ssjx-pic/crops/npc/grocery-boss.png",
       "source_crop_sha256": "40fe520eeb0edd4e0fe85412d0144f30788c2844fde4182997cde0ae7799cbfb",
       "source_region_ids": [
@@ -918,7 +944,9 @@
           ],
           "name_confidence": "not_separately_assessed"
         }
-      ]
+      ],
+      "runtime_actor": "npc/ssjx_grocery_boss",
+      "runtime_resident_count": 25
     },
     {
       "id": "zhi-xian",
@@ -962,7 +990,7 @@
       "exact_original_pixels": false,
       "original_animation_recovered": false,
       "frames": 1,
-      "runtime_enabled": false,
+      "runtime_enabled": true,
       "source_crop": "analysis/recovery/ssjx-pic/crops/npc/zhi-xian.png",
       "source_crop_sha256": "2d0d307edf0b28d3e248fcaf617457430f3e78c0b563d9cc020e80163ed188af",
       "source_region_ids": [
@@ -982,7 +1010,9 @@
           ],
           "name_confidence": "not_separately_assessed"
         }
-      ]
+      ],
+      "runtime_actor": "npc/ssjx_zhi_xian",
+      "runtime_resident_count": 137
     },
     {
       "id": "tianchi-shangren",
@@ -1026,7 +1056,7 @@
       "exact_original_pixels": false,
       "original_animation_recovered": false,
       "frames": 1,
-      "runtime_enabled": false,
+      "runtime_enabled": true,
       "source_crop": "analysis/recovery/ssjx-pic/crops/npc/tianchi-shangren.png",
       "source_crop_sha256": "bfa1ef69abb02a0f1b7a7f5e712685adea0f3934eae0ffaa6898a1e8826d92a1",
       "source_region_ids": [
@@ -1060,7 +1090,9 @@
           ],
           "name_confidence": "not_separately_assessed"
         }
-      ]
+      ],
+      "runtime_actor": "npc/ssjx_tianchi_shangren",
+      "runtime_resident_count": 132
     },
     {
       "id": "xiaoyue-chanshi",
@@ -1104,7 +1136,7 @@
       "exact_original_pixels": false,
       "original_animation_recovered": false,
       "frames": 1,
-      "runtime_enabled": false,
+      "runtime_enabled": true,
       "source_crop": "analysis/recovery/ssjx-pic/crops/npc/xiaoyue-chanshi.png",
       "source_crop_sha256": "c3a9ebf8bbf1575a53027f671f64c06c55dc3c58ffd6c8fe697e764fb6af943f",
       "source_region_ids": [
@@ -1124,7 +1156,9 @@
           ],
           "name_confidence": "not_separately_assessed"
         }
-      ]
+      ],
+      "runtime_actor": "npc/ssjx_xiaoyue_chanshi",
+      "runtime_resident_count": 49
     },
     {
       "id": "zhen-gen",
@@ -1168,7 +1202,7 @@
       "exact_original_pixels": false,
       "original_animation_recovered": false,
       "frames": 1,
-      "runtime_enabled": false,
+      "runtime_enabled": true,
       "source_crop": "analysis/recovery/ssjx-pic/crops/npc/zhen-gen.png",
       "source_crop_sha256": "231ff4ed31df9043b32ea4277f2053cd30af0f5bbd28ec7b7f3e4eecce1fc936",
       "source_region_ids": [
@@ -1188,7 +1222,9 @@
           ],
           "name_confidence": "low"
         }
-      ]
+      ],
+      "runtime_actor": "npc/ssjx_zhen_gen",
+      "runtime_resident_count": 134
     },
     {
       "id": "qi-xiaer",
@@ -1232,7 +1268,7 @@
       "exact_original_pixels": false,
       "original_animation_recovered": false,
       "frames": 1,
-      "runtime_enabled": false,
+      "runtime_enabled": true,
       "source_crop": "analysis/recovery/ssjx-pic/crops/npc/qi-xiaer.png",
       "source_crop_sha256": "9a5eb5f6a2060ec8d8c714d378e12c0a5ca865e3961e63fa29ee527525ab058d",
       "source_region_ids": [
@@ -1266,7 +1302,9 @@
           ],
           "name_confidence": "not_separately_assessed"
         }
-      ]
+      ],
+      "runtime_actor": "npc/ssjx_qi_xiaer",
+      "runtime_resident_count": 144
     },
     {
       "id": "wudu-tianwang",
@@ -1310,7 +1348,7 @@
       "exact_original_pixels": false,
       "original_animation_recovered": false,
       "frames": 1,
-      "runtime_enabled": false,
+      "runtime_enabled": true,
       "source_crop": "analysis/recovery/ssjx-pic/crops/npc/wudu-tianwang.png",
       "source_crop_sha256": "3bbaf55dd1c8a13f553a10dcce69299629b49725b4e0740ae85edcdbd8b6cac0",
       "source_region_ids": [
@@ -1330,7 +1368,9 @@
           ],
           "name_confidence": "not_separately_assessed"
         }
-      ]
+      ],
+      "runtime_actor": "npc/ssjx_wudu_tianwang",
+      "runtime_resident_count": 26
     },
     {
       "id": "school-daily",
@@ -1374,7 +1414,7 @@
       "exact_original_pixels": false,
       "original_animation_recovered": false,
       "frames": 1,
-      "runtime_enabled": false,
+      "runtime_enabled": true,
       "source_crop": "analysis/recovery/ssjx-pic/crops/npc/school-daily.png",
       "source_crop_sha256": "7d2de83ae6bfaf54c9e0137748be9c90fff9fae0bb4c32d400a4b4f0336f8b8a",
       "source_region_ids": [
@@ -1394,7 +1434,9 @@
           ],
           "name_confidence": "unknown"
         }
-      ]
+      ],
+      "runtime_actor": "npc/ssjx_school_daily",
+      "runtime_resident_count": 40
     }
   ],
   "unresolved": [

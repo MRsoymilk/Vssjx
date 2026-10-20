@@ -1,0 +1,55 @@
+{
+  "texture": "res://assets/actors/npc_ssjx_budai_xianren.png",
+  "width": 43,
+  "height": 44,
+  "columns": 1,
+  "count": 1,
+  "origin": [
+    -22,
+    -42
+  ],
+  "anchor_x": 0,
+  "sequences": [
+    [
+      [
+        0,
+        1
+      ]
+    ]
+  ],
+  "playback": {
+    "idle": [
+      [
+        0,
+        1
+      ]
+    ],
+    "walk": [
+      [
+        0,
+        1
+      ]
+    ],
+    "attack": [
+      [
+        0,
+        1
+      ]
+    ]
+  },
+  "provenance": {
+    "source": "ssjx_pic截图 + AI辅助抠图/补全",
+    "source_asset": "client/assets/recovered/ssjx_pic/npcs/budai-xianren.png",
+    "source_sha256": "67a9637ac5ae19111510899ca1eb1c3c42d3a356c86e7fcbb3baea576c29929b",
+    "asset_id": "budai-xianren",
+    "repair_type": "background_removal",
+    "alpha_bounds": [
+      179,
+      62,
+      1194,
+      1116
+    ],
+    "preparation": "alpha>=16 bounds; nearest-neighbor resize; 2px padding; feet at y=0",
+    "original_animation_recovered": false
+  }
+}

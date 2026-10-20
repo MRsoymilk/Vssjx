@@ -215,6 +215,26 @@
     "monster/zb5": "res://assets/data/actors/monster/zb5.json",
     "monster/zb6": "res://assets/data/actors/monster/zb6.json",
     "monster/zbjl1": "res://assets/data/actors/monster/zbjl1.json",
-    "monster/zbjl2": "res://assets/data/actors/monster/zbjl2.json"
+    "monster/zbjl2": "res://assets/data/actors/monster/zbjl2.json",
+    "npc/ssjx_baishouxian": "res://assets/data/actors/npc/ssjx_baishouxian.json",
+    "npc/ssjx_brown_mask_full": "res://assets/data/actors/npc/ssjx_brown_mask_full.json",
+    "npc/ssjx_budai_xianren": "res://assets/data/actors/npc/ssjx_budai_xianren.json",
+    "npc/ssjx_crane_daren": "res://assets/data/actors/npc/ssjx_crane_daren.json",
+    "npc/ssjx_fashion_vendor": "res://assets/data/actors/npc/ssjx_fashion_vendor.json",
+    "npc/ssjx_grocery_boss": "res://assets/data/actors/npc/ssjx_grocery_boss.json",
+    "npc/ssjx_jiang_xier": "res://assets/data/actors/npc/ssjx_jiang_xier.json",
+    "npc/ssjx_jingji_envoy": "res://assets/data/actors/npc/ssjx_jingji_envoy.json",
+    "npc/ssjx_qi_xiaer": "res://assets/data/actors/npc/ssjx_qi_xiaer.json",
+    "npc/ssjx_school_daily": "res://assets/data/actors/npc/ssjx_school_daily.json",
+    "npc/ssjx_tan_chang": "res://assets/data/actors/npc/ssjx_tan_chang.json",
+    "npc/ssjx_tianchi_shangren": "res://assets/data/actors/npc/ssjx_tianchi_shangren.json",
+    "npc/ssjx_wudu_tianwang": "res://assets/data/actors/npc/ssjx_wudu_tianwang.json",
+    "npc/ssjx_xiaoyue_chanshi": "res://assets/data/actors/npc/ssjx_xiaoyue_chanshi.json",
+    "npc/ssjx_yi_jing": "res://assets/data/actors/npc/ssjx_yi_jing.json",
+    "npc/ssjx_yi_zhou": "res://assets/data/actors/npc/ssjx_yi_zhou.json",
+    "npc/ssjx_zhen_gen": "res://assets/data/actors/npc/ssjx_zhen_gen.json",
+    "npc/ssjx_zhi_xian": "res://assets/data/actors/npc/ssjx_zhi_xian.json",
+    "npc/ssjx_zhou_qingyun": "res://assets/data/actors/npc/ssjx_zhou_qingyun.json",
+    "npc/ssjx_zhu_liang": "res://assets/data/actors/npc/ssjx_zhu_liang.json"
   }
 }

@@ -107,8 +107,18 @@ def build() -> dict:
                    rgba_verified=len(records), original_crops_preserved=True,
                    image_bytes=sum((ROOT / r["path"]).stat().st_size for r in records),
                    original_gameplay_bindings_changed=0)
+    runtime_path = OUT / "runtime-bindings.json"
+    if runtime_path.exists():
+        runtime = json.loads(runtime_path.read_text("utf-8"))
+        summary["runtime_maps"] = runtime["map_count"]
+        summary["runtime_residents"] = runtime["resident_count"]
+        for record in records:
+            uses = [r for r in runtime["bindings"] if r["asset_id"] == record["id"]]
+            record["runtime_enabled"] = bool(uses)
+            record["runtime_actor"] = uses[0]["art"] if uses else None
+            record["runtime_resident_count"] = len(uses)
     catalog = dict(format_version=1, source="用户ssjx_pic截图 + built-in image_gen编辑",
-                   status="静态透明人物修复稿，供审阅；未绑定运行NPC", summary=summary, records=records,
+                   status="静态透明人物修复稿；小尺寸派生图已应用共用地图" if runtime_path.exists() else "静态透明人物修复稿，供审阅；未绑定运行NPC", summary=summary, records=records,
                    unresolved=unresolved,
                    provenance="analysis/recovery/ssjx-pic/npc-cutouts/jobs.json",
                    notice="包括去背景稿在内，全部经过生成式图像编辑，颜色、表情、轮廓可能发生变化；不能称为逐像素恢复。补全部分为AI推测，非原包事实。")
@@ -146,7 +156,10 @@ def make_page(records: list[dict], unresolved: list[dict], summary: dict) -> Non
 <nav><input id="q" type="search" aria-label="搜索人物名称" placeholder="搜索人物名称…"><select id="kind" aria-label="处理类型"><option value="all">全部处理类型</option><option value="background_removal">去背景</option><option value="repair">含补全／修复</option></select><select id="background" aria-label="透明背景预览"><option value="checker">透明棋盘</option><option value="dark">深色底</option><option value="light">浅色底</option><option value="grass">草地色底</option></select><span id="count"></span></nav>
 <div id="cards">CARDS</div><section class="unresolved"><h2>2 条身份记录：外观证据不足</h2><ul>UNRESOLVED</ul></section></main><script>
 const q=document.getElementById('q'),kind=document.getElementById('kind');function filter(){let n=0;document.querySelectorAll('article').forEach(el=>{let match=el.textContent.toLowerCase().includes(q.value.trim().toLowerCase())&&(kind.value==='all'||(kind.value==='repair'?el.dataset.kind!=='background_removal':el.dataset.kind===kind.value));el.hidden=!match;if(match)n++});document.getElementById('count').textContent=n+' 张'}q.addEventListener('input',filter);kind.addEventListener('change',filter);document.getElementById('background').addEventListener('change',e=>{const colors={checker:['#e1e6ee','#bec7d4'],dark:['#07101a','#07101a'],light:['#f9fafc','#f9fafc'],grass:['#92bd64','#92bd64']}[e.target.value];document.documentElement.style.setProperty('--tile-a',colors[0]);document.documentElement.style.setProperty('--tile-b',colors[1])});filter();</script></html>'''
-    (OUT / "index.html").write_text(page.replace("CARDS", "\n".join(cards)).replace("UNRESOLVED", "\n".join(unresolved_cards)), encoding="utf-8", newline="\n")
+    runtime_note = ''
+    if summary.get('runtime_maps'):
+        runtime_note = f'<p>已应用共用地图：{summary["runtime_maps"]}张地图、{summary["runtime_residents"]}位现有NPC；使用40～60像素高的小尺寸派生图。<a href="runtime-bindings.json">查看地图绑定</a></p>'
+    (OUT / "index.html").write_text(page.replace("CARDS", "\n".join(cards)).replace("UNRESOLVED", "\n".join(unresolved_cards)).replace('<nav>', runtime_note+'<nav>', 1), encoding="utf-8", newline="\n")
 
 
 if __name__ == "__main__":

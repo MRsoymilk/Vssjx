@@ -21,7 +21,9 @@
     "rgba_verified": 20,
     "original_crops_preserved": true,
     "image_bytes": 14918564,
-    "original_gameplay_bindings_changed": 0
+    "original_gameplay_bindings_changed": 0,
+    "runtime_maps": 213,
+    "runtime_residents": 1100
   },
   "visual_review": "已逐张对照原裁片查看；头部、发型与服装可辨，文字、地面和邻近人物已移除。仍保留生成式变化风险。",
   "pixel_editing_in_this_script": false

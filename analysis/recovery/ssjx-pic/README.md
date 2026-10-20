@@ -4,7 +4,7 @@
 
 打开 [可筛选审阅页](index.html)，或查看 [疑似缺失候选总览](missing-candidates.png)。首次截图裁切结果留在分析目录，没有替换游戏运行资产或修改 NPC、任务、传送规则。
 
-后续按用户要求增加了 [NPC透明抠图与缺损补全对照](npc-cutouts/index.html)：20个外观组对应27条人物观察，10张去背景稿、10张修复／补全稿。透明PNG放在 `client/assets/recovered/ssjx_pic/npcs/`，其余原图裁片及证据仍保留在分析目录。全部透明稿经过内置 `image_gen` 生成式编辑，补画内容不是原包事实，没有替换运行NPC绑定；详细说明见 [人物修复记录](npc-cutouts/README.md)。
+后续按用户要求增加了 [NPC透明抠图与缺损补全对照](npc-cutouts/index.html)：20个外观组对应27条人物观察，10张去背景稿、10张修复／补全稿。透明PNG放在 `client/assets/recovered/ssjx_pic/npcs/`，原图裁片及证据保留在分析目录。全部透明稿经过内置 `image_gen` 生成式编辑，补画内容不是原包事实。小尺寸派生图现已用于213张共用地图、1,100位现有NPC；详细来源与适配范围见 [人物修复与地图应用记录](npc-cutouts/README.md)。
 
 ## 已提取
 

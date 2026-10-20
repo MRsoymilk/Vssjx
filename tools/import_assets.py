@@ -211,6 +211,8 @@ def build_actor_catalog(parsed, write_textures=True):
     baked.update(build_assets(parsed,write_textures))
     from build_ai_monster_art import build_assets as build_monsters
     baked.update(build_monsters(write_textures))
+    from build_recovered_npc_art import build_assets as build_npcs
+    baked.update(build_npcs(write_textures))
     return baked
 
 

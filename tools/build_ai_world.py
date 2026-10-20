@@ -167,7 +167,7 @@ def build():
             m['screenshot_reference']={'files':['flower-sect-court.png','flower-sect-garden.png'],'directory':'analysis/references/map-screenshots','scope':'局部结构与NPC称谓确认；全图尺寸、NPC外形、碰撞和任务为AI设计','screenshot_exit_ids':{'秋兰竹亭':10022,'幻波池':10023},'native_exit_ids':{'秋兰竹亭':22,'幻波池':23}}
         elif m['original_map_id'] in (22,23):
             m['screenshot_reference']={'files':['bamboo-waterfront.png'],'directory':'analysis/references/map-screenshots','scope':'竹林与水岸的环境参考；未能从截图确认整张地图名称，按相邻地域推定适配'}
-    return dict(version="ai-world-v1",label="AI生成·蜀山补全试验",layout_revision=4,npc_revision=1,monster_revision=1,portal_revision=3,seed=20261018,
+    return dict(version="ai-world-v1",label="AI生成·蜀山补全试验",layout_revision=4,npc_revision=2,monster_revision=1,portal_revision=3,seed=20261018,
                 disclaimer="地名、等级与总览坐标参考原包；场景布局、NPC布置、任务剧情与奖励均为AI生成。不是恢复出的原版内容。",maps=maps)
 
 def main():
@@ -197,6 +197,15 @@ def main():
         records=[dict(map_id=m['map_id'],map_name=m['name'],**r) for m in data['maps'] for r in m['residents'] if r['kind']=='npc'],
         excluded=[dict(map_id=m['map_id'],**p) for m in data['maps'] for p in m['npc_notes']])
     (ROOT/'analysis/ai-generated/npc-mapping-v1.json').write_text(json.dumps(npc_audit,ensure_ascii=False,indent=2)+'\n',encoding='utf8',newline='\n')
+    bindings = [dict(map_id=m['map_id'],map_name=m['name'],resident_id=r['id'],name=r['name'],
+        art=r['art'],cell=r['cell'],service_label=r['service_label'],
+        **r['npc_reference']['appearance_reference'])
+        for m in data['maps'] for r in m['residents'] if r['kind']=='npc' and 'appearance_reference' in r['npc_reference']]
+    runtime=dict(format_version=1,npc_revision=data['npc_revision'],runtime_enabled=True,
+        asset_count=len({r['art'] for r in bindings}),resident_count=len(bindings),
+        map_count=len({r['map_id'] for r in bindings}),bindings=bindings,
+        notice='静态修复外观已应用本地/联机共用地图；地图坐标、人物身份和任务不变。适配外观不等于恢复原NPC身份。')
+    (ROOT/'analysis/recovery/ssjx-pic/npc-cutouts/runtime-bindings.json').write_text(json.dumps(runtime,ensure_ascii=False,indent=2)+'\n',encoding='utf8',newline='\n')
     print(f"AI maps: {len(data['maps'])}; quests: {sum(len(m['quests']) for m in data['maps'])}; sha256: {hashlib.sha256(raw.encode()).hexdigest()}")
 
 if __name__=="__main__": main()

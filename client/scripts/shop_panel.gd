@@ -195,7 +195,7 @@ func refresh() -> void:
 	equip_button.disabled=locked or version_locked or not equipment or count==0 or incompatible
 	equip_button.text="卸下" if ShopRules.equipped_id(gear,entry.slot)==selected else "装备"
 	preview_button.disabled=not equipment or incompatible
-	hint.text=notice if not notice.is_empty() else ("此商品需要更新服务端" if version_locked else (entry.get("set_name", "套装")+" · AI新设计 · 数值为重建规则" if entry.get("art_source")=="AI生成" else "原包图标 · 名称、数值和部分换装映射为重建规则"))
+	hint.text=notice if not notice.is_empty() else ("此商品需要更新服务端" if version_locked else (entry.get("set_name", "套装")+" · AI新设计 · 数值为重建规则" if String(entry.get("art_source", "")).begins_with("AI") else "原包图标 · 名称、数值和部分换装映射为重建规则"))
 	_refreshing=false
 
 func _online_changed() -> void:

@@ -1,6 +1,6 @@
 {
   "format_version": 1,
-  "source": "AI脚本像素绘制；用户指定EVA初号机同人主题；原生人物分层适配，非官方授权素材",
+  "source": "AI参考设计；原版七阶甲衣和原生人物分层适配；初号机同人配色",
   "sets": [
     {
       "id": "eva01/mzs",
@@ -13,9 +13,9 @@
       "head_code": 22,
       "head": "eva01/mzs/mzst2",
       "body": [
-        "eva01/mzs/mzs1",
-        "eva01/mzs/mzs1q",
-        "eva01/mzs/mzs1x"
+        "eva01/mzs/mzs7",
+        "eva01/mzs/mzs7q",
+        "eva01/mzs/mzs7x"
       ],
       "weapon": "eva01/mzs/ezs9",
       "weapon_name": "高振动破障斧"
@@ -31,9 +31,9 @@
       "head_code": 23,
       "head": "eva01/wzs/wzst2",
       "body": [
-        "eva01/wzs/wzs1",
-        "eva01/wzs/wzs1q",
-        "eva01/wzs/wzs1x"
+        "eva01/wzs/wzs7",
+        "eva01/wzs/wzs7q",
+        "eva01/wzs/wzs7x"
       ],
       "weapon": "eva01/wzs/ezs9",
       "weapon_name": "高振动镇岳斧"
@@ -49,9 +49,9 @@
       "head_code": 24,
       "head": "eva01/mck/mckt2",
       "body": [
-        "eva01/mck/mck1",
-        "eva01/mck/mck1q",
-        "eva01/mck/mck1x"
+        "eva01/mck/mck7",
+        "eva01/mck/mck7q",
+        "eva01/mck/mck7x"
       ],
       "weapon": "eva01/mck/eck9",
       "weapon_name": "高振动短刃"
@@ -67,9 +67,9 @@
       "head_code": 25,
       "head": "eva01/wck/wckt2",
       "body": [
-        "eva01/wck/wck1",
-        "eva01/wck/wck1q",
-        "eva01/wck/wck1x"
+        "eva01/wck/wck7",
+        "eva01/wck/wck7q",
+        "eva01/wck/wck7x"
       ],
       "weapon": "eva01/wck/eck17",
       "weapon_name": "高振动双刃"
@@ -85,9 +85,9 @@
       "head_code": 26,
       "head": "eva01/mfs/mfst2",
       "body": [
-        "eva01/mfs/mfs2",
-        "eva01/mfs/mfs2q",
-        "eva01/mfs/mfs2x"
+        "eva01/mfs/mfs7",
+        "eva01/mfs/mfs7q",
+        "eva01/mfs/mfs7x"
       ],
       "weapon": "eva01/mfs/efs2",
       "weapon_name": "力场共鸣杖"
@@ -103,9 +103,9 @@
       "head_code": 27,
       "head": "eva01/wfs/wfst2",
       "body": [
-        "eva01/wfs/wfs2",
-        "eva01/wfs/wfs2q",
-        "eva01/wfs/wfs2x"
+        "eva01/wfs/wfs7",
+        "eva01/wfs/wfs7q",
+        "eva01/wfs/wfs7x"
       ],
       "weapon": "eva01/wfs/efs7",
       "weapon_name": "力场觉醒杖"
@@ -129,8 +129,8 @@
         ]
       ]
     },
-    "eva01/mzs/mzs1": {
-      "texture": "res://assets/generated/equipment/eva01/mzs/parts/mzs1.png",
+    "eva01/mzs/mzs7": {
+      "texture": "res://assets/generated/equipment/eva01/mzs/parts/mzs7.png",
       "frames": [
         [
           0,
@@ -152,8 +152,8 @@
         ]
       ]
     },
-    "eva01/mzs/mzs1q": {
-      "texture": "res://assets/generated/equipment/eva01/mzs/parts/mzs1q.png",
+    "eva01/mzs/mzs7q": {
+      "texture": "res://assets/generated/equipment/eva01/mzs/parts/mzs7q.png",
       "frames": [
         [
           0,
@@ -175,8 +175,8 @@
         ]
       ]
     },
-    "eva01/mzs/mzs1x": {
-      "texture": "res://assets/generated/equipment/eva01/mzs/parts/mzs1x.png",
+    "eva01/mzs/mzs7x": {
+      "texture": "res://assets/generated/equipment/eva01/mzs/parts/mzs7x.png",
       "frames": [
         [
           0,
@@ -250,8 +250,8 @@
         ]
       ]
     },
-    "eva01/wzs/wzs1": {
-      "texture": "res://assets/generated/equipment/eva01/wzs/parts/wzs1.png",
+    "eva01/wzs/wzs7": {
+      "texture": "res://assets/generated/equipment/eva01/wzs/parts/wzs7.png",
       "frames": [
         [
           0,
@@ -273,8 +273,8 @@
         ]
       ]
     },
-    "eva01/wzs/wzs1q": {
-      "texture": "res://assets/generated/equipment/eva01/wzs/parts/wzs1q.png",
+    "eva01/wzs/wzs7q": {
+      "texture": "res://assets/generated/equipment/eva01/wzs/parts/wzs7q.png",
       "frames": [
         [
           0,
@@ -296,8 +296,8 @@
         ]
       ]
     },
-    "eva01/wzs/wzs1x": {
-      "texture": "res://assets/generated/equipment/eva01/wzs/parts/wzs1x.png",
+    "eva01/wzs/wzs7x": {
+      "texture": "res://assets/generated/equipment/eva01/wzs/parts/wzs7x.png",
       "frames": [
         [
           0,
@@ -371,8 +371,8 @@
         ]
       ]
     },
-    "eva01/mck/mck1": {
-      "texture": "res://assets/generated/equipment/eva01/mck/parts/mck1.png",
+    "eva01/mck/mck7": {
+      "texture": "res://assets/generated/equipment/eva01/mck/parts/mck7.png",
       "frames": [
         [
           0,
@@ -388,8 +388,8 @@
         ]
       ]
     },
-    "eva01/mck/mck1q": {
-      "texture": "res://assets/generated/equipment/eva01/mck/parts/mck1q.png",
+    "eva01/mck/mck7q": {
+      "texture": "res://assets/generated/equipment/eva01/mck/parts/mck7q.png",
       "frames": [
         [
           0,
@@ -435,8 +435,8 @@
         ]
       ]
     },
-    "eva01/mck/mck1x": {
-      "texture": "res://assets/generated/equipment/eva01/mck/parts/mck1x.png",
+    "eva01/mck/mck7x": {
+      "texture": "res://assets/generated/equipment/eva01/mck/parts/mck7x.png",
       "frames": [
         [
           0,
@@ -510,8 +510,8 @@
         ]
       ]
     },
-    "eva01/wck/wck1": {
-      "texture": "res://assets/generated/equipment/eva01/wck/parts/wck1.png",
+    "eva01/wck/wck7": {
+      "texture": "res://assets/generated/equipment/eva01/wck/parts/wck7.png",
       "frames": [
         [
           0,
@@ -527,8 +527,8 @@
         ]
       ]
     },
-    "eva01/wck/wck1q": {
-      "texture": "res://assets/generated/equipment/eva01/wck/parts/wck1q.png",
+    "eva01/wck/wck7q": {
+      "texture": "res://assets/generated/equipment/eva01/wck/parts/wck7q.png",
       "frames": [
         [
           0,
@@ -550,8 +550,8 @@
         ]
       ]
     },
-    "eva01/wck/wck1x": {
-      "texture": "res://assets/generated/equipment/eva01/wck/parts/wck1x.png",
+    "eva01/wck/wck7x": {
+      "texture": "res://assets/generated/equipment/eva01/wck/parts/wck7x.png",
       "frames": [
         [
           0,
@@ -625,8 +625,8 @@
         ]
       ]
     },
-    "eva01/mfs/mfs2": {
-      "texture": "res://assets/generated/equipment/eva01/mfs/parts/mfs2.png",
+    "eva01/mfs/mfs7": {
+      "texture": "res://assets/generated/equipment/eva01/mfs/parts/mfs7.png",
       "frames": [
         [
           0,
@@ -648,8 +648,8 @@
         ]
       ]
     },
-    "eva01/mfs/mfs2q": {
-      "texture": "res://assets/generated/equipment/eva01/mfs/parts/mfs2q.png",
+    "eva01/mfs/mfs7q": {
+      "texture": "res://assets/generated/equipment/eva01/mfs/parts/mfs7q.png",
       "frames": [
         [
           0,
@@ -671,8 +671,8 @@
         ]
       ]
     },
-    "eva01/mfs/mfs2x": {
-      "texture": "res://assets/generated/equipment/eva01/mfs/parts/mfs2x.png",
+    "eva01/mfs/mfs7x": {
+      "texture": "res://assets/generated/equipment/eva01/mfs/parts/mfs7x.png",
       "frames": [
         [
           0,
@@ -746,8 +746,8 @@
         ]
       ]
     },
-    "eva01/wfs/wfs2": {
-      "texture": "res://assets/generated/equipment/eva01/wfs/parts/wfs2.png",
+    "eva01/wfs/wfs7": {
+      "texture": "res://assets/generated/equipment/eva01/wfs/parts/wfs7.png",
       "frames": [
         [
           0,
@@ -769,8 +769,8 @@
         ]
       ]
     },
-    "eva01/wfs/wfs2q": {
-      "texture": "res://assets/generated/equipment/eva01/wfs/parts/wfs2q.png",
+    "eva01/wfs/wfs7q": {
+      "texture": "res://assets/generated/equipment/eva01/wfs/parts/wfs7q.png",
       "frames": [
         [
           0,
@@ -798,8 +798,8 @@
         ]
       ]
     },
-    "eva01/wfs/wfs2x": {
-      "texture": "res://assets/generated/equipment/eva01/wfs/parts/wfs2x.png",
+    "eva01/wfs/wfs7x": {
+      "texture": "res://assets/generated/equipment/eva01/wfs/parts/wfs7x.png",
       "frames": [
         [
           0,

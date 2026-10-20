@@ -2,7 +2,7 @@
 import hashlib
 import importlib.util
 import json
-import copy
+import sys
 from pathlib import Path
 import re
 import unittest
@@ -10,15 +10,17 @@ import unittest
 from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT/'tools'))
 spec = importlib.util.spec_from_file_location('eva01_builder', ROOT/'tools/build_eva01_equipment.py')
+from eva01_native_style import skin
 builder = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(builder)
 
 
 class Eva01Assets(unittest.TestCase):
     def setUp(self):
-        self.manifest = json.loads((ROOT/'client/assets/data/eva01-equipment.json').read_text())
-        self.native = json.loads((ROOT/'client/assets/data/hero-parts.json').read_text())
+        self.manifest = json.loads((ROOT/'client/assets/data/eva01-equipment.json').read_text('utf8'))
+        self.native = json.loads((ROOT/'client/assets/data/hero-parts.json').read_text('utf8'))
 
     def test_six_character_sets_and_distinct_reserved_codes(self):
         self.assertEqual([s['stem'] for s in self.manifest['sets']], ['mzs','wzs','mck','wck','mfs','wfs'])
@@ -27,7 +29,7 @@ class Eva01Assets(unittest.TestCase):
             self.assertEqual([row['weapon_code'],row['clothing_code'],row['head_code']], [40+index,24+index,22+index])
             self.assertEqual((row['job'],row['gender']), (index//2,index%2))
             for family in ['boneglow', 'gravebloom']:
-                previous = json.loads((ROOT/f'client/assets/data/{family}-equipment.json').read_text())
+                previous = json.loads((ROOT/f'client/assets/data/{family}-equipment.json').read_text('utf8'))
                 for old in previous['sets']:
                     self.assertNotEqual(row['weapon_code'],old['weapon_code'])
                     self.assertNotEqual(row['clothing_code'],old['clothing_code'])
@@ -45,12 +47,7 @@ class Eva01Assets(unittest.TestCase):
                     actual = image.crop((x,y,x+w,y+h)).getchannel('A')
                     expected = old.crop((x,y,x+w,y+h)).getchannel('A')
                     self.assertEqual(actual.getbbox() is None, expected.getbbox() is None)
-                    if '/parts/' in entry['texture'] and ('t2' not in part_id or frame > 0):
-                        self.assertEqual(actual.tobytes(), expected.tobytes(), 'All hands, weapons, legs and lower collars keep their native mask')
-                    elif expected.getbbox():
-                        bounds = expected.getbbox()
-                        self.assertEqual(actual.getbbox()[3], bounds[3], 'Head/collar bottom anchor stays fixed')
-                        self.assertEqual(actual.crop((0,h-4,w,h)).tobytes(), expected.crop((0,h-4,w,h)).tobytes(), 'No disconnected lower-hair seam')
+                    self.assertEqual(actual.tobytes(), expected.tobytes(), 'Every body, face, hand, weapon and hair seam retains the original mask')
 
     def test_ten_icons_binary_transparency_and_visible_unit01_colors(self):
         for row in self.manifest['sets']:
@@ -63,22 +60,31 @@ class Eva01Assets(unittest.TestCase):
                     self.assertIsNotNone(image.getbbox())
                     self.assertEqual(image.getpixel((0,0))[3],0)
                     self.assertLessEqual(set(image.getchannel('A').tobytes()),{0,255})
-            with Image.open(ROOT/'client'/self.manifest['parts'][row['head']]['texture'][6:]) as head:
-                colors = set(head.get_flattened_data())
-                for name in ['purple','green','white']:
-                    self.assertIn(builder.COLORS[name],colors)
+            source = self.native['parts'][row['stem']+'t2']
+            entry = self.manifest['parts'][row['head']]
+            with Image.open(ROOT/'client'/entry['texture'][6:]) as head, Image.open(ROOT/'client'/source['texture'][6:]) as original:
+                self.assertEqual(head.size, original.size)
+                changed = 0
+                for old, new in zip(original.get_flattened_data(), head.get_flattened_data()):
+                    if old != new: changed += 1
+                    if skin(old): self.assertEqual(new, old, 'Native face remains untouched')
+                self.assertGreater(changed, 0, 'Crest is actually visible')
+                self.assertLessEqual(changed, 25, 'Tiny ornament cannot replace a face with a helmet')
+                x,y,w,h = entry['frames'][1]
+                self.assertEqual(head.crop((x,y,x+w,y+h)).tobytes(), original.crop((x,y,x+w,y+h)).tobytes(), 'Lower hair/neck seam is unchanged')
 
     def test_generated_records_and_original_inputs_match_hashes(self):
         folder=ROOT/'analysis/ai-generated/equipment/eva01'
-        report=json.loads((folder/'runtime-import-report.json').read_text())
+        report=json.loads((folder/'runtime-import-report.json').read_text('utf8'))
         self.assertEqual(len(report),90)
         for record in report:
             self.assertEqual(hashlib.sha256((ROOT/'client'/record['path'][6:]).read_bytes()).hexdigest(),record['sha256'])
-        provenance=json.loads((folder/'generation-record.json').read_text())
+        provenance=json.loads((folder/'generation-record.json').read_text('utf8'))
         self.assertEqual(hashlib.sha256((ROOT/provenance['generator']).read_bytes()).hexdigest(),provenance['generator_sha256'])
         for path,checksum in provenance['native_inputs'].items():
             self.assertEqual(hashlib.sha256((ROOT/path).read_bytes()).hexdigest(),checksum)
-        self.assertIn('未使用外部图片生成服务',provenance['method'])
+        self.assertIn('image_gen',provenance['method'])
+        self.assertEqual(hashlib.sha256((ROOT/provenance['style_module']).read_bytes()).hexdigest(),provenance['style_sha256'])
 
     def test_items_use_actual_icons_ten_slots_and_explicit_restrictions(self):
         items=builder.equipment_items()
@@ -93,41 +99,48 @@ class Eva01Assets(unittest.TestCase):
                 self.assertTrue((ROOT/'client'/item['icon'][6:]).is_file())
 
     def test_catalog_and_migration_preserve_existing_items_and_slot_constraints(self):
-        catalog=json.loads((ROOT/'client/assets/data/shop-v2.json').read_text())['items']
-        self.assertEqual(len(catalog),394)
+        catalog=json.loads((ROOT/'client/assets/data/shop-v2.json').read_text('utf8'))['items']
+        self.assertEqual(len(catalog),396)
         self.assertEqual([i for i in catalog if i['id'].startswith('ai/eva01/')],builder.equipment_items())
-        sql=(ROOT/'server/migrations/0023_eva01_equipment.sql').read_text()
+        sql=(ROOT/'server/migrations/0023_eva01_equipment.sql').read_text('utf8')
         whitelist=re.search(r'definition_id IN \((.*?)\)\)',sql)[1]
-        self.assertEqual(set(re.findall("'([^']+)'",whitelist)),{i['id'] for i in catalog})
+        self.assertTrue(set(re.findall("'([^']+)'",whitelist)) <= {i['id'] for i in catalog})
+        self.assertEqual(len(set(re.findall("'([^']+)'",whitelist))),394)
         for ids,slot in re.findall(r"WHEN definition_id IN \((.*?)\) THEN '([^']+)'",sql):
-            self.assertEqual(set(re.findall("'([^']+)'",ids)),{i['id'] for i in catalog if i['slot']==slot})
+            historical=set(re.findall("'([^']+)'",whitelist))
+            self.assertEqual(set(re.findall("'([^']+)'",ids)),{i['id'] for i in catalog if i['slot']==slot and i['id'] in historical})
         self.assertIn('CREATE UNIQUE INDEX one_equipped_per_slot',sql)
         self.assertNotIn('DELETE FROM',sql.upper())
 
-    def test_lishi_axes_change_only_the_two_requested_weapons(self):
-        record=json.loads((ROOT/'analysis/ai-generated/equipment/eva01/axe-change-record.json').read_text())
-        def digest(value):
-            return hashlib.sha256(json.dumps(value,sort_keys=True,ensure_ascii=False,separators=(',',':')).encode()).hexdigest()
-        changed={f'client/assets/generated/equipment/eva01/{stem}/{suffix}'
-                 for stem in ['mzs','wzs'] for suffix in ['parts/ezs9.png','icons/weapon.png']}
-        paths=list((ROOT/'client/assets/generated/equipment/eva01').rglob('*.png'))
-        self.assertEqual(len(paths),90,'No stale hammer atlases remain in the export resources')
-        untouched={str(path.relative_to(ROOT)):hashlib.sha256(path.read_bytes()).hexdigest()
-                   for path in paths if str(path.relative_to(ROOT)) not in changed}
-        self.assertEqual(len(untouched),record['unchanged_runtime_count'])
-        self.assertEqual(digest(untouched),record['unchanged_runtime_sha256'])
-        catalog=json.loads((ROOT/'client/assets/data/shop-v2.json').read_text())
-        for item in catalog['items']:
-            if item['id'] in ['ai/eva01/mzs/weapon','ai/eva01/wzs/weapon']:
-                self.assertTrue(item.pop('name').endswith('斧'))
-        self.assertEqual(digest(catalog),record['catalog_without_two_weapon_names_sha256'])
-        manifest=copy.deepcopy(self.manifest)
-        for row in manifest['sets']:
-            if row['stem'] in ['mzs','wzs']:
-                self.assertEqual(row['weapon'],f"eva01/{row['stem']}/ezs9")
-                self.assertTrue(row.pop('weapon_name').endswith('斧'))
-                manifest['parts'].pop(row.pop('weapon'))
-        self.assertEqual(digest(manifest),record['manifest_without_two_weapon_parts_and_names_sha256'])
+    def test_refined_clothes_keep_original_skin_and_seven_tier_anatomy(self):
+        from eva01_native_style import skin
+        for row in self.manifest['sets']:
+            self.assertEqual([p.rsplit('/',1)[-1] for p in row['body']], [row['stem']+'7'+tail for tail in ['', 'q', 'x']])
+            for key in row['body']:
+                entry = self.manifest['parts'][key]
+                original = self.native['parts'][key.rsplit('/',1)[-1]]
+                with Image.open(ROOT/'client'/entry['texture'][6:]) as image, Image.open(ROOT/'client'/original['texture'][6:]) as old:
+                    kept = 0
+                    for before, after in zip(old.get_flattened_data(), image.get_flattened_data()):
+                        if skin(before):
+                            self.assertEqual(before,after,'Hands and exposed skin must retain their native shades')
+                            kept += 1
+                    if key == row['body'][0]: self.assertGreater(kept,0)
+        paths = list((ROOT/'client/assets/generated/equipment/eva01').rglob('*.png'))
+        self.assertEqual(len(paths),90,'Obsolete body atlases cannot remain in export resources')
+        for row in self.manifest['sets'][:2]:
+            self.assertEqual(row['weapon'],f"eva01/{row['stem']}/ezs9")
+            self.assertTrue(row['weapon_name'].endswith('斧'))
+
+    def test_design_reference_and_original_icons_are_recorded(self):
+        from eva01_native_style import ICON_SOURCES
+        folder=ROOT/'analysis/ai-generated/equipment/eva01/refinement-v2'
+        prompt=json.loads((folder/'prompt.json').read_text('utf8'))
+        self.assertIn('image_gen',prompt['tool'])
+        self.assertTrue((folder/'design-reference.png').is_file())
+        provenance=json.loads((ROOT/'analysis/ai-generated/equipment/eva01/generation-record.json').read_text('utf8'))
+        for number in ICON_SOURCES.values():
+            self.assertIn(f'client/assets/items/original/if{number}.png',provenance['native_inputs'])
 
 
 if __name__ == '__main__':

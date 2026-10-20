@@ -1,7 +1,7 @@
 [
   {
     "path": "res://assets/generated/equipment/eva01/mzs/parts/mzst2.png",
-    "sha256": "d574b3cc27ca4282de624725a9fd73ee4e575c5fd8a318d6e0b7b0ae0d4eef87",
+    "sha256": "6e1376b2b05aa818959d53a447182cac2e94277f2d19447c4717ea1959b895d5",
     "native_frames": [
       [
         0,
@@ -18,8 +18,8 @@
     ]
   },
   {
-    "path": "res://assets/generated/equipment/eva01/mzs/parts/mzs1.png",
-    "sha256": "781e3e700b16110af0f1485604cae71396cb461675044995c7737eeac18a4449",
+    "path": "res://assets/generated/equipment/eva01/mzs/parts/mzs7.png",
+    "sha256": "255cfc92e4625a79dcd1906fe78b2283794e3b377d3a43c490e7ddc6514a1655",
     "native_frames": [
       [
         0,
@@ -42,8 +42,8 @@
     ]
   },
   {
-    "path": "res://assets/generated/equipment/eva01/mzs/parts/mzs1q.png",
-    "sha256": "6784e28059410a0903bf2414189cc985683eaa9f34065f1d14955b66a58642ec",
+    "path": "res://assets/generated/equipment/eva01/mzs/parts/mzs7q.png",
+    "sha256": "6dba99f3bedaa1a74fe0867e8b288de2fe82dfe7e3ddae05b78d1a1c25bdb25c",
     "native_frames": [
       [
         0,
@@ -66,8 +66,8 @@
     ]
   },
   {
-    "path": "res://assets/generated/equipment/eva01/mzs/parts/mzs1x.png",
-    "sha256": "975b3b851e4d16b3e5cc8d3e57e98dbbdda0486633111ab578ff439c336ab53e",
+    "path": "res://assets/generated/equipment/eva01/mzs/parts/mzs7x.png",
+    "sha256": "1276b84cf79e661ca31f39b3993689fb4c84b242a17623d1aa754d2427e4fef7",
     "native_frames": [
       [
         0,
@@ -109,7 +109,7 @@
   },
   {
     "path": "res://assets/generated/equipment/eva01/mzs/parts/ezs9.png",
-    "sha256": "b634a5bd9de0bf9fe9119cac04bbf89dbef3af29d8cdc929ca74dd289865bff7",
+    "sha256": "cf0a5a2d7c4d931d864fa1ea09ad0d2f71d9fc801e8927665565dd01051f65da",
     "native_frames": [
       [
         0,
@@ -127,47 +127,47 @@
   },
   {
     "path": "res://assets/generated/equipment/eva01/mzs/icons/weapon.png",
-    "sha256": "11e3af4912c09af03057530c5e859c23e91468024290f8e949184c35b15a8f56"
+    "sha256": "8de14a4e68fa9db07e808db3a79b0d62cf1b9cf275413f34eb2613819723d3e5"
   },
   {
     "path": "res://assets/generated/equipment/eva01/mzs/icons/pendant.png",
-    "sha256": "7d8ad38ed177d61a5831f324141decb51168128858ca3b84c2a4f7a4a6bccb04"
+    "sha256": "0b5edd109ba71dda8f4252dd06d1192a1cc070f828e5624abf8bfe8d76c9b53e"
   },
   {
     "path": "res://assets/generated/equipment/eva01/mzs/icons/armor.png",
-    "sha256": "a3579b54d4d9dac8b1501543f167844c8d34cfab853878f9d6217a7f0573dbe7"
+    "sha256": "8087a4097f33f2da549c0c353dfe9ba72b6448ccd0fcbd8f608a7179f1015523"
   },
   {
     "path": "res://assets/generated/equipment/eva01/mzs/icons/wrist.png",
-    "sha256": "92348eccb86443bb4dfebca7e8776673612bab8ff0e1e2858f5db453a2fef3f5"
+    "sha256": "3775fbae89acb4fcabd509526e530062290a0229074fa1d6bf270e5b28a22b3a"
   },
   {
     "path": "res://assets/generated/equipment/eva01/mzs/icons/belt.png",
-    "sha256": "1e8370e505a391cbd7a60f5f4589b4f1ae7d21720d205dcdf21511367ccd1720"
+    "sha256": "fe54202ae7bfce2afad14618fa264d8c0f0863a885b27f1f3da9b525f33c30f1"
   },
   {
     "path": "res://assets/generated/equipment/eva01/mzs/icons/pants.png",
-    "sha256": "4ac06a79939e87ff9c3e227af2de9838e13decd53ef7392fc2274785f781aaa8"
+    "sha256": "75c0c61f3a24661fcaa9865185beee149045a613b130bfff7fcaee36a94ef9d9"
   },
   {
     "path": "res://assets/generated/equipment/eva01/mzs/icons/boots.png",
-    "sha256": "1d895e3bbf3f7013341d3120715d689385d8185dbc5195aa3330bc1fb66131b1"
+    "sha256": "8770a6cec391c167f5708f757e4bb3bd619e8c9c932ae36244fcf88ad6187ea7"
   },
   {
     "path": "res://assets/generated/equipment/eva01/mzs/icons/ring.png",
-    "sha256": "6eab95303aee7540e7b3c66054948686030b019a152be3ae497d5e8bcfb40221"
+    "sha256": "fa874265cd0c9523e7226dd683689f5f8918a4db60732a33127cc15f63396360"
   },
   {
     "path": "res://assets/generated/equipment/eva01/mzs/icons/necklace.png",
-    "sha256": "a373d38879d132b8f120df39392371d3f7c83acebe1def5c806fb72b27f30861"
+    "sha256": "98df05909d78812f330e76f36b9baeeec71d662fd6f869a3dbc6fdb3154627f9"
   },
   {
     "path": "res://assets/generated/equipment/eva01/mzs/icons/hat.png",
-    "sha256": "2cc015f19bb9596e87f09ba904b02c59ae0848f5395d8ac38b184d65a56491ab"
+    "sha256": "d0de9f21d2c0b9d54e307b090988c16d0f7a7df79f905ccab05520b0444bef14"
   },
   {
     "path": "res://assets/generated/equipment/eva01/wzs/parts/wzst2.png",
-    "sha256": "052d90d593c70cf7d6c1c6558e66d54df11b7cbc39c9ffe5e688557ecb76d9e2",
+    "sha256": "b7af0df9fde146d906475adeca6075d3068dda233881044bd24af39c20883430",
     "native_frames": [
       [
         0,
@@ -184,8 +184,8 @@
     ]
   },
   {
-    "path": "res://assets/generated/equipment/eva01/wzs/parts/wzs1.png",
-    "sha256": "0d02d2ed814321ed88c8c44cb81c6dae20e925f8cf8fac168d843a25f78296c7",
+    "path": "res://assets/generated/equipment/eva01/wzs/parts/wzs7.png",
+    "sha256": "12b0dd56f24dd21d04d233f87adc9c061af3117636741c78523dd188f7f2e6d0",
     "native_frames": [
       [
         0,
@@ -208,8 +208,8 @@
     ]
   },
   {
-    "path": "res://assets/generated/equipment/eva01/wzs/parts/wzs1q.png",
-    "sha256": "cc6d8ff31fe37373d6c15662d132a02f8e1d20293cd576b44acb76ce5e03d166",
+    "path": "res://assets/generated/equipment/eva01/wzs/parts/wzs7q.png",
+    "sha256": "79f33da6bff400732bf3ba2bdadc628dea9706dc2c192078db55abf403fb33bf",
     "native_frames": [
       [
         0,
@@ -232,8 +232,8 @@
     ]
   },
   {
-    "path": "res://assets/generated/equipment/eva01/wzs/parts/wzs1x.png",
-    "sha256": "ea105aa4fafbfce42ac2e9bde8a6e515a075e636f490a0501a7b59ef2bde1e4f",
+    "path": "res://assets/generated/equipment/eva01/wzs/parts/wzs7x.png",
+    "sha256": "313c39c45292ff00bdab3f8a9f180c618626917c7b256389467791c5b6fbb5a0",
     "native_frames": [
       [
         0,
@@ -275,7 +275,7 @@
   },
   {
     "path": "res://assets/generated/equipment/eva01/wzs/parts/ezs9.png",
-    "sha256": "b634a5bd9de0bf9fe9119cac04bbf89dbef3af29d8cdc929ca74dd289865bff7",
+    "sha256": "cf0a5a2d7c4d931d864fa1ea09ad0d2f71d9fc801e8927665565dd01051f65da",
     "native_frames": [
       [
         0,
@@ -293,47 +293,47 @@
   },
   {
     "path": "res://assets/generated/equipment/eva01/wzs/icons/weapon.png",
-    "sha256": "11e3af4912c09af03057530c5e859c23e91468024290f8e949184c35b15a8f56"
+    "sha256": "8de14a4e68fa9db07e808db3a79b0d62cf1b9cf275413f34eb2613819723d3e5"
   },
   {
     "path": "res://assets/generated/equipment/eva01/wzs/icons/pendant.png",
-    "sha256": "7d8ad38ed177d61a5831f324141decb51168128858ca3b84c2a4f7a4a6bccb04"
+    "sha256": "0b5edd109ba71dda8f4252dd06d1192a1cc070f828e5624abf8bfe8d76c9b53e"
   },
   {
     "path": "res://assets/generated/equipment/eva01/wzs/icons/armor.png",
-    "sha256": "a3579b54d4d9dac8b1501543f167844c8d34cfab853878f9d6217a7f0573dbe7"
+    "sha256": "8087a4097f33f2da549c0c353dfe9ba72b6448ccd0fcbd8f608a7179f1015523"
   },
   {
     "path": "res://assets/generated/equipment/eva01/wzs/icons/wrist.png",
-    "sha256": "92348eccb86443bb4dfebca7e8776673612bab8ff0e1e2858f5db453a2fef3f5"
+    "sha256": "3775fbae89acb4fcabd509526e530062290a0229074fa1d6bf270e5b28a22b3a"
   },
   {
     "path": "res://assets/generated/equipment/eva01/wzs/icons/belt.png",
-    "sha256": "1e8370e505a391cbd7a60f5f4589b4f1ae7d21720d205dcdf21511367ccd1720"
+    "sha256": "fe54202ae7bfce2afad14618fa264d8c0f0863a885b27f1f3da9b525f33c30f1"
   },
   {
     "path": "res://assets/generated/equipment/eva01/wzs/icons/pants.png",
-    "sha256": "4ac06a79939e87ff9c3e227af2de9838e13decd53ef7392fc2274785f781aaa8"
+    "sha256": "75c0c61f3a24661fcaa9865185beee149045a613b130bfff7fcaee36a94ef9d9"
   },
   {
     "path": "res://assets/generated/equipment/eva01/wzs/icons/boots.png",
-    "sha256": "1d895e3bbf3f7013341d3120715d689385d8185dbc5195aa3330bc1fb66131b1"
+    "sha256": "8770a6cec391c167f5708f757e4bb3bd619e8c9c932ae36244fcf88ad6187ea7"
   },
   {
     "path": "res://assets/generated/equipment/eva01/wzs/icons/ring.png",
-    "sha256": "6eab95303aee7540e7b3c66054948686030b019a152be3ae497d5e8bcfb40221"
+    "sha256": "fa874265cd0c9523e7226dd683689f5f8918a4db60732a33127cc15f63396360"
   },
   {
     "path": "res://assets/generated/equipment/eva01/wzs/icons/necklace.png",
-    "sha256": "a373d38879d132b8f120df39392371d3f7c83acebe1def5c806fb72b27f30861"
+    "sha256": "98df05909d78812f330e76f36b9baeeec71d662fd6f869a3dbc6fdb3154627f9"
   },
   {
     "path": "res://assets/generated/equipment/eva01/wzs/icons/hat.png",
-    "sha256": "01002be6a2f577e24e349173d4a0d47273547861e1cbc85b1c3e71bb677793cb"
+    "sha256": "d0de9f21d2c0b9d54e307b090988c16d0f7a7df79f905ccab05520b0444bef14"
   },
   {
     "path": "res://assets/generated/equipment/eva01/mck/parts/mckt2.png",
-    "sha256": "876661e70226b8d45ba5405a78b60a105f28871d22c59b48951b2cb1f7bbd69a",
+    "sha256": "c5f04dad0eae1d852bd357ac5cc13590d424198b1b0c52916fb618297e64defc",
     "native_frames": [
       [
         0,
@@ -350,8 +350,8 @@
     ]
   },
   {
-    "path": "res://assets/generated/equipment/eva01/mck/parts/mck1.png",
-    "sha256": "b8c56ad51b2d91e20e08bdaea3a8a3230eb766b8bfe3926549a0044c4793afdf",
+    "path": "res://assets/generated/equipment/eva01/mck/parts/mck7.png",
+    "sha256": "4eea5157232845eaf1169dcb544eda0cb5106090df3e1d8d70c4af6fb0a6bbcb",
     "native_frames": [
       [
         0,
@@ -368,8 +368,8 @@
     ]
   },
   {
-    "path": "res://assets/generated/equipment/eva01/mck/parts/mck1q.png",
-    "sha256": "b9bb157d6dbe6d75ceb6ad960cca74f061a6943e446203d75c01b54060da7dba",
+    "path": "res://assets/generated/equipment/eva01/mck/parts/mck7q.png",
+    "sha256": "26f07f6218e8866aca887bf507f352771e7b92a3dbe08c183d3c24d14d2115ad",
     "native_frames": [
       [
         0,
@@ -416,8 +416,8 @@
     ]
   },
   {
-    "path": "res://assets/generated/equipment/eva01/mck/parts/mck1x.png",
-    "sha256": "e17be90d805c2a73f76570c28c6d7ee55150a745933634ecd5624b116a662033",
+    "path": "res://assets/generated/equipment/eva01/mck/parts/mck7x.png",
+    "sha256": "eb959b42e4244a27b7aaacf3925d5b32c0341d82183f4628b5c2b399213d0514",
     "native_frames": [
       [
         0,
@@ -459,7 +459,7 @@
   },
   {
     "path": "res://assets/generated/equipment/eva01/mck/parts/eck9.png",
-    "sha256": "23909cec541c60119b8c20a2b4cf7bf3eece4d0e697ae32c7bb36f2773f5e624",
+    "sha256": "611bf8e9eabb27ae703b95368c94eba50ffe68fe581a4e6fc3b52d1bfbd1c479",
     "native_frames": [
       [
         0,
@@ -477,47 +477,47 @@
   },
   {
     "path": "res://assets/generated/equipment/eva01/mck/icons/weapon.png",
-    "sha256": "6b4b491fd6af8a013792da13aa3d826a9e13da6ba2c6614d4b17b2691d6ef39a"
+    "sha256": "babadf8fef16d8e6aef7f51922821474b8e729e7c5368391f4e56af5792c3a7e"
   },
   {
     "path": "res://assets/generated/equipment/eva01/mck/icons/pendant.png",
-    "sha256": "7d8ad38ed177d61a5831f324141decb51168128858ca3b84c2a4f7a4a6bccb04"
+    "sha256": "0b5edd109ba71dda8f4252dd06d1192a1cc070f828e5624abf8bfe8d76c9b53e"
   },
   {
     "path": "res://assets/generated/equipment/eva01/mck/icons/armor.png",
-    "sha256": "a3579b54d4d9dac8b1501543f167844c8d34cfab853878f9d6217a7f0573dbe7"
+    "sha256": "8087a4097f33f2da549c0c353dfe9ba72b6448ccd0fcbd8f608a7179f1015523"
   },
   {
     "path": "res://assets/generated/equipment/eva01/mck/icons/wrist.png",
-    "sha256": "92348eccb86443bb4dfebca7e8776673612bab8ff0e1e2858f5db453a2fef3f5"
+    "sha256": "3775fbae89acb4fcabd509526e530062290a0229074fa1d6bf270e5b28a22b3a"
   },
   {
     "path": "res://assets/generated/equipment/eva01/mck/icons/belt.png",
-    "sha256": "1e8370e505a391cbd7a60f5f4589b4f1ae7d21720d205dcdf21511367ccd1720"
+    "sha256": "fe54202ae7bfce2afad14618fa264d8c0f0863a885b27f1f3da9b525f33c30f1"
   },
   {
     "path": "res://assets/generated/equipment/eva01/mck/icons/pants.png",
-    "sha256": "4ac06a79939e87ff9c3e227af2de9838e13decd53ef7392fc2274785f781aaa8"
+    "sha256": "75c0c61f3a24661fcaa9865185beee149045a613b130bfff7fcaee36a94ef9d9"
   },
   {
     "path": "res://assets/generated/equipment/eva01/mck/icons/boots.png",
-    "sha256": "1d895e3bbf3f7013341d3120715d689385d8185dbc5195aa3330bc1fb66131b1"
+    "sha256": "8770a6cec391c167f5708f757e4bb3bd619e8c9c932ae36244fcf88ad6187ea7"
   },
   {
     "path": "res://assets/generated/equipment/eva01/mck/icons/ring.png",
-    "sha256": "6eab95303aee7540e7b3c66054948686030b019a152be3ae497d5e8bcfb40221"
+    "sha256": "fa874265cd0c9523e7226dd683689f5f8918a4db60732a33127cc15f63396360"
   },
   {
     "path": "res://assets/generated/equipment/eva01/mck/icons/necklace.png",
-    "sha256": "a373d38879d132b8f120df39392371d3f7c83acebe1def5c806fb72b27f30861"
+    "sha256": "98df05909d78812f330e76f36b9baeeec71d662fd6f869a3dbc6fdb3154627f9"
   },
   {
     "path": "res://assets/generated/equipment/eva01/mck/icons/hat.png",
-    "sha256": "b02574385c225be37fe92d99a49d5c92de8cc3195cf3061d356192d959da9fee"
+    "sha256": "d0de9f21d2c0b9d54e307b090988c16d0f7a7df79f905ccab05520b0444bef14"
   },
   {
     "path": "res://assets/generated/equipment/eva01/wck/parts/wckt2.png",
-    "sha256": "c74635bd2595a3dd0a834581cd50d945f275cb195fca7f29509b8c4b1be0d499",
+    "sha256": "f5329c53f468c92a2a89377081a8717e7ae30a124b4461b4df673e0219251df5",
     "native_frames": [
       [
         0,
@@ -534,8 +534,8 @@
     ]
   },
   {
-    "path": "res://assets/generated/equipment/eva01/wck/parts/wck1.png",
-    "sha256": "a8d5a0e4b0ddb0acb122e183150fa3ba47a4996ac8eeb884a95533e4b83057cb",
+    "path": "res://assets/generated/equipment/eva01/wck/parts/wck7.png",
+    "sha256": "1d58df1609bff7a4fcd149bbc76b04ae19d6b06256a92ba15a7353d579e49dea",
     "native_frames": [
       [
         0,
@@ -552,8 +552,8 @@
     ]
   },
   {
-    "path": "res://assets/generated/equipment/eva01/wck/parts/wck1q.png",
-    "sha256": "36dededebaf7531468a2caeee6a975dd76829eb8d15df15af1efb95a954e09e4",
+    "path": "res://assets/generated/equipment/eva01/wck/parts/wck7q.png",
+    "sha256": "cfd94e807e4e4262c3a066fc04db8d06eb60dd81b8f59d67154bd53c41577033",
     "native_frames": [
       [
         0,
@@ -576,8 +576,8 @@
     ]
   },
   {
-    "path": "res://assets/generated/equipment/eva01/wck/parts/wck1x.png",
-    "sha256": "ec448bb783e9a2b32b1ff63b009ef90807b2ee3f8fa96412623a1f2f744ffdd9",
+    "path": "res://assets/generated/equipment/eva01/wck/parts/wck7x.png",
+    "sha256": "a19a373ef73226ce13ada0241b5b02279530793cfdf3c504b6e1948656f251a5",
     "native_frames": [
       [
         0,
@@ -619,7 +619,7 @@
   },
   {
     "path": "res://assets/generated/equipment/eva01/wck/parts/eck17.png",
-    "sha256": "76730a753a17955dee24f447cd1e1a88092792d87d9a024dbca99706b24bbb30",
+    "sha256": "e04eed022284b25c556665296124bf43b7f902bfda4e0616129f2bb76f5a68f4",
     "native_frames": [
       [
         0,
@@ -637,47 +637,47 @@
   },
   {
     "path": "res://assets/generated/equipment/eva01/wck/icons/weapon.png",
-    "sha256": "cc180e81a3faf8d13b8228cbdaac2fde6249fcc975645804673403ce12d43549"
+    "sha256": "8d61d582a6063d06b90d0dcce6ee5950d7e3ec305f12db9ef14746f5a1da210f"
   },
   {
     "path": "res://assets/generated/equipment/eva01/wck/icons/pendant.png",
-    "sha256": "7d8ad38ed177d61a5831f324141decb51168128858ca3b84c2a4f7a4a6bccb04"
+    "sha256": "0b5edd109ba71dda8f4252dd06d1192a1cc070f828e5624abf8bfe8d76c9b53e"
   },
   {
     "path": "res://assets/generated/equipment/eva01/wck/icons/armor.png",
-    "sha256": "a3579b54d4d9dac8b1501543f167844c8d34cfab853878f9d6217a7f0573dbe7"
+    "sha256": "8087a4097f33f2da549c0c353dfe9ba72b6448ccd0fcbd8f608a7179f1015523"
   },
   {
     "path": "res://assets/generated/equipment/eva01/wck/icons/wrist.png",
-    "sha256": "92348eccb86443bb4dfebca7e8776673612bab8ff0e1e2858f5db453a2fef3f5"
+    "sha256": "3775fbae89acb4fcabd509526e530062290a0229074fa1d6bf270e5b28a22b3a"
   },
   {
     "path": "res://assets/generated/equipment/eva01/wck/icons/belt.png",
-    "sha256": "1e8370e505a391cbd7a60f5f4589b4f1ae7d21720d205dcdf21511367ccd1720"
+    "sha256": "fe54202ae7bfce2afad14618fa264d8c0f0863a885b27f1f3da9b525f33c30f1"
   },
   {
     "path": "res://assets/generated/equipment/eva01/wck/icons/pants.png",
-    "sha256": "4ac06a79939e87ff9c3e227af2de9838e13decd53ef7392fc2274785f781aaa8"
+    "sha256": "75c0c61f3a24661fcaa9865185beee149045a613b130bfff7fcaee36a94ef9d9"
   },
   {
     "path": "res://assets/generated/equipment/eva01/wck/icons/boots.png",
-    "sha256": "1d895e3bbf3f7013341d3120715d689385d8185dbc5195aa3330bc1fb66131b1"
+    "sha256": "8770a6cec391c167f5708f757e4bb3bd619e8c9c932ae36244fcf88ad6187ea7"
   },
   {
     "path": "res://assets/generated/equipment/eva01/wck/icons/ring.png",
-    "sha256": "6eab95303aee7540e7b3c66054948686030b019a152be3ae497d5e8bcfb40221"
+    "sha256": "fa874265cd0c9523e7226dd683689f5f8918a4db60732a33127cc15f63396360"
   },
   {
     "path": "res://assets/generated/equipment/eva01/wck/icons/necklace.png",
-    "sha256": "a373d38879d132b8f120df39392371d3f7c83acebe1def5c806fb72b27f30861"
+    "sha256": "98df05909d78812f330e76f36b9baeeec71d662fd6f869a3dbc6fdb3154627f9"
   },
   {
     "path": "res://assets/generated/equipment/eva01/wck/icons/hat.png",
-    "sha256": "89b397c64b32a2e2163532bf15a151326969fbb2b3d6183073b08167aa2ce9f3"
+    "sha256": "d0de9f21d2c0b9d54e307b090988c16d0f7a7df79f905ccab05520b0444bef14"
   },
   {
     "path": "res://assets/generated/equipment/eva01/mfs/parts/mfst2.png",
-    "sha256": "47c818eb80e33f4945635fc41836b65358c9ae9c278960ab67e41584d6ceca8d",
+    "sha256": "1b2f41ee179f991d64a4da7aeea9941c2db21761e9aa2c285d9ea0998afbd92b",
     "native_frames": [
       [
         0,
@@ -694,8 +694,8 @@
     ]
   },
   {
-    "path": "res://assets/generated/equipment/eva01/mfs/parts/mfs2.png",
-    "sha256": "deb989d780f1efd05dd6e08ac008b4787367cd223d3890c1e9dbe7ac62401a63",
+    "path": "res://assets/generated/equipment/eva01/mfs/parts/mfs7.png",
+    "sha256": "209ead1b4239d6fb03de72dd8b611108a9e99872c1deae89e51520917a11e5aa",
     "native_frames": [
       [
         0,
@@ -718,8 +718,8 @@
     ]
   },
   {
-    "path": "res://assets/generated/equipment/eva01/mfs/parts/mfs2q.png",
-    "sha256": "679cfb00f4227b8572d75efc720b815fca139f6f95edf128494ea034f1a22a88",
+    "path": "res://assets/generated/equipment/eva01/mfs/parts/mfs7q.png",
+    "sha256": "6f28f9813d733f5d9d1abbffe9262238389727f07bd2fa58c1ef407316bcd170",
     "native_frames": [
       [
         0,
@@ -742,8 +742,8 @@
     ]
   },
   {
-    "path": "res://assets/generated/equipment/eva01/mfs/parts/mfs2x.png",
-    "sha256": "e16980891b22c0752108d08fc5dce591483a08c3e15f961ce2f3786d1718194b",
+    "path": "res://assets/generated/equipment/eva01/mfs/parts/mfs7x.png",
+    "sha256": "0b46f82d835ea8c03d27da9aafe69741d751fc169701eeed3089ecfa26bc8ef9",
     "native_frames": [
       [
         0,
@@ -785,7 +785,7 @@
   },
   {
     "path": "res://assets/generated/equipment/eva01/mfs/parts/efs2.png",
-    "sha256": "83375c5755d5b11f532fea9336abe265420ce48d36080667f396170e24b0168a",
+    "sha256": "6396e1ceee04475076a009a01c4a7bd255282ecd7e17659d1fa6765d3bba273c",
     "native_frames": [
       [
         0,
@@ -803,47 +803,47 @@
   },
   {
     "path": "res://assets/generated/equipment/eva01/mfs/icons/weapon.png",
-    "sha256": "1d70c8806db6f267375a3cab6849621bda44dbc5dfe0d5bd1dc910104503f8fe"
+    "sha256": "f01b1f6b26a95d8b9921588317be255eb02a1d4801b0bc474ceedf21a9e255b3"
   },
   {
     "path": "res://assets/generated/equipment/eva01/mfs/icons/pendant.png",
-    "sha256": "7d8ad38ed177d61a5831f324141decb51168128858ca3b84c2a4f7a4a6bccb04"
+    "sha256": "0b5edd109ba71dda8f4252dd06d1192a1cc070f828e5624abf8bfe8d76c9b53e"
   },
   {
     "path": "res://assets/generated/equipment/eva01/mfs/icons/armor.png",
-    "sha256": "a3579b54d4d9dac8b1501543f167844c8d34cfab853878f9d6217a7f0573dbe7"
+    "sha256": "8087a4097f33f2da549c0c353dfe9ba72b6448ccd0fcbd8f608a7179f1015523"
   },
   {
     "path": "res://assets/generated/equipment/eva01/mfs/icons/wrist.png",
-    "sha256": "92348eccb86443bb4dfebca7e8776673612bab8ff0e1e2858f5db453a2fef3f5"
+    "sha256": "3775fbae89acb4fcabd509526e530062290a0229074fa1d6bf270e5b28a22b3a"
   },
   {
     "path": "res://assets/generated/equipment/eva01/mfs/icons/belt.png",
-    "sha256": "1e8370e505a391cbd7a60f5f4589b4f1ae7d21720d205dcdf21511367ccd1720"
+    "sha256": "fe54202ae7bfce2afad14618fa264d8c0f0863a885b27f1f3da9b525f33c30f1"
   },
   {
     "path": "res://assets/generated/equipment/eva01/mfs/icons/pants.png",
-    "sha256": "4ac06a79939e87ff9c3e227af2de9838e13decd53ef7392fc2274785f781aaa8"
+    "sha256": "75c0c61f3a24661fcaa9865185beee149045a613b130bfff7fcaee36a94ef9d9"
   },
   {
     "path": "res://assets/generated/equipment/eva01/mfs/icons/boots.png",
-    "sha256": "1d895e3bbf3f7013341d3120715d689385d8185dbc5195aa3330bc1fb66131b1"
+    "sha256": "8770a6cec391c167f5708f757e4bb3bd619e8c9c932ae36244fcf88ad6187ea7"
   },
   {
     "path": "res://assets/generated/equipment/eva01/mfs/icons/ring.png",
-    "sha256": "6eab95303aee7540e7b3c66054948686030b019a152be3ae497d5e8bcfb40221"
+    "sha256": "fa874265cd0c9523e7226dd683689f5f8918a4db60732a33127cc15f63396360"
   },
   {
     "path": "res://assets/generated/equipment/eva01/mfs/icons/necklace.png",
-    "sha256": "a373d38879d132b8f120df39392371d3f7c83acebe1def5c806fb72b27f30861"
+    "sha256": "98df05909d78812f330e76f36b9baeeec71d662fd6f869a3dbc6fdb3154627f9"
   },
   {
     "path": "res://assets/generated/equipment/eva01/mfs/icons/hat.png",
-    "sha256": "0b054ca3475fcbba23b860911d5633ef7782494ae8f1d944a29425ea4171fa26"
+    "sha256": "d0de9f21d2c0b9d54e307b090988c16d0f7a7df79f905ccab05520b0444bef14"
   },
   {
     "path": "res://assets/generated/equipment/eva01/wfs/parts/wfst2.png",
-    "sha256": "cc6d3b646be3d3a2991964f2afb2ef506d9ae69680ef4c78ed6258e3366c8ad7",
+    "sha256": "7d76793134fa3871e686d4357764c4a9e66908fdfed17eb8d7e5872c6c98b3f5",
     "native_frames": [
       [
         0,
@@ -860,8 +860,8 @@
     ]
   },
   {
-    "path": "res://assets/generated/equipment/eva01/wfs/parts/wfs2.png",
-    "sha256": "8f886733656cbb054ccac4240432d82784b4b09abd8c2d07fb9b4ff62acb51b7",
+    "path": "res://assets/generated/equipment/eva01/wfs/parts/wfs7.png",
+    "sha256": "8793a8ecf4873420aee757ee89321b68420692778b07ba573f79f4f8f1d1307d",
     "native_frames": [
       [
         0,
@@ -884,8 +884,8 @@
     ]
   },
   {
-    "path": "res://assets/generated/equipment/eva01/wfs/parts/wfs2q.png",
-    "sha256": "a9d917f694b10d625e7e8e99f80927d2c8c0eab26a217ffead6b284cab3357d2",
+    "path": "res://assets/generated/equipment/eva01/wfs/parts/wfs7q.png",
+    "sha256": "afd559b9eedcbc91222edfcc47b1d890ba80f9e8f70fdce3049936247554e6ed",
     "native_frames": [
       [
         0,
@@ -914,8 +914,8 @@
     ]
   },
   {
-    "path": "res://assets/generated/equipment/eva01/wfs/parts/wfs2x.png",
-    "sha256": "22c6e449b962036bc76fcfd1b3ee9955bf389bec346258ca9391af7730a51f7f",
+    "path": "res://assets/generated/equipment/eva01/wfs/parts/wfs7x.png",
+    "sha256": "ad10afcf072a3692207e2d5b4d5c0df92de49812d811fe2407e07c2709bd1b8f",
     "native_frames": [
       [
         0,
@@ -957,7 +957,7 @@
   },
   {
     "path": "res://assets/generated/equipment/eva01/wfs/parts/efs7.png",
-    "sha256": "572bac5767c1d2c5eb036698235523a709c53441dec68f26a3936af1eecac094",
+    "sha256": "a9649fa308c0e1743eef82c13a0077e792fe8db6e4c772f2a67108b5ad7b41db",
     "native_frames": [
       [
         0,
@@ -975,42 +975,42 @@
   },
   {
     "path": "res://assets/generated/equipment/eva01/wfs/icons/weapon.png",
-    "sha256": "a0ffde2c36d2301dc2825953b64208b489026099ec5583d39418ca7fe36ff092"
+    "sha256": "09a41489f033e11242c08e10c4f5aca7be13e148f6c6f69ddcb8497dca18b648"
   },
   {
     "path": "res://assets/generated/equipment/eva01/wfs/icons/pendant.png",
-    "sha256": "7d8ad38ed177d61a5831f324141decb51168128858ca3b84c2a4f7a4a6bccb04"
+    "sha256": "0b5edd109ba71dda8f4252dd06d1192a1cc070f828e5624abf8bfe8d76c9b53e"
   },
   {
     "path": "res://assets/generated/equipment/eva01/wfs/icons/armor.png",
-    "sha256": "a3579b54d4d9dac8b1501543f167844c8d34cfab853878f9d6217a7f0573dbe7"
+    "sha256": "8087a4097f33f2da549c0c353dfe9ba72b6448ccd0fcbd8f608a7179f1015523"
   },
   {
     "path": "res://assets/generated/equipment/eva01/wfs/icons/wrist.png",
-    "sha256": "92348eccb86443bb4dfebca7e8776673612bab8ff0e1e2858f5db453a2fef3f5"
+    "sha256": "3775fbae89acb4fcabd509526e530062290a0229074fa1d6bf270e5b28a22b3a"
   },
   {
     "path": "res://assets/generated/equipment/eva01/wfs/icons/belt.png",
-    "sha256": "1e8370e505a391cbd7a60f5f4589b4f1ae7d21720d205dcdf21511367ccd1720"
+    "sha256": "fe54202ae7bfce2afad14618fa264d8c0f0863a885b27f1f3da9b525f33c30f1"
   },
   {
     "path": "res://assets/generated/equipment/eva01/wfs/icons/pants.png",
-    "sha256": "4ac06a79939e87ff9c3e227af2de9838e13decd53ef7392fc2274785f781aaa8"
+    "sha256": "75c0c61f3a24661fcaa9865185beee149045a613b130bfff7fcaee36a94ef9d9"
   },
   {
     "path": "res://assets/generated/equipment/eva01/wfs/icons/boots.png",
-    "sha256": "1d895e3bbf3f7013341d3120715d689385d8185dbc5195aa3330bc1fb66131b1"
+    "sha256": "8770a6cec391c167f5708f757e4bb3bd619e8c9c932ae36244fcf88ad6187ea7"
   },
   {
     "path": "res://assets/generated/equipment/eva01/wfs/icons/ring.png",
-    "sha256": "6eab95303aee7540e7b3c66054948686030b019a152be3ae497d5e8bcfb40221"
+    "sha256": "fa874265cd0c9523e7226dd683689f5f8918a4db60732a33127cc15f63396360"
   },
   {
     "path": "res://assets/generated/equipment/eva01/wfs/icons/necklace.png",
-    "sha256": "a373d38879d132b8f120df39392371d3f7c83acebe1def5c806fb72b27f30861"
+    "sha256": "98df05909d78812f330e76f36b9baeeec71d662fd6f869a3dbc6fdb3154627f9"
   },
   {
     "path": "res://assets/generated/equipment/eva01/wfs/icons/hat.png",
-    "sha256": "402a4ad87c7ea358f5045fa9b51efb86eaa8da72d856f2d18a379e989d7ebfc3"
+    "sha256": "d0de9f21d2c0b9d54e307b090988c16d0f7a7df79f905ccab05520b0444bef14"
   }
 ]

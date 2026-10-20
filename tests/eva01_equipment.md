@@ -1,5 +1,20 @@
 # 初号机套装离屏与规则验证
 
+## 2026-10-21 原版衣装美化
+
+新版采用原版七阶三层衣装、原生脸型与发型，替换封闭机甲头盔为小型碧玉冠饰。配色为紫甲、玉绿镶边、浅紫高光和少量金色扣饰。30张部件及60个图标已接入正式运行时目录；原物品ID和数值保持。
+
+- `python tests/test_eva01_assets.py`：8项通过，检查90张资源、原包输入哈希、人体轮廓、肤色和下发段、完整图标及六套映射；历史迁移仅核对其当时的394项，不把新增物品反写旧迁移。
+- Godot `res://tests/eva01_anatomy_test.tscn`：62项通过。与原版同武器、七阶衣装及同发型的合成图集比较，所有姿势的alpha、裁切位置、动作序列和战斗锚点一致，证明新绘制没有改变头发、衣领、手部及武器连接的轮廓。
+- Godot `res://tests/eva01_equipment_test.tscn`：496项通过，覆盖实际购买、十槽穿戴、持久化、混搭、地图、背包和管理界面。使用临时本地存档，不改用户存档或待发联机指令。
+- `python tests/test_full_shop_catalog.py`：5项通过；重生再造丹2项回归通过。
+
+使用 `F:/project/Vssjx/work/web-toolchain/godot-4.7.2/Godot_v4.7.2-stable_win64_console.exe`。设置 `SSJX_EQUIPMENT_GAME_CAPTURE=F:/project/Vssjx/work/eva01-refinement` 可重建实际界面截图。动作审阅仍用 `eva01_review.tscn`，`SSJX_EQUIPMENT_REVIEW_ACTION` 依次为idle/walk/attack/cast/hurt，并设置 `SSJX_EQUIPMENT_REVIEW_CAPTURE` 指向目标PNG。施法动作仅隐者原本具备，其他职业展示待机回退，不称为新增施法动画。
+
+本轮截图：`work/eva01-refinement/after-idle.png`、`after-walk.png`、`after-attack.png`、`after-cast.png`、`after-hurt.png`、`shop.png`、`inventory.png`、`world.png`、`admin.png`。使用Windows OpenGL实际渲染。未打包、部署、推送，也未操作正式数据库或服务器。
+
+以下为之前版本的历史记录，其中“独角全覆面盔”与86张图片不变等结论只适用于当时的斧头单项改动，不代表此次美化后的资源。
+
 [套装设计](../design/eva01-equipment.md) · [装备规范](../design/ai-equipment-style-spec.md) · [测试导航](testing.md)
 
 2026-10-20，Godot 4.7.2、独立 Xvfb 虚拟显示、Mesa 26.2.4 llvmpipe OpenGL ES 3.2。截图是真实游戏渲染，不以 `--headless` 的无图形逻辑测试冒充离屏截图。没有使用桌面 `:0`、生产账号、正式数据库或真实玩家存档；未打包、推送或部署。

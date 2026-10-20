@@ -54,7 +54,7 @@ fn team_events_attach_critical_to_the_specific_hit() {
     let mut battle = team_rules::Battle::new("qingyun_trail".into(), vec![fighter], vec![enemy], 1000);
     battle.act(me, "attack", Some("m0"), None, 2000, 0).unwrap();
     assert!(battle.events.iter().any(|e| e.actor == me.to_string() && e.critical && e.damage > 0));
-    assert!(battle.events.iter().filter(|e| e.actor == "m0").all(|e| !e.critical));
+    assert!(battle.events.iter().any(|e| e.actor == "m0" && e.critical && e.damage > 0), "Monster critical metadata belongs to its own hit");
     let encoded = serde_json::to_value(&battle.events).unwrap();
     assert_eq!(encoded[0]["critical"], true);
 }

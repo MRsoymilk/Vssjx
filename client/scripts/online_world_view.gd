@@ -69,6 +69,8 @@ var social_panel: Control
 var _social_incoming: Array = []
 var team:RefCounted=preload("res://scripts/network/online_team.gd").new()
 var team_panel:Control
+var solo_model:=SoloEncounter.new()
+var solo_battle:Control
 var team_battle:Control
 var team_notice:Panel
 var team_notice_text:Label
@@ -81,6 +83,12 @@ var _soul_transition_id := ""
 var _soul_snap_pending := false
 
 func _ready() -> void:
+	solo_model.attach(network.pve)
+	solo_battle=preload("res://scenes/ui/team_battle_view.tscn").instantiate();solo_battle.model=solo_model;add_child(solo_battle)
+	solo_battle.dismissed.connect(func()->void:
+		if network.pve.state.get("battle") is Dictionary:_closed_battle=network.pve.state.battle.id
+		screen.hud.show();count_label.show();screen.chrome.round_label.text="常规模式";_set_battle_layout(false)
+	)
 	team.bind_character(character_id)
 	team.send_requested.connect(OnlineAccount.team_request)
 	team_panel=preload("res://scenes/ui/team_panel.tscn").instantiate();team_panel.model=team;add_child(team_panel)
@@ -668,7 +676,7 @@ func _process(delta: float) -> void:
 	if OS.has_feature("web") and (not Platform.context.lifecycle.focused or Platform.context.lifecycle.suspended): return
 	if _follow_transfer():return
 	_advance_approach()
-	if team_panel.visible or social_panel.visible or bag_overlay != null or chat_input.has_focus() or menu.visible or details.visible or npc_dialog.visible or emote_picker.visible or encounter.visible or battle_view.visible or expanded_chat.visible or attributes.visible or world_map.visible or network.pve.pending() or network.pve.active():
+	if team_panel.visible or social_panel.visible or bag_overlay != null or chat_input.has_focus() or menu.visible or details.visible or npc_dialog.visible or emote_picker.visible or encounter.visible or (battle_view.visible or solo_battle.visible) or expanded_chat.visible or attributes.visible or world_map.visible or network.pve.pending() or network.pve.active():
 		_was_keyboard = false
 		return
 	if network.team_following: return
@@ -696,7 +704,7 @@ func _map_input(event: InputEvent) -> void:
 	if _battle_load_failed:
 		if (event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed) or (event is InputEventScreenTouch and event.pressed): _pve_changed()
 		return
-	if social_panel.visible or bag_overlay != null or not network.world_ready or menu.visible or details.visible or npc_dialog.visible or encounter.visible or battle_view.visible or expanded_chat.visible or attributes.visible or world_map.visible or network.pve.pending() or network.pve.active(): return
+	if social_panel.visible or bag_overlay != null or not network.world_ready or menu.visible or details.visible or npc_dialog.visible or encounter.visible or (battle_view.visible or solo_battle.visible) or expanded_chat.visible or attributes.visible or world_map.visible or network.pve.pending() or network.pve.active(): return
 	var point := Vector2.ZERO
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed: point = event.position
 	elif event is InputEventScreenTouch and event.pressed: point = event.position
@@ -787,7 +795,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 			else: expanded_chat.dismiss()
 			get_viewport().set_input_as_handled()
 			return
-		if battle_view.visible: return
+		if (battle_view.visible or solo_battle.visible): return
 		if not _approach.is_empty():
 			_cancel_approach()
 		elif emote_picker.visible: emote_picker.hide()
@@ -795,8 +803,8 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		elif details.visible: details.hide()
 		elif chat_input.has_focus(): Platform.context.text_input.release_focus(chat_input)
 		else: _scene_action("menu")
-	elif event.keycode == KEY_C and not expanded_chat.visible and not battle_view.visible and not chat_input.has_focus(): _scene_action("properties")
-	elif event.keycode == KEY_3 and not expanded_chat.visible and not battle_view.visible and not chat_input.has_focus(): _scene_action("map")
+	elif event.keycode == KEY_C and not expanded_chat.visible and not (battle_view.visible or solo_battle.visible) and not chat_input.has_focus(): _scene_action("properties")
+	elif event.keycode == KEY_3 and not expanded_chat.visible and not (battle_view.visible or solo_battle.visible) and not chat_input.has_focus(): _scene_action("map")
 	elif event.keycode == KEY_ENTER: _focus_chat()
 	else: return
 	get_viewport().set_input_as_handled()
@@ -829,12 +837,12 @@ func _pve_changed() -> void:
 		screen.hud.get_node("WorldIdentity").text = "等级 %d\n%s" % [int(_character.level),SchoolRules.label(int(_character.school))]
 		_population(network.population.entities)
 		if model.state.battle is Dictionary and (model.active() or model.state.battle.id != _closed_battle):
-			if battle_view.battle_id == model.state.battle.id:
+			if battle_view.battle_id == model.state.battle.id or (model.state.battle.get("formation") is Dictionary and solo_battle.battle_id==model.state.battle.formation.id):
 				_present_battle()
 			elif model.ready and _loading_battle != model.state.battle.id:
 				_prepare_battle(model.state.battle)
-		elif battle_view.visible:
-			battle_view.hide()
+		elif (battle_view.visible or solo_battle.visible):
+			battle_view.hide();solo_battle.hide()
 			_set_battle_layout(false)
 			screen.hud.show()
 			count_label.show()
@@ -846,7 +854,7 @@ func _pve_changed() -> void:
 func _update_soul_visuals() -> void:
 	if network==null or soul_overlay==null:return
 	var spirit:=network.pve.is_soul()
-	soul_overlay.visible=spirit and not battle_view.visible and (team_battle==null or not team_battle.visible)
+	soul_overlay.visible=spirit and not (battle_view.visible or solo_battle.visible) and (team_battle==null or not team_battle.visible)
 	if spirit:
 		soul_overlay.get_node("Hint").text=SoulRules.hint(network.pve.state.character.corpse)
 		network.team_following=false
@@ -1021,7 +1029,7 @@ func _battle_preparation_failed() -> void:
 func _prepare_battle(snapshot: Dictionary) -> void:
 	_cancel_battle_preparation()
 	npc_dialog.hide()
-	battle_view.hide()
+	battle_view.hide();solo_battle.hide()
 	_set_battle_layout(false)
 	screen.chrome.round_label.text = "常规模式"
 	screen.hud.show()
@@ -1036,6 +1044,9 @@ func _prepare_battle(snapshot: Dictionary) -> void:
 	var c: Dictionary = network.pve.state.character
 	var key: String = (["mzs", "mck", "mfs"] if int(c.gender) == 0 else ["wzs", "wck", "wfs"])[int(c.job)]
 	var keys: Array[String] = [ShopRules.actor_key(int(c.job),int(c.gender),ShopRules.appearance(network.pve.state.shop)) if network.pve.state.has("shop") else "hero/" + key, String(snapshot.enemy.art), "effect/flash", BattleDeathPlayback.ART_KEY]
+	if snapshot.get("formation") is Dictionary:
+		for e in snapshot.formation.enemies:
+			if not keys.has(String(e.definition.art)):keys.append(String(e.definition.art))
 	keys.append_array(BattleResultView.ART_KEYS)
 	keys.append_array(BattleEffects.preload_keys(int(c.job),int(c.school),int(c.level),not network.pve.state.has("skills")))
 	var paths: Array[String] = ["res://assets/tiles/original_tiles.png"]
@@ -1072,7 +1083,10 @@ func _prepare_battle(snapshot: Dictionary) -> void:
 	_present_battle()
 
 func _present_battle() -> void:
-	battle_view.present(network.pve)
+	if network.pve.state.battle.get("formation") is Dictionary:
+		battle_view.hide();solo_model.display_ready=true;solo_battle.present()
+	else:
+		solo_battle.hide();battle_view.present(network.pve)
 	screen.chrome.round_label.text = "回合：%d/30" % int(network.pve.state.battle.round)
 	_set_battle_layout(true)
 	screen.hud.hide()
@@ -1167,7 +1181,7 @@ func _close_attributes() -> void:
 
 func _open_world_map() -> void:
 	_close_inventory()
-	if battle_view.visible or network.pve.active(): return
+	if (battle_view.visible or solo_battle.visible) or network.pve.active(): return
 	details.hide()
 	Platform.context.text_input.release_focus(chat_input)
 	world_map.present()

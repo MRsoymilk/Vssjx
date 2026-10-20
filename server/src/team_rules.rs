@@ -327,6 +327,8 @@ impl Battle {
                     || e.actor != self.events[n - 1].actor
                     || e.action != self.events[n - 1].action
                     || e.skill != self.events[n - 1].skill
+                    || e.action != "skill"
+                    || e.target == self.events[n - 1].target
             })
             .count() as i64;
         self.selection_starts_ms = now + groups * 3000 + 1000;

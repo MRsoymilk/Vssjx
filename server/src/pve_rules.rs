@@ -48,6 +48,10 @@ pub struct Command {
     pub attributes: Option<[i32; 5]>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub quantity: Option<i32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub enemy_slot: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub encounter_version: Option<u8>,
 }
 #[derive(Clone, Copy, Debug, Serialize, Deserialize)]
 pub struct Stats {
@@ -99,6 +103,8 @@ pub struct Battle {
     pub skill_rules_version: u8,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub frozen_stats: Option<Stats>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub formation: Option<Box<crate::team_rules::Battle>>,
 }
 impl Battle {
     pub fn new(enemy: ResidentDefinition, hp: i32, mp: i32, potions: i32) -> Self {
@@ -115,12 +121,46 @@ impl Battle {
             skills: Default::default(),
             skill_rules_version: 0,
             frozen_stats: None,
+            formation: None,
         }
     }
     pub fn view(&self) -> Value {
         let mut value = serde_json::to_value(self).expect("battle view");
         value["revision"] = json!(self.revision.to_string());
         value
+    }
+    pub fn new_formation(map: String, fighter: crate::team_rules::Fighter, sources: Vec<ResidentDefinition>, now: i64) -> Self {
+        let stats=fighter.stats;
+        let primary=if stats.balance.is_some(){crate::skill_balance::monster(sources[0].clone())}else{sources[0].clone()};
+        let arena=crate::team_rules::Battle::new(map,vec![fighter],sources,now);
+        let f=&arena.fighters[0];
+        let mut b=Self::new(primary,f.hp,f.mp,f.potions);
+        b.enemy_hp=arena.enemies[0].hp;
+        b.skills=f.effects.clone();b.skill_rules_version=1;b.frozen_stats=Some(stats);
+        b.formation=Some(Box::new(arena));b
+    }
+    pub fn defeated_enemies(&self) -> Vec<ResidentDefinition> {
+        self.formation.as_ref().map(|b|b.enemies.iter().filter(|e|e.hp==0).map(|e|e.definition.clone()).collect()).unwrap_or_else(||vec![self.enemy.clone()])
+    }
+    pub fn turn_formation(&mut self, action: Action, skill: Option<&str>, target: Option<&str>, now: i64, roll: i32) -> Result<Vec<String>, &'static str> {
+        if self.outcome!="active" {return Err("BATTLE_FINISHED");}
+        let arena=self.formation.as_mut().ok_or("INVALID_BATTLE_TARGET")?;
+        if action==Action::Flee {
+            if skill.is_some()||target.is_some(){return Err("INVALID_PVE_COMMAND");}
+            arena.finish("fled");arena.events.clear();arena.revision+=1;arena.events_revision=arena.revision;
+        }else{
+            let name=match action{Action::Attack=>"attack",Action::Skill=>"skill",Action::Guard=>"guard",Action::Potion=>"potion",_=>return Err("INVALID_BATTLE_ACTION")};
+            let default=arena.enemies.iter().find(|e|e.hp>0).map(|e|e.slot.clone());
+            let target=if matches!(action,Action::Attack|Action::Skill){target.or(default.as_deref())}else{if target.is_some(){return Err("INVALID_PVE_COMMAND");}None};
+            // Solo input is paced by its playback, not the shared team's 30s window.
+            let previous=(arena.selection_starts_ms,arena.deadline_ms);
+            arena.selection_starts_ms=now;arena.deadline_ms=now+crate::team_rules::TURN_MS;
+            if let Err(code)=arena.act(arena.fighters[0].id,name,target,skill,now,roll){arena.selection_starts_ms=previous.0;arena.deadline_ms=previous.1;return Err(code);}
+            if arena.round>30&&arena.active(){arena.finish("fled");}
+        }
+        let f=&arena.fighters[0];self.hp=f.hp;self.mp=f.mp;self.potions=f.potions;self.skills=f.effects.clone();
+        self.enemy_hp=arena.enemies[0].hp;self.round=(arena.round-1) as u32;self.revision+=1;self.outcome=arena.outcome.clone();
+        Ok(arena.lines.clone())
     }
     pub fn turn(
         &mut self,

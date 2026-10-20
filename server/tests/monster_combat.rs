@@ -45,3 +45,32 @@ fn bleed_persists_ticks_once_per_round_and_expires(){
     }
     assert!(observed);
 }
+
+#[test]
+fn solo_formation_targets_aoe_and_saved_rounds_are_authoritative(){
+    use vssjx_server::pve_rules::{Battle as Solo,Action};
+    let mut sources:Vec<_>=population::definitions().into_iter().filter(|d|d.kind!="npc").take(3).collect();
+    for d in &mut sources{d.hp=10000;}
+    let mut b=Solo::new_formation("qingyun_trail".into(),fighter(),sources,1000);
+    assert_eq!(b.formation.as_ref().unwrap().enemies.len(),3);
+    let before=serde_json::to_value(&b).unwrap();
+    assert_eq!(b.turn_formation(Action::Attack,None,Some("m9"),2000,99),Err("INVALID_BATTLE_TARGET"));assert_eq!(serde_json::to_value(&b).unwrap(),before);
+    b.turn_formation(Action::Attack,None,Some("m2"),2000,99).unwrap();
+    let group=b.formation.as_ref().unwrap();assert_eq!(group.enemies[0].hp,10000);assert_eq!(group.enemies[1].hp,10000);assert!(group.events.iter().any(|e|e.actor==group.fighters[0].id.to_string()&&e.target=="m2"));
+    let mut b:Solo=serde_json::from_value(serde_json::to_value(&b).unwrap()).unwrap();
+    let skill=skills::ITEMS.iter().find(|s|s.active&&s.job==1&&s.target=="all_enemies").unwrap();
+    let mp=b.mp;let cost=vssjx_server::skill_balance::cost(skill,b.frozen_stats.unwrap());
+    b.turn_formation(Action::Skill,Some(&skill.id),Some("m1"),2001,99).unwrap();
+    assert_eq!(b.mp,mp-cost);assert_eq!(b.round,2);
+    assert_eq!(b.formation.as_ref().unwrap().events.iter().filter(|e|e.skill==skill.id).count(),3);
+    assert!(b.defeated_enemies().is_empty());
+    b.turn_formation(Action::Flee,None,None,2002,99).unwrap();assert_eq!(b.outcome,"fled");
+    let before=serde_json::to_value(&b).unwrap();assert_eq!(b.turn_formation(Action::Attack,None,Some("m0"),2003,99),Err("BATTLE_FINISHED"));assert_eq!(serde_json::to_value(&b).unwrap(),before);
+    let boss=population::definitions_for("ancient_ruins").into_iter().find(|d|d.id=="boss").unwrap();
+    let budget=vssjx_server::skill_balance::monster(boss.clone()).hp;
+    let guard=population::definitions_for("ancient_ruins").into_iter().find(|d|d.id=="guardian").unwrap();
+    let b=Solo::new_formation("ancient_ruins".into(),fighter(),vec![boss,guard],1000);
+    assert_eq!(b.enemy.hp,budget,"Legacy envelope keeps the primary template for client validation");
+    assert_eq!(b.enemy_hp,b.formation.as_ref().unwrap().enemies[0].hp,"Primary current HP matches its allocated encounter share");
+    assert_eq!(b.formation.unwrap().enemies.iter().map(|e|e.hp).sum::<i32>(),budget);
+}

@@ -219,6 +219,8 @@ impl Loaded {
         if context.moving {
             return Err("PLAYER_MOVING");
         }
+        if command.encounter_version.is_some() && (command.encounter_version!=Some(1)||command.action!=Action::Challenge){return Err("INVALID_PVE_COMMAND");}
+        if command.enemy_slot.is_some() && (!matches!(command.action,Action::Attack|Action::Skill) || self.battle.as_ref().is_none_or(|b|b.formation.is_none())){return Err("INVALID_BATTLE_TARGET");}
         if let Some(corpse)=self.character.corpse.as_ref() {
             if command.action!=Action::Revive { return Err("SOUL_STATE"); }
             if command.battle_id.is_some()||command.attributes.is_some()||command.quantity.is_some(){return Err("INVALID_PVE_COMMAND");}
@@ -426,16 +428,26 @@ impl Loaded {
                     if self.character.quest_stage == 0 && crate::ai_world::map(&context.map_id).is_none() {
                         return Err("QUEST_REQUIRED");
                     }
-                    let definition=if self.character.balance_revision==1{crate::skill_balance::monster(definition)}else{definition};
                     let name = definition.name.clone();
                     let frozen=self.stats();
-                    self.battle = Some(Battle::new(
-                        definition,
-                        self.character.hp,
-                        self.character.mp,
-                        self.potions,
-                    ));
-                    if frozen.balance.is_some(){self.battle.as_mut().unwrap().frozen_stats=Some(frozen);}
+                    // Clients must opt into formation rendering; old clients retain solo-v1.
+                    if command.encounter_version.is_none(){
+                        let definition=if self.character.balance_revision==1{crate::skill_balance::monster(definition)}else{definition};
+                        let mut battle=Battle::new(definition,self.character.hp,self.character.mp,self.potions);
+                        if frozen.balance.is_some(){battle.frozen_stats=Some(frozen);}
+                        self.battle=Some(battle);
+                        return Ok(vec![format!("与{name}的遭遇战开始。")]);
+                    }
+                    let mut pool:Vec<_>=population::definitions_for(&context.map_id).into_iter().filter(|d|d.id!=definition.id&&d.kind!="npc"&&d.kind!="boss"&&(d.level-definition.level).abs()<=3&&!self.respawns.get(&d.id).is_some_and(|t|*t>unix_ms())&&!self.ai.respawns.get(&d.id).is_some_and(|t|*t>unix_ms())).collect();
+                    use rand::seq::SliceRandom;
+                    pool.shuffle(&mut rand::thread_rng());
+                    let count=crate::monster_combat::solo_count(rand::thread_rng().gen_range(0..100));
+                    let mut sources=vec![definition.clone()];sources.extend(pool.iter().take(count-1).cloned());
+                    if definition.kind!="boss"{pool.push(definition);}
+                    while sources.len()<count&&!pool.is_empty(){sources.push(pool.choose(&mut rand::thread_rng()).unwrap().clone());}
+                    let c=&self.character;
+                    let fighter=crate::team_rules::Fighter{id:c.id,name:c.display_name.clone(),job:c.job,gender:c.gender,school:c.school,level:c.level,appearance:self.loot.look(crate::shop::appearance(&self.gear)),stats:frozen,hp:c.hp,mp:c.mp,potions:self.potions,effects:crate::skills::State::new(c.job,c.school,c.level,c.level),guarding:false};
+                    self.battle=Some(Battle::new_formation(context.map_id.clone(),fighter,sources,unix_ms()));
                     return Ok(vec![format!("与{name}的遭遇战开始。")]);
                 }
                 if command.target.as_deref() != Some("qingwei") {
@@ -485,7 +497,8 @@ impl Loaded {
                     return Err("STALE_BATTLE");
                 }
                 let mut rng = rand::thread_rng();
-                let mut lines = battle.turn_selected(
+                let mut lines = if battle.formation.is_some(){battle.turn_formation(action,command.target.as_deref(),command.enemy_slot.as_deref(),unix_ms(),rng.gen_range(0..100))?}else{
+                    battle.turn_selected(
                     action,
                     self.character.job,
                     self.character.school,
@@ -495,25 +508,26 @@ impl Loaded {
                     rng.gen_range(-2..=2),
                     command.target.as_deref(),
                     rng.gen_range(0..100),
-                )?;
+                )?
+                };
                 self.character.hp = battle.hp.max(1);
                 self.character.mp = battle.mp;
                 self.potions = battle.potions;
                 if battle.outcome == "victory" {
-                    let gold = battle.enemy.gold;
-                    let xp = battle.enemy.xp;
-                    if crate::ai_world::resident(&battle.enemy.id).is_some() {
-                        self.ai.event("kill",&battle.enemy.id);
-                        self.ai.respawns.insert(battle.enemy.id.clone(),unix_ms()+MONSTER_RESPAWN_MS);
-                    } else {
-                        self.defeated |= pve_rules::mask(&battle.enemy.id).ok_or("INVALID_RESIDENT")?;
-                        self.respawns.insert(battle.enemy.id.clone(), unix_ms() + MONSTER_RESPAWN_MS);
+                    let defeated=battle.defeated_enemies();
+                    let gold=defeated.iter().map(|d|d.gold).sum();let xp=defeated.iter().map(|d|d.xp).sum();
+                    let killed_boss=defeated.iter().any(|d|d.id=="boss");
+                    let mut recorded=std::collections::HashSet::new();
+                    for enemy in defeated {
+                        if !recorded.insert(enemy.id.clone()){continue;}
+                        if crate::ai_world::resident(&enemy.id).is_some(){self.ai.event("kill",&enemy.id);self.ai.respawns.insert(enemy.id.clone(),unix_ms()+MONSTER_RESPAWN_MS);}
+                        else{self.defeated|=pve_rules::mask(&enemy.id).ok_or("INVALID_RESIDENT")?;self.respawns.insert(enemy.id,unix_ms()+MONSTER_RESPAWN_MS);}
                     }
                     if self.character.quest_stage == 1 && self.defeated & 7 == 7 {
                         self.character.quest_stage = 2;
                         lines.push("三只山狼已清除，请返回清微道人处领取奖励。".into());
                     }
-                    if battle.enemy.id == "boss" && self.character.quest_stage == 3 {
+                    if killed_boss && self.character.quest_stage == 3 {
                         self.character.quest_stage = 4;
                         lines.push("赤焰妖王已被击败，古剑遗迹的妖气消散了。".into());
                     }

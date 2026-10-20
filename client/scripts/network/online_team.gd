@@ -1,3 +1,4 @@
+class_name OnlineTeamModel
 extends RefCounted
 signal changed
 signal message(text: String)
@@ -98,7 +99,9 @@ func valid(v:Dictionary)->bool:
 	if leaders!=1 or not ids.has(character_id):return false
 	for offer in p.outgoing:
 		if not offer is Dictionary or not OnlineWorldClient._uuid(offer.get("id")) or not OnlineAccount.valid_nickname(offer.get("name","")):return false
-	var b:Variant=p.battle
+	return valid_battle(p.battle,character_id,ids)
+
+static func valid_battle(b:Variant,character_id:String,ids:Dictionary)->bool:
 	if b==null:return true
 	if not b is Dictionary or not OnlineWorldClient._uuid(b.get("id")) or b.get("outcome") not in ["active","victory","defeat","fled"] or not b.get("fighters") is Array or b.fighters.is_empty() or b.fighters.size()>5 or not b.get("enemies") is Array or b.enemies.is_empty() or b.enemies.size()>5 or not b.get("events") is Array or b.events.size()>128 or not b.get("lines") is Array:return false
 	if not OnlinePve.integer(b.get("turn"),0,b.fighters.size()-1) or not OnlinePve.integer(b.get("revision"),0,1000) or not OnlinePve.integer(b.get("round"),1,61) or not OnlinePve.integer(b.get("deadline_ms"),0,253402300799999):return false
@@ -122,6 +125,12 @@ func valid(v:Dictionary)->bool:
 			if intent.action=="skill":
 				if not intent.get("skill") is String or not SkillRules.item(intent.skill).get("active",false):return false
 			elif intent.get("skill")!=null:return false
+	if b.has("monster_revision") and not OnlinePve.integer(b.monster_revision,0,1):return false
+	if b.has("wounds"):
+		if not b.wounds is Dictionary or b.wounds.size()>fighters.size():return false
+		for id in b.wounds:
+			var wound:Variant=b.wounds[id]
+			if not fighters.has(id) or not wound is Array or wound.size()!=2 or not OnlinePve.integer(wound[0],1,3) or not OnlinePve.integer(wound[1],1,100000):return false
 	var enemies:={}
 	for e in b.enemies:
 		if not e is Dictionary or not e.get("slot") is String or e.slot not in ["m0","m1","m2","m3","m4"] or enemies.has(e.slot) or not e.get("definition") is Dictionary or not e.definition.get("art") is String:return false

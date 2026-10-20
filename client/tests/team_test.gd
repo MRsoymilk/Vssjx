@@ -91,6 +91,9 @@ func _run()->void:
 	check(model.receive(response(model,state(done))),"Completed shared fight is received")
 	await get_tree().process_frame
 	await get_tree().process_frame
+	check(view.deaths.size()==3 and not view.result.visible,"Victory waits for the native monster death sequences")
+	for death in view.deaths:death.advance(death.remaining())
+	view._process(0)
 	check(view.deaths.size()==3 and view.result.outcome=="victory","All dead monsters receive tombstones and original victory glyph")
 	await capture("victory")
 	view._dismiss();check(not view.visible,"Finished shared battle returns to map")

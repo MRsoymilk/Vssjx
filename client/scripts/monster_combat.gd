@@ -25,4 +25,7 @@ static func formation(primary:Dictionary,pool:Array,roll:int)->Array:
 	for d in candidates:
 		if chosen.size()>=solo_count(roll):break
 		chosen.append(d.duplicate(true))
+	var reinforcements:Array=candidates.duplicate()
+	if primary.kind!="boss":reinforcements.append(primary)
+	while chosen.size()<solo_count(roll) and not reinforcements.is_empty():chosen.append(reinforcements.pick_random().duplicate(true))
 	return chosen

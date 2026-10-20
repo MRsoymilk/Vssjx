@@ -31,7 +31,7 @@ static func preload_keys(job:int,school:int,level:int,legacy_only:bool=false)->A
 			if not keys.has(layer.art):keys.append(layer.art)
 	return keys
 
-func play_binding(id:String,trigger:String,hero:AnimatedSprite2D,enemy:AnimatedSprite2D)->AnimatedSprite2D:
+func play_binding(id:String,trigger:String,hero:AnimatedSprite2D,enemy:AnimatedSprite2D,with_audio:bool=true)->AnimatedSprite2D:
 	var selected:=binding(id)
 	if selected.is_empty() or selected.trigger!=trigger:return null
 	var primary:AnimatedSprite2D
@@ -40,7 +40,7 @@ func play_binding(id:String,trigger:String,hero:AnimatedSprite2D,enemy:AnimatedS
 		if sprite!=null:
 			sprite.set_meta("skill_id",id);sprite.set_meta("trigger",trigger)
 			if primary==null:primary=sprite
-	if primary!=null and selected.has("audio_id"):
+	if primary!=null and with_audio and selected.has("audio_id"):
 		var sound:=GameAudio.player(selected.audio_id)
 		if sound!=null:
 			add_child(sound,false,Node.INTERNAL_MODE_BACK)

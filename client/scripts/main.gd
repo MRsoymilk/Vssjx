@@ -16,6 +16,8 @@ var hud_name: Label
 var hud_stats: Label
 var quest_label: Label
 var modal: Control
+var local_encounter:SoloEncounter
+var local_encounter_view:Control
 var battle: ShushanBattle
 var battle_hero: AnimatedSprite2D
 var battle_enemy: AnimatedSprite2D
@@ -74,6 +76,8 @@ var map_transition: OriginalMapTransition
 
 func _exit_tree() -> void:
 	_ui_epoch += 1
+	if is_instance_valid(local_encounter_view):local_encounter_view._cancel()
+	local_encounter_view=null;local_encounter=null
 	if is_instance_valid(battle_effects):battle_effects.clear()
 	if battle_death != null: battle_death.cancel()
 	battle_death = null
@@ -140,6 +144,9 @@ func _process(delta: float) -> void:
 		clock_timer = 0.0
 		if mode == "world": chrome.update_header(int(Game.player.hp), int(Game.player.mp), 0)
 		elif mode == "battle": chrome.update_header(battle.hp, battle.mp, battle.round_number)
+		elif mode=="local_encounter" and local_encounter!=null:
+			var shown:Dictionary=local_encounter_view.actors.get(local_encounter.character_id,{})
+			chrome.update_header(int(shown.hp.value) if not shown.is_empty() else local_encounter.engine.hp,local_encounter.engine.mp,maxi(0,int(local_encounter.state.round)-1))
 	if mode == "battle" and battle_auto and battle.phase == "select" and modal == null:
 		auto_timer += delta
 		if auto_timer >= 0.9:
@@ -265,6 +272,8 @@ func _button(parent: Node, text_value: String, rect: Rect2, callback: Callable, 
 
 func _clear_ui() -> void:
 	soul_overlay.hide()
+	if is_instance_valid(local_encounter_view):local_encounter_view._cancel()
+	local_encounter_view=null;local_encounter=null
 	if is_instance_valid(battle_effects):battle_effects.clear()
 	battle_effects=null
 	_ui_epoch += 1
@@ -972,6 +981,7 @@ func _encounter_battle(enemy: Dictionary) -> void:
 	battle_transition_epoch += 1
 	var epoch := battle_transition_epoch
 	var world_id := world.get_instance_id()
+	var opponents:=MonsterCombat.formation(enemy,world.available_enemies(),randi_range(0,99))
 	world.camera.force_update_scroll()
 	var point: Vector2 = world.hero.get_global_transform_with_canvas().origin + world_view.position
 	battle_transition = load("res://scenes/ui/battle_encounter_transition.tscn").instantiate()
@@ -981,6 +991,8 @@ func _encounter_battle(enemy: Dictionary) -> void:
 	await get_tree().create_timer(0.20).timeout
 	if not _encounter_current(epoch, world_id): return
 	var keys: Array[String] = [Game.appearance_key(), String(enemy.get("art", "")), "effect/flash", BattleDeathPlayback.ART_KEY]
+	for d in opponents:
+		if not keys.has(String(d.art)):keys.append(String(d.art))
 	keys.append_array(BattleResultView.ART_KEYS)
 	keys.append_array(BattleEffects.preload_keys(int(Game.player.job),int(Game.player.school),int(Game.player.level)))
 	var paths: Array[String] = ["res://assets/tiles/original_tiles.png"]
@@ -1013,7 +1025,22 @@ func _encounter_battle(enemy: Dictionary) -> void:
 	battle_transition.set_progress(1.0, "准备就绪")
 	await get_tree().create_timer(0.16).timeout
 	if not _encounter_current(epoch, world_id): return
-	_start_battle(enemy)
+	_start_local_encounter(opponents)
+
+func _start_local_encounter(opponents:Array)->void:
+	world.pause_moving();mode="local_encounter";_clear_ui()
+	local_encounter=SoloEncounter.new();local_encounter.start(opponents)
+	chrome=preload("res://scenes/ui/battle_chrome.tscn").instantiate();ui.add_child(chrome)
+	chrome.log_label.text="[系统] 遭遇%d名敌人，点击目标选择指令。"%opponents.size()
+	local_encounter_view=preload("res://scenes/ui/team_battle_view.tscn").instantiate();local_encounter_view.model=local_encounter;ui.add_child(local_encounter_view)
+	local_encounter.message.connect(func(text:String)->void:
+		if is_instance_valid(chrome):chrome.log_label.text="[系统] "+text.replace("\n","\n[系统] ")
+		_local_messages.append({"message_id":"battle-%d"%Time.get_ticks_usec(),"channel":"system","display_name":"系统","text":text})
+		while _local_messages.size()>LocalWorldChat.LIMIT:_local_messages.pop_front()
+	)
+	local_encounter_view.dismissed.connect(_enter_world)
+	local_encounter_view.present()
+	chrome.update_header(local_encounter.engine.hp,local_encounter.engine.mp,0)
 
 func _start_battle(enemy: Dictionary) -> void:
 	world.pause_moving()
@@ -1317,6 +1344,8 @@ func _close_requested() -> void:
 	await Game.wait_for_storage()
 	if not is_inside_tree(): return
 	if mode != "online_world" and not Game.player.is_empty():
+		if mode=="local_encounter" and local_encounter!=null and local_encounter.active():
+			Game.player.hp=local_encounter.engine.hp;Game.player.mp=local_encounter.engine.mp;Game.player.potions=local_encounter.engine.potions
 		if mode == "battle" and battle != null:
 			if battle.finished and battle.phase == "settlement":
 				battle.finish_round()

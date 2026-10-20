@@ -102,13 +102,20 @@ func valid(value: Variant) -> bool:
 	elif not enemy.get("art") in ["monster/langw", "monster/hs1", "monster/xt1", "monster/nt1"]: return false
 	if not integer(enemy.get("hp"), 1, 10000) or not integer(enemy.get("level"), 1, 60): return false
 	if not integer(battle.get("hp"), 0, int(value.stats.hp)) or not integer(battle.get("mp"), 0, int(value.stats.mp)) or not integer(battle.get("enemy_hp"), 0, int(enemy.hp)) or not integer(battle.get("potions"), 0, 99): return false
+	if battle.has("formation"):
+		var group:Variant=battle.formation
+		if not group is Dictionary or not OnlineTeamModel.valid_battle(group,character_id,{character_id:true}) or group.fighters.size()!=1 or group.enemies.size()>3:return false
+		var fighter:Dictionary=group.fighters[0]
+		if group.outcome!=battle.outcome or fighter.hp!=battle.hp or fighter.mp!=battle.mp or fighter.potions!=battle.potions or group.enemies[0].hp!=battle.enemy_hp:return false
+		if group.enemies[0].definition.id!=battle.enemy.id:return false
+		if group.outcome=="active" and (fighter.stats!=value.stats or fighter.job!=value.character.job or fighter.level!=value.character.level):return false
 	return true
 
 func receive(packet: Dictionary) -> bool:
 	var kind: Variant = packet.get("type")
 	if not kind in ["pve.state", "pve.result"] or not valid(packet.get("state")): return false
 	if kind == "pve.result":
-		if not uuid(packet.get("operation_id")) or not packet.get("ok") is bool or not packet.get("replayed") is bool or not packet.get("lines") is Array or packet.lines.size() > 12: return false
+		if not uuid(packet.get("operation_id")) or not packet.get("ok") is bool or not packet.get("replayed") is bool or not packet.get("lines") is Array or packet.lines.size() > 64: return false
 		for line in packet.lines:
 			if not line is String or line.length() > 200: return false
 		if not packet.ok and not packet.get("code") is String: return false
@@ -175,8 +182,9 @@ func unavailable_monsters() -> Array:
 		if int(state.ai_world.respawns[id]) > server_time_ms(): hidden.append(id)
 	return hidden
 
-func submit(action: String, target: String = "", points: Array = [], count: int=1) -> bool:
+func submit(action: String, target: String = "", points: Array = [], count: int=1, enemy_slot:String="") -> bool:
 	if not ready or pending(): return false
+	if not enemy_slot.is_empty() and (not active() or not state.battle.has("formation") or action not in ["attack","skill"] or not state.battle.formation.enemies.any(func(e:Dictionary)->bool:return e.slot==enemy_slot and int(e.hp)>0)):return false
 	if is_soul() and action!="revive":return false
 	if action=="revive" and (not is_soul() or target!=state.character.corpse.id):return false
 	if action=="school_join" and (active() or int(state.character.school)!=SchoolRules.UNJOINED or SchoolRules.index(target)<0):return false
@@ -223,6 +231,8 @@ func submit(action: String, target: String = "", points: Array = [], count: int=
 	elif active():
 		command.battle_id = state.battle.id
 		command.expected_revision = state.battle.revision
+	if action=="challenge":command.encounter_version=1
+	if not enemy_slot.is_empty():command.enemy_slot=enemy_slot
 	OnlineAccount.pending_pve = {"realm": realm, "character": character_id, "command": command}
 	retry()
 	changed.emit()

@@ -16,6 +16,10 @@ var picker:SkillPicker
 var effects:BattleEffects
 var move_callout:BattleMoveCallout
 var _effect_wait:=""
+var automatic:=false
+var auto_elapsed:=0.0
+var solo_countdown:=30.0
+var auto_button:Button
 var result:BattleResultView
 var queue:Array=[]
 var motion:BattleActionPlayback
@@ -43,14 +47,26 @@ func _ready()->void:
 	for i in 6:
 		var button:Button=menu.get_node("BattleButtons%d"%i);action_buttons.append(button);button.pressed.connect(_choose.bind(commands[i]))
 	action_buttons[2].text="3 防御";action_buttons[5].text="6 撤退"
-	command_toggle=preload("res://scripts/social_chrome.gd").placed_button(self,"战斗指令",Rect2(115,326,90,30))
+	command_toggle=_compact_button("战斗指令",Vector2(84,350))
 	command_toggle.pressed.connect(func()->void:menu.visible=not menu.visible)
+	auto_button=_compact_button("自动战斗",Vector2(164,350))
+	auto_button.hide();auto_button.pressed.connect(_toggle_auto)
 	inspect_panel=preload("res://scenes/ui/battle_inspect.tscn").instantiate();add_child(inspect_panel);inspect_panel.size.y=140;inspect_panel.hide()
 	var close:=OriginalSceneChrome.button(inspect_panel,"返回",Rect2(57,112,50,24),12);close.add_theme_color_override("font_color",Color("654518"));close.pressed.connect(inspect_panel.hide)
 	picker=SkillPicker.new();add_child(picker);picker.position.y=-28;picker.hide();picker.chosen.connect(func(id:String)->void:picker.hide();_send("skill",id));picker.dismissed.connect(picker.hide)
 	result=preload("res://scenes/ui/battle_result.tscn").instantiate();add_child(result)
 	result.finished.connect(_dismiss);result.get_node("Return").pressed.connect(_dismiss)
 	model.changed.connect(present)
+func _compact_button(text:String,point:Vector2)->Button:
+	var button:Button=preload("res://scripts/social_chrome.gd").placed_button(self,text,Rect2(point,Vector2(72,22)))
+	button.custom_minimum_size=Vector2.ZERO
+	button.add_theme_font_size_override("font_size",11)
+	for state_name in ["normal","hover","pressed","disabled"]:
+		var style:StyleBox=button.get_theme_stylebox(state_name).duplicate()
+		style.content_margin_top=2;style.content_margin_bottom=2
+		button.add_theme_stylebox_override(state_name,style)
+	button.size=Vector2(72,22)
+	return button
 func _dismiss()->void:
 	_closed=battle_id;_cancel();hide();dismissed.emit()
 func _cancel()->void:
@@ -79,6 +95,7 @@ func _actor(id:String,key:String,point:Vector2,enemy:bool)->void:
 	actors[id]={"sprite":sprite,"key":key,"tag":nameplate,"hp":hp,"mp":mp,"hit":hit,"home":point,"dead":false}
 func present()->void:
 	if not is_node_ready():return
+	if model.has_method("presentation_ready") and not model.presentation_ready():return
 	var b:Dictionary=model.battle()
 	if b.is_empty():
 		if visible:hide();dismissed.emit()
@@ -97,6 +114,7 @@ func present()->void:
 			_actor(e.slot,e.definition.art,Vector2(44+(i%2)*56,96+floori(float(i)/2)*78+(i%2)*30),true)
 	var packet_events:=int(b.get("events_revision",b.revision))
 	if events_revision!=packet_events:
+		solo_countdown=30.0;auto_elapsed=0.0
 		if revision>=0:
 			# Play already-authoritative events; never compute damage locally.
 			for event in b.events:
@@ -140,7 +158,7 @@ func _refresh_controls()->void:
 	var b:Dictionary=model.battle()
 	if b.is_empty():return
 	var executing:=motion!=null or not queue.is_empty() or not _effect_wait.is_empty()
-	caption.text=("单人遭遇" if b.fighters.size()==1 else "队伍战斗")+" · 第%d回合 · %d名敌人"%[maxi(1,int(b.round)-(1 if executing and b.has("commands") else 0)),b.enemies.size()]
+	caption.text=("单人遭遇" if b.fighters.size()==1 else "队伍战斗")+" · 第%d回合 · %d名敌人"%[maxi(1,int(b.round)-(1 if executing and (b.has("commands") or b.get("solo",false)) else 0)),b.enemies.size()]
 	var left:=maxi(0,ceili((int(b.deadline_ms)-model.server_time-(Time.get_ticks_msec()-model.received_at))/1000.0))
 	var message:="等待确认" if model.pending() else ("轮到你行动" if model.my_turn() else "等待队友")
 	if b.has("commands"):
@@ -150,18 +168,29 @@ func _refresh_controls()->void:
 		message="已提交 %d/%d · %s"%[b.commands.size(),alive,"请选择指令" if model.my_turn() else ("已锁定，等待队友" if b.commands.has(model.character_id) else "等待指令窗口")]
 		if motion!=null or not queue.is_empty() or not _effect_wait.is_empty() or model.server_time+Time.get_ticks_msec()-model.received_at<int(b.selection_starts_ms):message="逐个执行中 · 下轮指令共用30秒";left=0
 	hint.text=message if left==0 and b.has("commands") else "%s · %d秒"%[message,left]
+	if b.get("solo",false):hint.text="逐个行动中" if executing else ("等待确认" if model.pending() else "点击敌人选定目标，再选择指令")
 	if b.get("wounds",{}).has(model.character_id):hint.text+=" · 流血%d回合"%int(b.wounds[model.character_id][0])
 	for i in action_buttons.size():action_buttons[i].disabled=not model.active() or not model.can_submit() or motion!=null or not queue.is_empty() or not _effect_wait.is_empty() or (not model.my_turn() if i<4 else (not model.party().get("leader",false) if i==5 else false))
 	command_toggle.disabled=not model.active() or model.pending() or motion!=null or not queue.is_empty() or not _effect_wait.is_empty()
+	auto_button.visible=b.get("solo",false) and model.active()
+	command_toggle.position.x=84 if b.get("solo",false) else 124
+	auto_button.text="手动战斗" if automatic else "自动战斗"
+	auto_button.disabled=model.pending()
 	if not model.active():menu.hide();inspect_panel.hide();picker.hide()
+
+func _toggle_auto()->void:
+	if not model.active() or not model.battle().get("solo",false):return
+	automatic=not automatic;auto_elapsed=0.0;menu.hide();_refresh_controls()
 
 func _unhandled_key_input(event:InputEvent)->void:
 	if not visible or not event is InputEventKey or not event.pressed or picker.visible:return
-	if event.keycode>=KEY_1 and event.keycode<=KEY_6:
+	if event.keycode==KEY_0:_toggle_auto();get_viewport().set_input_as_handled()
+	elif event.keycode>=KEY_1 and event.keycode<=KEY_6:
 		_choose(["attack","skill","guard","potion","inspect","flee"][event.keycode-KEY_1]);get_viewport().set_input_as_handled()
 	elif event.keycode==KEY_ESCAPE:menu.hide();inspect_panel.hide();get_viewport().set_input_as_handled()
 func _process(delta:float)->void:
 	if not visible:return
+	if model.has_method("connected") and not model.connected():_cancel();hint.text="连接中断，正在恢复战斗……";return
 	move_callout.update_anchor()
 	if not _effect_wait.is_empty():
 		if effects.has_skill_effects(_effect_wait):return
@@ -176,7 +205,11 @@ func _process(delta:float)->void:
 	else:
 		_sync_final_resources()
 		_start_deaths()
-		if not model.active() and not model.battle().is_empty():result.present(model.battle().outcome,"队伍共享结算，奖励已由服务器保存。",true)
+		if not model.active() and not model.battle().is_empty() and not model.pending() and deaths.all(func(d:BattleDeathPlayback)->bool:return not d.active):
+			var details:="\n".join(PackedStringArray(model.battle().get("lines",[])))
+			var saved:=true
+			if model is SoloEncounter and model.pve==null and model.save_result!=null:saved=model.save_result.ok
+			result.present(model.battle().outcome,details,saved)
 	for death in deaths:death.advance(delta)
 	for a in actors.values():
 		a.tag.position=a.sprite.position+Vector2(-37,-67);a.hp.position=a.sprite.position+Vector2(-24,-50);a.hit.position=a.sprite.position-Vector2(32,60)
@@ -184,6 +217,13 @@ func _process(delta:float)->void:
 	target_marker.visible=actors.has(selected) and not actors[selected].dead
 	if target_marker.visible:target_marker.position=actors[selected].sprite.position+Vector2(0,4)
 	_refresh_controls()
+	if model.battle().get("solo",false) and model.my_turn() and motion==null and queue.is_empty() and _effect_wait.is_empty() and not picker.visible:
+		solo_countdown=maxf(0,solo_countdown-delta);auto_elapsed+=delta
+		if automatic and auto_elapsed>=1.4:
+			auto_elapsed=0
+			var command:Dictionary=model.auto_command() if model.has_method("auto_command") else {"action":"attack","skill":""}
+			_send(command.action,command.skill)
+		elif solo_countdown==0:solo_countdown=30;_send("guard")
 func _sync_final_resources()->void:
 	var b:Dictionary=model.battle()
 	if b.is_empty():return
@@ -191,6 +231,9 @@ func _sync_final_resources()->void:
 		_display(f.id,f.name+" Lv."+str(int(f.level)),int(f.hp),int(f.stats.hp))
 		actors[f.id].mp.max_value=f.stats.mp;actors[f.id].mp.value=f.mp
 	for e in b.enemies:_display(e.slot,e.definition.name+" Lv."+str(int(e.definition.level)),int(e.hp),int(e.definition.hp))
+	if not actors.has(selected) or actors[selected].dead:
+		for e in b.enemies:
+			if int(e.hp)>0:selected=e.slot;break
 func _start_deaths()->void:
 	for a in actors.values():
 		if a.dead and a.sprite.visible:
@@ -216,9 +259,12 @@ func _play(event:Dictionary)->void:
 			healer.hp.value=minf(healer.hp.max_value,healer.hp.value+int(hit.healed));healer.dead=healer.hp.value<=0
 			effects.number(receiver.sprite,int(hit.damage),hit.get("critical",false))
 			effects.number(a.sprite if hit.actor!=hit.target and SkillRules.item(hit.get("skill","")).get("target")!="all_allies" else receiver.sprite,int(hit.healed),false,true)
-			if hit.action=="skill":effects.play_binding(hit.skill,"cast_impact",receiver.sprite if SkillRules.item(hit.skill).get("target")=="all_allies" else a.sprite,receiver.sprite)
+			if hit.action=="skill":effects.play_binding(hit.skill,"cast_impact",receiver.sprite if SkillRules.item(hit.skill).get("target")=="all_allies" else a.sprite,receiver.sprite,hit==group[0])
+			elif hit.action=="attack":effects.attach("effect/flash",receiver.sprite)
 			if int(hit.damage)>0 and receiver.sprite.sprite_frames.has_animation("hurt"):receiver.sprite.play("hurt")
 	)
 	motion.start(a.sprite,OriginalArt.actor_info(a.key),target.sprite.global_position,mode,target.sprite)
 	if String(event.skill).begins_with("monster_"):move_callout.present_for("流血" if event.skill=="monster_bleed" else MonsterCombat.action_name(event.skill),a.sprite,motion.duration)
 	elif event.action=="skill":move_callout.present_for(SkillRules.item(event.skill).get("name",""),a.sprite,motion.duration)
+
+func _exit_tree()->void:_cancel()

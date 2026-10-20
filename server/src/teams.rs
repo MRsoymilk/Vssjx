@@ -4,6 +4,7 @@ use crate::{
     auth::{self, AuthError, Peer},
     team_rules::{Battle, MAX_MEMBERS},
 };
+use rand::Rng;
 use axum::{
     Json,
     extract::{State, rejection::JsonRejection},
@@ -586,7 +587,7 @@ async fn apply(
                 .collect();
             let mut sources = vec![enemy.clone()];
             let n = if ids.len() == 1 {
-                1
+                if enemy.kind=="boss"&&pool.is_empty(){1}else{crate::monster_combat::solo_count(rand::thread_rng().gen_range(0..100))}
             } else {
                 (ids.len() + usize::from(rand::random::<bool>())).min(5)
             };

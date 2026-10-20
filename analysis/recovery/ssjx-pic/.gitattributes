@@ -1,0 +1,5 @@
+# Parent recovery rules normalize text; image payloads must remain byte-identical.
+*.png -text -diff
+*.jpg -text -diff
+*.jpeg -text -diff
+*.webp -text -diff

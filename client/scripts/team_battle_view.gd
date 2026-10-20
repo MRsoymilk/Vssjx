@@ -77,6 +77,7 @@ func _cancel()->void:
 	motion=null;queue=[]
 	for d in deaths:d.cancel()
 	deaths=[]
+	_refresh_actor_anchors()
 func _clear()->void:
 	_cancel()
 	for child in actors_layer.get_children():actors_layer.remove_child(child);child.queue_free()
@@ -92,7 +93,8 @@ func _actor(id:String,key:String,point:Vector2,enemy:bool)->void:
 	var hit:=Button.new();hit.flat=true;hit.size=Vector2(65,65);hit.mouse_default_cursor_shape=Control.CURSOR_POINTING_HAND;add_child(hit)
 	if enemy:hit.pressed.connect(func()->void:selected=id;_refresh_controls();menu.show())
 	else:hit.pressed.connect(func()->void:menu.show())
-	actors[id]={"sprite":sprite,"key":key,"tag":nameplate,"hp":hp,"mp":mp,"hit":hit,"home":point,"dead":false}
+	var info:=OriginalArt.actor_info(key)
+	actors[id]={"base_offset_x":float(info.origin[0])-float(info.get("anchor_x",0)),"sprite":sprite,"key":key,"tag":nameplate,"hp":hp,"mp":mp,"hit":hit,"home":point,"dead":false}
 func present()->void:
 	if not is_node_ready():return
 	if model.has_method("presentation_ready") and not model.presentation_ready():return
@@ -131,6 +133,7 @@ func present()->void:
 	if not actors.has(selected) or actors[selected].dead:
 		for e in b.enemies:
 			if e.hp>0:selected=e.slot;break
+	_refresh_actor_anchors()
 	show();_refresh_controls()
 func _display(id:String,text:String,hp:int,max_hp:int)->void:
 	if not actors.has(id):return
@@ -194,6 +197,7 @@ func _process(delta:float)->void:
 	if not visible:return
 	if model.has_method("connected") and not model.connected():_cancel();hint.text="连接中断，正在恢复战斗……";return
 	move_callout.update_anchor()
+	_refresh_actor_anchors()
 	if not _effect_wait.is_empty():
 		if effects.has_skill_effects(_effect_wait):return
 		_effect_wait=""
@@ -219,11 +223,7 @@ func _process(delta:float)->void:
 			if model is SoloEncounter and model.pve==null and model.save_result!=null:saved=model.save_result.ok
 			result.present(model.battle().outcome,details,saved)
 	for death in deaths:death.advance(delta)
-	for a in actors.values():
-		a.tag.position=a.sprite.position+Vector2(-37,-67);a.hp.position=a.sprite.position+Vector2(-24,-50);a.hit.position=a.sprite.position-Vector2(32,60)
-		if a.mp!=null:a.mp.position=a.sprite.position+Vector2(-24,-44)
-	target_marker.visible=actors.has(selected) and not actors[selected].dead
-	if target_marker.visible:target_marker.position=actors[selected].sprite.position+Vector2(0,4)
+	_refresh_actor_anchors()
 	_refresh_controls()
 	if model.battle().get("solo",false) and model.my_turn() and motion==null and queue.is_empty() and _effect_wait.is_empty() and not picker.visible:
 		solo_countdown=maxf(0,solo_countdown-delta);auto_elapsed+=delta
@@ -232,6 +232,22 @@ func _process(delta:float)->void:
 			var command:Dictionary=model.auto_command() if model.has_method("auto_command") else {"action":"attack","skill":""}
 			_send(command.action,command.skill)
 		elif solo_countdown==0:solo_countdown=30;_send("guard")
+func _actor_hud_anchor(a:Dictionary)->Vector2:
+	# Native battle frames restore head translations removed by the stable atlas.
+	# Equipped attacks can shift the visible body far from its logical sprite root.
+	var body:=Vector2.ZERO
+	if a.sprite.get_meta("native_ground_anchor",false):body.x=a.sprite.offset.x-float(a.base_offset_x)
+	return get_global_transform_with_canvas().affine_inverse()*(a.sprite.get_global_transform_with_canvas()*body)
+func _refresh_actor_anchors()->void:
+	for a in actors.values():
+		var point:=_actor_hud_anchor(a)
+		a.tag.position=point+Vector2(-a.tag.size.x/2,-67)
+		a.hp.position=point+Vector2(-a.hp.size.x/2,-50)
+		a.hit.position=point+Vector2(-a.hit.size.x/2,-60)
+		if a.mp!=null:a.mp.position=point+Vector2(-a.mp.size.x/2,-44)
+	if is_instance_valid(target_marker):
+		target_marker.visible=actors.has(selected) and not actors[selected].dead
+		if target_marker.visible:target_marker.position=_actor_hud_anchor(actors[selected])+Vector2(0,4)
 func _sync_final_resources()->void:
 	var b:Dictionary=model.battle()
 	if b.is_empty():return

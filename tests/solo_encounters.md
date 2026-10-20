@@ -33,3 +33,14 @@ python tests/run_solo_encounters.py
 ```
 
 本地渲染截图位于忽略的 `work/solo-formation.png`，不提交测试账号数据、临时存档或运行日志。此记录不代表已有网页／APK已经更新，也不宣称所有等级／装备的胜率均已完成平衡仿真。
+
+
+## 换装角色头顶血条（2026-10-21）
+
+原问题在新定位专项中可复现：54项中45项失败，攻击帧的姓名、气血和灵力与显示人物分离。修复后54项全部通过，实际OpenGL画面检查正常；覆盖左右朝向、连续动作采样、自然回位、取消、演员层平移／缩放及技能特效等待。现有组队回合54项、单人遭遇55项、精英及复活22项通过，角色数据和战斗规则未修改。
+
+```powershell
+godot --path client --rendering-method gl_compatibility res://tests/battle_hud_anchor_test.tscn
+```
+
+实际攻击截图与过程日志保存在忽略的 `work/battle-hud-anchor.png`、`work/hud-anchor-*`，未重新导出或部署客户端。

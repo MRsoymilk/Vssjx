@@ -1,0 +1,1420 @@
+{
+  "format_version": 1,
+  "source": "用户ssjx_pic截图 + built-in image_gen编辑",
+  "status": "静态透明人物修复稿，供审阅；未绑定运行NPC",
+  "summary": {
+    "appearance_assets": 20,
+    "covered_npc_observations": 27,
+    "unresolved_identity_only": 2,
+    "repair_types": {
+      "background_removal": 10,
+      "full_body_reconstruction": 1,
+      "edge_completion": 4,
+      "occlusion_fill": 5
+    },
+    "rgba_verified": 20,
+    "original_crops_preserved": true,
+    "image_bytes": 14918564,
+    "original_gameplay_bindings_changed": 0
+  },
+  "records": [
+    {
+      "id": "budai-xianren",
+      "name": "布袋仙人",
+      "appearance_group": "bag-monk",
+      "texture": "res://assets/recovered/ssjx_pic/npcs/budai-xianren.png",
+      "path": "client/assets/recovered/ssjx_pic/npcs/budai-xianren.png",
+      "sha256": "67a9637ac5ae19111510899ca1eb1c3c42d3a356c86e7fcbb3baea576c29929b",
+      "image": {
+        "width": 1305,
+        "height": 1206,
+        "mode": "RGBA",
+        "alpha_range": [
+          0,
+          255
+        ],
+        "transparent_pixels": 906837,
+        "transparent_fraction": 0.576198,
+        "visible_alpha_threshold": 16,
+        "visible_rect_xyxy": [
+          179,
+          62,
+          1194,
+          1116
+        ],
+        "foot_anchor_pixels": [
+          686.5,
+          1116
+        ],
+        "visible_margin_pixels": [
+          179,
+          62,
+          111,
+          90
+        ]
+      },
+      "repair_type": "background_removal",
+      "repair_label": "AI辅助去背景",
+      "repair_instructions": "Only remove scenery; preserve the visible complete silhouette.",
+      "ai_edited": true,
+      "exact_original_pixels": false,
+      "original_animation_recovered": false,
+      "frames": 1,
+      "runtime_enabled": false,
+      "source_crop": "analysis/recovery/ssjx-pic/crops/npc/budai-xianren.png",
+      "source_crop_sha256": "5450cf0947334fa2d955ab22573d8e08d06061deb95702bd04d8455ba4b3baae",
+      "source_region_ids": [
+        "budai-xianren"
+      ],
+      "aliases": [
+        {
+          "region_id": "budai-xianren",
+          "name": "布袋仙人",
+          "service": "活动兑奖",
+          "source_screenshot": "analysis/references/ssjx-pic/7.jpg",
+          "source_bbox": [
+            68,
+            214,
+            164,
+            312
+          ],
+          "name_confidence": "not_separately_assessed"
+        }
+      ]
+    },
+    {
+      "id": "fashion-vendor",
+      "name": "时尚先锋",
+      "appearance_group": "long-black-hair",
+      "texture": "res://assets/recovered/ssjx_pic/npcs/fashion-vendor.png",
+      "path": "client/assets/recovered/ssjx_pic/npcs/fashion-vendor.png",
+      "sha256": "b0d095b8582d1944d77779f6e04ffc5e75c9d0f846119d2bb61d8cafccf2ca69",
+      "image": {
+        "width": 1202,
+        "height": 1308,
+        "mode": "RGBA",
+        "alpha_range": [
+          0,
+          255
+        ],
+        "transparent_pixels": 1002436,
+        "transparent_fraction": 0.637594,
+        "visible_alpha_threshold": 16,
+        "visible_rect_xyxy": [
+          308,
+          93,
+          924,
+          1240
+        ],
+        "foot_anchor_pixels": [
+          616.0,
+          1240
+        ],
+        "visible_margin_pixels": [
+          308,
+          93,
+          278,
+          68
+        ]
+      },
+      "repair_type": "full_body_reconstruction",
+      "repair_label": "缺失身体补全",
+      "repair_instructions": "The reference shows only the head and upper shoulders; conservatively reconstruct a short full chibi body in a simple dark period robe, sleeves and two shoes. Preserve the exact visible face and hair; the unseen lower body is an inferred repair, not a new ornate design.",
+      "ai_edited": true,
+      "exact_original_pixels": false,
+      "original_animation_recovered": false,
+      "frames": 1,
+      "runtime_enabled": false,
+      "source_crop": "analysis/recovery/ssjx-pic/crops/npc/fashion-vendor.png",
+      "source_crop_sha256": "dd84e5f0cc944dc4abcb6bdf19c8479beac775193d047a3edbe917ece865aa59",
+      "source_region_ids": [
+        "fashion-vendor"
+      ],
+      "aliases": [
+        {
+          "region_id": "fashion-vendor",
+          "name": "时尚先锋",
+          "service": "外装商人",
+          "source_screenshot": "analysis/references/ssjx-pic/7.jpg",
+          "source_bbox": [
+            268,
+            530,
+            340,
+            602
+          ],
+          "name_confidence": "not_separately_assessed"
+        }
+      ]
+    },
+    {
+      "id": "baishouxian",
+      "name": "白蛇仙",
+      "appearance_group": "grey-face-red-band",
+      "texture": "res://assets/recovered/ssjx_pic/npcs/baishouxian.png",
+      "path": "client/assets/recovered/ssjx_pic/npcs/baishouxian.png",
+      "sha256": "753fc5c60d76c8bde9f71704d50aba14c9702b2a0f0c13755e77f803e79be019",
+      "image": {
+        "width": 1050,
+        "height": 1498,
+        "mode": "RGBA",
+        "alpha_range": [
+          0,
+          255
+        ],
+        "transparent_pixels": 990329,
+        "transparent_fraction": 0.62962,
+        "visible_alpha_threshold": 16,
+        "visible_rect_xyxy": [
+          152,
+          60,
+          923,
+          1440
+        ],
+        "foot_anchor_pixels": [
+          537.5,
+          1440
+        ],
+        "visible_margin_pixels": [
+          152,
+          60,
+          127,
+          58
+        ]
+      },
+      "repair_type": "background_removal",
+      "repair_label": "AI辅助去背景",
+      "repair_instructions": "The character is complete: remove only the yellow ground and exterior shadow. Keep both arms, original pose, grey skin and turquoise sash.",
+      "ai_edited": true,
+      "exact_original_pixels": false,
+      "original_animation_recovered": false,
+      "frames": 1,
+      "runtime_enabled": false,
+      "source_crop": "analysis/recovery/ssjx-pic/crops/npc/baishouxian.png",
+      "source_crop_sha256": "c128daf6e02aca8c6384c9280f73ac53fa7fb139f98e93ddf7cd0cbf2c779187",
+      "source_region_ids": [
+        "baishouxian"
+      ],
+      "aliases": [
+        {
+          "region_id": "baishouxian",
+          "name": "白蛇仙",
+          "service": "商店",
+          "source_screenshot": "analysis/references/ssjx-pic/26.jpg",
+          "source_bbox": [
+            40,
+            310,
+            130,
+            458
+          ],
+          "name_confidence": "not_separately_assessed"
+        }
+      ]
+    },
+    {
+      "id": "crane-daren",
+      "name": "达人使者／博浪沙火鹤",
+      "appearance_group": "white-crane",
+      "texture": "res://assets/recovered/ssjx_pic/npcs/crane-daren.png",
+      "path": "client/assets/recovered/ssjx_pic/npcs/crane-daren.png",
+      "sha256": "f95995aded956a792ca1c3db1369aec47674c607549e8a6868dea404cd65e7e1",
+      "image": {
+        "width": 926,
+        "height": 1698,
+        "mode": "RGBA",
+        "alpha_range": [
+          0,
+          255
+        ],
+        "transparent_pixels": 1087071,
+        "transparent_fraction": 0.691368,
+        "visible_alpha_threshold": 16,
+        "visible_rect_xyxy": [
+          107,
+          19,
+          820,
+          1667
+        ],
+        "foot_anchor_pixels": [
+          463.5,
+          1667
+        ],
+        "visible_margin_pixels": [
+          107,
+          19,
+          106,
+          31
+        ]
+      },
+      "repair_type": "background_removal",
+      "repair_label": "AI辅助去背景",
+      "repair_instructions": "Preserve the complete crane, including fine beak and thin feet. Remove all grass and ground shadow.",
+      "ai_edited": true,
+      "exact_original_pixels": false,
+      "original_animation_recovered": false,
+      "frames": 1,
+      "runtime_enabled": false,
+      "source_crop": "analysis/recovery/ssjx-pic/crops/npc/crane-daren.png",
+      "source_crop_sha256": "24f26cfbf98117832d8cfff294754dcaeed2b433f93b1b730f0fe3dc5e095a52",
+      "source_region_ids": [
+        "crane-daren",
+        "crane-dungeon"
+      ],
+      "aliases": [
+        {
+          "region_id": "crane-daren",
+          "name": "达人使者",
+          "service": "达人使者",
+          "source_screenshot": "analysis/references/ssjx-pic/6.jpg",
+          "source_bbox": [
+            326,
+            270,
+            410,
+            424
+          ],
+          "name_confidence": "not_separately_assessed"
+        },
+        {
+          "region_id": "crane-dungeon",
+          "name": "博浪沙火鹤",
+          "service": "副本传送",
+          "source_screenshot": "analysis/references/ssjx-pic/53.jpg",
+          "source_bbox": [
+            74,
+            346,
+            156,
+            494
+          ],
+          "name_confidence": "not_separately_assessed"
+        }
+      ]
+    },
+    {
+      "id": "tan-chang",
+      "name": "谭长（读字待核）",
+      "appearance_group": "white-beard-staff",
+      "texture": "res://assets/recovered/ssjx_pic/npcs/tan-chang.png",
+      "path": "client/assets/recovered/ssjx_pic/npcs/tan-chang.png",
+      "sha256": "70c39dbfa5152dd8dbadfc2645d46f7f1add4c7336cba47dbd72c99ddbad7203",
+      "image": {
+        "width": 1267,
+        "height": 1241,
+        "mode": "RGBA",
+        "alpha_range": [
+          0,
+          255
+        ],
+        "transparent_pixels": 1052747,
+        "transparent_fraction": 0.669539,
+        "visible_alpha_threshold": 16,
+        "visible_rect_xyxy": [
+          185,
+          49,
+          1054,
+          1193
+        ],
+        "foot_anchor_pixels": [
+          619.5,
+          1193
+        ],
+        "visible_margin_pixels": [
+          185,
+          49,
+          213,
+          48
+        ]
+      },
+      "repair_type": "edge_completion",
+      "repair_label": "边缘补全",
+      "repair_instructions": "Restore the tiny cut-off staff tip if necessary. Keep original elderly facial features, pose and the visible coarse pixel outlines.",
+      "ai_edited": true,
+      "exact_original_pixels": false,
+      "original_animation_recovered": false,
+      "frames": 1,
+      "runtime_enabled": false,
+      "source_crop": "analysis/recovery/ssjx-pic/crops/npc/tan-chang.png",
+      "source_crop_sha256": "f6638f550ee24d70fb8980a5c32b017f4487d757c2d2f1bcc87f919617dfec5e",
+      "source_region_ids": [
+        "tan-chang"
+      ],
+      "aliases": [
+        {
+          "region_id": "tan-chang",
+          "name": "谭长",
+          "service": "仓库管理",
+          "source_screenshot": "analysis/references/ssjx-pic/39.jpg",
+          "source_bbox": [
+            150,
+            334,
+            216,
+            426
+          ],
+          "name_confidence": "medium"
+        }
+      ]
+    },
+    {
+      "id": "zhu-liang",
+      "name": "朱亮",
+      "appearance_group": "white-hair-green-robe",
+      "texture": "res://assets/recovered/ssjx_pic/npcs/zhu-liang.png",
+      "path": "client/assets/recovered/ssjx_pic/npcs/zhu-liang.png",
+      "sha256": "06822a5ade78e50ca808290003ecc679d9cbd44633b1330f772f1ee5c61a00da",
+      "image": {
+        "width": 979,
+        "height": 1606,
+        "mode": "RGBA",
+        "alpha_range": [
+          0,
+          255
+        ],
+        "transparent_pixels": 832307,
+        "transparent_fraction": 0.529365,
+        "visible_alpha_threshold": 16,
+        "visible_rect_xyxy": [
+          116,
+          74,
+          873,
+          1541
+        ],
+        "foot_anchor_pixels": [
+          494.5,
+          1541
+        ],
+        "visible_margin_pixels": [
+          116,
+          74,
+          106,
+          65
+        ]
+      },
+      "repair_type": "occlusion_fill",
+      "repair_label": "遮挡修复",
+      "repair_instructions": "Remove turquoise/gold fragments belonging to the neighbouring player at the top. Reconstruct only the occluded crown edge of the existing white hairstyle. Keep robe, face, pose and shoes.",
+      "ai_edited": true,
+      "exact_original_pixels": false,
+      "original_animation_recovered": false,
+      "frames": 1,
+      "runtime_enabled": false,
+      "source_crop": "analysis/recovery/ssjx-pic/crops/npc/zhu-liang.png",
+      "source_crop_sha256": "ae93fc8b86f82e3b8de21d6646937c1b790e81b668c07451e922cafeb4c9ee2c",
+      "source_region_ids": [
+        "zhu-liang"
+      ],
+      "aliases": [
+        {
+          "region_id": "zhu-liang",
+          "name": "朱亮",
+          "service": null,
+          "source_screenshot": "analysis/references/ssjx-pic/43.jpg",
+          "source_bbox": [
+            164,
+            330,
+            242,
+            458
+          ],
+          "name_confidence": "not_separately_assessed"
+        }
+      ]
+    },
+    {
+      "id": "jiang-xier",
+      "name": "金萍／蒋绣儿（读字待核）",
+      "appearance_group": "yellow-hair-flower",
+      "texture": "res://assets/recovered/ssjx_pic/npcs/jiang-xier.png",
+      "path": "client/assets/recovered/ssjx_pic/npcs/jiang-xier.png",
+      "sha256": "14e9b4726d9abeaa87eda81a725972cd68831f54deb0b5cc4a31200db24d74b3",
+      "image": {
+        "width": 1217,
+        "height": 1293,
+        "mode": "RGBA",
+        "alpha_range": [
+          0,
+          255
+        ],
+        "transparent_pixels": 837862,
+        "transparent_fraction": 0.532456,
+        "visible_alpha_threshold": 16,
+        "visible_rect_xyxy": [
+          86,
+          53,
+          1131,
+          1211
+        ],
+        "foot_anchor_pixels": [
+          608.5,
+          1211
+        ],
+        "visible_margin_pixels": [
+          86,
+          53,
+          86,
+          82
+        ]
+      },
+      "repair_type": "edge_completion",
+      "repair_label": "边缘补全",
+      "repair_instructions": "Remove all neighbouring character fragments at right; restore clipped tips of the right-side curled hair and leaves to match the intact left-side style. Preserve face, smile, original pose and short proportions.",
+      "ai_edited": true,
+      "exact_original_pixels": false,
+      "original_animation_recovered": false,
+      "frames": 1,
+      "runtime_enabled": false,
+      "source_crop": "analysis/recovery/ssjx-pic/crops/npc/jiang-xier.png",
+      "source_crop_sha256": "a20c0e20f440fb9751330e0e1e2f4e342a7debb4b83deca1e751a947692bbf8a",
+      "source_region_ids": [
+        "jin-ping",
+        "jiang-xier"
+      ],
+      "aliases": [
+        {
+          "region_id": "jin-ping",
+          "name": "金萍",
+          "service": null,
+          "source_screenshot": "analysis/references/ssjx-pic/43.jpg",
+          "source_bbox": [
+            396,
+            242,
+            480,
+            350
+          ],
+          "name_confidence": "not_separately_assessed"
+        },
+        {
+          "region_id": "jiang-xier",
+          "name": "蒋绣儿",
+          "service": null,
+          "source_screenshot": "analysis/references/ssjx-pic/67.jpg",
+          "source_bbox": [
+            118,
+            284,
+            212,
+            384
+          ],
+          "name_confidence": "low"
+        }
+      ]
+    },
+    {
+      "id": "yi-zhou",
+      "name": "易周",
+      "appearance_group": "spiky-grey-hair-robe",
+      "texture": "res://assets/recovered/ssjx_pic/npcs/yi-zhou.png",
+      "path": "client/assets/recovered/ssjx_pic/npcs/yi-zhou.png",
+      "sha256": "766ba318fd27b530529840f10c269c475466dfd3cba3d77c619a4883d8b7ed9b",
+      "image": {
+        "width": 1114,
+        "height": 1412,
+        "mode": "RGBA",
+        "alpha_range": [
+          0,
+          255
+        ],
+        "transparent_pixels": 972171,
+        "transparent_fraction": 0.618049,
+        "visible_alpha_threshold": 16,
+        "visible_rect_xyxy": [
+          192,
+          89,
+          975,
+          1328
+        ],
+        "foot_anchor_pixels": [
+          583.5,
+          1328
+        ],
+        "visible_margin_pixels": [
+          192,
+          89,
+          139,
+          84
+        ]
+      },
+      "repair_type": "edge_completion",
+      "repair_label": "边缘补全",
+      "repair_instructions": "The right edge cuts off the staff and possibly hand. Restore the short missing edge and staff, keeping the visible design and pose; do not add weapons or ornaments. Remove the lava and purple ground completely.",
+      "ai_edited": true,
+      "exact_original_pixels": false,
+      "original_animation_recovered": false,
+      "frames": 1,
+      "runtime_enabled": false,
+      "source_crop": "analysis/recovery/ssjx-pic/crops/npc/yi-zhou.png",
+      "source_crop_sha256": "eebd8a460a0b981df4437da623fa631b63a501d2625f73eec9de8bf72fc17fff",
+      "source_region_ids": [
+        "yi-zhou"
+      ],
+      "aliases": [
+        {
+          "region_id": "yi-zhou",
+          "name": "易周",
+          "service": null,
+          "source_screenshot": "analysis/references/ssjx-pic/33.jpg",
+          "source_bbox": [
+            398,
+            244,
+            480,
+            348
+          ],
+          "name_confidence": "not_separately_assessed"
+        }
+      ]
+    },
+    {
+      "id": "yi-jing",
+      "name": "易静／隐名剑仙",
+      "appearance_group": "blue-grey-hair-green-robe",
+      "texture": "res://assets/recovered/ssjx_pic/npcs/yi-jing.png",
+      "path": "client/assets/recovered/ssjx_pic/npcs/yi-jing.png",
+      "sha256": "c68e113ee65d14929184318f0dc9e3d3b8254c3e82c5a0fd7f10c1423c65e31c",
+      "image": {
+        "width": 1020,
+        "height": 1542,
+        "mode": "RGBA",
+        "alpha_range": [
+          0,
+          255
+        ],
+        "transparent_pixels": 819111,
+        "transparent_fraction": 0.520785,
+        "visible_alpha_threshold": 16,
+        "visible_rect_xyxy": [
+          105,
+          86,
+          924,
+          1469
+        ],
+        "foot_anchor_pixels": [
+          514.5,
+          1469
+        ],
+        "visible_margin_pixels": [
+          105,
+          86,
+          96,
+          73
+        ]
+      },
+      "repair_type": "background_removal",
+      "repair_label": "AI辅助去背景",
+      "repair_instructions": "Keep the complete head-to-shoes original pose and blades, cleanly remove snowy ground and shadow. Preserve grey-blue hair and green face, do not change apparent identity.",
+      "ai_edited": true,
+      "exact_original_pixels": false,
+      "original_animation_recovered": false,
+      "frames": 1,
+      "runtime_enabled": false,
+      "source_crop": "analysis/recovery/ssjx-pic/crops/npc/yi-jing.png",
+      "source_crop_sha256": "2e7e5c3eb5e6ec4d93905b743d1b2db6ba05b0335b4e306ac12e46a741b61621",
+      "source_region_ids": [
+        "yi-jing",
+        "yinming-jianxian"
+      ],
+      "aliases": [
+        {
+          "region_id": "yi-jing",
+          "name": "易静",
+          "service": null,
+          "source_screenshot": "analysis/references/ssjx-pic/45.jpg",
+          "source_bbox": [
+            332,
+            218,
+            418,
+            348
+          ],
+          "name_confidence": "not_separately_assessed"
+        },
+        {
+          "region_id": "yinming-jianxian",
+          "name": "隐名剑仙",
+          "service": "门派商店",
+          "source_screenshot": "analysis/references/ssjx-pic/100.webp",
+          "source_bbox": [
+            394,
+            220,
+            480,
+            352
+          ],
+          "name_confidence": "not_separately_assessed"
+        }
+      ]
+    },
+    {
+      "id": "zhou-qingyun",
+      "name": "周轻云",
+      "appearance_group": "red-flower-gold-cap",
+      "texture": "res://assets/recovered/ssjx_pic/npcs/zhou-qingyun.png",
+      "path": "client/assets/recovered/ssjx_pic/npcs/zhou-qingyun.png",
+      "sha256": "d430dd224c0558a1e4cb323b48cf09394bfc3f3ad7e90d82ea4154f8394cd769",
+      "image": {
+        "width": 1083,
+        "height": 1453,
+        "mode": "RGBA",
+        "alpha_range": [
+          0,
+          255
+        ],
+        "transparent_pixels": 892315,
+        "transparent_fraction": 0.567054,
+        "visible_alpha_threshold": 16,
+        "visible_rect_xyxy": [
+          88,
+          77,
+          1006,
+          1373
+        ],
+        "foot_anchor_pixels": [
+          547.0,
+          1373
+        ],
+        "visible_margin_pixels": [
+          88,
+          77,
+          77,
+          80
+        ]
+      },
+      "repair_type": "background_removal",
+      "repair_label": "AI辅助去背景",
+      "repair_instructions": "Preserve all character pixels and pose; remove green grass and exterior ground shadow. Do not invent jewellery, weapons or different clothes.",
+      "ai_edited": true,
+      "exact_original_pixels": false,
+      "original_animation_recovered": false,
+      "frames": 1,
+      "runtime_enabled": false,
+      "source_crop": "analysis/recovery/ssjx-pic/crops/npc/zhou-qingyun.png",
+      "source_crop_sha256": "04df6367ed4f24b553d8ed5a4b9969fb74811f98a332011a4e8722dd3a15a07d",
+      "source_region_ids": [
+        "zhou-qingyun"
+      ],
+      "aliases": [
+        {
+          "region_id": "zhou-qingyun",
+          "name": "周轻云",
+          "service": null,
+          "source_screenshot": "analysis/references/ssjx-pic/50.jpg",
+          "source_bbox": [
+            274,
+            240,
+            356,
+            350
+          ],
+          "name_confidence": "not_separately_assessed"
+        }
+      ]
+    },
+    {
+      "id": "jingji-envoy",
+      "name": "竞技活动使者／笑和尚",
+      "appearance_group": "moustache-monk",
+      "texture": "res://assets/recovered/ssjx_pic/npcs/jingji-envoy.png",
+      "path": "client/assets/recovered/ssjx_pic/npcs/jingji-envoy.png",
+      "sha256": "d521cc0302956a1fada90c038bade1bb9aa5f61138c6ff157be03ccccb9ee40b",
+      "image": {
+        "width": 929,
+        "height": 1693,
+        "mode": "RGBA",
+        "alpha_range": [
+          0,
+          255
+        ],
+        "transparent_pixels": 984310,
+        "transparent_fraction": 0.625834,
+        "visible_alpha_threshold": 16,
+        "visible_rect_xyxy": [
+          92,
+          102,
+          873,
+          1607
+        ],
+        "foot_anchor_pixels": [
+          482.5,
+          1607
+        ],
+        "visible_margin_pixels": [
+          92,
+          102,
+          56,
+          86
+        ]
+      },
+      "repair_type": "edge_completion",
+      "repair_label": "边缘补全",
+      "repair_instructions": "Remove the blue name-label fragments at the top and yellow ground. If the scalp touches the label, restore the natural rounded bald outline. Keep original moustache, tan robe and standing pose.",
+      "ai_edited": true,
+      "exact_original_pixels": false,
+      "original_animation_recovered": false,
+      "frames": 1,
+      "runtime_enabled": false,
+      "source_crop": "analysis/recovery/ssjx-pic/crops/npc/jingji-envoy.png",
+      "source_crop_sha256": "3a4dfca86899842c443c55f2b78aadabae369b412acb0a3d212a4b1f31e06d80",
+      "source_region_ids": [
+        "xiao-heshang",
+        "jingji-envoy"
+      ],
+      "aliases": [
+        {
+          "region_id": "xiao-heshang",
+          "name": "笑和尚",
+          "service": "仙境使者",
+          "source_screenshot": "analysis/references/ssjx-pic/53.jpg",
+          "source_bbox": [
+            340,
+            224,
+            400,
+            348
+          ],
+          "name_confidence": "not_separately_assessed"
+        },
+        {
+          "region_id": "jingji-envoy",
+          "name": "姓名未显示·竞技活动使者",
+          "service": "竞技活动",
+          "source_screenshot": "analysis/references/ssjx-pic/71.jpg",
+          "source_bbox": [
+            204,
+            112,
+            272,
+            236
+          ],
+          "name_confidence": "unknown"
+        }
+      ]
+    },
+    {
+      "id": "brown-mask-full",
+      "name": "诸有功／新颠仙（读字待核）",
+      "appearance_group": "brown-hair-mask",
+      "texture": "res://assets/recovered/ssjx_pic/npcs/brown-mask-full.png",
+      "path": "client/assets/recovered/ssjx_pic/npcs/brown-mask-full.png",
+      "sha256": "237b8f4ca04b8ce947b78d27b9dd65ea42d75caee93cac59548262b36fed9c41",
+      "image": {
+        "width": 1012,
+        "height": 1554,
+        "mode": "RGBA",
+        "alpha_range": [
+          0,
+          255
+        ],
+        "transparent_pixels": 769003,
+        "transparent_fraction": 0.488986,
+        "visible_alpha_threshold": 16,
+        "visible_rect_xyxy": [
+          168,
+          32,
+          870,
+          1523
+        ],
+        "foot_anchor_pixels": [
+          519.0,
+          1523
+        ],
+        "visible_margin_pixels": [
+          168,
+          32,
+          142,
+          31
+        ]
+      },
+      "repair_type": "occlusion_fill",
+      "repair_label": "遮挡修复",
+      "repair_instructions": "Remove all green lettering at top and the brightly coloured player/equipment overlapping lower left. Reconstruct only occluded left robe hem and left shoulder matching visible right-side design and original pose; keep face, hair, gold pattern, grey skin.",
+      "ai_edited": true,
+      "exact_original_pixels": false,
+      "original_animation_recovered": false,
+      "frames": 1,
+      "runtime_enabled": false,
+      "source_crop": "analysis/recovery/ssjx-pic/crops/npc/brown-mask-full.png",
+      "source_crop_sha256": "1367e5389001cf25478bae64f286bb574e4b717f342699a9a305a20c938eaf55",
+      "source_region_ids": [
+        "zhu-yougong",
+        "brown-mask-full"
+      ],
+      "aliases": [
+        {
+          "region_id": "zhu-yougong",
+          "name": "诸有功",
+          "service": "帮会管理",
+          "source_screenshot": "analysis/references/ssjx-pic/54.jpg",
+          "source_bbox": [
+            96,
+            498,
+            184,
+            602
+          ],
+          "name_confidence": "not_separately_assessed"
+        },
+        {
+          "region_id": "brown-mask-full",
+          "name": "新颠仙（读字待核）",
+          "service": "帮会管理",
+          "source_screenshot": "analysis/references/ssjx-pic/60.jpg",
+          "source_bbox": [
+            362,
+            240,
+            448,
+            372
+          ],
+          "name_confidence": "low"
+        }
+      ]
+    },
+    {
+      "id": "grocery-boss",
+      "name": "杂货店老板及同外观商人",
+      "appearance_group": "brown-vest-large-face",
+      "texture": "res://assets/recovered/ssjx_pic/npcs/grocery-boss.png",
+      "path": "client/assets/recovered/ssjx_pic/npcs/grocery-boss.png",
+      "sha256": "d0443ac3b78569418782d4189614f60fd63e9a663ff2cc5e877a6f5f0488b1dd",
+      "image": {
+        "width": 1178,
+        "height": 1335,
+        "mode": "RGBA",
+        "alpha_range": [
+          0,
+          255
+        ],
+        "transparent_pixels": 1139891,
+        "transparent_fraction": 0.724831,
+        "visible_alpha_threshold": 16,
+        "visible_rect_xyxy": [
+          284,
+          138,
+          917,
+          1246
+        ],
+        "foot_anchor_pixels": [
+          600.5,
+          1246
+        ],
+        "visible_margin_pixels": [
+          284,
+          138,
+          261,
+          89
+        ]
+      },
+      "repair_type": "occlusion_fill",
+      "repair_label": "遮挡修复",
+      "repair_instructions": "Remove all neighbouring purple/gold player fragments along the right and top. Reconstruct the overlapped top hair edge and right arm conservatively from the same reference, preserving the grin, white band, pose, proportions and outfit.",
+      "ai_edited": true,
+      "exact_original_pixels": false,
+      "original_animation_recovered": false,
+      "frames": 1,
+      "runtime_enabled": false,
+      "source_crop": "analysis/recovery/ssjx-pic/crops/npc/grocery-boss.png",
+      "source_crop_sha256": "40fe520eeb0edd4e0fe85412d0144f30788c2844fde4182997cde0ae7799cbfb",
+      "source_region_ids": [
+        "grocery-boss"
+      ],
+      "aliases": [
+        {
+          "region_id": "grocery-boss",
+          "name": "杂货店老板",
+          "service": "商店",
+          "source_screenshot": "analysis/references/ssjx-pic/61.jpg",
+          "source_bbox": [
+            134,
+            324,
+            212,
+            458
+          ],
+          "name_confidence": "not_separately_assessed"
+        }
+      ]
+    },
+    {
+      "id": "zhi-xian",
+      "name": "芝仙",
+      "appearance_group": "green-purple-cap",
+      "texture": "res://assets/recovered/ssjx_pic/npcs/zhi-xian.png",
+      "path": "client/assets/recovered/ssjx_pic/npcs/zhi-xian.png",
+      "sha256": "0eb0e1371fd261b13ca2f7c7653cfcbf3e94ee74b17e84f4b68d95473e4f293a",
+      "image": {
+        "width": 1052,
+        "height": 1495,
+        "mode": "RGBA",
+        "alpha_range": [
+          0,
+          255
+        ],
+        "transparent_pixels": 776816,
+        "transparent_fraction": 0.493925,
+        "visible_alpha_threshold": 16,
+        "visible_rect_xyxy": [
+          43,
+          25,
+          980,
+          1470
+        ],
+        "foot_anchor_pixels": [
+          511.5,
+          1470
+        ],
+        "visible_margin_pixels": [
+          43,
+          25,
+          72,
+          25
+        ]
+      },
+      "repair_type": "background_removal",
+      "repair_label": "AI辅助去背景",
+      "repair_instructions": "Keep entire visible original person including long ribbons and shoes; remove only the yellow ground and exterior shadow.",
+      "ai_edited": true,
+      "exact_original_pixels": false,
+      "original_animation_recovered": false,
+      "frames": 1,
+      "runtime_enabled": false,
+      "source_crop": "analysis/recovery/ssjx-pic/crops/npc/zhi-xian.png",
+      "source_crop_sha256": "2d0d307edf0b28d3e248fcaf617457430f3e78c0b563d9cc020e80163ed188af",
+      "source_region_ids": [
+        "zhi-xian"
+      ],
+      "aliases": [
+        {
+          "region_id": "zhi-xian",
+          "name": "芝仙",
+          "service": "商店",
+          "source_screenshot": "analysis/references/ssjx-pic/66.jpg",
+          "source_bbox": [
+            98,
+            352,
+            174,
+            460
+          ],
+          "name_confidence": "not_separately_assessed"
+        }
+      ]
+    },
+    {
+      "id": "tianchi-shangren",
+      "name": "天池上人／独指人",
+      "appearance_group": "grey-spiky-hair-blue-robe",
+      "texture": "res://assets/recovered/ssjx_pic/npcs/tianchi-shangren.png",
+      "path": "client/assets/recovered/ssjx_pic/npcs/tianchi-shangren.png",
+      "sha256": "fcc28014d048755716397871903e192f93ac5aea320c800c65fc5c26991d4176",
+      "image": {
+        "width": 993,
+        "height": 1584,
+        "mode": "RGBA",
+        "alpha_range": [
+          0,
+          255
+        ],
+        "transparent_pixels": 1026456,
+        "transparent_fraction": 0.652583,
+        "visible_alpha_threshold": 16,
+        "visible_rect_xyxy": [
+          196,
+          159,
+          853,
+          1385
+        ],
+        "foot_anchor_pixels": [
+          524.5,
+          1385
+        ],
+        "visible_margin_pixels": [
+          196,
+          159,
+          140,
+          199
+        ]
+      },
+      "repair_type": "background_removal",
+      "repair_label": "AI辅助去背景",
+      "repair_instructions": "Keep original pose, grey hair spikes, scarf, long robe, sash and feet exactly in design. Remove yellow terrain and outer ground shadow.",
+      "ai_edited": true,
+      "exact_original_pixels": false,
+      "original_animation_recovered": false,
+      "frames": 1,
+      "runtime_enabled": false,
+      "source_crop": "analysis/recovery/ssjx-pic/crops/npc/tianchi-shangren.png",
+      "source_crop_sha256": "bfa1ef69abb02a0f1b7a7f5e712685adea0f3934eae0ffaa6898a1e8826d92a1",
+      "source_region_ids": [
+        "tianchi-shangren",
+        "duzhi-ren"
+      ],
+      "aliases": [
+        {
+          "region_id": "tianchi-shangren",
+          "name": "天池上人",
+          "service": "地图传送",
+          "source_screenshot": "analysis/references/ssjx-pic/70.jpg",
+          "source_bbox": [
+            134,
+            418,
+            208,
+            536
+          ],
+          "name_confidence": "not_separately_assessed"
+        },
+        {
+          "region_id": "duzhi-ren",
+          "name": "独指人",
+          "service": null,
+          "source_screenshot": "analysis/references/ssjx-pic/94.jpg",
+          "source_bbox": [
+            36,
+            194,
+            112,
+            314
+          ],
+          "name_confidence": "not_separately_assessed"
+        }
+      ]
+    },
+    {
+      "id": "xiaoyue-chanshi",
+      "name": "晓月禅师",
+      "appearance_group": "green-coiled-hair",
+      "texture": "res://assets/recovered/ssjx_pic/npcs/xiaoyue-chanshi.png",
+      "path": "client/assets/recovered/ssjx_pic/npcs/xiaoyue-chanshi.png",
+      "sha256": "e56e77b995f4b0a7cc0df3e6b2b148feeb01b7820d6499f8f43adc613d95afb9",
+      "image": {
+        "width": 1043,
+        "height": 1508,
+        "mode": "RGBA",
+        "alpha_range": [
+          0,
+          255
+        ],
+        "transparent_pixels": 820500,
+        "transparent_fraction": 0.521666,
+        "visible_alpha_threshold": 16,
+        "visible_rect_xyxy": [
+          100,
+          66,
+          919,
+          1467
+        ],
+        "foot_anchor_pixels": [
+          509.5,
+          1467
+        ],
+        "visible_margin_pixels": [
+          100,
+          66,
+          124,
+          41
+        ]
+      },
+      "repair_type": "occlusion_fill",
+      "repair_label": "遮挡修复",
+      "repair_instructions": "Remove overlaid yellow/cyan Chinese labels across the torso and the red player/black fragments at top. Reconstruct the obscured chest, hands and lower robe consistent with the visible hair, face, existing sleeve and feet. Preserve the original standing pose and chibi proportions, no new props.",
+      "ai_edited": true,
+      "exact_original_pixels": false,
+      "original_animation_recovered": false,
+      "frames": 1,
+      "runtime_enabled": false,
+      "source_crop": "analysis/recovery/ssjx-pic/crops/npc/xiaoyue-chanshi.png",
+      "source_crop_sha256": "c3a9ebf8bbf1575a53027f671f64c06c55dc3c58ffd6c8fe697e764fb6af943f",
+      "source_region_ids": [
+        "xiaoyue-chanshi"
+      ],
+      "aliases": [
+        {
+          "region_id": "xiaoyue-chanshi",
+          "name": "晓月禅师",
+          "service": null,
+          "source_screenshot": "analysis/references/ssjx-pic/73.jpg",
+          "source_bbox": [
+            202,
+            400,
+            276,
+            534
+          ],
+          "name_confidence": "not_separately_assessed"
+        }
+      ]
+    },
+    {
+      "id": "zhen-gen",
+      "name": "甄艮（末字待核）",
+      "appearance_group": "long-dark-hair-white-robe",
+      "texture": "res://assets/recovered/ssjx_pic/npcs/zhen-gen.png",
+      "path": "client/assets/recovered/ssjx_pic/npcs/zhen-gen.png",
+      "sha256": "bb5c096cb96e44592732690ef868b038e81c9ca9a2a80911cb6bd0c1b6a40ed1",
+      "image": {
+        "width": 968,
+        "height": 1624,
+        "mode": "RGBA",
+        "alpha_range": [
+          0,
+          255
+        ],
+        "transparent_pixels": 813620,
+        "transparent_fraction": 0.517559,
+        "visible_alpha_threshold": 16,
+        "visible_rect_xyxy": [
+          81,
+          66,
+          818,
+          1573
+        ],
+        "foot_anchor_pixels": [
+          449.5,
+          1573
+        ],
+        "visible_margin_pixels": [
+          81,
+          66,
+          150,
+          51
+        ]
+      },
+      "repair_type": "background_removal",
+      "repair_label": "AI辅助去背景",
+      "repair_instructions": "Preserve complete character and standing pose, remove snowy terrain and blue background fragments. Keep the same smile, hair outline, gown and shoes.",
+      "ai_edited": true,
+      "exact_original_pixels": false,
+      "original_animation_recovered": false,
+      "frames": 1,
+      "runtime_enabled": false,
+      "source_crop": "analysis/recovery/ssjx-pic/crops/npc/zhen-gen.png",
+      "source_crop_sha256": "231ff4ed31df9043b32ea4277f2053cd30af0f5bbd28ec7b7f3e4eecce1fc936",
+      "source_region_ids": [
+        "zhen-gen"
+      ],
+      "aliases": [
+        {
+          "region_id": "zhen-gen",
+          "name": "甄艮（末字待核）",
+          "service": null,
+          "source_screenshot": "analysis/references/ssjx-pic/75.jpg",
+          "source_bbox": [
+            74,
+            236,
+            142,
+            350
+          ],
+          "name_confidence": "low"
+        }
+      ]
+    },
+    {
+      "id": "qi-xiaer",
+      "name": "齐霞儿／医者",
+      "appearance_group": "white-blue-flower-cap",
+      "texture": "res://assets/recovered/ssjx_pic/npcs/qi-xiaer.png",
+      "path": "client/assets/recovered/ssjx_pic/npcs/qi-xiaer.png",
+      "sha256": "1ac8f49d32bd1e0224e5e92d18d90e09a978d8b57adf421107ff5fdb39001fbb",
+      "image": {
+        "width": 1054,
+        "height": 1492,
+        "mode": "RGBA",
+        "alpha_range": [
+          0,
+          255
+        ],
+        "transparent_pixels": 991764,
+        "transparent_fraction": 0.630665,
+        "visible_alpha_threshold": 16,
+        "visible_rect_xyxy": [
+          136,
+          139,
+          938,
+          1363
+        ],
+        "foot_anchor_pixels": [
+          537.0,
+          1363
+        ],
+        "visible_margin_pixels": [
+          136,
+          139,
+          116,
+          129
+        ]
+      },
+      "repair_type": "background_removal",
+      "repair_label": "AI辅助去背景",
+      "repair_instructions": "Remove green grass background; keep original headpiece, cyan flower, complete hair strands, expression, pose, clothes and feet. No redesign.",
+      "ai_edited": true,
+      "exact_original_pixels": false,
+      "original_animation_recovered": false,
+      "frames": 1,
+      "runtime_enabled": false,
+      "source_crop": "analysis/recovery/ssjx-pic/crops/npc/qi-xiaer.png",
+      "source_crop_sha256": "9a5eb5f6a2060ec8d8c714d378e12c0a5ca865e3961e63fa29ee527525ab058d",
+      "source_region_ids": [
+        "qi-xiaer",
+        "yi-zhe"
+      ],
+      "aliases": [
+        {
+          "region_id": "qi-xiaer",
+          "name": "齐霞儿",
+          "service": "商店",
+          "source_screenshot": "analysis/references/ssjx-pic/87.jpg",
+          "source_bbox": [
+            306,
+            310,
+            388,
+            426
+          ],
+          "name_confidence": "not_separately_assessed"
+        },
+        {
+          "region_id": "yi-zhe",
+          "name": "医者",
+          "service": "商店",
+          "source_screenshot": "analysis/references/ssjx-pic/89.jpg",
+          "source_bbox": [
+            100,
+            352,
+            178,
+            462
+          ],
+          "name_confidence": "not_separately_assessed"
+        }
+      ]
+    },
+    {
+      "id": "wudu-tianwang",
+      "name": "五毒天王",
+      "appearance_group": "blue-green-hair-purple-face",
+      "texture": "res://assets/recovered/ssjx_pic/npcs/wudu-tianwang.png",
+      "path": "client/assets/recovered/ssjx_pic/npcs/wudu-tianwang.png",
+      "sha256": "b30d474ea0a6be9296120cdb9e9482d8b9300c76eec3ba2ee6f96a637775985c",
+      "image": {
+        "width": 963,
+        "height": 1632,
+        "mode": "RGBA",
+        "alpha_range": [
+          0,
+          255
+        ],
+        "transparent_pixels": 772157,
+        "transparent_fraction": 0.491314,
+        "visible_alpha_threshold": 16,
+        "visible_rect_xyxy": [
+          54,
+          54,
+          893,
+          1577
+        ],
+        "foot_anchor_pixels": [
+          473.5,
+          1577
+        ],
+        "visible_margin_pixels": [
+          54,
+          54,
+          70,
+          55
+        ]
+      },
+      "repair_type": "background_removal",
+      "repair_label": "AI辅助去背景",
+      "repair_instructions": "Keep original complete silhouette, facial expression, robe, mint/cyan hair and head-to-feet proportions, remove grass and flowers in background.",
+      "ai_edited": true,
+      "exact_original_pixels": false,
+      "original_animation_recovered": false,
+      "frames": 1,
+      "runtime_enabled": false,
+      "source_crop": "analysis/recovery/ssjx-pic/crops/npc/wudu-tianwang.png",
+      "source_crop_sha256": "3bbaf55dd1c8a13f553a10dcce69299629b49725b4e0740ae85edcdbd8b6cac0",
+      "source_region_ids": [
+        "wudu-tianwang"
+      ],
+      "aliases": [
+        {
+          "region_id": "wudu-tianwang",
+          "name": "五毒天王",
+          "service": "门派商店",
+          "source_screenshot": "analysis/references/ssjx-pic/95.jpg",
+          "source_bbox": [
+            134,
+            340,
+            206,
+            462
+          ],
+          "name_confidence": "not_separately_assessed"
+        }
+      ]
+    },
+    {
+      "id": "school-daily",
+      "name": "门派日常NPC（姓名被遮挡）",
+      "appearance_group": "white-hair-red-robe",
+      "texture": "res://assets/recovered/ssjx_pic/npcs/school-daily.png",
+      "path": "client/assets/recovered/ssjx_pic/npcs/school-daily.png",
+      "sha256": "0a86f25734fe16d01399cf154cbb9bd5c22706f5f90856b171aeaa490d983b38",
+      "image": {
+        "width": 1070,
+        "height": 1470,
+        "mode": "RGBA",
+        "alpha_range": [
+          0,
+          255
+        ],
+        "transparent_pixels": 829682,
+        "transparent_fraction": 0.527486,
+        "visible_alpha_threshold": 16,
+        "visible_rect_xyxy": [
+          48,
+          30,
+          994,
+          1388
+        ],
+        "foot_anchor_pixels": [
+          521.0,
+          1388
+        ],
+        "visible_margin_pixels": [
+          48,
+          30,
+          76,
+          82
+        ]
+      },
+      "repair_type": "occlusion_fill",
+      "repair_label": "遮挡修复",
+      "repair_instructions": "Remove bright green Chinese player label crossing the face/chest and yellow background; reconstruct the small occluded part of the original mouth, moustache and chest in the same pixel style. Complete any cut-off robe hem and shoes conservatively, keeping visible hair, face, palette, original pose and scale.",
+      "ai_edited": true,
+      "exact_original_pixels": false,
+      "original_animation_recovered": false,
+      "frames": 1,
+      "runtime_enabled": false,
+      "source_crop": "analysis/recovery/ssjx-pic/crops/npc/school-daily.png",
+      "source_crop_sha256": "7d2de83ae6bfaf54c9e0137748be9c90fff9fae0bb4c32d400a4b4f0336f8b8a",
+      "source_region_ids": [
+        "school-daily"
+      ],
+      "aliases": [
+        {
+          "region_id": "school-daily",
+          "name": "姓名被遮挡·门派日常NPC",
+          "service": "门派日常",
+          "source_screenshot": "analysis/references/ssjx-pic/100.webp",
+          "source_bbox": [
+            140,
+            132,
+            220,
+            242
+          ],
+          "name_confidence": "unknown"
+        }
+      ]
+    }
+  ],
+  "unresolved": [
+    {
+      "region_id": "hongfa-laozu",
+      "name": "红发老祖",
+      "source_crop": "analysis/recovery/ssjx-pic/crops/npc/hongfa-laozu.png",
+      "source_label": "analysis/recovery/ssjx-pic/crops/npc/hongfa-laozu-label.png",
+      "status": "insufficient_visual_evidence",
+      "reason": "仅姓名文字或极少被界面遮挡的边缘像素；不能据此确定完整人物外观，未生成任意替代人物。"
+    },
+    {
+      "region_id": "school-daily-activity",
+      "name": "铁钟道人（读字待核）",
+      "source_crop": "analysis/recovery/ssjx-pic/crops/npc/school-daily-activity.png",
+      "source_label": "analysis/recovery/ssjx-pic/crops/npc/school-daily-activity-label.png",
+      "status": "insufficient_visual_evidence",
+      "reason": "仅姓名文字或极少被界面遮挡的边缘像素；不能据此确定完整人物外观，未生成任意替代人物。"
+    }
+  ],
+  "provenance": "analysis/recovery/ssjx-pic/npc-cutouts/jobs.json",
+  "notice": "包括去背景稿在内，全部经过生成式图像编辑，颜色、表情、轮廓可能发生变化；不能称为逐像素恢复。补全部分为AI推测，非原包事实。"
+}

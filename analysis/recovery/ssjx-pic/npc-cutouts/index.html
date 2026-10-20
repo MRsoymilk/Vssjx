@@ -1,0 +1,128 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>NPC透明抠图与补全对照</title><style>
+:root{--tile-a:#e1e6ee;--tile-b:#bec7d4}*{box-sizing:border-box}body{margin:0;background:#0c1422;color:#e9f0fa;font:15px/1.65 system-ui,"Microsoft YaHei",sans-serif}main{max-width:1500px;margin:auto;padding:28px}h1{font-size:29px;margin:0}header{max-width:1150px}header p{color:#b3c4d9}.notice{padding:12px 16px;background:#232b36;border-left:4px solid #ecc17c}a{color:#8ccaff}nav{position:sticky;top:0;background:#0c1422f2;display:flex;gap:10px;flex-wrap:wrap;padding:14px 0;z-index:1}input,select{background:#18283c;color:white;border:1px solid #43546c;border-radius:6px;padding:10px}#cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(370px,1fr));gap:18px}article{background:#172336;border:1px solid #304157;border-radius:10px;padding:16px}article[hidden]{display:none}h2{font-size:19px;margin:0}.tag{font-size:13px;color:#efc788}.pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}figure{margin:0;min-width:0}figure>div{height:260px;display:flex;align-items:center;justify-content:center;border-radius:6px}.original{background:#0a111d}.result{background-color:var(--tile-a);background-image:conic-gradient(var(--tile-b) 25%,transparent 0 50%,var(--tile-b) 0 75%,transparent 0);background-size:20px 20px}figure a{height:100%;width:100%;display:flex;align-items:center;justify-content:center}img{max-height:244px;max-width:100%;object-fit:contain;image-rendering:pixelated}.original img{width:auto;max-width:96%}figcaption{text-align:center;font-size:12px;color:#b0c3d8;padding-top:5px}.aliases{color:#b8cbdf;font-size:13px}details p,code{font-size:12px;color:#9fb7d2;overflow-wrap:anywhere}summary{cursor:pointer}.unresolved{margin-top:30px;padding:20px;background:#1d2735;border-radius:10px}@media(max-width:500px){main{padding:14px}#cards{grid-template-columns:1fr}figure>div{height:230px}img{max-height:218px}}
+</style><main><header><h1>NPC · 透明抠图与缺损补全</h1><p>20 张独立透明 PNG · 对应 27 条人物观察 · 10 张去背景稿 + 10 张边缘／遮挡／身体补全稿。</p>
+<p class="notice">全部使用内置 image_gen 编辑。生成式抠图也可能改变表情、颜色和轮廓；修复稿供项目使用与审阅，不能称为原包像素的精确恢复。补全范围写在每张图的说明里。原裁片完整保留。</p>
+<p><a href="../index.html">全部截图资源</a> · <a href="manifest.json">人物索引与来源</a> · <a href="jobs.json">完整提示词</a> · <a href="validation.json">透明通道验证</a></p></header>
+<nav><input id="q" type="search" aria-label="搜索人物名称" placeholder="搜索人物名称…"><select id="kind" aria-label="处理类型"><option value="all">全部处理类型</option><option value="background_removal">去背景</option><option value="repair">含补全／修复</option></select><select id="background" aria-label="透明背景预览"><option value="checker">透明棋盘</option><option value="dark">深色底</option><option value="light">浅色底</option><option value="grass">草地色底</option></select><span id="count"></span></nav>
+<div id="cards"><article data-kind="background_removal"><h2>布袋仙人</h2>
+<p class="tag">AI辅助去背景 · RGBA · 1305×1206</p>
+<div class="pair"><figure><div class="original"><a href="../crops/npc/budai-xianren.png"><img src="../crops/npc/budai-xianren.png" alt="原截图裁片"></a></div><figcaption>原截图裁片</figcaption></figure>
+<figure><div class="result"><a href="../../../../client/assets/recovered/ssjx_pic/npcs/budai-xianren.png"><img src="../../../../client/assets/recovered/ssjx_pic/npcs/budai-xianren.png" alt="透明人物修复稿"></a></div><figcaption>透明稿 · AI辅助处理</figcaption></figure></div>
+<p class="aliases">关联：布袋仙人</p><details><summary>补全约束与来源</summary><p>Only remove scenery; preserve the visible complete silhouette.</p><code>res://assets/recovered/ssjx_pic/npcs/budai-xianren.png</code></details>
+<p><a download href="../../../../client/assets/recovered/ssjx_pic/npcs/budai-xianren.png">保存透明 PNG</a> · <a href="../crops/npc/budai-xianren.png">查看原裁片</a></p></article>
+<article data-kind="full_body_reconstruction"><h2>时尚先锋</h2>
+<p class="tag">缺失身体补全 · RGBA · 1202×1308</p>
+<div class="pair"><figure><div class="original"><a href="../crops/npc/fashion-vendor.png"><img src="../crops/npc/fashion-vendor.png" alt="原截图裁片"></a></div><figcaption>原截图裁片</figcaption></figure>
+<figure><div class="result"><a href="../../../../client/assets/recovered/ssjx_pic/npcs/fashion-vendor.png"><img src="../../../../client/assets/recovered/ssjx_pic/npcs/fashion-vendor.png" alt="透明人物修复稿"></a></div><figcaption>透明稿 · AI辅助处理</figcaption></figure></div>
+<p class="aliases">关联：时尚先锋</p><details><summary>补全约束与来源</summary><p>The reference shows only the head and upper shoulders; conservatively reconstruct a short full chibi body in a simple dark period robe, sleeves and two shoes. Preserve the exact visible face and hair; the unseen lower body is an inferred repair, not a new ornate design.</p><code>res://assets/recovered/ssjx_pic/npcs/fashion-vendor.png</code></details>
+<p><a download href="../../../../client/assets/recovered/ssjx_pic/npcs/fashion-vendor.png">保存透明 PNG</a> · <a href="../crops/npc/fashion-vendor.png">查看原裁片</a></p></article>
+<article data-kind="background_removal"><h2>白蛇仙</h2>
+<p class="tag">AI辅助去背景 · RGBA · 1050×1498</p>
+<div class="pair"><figure><div class="original"><a href="../crops/npc/baishouxian.png"><img src="../crops/npc/baishouxian.png" alt="原截图裁片"></a></div><figcaption>原截图裁片</figcaption></figure>
+<figure><div class="result"><a href="../../../../client/assets/recovered/ssjx_pic/npcs/baishouxian.png"><img src="../../../../client/assets/recovered/ssjx_pic/npcs/baishouxian.png" alt="透明人物修复稿"></a></div><figcaption>透明稿 · AI辅助处理</figcaption></figure></div>
+<p class="aliases">关联：白蛇仙</p><details><summary>补全约束与来源</summary><p>The character is complete: remove only the yellow ground and exterior shadow. Keep both arms, original pose, grey skin and turquoise sash.</p><code>res://assets/recovered/ssjx_pic/npcs/baishouxian.png</code></details>
+<p><a download href="../../../../client/assets/recovered/ssjx_pic/npcs/baishouxian.png">保存透明 PNG</a> · <a href="../crops/npc/baishouxian.png">查看原裁片</a></p></article>
+<article data-kind="background_removal"><h2>达人使者／博浪沙火鹤</h2>
+<p class="tag">AI辅助去背景 · RGBA · 926×1698</p>
+<div class="pair"><figure><div class="original"><a href="../crops/npc/crane-daren.png"><img src="../crops/npc/crane-daren.png" alt="原截图裁片"></a></div><figcaption>原截图裁片</figcaption></figure>
+<figure><div class="result"><a href="../../../../client/assets/recovered/ssjx_pic/npcs/crane-daren.png"><img src="../../../../client/assets/recovered/ssjx_pic/npcs/crane-daren.png" alt="透明人物修复稿"></a></div><figcaption>透明稿 · AI辅助处理</figcaption></figure></div>
+<p class="aliases">关联：达人使者 / 博浪沙火鹤</p><details><summary>补全约束与来源</summary><p>Preserve the complete crane, including fine beak and thin feet. Remove all grass and ground shadow.</p><code>res://assets/recovered/ssjx_pic/npcs/crane-daren.png</code></details>
+<p><a download href="../../../../client/assets/recovered/ssjx_pic/npcs/crane-daren.png">保存透明 PNG</a> · <a href="../crops/npc/crane-daren.png">查看原裁片</a></p></article>
+<article data-kind="edge_completion"><h2>谭长（读字待核）</h2>
+<p class="tag">边缘补全 · RGBA · 1267×1241</p>
+<div class="pair"><figure><div class="original"><a href="../crops/npc/tan-chang.png"><img src="../crops/npc/tan-chang.png" alt="原截图裁片"></a></div><figcaption>原截图裁片</figcaption></figure>
+<figure><div class="result"><a href="../../../../client/assets/recovered/ssjx_pic/npcs/tan-chang.png"><img src="../../../../client/assets/recovered/ssjx_pic/npcs/tan-chang.png" alt="透明人物修复稿"></a></div><figcaption>透明稿 · AI辅助处理</figcaption></figure></div>
+<p class="aliases">关联：谭长</p><details><summary>补全约束与来源</summary><p>Restore the tiny cut-off staff tip if necessary. Keep original elderly facial features, pose and the visible coarse pixel outlines.</p><code>res://assets/recovered/ssjx_pic/npcs/tan-chang.png</code></details>
+<p><a download href="../../../../client/assets/recovered/ssjx_pic/npcs/tan-chang.png">保存透明 PNG</a> · <a href="../crops/npc/tan-chang.png">查看原裁片</a></p></article>
+<article data-kind="occlusion_fill"><h2>朱亮</h2>
+<p class="tag">遮挡修复 · RGBA · 979×1606</p>
+<div class="pair"><figure><div class="original"><a href="../crops/npc/zhu-liang.png"><img src="../crops/npc/zhu-liang.png" alt="原截图裁片"></a></div><figcaption>原截图裁片</figcaption></figure>
+<figure><div class="result"><a href="../../../../client/assets/recovered/ssjx_pic/npcs/zhu-liang.png"><img src="../../../../client/assets/recovered/ssjx_pic/npcs/zhu-liang.png" alt="透明人物修复稿"></a></div><figcaption>透明稿 · AI辅助处理</figcaption></figure></div>
+<p class="aliases">关联：朱亮</p><details><summary>补全约束与来源</summary><p>Remove turquoise/gold fragments belonging to the neighbouring player at the top. Reconstruct only the occluded crown edge of the existing white hairstyle. Keep robe, face, pose and shoes.</p><code>res://assets/recovered/ssjx_pic/npcs/zhu-liang.png</code></details>
+<p><a download href="../../../../client/assets/recovered/ssjx_pic/npcs/zhu-liang.png">保存透明 PNG</a> · <a href="../crops/npc/zhu-liang.png">查看原裁片</a></p></article>
+<article data-kind="edge_completion"><h2>金萍／蒋绣儿（读字待核）</h2>
+<p class="tag">边缘补全 · RGBA · 1217×1293</p>
+<div class="pair"><figure><div class="original"><a href="../crops/npc/jiang-xier.png"><img src="../crops/npc/jiang-xier.png" alt="原截图裁片"></a></div><figcaption>原截图裁片</figcaption></figure>
+<figure><div class="result"><a href="../../../../client/assets/recovered/ssjx_pic/npcs/jiang-xier.png"><img src="../../../../client/assets/recovered/ssjx_pic/npcs/jiang-xier.png" alt="透明人物修复稿"></a></div><figcaption>透明稿 · AI辅助处理</figcaption></figure></div>
+<p class="aliases">关联：金萍 / 蒋绣儿</p><details><summary>补全约束与来源</summary><p>Remove all neighbouring character fragments at right; restore clipped tips of the right-side curled hair and leaves to match the intact left-side style. Preserve face, smile, original pose and short proportions.</p><code>res://assets/recovered/ssjx_pic/npcs/jiang-xier.png</code></details>
+<p><a download href="../../../../client/assets/recovered/ssjx_pic/npcs/jiang-xier.png">保存透明 PNG</a> · <a href="../crops/npc/jiang-xier.png">查看原裁片</a></p></article>
+<article data-kind="edge_completion"><h2>易周</h2>
+<p class="tag">边缘补全 · RGBA · 1114×1412</p>
+<div class="pair"><figure><div class="original"><a href="../crops/npc/yi-zhou.png"><img src="../crops/npc/yi-zhou.png" alt="原截图裁片"></a></div><figcaption>原截图裁片</figcaption></figure>
+<figure><div class="result"><a href="../../../../client/assets/recovered/ssjx_pic/npcs/yi-zhou.png"><img src="../../../../client/assets/recovered/ssjx_pic/npcs/yi-zhou.png" alt="透明人物修复稿"></a></div><figcaption>透明稿 · AI辅助处理</figcaption></figure></div>
+<p class="aliases">关联：易周</p><details><summary>补全约束与来源</summary><p>The right edge cuts off the staff and possibly hand. Restore the short missing edge and staff, keeping the visible design and pose; do not add weapons or ornaments. Remove the lava and purple ground completely.</p><code>res://assets/recovered/ssjx_pic/npcs/yi-zhou.png</code></details>
+<p><a download href="../../../../client/assets/recovered/ssjx_pic/npcs/yi-zhou.png">保存透明 PNG</a> · <a href="../crops/npc/yi-zhou.png">查看原裁片</a></p></article>
+<article data-kind="background_removal"><h2>易静／隐名剑仙</h2>
+<p class="tag">AI辅助去背景 · RGBA · 1020×1542</p>
+<div class="pair"><figure><div class="original"><a href="../crops/npc/yi-jing.png"><img src="../crops/npc/yi-jing.png" alt="原截图裁片"></a></div><figcaption>原截图裁片</figcaption></figure>
+<figure><div class="result"><a href="../../../../client/assets/recovered/ssjx_pic/npcs/yi-jing.png"><img src="../../../../client/assets/recovered/ssjx_pic/npcs/yi-jing.png" alt="透明人物修复稿"></a></div><figcaption>透明稿 · AI辅助处理</figcaption></figure></div>
+<p class="aliases">关联：易静 / 隐名剑仙</p><details><summary>补全约束与来源</summary><p>Keep the complete head-to-shoes original pose and blades, cleanly remove snowy ground and shadow. Preserve grey-blue hair and green face, do not change apparent identity.</p><code>res://assets/recovered/ssjx_pic/npcs/yi-jing.png</code></details>
+<p><a download href="../../../../client/assets/recovered/ssjx_pic/npcs/yi-jing.png">保存透明 PNG</a> · <a href="../crops/npc/yi-jing.png">查看原裁片</a></p></article>
+<article data-kind="background_removal"><h2>周轻云</h2>
+<p class="tag">AI辅助去背景 · RGBA · 1083×1453</p>
+<div class="pair"><figure><div class="original"><a href="../crops/npc/zhou-qingyun.png"><img src="../crops/npc/zhou-qingyun.png" alt="原截图裁片"></a></div><figcaption>原截图裁片</figcaption></figure>
+<figure><div class="result"><a href="../../../../client/assets/recovered/ssjx_pic/npcs/zhou-qingyun.png"><img src="../../../../client/assets/recovered/ssjx_pic/npcs/zhou-qingyun.png" alt="透明人物修复稿"></a></div><figcaption>透明稿 · AI辅助处理</figcaption></figure></div>
+<p class="aliases">关联：周轻云</p><details><summary>补全约束与来源</summary><p>Preserve all character pixels and pose; remove green grass and exterior ground shadow. Do not invent jewellery, weapons or different clothes.</p><code>res://assets/recovered/ssjx_pic/npcs/zhou-qingyun.png</code></details>
+<p><a download href="../../../../client/assets/recovered/ssjx_pic/npcs/zhou-qingyun.png">保存透明 PNG</a> · <a href="../crops/npc/zhou-qingyun.png">查看原裁片</a></p></article>
+<article data-kind="edge_completion"><h2>竞技活动使者／笑和尚</h2>
+<p class="tag">边缘补全 · RGBA · 929×1693</p>
+<div class="pair"><figure><div class="original"><a href="../crops/npc/jingji-envoy.png"><img src="../crops/npc/jingji-envoy.png" alt="原截图裁片"></a></div><figcaption>原截图裁片</figcaption></figure>
+<figure><div class="result"><a href="../../../../client/assets/recovered/ssjx_pic/npcs/jingji-envoy.png"><img src="../../../../client/assets/recovered/ssjx_pic/npcs/jingji-envoy.png" alt="透明人物修复稿"></a></div><figcaption>透明稿 · AI辅助处理</figcaption></figure></div>
+<p class="aliases">关联：笑和尚 / 姓名未显示·竞技活动使者</p><details><summary>补全约束与来源</summary><p>Remove the blue name-label fragments at the top and yellow ground. If the scalp touches the label, restore the natural rounded bald outline. Keep original moustache, tan robe and standing pose.</p><code>res://assets/recovered/ssjx_pic/npcs/jingji-envoy.png</code></details>
+<p><a download href="../../../../client/assets/recovered/ssjx_pic/npcs/jingji-envoy.png">保存透明 PNG</a> · <a href="../crops/npc/jingji-envoy.png">查看原裁片</a></p></article>
+<article data-kind="occlusion_fill"><h2>诸有功／新颠仙（读字待核）</h2>
+<p class="tag">遮挡修复 · RGBA · 1012×1554</p>
+<div class="pair"><figure><div class="original"><a href="../crops/npc/brown-mask-full.png"><img src="../crops/npc/brown-mask-full.png" alt="原截图裁片"></a></div><figcaption>原截图裁片</figcaption></figure>
+<figure><div class="result"><a href="../../../../client/assets/recovered/ssjx_pic/npcs/brown-mask-full.png"><img src="../../../../client/assets/recovered/ssjx_pic/npcs/brown-mask-full.png" alt="透明人物修复稿"></a></div><figcaption>透明稿 · AI辅助处理</figcaption></figure></div>
+<p class="aliases">关联：诸有功 / 新颠仙（读字待核）</p><details><summary>补全约束与来源</summary><p>Remove all green lettering at top and the brightly coloured player/equipment overlapping lower left. Reconstruct only occluded left robe hem and left shoulder matching visible right-side design and original pose; keep face, hair, gold pattern, grey skin.</p><code>res://assets/recovered/ssjx_pic/npcs/brown-mask-full.png</code></details>
+<p><a download href="../../../../client/assets/recovered/ssjx_pic/npcs/brown-mask-full.png">保存透明 PNG</a> · <a href="../crops/npc/brown-mask-full.png">查看原裁片</a></p></article>
+<article data-kind="occlusion_fill"><h2>杂货店老板及同外观商人</h2>
+<p class="tag">遮挡修复 · RGBA · 1178×1335</p>
+<div class="pair"><figure><div class="original"><a href="../crops/npc/grocery-boss.png"><img src="../crops/npc/grocery-boss.png" alt="原截图裁片"></a></div><figcaption>原截图裁片</figcaption></figure>
+<figure><div class="result"><a href="../../../../client/assets/recovered/ssjx_pic/npcs/grocery-boss.png"><img src="../../../../client/assets/recovered/ssjx_pic/npcs/grocery-boss.png" alt="透明人物修复稿"></a></div><figcaption>透明稿 · AI辅助处理</figcaption></figure></div>
+<p class="aliases">关联：杂货店老板</p><details><summary>补全约束与来源</summary><p>Remove all neighbouring purple/gold player fragments along the right and top. Reconstruct the overlapped top hair edge and right arm conservatively from the same reference, preserving the grin, white band, pose, proportions and outfit.</p><code>res://assets/recovered/ssjx_pic/npcs/grocery-boss.png</code></details>
+<p><a download href="../../../../client/assets/recovered/ssjx_pic/npcs/grocery-boss.png">保存透明 PNG</a> · <a href="../crops/npc/grocery-boss.png">查看原裁片</a></p></article>
+<article data-kind="background_removal"><h2>芝仙</h2>
+<p class="tag">AI辅助去背景 · RGBA · 1052×1495</p>
+<div class="pair"><figure><div class="original"><a href="../crops/npc/zhi-xian.png"><img src="../crops/npc/zhi-xian.png" alt="原截图裁片"></a></div><figcaption>原截图裁片</figcaption></figure>
+<figure><div class="result"><a href="../../../../client/assets/recovered/ssjx_pic/npcs/zhi-xian.png"><img src="../../../../client/assets/recovered/ssjx_pic/npcs/zhi-xian.png" alt="透明人物修复稿"></a></div><figcaption>透明稿 · AI辅助处理</figcaption></figure></div>
+<p class="aliases">关联：芝仙</p><details><summary>补全约束与来源</summary><p>Keep entire visible original person including long ribbons and shoes; remove only the yellow ground and exterior shadow.</p><code>res://assets/recovered/ssjx_pic/npcs/zhi-xian.png</code></details>
+<p><a download href="../../../../client/assets/recovered/ssjx_pic/npcs/zhi-xian.png">保存透明 PNG</a> · <a href="../crops/npc/zhi-xian.png">查看原裁片</a></p></article>
+<article data-kind="background_removal"><h2>天池上人／独指人</h2>
+<p class="tag">AI辅助去背景 · RGBA · 993×1584</p>
+<div class="pair"><figure><div class="original"><a href="../crops/npc/tianchi-shangren.png"><img src="../crops/npc/tianchi-shangren.png" alt="原截图裁片"></a></div><figcaption>原截图裁片</figcaption></figure>
+<figure><div class="result"><a href="../../../../client/assets/recovered/ssjx_pic/npcs/tianchi-shangren.png"><img src="../../../../client/assets/recovered/ssjx_pic/npcs/tianchi-shangren.png" alt="透明人物修复稿"></a></div><figcaption>透明稿 · AI辅助处理</figcaption></figure></div>
+<p class="aliases">关联：天池上人 / 独指人</p><details><summary>补全约束与来源</summary><p>Keep original pose, grey hair spikes, scarf, long robe, sash and feet exactly in design. Remove yellow terrain and outer ground shadow.</p><code>res://assets/recovered/ssjx_pic/npcs/tianchi-shangren.png</code></details>
+<p><a download href="../../../../client/assets/recovered/ssjx_pic/npcs/tianchi-shangren.png">保存透明 PNG</a> · <a href="../crops/npc/tianchi-shangren.png">查看原裁片</a></p></article>
+<article data-kind="occlusion_fill"><h2>晓月禅师</h2>
+<p class="tag">遮挡修复 · RGBA · 1043×1508</p>
+<div class="pair"><figure><div class="original"><a href="../crops/npc/xiaoyue-chanshi.png"><img src="../crops/npc/xiaoyue-chanshi.png" alt="原截图裁片"></a></div><figcaption>原截图裁片</figcaption></figure>
+<figure><div class="result"><a href="../../../../client/assets/recovered/ssjx_pic/npcs/xiaoyue-chanshi.png"><img src="../../../../client/assets/recovered/ssjx_pic/npcs/xiaoyue-chanshi.png" alt="透明人物修复稿"></a></div><figcaption>透明稿 · AI辅助处理</figcaption></figure></div>
+<p class="aliases">关联：晓月禅师</p><details><summary>补全约束与来源</summary><p>Remove overlaid yellow/cyan Chinese labels across the torso and the red player/black fragments at top. Reconstruct the obscured chest, hands and lower robe consistent with the visible hair, face, existing sleeve and feet. Preserve the original standing pose and chibi proportions, no new props.</p><code>res://assets/recovered/ssjx_pic/npcs/xiaoyue-chanshi.png</code></details>
+<p><a download href="../../../../client/assets/recovered/ssjx_pic/npcs/xiaoyue-chanshi.png">保存透明 PNG</a> · <a href="../crops/npc/xiaoyue-chanshi.png">查看原裁片</a></p></article>
+<article data-kind="background_removal"><h2>甄艮（末字待核）</h2>
+<p class="tag">AI辅助去背景 · RGBA · 968×1624</p>
+<div class="pair"><figure><div class="original"><a href="../crops/npc/zhen-gen.png"><img src="../crops/npc/zhen-gen.png" alt="原截图裁片"></a></div><figcaption>原截图裁片</figcaption></figure>
+<figure><div class="result"><a href="../../../../client/assets/recovered/ssjx_pic/npcs/zhen-gen.png"><img src="../../../../client/assets/recovered/ssjx_pic/npcs/zhen-gen.png" alt="透明人物修复稿"></a></div><figcaption>透明稿 · AI辅助处理</figcaption></figure></div>
+<p class="aliases">关联：甄艮（末字待核）</p><details><summary>补全约束与来源</summary><p>Preserve complete character and standing pose, remove snowy terrain and blue background fragments. Keep the same smile, hair outline, gown and shoes.</p><code>res://assets/recovered/ssjx_pic/npcs/zhen-gen.png</code></details>
+<p><a download href="../../../../client/assets/recovered/ssjx_pic/npcs/zhen-gen.png">保存透明 PNG</a> · <a href="../crops/npc/zhen-gen.png">查看原裁片</a></p></article>
+<article data-kind="background_removal"><h2>齐霞儿／医者</h2>
+<p class="tag">AI辅助去背景 · RGBA · 1054×1492</p>
+<div class="pair"><figure><div class="original"><a href="../crops/npc/qi-xiaer.png"><img src="../crops/npc/qi-xiaer.png" alt="原截图裁片"></a></div><figcaption>原截图裁片</figcaption></figure>
+<figure><div class="result"><a href="../../../../client/assets/recovered/ssjx_pic/npcs/qi-xiaer.png"><img src="../../../../client/assets/recovered/ssjx_pic/npcs/qi-xiaer.png" alt="透明人物修复稿"></a></div><figcaption>透明稿 · AI辅助处理</figcaption></figure></div>
+<p class="aliases">关联：齐霞儿 / 医者</p><details><summary>补全约束与来源</summary><p>Remove green grass background; keep original headpiece, cyan flower, complete hair strands, expression, pose, clothes and feet. No redesign.</p><code>res://assets/recovered/ssjx_pic/npcs/qi-xiaer.png</code></details>
+<p><a download href="../../../../client/assets/recovered/ssjx_pic/npcs/qi-xiaer.png">保存透明 PNG</a> · <a href="../crops/npc/qi-xiaer.png">查看原裁片</a></p></article>
+<article data-kind="background_removal"><h2>五毒天王</h2>
+<p class="tag">AI辅助去背景 · RGBA · 963×1632</p>
+<div class="pair"><figure><div class="original"><a href="../crops/npc/wudu-tianwang.png"><img src="../crops/npc/wudu-tianwang.png" alt="原截图裁片"></a></div><figcaption>原截图裁片</figcaption></figure>
+<figure><div class="result"><a href="../../../../client/assets/recovered/ssjx_pic/npcs/wudu-tianwang.png"><img src="../../../../client/assets/recovered/ssjx_pic/npcs/wudu-tianwang.png" alt="透明人物修复稿"></a></div><figcaption>透明稿 · AI辅助处理</figcaption></figure></div>
+<p class="aliases">关联：五毒天王</p><details><summary>补全约束与来源</summary><p>Keep original complete silhouette, facial expression, robe, mint/cyan hair and head-to-feet proportions, remove grass and flowers in background.</p><code>res://assets/recovered/ssjx_pic/npcs/wudu-tianwang.png</code></details>
+<p><a download href="../../../../client/assets/recovered/ssjx_pic/npcs/wudu-tianwang.png">保存透明 PNG</a> · <a href="../crops/npc/wudu-tianwang.png">查看原裁片</a></p></article>
+<article data-kind="occlusion_fill"><h2>门派日常NPC（姓名被遮挡）</h2>
+<p class="tag">遮挡修复 · RGBA · 1070×1470</p>
+<div class="pair"><figure><div class="original"><a href="../crops/npc/school-daily.png"><img src="../crops/npc/school-daily.png" alt="原截图裁片"></a></div><figcaption>原截图裁片</figcaption></figure>
+<figure><div class="result"><a href="../../../../client/assets/recovered/ssjx_pic/npcs/school-daily.png"><img src="../../../../client/assets/recovered/ssjx_pic/npcs/school-daily.png" alt="透明人物修复稿"></a></div><figcaption>透明稿 · AI辅助处理</figcaption></figure></div>
+<p class="aliases">关联：姓名被遮挡·门派日常NPC</p><details><summary>补全约束与来源</summary><p>Remove bright green Chinese player label crossing the face/chest and yellow background; reconstruct the small occluded part of the original mouth, moustache and chest in the same pixel style. Complete any cut-off robe hem and shoes conservatively, keeping visible hair, face, palette, original pose and scale.</p><code>res://assets/recovered/ssjx_pic/npcs/school-daily.png</code></details>
+<p><a download href="../../../../client/assets/recovered/ssjx_pic/npcs/school-daily.png">保存透明 PNG</a> · <a href="../crops/npc/school-daily.png">查看原裁片</a></p></article></div><section class="unresolved"><h2>2 条身份记录：外观证据不足</h2><ul><li><b>红发老祖</b>：仅姓名文字或极少被界面遮挡的边缘像素；不能据此确定完整人物外观，未生成任意替代人物。 <a href="../crops/npc/hongfa-laozu.png">裁片</a> · <a href="../crops/npc/hongfa-laozu-label.png">文字证据</a></li>
+<li><b>铁钟道人（读字待核）</b>：仅姓名文字或极少被界面遮挡的边缘像素；不能据此确定完整人物外观，未生成任意替代人物。 <a href="../crops/npc/school-daily-activity.png">裁片</a> · <a href="../crops/npc/school-daily-activity-label.png">文字证据</a></li></ul></section></main><script>
+const q=document.getElementById('q'),kind=document.getElementById('kind');function filter(){let n=0;document.querySelectorAll('article').forEach(el=>{let match=el.textContent.toLowerCase().includes(q.value.trim().toLowerCase())&&(kind.value==='all'||(kind.value==='repair'?el.dataset.kind!=='background_removal':el.dataset.kind===kind.value));el.hidden=!match;if(match)n++});document.getElementById('count').textContent=n+' 张'}q.addEventListener('input',filter);kind.addEventListener('change',filter);document.getElementById('background').addEventListener('change',e=>{const colors={checker:['#e1e6ee','#bec7d4'],dark:['#07101a','#07101a'],light:['#f9fafc','#f9fafc'],grass:['#92bd64','#92bd64']}[e.target.value];document.documentElement.style.setProperty('--tile-a',colors[0]);document.documentElement.style.setProperty('--tile-b',colors[1])});filter();</script></html>

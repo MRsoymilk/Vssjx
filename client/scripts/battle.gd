@@ -22,6 +22,7 @@ var escaped := false
 var committed := false
 var save_result: PlatformResult
 var rng := RandomNumberGenerator.new()
+var frozen_stats:Dictionary={}
 
 static func action_name(command: String, job: int, skill_id:String="") -> String:
 	if command == "skill": return String(SkillRules.item(skill_id).name) if not skill_id.is_empty() and not SkillRules.item(skill_id).is_empty() else SKILL_NAMES[clampi(job, 0, 2)]
@@ -34,6 +35,7 @@ func _init(opponent: Dictionary) -> void:
 	hp = int(Game.player.hp)
 	mp = int(Game.player.mp)
 	potions = int(Game.player.potions)
+	frozen_stats=Game.stats().duplicate(true)
 	skills=SkillRules.new_state(int(Game.player.job),int(Game.player.school),int(Game.player.level),int(enemy.get("level",1)))
 	selected_skill=SkillRules.default_id(int(Game.player.job),int(Game.player.school),int(Game.player.level))
 	rng.randomize()
@@ -66,13 +68,14 @@ func begin_action(command: String, skill_id:String="") -> Dictionary:
 
 func resolve_player() -> Dictionary:
 	if phase != "player": return {"ok": false, "lines": []}
-	var values := Game.stats()
+	var values := frozen_stats
 	var lines: Array[String] = []
 	var damage := 0
 	match pending_command:
 		"attack":
-			damage = maxi(1, int(CharacterAttributeRules.power(values,int(Game.player.job),false).attack) - int(enemy.defense) + rng.randi_range(-2, 2))
-			damage=CharacterAttributeRules.critical_at(values,false,skills,damage,rng.randi_range(0,9999))
+			var magical:bool=int(Game.player.job)==2 and values.has("balance")
+			damage = CharacterAttributeRules.direct_damage(CharacterAttributeRules.power(values,int(Game.player.job),magical),int(enemy.defense),10000,rng.randi_range(-2,2))
+			damage=CharacterAttributeRules.critical_at(values,magical,skills,damage,rng.randi_range(0,9999))
 			skills.enemy_sleep=0
 			lines.append("你%s出击，造成 %d 点伤害。" % [["挥锤", "挥剑", "挥杖"][int(Game.player.job)], damage])
 		"skill":
@@ -109,12 +112,12 @@ func resolve_player() -> Dictionary:
 
 func resolve_enemy() -> Dictionary:
 	if phase != "enemy": return {"ok": false, "lines": []}
-	var values := Game.stats()
+	var values := frozen_stats
 	var lines: Array[String] = []
 	if int(skills.enemy_sleep)>0:
 		phase="settlement"
 		return {"ok":true,"lines":["%s处于睡眠，无法行动。"%enemy.name],"incoming":0,"reflected":0}
-	var incoming := maxi(1, int(enemy.attack) - int(values.defense) + rng.randi_range(-2, 2))
+	var incoming := CharacterAttributeRules.incoming(int(enemy.attack),int(enemy.get("level",1)),values,false,rng.randi_range(-2,2))
 	var landed:=rng.randi_range(0,9999)<CharacterAttributeRules.hit_chance({},values)
 	if guarding: incoming = maxi(1, incoming / 2)
 	var hit:=SkillRules.enemy_hit(skills,incoming) if landed else Vector2i.ZERO

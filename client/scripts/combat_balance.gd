@@ -1,6 +1,6 @@
 class_name CombatBalance
 extends RefCounted
-## Candidate contract only: existing saved battles still use their legacy rules.
+## Versioned contract; revised battles use this, legacy encounters retain their own adapter.
 static var rules: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://assets/data/balance-v1.json"))
 
 static func _level(value: Variant) -> bool:

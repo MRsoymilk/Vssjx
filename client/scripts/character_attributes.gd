@@ -4,6 +4,7 @@ extends Control
 
 signal back_requested
 signal allocation_requested(points: Array)
+signal respec_requested
 @export var online_mode := false
 var _online_character: Dictionary = {}
 var _online_stats: Dictionary = {}
@@ -163,11 +164,16 @@ func _extended() -> void:
 		content.get_node("Unknown_" + key).visible = value == null
 		if key in ["physical_crit","magic_crit","physical_hit","magic_hit","physical_evasion","magic_evasion"]:number.tooltip_text=CharacterAttributeRules.RATING_HELP
 	for i in 5:
-		for prefix in ["Points","Minus","Plus"]:content.get_node(prefix+str(i)).tooltip_text=CharacterAttributeRules.POINT_HELP[i] if _attribute_profile.get("formula_revision")==2 else "以当前服务端属性规则为准"
+		for prefix in ["Points","Minus","Plus"]:content.get_node(prefix+str(i)).tooltip_text=("定力：法术评级+1，每2点法防+1" if i==4 and _attribute_profile.get("formula_revision")==3 else CharacterAttributeRules.POINT_HELP[i]) if _attribute_profile.get("formula_revision") in [2,3] else "以当前服务端属性规则为准"
 		content.get_node("Minus%d" % i).pressed.connect(_adjust_allocation.bind(i, -1))
 		content.get_node("Plus%d" % i).pressed.connect(_adjust_allocation.bind(i, 1))
 	content.get_node("Recommend").pressed.connect(_recommend_allocation)
 	content.get_node("Confirm").pressed.connect(_confirm_allocation)
+	content.get_node("Respec").pressed.connect(func()->void:
+		var button:Button=content.get_node("Respec")
+		if button.text!="确认重置":button.text="确认重置";content.get_node("Status").text="再次点击确认：仅一次，按比例保留血蓝，不会回满。"
+		else:respec_requested.emit()
+	)
 	_refresh_allocation()
 
 func set_allocation_enabled(enabled: bool, hint: String = "停稳后可加点") -> void:
@@ -194,6 +200,7 @@ func _refresh_allocation() -> void:
 	content.get_node("Remaining").text = str(_draft_remaining()) if available else "—"
 	content.get_node("Recommend").disabled = not enabled or int(_attribute_profile.get("available", 0)) <= 0
 	content.get_node("Confirm").disabled = not enabled or allocation_draft == allocated
+	content.get_node("Respec").disabled=not enabled or not _player_data().get("balance_respec_available",false) or _player_data().get("corpse") is Dictionary or not allocated.any(func(v:Variant)->bool:return int(v)>0)
 	content.get_node("Status").text = "同步中，请稍候" if not available else (allocation_hint if not allocation_enabled else (("确认后保存到服务端" if online_mode else "确认后保存到本地") if allocation_draft != allocated else "每级获得5点属性点"))
 	if enabled and allocation_focus>=0 and _attribute_profile.get("formula_revision")==2:content.get_node("Status").text=CharacterAttributeRules.POINT_HELP[allocation_focus]
 

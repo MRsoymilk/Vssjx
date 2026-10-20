@@ -1,4 +1,4 @@
-//! Candidate v1 numeric kernel. Not activated in persisted/legacy encounters.
+//! Versioned v1 kernel; legacy encounters explicitly retain legacy adapters.
 //! Integer basis points; floor each stage, cap each multiplier once.
 use serde::{Deserialize, Serialize};
 use std::sync::LazyLock;

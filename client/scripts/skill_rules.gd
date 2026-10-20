@@ -74,7 +74,7 @@ static func critical(state:Dictionary,damage:int,roll:int)->int:
 static func cast(skill:Dictionary,state:Dictionary,stats:Dictionary,hp:int,mp:int,enemy_defense:int,roll:int)->Dictionary:
 	state.last_skill=skill.id
 	mp-=int(skill.mp_cost)
-	var damage:=maxi(1,int(stats.attack)*int(skill.damage_percent)/100-enemy_defense) if int(skill.damage_percent)>0 else 0
+	var damage:=CharacterAttributeRules.direct_damage(stats,enemy_defense,int(skill.damage_percent)*100) if int(skill.damage_percent)>0 else 0
 	var healed:=mini(int(skill.legacy_heal),int(stats.hp)-hp)
 	hp+=healed
 	var value:=int(skill.value);var duration:=int(skill.duration)

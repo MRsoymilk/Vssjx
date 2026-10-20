@@ -908,6 +908,16 @@ func _attributes() -> void:
 	ui.add_child(attributes)
 	attributes.back_requested.connect(_return_from_attributes)
 	attributes.allocation_requested.connect(_allocate_local_attributes)
+	attributes.respec_requested.connect(_respec_local_attributes)
+
+func _respec_local_attributes()->void:
+	if mode!="attributes" or Game.storage_busy or _closing:return
+	var page:=attributes
+	page.set_allocation_enabled(false,"正在保存")
+	var result:=await Game.respec_attributes()
+	if not is_instance_valid(page) or mode!="attributes":return
+	page.display_local()
+	if not result.ok:page.content.get_node("Status").text=result.message
 
 func _allocate_local_attributes(points: Array) -> void:
 	if mode != "attributes" or Game.storage_busy or _closing: return

@@ -987,3 +987,16 @@ text = "同步中，请稍候"
 vertical_alignment = 1
 horizontal_alignment = 1
 
+[node name="Respec" type="Button" parent="."]
+offset_left = 19.0
+offset_top = 387.0
+offset_right = 143.0
+offset_bottom = 421.0
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(0.48, 0.35, 0.12, 1)
+theme_override_styles/normal = SubResource("Button")
+theme_override_styles/hover = SubResource("Hover")
+theme_override_styles/pressed = SubResource("Hover")
+theme_override_styles/disabled = SubResource("Slot")
+text = "免费重置"
+disabled = true

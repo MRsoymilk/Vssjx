@@ -147,6 +147,9 @@ func _ready() -> void:
 		if ai_panel != null: ai_panel.selected_map=id; ai_panel.refresh()
 	)
 	attributes.allocation_requested.connect(_allocate_attributes)
+	attributes.respec_requested.connect(func()->void:
+		if attributes.allocation_enabled:network.pve.submit("respec")
+	)
 	$Menu/Panel/Continue.pressed.connect(func() -> void: details.hide())
 	$Menu/Panel/Leave.pressed.connect(_leave_world)
 	$Menu/Panel/Chat.pressed.connect(_focus_chat)

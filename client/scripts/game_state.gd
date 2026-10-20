@@ -101,7 +101,7 @@ func select_local_character(id: String) -> PlatformResult:
 			var maxima:=stats()
 			player.hp=mini(int(player.hp),int(maxima.hp))
 			player.mp=mini(int(player.mp),int(maxima.mp))
-			player.attribute_rules_revision=2
+			player.attribute_rules_revision=3
 			found = true
 	if not found:
 		_local_roster_busy = false
@@ -147,8 +147,9 @@ func new_player(nickname: String, job: int, school: int, gender: int = 0) -> voi
 		"equipped": false, "zone": 0, "cell": [START_CELL.x, START_CELL.y],
 		"defeated": [], "enemy_respawns": {}, "signature": "", "title": "",
 		"ingots": 0, "guild_contribution": 0, "essence": 0,
-		"allocated_attributes": [0,0,0,0,0], "attribute_rules_revision": 2,
-		"corpse":null
+		"allocated_attributes": [0,0,0,0,0], "attribute_rules_revision": 3,
+		"corpse":null,
+		"balance_revision":1,"balance_respec_available":true
 	}
 	if String(player.name).is_empty():
 		player.name = "青衫客"
@@ -197,10 +198,9 @@ func actor_key() -> String:
 	return "hero/" + keys[int(player.get("job", 0))]
 
 func stats() -> Dictionary:
-	var value: Dictionary = ATTRIBUTE_RULES.stats(int(player.get("job",1)),int(player.get("level",1)),bool(player.get("equipped",false)),allocated_attributes())
+	var value: Dictionary = ATTRIBUTE_RULES.balanced_stats(int(player.get("job",1)),int(player.get("level",1)),bool(player.get("equipped",false)),allocated_attributes()) if player.get("balance_revision",0)==1 else ATTRIBUTE_RULES.stats(int(player.get("job",1)),int(player.get("level",1)),bool(player.get("equipped",false)),allocated_attributes())
 	var gear_bonus := ShopRules.bonus(ShopRules.local_state(player))
-	value.attack += gear_bonus.x - (5 if player.get("equipped",false) else 0)
-	value.defense += gear_bonus.y
+	ATTRIBUTE_RULES.gear_bonus(value,gear_bonus.x-(5 if player.get("equipped",false) else 0),gear_bonus.y)
 	return value
 
 func allocated_attributes() -> Array:
@@ -209,6 +209,7 @@ func allocated_attributes() -> Array:
 	return points
 
 func attribute_profile() -> Dictionary:
+	if player.get("balance_revision",0)==1:return ATTRIBUTE_RULES.profile_for(stats(),int(player.job),int(player.level),allocated_attributes())
 	var value: Dictionary = ATTRIBUTE_RULES.profile(int(player.get("job",1)),int(player.get("level",1)),bool(player.get("equipped",false)),allocated_attributes())
 	var gear_bonus := ShopRules.bonus(ShopRules.local_state(player))
 	for key in ["physical_attack","magic_attack"]: value.combat[key] += gear_bonus.x - (5 if player.get("equipped",false) else 0)
@@ -300,6 +301,30 @@ func _migrate_school_membership(data: Dictionary) -> void:
 		data.school_membership_version=1
 	for entry in data.get("local_characters",{}).get("characters",[]):
 		_migrate_school_membership(entry.data)
+
+func _migrate_balance(data:Dictionary)->void:
+	if data.get("balance_revision",0)==0:
+		var a:Array=data.get("allocated_attributes",[0,0,0,0,0])
+		var old:=ATTRIBUTE_RULES.stats(int(data.job),int(data.level),bool(data.equipped),a)
+		var next:=ATTRIBUTE_RULES.balanced_stats(int(data.job),int(data.level),bool(data.equipped),a)
+		var bonus:=ShopRules.bonus(ShopRules.local_state(data))
+		ATTRIBUTE_RULES.gear_bonus(old,bonus.x-(5 if data.equipped else 0),bonus.y)
+		ATTRIBUTE_RULES.gear_bonus(next,bonus.x-(5 if data.equipped else 0),bonus.y)
+		if data.get("corpse")==null:data.hp=clampi(int(data.hp)*int(next.hp)/int(old.hp),1,int(next.hp))
+		data.mp=clampi(int(data.mp)*int(next.mp)/int(old.mp),0,int(next.mp))
+		data.balance_revision=1;data.balance_respec_available=true
+	for entry in data.get("local_characters",{}).get("characters",[]):_migrate_balance(entry.data)
+
+func respec_attributes()->PlatformResult:
+	if storage_busy or _local_roster_busy:return PlatformResult.new(PlatformResult.Status.TEMPORARY_FAILURE,"STORAGE_BUSY","正在保存")
+	if is_soul() or not player.get("balance_respec_available",false):return PlatformResult.new(PlatformResult.Status.INVALID_DATA,"RESPEC_USED","灵魂状态不能重置，或免费次数已用完。")
+	var before:=player.duplicate(true);var previous:=stats();var generation:=_player_generation;var path:=save_path
+	player.allocated_attributes=[0,0,0,0,0];player.balance_respec_available=false
+	var next:=stats()
+	player.hp=clampi(int(player.hp)*int(next.hp)/int(previous.hp),1,int(next.hp));player.mp=clampi(int(player.mp)*int(next.mp)/int(previous.mp),0,int(next.mp))
+	var result:=await save_game()
+	if not result.ok and generation==_player_generation and path==save_path:player=before
+	return result
 
 ## Offline test helper. Only LocalWorldChat exposes this; no network protocol hook.
 func set_local_test_level(level: int) -> PlatformResult:
@@ -478,6 +503,7 @@ func load_game() -> PlatformResult:
 	if not valid_save(data):
 		return _finish_storage(_invalid_save(), generation)
 	_migrate_school_membership(data)
+	_migrate_balance(data)
 	player = data
 	last_save_receipt = {}
 	if not player.has("gender"): player.gender = 0
@@ -491,7 +517,7 @@ func load_game() -> PlatformResult:
 	var maxima:=stats()
 	player.hp=mini(int(player.hp),int(maxima.hp))
 	player.mp=mini(int(player.mp),int(maxima.mp))
-	player.attribute_rules_revision=2
+	player.attribute_rules_revision=3
 	_player_generation += 1
 	result = _finish_storage(PlatformResult.success(), _player_generation)
 	return result
@@ -502,6 +528,7 @@ func _invalid_save() -> PlatformResult:
 func valid_save(data: Variant) -> bool:
 	if not data is Dictionary:
 		return false
+	if not ShopRules._integer(data.get("balance_revision",0),0,1) or not data.get("balance_respec_available",true) is bool:return false
 	if data.has("ai_map") and (not data.ai_map is String or (not data.ai_map.is_empty() and AIWorld.map_data(data.ai_map).is_empty())): return false
 	if data.has("ai_progress") and not AIWorld.valid_progress(data.ai_progress): return false
 	if data.get("corpse")!=null:
@@ -569,7 +596,7 @@ func valid_save(data: Variant) -> bool:
 	var values := stats()
 	player = old
 	var revision:Variant=data.get("attribute_rules_revision",1)
-	if not (revision is int or revision is float) or not is_finite(float(revision)) or float(revision)!=floor(float(revision)) or revision<1 or revision>2:return false
+	if not (revision is int or revision is float) or not is_finite(float(revision)) or float(revision)!=floor(float(revision)) or revision<1 or revision>3:return false
 	var max_hp:=int(values.hp);var max_mp:=int(values.mp)
 	if revision==1:
 		var a:Array=data.get("allocated_attributes",[0,0,0,0,0])

@@ -77,14 +77,17 @@ impl Battle {
     ) -> Self {
         assert!((1..=MAX_MEMBERS).contains(&fighters.len()) && !source.is_empty());
         let extra = fighters.len() as i32 - 1;
+        let balanced=fighters.iter().all(|f|f.stats.balance.is_some());
         let enemies = source
             .into_iter()
             .take(5)
             .enumerate()
             .map(|(i, mut d)| {
-                d.hp = (d.hp * (100 + 35 * extra) + 99) / 100;
-                d.attack = (d.attack * (100 + 15 * extra) + 99) / 100;
-                d.defense = (d.defense * (100 + 10 * extra) + 99) / 100;
+                if !balanced{
+                    d.hp = (d.hp * (100 + 35 * extra) + 99) / 100;
+                    d.attack = (d.attack * (100 + 15 * extra) + 99) / 100;
+                    d.defense = (d.defense * (100 + 10 * extra) + 99) / 100;
+                }
                 Enemy {
                     slot: format!("m{i}"),
                     hp: d.hp,
@@ -402,12 +405,12 @@ impl Battle {
         } else if action == "attack" {
             let e = &mut self.enemies[target_index.unwrap()];
             let a = &mut self.fighters[i];
-            let power = crate::attributes::for_attack(a.stats, a.job, false);
+            let power = crate::attributes::for_attack(a.stats, a.job, a.job==2&&a.stats.balance.is_some());
             let damage = crate::attributes::critical(
                 a.stats,
-                false,
+                a.job==2&&a.stats.balance.is_some(),
                 &mut a.effects,
-                (power.attack - e.definition.defense).max(1),
+                crate::attributes::direct_damage(power,e.definition.defense,10000,0),
                 roll,
             )
             .min(e.hp);
@@ -500,7 +503,7 @@ impl Battle {
             let a = &mut self.fighters[i];
             let landed = crate::attributes::lands(None, Some(a.stats), false);
             let incoming = if landed {
-                (e.definition.attack - a.stats.defense).max(1)
+                crate::attributes::incoming(e.definition.attack,e.definition.level,a.stats,false,0)
             } else {
                 0
             };

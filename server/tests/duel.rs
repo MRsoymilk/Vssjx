@@ -21,6 +21,7 @@ fn fighter(name: &str, job: i16) -> Fighter {
             attack: 100,
             defense: 5,
             attributes: [0; 5],
+            balance: None,
         },
         appearance: [1, 0, 0],
         hp: 300,

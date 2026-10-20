@@ -8,6 +8,7 @@ pub const RULES: &str = "qingyun-pve-v1";
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "snake_case")]
 pub enum Action {
+    Respec,
     Revive,
     SchoolJoin,
     AiAccept,
@@ -53,6 +54,8 @@ pub struct Stats {
     pub defense: i32,
     #[serde(default, skip_serializing_if = "crate::attributes::unallocated")]
     pub attributes: [i32; 5],
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub balance: Option<crate::attributes::BalanceStats>,
 }
 pub fn stats(job: i16, level: i32, equipped: bool) -> Stats {
     let job = job as usize;
@@ -62,6 +65,7 @@ pub fn stats(job: i16, level: i32, equipped: bool) -> Stats {
         attack: [18, 23, 21][job] + (level - 1) * 4 + if equipped { 5 } else { 0 },
         defense: [7, 4, 3][job] + (level - 1) * 2,
         attributes: [0; 5],
+        balance: None,
     }
 }
 pub fn mask(id: &str) -> Option<i32> {
@@ -90,6 +94,8 @@ pub struct Battle {
     pub skills: crate::skills::State,
     #[serde(default)]
     pub skill_rules_version: u8,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub frozen_stats: Option<Stats>,
 }
 impl Battle {
     pub fn new(enemy: ResidentDefinition, hp: i32, mp: i32, potions: i32) -> Self {
@@ -105,6 +111,7 @@ impl Battle {
             outcome: "active".into(),
             skills: Default::default(),
             skill_rules_version: 0,
+            frozen_stats: None,
         }
     }
     pub fn view(&self) -> Value {
@@ -135,6 +142,7 @@ impl Battle {
         skill_id: Option<&str>,
         effect_roll: i32,
     ) -> Result<Vec<String>, &'static str> {
+        let stats = self.frozen_stats.unwrap_or(stats);
         if self.outcome != "active" {
             return Err("BATTLE_FINISHED");
         }
@@ -182,9 +190,10 @@ impl Battle {
         let mut damage = match action {
             Action::Attack => {
                 self.skills.enemy_sleep = 0;
-                let power = crate::attributes::for_attack(stats, job, false);
-                crate::attributes::critical(stats, false, &mut self.skills,
-                    (power.attack - self.enemy.defense + player_roll.clamp(-2, 2)).max(1), effect_roll)
+                let magical=job==2&&stats.balance.is_some();
+                let power = crate::attributes::for_attack(stats, job, magical);
+                crate::attributes::critical(stats, magical, &mut self.skills,
+                    crate::attributes::direct_damage(power,self.enemy.defense,10000,player_roll.clamp(-2,2)), effect_roll)
             }
             Action::Skill => {
                 let skill = selected.expect("selected skill");
@@ -239,7 +248,7 @@ impl Battle {
         if self.skills.enemy_sleep > 0 {
             lines.push(format!("{}处于睡眠，无法行动。", self.enemy.name));
         } else {
-            let mut incoming = (self.enemy.attack - stats.defense + enemy_roll.clamp(-2, 2)).max(1);
+            let mut incoming = crate::attributes::incoming(self.enemy.attack,self.enemy.level,stats,false,enemy_roll.clamp(-2,2));
             let landed = crate::attributes::lands(None, Some(stats), false);
             if !landed { incoming = 0; }
             if action == Action::Guard {

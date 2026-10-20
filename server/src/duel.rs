@@ -112,6 +112,7 @@ impl Fighter {
             defense: stat("defense")?,
             attributes: serde_json::from_value(s["attributes"]["allocated"].clone())
                 .map_err(|_| "DUEL_PROFILE_UNAVAILABLE")?,
+            balance: serde_json::from_value(s["stats"].get("balance").cloned().unwrap_or(Value::Null)).map_err(|_|"DUEL_PROFILE_UNAVAILABLE")?,
         };
         let (job, school, level) = (
             number("job")? as i16,
@@ -336,12 +337,12 @@ impl Battle {
                 let roll = rolls[1 + me];
                 let raw = match choice.action.as_str() {
                     "attack" => {
-                        if crate::attributes::lands(Some(actor.stats), Some(enemy.stats), false) {
+                        if crate::attributes::lands(Some(actor.stats), Some(enemy.stats), actor.job==2&&actor.stats.balance.is_some()) {
                             actor.effects.enemy_sleep = 0;
-                            let power = crate::attributes::for_attack(actor.stats, actor.job, false);
+                            let power = crate::attributes::for_attack(actor.stats, actor.job, actor.job==2&&actor.stats.balance.is_some());
                             crate::attributes::critical(
-                                actor.stats, false, &mut actor.effects,
-                                (power.attack - enemy.stats.defense).max(1), roll,
+                                actor.stats, actor.job==2&&actor.stats.balance.is_some(), &mut actor.effects,
+                                crate::attributes::direct_damage(power,crate::attributes::defense(enemy.stats,actor.job==2&&actor.stats.balance.is_some()),10000,0), roll,
                             )
                         } else {
                             0
@@ -363,7 +364,7 @@ impl Battle {
                                 crate::attributes::for_attack(actor.stats, actor.job, magical),
                                 &mut actor.hp,
                                 &mut actor.mp,
-                                enemy.stats.defense,
+                                crate::attributes::defense(enemy.stats,magical),
                                 roll,
                             );
                             if s.effect == "mana_steal" {

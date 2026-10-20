@@ -10,6 +10,7 @@ fn stats() -> Stats {
         attack: 100,
         defense: 20,
         attributes: [0; 5],
+        balance: None,
     }
 }
 #[test]

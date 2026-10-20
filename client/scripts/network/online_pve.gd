@@ -206,6 +206,9 @@ func submit(action: String, target: String = "", points: Array = [], count: int=
 	if action == "allocate":
 		command.attributes = normalized_points(points)
 		command.expected_revision = state.character.state_revision
+	elif action=="respec":
+		if active() or not state.character.get("balance_respec_available",false):return false
+		command.expected_revision=state.character.state_revision
 	elif action in ["buy", "equip", "unequip", "use", "discard","school_join","revive"]:
 		command.target = target
 		if count!=1: command.quantity=count
@@ -280,4 +283,5 @@ static func valid_attributes(profile: Variant, value: Dictionary) -> bool:
 	if not profile.get("combat") is Dictionary: return false
 	for key in ["hp", "mp", "physical_attack", "magic_attack", "physical_defense", "magic_defense", "physical_crit", "magic_crit", "physical_hit", "magic_hit", "physical_evasion", "magic_evasion", "damage_reduction"]:
 		if not integer(profile.combat.get(key), 0, 10000): return false
-	return profile.combat.hp == value.stats.hp and profile.combat.mp == value.stats.mp and profile.combat.physical_defense == value.stats.defense and profile.combat.magic_defense == value.stats.defense and profile.combat.get("magic_attack" if int(value.character.job) == 2 else "physical_attack") == value.stats.attack
+	var magic_defense:Variant=value.stats.get("balance",{}).get("magic_defense",value.stats.defense)
+	return profile.combat.hp == value.stats.hp and profile.combat.mp == value.stats.mp and profile.combat.physical_defense == value.stats.defense and profile.combat.magic_defense == magic_defense and profile.combat.get("magic_attack" if int(value.character.job) == 2 else "physical_attack") == value.stats.attack

@@ -122,6 +122,17 @@ async fn load_character(tx:&mut Transaction<'_,Postgres>,character_id:Uuid,accou
             .try_into()
             .map_err(|_| unavailable())?,
     };
+    if loaded.character.balance_revision==0&&loaded.battle.is_none(){
+        let team_active:bool=sqlx::query_scalar("SELECT EXISTS(SELECT 1 FROM team_members m JOIN team_battles b ON b.team_id=m.team_id AND b.active WHERE m.character_id=$1)").bind(character_id).fetch_one(&mut **tx).await.map_err(database)?;
+        if !team_active{
+            let previous=loaded.stats();loaded.character.balance_revision=1;
+            let next=loaded.stats();
+            if loaded.character.corpse.is_none(){loaded.character.hp=((i64::from(loaded.character.hp)*i64::from(next.hp))/i64::from(previous.hp)).clamp(1,i64::from(next.hp)) as i32;}
+            loaded.character.mp=((i64::from(loaded.character.mp)*i64::from(next.mp))/i64::from(previous.mp)).clamp(0,i64::from(next.mp)) as i32;
+            let rev:i64=sqlx::query_scalar("UPDATE characters SET balance_revision=1,hp=$2,mp=$3,state_revision=state_revision+1 WHERE id=$1 RETURNING state_revision").bind(character_id).bind(loaded.character.hp).bind(loaded.character.mp).fetch_one(&mut **tx).await.map_err(database)?;
+            loaded.character.state_revision=rev.to_string();
+        }
+    }
     // Formula updates retain allocations and never refill resources on login.
     let maxima = loaded.stats();
     loaded.character.hp = loaded.character.hp.min(maxima.hp);
@@ -134,15 +145,16 @@ async fn load_character(tx:&mut Transaction<'_,Postgres>,character_id:Uuid,accou
 }
 impl Loaded {
     fn stats(&self) -> pve_rules::Stats {
-        let mut stats = crate::attributes::stats(
+        if let Some(stats)=self.battle.as_ref().filter(|b|b.outcome=="active").and_then(|b|b.frozen_stats){return stats;}
+        let factory=if self.character.balance_revision==1{crate::attributes::balanced_stats}else{crate::attributes::stats};
+        let mut stats = factory(
             self.character.job,
             self.character.level,
             self.equipped,
             self.allocated,
         );
         let (attack,defense) = crate::shop::bonus(&self.gear);
-        stats.attack += attack - if self.equipped {5} else {0};
-        stats.defense += defense;
+        crate::attributes::gear_bonus(&mut stats,attack-if self.equipped{5}else{0},defense);
         stats
     }
     fn state(&self) -> Value {
@@ -156,6 +168,7 @@ impl Loaded {
         let (attack,_) = crate::shop::bonus(&self.gear);
         for key in ["physical_attack","magic_attack"] { profile["combat"][key] = json!(profile["combat"][key].as_i64().unwrap() + i64::from(attack - if self.equipped {5} else {0})); }
         for key in ["physical_defense","magic_defense"] { profile["combat"][key] = json!(self.stats().defense); }
+        if self.stats().balance.is_some(){profile=crate::attributes::profile_for(self.stats(),self.character.job,self.character.level,self.allocated);}
         json!({"rules_version":pve_rules::RULES,"character":self.character,"potions":self.potions,
             "equipment":{"version":"equipment-v1","weapon_owned":self.weapon_owned,"weapon":if self.equipped {Some("sword")} else {None}},
             "stats":self.stats(),
@@ -207,6 +220,17 @@ impl Loaded {
             return Ok(vec!["你寻回了自己的尸体，灵魂与肉身重新合一，气血与灵力恢复。".into()]);
         }
         if command.action==Action::Revive {return Err("NO_CORPSE");}
+        if command.action==Action::Respec {
+            if self.battle.is_some(){return Err("BATTLE_ACTIVE");}
+            if !self.character.balance_respec_available{return Err("RESPEC_USED");}
+            if command.expected_revision.as_deref()!=Some(&self.character.state_revision){return Err("STALE_ATTRIBUTES");}
+            if command.target.is_some()||command.battle_id.is_some()||command.attributes.is_some()||command.quantity.is_some(){return Err("INVALID_PVE_COMMAND");}
+            let before=self.stats();self.allocated=[0;5];let next=self.stats();
+            self.character.hp=(i64::from(self.character.hp)*i64::from(next.hp)/i64::from(before.hp)).clamp(1,i64::from(next.hp)) as i32;
+            self.character.mp=(i64::from(self.character.mp)*i64::from(next.mp)/i64::from(before.mp)).clamp(0,i64::from(next.mp)) as i32;
+            self.character.balance_respec_available=false;
+            return Ok(vec!["已使用一次免费重置，全部属性点退回，气血和灵力按比例保留。".into()]);
+        }
         if command.action==Action::SchoolJoin {
             if self.battle.is_some(){return Err("BATTLE_ACTIVE");}
             if command.battle_id.is_some()||command.attributes.is_some()||command.quantity.is_some(){return Err("INVALID_PVE_COMMAND");}
@@ -381,12 +405,14 @@ impl Loaded {
                         return Err("QUEST_REQUIRED");
                     }
                     let name = definition.name.clone();
+                    let frozen=self.stats();
                     self.battle = Some(Battle::new(
                         definition,
                         self.character.hp,
                         self.character.mp,
                         self.potions,
                     ));
+                    if frozen.balance.is_some(){self.battle.as_mut().unwrap().frozen_stats=Some(frozen);}
                     return Ok(vec![format!("与{name}的遭遇战开始。")]);
                 }
                 if command.target.as_deref() != Some("qingwei") {
@@ -580,9 +606,9 @@ pub async fn execute(
         }
         let character_id = loaded.character.id;
         let c = &loaded.character;
-        let revision:i64=sqlx::query_scalar("UPDATE characters SET level=$2,xp=$3,gold=$4,hp=$5,mp=$6,quest_stage=$7,defeated_mask=$8,active_battle_id=$9,allocated_attributes=$10,monster_respawns=$11,ai_progress=$12,school=$13,corpse=$14,state_revision=state_revision+1 WHERE id=$1 RETURNING state_revision")
+        let revision:i64=sqlx::query_scalar("UPDATE characters SET level=$2,xp=$3,gold=$4,hp=$5,mp=$6,quest_stage=$7,defeated_mask=$8,active_battle_id=$9,allocated_attributes=$10,monster_respawns=$11,ai_progress=$12,school=$13,corpse=$14,balance_respec_available=$15,state_revision=state_revision+1 WHERE id=$1 RETURNING state_revision")
             .bind(c.id).bind(c.level).bind(c.xp).bind(c.gold).bind(c.hp).bind(c.mp).bind(c.quest_stage).bind(loaded.defeated).bind(active).bind(loaded.allocated.to_vec()).bind(Json(&loaded.respawns))
-            .bind(Json(&loaded.ai)).bind(c.school).bind(&c.corpse).fetch_one(&mut *tx).await.map_err(database)?;
+            .bind(Json(&loaded.ai)).bind(c.school).bind(&c.corpse).bind(c.balance_respec_available).fetch_one(&mut *tx).await.map_err(database)?;
         loaded.character.state_revision = revision.to_string();
         if loaded.potions == 0 {
             sqlx::query(

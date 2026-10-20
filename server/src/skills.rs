@@ -138,7 +138,7 @@ impl State {
         self.last_skill = s.id.clone();
         *mp -= s.mp_cost;
         let damage = if s.damage_percent > 0 {
-            (stats.attack * s.damage_percent / 100 - enemy_defense).max(1)
+            crate::attributes::direct_damage(stats,enemy_defense,s.damage_percent*100,0)
         } else {
             0
         };

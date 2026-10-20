@@ -18,6 +18,15 @@ function check(value, title) {assert(value, title); count++; console.log('PASS: 
     page.on('pageerror', error => errors.push(error.message));
     page.on('response', response => {if (response.status() >= 400) failed.push(response.status() + ' ' + new URL(response.url()).pathname);});
     page.on('request', request => requests.push(request.url()));
+    if (!local) {
+      await page.goto(new URL(base).origin + '/', {waitUntil: 'networkidle'});
+      check(await page.locator('a[href="/flarum/"]').count() === 3, 'Portal forum navigation and card links are enabled');
+      check(requests.every(url => !/^\/(?:flarum|webgame|api)(?:\/|$)/.test(new URL(url).pathname)), 'Portal does not preload forum, game or API');
+      await page.screenshot({path: path.join(output, 'portal-forum-enabled.png'), fullPage: true});
+      await page.locator('a[href="/flarum/"]').first().click();
+      await page.waitForURL(base + '/');
+      check(page.url() === base + '/', 'Portal link enters the deployed forum');
+    }
     const response = await page.goto(base + '/', {waitUntil: 'networkidle'});
     await page.waitForFunction(() => window.flarum?.core?.app?.booted || document.querySelector('.IndexPage'));
     check(response.status() === 200, 'Forum homepage responds over the intended prefix');

@@ -9,6 +9,7 @@
 | 开源文档与链接 | [文档检查](documentation.md) |
 | 导航与游戏子路径 | [页面、浏览器与隔离 Nginx 验证](portal_navigation.md) |
 | 私有统计后台与 APK 管理 | [采集、文件管理、HTTP 安全与浏览器验证](portal_stats.md) |
+| 独立 Flarum 论坛 | [2026-10-20 安装、隔离、资源与公网浏览器验证](flarum_release_20261020.md) |
 | 任务、战斗与地图 | [线上 PVE](online_pve.md)、[第二张地图](online_maps.md)、[技能](../design/skills.md#验证) |
 | 社交与多人战斗 | [社交](social.md)、[组队](teams.md)、[决斗](player_duels.md) |
 | 平台与网页 | [平台基础](platform_interface.md)、[主游戏 Web](web_game.md)、[浏览器存储](web_storage.md) |

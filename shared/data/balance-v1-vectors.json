@@ -1,0 +1,36 @@
+{
+  "stats": [
+    {"job":0,"level":1,"points":[0,0,0,0,0],"expected":{"hp":120,"mp":35,"physical_attack":18,"magic_attack":10,"physical_defense":7,"magic_defense":7,"available":5}},
+    {"job":1,"level":30,"points":[30,0,90,30,0],"expected":{"hp":857,"mp":397,"physical_attack":319,"magic_attack":128,"physical_defense":62,"magic_defense":62,"available":0}},
+    {"job":2,"level":60,"points":[80,160,0,0,60],"expected":{"hp":1669,"mp":1417,"physical_attack":248,"magic_attack":577,"physical_defense":121,"magic_defense":151,"available":0}}
+  ],
+  "damage": [
+    {"input":{"attack":300,"defense":280,"level":30,"coefficient_bp":15000,"increased_bp":2000},"expected":{"damage":324,"effective_defense":280,"reduction_bp":4000}},
+    {"input":{"attack":300,"defense":280,"level":30,"coefficient_bp":15000,"increased_bp":2000,"critical":true},"expected":{"damage":486,"effective_defense":280,"reduction_bp":4000}},
+    {"input":{"attack":300,"defense":280,"level":30,"coefficient_bp":15000,"increased_bp":2000,"guarding":true},"expected":{"damage":162,"effective_defense":280,"reduction_bp":4000}},
+    {"input":{"attack":100,"defense":1000000,"level":1},"expected":{"damage":40,"effective_defense":1000000,"reduction_bp":6000}},
+    {"input":{"attack":100,"defense":200,"level":1,"penetration_bp":1000000,"flat_penetration":200},"expected":{"damage":100,"effective_defense":0,"reduction_bp":0}},
+    {"input":{"attack":100,"defense":0,"level":60,"coefficient_bp":0},"expected":{"damage":0,"effective_defense":0,"reduction_bp":0}},
+    {"input":{"attack":100,"defense":0,"level":60,"critical":true,"critical_multiplier_bp":1000000,"increased_bp":1000000,"legendary_bp":1000000,"extra_reduction_bp":1000000},"expected":{"damage":454,"effective_defense":0,"reduction_bp":0}}
+  ],
+  "ratings": [
+    {"level":60,"rating":0,"bonus_bp":0,"expected":500},
+    {"level":60,"rating":330,"bonus_bp":0,"expected":2750},
+    {"level":60,"rating":330,"bonus_bp":2500,"expected":5000}
+  ],
+  "hit": [
+    {"level":60,"hit":0,"evasion":0,"expected":9500},
+    {"level":60,"hit":330,"evasion":0,"expected":9900},
+    {"level":60,"hit":0,"evasion":330,"expected":8500}
+  ],
+  "aoe": [
+    {"coefficient_bp":8000,"targets":1,"expected":8000},
+    {"coefficient_bp":8000,"targets":3,"expected":8000},
+    {"coefficient_bp":8000,"targets":5,"expected":4800}
+  ],
+  "boss": [
+    {"hp":1000,"members":1,"expected":1000},
+    {"hp":1000,"members":2,"expected":1800},
+    {"hp":1000,"members":5,"expected":4200}
+  ]
+}

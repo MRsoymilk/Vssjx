@@ -1,4 +1,5 @@
 pub mod shop;
+pub mod combat_balance;
 pub mod soul;
 pub mod social;
 pub mod team_rules;

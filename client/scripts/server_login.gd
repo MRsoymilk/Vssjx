@@ -150,7 +150,12 @@ func _update_controls() -> void:
 	var local := ServerConnectionSettings.is_local(address_input.text)
 	var locked := _probing or (OnlineAccount.busy and not local)
 	var options := settings.connection_options()
-	var editable_address: bool = options.ok and options.value.editable
+	# The field can choose local or the site's fixed service; Web target policy
+	# still validates the exact configured origin before any network request.
+	var editable_address: bool = options.ok
+	if options.ok and not options.value.editable:
+		address_input.placeholder_text=options.value.server_address
+		address_input.tooltip_text="本地模式：local\n本站联机："+String(options.value.server_address)
 	auth_button.disabled = locked
 	switch_button.disabled = locked or local
 	remember_me.visible = remembered.is_supported()
@@ -204,7 +209,9 @@ func _show_account() -> void:
 
 func _account_result(action: String, result: Dictionary) -> void:
 	if action in ["social","teams"]:return
-	if ServerConnectionSettings.is_local(address_input.text): return
+	if ServerConnectionSettings.is_local(address_input.text):
+		_pending_credentials={};_registration_secret=""
+		return
 	password_input.clear()
 	_update_controls()
 	if not result.ok:

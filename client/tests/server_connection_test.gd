@@ -61,7 +61,11 @@ func _run() -> void:
 	for raw in ["", "ftp://example.com", "ws://example.com", "http://user:pass@example.com", "https://example.com?token=secret", "https://example.com/#fragment", "127.0.0.1:0", "127.0.0.1:65536", "999.999.999.999:80", "http://bad host", "http://bad\\host", "http://-bad.example", "http://example.com/../api", "http://example.com/%2e%2e/api", "http://example.com/%oops", "http://[invalid]:8080"]:
 		check(not ServerConnectionSettings.normalize(raw).ok, "Reject invalid test address: " + raw)
 	var settings := ServerConnectionSettings.new(isolated)
-	check(settings.load_address().is_empty(), "First launch has no saved server")
+	check(settings.load_address()=="local", "First launch defaults to local without writing a preference")
+	check(not FileAccess.file_exists(isolated),"Default local does not create a settings file")
+	var first:=login_form()
+	check(first.address_input.text=="local" and first.auth_button.text=="进入游戏" and not first.username_input.editable,"First login form enters local without credentials")
+	app._close_modal()
 	check(settings.save_address("127.0.0.1:8080"), "Valid address is written to disk")
 	check(ServerConnectionSettings.new(isolated).load_address() == "http://127.0.0.1:8080", "New settings object restores address")
 	check(settings.save_address(DOMAIN), "Domain replaces old IP")

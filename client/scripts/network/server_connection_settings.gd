@@ -4,6 +4,7 @@ extends RefCounted
 
 var settings_path := ""
 var last_error := ""
+const DEFAULT_ADDRESS := "local"
 
 func _init(path: String = "") -> void:
 	if not Platform.is_available():
@@ -72,12 +73,12 @@ func load_address() -> String:
 	if not options.ok:
 		last_error = options.message
 		return ""
-	if not options.value.editable: return options.value.server_address
+	if not options.value.editable: return DEFAULT_ADDRESS
 	if not _storage_ready(): return ""
 	var read := Platform.context.storage.read_text(settings_path, 65536)
 	if not read.ok:
 		if read.code != "NOT_FOUND": last_error = "无法读取已保存的服务器地址，请重新填写。"
-		return ""
+		return DEFAULT_ADDRESS if read.code=="NOT_FOUND" else ""
 	var config := ConfigFile.new()
 	if config.parse(read.value) != OK:
 		last_error = "无法读取已保存的服务器地址，请重新填写。"

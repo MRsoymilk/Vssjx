@@ -90,9 +90,9 @@ func _test_config() -> void:
 		check(config.check_network_target(address).code == "TARGET_NOT_ALLOWED", "Exact target including prefix, scheme, host and port")
 	_install()
 	var settings := ServerConnectionSettings.new(directory.path_join("poisoned.cfg"))
-	check(settings.load_address() == "https://game.example.com/ssjx" and settings.settings_path.is_empty(), "Web ignores explicit/native settings paths")
+	check(settings.load_address() == "local" and settings.settings_path.is_empty(), "Web defaults to local and ignores explicit/native settings paths")
 	check(settings.save_address("https://game.example.com/ssjx") and settings.save_address("local"), "Fixed service and offline selection need no synchronous writes")
-	check(not settings.save_address("https://evil.example") and settings.load_address() == "https://game.example.com/ssjx", "Address tampering cannot replace Web configuration")
+	check(not settings.save_address("https://evil.example") and settings.load_address() == "local", "Address tampering cannot replace the default or fixed Web service")
 	check(no_storage.accesses == 0, "Web connection settings never touch native/synchronous storage")
 
 func _test_credentials_and_ui() -> void:
@@ -111,7 +111,13 @@ func _test_credentials_and_ui() -> void:
 	check(not web_store.remember(config.origin, "test", "not-persisted-1234") and not web_store.forget(), "Every operation rechecks policy")
 	var form := load("res://scenes/ui/server_login.tscn").instantiate() as ServerLogin
 	add_child(form)
-	check(form.address_input.text == "https://game.example.com/ssjx" and not form.address_input.editable and not form.has_node("ConnectButton"), "Web UI keeps its fixed read-only address")
+	check(form.address_input.text == "local" and form.address_input.editable and not form.has_node("ConnectButton"), "Web UI defaults to local while allowing the configured online service")
+	check(form.auth_button.text=="进入游戏" and not form.username_input.editable,"Web local entry requires no account")
+	form.address_input.text="https://game.example.com/ssjx";form._update_controls()
+	check(form.save_draft() and form.username_input.editable,"Web can switch from local to the configured same-origin service")
+	form.address_input.text="https://evil.example"
+	check(not form.save_draft(),"Editable Web address still rejects an external target before networking")
+	form.address_input.text="local";form._update_controls()
 	check(not form.remember_me.visible and form.remember_me.disabled and not form.remember_me.button_pressed and form.password_input.text.is_empty(), "Web UI offers no remembering or credential restoration")
 	form.remembered.path = path
 	form.remember_me.button_pressed = true

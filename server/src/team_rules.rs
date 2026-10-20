@@ -41,6 +41,8 @@ pub struct Enemy {
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Event {
     #[serde(default)]
+    pub missed: bool,
+    #[serde(default)]
     pub critical: bool,
     pub actor: String,
     pub target: String,
@@ -156,7 +158,7 @@ impl Battle {
                     elite.revives_left-=1;
                     e.hp=(e.definition.hp*crate::monster_combat::elite_n(elite.party_size,"revive_bp")/10000).max(1);
                     e.effects=skills::State {enemy_mp:30+e.definition.level*2,..Default::default()};e.dots.clear();
-                    self.events.push(Event {actor:e.slot.clone(),target:e.slot.clone(),action:"revive".into(),skill:"monster_rebirth".into(),damage:0,healed:e.hp,critical:false});
+                    self.events.push(Event {missed:false,actor:e.slot.clone(),target:e.slot.clone(),action:"revive".into(),skill:"monster_rebirth".into(),damage:0,healed:e.hp,critical:false});
                     self.lines.push(format!("精英·{}妖躯复生，剩余{}次复活。",e.definition.name,elite.revives_left));
                 }
             }
@@ -397,7 +399,7 @@ impl Battle {
                     ally.effects
                         .cast(s, ally.stats, &mut ally.hp, &mut temporary_mp, 0, roll);
                     if ally.id!=who{if let Some(b)=ally.effects.balance.as_mut(){b.cooldowns=cooldowns.unwrap_or_default();}}
-                    self.events.push(Event {
+                    self.events.push(Event {missed:false,
                         actor: who.to_string(),
                         target: ally.id.to_string(),
                         action: "skill".into(),
@@ -418,6 +420,7 @@ impl Battle {
                         actor.mp += cost;
                     }
                     let missed=crate::skill_balance::revised(actor.stats)&&s.damage_percent>0&&matches!(mode,"enemy"|"all_enemies")&&!crate::attributes::lands(Some(actor.stats),None,actor.job==2);
+                    actor.effects.last_missed=missed;
                     let damage = if missed{actor.effects.miss(s,actor.stats,&mut actor.mp);0}else{actor.effects.cast(
                         s,
                         crate::attributes::for_attack(actor.stats, actor.job, actor.job == 2),
@@ -442,7 +445,7 @@ impl Battle {
                         let amount=if s.effect=="bleed"{enemy.effects.bleed_damage}else{enemy.effects.poison_damage};
                         enemy.dots.insert(format!("{who}/{}",s.effect),(ticks,amount));
                     }
-                    self.events.push(Event {
+                    self.events.push(Event {missed,
                         actor: who.to_string(),
                         target: if mode == "self" {
                             who.to_string()
@@ -465,7 +468,9 @@ impl Battle {
             let a = &mut self.fighters[i];
             a.mp=(a.mp+crate::skill_balance::recovery(a.stats,"basic_restore_bp",0)).min(a.stats.mp);
             let power = crate::attributes::for_attack(a.stats, a.job, a.job==2&&a.stats.balance.is_some());
-            let damage = if crate::skill_balance::revised(a.stats)&&!crate::attributes::lands(Some(a.stats),None,a.job==2){0}else{crate::attributes::critical(
+            let missed=crate::skill_balance::revised(a.stats)&&!crate::attributes::lands(Some(a.stats),None,a.job==2);
+            a.effects.last_missed=missed;
+            let damage = if missed{0}else{crate::attributes::critical(
                 a.stats,
                 a.job==2&&a.stats.balance.is_some(),
                 &mut a.effects,
@@ -474,8 +479,8 @@ impl Battle {
             )}
             .min(e.hp);
             e.hp -= damage;
-            e.effects.enemy_sleep = 0;
-            self.events.push(Event {
+            if !missed{e.effects.enemy_sleep = 0;}
+            self.events.push(Event {missed,
                 actor: who.to_string(),
                 target: e.slot.clone(),
                 action: action.into(),
@@ -488,7 +493,7 @@ impl Battle {
             self.fighters[i].guarding = true;
             let a = &mut self.fighters[i];
             a.mp = (a.mp + crate::skill_balance::recovery(a.stats,"guard_restore_bp",5)).min(a.stats.mp);
-            self.events.push(Event {
+            self.events.push(Event {missed:false,
                 actor: who.to_string(),
                 target: who.to_string(),
                 action: "guard".into(),
@@ -502,7 +507,7 @@ impl Battle {
             a.potions -= 1;
             let healed = crate::skill_balance::potion(a.stats).min(a.stats.hp - a.hp);
             a.hp += healed;
-            self.events.push(Event {
+            self.events.push(Event {missed:false,
                 actor: who.to_string(),
                 target: who.to_string(),
                 action: action.into(),
@@ -573,6 +578,7 @@ impl Battle {
                     let a=&mut self.fighters[i];
                     if a.hp<=0 || e.hp<=0 {continue;}
                     let landed=crate::attributes::lands(None,Some(a.stats),plan.magical);
+                    a.effects.last_enemy_missed=!landed;
                     let raw=if landed{crate::attributes::incoming(e.definition.attack,e.definition.level,a.stats,plan.magical,0)*plan.coefficient/10000}else{0};
                     let (incoming,critical)=if self.monster_revision>0{crate::monster_combat::elite_critical(e.elite.as_ref(),&e.definition,raw,(roll*37+n as i32*19+hit as i32*43+i as i32*11).rem_euclid(100))}else{(raw,false)};
                     let incoming=if landed&&a.guarding{(incoming/2).max(1)}else{incoming};
@@ -580,8 +586,8 @@ impl Battle {
                     let reflected=(reflected+if landed&&a.job==0&&a.guarding{6}else{0}).min(e.hp);
                     let damage=incoming.min(a.hp);
                     a.hp=(a.hp-incoming).max(0);e.hp-=reflected;
-                    self.events.push(Event{actor:e.slot.clone(),target:a.id.to_string(),action:if plan.skill.is_empty(){"attack"}else{"skill"}.into(),skill:plan.skill.clone(),damage,healed:0,critical});
-                    if reflected>0{self.events.push(Event{actor:a.id.to_string(),target:e.slot.clone(),action:"dot".into(),skill:String::new(),damage:reflected,healed:0,critical:false});}
+                    self.events.push(Event{missed:!landed,actor:e.slot.clone(),target:a.id.to_string(),action:if plan.skill.is_empty(){"attack"}else{"skill"}.into(),skill:plan.skill.clone(),damage,healed:0,critical});
+                    if reflected>0{self.events.push(Event{missed:false,actor:a.id.to_string(),target:e.slot.clone(),action:"dot".into(),skill:String::new(),damage:reflected,healed:0,critical:false});}
                     if plan.bleed&&damage>0&&a.hp>0{
                         let amount=(incoming*crate::monster_combat::n("bleed_bp")/10000).max(1);
                         let wound=self.wounds.entry(a.id.to_string()).or_insert((0,0));
@@ -593,11 +599,11 @@ impl Battle {
         }
         for ally in &mut self.fighters {
             if ally.hp>0{let before=ally.hp;ally.effects.end_balance_round(&mut ally.hp,ally.stats.hp);
-                if ally.hp>before{self.events.push(Event{actor:ally.id.to_string(),target:ally.id.to_string(),action:"regen".into(),skill:String::new(),damage:0,healed:ally.hp-before,critical:false});}
+                if ally.hp>before{self.events.push(Event{missed:false,actor:ally.id.to_string(),target:ally.id.to_string(),action:"regen".into(),skill:String::new(),damage:0,healed:ally.hp-before,critical:false});}
             }
             if let Some((ticks,amount))=self.wounds.get_mut(&ally.id.to_string()){
                 if *ticks>0&&ally.hp>0{let damage=(*amount).min(ally.hp);ally.hp-=damage;*ticks-=1;
-                    self.events.push(Event{actor:ally.id.to_string(),target:ally.id.to_string(),action:"dot".into(),skill:"monster_bleed".into(),damage,healed:0,critical:false});
+                    self.events.push(Event{missed:false,actor:ally.id.to_string(),target:ally.id.to_string(),action:"dot".into(),skill:"monster_bleed".into(),damage,healed:0,critical:false});
                 }
             }
             ally.effects.end_turn();
@@ -605,7 +611,7 @@ impl Battle {
         self.wounds.retain(|_,(ticks,_)|*ticks>0);
         for e in &mut self.enemies{
             if !e.dots.is_empty(){let mut total=0;for (ticks,amount) in e.dots.values_mut(){if *ticks>0{total+=*amount;*ticks-=1;}}let dealt=total.min(e.hp);e.hp=(e.hp-total).max(0);e.dots.retain(|_,(ticks,_)|*ticks>0);
-                if dealt>0{self.events.push(Event{actor:e.slot.clone(),target:e.slot.clone(),action:"dot".into(),skill:String::new(),damage:dealt,healed:0,critical:false});}
+                if dealt>0{self.events.push(Event{missed:false,actor:e.slot.clone(),target:e.slot.clone(),action:"dot".into(),skill:String::new(),damage:dealt,healed:0,critical:false});}
             }
             e.effects.tick_balance();
             e.effects.enemy_silence=(e.effects.enemy_silence-1).max(0);

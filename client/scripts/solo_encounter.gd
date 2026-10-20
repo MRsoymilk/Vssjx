@@ -73,8 +73,8 @@ func _sync()->void:
 func _copy_enemy(from:Dictionary,to:Dictionary)->void:
 	for key in ENEMY_FIELDS:to[key]=from[key]
 	if from.has("balance") and to.has("balance"):to.balance.control_protection=from.balance.control_protection
-func _event(actor:String,target:String,action:String,skill:String,damage:int=0,healed:int=0,critical:bool=false)->void:
-	state.events.append({"actor":actor,"target":target,"action":action,"skill":skill,"damage":damage,"healed":healed,"critical":critical})
+func _event(actor:String,target:String,action:String,skill:String,damage:int=0,healed:int=0,critical:bool=false,missed:bool=false)->void:
+	state.events.append({"actor":actor,"target":target,"action":action,"skill":skill,"damage":damage,"healed":healed,"critical":critical,"missed":missed})
 func submit(action:String,target:String="",skill:String="")->bool:
 	if not my_turn():return false
 	if pve!=null:return pve.submit(action,skill,[],1,target if action in ["attack","skill"] else "")
@@ -101,7 +101,9 @@ func submit(action:String,target:String="",skill:String="")->bool:
 		var old_hp:=engine.hp
 		var resolved:=engine.resolve_player();state.lines.append_array(resolved.lines);e.hp=engine.enemy_hp;_copy_enemy(engine.skills,e.effects)
 		var receiver:String=character_id if action in ["guard","potion"] or used.get("target") in ["self","all_allies"] else e.slot
-		_event(character_id,receiver,action,skill,int(engine.skills.last_damage),maxi(0,engine.hp-old_hp),engine.skills.get("last_critical",false))
+		_event(character_id,receiver,action,skill,int(resolved.get("direct_damage",engine.skills.last_damage)),maxi(0,engine.hp-old_hp),engine.skills.get("last_critical",false),engine.skills.get("last_missed",false))
+		var dot:=maxi(0,int(engine.skills.last_damage)-int(resolved.get("direct_damage",engine.skills.last_damage)))
+		if dot>0:_event(character_id,e.slot,"dot","",dot)
 	if action!="flee":_revive_fallen()
 	if action=="flee":state.outcome="fled"
 	elif state.enemies.all(func(e:Dictionary)->bool:return int(e.hp)==0):state.outcome="victory"
@@ -127,7 +129,7 @@ func _enemy_round()->void:
 			var taken:=SkillRules.enemy_hit(engine.skills,maxi(1,damage),plan.magical) if landed else Vector2i.ZERO
 			var reflected:=mini(int(e.hp),taken.y+(6 if landed and int(Game.player.job)==0 and engine.guarding else 0))
 			damage=mini(engine.hp,taken.x);engine.hp-=damage;e.hp=int(e.hp)-reflected
-			_event(e.slot,character_id,"skill" if not plan.skill.is_empty() else "attack",plan.skill,damage,0,crit.critical)
+			_event(e.slot,character_id,"skill" if not plan.skill.is_empty() else "attack",plan.skill,damage,0,crit.critical,not landed)
 			if reflected>0:_event(character_id,e.slot,"dot","",reflected)
 			if plan.bleed and damage>0 and engine.hp>0:
 				var previous:Array=state.wounds.get(character_id,[0,0]);state.wounds[character_id]=[int(MonsterCombat.rules.bleed_rounds),maxi(int(previous[1]),maxi(1,taken.x*int(MonsterCombat.rules.bleed_bp)/10000))]

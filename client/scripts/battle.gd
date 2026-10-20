@@ -73,6 +73,7 @@ func begin_action(command: String, skill_id:String="") -> Dictionary:
 func resolve_player() -> Dictionary:
 	if phase != "player": return {"ok": false, "lines": []}
 	var values := frozen_stats
+	skills.erase("last_missed")
 	var lines: Array[String] = []
 	var damage := 0
 	match pending_command:
@@ -81,7 +82,7 @@ func resolve_player() -> Dictionary:
 			var magical:bool=int(Game.player.job)==2 and values.has("balance")
 			damage = CharacterAttributeRules.direct_damage(CharacterAttributeRules.power(values,int(Game.player.job),magical),int(enemy.defense),10000,rng.randi_range(-2,2))
 			damage=CharacterAttributeRules.critical_at(values,magical,skills,damage,rng.randi_range(0,9999))
-			if SkillBalance.revised(values) and rng.randi_range(0,9999)>=CharacterAttributeRules.hit_chance(values,{},magical):damage=0;skills.last_critical=false
+			if SkillBalance.revised(values) and rng.randi_range(0,9999)>=CharacterAttributeRules.hit_chance(values,{},magical):damage=0;skills.last_critical=false;skills.last_missed=true
 			if damage>0:skills.enemy_sleep=0
 			lines.append("你%s出击，造成 %d 点伤害。" % [["挥锤", "挥剑", "挥杖"][int(Game.player.job)], damage])
 		"skill":
@@ -107,6 +108,7 @@ func resolve_player() -> Dictionary:
 			escaped = true
 			phase = "settlement"
 			return {"ok": true, "lines": ["你撤回了安全地带。"], "damage": 0}
+	var direct_damage:=mini(enemy_hp,damage)
 	var after:=SkillRules.after_player(skills,hp,int(values.hp))
 	hp=int(after.hp)
 	if int(after.damage)>0:lines.append("持续效果造成 %d 点伤害。"%int(after.damage))
@@ -119,7 +121,7 @@ func resolve_player() -> Dictionary:
 		victory = true
 		lines.append("%s被击败了！" % enemy.name)
 	phase = "settlement" if finished else "enemy"
-	return {"ok": true, "lines": lines, "damage": damage}
+	return {"ok": true, "lines": lines, "damage": damage,"direct_damage":direct_damage}
 
 func resolve_enemy() -> Dictionary:
 	if phase != "enemy": return {"ok": false, "lines": []}
@@ -134,6 +136,7 @@ func resolve_enemy() -> Dictionary:
 	if values.has("balance") and (round_number+1)%int(SkillBalance.rules.cast_period)==0:lines.append("妖物正在蓄势，下轮留意防御或封印。")
 	var incoming := CharacterAttributeRules.incoming(int(enemy.attack),int(enemy.get("level",1)),values,magical,rng.randi_range(-2,2))
 	var landed:=rng.randi_range(0,9999)<CharacterAttributeRules.hit_chance({},values,magical)
+	skills.last_enemy_missed=not landed
 	if guarding: incoming = maxi(1, incoming / 2)
 	var hit:=SkillRules.enemy_hit(skills,incoming,magical) if landed else Vector2i.ZERO
 	incoming=hit.x;skills.last_enemy_acted=true

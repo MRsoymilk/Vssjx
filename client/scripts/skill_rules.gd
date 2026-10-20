@@ -44,6 +44,8 @@ static func valid_view(view:Variant,character:Dictionary)->bool:
 
 static func valid_state(state:Variant)->bool:
 	if not state is Dictionary or not state.get("last_skill") is String or not state.get("last_enemy_acted") is bool:return false
+	for key in ["last_missed","last_enemy_missed"]:
+		if state.has(key) and not state[key] is bool:return false
 	if state.has("last_critical") and not state.last_critical is bool:return false
 	if not state.last_skill.is_empty() and (item(state.last_skill).is_empty() or not item(state.last_skill).active):return false
 	var expected:=new_state(0,0,1)
@@ -70,6 +72,7 @@ static func new_state(job:int,school:int,level:int,enemy_level:int=1)->Dictionar
 
 static func reset_turn(state:Dictionary)->void:
 	if state.has("balance"):state.balance.last_enemy_magical=false
+	state.erase("last_missed");state.erase("last_enemy_missed")
 	state.erase("last_critical")
 	for key in ["last_damage","last_incoming","last_reflected","last_healed"]:state[key]=0
 	state.last_enemy_acted=false;state.last_skill=""
@@ -78,7 +81,7 @@ static func activate(state:Dictionary,stats:Dictionary)->void:
 	if SkillBalance.revised(stats) and not state.has("balance"):state.balance={"cooldowns":{},"targets":1,"control_protection":0,"last_enemy_magical":false}
 static func remaining(state:Dictionary,id:String)->int:return int(state.get("balance",{}).get("cooldowns",{}).get(id,0))
 static func miss(skill:Dictionary,state:Dictionary,stats:Dictionary,mp:int)->int:
-	activate(state,stats);state.last_skill=skill.id;state.balance.cooldowns[skill.id]=SkillBalance.cooldown(skill)+1
+	activate(state,stats);state.last_missed=true;state.last_skill=skill.id;state.balance.cooldowns[skill.id]=SkillBalance.cooldown(skill)+1
 	return mp-SkillBalance.cost(skill,stats)
 static func end_balance_round(state:Dictionary,hp:int,max_hp:int)->Dictionary:
 	if not state.has("balance"):return {"damage":0,"hp":hp}

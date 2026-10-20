@@ -235,7 +235,7 @@ impl Battle {
         let mut damage = match action {
             Action::Attack => {
                 self.mp=(self.mp+crate::skill_balance::recovery(stats,"basic_restore_bp",0)).min(stats.mp);
-                if crate::skill_balance::revised(stats)&&!crate::attributes::lands(Some(stats),None,job==2){lines.push("你的攻击落空了。".into());0}else{
+                if crate::skill_balance::revised(stats)&&!crate::attributes::lands(Some(stats),None,job==2){self.skills.last_missed=true;lines.push("你的攻击落空了。".into());0}else{
                 self.skills.enemy_sleep = 0;
                 let magical=job==2&&stats.balance.is_some();
                 let power = crate::attributes::for_attack(stats, job, magical);
@@ -306,6 +306,7 @@ impl Battle {
             if let Some(b)=self.skills.balance.as_mut(){b.last_enemy_magical=magical;}
             let mut incoming = crate::attributes::incoming(self.enemy.attack,self.enemy.level,stats,magical,enemy_roll.clamp(-2,2));
             let landed = crate::attributes::lands(None, Some(stats), magical);
+            self.skills.last_enemy_missed=!landed;
             if !landed { incoming = 0; }
             if action == Action::Guard {
                 incoming = if landed { (incoming / 2).max(1) } else { 0 };

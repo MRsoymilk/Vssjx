@@ -69,6 +69,10 @@ pub fn view(job: i16, school: i16, level: i32) -> Value {
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 #[serde(default)]
 pub struct State {
+    #[serde(skip_serializing_if="not_critical")]
+    pub last_missed: bool,
+    #[serde(skip_serializing_if="not_critical")]
+    pub last_enemy_missed: bool,
     #[serde(default,skip_serializing_if="Option::is_none")]
     pub balance:Option<BalanceState>,
     #[serde(skip_serializing_if = "not_critical")]
@@ -103,7 +107,7 @@ fn not_critical(value: &bool) -> bool {
     !*value
 }
 impl State {
-    pub fn miss(&mut self,s:&Skill,stats:Stats,mp:&mut i32){self.activate(stats);self.last_skill=s.id.clone();*mp-=crate::skill_balance::cost(s,stats);self.mark(s);self.last_critical=false;}
+    pub fn miss(&mut self,s:&Skill,stats:Stats,mp:&mut i32){self.activate(stats);self.last_skill=s.id.clone();self.last_missed=true;*mp-=crate::skill_balance::cost(s,stats);self.mark(s);self.last_critical=false;}
     pub fn activate(&mut self,stats:Stats){if crate::skill_balance::revised(stats)&&self.balance.is_none(){self.balance=Some(BalanceState{targets:1,..Default::default()});}}
     pub fn remaining(&self,id:&str)->i32{self.balance.as_ref().and_then(|b|b.cooldowns.get(id)).copied().unwrap_or(0)}
     pub fn mark(&mut self,s:&Skill){if let Some(b)=self.balance.as_mut(){b.cooldowns.insert(s.id.clone(),crate::skill_balance::cooldown(s)+1);}}
@@ -136,6 +140,7 @@ impl State {
     pub fn reset_turn(&mut self) {
         if let Some(b)=self.balance.as_mut(){b.last_enemy_magical=false;}
         self.last_critical = false;
+        self.last_missed=false;self.last_enemy_missed=false;
         self.last_skill.clear();
         self.last_enemy_acted = false;
         self.last_damage = 0;

@@ -152,6 +152,7 @@ struct Choice {
 }
 #[derive(Clone, Serialize)]
 pub struct Event {
+    pub missed: bool,
     pub critical: bool,
     pub actor: Uuid,
     pub action: String,
@@ -321,6 +322,7 @@ impl Battle {
             let mut action = choice.action.clone();
             let mut used = String::new();
             let mut damage = 0;
+            let mut missed=false;
             let mut reflected = 0;
             if dot > 0 {
                 self.lines
@@ -350,6 +352,7 @@ impl Battle {
                                 crate::attributes::direct_damage(power,crate::attributes::defense(enemy.stats,actor.job==2&&actor.stats.balance.is_some()),10000,0), roll,
                             )
                         } else {
+                            missed=true;
                             0
                         }
                     }
@@ -360,6 +363,7 @@ impl Battle {
                         let magical = actor.job == 2;
                         let directed = matches!(s.target.as_str(), "enemy" | "all_enemies");
                         if directed && !crate::attributes::lands(Some(actor.stats), Some(enemy.stats), magical) {
+                            missed=true;
                             actor.mp -= crate::skill_balance::cost(s,actor.stats);
                             if balanced{actor.effects.mark(s);}
                             actor.effects.last_skill = s.id.clone();
@@ -398,6 +402,7 @@ impl Battle {
                 actor.hp = (actor.hp - reflected).max(0);
                 enemy.effects.last_incoming = damage;
                 enemy.effects.last_reflected = reflected;
+                actor.effects.last_missed=missed;enemy.effects.last_enemy_missed=missed;
                 actor.effects.last_damage = damage;
                 actor.effects.last_reflected = reflected;
                 self.lines.push(format!(
@@ -417,6 +422,7 @@ impl Battle {
                 }
             }
             self.events.push(Event {
+                missed,
                 critical: damage > 0 && self.fighters[me].effects.last_critical,
                 actor: self.fighters[me].id,
                 action,

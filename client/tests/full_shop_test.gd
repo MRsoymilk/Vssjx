@@ -46,7 +46,7 @@ func _run() -> void:
 	check(source_count==208,"All recovered items are functional")
 	var page:ShopPanel=load("res://scenes/ui/shop_panel.tscn").instantiate()
 	add_child(page)
-	check(page.rows.size()==394 and page.grid.columns==2,"Complete two-column native catalog including three generated equipment families")
+	check(page.rows.size()==395 and page.grid.columns==2,"Complete two-column catalog including standalone legendary weapon")
 	for row in page.rows:
 		check(row.get_node("Icon").texture!=null,"Actual product icon "+String(row.get_meta("item_id")))
 	page.category="帽子";page.category_box.select(2);page._filter()

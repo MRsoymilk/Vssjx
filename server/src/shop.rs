@@ -104,7 +104,7 @@ mod tests {
             gear.insert(format!("ai/boneglow/{stem}/hat"),true);
             assert_eq!(appearance(&gear),[34+index as i32,18+index as i32,10+index as i32]);
         }
-        assert_eq!(ITEMS.len(),394);
+        assert_eq!(ITEMS.len(),395);
     }
     #[test]
     fn eva01_sets_preserve_role_restrictions_and_mix_with_previous_families(){
@@ -126,6 +126,21 @@ mod tests {
             assert_eq!(appearance(&gear),[40+index as i32,24+index as i32,16+index as i32]);
         }
         assert!(item("ai/eva01/unknown/weapon").is_none());
+    }
+    #[test]
+    fn potian_axe_is_one_authoritative_weapon_for_both_lishi_genders(){
+        let id="ai/legendary/potian_axe";
+        let entry=item(id).expect("approved axe is catalogued");
+        assert_eq!(ITEMS.iter().filter(|i|i.id==id).count(),1);
+        assert_eq!((entry.slot.as_str(),entry.price,entry.attack,entry.visual),("weapon",250,20,46));
+        for gender in [0,1] {
+            assert_eq!(entry.equip_error(0,gender),None);
+            for job in [1,2] {assert_eq!(entry.equip_error(job,gender),Some("WRONG_JOB"));}
+        }
+        let gear=BTreeMap::from([(id.into(),true),("ai/boneglow/wzs/armor".into(),true),("ai/gravebloom/wzs/hat".into(),true)]);
+        assert_eq!(appearance(&gear),[46,13,17]);
+        assert_eq!(bonus(&gear),(20,6));
+        assert_eq!(view(&gear,&BTreeMap::new(),0)["weapon"],id);
     }
     #[test]
     fn legacy_wire_response_never_rewrites_full_receipt_or_exposes_unknown_items(){

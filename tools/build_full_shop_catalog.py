@@ -9,6 +9,7 @@ from pathlib import Path
 from build_boneglow_equipment import equipment_items
 from build_gravebloom_equipment import equipment_items as gravebloom_items
 from build_eva01_equipment import equipment_items as eva01_items
+from build_legendary_equipment import equipment_items as legendary_items
 
 ROOT = Path(__file__).resolve().parents[1]
 SLOTS = ['weapon','pendant','armor','wrist','belt','pants','boots','ring','necklace','hat']
@@ -86,7 +87,7 @@ def build():
     assert {r['source_member'] for r in items}=={r['source_member'] for r in original['items']}
     return {'version':'shop-v2','provenance':'全量原包图标；显示名、分类和玩法数值为显式重建规则',
             'slots':SLOTS,'slot_labels':LABELS,'tabs':[['hot','热卖'],['rare','奇珍'],['craft','炼制'],['elixir','仙丹']],
-            'items':items+legacy+equipment_items()+gravebloom_items()+eva01_items()}
+            'items':items+legacy+equipment_items()+gravebloom_items()+eva01_items()+legendary_items()}
 
 
 if __name__=='__main__':

@@ -1,0 +1,44 @@
+{
+  "format_version": 1,
+  "source": "用户确认AI还原图片；原版力士武器坐标适配",
+  "sets": [],
+  "weapons": [
+    {
+      "id": "legendary/potian_axe",
+      "name": "破天斧",
+      "stem": "mzs",
+      "job": 0,
+      "gender": 0,
+      "weapon_code": 46,
+      "weapon": "legendary/potian_axe"
+    },
+    {
+      "id": "legendary/potian_axe",
+      "name": "破天斧",
+      "stem": "wzs",
+      "job": 0,
+      "gender": 1,
+      "weapon_code": 46,
+      "weapon": "legendary/potian_axe"
+    }
+  ],
+  "parts": {
+    "legendary/potian_axe": {
+      "texture": "res://assets/generated/equipment/legendary/potian-axe.png",
+      "frames": [
+        [
+          0,
+          0,
+          74,
+          38
+        ],
+        [
+          74,
+          0,
+          74,
+          47
+        ]
+      ]
+    }
+  }
+}

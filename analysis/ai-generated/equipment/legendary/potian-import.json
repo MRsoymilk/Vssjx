@@ -1,0 +1,51 @@
+{
+	"alpha_cutoff": 250,
+	"basis": "用户确认图片；仅透明阈值、等比最近邻采样和原版力士武器握持坐标适配，不重绘设计。",
+	"outputs": [
+		{
+			"path": "res://assets/generated/equipment/legendary/potian-axe.png",
+			"sha256": "8dcb8bceb267ee72f9bc4f2f72b0e058661dc21b53be57c1e64c35f9dafe7637"
+		},
+		{
+			"path": "res://assets/generated/equipment/legendary/potian-icon.png",
+			"sha256": "69ff3c3d09f7b09e751441277627ff951f77b6f051155992c0bbfc064e210c77"
+		}
+	],
+	"poses": [
+		{
+			"angle": 0.0,
+			"grip": [
+				13,
+				18
+			],
+			"rect": [
+				0,
+				0,
+				74,
+				38
+			],
+			"scale": 0.045
+		},
+		{
+			"angle": -27.0,
+			"grip": [
+				13,
+				33
+			],
+			"rect": [
+				74,
+				0,
+				74,
+				47
+			],
+			"scale": 0.045
+		}
+	],
+	"source": "res://../analysis/ai-generated/equipment/legendary/potian-approved.png",
+	"source_grip": [
+		400.0,
+		196.0
+	],
+	"source_sha256": "3ccb7861833d950ed46a2db25c13da1eea5f3c0b07b8952f1088c73f202dc610",
+	"source_shaft_angle": 34.47
+}

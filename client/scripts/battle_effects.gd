@@ -50,6 +50,12 @@ func play_binding(id:String,trigger:String,hero:AnimatedSprite2D,enemy:AnimatedS
 			audio_played.emit(selected.audio_id)
 	return primary
 
+func has_skill_effects(id:String)->bool:
+	for entry in _attachments:
+		var sprite:AnimatedSprite2D=entry.sprite
+		if is_instance_valid(sprite) and not sprite.is_queued_for_deletion() and sprite.get_meta("skill_id","")==id:return true
+	return false
+
 func play_reflection(job:int,school:int,level:int,state:Dictionary,magical:bool,hero:AnimatedSprite2D,enemy:AnimatedSprite2D)->void:
 	if int(state.get("last_reflected",0))<=0:return
 	var percent:=int(state.get("passive_magic" if magical else "passive_physical",0))

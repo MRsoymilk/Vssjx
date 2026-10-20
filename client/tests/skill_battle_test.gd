@@ -41,7 +41,8 @@ func _run()->void:
 	var book:SkillBook=attributes.content.get_node("SkillBook")
 	check(book.rows.get_child_count()==12 and book.rows.get_child(0).get_node("Rank").text=="—/—","Native compact list has independent rank column, without fake ranks")
 	book.select_skill(1)
-	check(book.detail.text.contains("反伤") and book.detail.text.contains("消耗灵力12"),"Selecting a row updates the separate description and cost")
+	var expected_cost:="消耗最大灵力10% · 冷却2轮" if book.balanced else "消耗灵力12"
+	check(book.detail.text.contains("反伤") and book.detail.text.contains(expected_cost),"Selecting a row shows its versioned cost and cooldown in the separate description")
 	check(attributes.get_node("Label5").text=="人物技能" and not attributes.signature.visible,"Skill page uses original title and replaces signature footer")
 	check(book.get_node("Upgrade").disabled and book.get_node("NextInfo").disabled,"Unrecovered growth actions cannot invent points or upgrade levels")
 	await capture("skill-attributes")

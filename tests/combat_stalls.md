@@ -45,3 +45,17 @@ python tests/run_offscreen.py --path client --rendering-method gl_compatibility 
 组队联调保留真实共享30秒等待、并发指令、事务失败回滚、重启恢复、死亡寻尸和真实 Godot 客户端。原有旧数值断言改为根据冻结版本验证怪物参数，未放宽业务成功／失败要求。决斗联调的两个专用8级UI角色合法分配40点，以适配新版虚拟气血及减伤后的原65秒UI测试预算；不改玩家数据或PvP规则。
 
 后续线上验收仍需要在用户设备、实际延迟／丢包条件下复测；本次不操作部署，不能据此保证现有安装包即时消除卡顿。
+
+## local 技能特效与怪物反击时序（2026-10-20）
+
+复现角色出招已结束、原生技能特效仍在播放时，怪物提前反击的问题。local 技能现在在原生命中点触发特效和音效，等待角色动作及本次技能全部特效层结束后进入反击；不增加固定延时，不等待音频尾音。退出战斗取消等待，避免旧回合继续执行。未改变技能费用、伤害、冷却、回合末结算或联机规则。
+
+新增 `local_skill_timing_test.tscn`，使用实际主场景和原生动画，覆盖雷霆一击、星火燎原、天罡战甲、狂风骤电，检查命中前无特效、多层最后一层仍阻止反击、播完立即反击及退出清理。修复前26项中6项失败；修复后真实 OpenGL 运行26项全部通过。技能战斗回归120项、音效回归22项通过，编辑器导入及 `git diff --check` 通过。技能说明断言同时按既有数值版本验证百分比消耗／冷却或旧固定消耗。
+
+```sh
+godot --path client --rendering-method gl_compatibility res://tests/local_skill_timing_test.tscn
+godot --headless --path client res://tests/skill_battle_test.tscn
+godot --headless --path client res://tests/skill_audio_test.tscn
+```
+
+本阶段仅修复本地源码并提交，未重新打包、推送或部署。

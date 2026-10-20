@@ -1161,6 +1161,12 @@ func _battle_turn(command: String, skill_id:String="") -> void:
 	else:
 		await get_tree().create_timer(0.6).timeout
 	if epoch != _ui_epoch or mode != "battle" or battle != active_battle: return
+	# Native skill FX can outlast the actor's cast. Keep all their layers in the
+	# player's action so a late flame/lightning frame cannot follow the counterattack.
+	if command=="skill":
+		while is_instance_valid(battle_effects) and battle_effects.has_skill_effects(skill_id):
+			await get_tree().process_frame
+			if epoch != _ui_epoch or mode != "battle" or battle != active_battle:return
 	battle_playback = null
 	battle_move_callout.clear()
 	if battle.phase=="enemy" and int(battle.skills.enemy_sleep)>0:

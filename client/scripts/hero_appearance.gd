@@ -6,6 +6,17 @@ static var _images: Dictionary = {}
 static var _parts: Dictionary = {}
 static var _prepared: Dictionary = {}
 static var _order: Array[String] = []
+static var _edit_revision := -1
+
+static func composition_key(key: String) -> String:
+	if is_key(key): return key
+	if not AppearanceEdits.any(): return ""
+	var parsed:=RegEx.create_from_string("^hero/([mw](zs|ck|fs))(_w([0-9]{1,3})_c([0-9]{1,3}))?$").search(key)
+	if parsed==null: return ""
+	var weapon:=1 if parsed.get_string(3).is_empty() else int(parsed.get_string(4))
+	var clothing:=0 if parsed.get_string(3).is_empty() else int(parsed.get_string(5))
+	var result:="hero/%s_w%d_c%d_h0"%[parsed.get_string(1),weapon,clothing]
+	return result if is_key(result) else ""
 
 static func is_key(key: String) -> bool:
 	var parsed := RegEx.create_from_string("^hero/([mw](zs|ck|fs))_w([0-9]{1,3})_c([0-9]{1,3})_h([0-9]{1,3})$").search(key)
@@ -18,10 +29,8 @@ static func _part(source: String, frame: int, transform: int) -> Image:
 	var entry: Dictionary = _data.parts[source]
 	if frame >= entry.frames.size(): return null
 	if not _images.has(source):
-		var texture: Texture2D = load(entry.texture)
-		var image := texture.get_image()
-		if image.is_compressed(): image.decompress()
-		image.convert(Image.FORMAT_RGBA8)
+		var image:=AppearanceEdits.image_for(source)
+		if image==null: image=AppearanceEdits.source_image(source)
 		_images[source] = image
 	var r: Array = entry.frames[frame]
 	var part: Image = _images[source].get_region(Rect2i(int(r[0]),int(r[1]),int(r[2]),int(r[3])))
@@ -37,6 +46,10 @@ static func _part(source: String, frame: int, transform: int) -> Image:
 	return part
 
 static func build(key: String, base: Dictionary) -> Dictionary:
+	AppearanceEdits.ensure_loaded()
+	if _edit_revision!=AppearanceEdits.revision:
+		_images.clear();_parts.clear();_prepared.clear();_order.clear()
+		_edit_revision=AppearanceEdits.revision
 	if _prepared.has(key): return _prepared[key]
 	if not is_key(key): return {}
 	if _data.is_empty():
@@ -69,7 +82,8 @@ static func build(key: String, base: Dictionary) -> Dictionary:
 			var part := _part(source,int(layer.frame),int(layer.transform))
 			if part == null: return {}
 			if layer.source == recipe.sources[0] and int(layer.frame) == 0: center = int(layer.x) + part.get_width()/2
-			images.append([part,int(layer.x),int(layer.y)])
+			var shift:=AppearanceEdits.offset_for(source,int(layer.frame),int(layer.transform))
+			images.append([part,int(layer.x)+shift.x,int(layer.y)+shift.y])
 		centers.append(center)
 		for image in images:
 			image[1] -= center

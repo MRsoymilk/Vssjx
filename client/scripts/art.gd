@@ -9,6 +9,8 @@ static var _index: Dictionary = {}
 static var _index_loaded := false
 static var _metadata_reads := 0
 static var _metadata_bytes := 0
+static var _native_catalog: Dictionary = {}
+static var _edit_revision := -1
 const ACTOR_SCENE := preload("res://scenes/actors/original_actor.tscn")
 const INDEX_PATH := "res://assets/data/actors.json"
 
@@ -33,20 +35,39 @@ static func has_actor(key: String) -> bool:
 static func actor_info(key: String) -> Dictionary:
 	# Metadata and SpriteFrames are separate caches: battle preparation may read
 	# only the requested metadata before loading its texture asynchronously.
+	_sync_edits()
 	if catalog.has(key): return catalog[key]
-	if HeroAppearance.is_key(key):
-		var base := actor_info("hero/"+key.trim_prefix("hero/").get_slice("_",0))
-		var prepared := HeroAppearance.build(key,base)
+	var composition:=HeroAppearance.composition_key(key)
+	if not composition.is_empty():
+		var base := _native_info("hero/"+key.trim_prefix("hero/").get_slice("_",0))
+		var prepared := HeroAppearance.build(composition,base)
 		if prepared.is_empty(): return {}
 		catalog[key] = prepared.info
 		return prepared.info
+	var info:=_native_info(key)
+	if not info.is_empty(): catalog[key]=info
+	return info
+
+static func _native_info(key: String) -> Dictionary:
+	if _native_catalog.has(key): return _native_catalog[key]
 	if not has_actor(key): return {}
 	var path: Variant = _index[key]
 	if not path is String or path != "res://assets/data/actors/" + key + ".json": return {}
 	var info := _read_metadata(path)
 	if not _valid_info(info): return {}
-	catalog[key] = info
+	_native_catalog[key] = info
 	return info
+
+static func _sync_edits() -> void:
+	AppearanceEdits.ensure_loaded()
+	if _edit_revision==AppearanceEdits.revision: return
+	_edit_revision=AppearanceEdits.revision
+	# Invalidate strong AND weak sprite-frame caches, including native hero aliases.
+	for key in catalog.keys():
+		if key.begins_with("hero/"): catalog.erase(key)
+	for key in cached.keys():
+		if key.begins_with("hero/"): cached.erase(key)
+	_dynamic_weak.clear();_dynamic_order.clear()
 
 static func metadata_stats() -> Dictionary:
 	return {"indexed_actors": _index.size(), "loaded_actors": catalog.size(), "sprite_frames": cached.size(), "json_files_read": _metadata_reads, "json_bytes_read": _metadata_bytes}
@@ -87,7 +108,8 @@ static func actor(key: String) -> AnimatedSprite2D:
 	if not cached.has(key):
 		var frames := SpriteFrames.new()
 		frames.remove_animation("default")
-		var prepared: Dictionary = HeroAppearance.build(key,actor_info("hero/"+key.trim_prefix("hero/").get_slice("_",0))) if HeroAppearance.is_key(key) else {}
+		var composition:=HeroAppearance.composition_key(key)
+		var prepared: Dictionary = HeroAppearance.build(composition,_native_info("hero/"+key.trim_prefix("hero/").get_slice("_",0))) if not composition.is_empty() else {}
 		var texture: Texture2D = prepared.texture if not prepared.is_empty() else load(info.texture)
 		var regions: Array[AtlasTexture] = []
 		for i in int(info.count):
@@ -123,11 +145,12 @@ static func actor(key: String) -> AnimatedSprite2D:
 			for step in steps:
 				frames.add_frame(mode, regions[int(step[0])], maxf(1.0, float(step[1])))
 		cached[key] = frames
-	if HeroAppearance.is_key(key):
+	if not HeroAppearance.composition_key(key).is_empty():
 		_dynamic_weak[key] = weakref(cached[key])
 		_dynamic_order.erase(key);_dynamic_order.append(key)
 		while _dynamic_order.size()>6: cached.erase(_dynamic_order.pop_front())
 	sprite.set_meta("art_key",key)
+	sprite.set_meta("appearance_edit_revision",AppearanceEdits.revision)
 	sprite.sprite_frames = cached[key]
 	sprite.offset = Vector2(info.origin[0] - info.get("anchor_x", 0), info.origin[1])
 	if key.begins_with("hero/"):
@@ -173,13 +196,14 @@ static func effect(key: String, sequence: int = 0) -> AnimatedSprite2D:
 	return sprite
 
 static func apply_appearance(sprite: AnimatedSprite2D, key: String) -> void:
-	if sprite.get_meta("art_key", "") == key: return
+	if sprite.get_meta("art_key", "") == key and int(sprite.get_meta("appearance_edit_revision",-1))==AppearanceEdits.revision: return
 	var replacement := actor(key)
 	var animation := sprite.animation
 	var frame := sprite.frame
 	sprite.sprite_frames = replacement.sprite_frames
 	sprite.offset = replacement.offset
 	sprite.set_meta("art_key",key)
+	sprite.set_meta("appearance_edit_revision",AppearanceEdits.revision)
 	sprite.set_meta("ground_pose_x",replacement.get_meta("ground_pose_x",{}))
 	sprite.play(animation if sprite.sprite_frames.has_animation(animation) else &"idle")
 	sprite.frame = mini(frame,sprite.sprite_frames.get_frame_count(sprite.animation)-1)

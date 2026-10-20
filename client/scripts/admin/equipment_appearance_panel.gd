@@ -1,15 +1,33 @@
 extends VBoxContainer
 const MAPPING := preload("res://scripts/admin/equipment_appearance.gd")
 var equipment: Dictionary = {}
+var pixel_editor: Window
 @onready var before_preview = %BeforePreview
 @onready var after_preview = %AfterPreview
 
 func _ready() -> void:
 	for chooser in [%Job, %Gender, %Action]: chooser.item_selected.connect(func(_index: int) -> void: _refresh())
 	%SetPreview.toggled.connect(func(_value: bool) -> void: _refresh())
+	%EditAppearance.pressed.connect(open_pixel_editor)
+
+func open_pixel_editor() -> void:
+	if is_instance_valid(pixel_editor): pixel_editor.grab_focus();return
+	if equipment.is_empty(): return
+	var full_set:bool=%SetPreview.visible and %SetPreview.button_pressed
+	if equipment.slot not in ["weapon","armor","hat"] and not full_set: return
+	var mapping:=MAPPING.variant(equipment,%Job.selected,%Gender.selected,full_set)
+	if mapping.is_empty(): return
+	mapping.edit_full_set=full_set
+	pixel_editor=preload("res://scripts/admin/equipment_pixel_editor.gd").new()
+	pixel_editor.mapping=mapping;pixel_editor.equipment=equipment.duplicate(true);pixel_editor.ui_theme=theme if theme!=null else get_theme()
+	add_child(pixel_editor)
+	pixel_editor.applied.connect(_refresh)
+	pixel_editor.editor_closed.connect(_refresh)
+	pixel_editor.popup_centered(Vector2i(1100,760))
 
 func set_equipment(entry: Dictionary) -> void:
 	equipment = entry
+	%EditAppearance.visible=not entry.is_empty() and entry.get("slot") in ["weapon","armor","hat"]
 	%SetPreview.visible = entry.has("set_id")
 	%SetPreview.set_pressed_no_signal(false)
 	visible = not entry.is_empty()
@@ -28,6 +46,7 @@ func set_equipment(entry: Dictionary) -> void:
 func _refresh() -> void:
 	if equipment.is_empty(): return
 	var full_set: bool = %SetPreview.visible and %SetPreview.button_pressed
+	%EditAppearance.visible=full_set or equipment.slot in ["weapon","armor","hat"]
 	var mapping := MAPPING.variant(equipment, %Job.selected, %Gender.selected, full_set)
 	if mapping.is_empty(): return
 	%AfterCaption.text = "装备后 · 整套穿戴" if full_set else "装备后 · 仅当前装备"

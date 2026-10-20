@@ -91,3 +91,8 @@ theme_override_colors/font_color = Color(0.51, 0.87, 0.74, 1)
 theme_override_font_sizes/font_size = 11
 autowrap_mode = 3
 text = "部件对应"
+
+[node name="EditAppearance" type="Button" parent="."]
+unique_name_in_owner = true
+text = "编辑图片 / 调整部件位置…"
+tooltip_text = "像素铅笔、橡皮擦、取色、部件移动与实时人物预览；保存后作为此项目的美术修改应用。"

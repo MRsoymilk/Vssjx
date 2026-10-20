@@ -1,5 +1,5 @@
 extends Control
-## Standalone project-data workbench. No editing, network calls or save loading.
+## Standalone workbench. Data is read-only; equipment art has a local pixel editor.
 
 const CATALOG := preload("res://scripts/admin/data_catalog.gd")
 const LAYOUT := preload("res://scripts/admin/admin_window_layout.gd")
@@ -164,7 +164,7 @@ func _fill_list(preferred_id: String = "") -> void:
 		_show_entry(selected.get_metadata(0))
 	else:
 		_show_entry({})
-	%Footer.text = "只读浏览 · 本地项目定义 · 不连接数据库或读取玩家存档" if catalog.errors.is_empty() else "数据加载异常：" + "；".join(catalog.errors)
+	%Footer.text = "本地项目数据 · 装备图像可进入编辑模式 · 不连接数据库或读取玩家存档" if catalog.errors.is_empty() else "数据加载异常：" + "；".join(catalog.errors)
 
 func _record_selected() -> void:
 	var row: TreeItem = %Records.get_selected()

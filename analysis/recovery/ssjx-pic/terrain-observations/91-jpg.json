@@ -1,0 +1,22 @@
+{
+  "source_file": "91.jpg",
+  "source_sha256": "a476b4b98c6254f6b340cb88a3dffbfac4b6c5682f3315263818ecc3e29edf62",
+  "source_path": "analysis/references/ssjx-pic/91.jpg",
+  "screenshot_scene_id": "91-jpg",
+  "theme": "snow_ice",
+  "classification": "人工视觉分类；不是原版地图名称或地图编号",
+  "viewport_bbox": [
+    0,
+    86,
+    480,
+    602
+  ],
+  "viewport_is_partial": true,
+  "visible_regions": [],
+  "world_map_id": null,
+  "tile_grid": null,
+  "collision": null,
+  "teleport_targets": null,
+  "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+  "runtime_enabled": false
+}

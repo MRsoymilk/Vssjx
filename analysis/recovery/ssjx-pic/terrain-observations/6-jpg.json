@@ -1,0 +1,35 @@
+{
+  "source_file": "6.jpg",
+  "source_sha256": "c4ed70e5a27a47c82916023ff1df7bf40ee1236ed668420de25f108948838900",
+  "source_path": "analysis/references/ssjx-pic/6.jpg",
+  "screenshot_scene_id": "6-jpg",
+  "theme": "grass_water",
+  "classification": "人工视觉分类；不是原版地图名称或地图编号",
+  "viewport_bbox": [
+    0,
+    86,
+    480,
+    602
+  ],
+  "viewport_is_partial": true,
+  "visible_regions": [
+    {
+      "region_id": "crane-daren",
+      "category": "npc",
+      "name": "达人使者",
+      "bbox": [
+        326,
+        270,
+        410,
+        424
+      ],
+      "semantic_class": null
+    }
+  ],
+  "world_map_id": null,
+  "tile_grid": null,
+  "collision": null,
+  "teleport_targets": null,
+  "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+  "runtime_enabled": false
+}

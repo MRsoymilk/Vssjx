@@ -1,0 +1,35 @@
+{
+  "source_file": "89.jpg",
+  "source_sha256": "342e490b01e8af065bf066025ddb229ab52d7ae10cffe76f885de2fb8329bfb0",
+  "source_path": "analysis/references/ssjx-pic/89.jpg",
+  "screenshot_scene_id": "89-jpg",
+  "theme": "settlement_dry",
+  "classification": "人工视觉分类；不是原版地图名称或地图编号",
+  "viewport_bbox": [
+    0,
+    86,
+    480,
+    602
+  ],
+  "viewport_is_partial": true,
+  "visible_regions": [
+    {
+      "region_id": "yi-zhe",
+      "category": "npc",
+      "name": "医者",
+      "bbox": [
+        100,
+        352,
+        178,
+        462
+      ],
+      "semantic_class": null
+    }
+  ],
+  "world_map_id": null,
+  "tile_grid": null,
+  "collision": null,
+  "teleport_targets": null,
+  "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+  "runtime_enabled": false
+}

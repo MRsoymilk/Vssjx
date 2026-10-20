@@ -1,0 +1,35 @@
+{
+  "source_file": "88.jpg",
+  "source_sha256": "af078439a69e8c59be13b8d6832b2b7757a792e40d01fb430653c1464bc336d1",
+  "source_path": "analysis/references/ssjx-pic/88.jpg",
+  "screenshot_scene_id": "88-jpg",
+  "theme": "dry_wilderness",
+  "classification": "人工视觉分类；不是原版地图名称或地图编号",
+  "viewport_bbox": [
+    0,
+    86,
+    480,
+    602
+  ],
+  "viewport_is_partial": true,
+  "visible_regions": [
+    {
+      "region_id": "dry-cliff",
+      "category": "terrain",
+      "name": "黄土石壁与碎石",
+      "bbox": [
+        4,
+        368,
+        300,
+        600
+      ],
+      "semantic_class": "dry_cliff"
+    }
+  ],
+  "world_map_id": null,
+  "tile_grid": null,
+  "collision": null,
+  "teleport_targets": null,
+  "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+  "runtime_enabled": false
+}

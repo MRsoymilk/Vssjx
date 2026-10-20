@@ -1,0 +1,22 @@
+{
+  "source_file": "32.jpg",
+  "source_sha256": "2d2d9e408e1e1038216ac1f2ec2bb32356c797b9804eeecf5e3cd9ffef5dcd3c",
+  "source_path": "analysis/references/ssjx-pic/32.jpg",
+  "screenshot_scene_id": "32-jpg",
+  "theme": "lava",
+  "classification": "人工视觉分类；不是原版地图名称或地图编号",
+  "viewport_bbox": [
+    0,
+    86,
+    480,
+    602
+  ],
+  "viewport_is_partial": true,
+  "visible_regions": [],
+  "world_map_id": null,
+  "tile_grid": null,
+  "collision": null,
+  "teleport_targets": null,
+  "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+  "runtime_enabled": false
+}

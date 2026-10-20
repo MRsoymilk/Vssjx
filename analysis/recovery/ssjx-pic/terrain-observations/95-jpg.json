@@ -1,0 +1,47 @@
+{
+  "source_file": "95.jpg",
+  "source_sha256": "c163a90bfb82907bfc75aef21d850ee086a662afd2d24e9343da27e5eebfa3c7",
+  "source_path": "analysis/references/ssjx-pic/95.jpg",
+  "screenshot_scene_id": "95-jpg",
+  "theme": "grass_water",
+  "classification": "人工视觉分类；不是原版地图名称或地图编号",
+  "viewport_bbox": [
+    0,
+    86,
+    480,
+    602
+  ],
+  "viewport_is_partial": true,
+  "visible_regions": [
+    {
+      "region_id": "wudu-tianwang",
+      "category": "npc",
+      "name": "五毒天王",
+      "bbox": [
+        134,
+        340,
+        206,
+        462
+      ],
+      "semantic_class": null
+    },
+    {
+      "region_id": "palm",
+      "category": "object",
+      "name": "棕榈树",
+      "bbox": [
+        0,
+        338,
+        136,
+        498
+      ],
+      "semantic_class": null
+    }
+  ],
+  "world_map_id": null,
+  "tile_grid": null,
+  "collision": null,
+  "teleport_targets": null,
+  "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+  "runtime_enabled": false
+}

@@ -1,0 +1,22 @@
+{
+  "source_file": "92.jpg",
+  "source_sha256": "cc68e95da793278cc3f7164e28db9fc69dce6462ba850679c4324b34037e2414",
+  "source_path": "analysis/references/ssjx-pic/92.jpg",
+  "screenshot_scene_id": "92-jpg",
+  "theme": "grass_water",
+  "classification": "人工视觉分类；不是原版地图名称或地图编号",
+  "viewport_bbox": [
+    0,
+    86,
+    480,
+    602
+  ],
+  "viewport_is_partial": true,
+  "visible_regions": [],
+  "world_map_id": null,
+  "tile_grid": null,
+  "collision": null,
+  "teleport_targets": null,
+  "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+  "runtime_enabled": false
+}

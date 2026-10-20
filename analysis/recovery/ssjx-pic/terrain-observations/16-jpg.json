@@ -1,0 +1,22 @@
+{
+  "source_file": "16.jpg",
+  "source_sha256": "34bea87aefee92c806a37cb6a0be922e905952e6cd835b71a32518a758b06e09",
+  "source_path": "analysis/references/ssjx-pic/16.jpg",
+  "screenshot_scene_id": "16-jpg",
+  "theme": "blue_paving",
+  "classification": "人工视觉分类；不是原版地图名称或地图编号",
+  "viewport_bbox": [
+    0,
+    86,
+    480,
+    602
+  ],
+  "viewport_is_partial": true,
+  "visible_regions": [],
+  "world_map_id": null,
+  "tile_grid": null,
+  "collision": null,
+  "teleport_targets": null,
+  "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+  "runtime_enabled": false
+}

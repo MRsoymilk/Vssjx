@@ -1,0 +1,59 @@
+{
+  "source_file": "100.webp",
+  "source_sha256": "ce12f1f8bab16a13221ca960873d04c55ac5462945a2141b2a78a4ce8db30f44",
+  "source_path": "analysis/references/ssjx-pic/100.webp",
+  "screenshot_scene_id": "100-webp",
+  "theme": "settlement_dry",
+  "classification": "人工视觉分类；不是原版地图名称或地图编号",
+  "viewport_bbox": [
+    0,
+    86,
+    480,
+    602
+  ],
+  "viewport_is_partial": true,
+  "visible_regions": [
+    {
+      "region_id": "yinming-jianxian",
+      "category": "npc",
+      "name": "隐名剑仙",
+      "bbox": [
+        394,
+        220,
+        480,
+        352
+      ],
+      "semantic_class": null
+    },
+    {
+      "region_id": "school-daily",
+      "category": "npc",
+      "name": "姓名被遮挡·门派日常NPC",
+      "bbox": [
+        140,
+        132,
+        220,
+        242
+      ],
+      "semantic_class": null
+    },
+    {
+      "region_id": "school-daily-activity",
+      "category": "npc",
+      "name": "铁钟道人（读字待核）",
+      "bbox": [
+        416,
+        546,
+        480,
+        602
+      ],
+      "semantic_class": null
+    }
+  ],
+  "world_map_id": null,
+  "tile_grid": null,
+  "collision": null,
+  "teleport_targets": null,
+  "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+  "runtime_enabled": false
+}

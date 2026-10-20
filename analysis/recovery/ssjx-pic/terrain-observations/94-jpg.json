@@ -1,0 +1,47 @@
+{
+  "source_file": "94.jpg",
+  "source_sha256": "0a2763a6ba4ea95ea47904506d3f0eeda229d466168887f2e9834d77fbc3348a",
+  "source_path": "analysis/references/ssjx-pic/94.jpg",
+  "screenshot_scene_id": "94-jpg",
+  "theme": "grass_water",
+  "classification": "人工视觉分类；不是原版地图名称或地图编号",
+  "viewport_bbox": [
+    0,
+    86,
+    480,
+    602
+  ],
+  "viewport_is_partial": true,
+  "visible_regions": [
+    {
+      "region_id": "duzhi-ren",
+      "category": "npc",
+      "name": "独指人",
+      "bbox": [
+        36,
+        194,
+        112,
+        314
+      ],
+      "semantic_class": null
+    },
+    {
+      "region_id": "bamboo",
+      "category": "object",
+      "name": "竹丛",
+      "bbox": [
+        150,
+        346,
+        228,
+        494
+      ],
+      "semantic_class": null
+    }
+  ],
+  "world_map_id": null,
+  "tile_grid": null,
+  "collision": null,
+  "teleport_targets": null,
+  "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+  "runtime_enabled": false
+}

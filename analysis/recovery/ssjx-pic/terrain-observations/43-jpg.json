@@ -1,0 +1,59 @@
+{
+  "source_file": "43.jpg",
+  "source_sha256": "7c9eb564aaa6073eb7535bdb613555a8570a7a72f02f80c2c9f82d7b57cca8dd",
+  "source_path": "analysis/references/ssjx-pic/43.jpg",
+  "screenshot_scene_id": "43-jpg",
+  "theme": "settlement_dry",
+  "classification": "人工视觉分类；不是原版地图名称或地图编号",
+  "viewport_bbox": [
+    0,
+    86,
+    480,
+    602
+  ],
+  "viewport_is_partial": true,
+  "visible_regions": [
+    {
+      "region_id": "zhu-liang",
+      "category": "npc",
+      "name": "朱亮",
+      "bbox": [
+        164,
+        330,
+        242,
+        458
+      ],
+      "semantic_class": null
+    },
+    {
+      "region_id": "jin-ping",
+      "category": "npc",
+      "name": "金萍",
+      "bbox": [
+        396,
+        242,
+        480,
+        350
+      ],
+      "semantic_class": null
+    },
+    {
+      "region_id": "bare-tree",
+      "category": "object",
+      "name": "枯树",
+      "bbox": [
+        48,
+        368,
+        148,
+        508
+      ],
+      "semantic_class": null
+    }
+  ],
+  "world_map_id": null,
+  "tile_grid": null,
+  "collision": null,
+  "teleport_targets": null,
+  "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+  "runtime_enabled": false
+}

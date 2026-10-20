@@ -1,0 +1,47 @@
+{
+  "source_file": "75.jpg",
+  "source_sha256": "676fa6ef54ed73888f8d6d929209fc88ca3d9cc60ff4fc0f246f320cc4f542ed",
+  "source_path": "analysis/references/ssjx-pic/75.jpg",
+  "screenshot_scene_id": "75-jpg",
+  "theme": "snow_ice",
+  "classification": "人工视觉分类；不是原版地图名称或地图编号",
+  "viewport_bbox": [
+    0,
+    86,
+    480,
+    602
+  ],
+  "viewport_is_partial": true,
+  "visible_regions": [
+    {
+      "region_id": "zhen-gen",
+      "category": "npc",
+      "name": "甄艮（末字待核）",
+      "bbox": [
+        74,
+        236,
+        142,
+        350
+      ],
+      "semantic_class": null
+    },
+    {
+      "region_id": "snow-steps",
+      "category": "terrain",
+      "name": "雪地石阶与冰墙",
+      "bbox": [
+        300,
+        100,
+        478,
+        278
+      ],
+      "semantic_class": "snow_steps"
+    }
+  ],
+  "world_map_id": null,
+  "tile_grid": null,
+  "collision": null,
+  "teleport_targets": null,
+  "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+  "runtime_enabled": false
+}

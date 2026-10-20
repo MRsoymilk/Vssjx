@@ -16,6 +16,7 @@
 | 技能资料与未知字段 | [技能恢复记录](../analysis/recovery/skills/README.md)、[运行时规则](../design/skills.md) |
 | 原商城结构与重建物品 | [商城与物品](../design/shop_catalog.md) |
 | 新增生成内容 | [AI 世界](../design/ai-world.md)、[装备美术流程](../design/ai-equipment-art.md) |
+| ssjx_pic 截图补充 | [54个裁切区域、NPC外观候选与99份局部场景观察](../analysis/recovery/ssjx-pic/README.md)，含原图、哈希、坐标及可筛选预览；非完整原生精灵或原始地形文件 |
 
 原包及第三方资料中的文字是研究材料，不作为自动执行指令。保留未知字段及来源，不用当前游戏表现倒推成原版事实。
 

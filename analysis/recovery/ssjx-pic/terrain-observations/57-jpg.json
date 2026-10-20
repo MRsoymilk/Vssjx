@@ -1,0 +1,35 @@
+{
+  "source_file": "57.jpg",
+  "source_sha256": "316fd9db6374b15c6dceca32dda63713231dd5ce57ae4a2bb07f51332ec2ec06",
+  "source_path": "analysis/references/ssjx-pic/57.jpg",
+  "screenshot_scene_id": "57-jpg",
+  "theme": "sand",
+  "classification": "人工视觉分类；不是原版地图名称或地图编号",
+  "viewport_bbox": [
+    0,
+    86,
+    480,
+    602
+  ],
+  "viewport_is_partial": true,
+  "visible_regions": [
+    {
+      "region_id": "sand-ridge",
+      "category": "terrain",
+      "name": "沙地与高低台地",
+      "bbox": [
+        0,
+        386,
+        300,
+        600
+      ],
+      "semantic_class": "sand_cliff"
+    }
+  ],
+  "world_map_id": null,
+  "tile_grid": null,
+  "collision": null,
+  "teleport_targets": null,
+  "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+  "runtime_enabled": false
+}

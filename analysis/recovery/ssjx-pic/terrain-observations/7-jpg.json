@@ -1,0 +1,47 @@
+{
+  "source_file": "7.jpg",
+  "source_sha256": "f93205f496fe35794a34fa3ff97afecff5939248f40be0f281e8c83b5e3e2159",
+  "source_path": "analysis/references/ssjx-pic/7.jpg",
+  "screenshot_scene_id": "7-jpg",
+  "theme": "grass_water",
+  "classification": "人工视觉分类；不是原版地图名称或地图编号",
+  "viewport_bbox": [
+    0,
+    86,
+    480,
+    602
+  ],
+  "viewport_is_partial": true,
+  "visible_regions": [
+    {
+      "region_id": "budai-xianren",
+      "category": "npc",
+      "name": "布袋仙人",
+      "bbox": [
+        68,
+        214,
+        164,
+        312
+      ],
+      "semantic_class": null
+    },
+    {
+      "region_id": "fashion-vendor",
+      "category": "npc",
+      "name": "时尚先锋",
+      "bbox": [
+        268,
+        530,
+        340,
+        602
+      ],
+      "semantic_class": null
+    }
+  ],
+  "world_map_id": null,
+  "tile_grid": null,
+  "collision": null,
+  "teleport_targets": null,
+  "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+  "runtime_enabled": false
+}

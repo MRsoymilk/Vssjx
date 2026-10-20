@@ -1,0 +1,22 @@
+{
+  "source_file": "15.jpg",
+  "source_sha256": "18ff429076e23a4eee1c1cc9ca6bf94c5326c92ce04d6367b607cb6561d5c6cd",
+  "source_path": "analysis/references/ssjx-pic/15.jpg",
+  "screenshot_scene_id": "15-jpg",
+  "theme": "sand",
+  "classification": "人工视觉分类；不是原版地图名称或地图编号",
+  "viewport_bbox": [
+    0,
+    86,
+    480,
+    602
+  ],
+  "viewport_is_partial": true,
+  "visible_regions": [],
+  "world_map_id": null,
+  "tile_grid": null,
+  "collision": null,
+  "teleport_targets": null,
+  "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+  "runtime_enabled": false
+}

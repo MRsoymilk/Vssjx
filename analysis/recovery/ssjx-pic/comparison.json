@@ -1,0 +1,150 @@
+{
+  "format_version": 1,
+  "summary": {
+    "source_images": 100,
+    "source_bytes": 6118226,
+    "regions": 54,
+    "npc_identity_observations": 29,
+    "npc_appearance_groups": 20,
+    "npc_visual_observations": 27,
+    "npc_observations_with_quality_flags": 13,
+    "terrain_observations": 99,
+    "categories": {
+      "npc": 29,
+      "object": 8,
+      "gathering": 3,
+      "terrain": 13,
+      "ui_reference": 1
+    },
+    "statuses": {
+      "missing_appearance_candidate": 28,
+      "new_identity_evidence": 3,
+      "missing_texture_candidate": 2,
+      "existing_visual_family": 6,
+      "unresolved": 3,
+      "new_layout_evidence": 12
+    },
+    "runtime_assets_replaced": 0
+  },
+  "npc_appearance_groups": {
+    "bag-monk": [
+      "budai-xianren"
+    ],
+    "long-black-hair": [
+      "fashion-vendor"
+    ],
+    "grey-face-red-band": [
+      "baishouxian"
+    ],
+    "white-crane": [
+      "crane-daren",
+      "crane-dungeon"
+    ],
+    "white-beard-staff": [
+      "tan-chang"
+    ],
+    "white-hair-green-robe": [
+      "zhu-liang"
+    ],
+    "yellow-hair-flower": [
+      "jin-ping",
+      "jiang-xier"
+    ],
+    "spiky-grey-hair-robe": [
+      "yi-zhou"
+    ],
+    "blue-grey-hair-green-robe": [
+      "yi-jing",
+      "yinming-jianxian"
+    ],
+    "red-flower-gold-cap": [
+      "zhou-qingyun"
+    ],
+    "moustache-monk": [
+      "xiao-heshang",
+      "jingji-envoy"
+    ],
+    "brown-hair-mask": [
+      "zhu-yougong",
+      "brown-mask-full"
+    ],
+    "brown-vest-large-face": [
+      "grocery-boss"
+    ],
+    "green-purple-cap": [
+      "zhi-xian"
+    ],
+    "grey-spiky-hair-blue-robe": [
+      "tianchi-shangren",
+      "duzhi-ren"
+    ],
+    "green-coiled-hair": [
+      "xiaoyue-chanshi"
+    ],
+    "long-dark-hair-white-robe": [
+      "zhen-gen"
+    ],
+    "white-blue-flower-cap": [
+      "qi-xiaer",
+      "yi-zhe"
+    ],
+    "blue-green-hair-purple-face": [
+      "wudu-tianwang"
+    ],
+    "white-hair-red-robe": [
+      "school-daily"
+    ]
+  },
+  "existing_visual_family": [
+    "bamboo",
+    "palm",
+    "snow-tree",
+    "bare-tree",
+    "gate-pillar",
+    "coarse-copper"
+  ],
+  "missing_candidates": [
+    "budai-xianren",
+    "fashion-vendor",
+    "baishouxian",
+    "crane-daren",
+    "tan-chang",
+    "zhu-liang",
+    "jin-ping",
+    "jiang-xier",
+    "yi-zhou",
+    "yi-jing",
+    "zhou-qingyun",
+    "crane-dungeon",
+    "xiao-heshang",
+    "zhu-yougong",
+    "brown-mask-full",
+    "grocery-boss",
+    "zhi-xian",
+    "tianchi-shangren",
+    "jingji-envoy",
+    "xiaoyue-chanshi",
+    "zhen-gen",
+    "qi-xiaer",
+    "yi-zhe",
+    "duzhi-ren",
+    "wudu-tianwang",
+    "yinming-jianxian",
+    "school-daily",
+    "territory-altar",
+    "portal-horizontal",
+    "portal-vertical"
+  ],
+  "baseline_inventory": "baseline-inventory.json",
+  "comparison_method": "人工对照原包图块总览、117套怪物动画首帧、地图物件图集和项目NPC造型配置；哈希仅用于来源复核，不用于断言截图裁片是否缺失。",
+  "comparison_limitations": "missing_* 是已审阅目录中未找到对应造型的候选，非穷尽所有组合帧的数学证明；已有名称不等于已有专用造型。同类匹配不代表逐像素或版本一致。",
+  "npc_names_already_in_project": "表格或AI世界已存在的名字仍可缺少专用造型；本报告不把新截图当作新NPC定义。",
+  "not_recovered": [
+    "完整原生NPC精灵及动画",
+    "原始透明边缘",
+    "整图地形格网",
+    "原始碰撞及通行层",
+    "NPC全局坐标",
+    "原始任务及服务器规则"
+  ]
+}

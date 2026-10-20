@@ -1,0 +1,35 @@
+{
+  "source_file": "73.jpg",
+  "source_sha256": "7d43544d8e05c60adb2e88109322837523225fda02d4e2758c7d95335a841598",
+  "source_path": "analysis/references/ssjx-pic/73.jpg",
+  "screenshot_scene_id": "73-jpg",
+  "theme": "blue_paving",
+  "classification": "人工视觉分类；不是原版地图名称或地图编号",
+  "viewport_bbox": [
+    0,
+    86,
+    480,
+    602
+  ],
+  "viewport_is_partial": true,
+  "visible_regions": [
+    {
+      "region_id": "xiaoyue-chanshi",
+      "category": "npc",
+      "name": "晓月禅师",
+      "bbox": [
+        202,
+        400,
+        276,
+        534
+      ],
+      "semantic_class": null
+    }
+  ],
+  "world_map_id": null,
+  "tile_grid": null,
+  "collision": null,
+  "teleport_targets": null,
+  "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+  "runtime_enabled": false
+}

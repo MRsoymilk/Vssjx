@@ -1,0 +1,35 @@
+{
+  "source_file": "61.jpg",
+  "source_sha256": "d726087a4a8f8348c0e781c591eeaf1c99b61a49074a4d8cd36ac9a57e12d724",
+  "source_path": "analysis/references/ssjx-pic/61.jpg",
+  "screenshot_scene_id": "61-jpg",
+  "theme": "yellow_courtyard",
+  "classification": "人工视觉分类；不是原版地图名称或地图编号",
+  "viewport_bbox": [
+    0,
+    86,
+    480,
+    602
+  ],
+  "viewport_is_partial": true,
+  "visible_regions": [
+    {
+      "region_id": "grocery-boss",
+      "category": "npc",
+      "name": "杂货店老板",
+      "bbox": [
+        134,
+        324,
+        212,
+        458
+      ],
+      "semantic_class": null
+    }
+  ],
+  "world_map_id": null,
+  "tile_grid": null,
+  "collision": null,
+  "teleport_targets": null,
+  "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+  "runtime_enabled": false
+}

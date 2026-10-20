@@ -1,0 +1,3052 @@
+{
+  "format_version": 1,
+  "scenes": [
+    {
+      "source_file": "1.jpg",
+      "source_sha256": "c7567da0e0da9104bc7a0d5e9969f0879a7e76e363a853186876267593773769",
+      "source_path": "analysis/references/ssjx-pic/1.jpg",
+      "screenshot_scene_id": "1-jpg",
+      "theme": "settlement_dry",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/1-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/1-jpg.jpg"
+    },
+    {
+      "source_file": "2.jpg",
+      "source_sha256": "aa3985a5635b9b4537df116c3debe8ef9811b6a0583849573ec8b4d22c3217eb",
+      "source_path": "analysis/references/ssjx-pic/2.jpg",
+      "screenshot_scene_id": "2-jpg",
+      "theme": "settlement_dry",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/2-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/2-jpg.jpg"
+    },
+    {
+      "source_file": "3.jpg",
+      "source_sha256": "21ac080647f2bd0458b6f5d85bdbaf30d4231718f63a8d726d99bf085a43e725",
+      "source_path": "analysis/references/ssjx-pic/3.jpg",
+      "screenshot_scene_id": "3-jpg",
+      "theme": "settlement_dry",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/3-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/3-jpg.jpg"
+    },
+    {
+      "source_file": "4.jpg",
+      "source_sha256": "6f69e0ee8e82fccfadbbb20bbe3dab94e4eee291fb2a9a9830db0f25efa5fe7a",
+      "source_path": "analysis/references/ssjx-pic/4.jpg",
+      "screenshot_scene_id": "4-jpg",
+      "theme": "settlement_dry",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/4-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/4-jpg.jpg"
+    },
+    {
+      "source_file": "5.jpg",
+      "source_sha256": "0c8f094ddeacf3a40cdd64fcd0048f398b33ffd9497c1c4aee0ae32061b952d7",
+      "source_path": "analysis/references/ssjx-pic/5.jpg",
+      "screenshot_scene_id": "5-jpg",
+      "theme": "grass_water",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/5-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/5-jpg.jpg"
+    },
+    {
+      "source_file": "6.jpg",
+      "source_sha256": "c4ed70e5a27a47c82916023ff1df7bf40ee1236ed668420de25f108948838900",
+      "source_path": "analysis/references/ssjx-pic/6.jpg",
+      "screenshot_scene_id": "6-jpg",
+      "theme": "grass_water",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [
+        {
+          "region_id": "crane-daren",
+          "category": "npc",
+          "name": "达人使者",
+          "bbox": [
+            326,
+            270,
+            410,
+            424
+          ],
+          "semantic_class": null
+        }
+      ],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/6-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/6-jpg.jpg"
+    },
+    {
+      "source_file": "7.jpg",
+      "source_sha256": "f93205f496fe35794a34fa3ff97afecff5939248f40be0f281e8c83b5e3e2159",
+      "source_path": "analysis/references/ssjx-pic/7.jpg",
+      "screenshot_scene_id": "7-jpg",
+      "theme": "grass_water",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [
+        {
+          "region_id": "budai-xianren",
+          "category": "npc",
+          "name": "布袋仙人",
+          "bbox": [
+            68,
+            214,
+            164,
+            312
+          ],
+          "semantic_class": null
+        },
+        {
+          "region_id": "fashion-vendor",
+          "category": "npc",
+          "name": "时尚先锋",
+          "bbox": [
+            268,
+            530,
+            340,
+            602
+          ],
+          "semantic_class": null
+        }
+      ],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/7-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/7-jpg.jpg"
+    },
+    {
+      "source_file": "8.jpg",
+      "source_sha256": "9c196d5706827a0a0f21d4fdb613fc2fd086771228f590c8d4f2029415cb8777",
+      "source_path": "analysis/references/ssjx-pic/8.jpg",
+      "screenshot_scene_id": "8-jpg",
+      "theme": "grass_water",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/8-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/8-jpg.jpg"
+    },
+    {
+      "source_file": "9.jpg",
+      "source_sha256": "eff03862d6062cc62c7cb8454144994654b9dd877aa1594d0bb176115bfdf1c3",
+      "source_path": "analysis/references/ssjx-pic/9.jpg",
+      "screenshot_scene_id": "9-jpg",
+      "theme": "lava",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/9-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/9-jpg.jpg"
+    },
+    {
+      "source_file": "10.jpg",
+      "source_sha256": "b026df72a1922e8303559240c18c98adf56a3d1f8d127ffe1ff1094e651886f1",
+      "source_path": "analysis/references/ssjx-pic/10.jpg",
+      "screenshot_scene_id": "10-jpg",
+      "theme": "grass_water",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/10-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/10-jpg.jpg"
+    },
+    {
+      "source_file": "11.jpg",
+      "source_sha256": "5edbdc84f7c30ffbf9b17533477e1504d221dd944ffcb4a86a015ec096af7dfb",
+      "source_path": "analysis/references/ssjx-pic/11.jpg",
+      "screenshot_scene_id": "11-jpg",
+      "theme": "grass_water",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/11-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/11-jpg.jpg"
+    },
+    {
+      "source_file": "12.jpg",
+      "source_sha256": "fca060e4f75d6f3f81c9cb9457e9f6abca350dba80a3ecd6fee83e14e7bdb577",
+      "source_path": "analysis/references/ssjx-pic/12.jpg",
+      "screenshot_scene_id": "12-jpg",
+      "theme": "grass_water",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/12-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/12-jpg.jpg"
+    },
+    {
+      "source_file": "13.jpg",
+      "source_sha256": "d1aeec3bc1bb91d99eee97d3a3cef76589d5bb761cdb9b26a8a5153ae21ad321",
+      "source_path": "analysis/references/ssjx-pic/13.jpg",
+      "screenshot_scene_id": "13-jpg",
+      "theme": "grass_water",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/13-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/13-jpg.jpg"
+    },
+    {
+      "source_file": "14.jpg",
+      "source_sha256": "b81c86bf96cfa14dd0b4587259e20bcf70fa0147a3da1d61cc1f3d942058c30e",
+      "source_path": "analysis/references/ssjx-pic/14.jpg",
+      "screenshot_scene_id": "14-jpg",
+      "theme": "grass_water",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [
+        {
+          "region_id": "green-steps",
+          "category": "terrain",
+          "name": "草坡台阶与两侧花草",
+          "bbox": [
+            4,
+            450,
+            360,
+            592
+          ],
+          "semantic_class": "grass_steps"
+        }
+      ],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/14-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/14-jpg.jpg"
+    },
+    {
+      "source_file": "15.jpg",
+      "source_sha256": "18ff429076e23a4eee1c1cc9ca6bf94c5326c92ce04d6367b607cb6561d5c6cd",
+      "source_path": "analysis/references/ssjx-pic/15.jpg",
+      "screenshot_scene_id": "15-jpg",
+      "theme": "sand",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/15-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/15-jpg.jpg"
+    },
+    {
+      "source_file": "16.jpg",
+      "source_sha256": "34bea87aefee92c806a37cb6a0be922e905952e6cd835b71a32518a758b06e09",
+      "source_path": "analysis/references/ssjx-pic/16.jpg",
+      "screenshot_scene_id": "16-jpg",
+      "theme": "blue_paving",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/16-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/16-jpg.jpg"
+    },
+    {
+      "source_file": "17.jpg",
+      "source_sha256": "f7d4594be59dfaccf196f623c22c082287a8375554cda54054b0bf629d8a03cd",
+      "source_path": "analysis/references/ssjx-pic/17.jpg",
+      "screenshot_scene_id": "17-jpg",
+      "theme": "rock_cave",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/17-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/17-jpg.jpg"
+    },
+    {
+      "source_file": "18.jpg",
+      "source_sha256": "dc659706cf87206d76ed44fbb360c01d5105e9826ab32e98df5457f062fedb86",
+      "source_path": "analysis/references/ssjx-pic/18.jpg",
+      "screenshot_scene_id": "18-jpg",
+      "theme": "rock_cave",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/18-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/18-jpg.jpg"
+    },
+    {
+      "source_file": "19.jpg",
+      "source_sha256": "76b7d3800d3e29d1ac066712c77d068235d5ba81ebb4923c3347ade95e818a55",
+      "source_path": "analysis/references/ssjx-pic/19.jpg",
+      "screenshot_scene_id": "19-jpg",
+      "theme": "settlement_dry",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/19-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/19-jpg.jpg"
+    },
+    {
+      "source_file": "20.jpg",
+      "source_sha256": "6b38b4645ec8a68caead6742a6eee0dcc8b219f0e267d3ebe5747fde3502a8e9",
+      "source_path": "analysis/references/ssjx-pic/20.jpg",
+      "screenshot_scene_id": "20-jpg",
+      "theme": "rock_cave",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/20-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/20-jpg.jpg"
+    },
+    {
+      "source_file": "21.jpg",
+      "source_sha256": "852b800681fd5e3ad35ee5d707ab320ce6e969416023d019111bf5e04efc1cbc",
+      "source_path": "analysis/references/ssjx-pic/21.jpg",
+      "screenshot_scene_id": "21-jpg",
+      "theme": "grass_water",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/21-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/21-jpg.jpg"
+    },
+    {
+      "source_file": "22.jpg",
+      "source_sha256": "d574986f668db6482c81decda2f5343cfb15f6875008f780a7ab85ea42f57ee4",
+      "source_path": "analysis/references/ssjx-pic/22.jpg",
+      "screenshot_scene_id": "22-jpg",
+      "theme": "grass_water",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [
+        {
+          "region_id": "lotus-shore",
+          "category": "terrain",
+          "name": "荷花水岸",
+          "bbox": [
+            38,
+            394,
+            300,
+            594
+          ],
+          "semantic_class": "water_grass_shore"
+        }
+      ],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/22-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/22-jpg.jpg"
+    },
+    {
+      "source_file": "23.jpg",
+      "source_sha256": "b9fae84441d863dc7a82430f3ec935554b509ccd85d05d3d554002a71a9e538d",
+      "source_path": "analysis/references/ssjx-pic/23.jpg",
+      "screenshot_scene_id": "23-jpg",
+      "theme": "grass_water",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/23-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/23-jpg.jpg"
+    },
+    {
+      "source_file": "24.jpg",
+      "source_sha256": "caff8bcd9431516fcdd1ea358abfb58774998969d21c4885bce30e8eff9d864c",
+      "source_path": "analysis/references/ssjx-pic/24.jpg",
+      "screenshot_scene_id": "24-jpg",
+      "theme": "grass_water",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/24-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/24-jpg.jpg"
+    },
+    {
+      "source_file": "26.jpg",
+      "source_sha256": "c7c67fd347712c494934ecfb0c16eaa620fd007b57f4add4e319b0d91472a98f",
+      "source_path": "analysis/references/ssjx-pic/26.jpg",
+      "screenshot_scene_id": "26-jpg",
+      "theme": "settlement_dry",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [
+        {
+          "region_id": "baishouxian",
+          "category": "npc",
+          "name": "白蛇仙",
+          "bbox": [
+            40,
+            310,
+            130,
+            458
+          ],
+          "semantic_class": null
+        }
+      ],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/26-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/26-jpg.jpg"
+    },
+    {
+      "source_file": "27.jpg",
+      "source_sha256": "08a5253abdad8450ae0a1e78307757b522ab6371ea4e3b3ff6ffd0e4445872e6",
+      "source_path": "analysis/references/ssjx-pic/27.jpg",
+      "screenshot_scene_id": "27-jpg",
+      "theme": "grass_water",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/27-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/27-jpg.jpg"
+    },
+    {
+      "source_file": "28.jpg",
+      "source_sha256": "5f7c60d1540143f147d094359796b6e11b2850e0ef327bf82a74900653e37317",
+      "source_path": "analysis/references/ssjx-pic/28.jpg",
+      "screenshot_scene_id": "28-jpg",
+      "theme": "settlement_dry",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/28-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/28-jpg.jpg"
+    },
+    {
+      "source_file": "29.jpg",
+      "source_sha256": "9e32768148d1f044a928c371bd9182bcf013549b9a65622301c315ab05b0d90b",
+      "source_path": "analysis/references/ssjx-pic/29.jpg",
+      "screenshot_scene_id": "29-jpg",
+      "theme": "rock_cave",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/29-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/29-jpg.jpg"
+    },
+    {
+      "source_file": "30.jpg",
+      "source_sha256": "2683134aac4abfb60e92db0d1e6658edc490eac19a8a65398165aaa5257991dd",
+      "source_path": "analysis/references/ssjx-pic/30.jpg",
+      "screenshot_scene_id": "30-jpg",
+      "theme": "rock_cave",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/30-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/30-jpg.jpg"
+    },
+    {
+      "source_file": "31.jpg",
+      "source_sha256": "e649c56ebf7660a1337e5dc3e4fc735e8f65c60f508b5d4289eaa6e0396db897",
+      "source_path": "analysis/references/ssjx-pic/31.jpg",
+      "screenshot_scene_id": "31-jpg",
+      "theme": "rock_cave",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/31-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/31-jpg.jpg"
+    },
+    {
+      "source_file": "32.jpg",
+      "source_sha256": "2d2d9e408e1e1038216ac1f2ec2bb32356c797b9804eeecf5e3cd9ffef5dcd3c",
+      "source_path": "analysis/references/ssjx-pic/32.jpg",
+      "screenshot_scene_id": "32-jpg",
+      "theme": "lava",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/32-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/32-jpg.jpg"
+    },
+    {
+      "source_file": "33.jpg",
+      "source_sha256": "e5d8d9622c27a6dfe1c13ae0c5f27fc0171b5ea34c29625d752ad84d7f7fefe6",
+      "source_path": "analysis/references/ssjx-pic/33.jpg",
+      "screenshot_scene_id": "33-jpg",
+      "theme": "lava",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [
+        {
+          "region_id": "yi-zhou",
+          "category": "npc",
+          "name": "易周",
+          "bbox": [
+            398,
+            244,
+            480,
+            348
+          ],
+          "semantic_class": null
+        },
+        {
+          "region_id": "lava-cliff",
+          "category": "terrain",
+          "name": "紫岩断崖与熔岩",
+          "bbox": [
+            0,
+            398,
+            212,
+            598
+          ],
+          "semantic_class": "lava_cliff"
+        }
+      ],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/33-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/33-jpg.jpg"
+    },
+    {
+      "source_file": "34.jpg",
+      "source_sha256": "52915a213fb5a08d03b1865d970acf72bdb996cbefc24e1b1b27672edafa146e",
+      "source_path": "analysis/references/ssjx-pic/34.jpg",
+      "screenshot_scene_id": "34-jpg",
+      "theme": "rock_cave",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/34-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/34-jpg.jpg"
+    },
+    {
+      "source_file": "35.jpg",
+      "source_sha256": "2e59a278872088e6c241b6349e228f3d27d01889a5a21462557f51f3814ab5b3",
+      "source_path": "analysis/references/ssjx-pic/35.jpg",
+      "screenshot_scene_id": "35-jpg",
+      "theme": "rock_cave",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/35-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/35-jpg.jpg"
+    },
+    {
+      "source_file": "36.jpg",
+      "source_sha256": "6e9180d8abce727497a0d531336dd4093140aa38ffbf5deb5a2d32a014816432",
+      "source_path": "analysis/references/ssjx-pic/36.jpg",
+      "screenshot_scene_id": "36-jpg",
+      "theme": "rock_cave",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [
+        {
+          "region_id": "rock-cave-edge",
+          "category": "terrain",
+          "name": "蓝紫洞窟断崖与晶石",
+          "bbox": [
+            158,
+            398,
+            396,
+            594
+          ],
+          "semantic_class": "cave_cliff_crystal"
+        }
+      ],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/36-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/36-jpg.jpg"
+    },
+    {
+      "source_file": "37.jpg",
+      "source_sha256": "3b7b3ae27ce4884236b2fc322db7468cd4cb703faf16e86cdd9ddf9502867b6e",
+      "source_path": "analysis/references/ssjx-pic/37.jpg",
+      "screenshot_scene_id": "37-jpg",
+      "theme": "rock_cave",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/37-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/37-jpg.jpg"
+    },
+    {
+      "source_file": "38.jpg",
+      "source_sha256": "39d0bd4883abd8771150911fbe64e60dbb97a6714b2045a726a2c0c301d618a3",
+      "source_path": "analysis/references/ssjx-pic/38.jpg",
+      "screenshot_scene_id": "38-jpg",
+      "theme": "snow_ice",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/38-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/38-jpg.jpg"
+    },
+    {
+      "source_file": "39.jpg",
+      "source_sha256": "3ea69443be1b44aa0ea4390b55c20ec265dcd169a7250404321c6988e39faae9",
+      "source_path": "analysis/references/ssjx-pic/39.jpg",
+      "screenshot_scene_id": "39-jpg",
+      "theme": "settlement_dry",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [
+        {
+          "region_id": "tan-chang",
+          "category": "npc",
+          "name": "谭长",
+          "bbox": [
+            150,
+            334,
+            216,
+            426
+          ],
+          "semantic_class": null
+        }
+      ],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/39-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/39-jpg.jpg"
+    },
+    {
+      "source_file": "40.jpg",
+      "source_sha256": "7e60c31a000ef3af68e895977a411edc98f4f5efdd4c7a3be75c14921861984a",
+      "source_path": "analysis/references/ssjx-pic/40.jpg",
+      "screenshot_scene_id": "40-jpg",
+      "theme": "settlement_dry",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [
+        {
+          "region_id": "gate-pillar",
+          "category": "object",
+          "name": "青顶山门石柱",
+          "bbox": [
+            96,
+            198,
+            218,
+            388
+          ],
+          "semantic_class": null
+        },
+        {
+          "region_id": "gate-layout",
+          "category": "terrain",
+          "name": "山门两柱与道路局部布局",
+          "bbox": [
+            72,
+            190,
+            478,
+            402
+          ],
+          "semantic_class": "gate_layout"
+        }
+      ],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/40-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/40-jpg.jpg"
+    },
+    {
+      "source_file": "41.jpg",
+      "source_sha256": "5b9bb3b872145b12f5b9d471650881fc5e074107a1880c668f1d2c89cb22ba92",
+      "source_path": "analysis/references/ssjx-pic/41.jpg",
+      "screenshot_scene_id": "41-jpg",
+      "theme": "lava",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/41-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/41-jpg.jpg"
+    },
+    {
+      "source_file": "42.jpg",
+      "source_sha256": "b6e6ad144cbe026439f11a79d09d32e41a4ce9f7cca84ad70a2677feb87b0dfe",
+      "source_path": "analysis/references/ssjx-pic/42.jpg",
+      "screenshot_scene_id": "42-jpg",
+      "theme": "sand",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/42-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/42-jpg.jpg"
+    },
+    {
+      "source_file": "43.jpg",
+      "source_sha256": "7c9eb564aaa6073eb7535bdb613555a8570a7a72f02f80c2c9f82d7b57cca8dd",
+      "source_path": "analysis/references/ssjx-pic/43.jpg",
+      "screenshot_scene_id": "43-jpg",
+      "theme": "settlement_dry",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [
+        {
+          "region_id": "zhu-liang",
+          "category": "npc",
+          "name": "朱亮",
+          "bbox": [
+            164,
+            330,
+            242,
+            458
+          ],
+          "semantic_class": null
+        },
+        {
+          "region_id": "jin-ping",
+          "category": "npc",
+          "name": "金萍",
+          "bbox": [
+            396,
+            242,
+            480,
+            350
+          ],
+          "semantic_class": null
+        },
+        {
+          "region_id": "bare-tree",
+          "category": "object",
+          "name": "枯树",
+          "bbox": [
+            48,
+            368,
+            148,
+            508
+          ],
+          "semantic_class": null
+        }
+      ],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/43-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/43-jpg.jpg"
+    },
+    {
+      "source_file": "44.jpg",
+      "source_sha256": "2d0604572075fbef52c39a94d4e552cfb793942139fbd0ff1ed683732ea66689",
+      "source_path": "analysis/references/ssjx-pic/44.jpg",
+      "screenshot_scene_id": "44-jpg",
+      "theme": "settlement_dry",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/44-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/44-jpg.jpg"
+    },
+    {
+      "source_file": "45.jpg",
+      "source_sha256": "733034cc93e1de5efc8570042c136a851daaccf08bbb568693630237d5e23358",
+      "source_path": "analysis/references/ssjx-pic/45.jpg",
+      "screenshot_scene_id": "45-jpg",
+      "theme": "snow_ice",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [
+        {
+          "region_id": "yi-jing",
+          "category": "npc",
+          "name": "易静",
+          "bbox": [
+            332,
+            218,
+            418,
+            348
+          ],
+          "semantic_class": null
+        },
+        {
+          "region_id": "snow-tree",
+          "category": "object",
+          "name": "积雪松树",
+          "bbox": [
+            248,
+            362,
+            392,
+            562
+          ],
+          "semantic_class": null
+        },
+        {
+          "region_id": "snow-shore",
+          "category": "terrain",
+          "name": "雪地与冰水边界",
+          "bbox": [
+            0,
+            116,
+            148,
+            282
+          ],
+          "semantic_class": "snow_ice_shore"
+        }
+      ],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/45-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/45-jpg.jpg"
+    },
+    {
+      "source_file": "46.jpg",
+      "source_sha256": "71c83713810bd68ad3875bb91efc7ffc2c16412d11deda793802ddd62a91363f",
+      "source_path": "analysis/references/ssjx-pic/46.jpg",
+      "screenshot_scene_id": "46-jpg",
+      "theme": "snow_ice",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/46-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/46-jpg.jpg"
+    },
+    {
+      "source_file": "47.jpg",
+      "source_sha256": "dbea2a566a9359ac1035e7b86579737324f8627aa57a0b5eec5abcd6073a54bb",
+      "source_path": "analysis/references/ssjx-pic/47.jpg",
+      "screenshot_scene_id": "47-jpg",
+      "theme": "rock_cave",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/47-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/47-jpg.jpg"
+    },
+    {
+      "source_file": "48.jpg",
+      "source_sha256": "e2680114ca87df40a0104a4cf6c1e4ab98268d5eefa734b9cea7c6e7303277f0",
+      "source_path": "analysis/references/ssjx-pic/48.jpg",
+      "screenshot_scene_id": "48-jpg",
+      "theme": "blue_paving",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [
+        {
+          "region_id": "blue-stone-floor",
+          "category": "terrain",
+          "name": "青石地砖与草地边界",
+          "bbox": [
+            0,
+            380,
+            320,
+            600
+          ],
+          "semantic_class": "blue_paving"
+        }
+      ],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/48-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/48-jpg.jpg"
+    },
+    {
+      "source_file": "49.jpg",
+      "source_sha256": "7b9eb2e4ab3e8211f53eb910ba373d2983a11e8366bc4bf5eb6883722a7c3b48",
+      "source_path": "analysis/references/ssjx-pic/49.jpg",
+      "screenshot_scene_id": "49-jpg",
+      "theme": "rock_cave",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/49-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/49-jpg.jpg"
+    },
+    {
+      "source_file": "50.jpg",
+      "source_sha256": "2baf288e0e3462f3a9655e683c51b628c9d6f26e372fcacca904b7e71ac142e9",
+      "source_path": "analysis/references/ssjx-pic/50.jpg",
+      "screenshot_scene_id": "50-jpg",
+      "theme": "grass_water",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [
+        {
+          "region_id": "zhou-qingyun",
+          "category": "npc",
+          "name": "周轻云",
+          "bbox": [
+            274,
+            240,
+            356,
+            350
+          ],
+          "semantic_class": null
+        }
+      ],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/50-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/50-jpg.jpg"
+    },
+    {
+      "source_file": "51.jpg",
+      "source_sha256": "5226e88a4122ad78fba0e8ce4b253a02381cc0d79e5b1786fbec393ca2397297",
+      "source_path": "analysis/references/ssjx-pic/51.jpg",
+      "screenshot_scene_id": "51-jpg",
+      "theme": "grass_water",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [
+        {
+          "region_id": "gancao",
+          "category": "gathering",
+          "name": "甘草",
+          "bbox": [
+            374,
+            412,
+            430,
+            478
+          ],
+          "semantic_class": null
+        }
+      ],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/51-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/51-jpg.jpg"
+    },
+    {
+      "source_file": "52.jpg",
+      "source_sha256": "3a2cac60035d510fa84257f55b7e0418331b2ba4ed45084880285d5b0e4f6205",
+      "source_path": "analysis/references/ssjx-pic/52.jpg",
+      "screenshot_scene_id": "52-jpg",
+      "theme": "settlement_dry",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/52-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/52-jpg.jpg"
+    },
+    {
+      "source_file": "53.jpg",
+      "source_sha256": "9ea4bd0fea396412aa1f31de04d9a19501174f689b30758fbeaf6e852b811154",
+      "source_path": "analysis/references/ssjx-pic/53.jpg",
+      "screenshot_scene_id": "53-jpg",
+      "theme": "settlement_dry",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [
+        {
+          "region_id": "crane-dungeon",
+          "category": "npc",
+          "name": "博浪沙火鹤",
+          "bbox": [
+            74,
+            346,
+            156,
+            494
+          ],
+          "semantic_class": null
+        },
+        {
+          "region_id": "xiao-heshang",
+          "category": "npc",
+          "name": "笑和尚",
+          "bbox": [
+            340,
+            224,
+            400,
+            348
+          ],
+          "semantic_class": null
+        }
+      ],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/53-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/53-jpg.jpg"
+    },
+    {
+      "source_file": "54.jpg",
+      "source_sha256": "fc69ef51907a7f466a5d6dbac2600f72ee997901096433b0d04d65356509ab5e",
+      "source_path": "analysis/references/ssjx-pic/54.jpg",
+      "screenshot_scene_id": "54-jpg",
+      "theme": "settlement_dry",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [
+        {
+          "region_id": "zhu-yougong",
+          "category": "npc",
+          "name": "诸有功",
+          "bbox": [
+            96,
+            498,
+            184,
+            602
+          ],
+          "semantic_class": null
+        },
+        {
+          "region_id": "hongfa-laozu",
+          "category": "npc",
+          "name": "红发老祖",
+          "bbox": [
+            414,
+            550,
+            480,
+            602
+          ],
+          "semantic_class": null
+        }
+      ],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/54-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/54-jpg.jpg"
+    },
+    {
+      "source_file": "55.jpg",
+      "source_sha256": "da815aa26956899aa5b9f9e7692b0bfc0f39c36d4803e1e88ad4656631857662",
+      "source_path": "analysis/references/ssjx-pic/55.jpg",
+      "screenshot_scene_id": "55-jpg",
+      "theme": "lava",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/55-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/55-jpg.jpg"
+    },
+    {
+      "source_file": "56.jpg",
+      "source_sha256": "2395693f50909b207cebd8ce6cac44b383080a6d5b350d8ff7630472d47cbfda",
+      "source_path": "analysis/references/ssjx-pic/56.jpg",
+      "screenshot_scene_id": "56-jpg",
+      "theme": "lava",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/56-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/56-jpg.jpg"
+    },
+    {
+      "source_file": "57.jpg",
+      "source_sha256": "316fd9db6374b15c6dceca32dda63713231dd5ce57ae4a2bb07f51332ec2ec06",
+      "source_path": "analysis/references/ssjx-pic/57.jpg",
+      "screenshot_scene_id": "57-jpg",
+      "theme": "sand",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [
+        {
+          "region_id": "sand-ridge",
+          "category": "terrain",
+          "name": "沙地与高低台地",
+          "bbox": [
+            0,
+            386,
+            300,
+            600
+          ],
+          "semantic_class": "sand_cliff"
+        }
+      ],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/57-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/57-jpg.jpg"
+    },
+    {
+      "source_file": "58.jpg",
+      "source_sha256": "7aedb8664fd5739bf0e010210d4fc350831b2dfa97b68327dab53502392047e9",
+      "source_path": "analysis/references/ssjx-pic/58.jpg",
+      "screenshot_scene_id": "58-jpg",
+      "theme": "sand",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/58-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/58-jpg.jpg"
+    },
+    {
+      "source_file": "59.jpg",
+      "source_sha256": "0382fdb570745be1efc2842705896c8c3ea936678c3aaeb4a524b1ed86f68e9b",
+      "source_path": "analysis/references/ssjx-pic/59.jpg",
+      "screenshot_scene_id": "59-jpg",
+      "theme": "snow_ice",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/59-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/59-jpg.jpg"
+    },
+    {
+      "source_file": "60.jpg",
+      "source_sha256": "874c50b2b157a92e171842f89a565bd10612d11adef7221d35002c856062ba6b",
+      "source_path": "analysis/references/ssjx-pic/60.jpg",
+      "screenshot_scene_id": "60-jpg",
+      "theme": "yellow_courtyard",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [
+        {
+          "region_id": "brown-mask-full",
+          "category": "npc",
+          "name": "新颠仙（读字待核）",
+          "bbox": [
+            362,
+            240,
+            448,
+            372
+          ],
+          "semantic_class": null
+        },
+        {
+          "region_id": "yellow-paving",
+          "category": "terrain",
+          "name": "黄色庭院砖地",
+          "bbox": [
+            104,
+            420,
+            382,
+            594
+          ],
+          "semantic_class": "yellow_paving"
+        }
+      ],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/60-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/60-jpg.jpg"
+    },
+    {
+      "source_file": "61.jpg",
+      "source_sha256": "d726087a4a8f8348c0e781c591eeaf1c99b61a49074a4d8cd36ac9a57e12d724",
+      "source_path": "analysis/references/ssjx-pic/61.jpg",
+      "screenshot_scene_id": "61-jpg",
+      "theme": "yellow_courtyard",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [
+        {
+          "region_id": "grocery-boss",
+          "category": "npc",
+          "name": "杂货店老板",
+          "bbox": [
+            134,
+            324,
+            212,
+            458
+          ],
+          "semantic_class": null
+        }
+      ],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/61-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/61-jpg.jpg"
+    },
+    {
+      "source_file": "62.jpg",
+      "source_sha256": "e979977bdabb83414f2337699fe48744408e4aed3a53ad3867111364ad88ff10",
+      "source_path": "analysis/references/ssjx-pic/62.jpg",
+      "screenshot_scene_id": "62-jpg",
+      "theme": "sand",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/62-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/62-jpg.jpg"
+    },
+    {
+      "source_file": "63.jpg",
+      "source_sha256": "aec18c8d1b3e48819ed1f8be1033a7dd5789b2f76c43729d10318c59fab59034",
+      "source_path": "analysis/references/ssjx-pic/63.jpg",
+      "screenshot_scene_id": "63-jpg",
+      "theme": "grass_water",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [
+        {
+          "region_id": "willow-wood",
+          "category": "gathering",
+          "name": "柳木",
+          "bbox": [
+            120,
+            540,
+            180,
+            602
+          ],
+          "semantic_class": null
+        }
+      ],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/63-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/63-jpg.jpg"
+    },
+    {
+      "source_file": "64.jpg",
+      "source_sha256": "8ab269fc3687ded3dfed76d7789127f806dfa57406e9bb4c21bd2554b69bfece",
+      "source_path": "analysis/references/ssjx-pic/64.jpg",
+      "screenshot_scene_id": "64-jpg",
+      "theme": "rock_cave",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/64-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/64-jpg.jpg"
+    },
+    {
+      "source_file": "65.jpg",
+      "source_sha256": "4e8c57e0e39197b6b328aa24a7ccdc5cb4fb1a1c0f87dcaa01f87e69e9d9c041",
+      "source_path": "analysis/references/ssjx-pic/65.jpg",
+      "screenshot_scene_id": "65-jpg",
+      "theme": "snow_ice",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/65-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/65-jpg.jpg"
+    },
+    {
+      "source_file": "66.jpg",
+      "source_sha256": "d99c88b8da64f0959daedfdf461b2b603e2bbdd1582b185dc83c2be105b02c3a",
+      "source_path": "analysis/references/ssjx-pic/66.jpg",
+      "screenshot_scene_id": "66-jpg",
+      "theme": "settlement_dry",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [
+        {
+          "region_id": "zhi-xian",
+          "category": "npc",
+          "name": "芝仙",
+          "bbox": [
+            98,
+            352,
+            174,
+            460
+          ],
+          "semantic_class": null
+        }
+      ],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/66-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/66-jpg.jpg"
+    },
+    {
+      "source_file": "67.jpg",
+      "source_sha256": "bd7ddcbf1ef69757aa046dc92c7c0d8ebaa525afbb5cf5240cc0403a427e9aac",
+      "source_path": "analysis/references/ssjx-pic/67.jpg",
+      "screenshot_scene_id": "67-jpg",
+      "theme": "settlement_dry",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [
+        {
+          "region_id": "jiang-xier",
+          "category": "npc",
+          "name": "蒋绣儿",
+          "bbox": [
+            118,
+            284,
+            212,
+            384
+          ],
+          "semantic_class": null
+        },
+        {
+          "region_id": "portal-vertical",
+          "category": "object",
+          "name": "竖排三块青色回纹传送砖",
+          "bbox": [
+            30,
+            416,
+            66,
+            534
+          ],
+          "semantic_class": null
+        }
+      ],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/67-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/67-jpg.jpg"
+    },
+    {
+      "source_file": "68.jpg",
+      "source_sha256": "c80b07623d8cb388062c56af924a3013515742873998eff91376515fb0eeddb1",
+      "source_path": "analysis/references/ssjx-pic/68.jpg",
+      "screenshot_scene_id": "68-jpg",
+      "theme": "rock_cave",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/68-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/68-jpg.jpg"
+    },
+    {
+      "source_file": "69.jpg",
+      "source_sha256": "6e41a2e2be0f71e955dca38bdec85a6c584a48f30c8975aa8c3210b17523afc4",
+      "source_path": "analysis/references/ssjx-pic/69.jpg",
+      "screenshot_scene_id": "69-jpg",
+      "theme": "lava",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/69-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/69-jpg.jpg"
+    },
+    {
+      "source_file": "70.jpg",
+      "source_sha256": "864dca20b149ea3720b41518ba189cdcfa7e7b309fb70d7fffe1850d5e9a81c9",
+      "source_path": "analysis/references/ssjx-pic/70.jpg",
+      "screenshot_scene_id": "70-jpg",
+      "theme": "settlement_dry",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [
+        {
+          "region_id": "tianchi-shangren",
+          "category": "npc",
+          "name": "天池上人",
+          "bbox": [
+            134,
+            418,
+            208,
+            536
+          ],
+          "semantic_class": null
+        }
+      ],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/70-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/70-jpg.jpg"
+    },
+    {
+      "source_file": "71.jpg",
+      "source_sha256": "f35655d2127fac4458fa31ad3d5c56fc658745bac8124bffa57835e1596b54d0",
+      "source_path": "analysis/references/ssjx-pic/71.jpg",
+      "screenshot_scene_id": "71-jpg",
+      "theme": "settlement_dry",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [
+        {
+          "region_id": "jingji-envoy",
+          "category": "npc",
+          "name": "姓名未显示·竞技活动使者",
+          "bbox": [
+            204,
+            112,
+            272,
+            236
+          ],
+          "semantic_class": null
+        },
+        {
+          "region_id": "territory-altar",
+          "category": "object",
+          "name": "领土战祭台",
+          "bbox": [
+            286,
+            274,
+            386,
+            458
+          ],
+          "semantic_class": null
+        }
+      ],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/71-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/71-jpg.jpg"
+    },
+    {
+      "source_file": "72.jpg",
+      "source_sha256": "d6ba6ab508cbbf3c5f0e4d442ffa9a7a1dad3d0b9ed7ff35e956fdec02614f6e",
+      "source_path": "analysis/references/ssjx-pic/72.jpg",
+      "screenshot_scene_id": "72-jpg",
+      "theme": "sand",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/72-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/72-jpg.jpg"
+    },
+    {
+      "source_file": "73.jpg",
+      "source_sha256": "7d43544d8e05c60adb2e88109322837523225fda02d4e2758c7d95335a841598",
+      "source_path": "analysis/references/ssjx-pic/73.jpg",
+      "screenshot_scene_id": "73-jpg",
+      "theme": "blue_paving",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [
+        {
+          "region_id": "xiaoyue-chanshi",
+          "category": "npc",
+          "name": "晓月禅师",
+          "bbox": [
+            202,
+            400,
+            276,
+            534
+          ],
+          "semantic_class": null
+        }
+      ],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/73-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/73-jpg.jpg"
+    },
+    {
+      "source_file": "74.jpg",
+      "source_sha256": "a419b5dc2412e5eec7123bd5782af8c1ba0a92b16fa3b6a205ce32baf7e30f71",
+      "source_path": "analysis/references/ssjx-pic/74.jpg",
+      "screenshot_scene_id": "74-jpg",
+      "theme": "snow_ice",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/74-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/74-jpg.jpg"
+    },
+    {
+      "source_file": "75.jpg",
+      "source_sha256": "676fa6ef54ed73888f8d6d929209fc88ca3d9cc60ff4fc0f246f320cc4f542ed",
+      "source_path": "analysis/references/ssjx-pic/75.jpg",
+      "screenshot_scene_id": "75-jpg",
+      "theme": "snow_ice",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [
+        {
+          "region_id": "zhen-gen",
+          "category": "npc",
+          "name": "甄艮（末字待核）",
+          "bbox": [
+            74,
+            236,
+            142,
+            350
+          ],
+          "semantic_class": null
+        },
+        {
+          "region_id": "snow-steps",
+          "category": "terrain",
+          "name": "雪地石阶与冰墙",
+          "bbox": [
+            300,
+            100,
+            478,
+            278
+          ],
+          "semantic_class": "snow_steps"
+        }
+      ],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/75-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/75-jpg.jpg"
+    },
+    {
+      "source_file": "76.jpg",
+      "source_sha256": "0c04dbd2df32f119f3c2e8c140d652fd6e84211e9e443d60204073226a151754",
+      "source_path": "analysis/references/ssjx-pic/76.jpg",
+      "screenshot_scene_id": "76-jpg",
+      "theme": "grass_water",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/76-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/76-jpg.jpg"
+    },
+    {
+      "source_file": "77.jpg",
+      "source_sha256": "4239bf96ecbb7a0ca4d73bd774de126e8cbdc648c1ee7b58a7cac7e824aa5496",
+      "source_path": "analysis/references/ssjx-pic/77.jpg",
+      "screenshot_scene_id": "77-jpg",
+      "theme": "sand",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/77-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/77-jpg.jpg"
+    },
+    {
+      "source_file": "78.jpg",
+      "source_sha256": "a08e52c9b8174b165001a181ae68f45947f71a7c33a275adf3a51a25a5d17f66",
+      "source_path": "analysis/references/ssjx-pic/78.jpg",
+      "screenshot_scene_id": "78-jpg",
+      "theme": "settlement_dry",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [
+        {
+          "region_id": "coarse-copper",
+          "category": "gathering",
+          "name": "粗铜矿",
+          "bbox": [
+            88,
+            368,
+            136,
+            424
+          ],
+          "semantic_class": null
+        }
+      ],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/78-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/78-jpg.jpg"
+    },
+    {
+      "source_file": "79.jpg",
+      "source_sha256": "185afc1b1caeb98a9fee9717c7eb90fdf5b02af49e24b8e9f2aaf006f6483f9e",
+      "source_path": "analysis/references/ssjx-pic/79.jpg",
+      "screenshot_scene_id": "79-jpg",
+      "theme": "grass_water",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/79-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/79-jpg.jpg"
+    },
+    {
+      "source_file": "80.jpg",
+      "source_sha256": "b1cf42808ba22a7f761703729cfd41a475bfa37ab555f38c545d23a5a5d677e8",
+      "source_path": "analysis/references/ssjx-pic/80.jpg",
+      "screenshot_scene_id": "80-jpg",
+      "theme": "snow_ice",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/80-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/80-jpg.jpg"
+    },
+    {
+      "source_file": "81.jpg",
+      "source_sha256": "d3244000f5ad1dc0b1e729ec69479aec3b7b7bfff5b2173322670bfe20ca930c",
+      "source_path": "analysis/references/ssjx-pic/81.jpg",
+      "screenshot_scene_id": "81-jpg",
+      "theme": "grass_water",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/81-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/81-jpg.jpg"
+    },
+    {
+      "source_file": "82.jpg",
+      "source_sha256": "a4adbdef8b935f2f8c2e60c0ac6f004f59e72d6af896cf4e3ddf55175c1e18a3",
+      "source_path": "analysis/references/ssjx-pic/82.jpg",
+      "screenshot_scene_id": "82-jpg",
+      "theme": "yellow_courtyard",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/82-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/82-jpg.jpg"
+    },
+    {
+      "source_file": "83.jpg",
+      "source_sha256": "6791ddf048350d97dcba944ee259580775f6cc524a414ec39d796530bdb68ab9",
+      "source_path": "analysis/references/ssjx-pic/83.jpg",
+      "screenshot_scene_id": "83-jpg",
+      "theme": "yellow_courtyard",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/83-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/83-jpg.jpg"
+    },
+    {
+      "source_file": "84.jpg",
+      "source_sha256": "d45046d4f3e4628011f7fe31570e0812639b738bbf56f6b08b9431fa73dff14e",
+      "source_path": "analysis/references/ssjx-pic/84.jpg",
+      "screenshot_scene_id": "84-jpg",
+      "theme": "rock_cave",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/84-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/84-jpg.jpg"
+    },
+    {
+      "source_file": "85.jpg",
+      "source_sha256": "a69efcb4ef41fd779b909be6d515f398ae4de14b29f284ca25a4da0adec41185",
+      "source_path": "analysis/references/ssjx-pic/85.jpg",
+      "screenshot_scene_id": "85-jpg",
+      "theme": "rock_cave",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/85-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/85-jpg.jpg"
+    },
+    {
+      "source_file": "86.jpg",
+      "source_sha256": "a134f0d8543f475b12464e558942a44799c30adbf457e00d0c9329c10363ac7e",
+      "source_path": "analysis/references/ssjx-pic/86.jpg",
+      "screenshot_scene_id": "86-jpg",
+      "theme": "rock_cave",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/86-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/86-jpg.jpg"
+    },
+    {
+      "source_file": "87.jpg",
+      "source_sha256": "102bec4e178cb23a1ef03801ebce6f5067ade0e57dc10ae80d2674168b043b14",
+      "source_path": "analysis/references/ssjx-pic/87.jpg",
+      "screenshot_scene_id": "87-jpg",
+      "theme": "grass_water",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [
+        {
+          "region_id": "qi-xiaer",
+          "category": "npc",
+          "name": "齐霞儿",
+          "bbox": [
+            306,
+            310,
+            388,
+            426
+          ],
+          "semantic_class": null
+        }
+      ],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/87-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/87-jpg.jpg"
+    },
+    {
+      "source_file": "88.jpg",
+      "source_sha256": "af078439a69e8c59be13b8d6832b2b7757a792e40d01fb430653c1464bc336d1",
+      "source_path": "analysis/references/ssjx-pic/88.jpg",
+      "screenshot_scene_id": "88-jpg",
+      "theme": "dry_wilderness",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [
+        {
+          "region_id": "dry-cliff",
+          "category": "terrain",
+          "name": "黄土石壁与碎石",
+          "bbox": [
+            4,
+            368,
+            300,
+            600
+          ],
+          "semantic_class": "dry_cliff"
+        }
+      ],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/88-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/88-jpg.jpg"
+    },
+    {
+      "source_file": "89.jpg",
+      "source_sha256": "342e490b01e8af065bf066025ddb229ab52d7ae10cffe76f885de2fb8329bfb0",
+      "source_path": "analysis/references/ssjx-pic/89.jpg",
+      "screenshot_scene_id": "89-jpg",
+      "theme": "settlement_dry",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [
+        {
+          "region_id": "yi-zhe",
+          "category": "npc",
+          "name": "医者",
+          "bbox": [
+            100,
+            352,
+            178,
+            462
+          ],
+          "semantic_class": null
+        }
+      ],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/89-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/89-jpg.jpg"
+    },
+    {
+      "source_file": "90.jpg",
+      "source_sha256": "46588ea725d66a7fbf88b88f0463bc93eb7862fe709c35daf46622102384b77f",
+      "source_path": "analysis/references/ssjx-pic/90.jpg",
+      "screenshot_scene_id": "90-jpg",
+      "theme": "grass_water",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [
+        {
+          "region_id": "grass-ledge",
+          "category": "terrain",
+          "name": "草地断崖与纵向坡纹",
+          "bbox": [
+            18,
+            362,
+            180,
+            570
+          ],
+          "semantic_class": "grass_cliff"
+        }
+      ],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/90-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/90-jpg.jpg"
+    },
+    {
+      "source_file": "91.jpg",
+      "source_sha256": "a476b4b98c6254f6b340cb88a3dffbfac4b6c5682f3315263818ecc3e29edf62",
+      "source_path": "analysis/references/ssjx-pic/91.jpg",
+      "screenshot_scene_id": "91-jpg",
+      "theme": "snow_ice",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/91-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/91-jpg.jpg"
+    },
+    {
+      "source_file": "92.jpg",
+      "source_sha256": "cc68e95da793278cc3f7164e28db9fc69dce6462ba850679c4324b34037e2414",
+      "source_path": "analysis/references/ssjx-pic/92.jpg",
+      "screenshot_scene_id": "92-jpg",
+      "theme": "grass_water",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/92-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/92-jpg.jpg"
+    },
+    {
+      "source_file": "93.jpg",
+      "source_sha256": "225f0f5706c3fc382acd437f7caf0cc1367d75da21293e18d5a32b0b7b6f12eb",
+      "source_path": "analysis/references/ssjx-pic/93.jpg",
+      "screenshot_scene_id": "93-jpg",
+      "theme": "grass_water",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/93-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/93-jpg.jpg"
+    },
+    {
+      "source_file": "94.jpg",
+      "source_sha256": "0a2763a6ba4ea95ea47904506d3f0eeda229d466168887f2e9834d77fbc3348a",
+      "source_path": "analysis/references/ssjx-pic/94.jpg",
+      "screenshot_scene_id": "94-jpg",
+      "theme": "grass_water",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [
+        {
+          "region_id": "duzhi-ren",
+          "category": "npc",
+          "name": "独指人",
+          "bbox": [
+            36,
+            194,
+            112,
+            314
+          ],
+          "semantic_class": null
+        },
+        {
+          "region_id": "bamboo",
+          "category": "object",
+          "name": "竹丛",
+          "bbox": [
+            150,
+            346,
+            228,
+            494
+          ],
+          "semantic_class": null
+        }
+      ],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/94-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/94-jpg.jpg"
+    },
+    {
+      "source_file": "95.jpg",
+      "source_sha256": "c163a90bfb82907bfc75aef21d850ee086a662afd2d24e9343da27e5eebfa3c7",
+      "source_path": "analysis/references/ssjx-pic/95.jpg",
+      "screenshot_scene_id": "95-jpg",
+      "theme": "grass_water",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [
+        {
+          "region_id": "wudu-tianwang",
+          "category": "npc",
+          "name": "五毒天王",
+          "bbox": [
+            134,
+            340,
+            206,
+            462
+          ],
+          "semantic_class": null
+        },
+        {
+          "region_id": "palm",
+          "category": "object",
+          "name": "棕榈树",
+          "bbox": [
+            0,
+            338,
+            136,
+            498
+          ],
+          "semantic_class": null
+        }
+      ],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/95-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/95-jpg.jpg"
+    },
+    {
+      "source_file": "96.jpg",
+      "source_sha256": "2769475665a4f1af0c7c971bea0cc366d4af18d4417fccf3f0a5c183af8bab0a",
+      "source_path": "analysis/references/ssjx-pic/96.jpg",
+      "screenshot_scene_id": "96-jpg",
+      "theme": "grass_water",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/96-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/96-jpg.jpg"
+    },
+    {
+      "source_file": "97.jpg",
+      "source_sha256": "a06f05616c0aa689261256afa5f1841032d9c458ba99e23d864de9e33e007ee9",
+      "source_path": "analysis/references/ssjx-pic/97.jpg",
+      "screenshot_scene_id": "97-jpg",
+      "theme": "yellow_courtyard",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [
+        {
+          "region_id": "portal-horizontal",
+          "category": "object",
+          "name": "横排三块青色回纹传送砖",
+          "bbox": [
+            350,
+            528,
+            450,
+            568
+          ],
+          "semantic_class": null
+        },
+        {
+          "region_id": "courtyard-water-junction",
+          "category": "terrain",
+          "name": "庭院与水岸交界",
+          "bbox": [
+            0,
+            426,
+            322,
+            598
+          ],
+          "semantic_class": "paving_grass_water_junction"
+        }
+      ],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/97-jpg.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/97-jpg.jpg"
+    },
+    {
+      "source_file": "97.webp",
+      "source_sha256": "d7d9ea60c54b3e90c2a020033ea02648b5d8ad5272cd4588edb5c326ad38cb60",
+      "source_path": "analysis/references/ssjx-pic/97.webp",
+      "screenshot_scene_id": "97-webp",
+      "theme": "settlement_dry",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/97-webp.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/97-webp.jpg"
+    },
+    {
+      "source_file": "99.webp",
+      "source_sha256": "114f0524fe870651b455908e690abddc0b87d841af92bfd6323d9632e22ee765",
+      "source_path": "analysis/references/ssjx-pic/99.webp",
+      "screenshot_scene_id": "99-webp",
+      "theme": "yellow_courtyard",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/99-webp.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/99-webp.jpg"
+    },
+    {
+      "source_file": "100.webp",
+      "source_sha256": "ce12f1f8bab16a13221ca960873d04c55ac5462945a2141b2a78a4ce8db30f44",
+      "source_path": "analysis/references/ssjx-pic/100.webp",
+      "screenshot_scene_id": "100-webp",
+      "theme": "settlement_dry",
+      "classification": "人工视觉分类；不是原版地图名称或地图编号",
+      "viewport_bbox": [
+        0,
+        86,
+        480,
+        602
+      ],
+      "viewport_is_partial": true,
+      "visible_regions": [
+        {
+          "region_id": "yinming-jianxian",
+          "category": "npc",
+          "name": "隐名剑仙",
+          "bbox": [
+            394,
+            220,
+            480,
+            352
+          ],
+          "semantic_class": null
+        },
+        {
+          "region_id": "school-daily",
+          "category": "npc",
+          "name": "姓名被遮挡·门派日常NPC",
+          "bbox": [
+            140,
+            132,
+            220,
+            242
+          ],
+          "semantic_class": null
+        },
+        {
+          "region_id": "school-daily-activity",
+          "category": "npc",
+          "name": "铁钟道人（读字待核）",
+          "bbox": [
+            416,
+            546,
+            480,
+            602
+          ],
+          "semantic_class": null
+        }
+      ],
+      "world_map_id": null,
+      "tile_grid": null,
+      "collision": null,
+      "teleport_targets": null,
+      "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+      "runtime_enabled": false,
+      "observation": "analysis/recovery/ssjx-pic/terrain-observations/100-webp.json",
+      "preview": "analysis/recovery/ssjx-pic/scene-previews/100-webp.jpg"
+    }
+  ]
+}

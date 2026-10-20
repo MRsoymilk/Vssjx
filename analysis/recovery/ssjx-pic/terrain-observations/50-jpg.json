@@ -1,0 +1,35 @@
+{
+  "source_file": "50.jpg",
+  "source_sha256": "2baf288e0e3462f3a9655e683c51b628c9d6f26e372fcacca904b7e71ac142e9",
+  "source_path": "analysis/references/ssjx-pic/50.jpg",
+  "screenshot_scene_id": "50-jpg",
+  "theme": "grass_water",
+  "classification": "人工视觉分类；不是原版地图名称或地图编号",
+  "viewport_bbox": [
+    0,
+    86,
+    480,
+    602
+  ],
+  "viewport_is_partial": true,
+  "visible_regions": [
+    {
+      "region_id": "zhou-qingyun",
+      "category": "npc",
+      "name": "周轻云",
+      "bbox": [
+        274,
+        240,
+        356,
+        350
+      ],
+      "semantic_class": null
+    }
+  ],
+  "world_map_id": null,
+  "tile_grid": null,
+  "collision": null,
+  "teleport_targets": null,
+  "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+  "runtime_enabled": false
+}

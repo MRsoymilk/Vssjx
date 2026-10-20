@@ -1,0 +1,47 @@
+{
+  "source_file": "60.jpg",
+  "source_sha256": "874c50b2b157a92e171842f89a565bd10612d11adef7221d35002c856062ba6b",
+  "source_path": "analysis/references/ssjx-pic/60.jpg",
+  "screenshot_scene_id": "60-jpg",
+  "theme": "yellow_courtyard",
+  "classification": "人工视觉分类；不是原版地图名称或地图编号",
+  "viewport_bbox": [
+    0,
+    86,
+    480,
+    602
+  ],
+  "viewport_is_partial": true,
+  "visible_regions": [
+    {
+      "region_id": "brown-mask-full",
+      "category": "npc",
+      "name": "新颠仙（读字待核）",
+      "bbox": [
+        362,
+        240,
+        448,
+        372
+      ],
+      "semantic_class": null
+    },
+    {
+      "region_id": "yellow-paving",
+      "category": "terrain",
+      "name": "黄色庭院砖地",
+      "bbox": [
+        104,
+        420,
+        382,
+        594
+      ],
+      "semantic_class": "yellow_paving"
+    }
+  ],
+  "world_map_id": null,
+  "tile_grid": null,
+  "collision": null,
+  "teleport_targets": null,
+  "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+  "runtime_enabled": false
+}

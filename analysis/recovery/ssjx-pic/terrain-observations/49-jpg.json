@@ -1,0 +1,22 @@
+{
+  "source_file": "49.jpg",
+  "source_sha256": "7b9eb2e4ab3e8211f53eb910ba373d2983a11e8366bc4bf5eb6883722a7c3b48",
+  "source_path": "analysis/references/ssjx-pic/49.jpg",
+  "screenshot_scene_id": "49-jpg",
+  "theme": "rock_cave",
+  "classification": "人工视觉分类；不是原版地图名称或地图编号",
+  "viewport_bbox": [
+    0,
+    86,
+    480,
+    602
+  ],
+  "viewport_is_partial": true,
+  "visible_regions": [],
+  "world_map_id": null,
+  "tile_grid": null,
+  "collision": null,
+  "teleport_targets": null,
+  "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+  "runtime_enabled": false
+}

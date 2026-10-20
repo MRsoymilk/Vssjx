@@ -1,0 +1,35 @@
+{
+  "source_file": "48.jpg",
+  "source_sha256": "e2680114ca87df40a0104a4cf6c1e4ab98268d5eefa734b9cea7c6e7303277f0",
+  "source_path": "analysis/references/ssjx-pic/48.jpg",
+  "screenshot_scene_id": "48-jpg",
+  "theme": "blue_paving",
+  "classification": "人工视觉分类；不是原版地图名称或地图编号",
+  "viewport_bbox": [
+    0,
+    86,
+    480,
+    602
+  ],
+  "viewport_is_partial": true,
+  "visible_regions": [
+    {
+      "region_id": "blue-stone-floor",
+      "category": "terrain",
+      "name": "青石地砖与草地边界",
+      "bbox": [
+        0,
+        380,
+        320,
+        600
+      ],
+      "semantic_class": "blue_paving"
+    }
+  ],
+  "world_map_id": null,
+  "tile_grid": null,
+  "collision": null,
+  "teleport_targets": null,
+  "unknown_pixels_policy": "玩家、名字、战斗单位、聊天及界面遮挡不可视为地形；未提供区域逐像素掩码。",
+  "runtime_enabled": false
+}

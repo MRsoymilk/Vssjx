@@ -9,7 +9,15 @@ func _run()->void:
 	var before:=Game.player.duplicate(true)
 	var browser=load("res://scenes/admin/data_browser.tscn").instantiate();add_child(browser)
 	browser.select_category("audio")
-	check(browser.visible_entries.size()==2,"Audio category exposes both registered skill sounds")
+	check(browser.visible_entries.size()==3,"Audio category exposes skill sounds and game music")
+	browser.get_node("%Search").text="背景"
+	browser._fill_list()
+	check(browser.visible_entries.size()==1 and browser.current.id=="background","Background music is searchable in the shared audio catalog")
+	var music_preview=browser.get_node("%AudioPreview")
+	check(music_preview.get_node("Player").stream is AudioStreamOggVorbis and not music_preview.get_node("Player").stream.loop and not music_preview.get_node("Player").playing,"Admin OGG audition stays finite and does not autoplay")
+	check(browser.current.data["编码"]=="Ogg Vorbis" and browser.current.data.volume_db==-18,"Music format and default volume are visible")
+	music_preview.get_node("Controls/Play").pressed.emit()
+	check(music_preview.get_node("Player").playing,"Provided background OGG can be auditioned")
 	browser.get_node("%Search").text="星火"
 	browser._fill_list()
 	check(browser.visible_entries.size()==1 and browser.current.id=="fire" and browser.current.data.skill_id=="sheet_018","Fire is searchable with its correct skill binding")

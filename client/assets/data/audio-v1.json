@@ -20,6 +20,16 @@
       "volume_db": -6.0,
       "source": "用户提供 fire.wav",
       "description": "星火燎原命中特效开始时播放一次；离开战斗时停止。"
+    },
+    {
+      "id": "background",
+      "name": "游戏背景音乐",
+      "path": "res://assets/audio/music/background.ogg",
+      "skill_id": "",
+      "trigger": "game_background",
+      "volume_db": -18.0,
+      "source": "用户提供 background.ogg",
+      "description": "登录、角色选择、地图和战斗连续循环播放；网页首次交互后开始，切出游戏暂停，返回继续。"
     }
   ]
 }

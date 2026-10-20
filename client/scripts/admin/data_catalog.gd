@@ -117,7 +117,11 @@ func _load_audio() -> void:
 			data["采样率"]=stream.mix_rate
 			data["声道"]="双声道" if stream.stereo else "单声道"
 			data["WAV编码"]="16位PCM" if stream.format==AudioStreamWAV.FORMAT_16_BITS else ("8位PCM" if stream.format==AudioStreamWAV.FORMAT_8_BITS else "压缩WAV")
-		_add("audio",entry.id,entry.name,"%.2f秒 · %s · %s"%[data["时长（秒）"],entry.skill_id,entry.trigger],"已接入",entry.path,data,{"kind":"audio","audio_id":entry.id})
+		elif stream is AudioStreamOggVorbis:
+			data["编码"]="Ogg Vorbis"
+			data["试听循环"]=stream.loop
+		var binding:String="背景音乐 · 游戏内循环" if entry.trigger=="game_background" else "%s · %s"%[entry.skill_id,entry.trigger]
+		_add("audio",entry.id,entry.name,"%.2f秒 · %s"%[data["时长（秒）"],binding],"已接入",entry.path,data,{"kind":"audio","audio_id":entry.id})
 
 func _load_ai_world() -> void:
 	AIWorld.prepare()

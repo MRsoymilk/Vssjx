@@ -108,8 +108,8 @@
     ]
   },
   {
-    "path": "res://assets/generated/equipment/eva01/mzs/parts/ezs14.png",
-    "sha256": "c259772cd9371912e9d75377ff5c2c4e457fa86706aeeaf7076f22153b82aac0",
+    "path": "res://assets/generated/equipment/eva01/mzs/parts/ezs9.png",
+    "sha256": "b634a5bd9de0bf9fe9119cac04bbf89dbef3af29d8cdc929ca74dd289865bff7",
     "native_frames": [
       [
         0,
@@ -127,7 +127,7 @@
   },
   {
     "path": "res://assets/generated/equipment/eva01/mzs/icons/weapon.png",
-    "sha256": "31c7908e5e86af0aa3f8db78a3f63d74ad6ea9eeecac13d3066aef20602b2fec"
+    "sha256": "11e3af4912c09af03057530c5e859c23e91468024290f8e949184c35b15a8f56"
   },
   {
     "path": "res://assets/generated/equipment/eva01/mzs/icons/pendant.png",
@@ -274,8 +274,8 @@
     ]
   },
   {
-    "path": "res://assets/generated/equipment/eva01/wzs/parts/ezs14.png",
-    "sha256": "c259772cd9371912e9d75377ff5c2c4e457fa86706aeeaf7076f22153b82aac0",
+    "path": "res://assets/generated/equipment/eva01/wzs/parts/ezs9.png",
+    "sha256": "b634a5bd9de0bf9fe9119cac04bbf89dbef3af29d8cdc929ca74dd289865bff7",
     "native_frames": [
       [
         0,
@@ -293,7 +293,7 @@
   },
   {
     "path": "res://assets/generated/equipment/eva01/wzs/icons/weapon.png",
-    "sha256": "31c7908e5e86af0aa3f8db78a3f63d74ad6ea9eeecac13d3066aef20602b2fec"
+    "sha256": "11e3af4912c09af03057530c5e859c23e91468024290f8e949184c35b15a8f56"
   },
   {
     "path": "res://assets/generated/equipment/eva01/wzs/icons/pendant.png",

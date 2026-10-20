@@ -1,0 +1,9 @@
+{
+  "baseline_commit": "86b98cf",
+  "scope": "Only male/female Lishi weapon parts, weapon icons, names and template mappings; all other equipment unchanged",
+  "native_axe": "ezs9",
+  "unchanged_runtime_count": 86,
+  "unchanged_runtime_sha256": "79fdf397a000af060ea67d223327c39a3e7a29a2aa2352bc27832d8a29ff3eb2",
+  "catalog_without_two_weapon_names_sha256": "e8a8657955f295bc9fd1e08cb3efd4239dfc70d1f64cb3bd527f8dfe4b4c6b74",
+  "manifest_without_two_weapon_parts_and_names_sha256": "0ee4d2abae5241d863eca7a0b52da1080b3d08392be01874134a8f67e30eec25"
+}

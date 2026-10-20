@@ -22,13 +22,13 @@
     "red": "#ae414b"
   },
   "generator": "tools/build_eva01_equipment.py",
-  "generator_sha256": "397c67e1276ef5db103aad419a4260c85869960164c7ef43c1e1447ba381f802",
+  "generator_sha256": "88f529f940f1d7978a8146fcec66fafccb3a46f83ea89743256b8196e94b323d",
   "native_inputs": {
     "client/assets/hero_parts/mzst2.png": "1134c3936652de9a77f2ba590d01ef2443409fa7a1bbfa88d1f1125746ead84f",
     "client/assets/hero_parts/mzs1.png": "08c7b97c1b14ea3f81c08e1b8420bf17f560ab6ad7ff549e14df49d5267182d6",
     "client/assets/hero_parts/mzs1q.png": "d370dd16a4e0f86c41b37ef7dec7043b43800ef66b130d9f53fca7544a6f4f67",
     "client/assets/hero_parts/mzs1x.png": "11e35db4c6cd9b2cc5881e99cd6f927745c625771125de4924cf12ab35718fbb",
-    "client/assets/hero_parts/ezs14.png": "25b92dc75dcc6e67bb87f8f93d8d4e5197d41a378c29326bf81f8af61d5a383b",
+    "client/assets/hero_parts/ezs9.png": "6cb023bea2049a29a7957a05506c132d946500beb669a63a132fd3e67d62bccb",
     "client/assets/hero_parts/wzst2.png": "8cb89cc080c9dc3b2069a7dadeb8cca2a84ffdab92defdd5ca62a13dcbc1c275",
     "client/assets/hero_parts/wzs1.png": "1d0c4de8477f90c11b1a7998d61ae5df7d2b12f687d041596aeb651dd3259bce",
     "client/assets/hero_parts/wzs1q.png": "b1bee100f0076f79240f0f06c646d10b30796767ef1e38bf3a96231fca8f0459",

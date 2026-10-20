@@ -2,6 +2,7 @@
 import hashlib
 import importlib.util
 import json
+import copy
 from pathlib import Path
 import re
 import unittest
@@ -102,6 +103,31 @@ class Eva01Assets(unittest.TestCase):
             self.assertEqual(set(re.findall("'([^']+)'",ids)),{i['id'] for i in catalog if i['slot']==slot})
         self.assertIn('CREATE UNIQUE INDEX one_equipped_per_slot',sql)
         self.assertNotIn('DELETE FROM',sql.upper())
+
+    def test_lishi_axes_change_only_the_two_requested_weapons(self):
+        record=json.loads((ROOT/'analysis/ai-generated/equipment/eva01/axe-change-record.json').read_text())
+        def digest(value):
+            return hashlib.sha256(json.dumps(value,sort_keys=True,ensure_ascii=False,separators=(',',':')).encode()).hexdigest()
+        changed={f'client/assets/generated/equipment/eva01/{stem}/{suffix}'
+                 for stem in ['mzs','wzs'] for suffix in ['parts/ezs9.png','icons/weapon.png']}
+        paths=list((ROOT/'client/assets/generated/equipment/eva01').rglob('*.png'))
+        self.assertEqual(len(paths),90,'No stale hammer atlases remain in the export resources')
+        untouched={str(path.relative_to(ROOT)):hashlib.sha256(path.read_bytes()).hexdigest()
+                   for path in paths if str(path.relative_to(ROOT)) not in changed}
+        self.assertEqual(len(untouched),record['unchanged_runtime_count'])
+        self.assertEqual(digest(untouched),record['unchanged_runtime_sha256'])
+        catalog=json.loads((ROOT/'client/assets/data/shop-v2.json').read_text())
+        for item in catalog['items']:
+            if item['id'] in ['ai/eva01/mzs/weapon','ai/eva01/wzs/weapon']:
+                self.assertTrue(item.pop('name').endswith('斧'))
+        self.assertEqual(digest(catalog),record['catalog_without_two_weapon_names_sha256'])
+        manifest=copy.deepcopy(self.manifest)
+        for row in manifest['sets']:
+            if row['stem'] in ['mzs','wzs']:
+                self.assertEqual(row['weapon'],f"eva01/{row['stem']}/ezs9")
+                self.assertTrue(row.pop('weapon_name').endswith('斧'))
+                manifest['parts'].pop(row.pop('weapon'))
+        self.assertEqual(digest(manifest),record['manifest_without_two_weapon_parts_and_names_sha256'])
 
 
 if __name__ == '__main__':

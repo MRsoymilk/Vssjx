@@ -17,8 +17,8 @@
         "eva01/mzs/mzs1q",
         "eva01/mzs/mzs1x"
       ],
-      "weapon": "eva01/mzs/ezs14",
-      "weapon_name": "高振动破障锤"
+      "weapon": "eva01/mzs/ezs9",
+      "weapon_name": "高振动破障斧"
     },
     {
       "id": "eva01/wzs",
@@ -35,8 +35,8 @@
         "eva01/wzs/wzs1q",
         "eva01/wzs/wzs1x"
       ],
-      "weapon": "eva01/wzs/ezs14",
-      "weapon_name": "高振动镇岳锤"
+      "weapon": "eva01/wzs/ezs9",
+      "weapon_name": "高振动镇岳斧"
     },
     {
       "id": "eva01/mck",
@@ -216,8 +216,8 @@
         ]
       ]
     },
-    "eva01/mzs/ezs14": {
-      "texture": "res://assets/generated/equipment/eva01/mzs/parts/ezs14.png",
+    "eva01/mzs/ezs9": {
+      "texture": "res://assets/generated/equipment/eva01/mzs/parts/ezs9.png",
       "frames": [
         [
           0,
@@ -337,8 +337,8 @@
         ]
       ]
     },
-    "eva01/wzs/ezs14": {
-      "texture": "res://assets/generated/equipment/eva01/wzs/parts/ezs14.png",
+    "eva01/wzs/ezs9": {
+      "texture": "res://assets/generated/equipment/eva01/wzs/parts/ezs9.png",
       "frames": [
         [
           0,

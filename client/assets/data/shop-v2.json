@@ -8213,7 +8213,7 @@
     },
     {
       "id": "ai/eva01/mzs/weapon",
-      "name": "高振动破障锤",
+      "name": "高振动破障斧",
       "slot": "weapon",
       "category": "武器",
       "price": 140,
@@ -8473,7 +8473,7 @@
     },
     {
       "id": "ai/eva01/wzs/weapon",
-      "name": "高振动镇岳锤",
+      "name": "高振动镇岳斧",
       "slot": "weapon",
       "category": "武器",
       "price": 140,

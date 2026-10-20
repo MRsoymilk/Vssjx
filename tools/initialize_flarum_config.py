@@ -23,8 +23,8 @@ def prepare(directory, base_url):
         'settings': {
             'forum_title': '蜀山剑侠 · 剑侠茶馆',
             'forum_description': '蜀山剑侠玩家交流社区',
-            'welcomeTitle': '欢迎来到剑侠茶馆',
-            'welcomeMessage': '交流游戏心得与反馈。论坛试运行中，暂不开放注册。',
+            'welcome_title': '欢迎来到剑侠茶馆',
+            'welcome_message': '交流游戏心得与反馈。论坛试运行中，暂不开放注册。',
             'theme_primary_color': '#476554',
             'theme_secondary_color': '#e7eee8',
             'allow_sign_up': '0',

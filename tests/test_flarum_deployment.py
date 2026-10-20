@@ -4,6 +4,7 @@ from pathlib import Path
 import re
 import tempfile
 import unittest
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -24,10 +25,24 @@ class FlarumDeploymentTests(unittest.TestCase):
             config = json.loads((target / 'install.json').read_text())
             self.assertEqual((target / 'admin-credentials.json').stat().st_mode & 0o777, 0o600)
             self.assertEqual(config['settings']['allow_sign_up'], '0')
+            self.assertIn('welcome_title', config['settings'])
             self.assertEqual(config['databaseConfiguration']['driver'], 'sqlite')
             self.assertGreater(len(config['adminUser']['password']), 32)
             with self.assertRaises(FileExistsError):
                 tool('initialize_flarum_config').prepare(target, 'https://47.93.114.190/flarum')
+
+    def test_backup_uses_online_forum_snapshot_not_a_live_database_file_copy(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            module = tool('backup_flarum')
+            with patch.object(module.subprocess, 'run') as run:
+                result = module.backup(temporary)
+            calls = [call.args[0] for call in run.call_args_list]
+            self.assertIn('$source->backup($target)', calls[0][-1])
+            self.assertIn('SQLITE3_OPEN_READONLY', calls[0][-1])
+            self.assertEqual(calls[1][5], 'tar')
+            self.assertNotIn('forum.sqlite', calls[1])
+            self.assertEqual(result.stat().st_mode & 0o777, 0o600)
+            self.assertTrue(all('vssjx-forum-forum-1' in call for call in calls))
 
     def test_proxy_merge_only_replaces_reserved_forum_locations(self):
         original = (ROOT / 'deploy/public.web.https.nginx.conf').read_text()

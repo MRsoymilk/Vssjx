@@ -7,7 +7,7 @@ from urllib.error import HTTPError
 from urllib.request import build_opener, ProxyHandler, Request
 
 
-def check(base):
+def check(base, registration='closed'):
     opener = build_opener(ProxyHandler({}))
     count = 0
 
@@ -32,7 +32,7 @@ def check(base):
     payload = json.loads(re.search(r'<script id="flarum-json-payload" type="application/json">(.*?)</script>', text, re.S)[1])
     forum = next(row for row in payload['resources'] if row['type'] == 'forums')['attributes']
     expect(forum['baseUrl'] == base, 'Canonical forum URL and subpath are correct')
-    expect(forum['allowSignUp'] is False, 'Public registration is disabled')
+    expect(forum['allowSignUp'] is (registration == 'open'), 'Registration matches expected state: ' + registration)
     expect(not forum['debug'], 'Debug is disabled')
     cookies = SimpleCookie()
     cookies.load(headers.get('Set-Cookie', ''))
@@ -56,4 +56,6 @@ def check(base):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('base', help='Canonical URL ending in /flarum, without trailing slash')
-    check(parser.parse_args().base.rstrip('/'))
+    parser.add_argument('--registration', choices=('closed', 'open'), default='closed')
+    args = parser.parse_args()
+    check(args.base.rstrip('/'), args.registration)

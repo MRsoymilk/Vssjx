@@ -3,7 +3,9 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const {chromium} = require(process.env.PLAYWRIGHT_MODULE_PATH || 'playwright-core');
-const [base, output, credentials] = process.argv.slice(2);
+const args = process.argv.slice(2);
+const openRegistration = args.includes('--registration=open');
+const [base, output, credentials] = args.filter(value => value !== '--registration=open');
 const local = new URL(base).hostname === '127.0.0.1';
 assert(!credentials || local, 'Never import production credentials into browser fixtures');
 let browser, count = 0;
@@ -32,7 +34,15 @@ function check(value, title) {assert(value, title); count++; console.log('PASS: 
     check(response.status() === 200, 'Forum homepage responds over the intended prefix');
     check((await page.title()).includes('剑侠茶馆'), 'Chinese forum title is present');
     check(await page.locator('.Header-secondary').getByText('登录', {exact: true}).count() > 0, 'Chinese JavaScript UI has loaded');
-    check(await page.locator('.Header-secondary').getByText('注册', {exact: true}).count() === 0, 'Public registration is disabled');
+    const register = page.locator('.Header-secondary').getByText('注册', {exact: true});
+    check((await register.count() > 0) === openRegistration, 'Registration matches the expected state');
+    if (openRegistration) {
+      await register.click();
+      await page.waitForSelector('.SignUpModal input[name=email]');
+      check(await page.locator('.SignUpModal input[name=username], .SignUpModal input[name=email], .SignUpModal input[name=password]').count() === 3, 'Registration form opens with username, email and password; no account is submitted');
+      await page.screenshot({path: path.join(output, 'forum-registration.png'), fullPage: true});
+      await page.locator('.Modal-close').click();
+    }
     check(await page.locator('link[rel=stylesheet]').count() > 0, 'Styles are loaded');
     check(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), 'Desktop layout fits viewport');
     const cookies = await context.cookies();

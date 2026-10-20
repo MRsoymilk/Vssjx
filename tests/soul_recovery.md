@@ -2,7 +2,8 @@
 
 - `tests/run_soul_recovery.py`：独占临时 PostgreSQL / Rust 服务 / WebSocket，18 项通过。实际战败、原地坟堆、同图 spawn、资产保留、灵魂操作限制、错误尸体／距离拒绝、真实进程重启、失败事务回滚、成功复活和回执重放。
 - `client/tests/soul_recovery_test.tscn`：所有现有地图复活点／尸体格式验证、本地战败落盘与重读、恢复限制、寻路返回坟堆、保存失败回滚、复活去灰／删除坟堆、真实服务端快照验证。
-- Xvfb + Mesa llvmpipe 实际 OpenGL ES 离屏渲染，464 项通过。截图及日志：`work/soul-recovery/`（忽略目录）。`soul-spawn.png`、`corpse-nearby.png`、`revived.png` 已人工检查；逐像素抽样验证灵魂全屏灰度及复活后恢复彩色。
+- Xvfb + Mesa llvmpipe 实际 OpenGL ES 离屏渲染，472 项通过。截图及日志：`work/soul-recovery/`（忽略目录）。`soul-spawn.png`、`corpse-nearby.png`、`revived.png` 已人工检查；逐像素抽样验证灵魂全屏灰度及复活后恢复彩色。还将真实服务端死亡／复活快照注入正式联机界面，校验坟堆、灰色界面和人物半透明的显示／撤销，截图 `online-soul.png`、`online-revived.png`。
+- 组队团灭、各自留坟与同图出生、灵魂队员不受队长跟随叫停的真实服务端验证见 [组队测试](teams.md)。
 
 ```sh
 cargo build --offline --manifest-path server/Cargo.toml

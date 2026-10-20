@@ -17,7 +17,7 @@ func capture(name:String)->void:
 		for x in range(0,image.get_width(),8):
 			var pixel:=image.get_pixel(x,y)
 			if absf(pixel.r-pixel.g)>0.02 or absf(pixel.g-pixel.b)>0.02:colorful+=1
-	check(colorful==0 if name!="revived" else colorful>100,"Full viewport grayscale follows only the soul state")
+	check(colorful==0 if not name.ends_with("revived") else colorful>100,"Full viewport grayscale follows only the soul state")
 func _run()->void:
 	await Game.when_ready()
 	var old:=Game.player.duplicate(true)
@@ -79,11 +79,24 @@ func _run()->void:
 	check((await Game.load_game()).ok and not Game.is_soul(),"Revived state survives disk reload")
 	check(not (await Game.recover_corpse(corpse.id,app.world.cell)).ok,"Duplicate recovery cannot create another restore")
 	var fixture:=OS.get_environment("SSJX_SOUL_SERVER_FIXTURES")
+	app.queue_free();await get_tree().process_frame
 	if not fixture.is_empty():
 		for record in JSON.parse_string(FileAccess.get_file_as_string(fixture)):
 			var model:=OnlinePve.new();model.bind_character(record.character.id,"http://127.0.0.1:1")
 			check(model.valid(record),"Real server soul/revived snapshots validate")
-	app.queue_free();await get_tree().process_frame
+			var online:OnlineWorldView=load("res://scenes/ui/online_world_view.tscn").instantiate()
+			online.character_id=record.character.id;add_child(online);online.set_process(false);online.network.set_process(false)
+			online.network.pve.state=record;online.network.pve.ready=true
+			var c:Dictionary=record.character
+			var entity:Dictionary={"id":c.id,"display_name":c.display_name,"job":c.job,"gender":c.gender,"cell":[c.cell_x,c.cell_y],"next_cell":null,"segment_progress":0,"entity_revision":"1","world_epoch":"1","last_input_seq":0}
+			online.network.entities={c.id:entity};online._snapshot(online.network.entities)
+			online.camera.position=online.actors[c.id].root.position
+			online._update_soul_visuals()
+			var spirit:bool=c.get("corpse") is Dictionary
+			check(online.soul_overlay.visible==spirit and online.soul_markers.grave.visible==spirit,"Production online view renders and removes the private corpse from actual server snapshots")
+			check((online.actors[c.id].sprite.modulate.a<1)==spirit,"Online actor transparency follows authoritative soul state")
+			await capture("online-soul" if spirit else "online-revived")
+			online.queue_free();await get_tree().process_frame
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(good_path))
 	Game.player=old;Game.save_path=old_path
 	check(OnlineAccount.pending_pve==pending and (FileAccess.get_sha256(old_path) if FileAccess.file_exists(old_path) else "")==old_hash,"Test leaves real saves and online commands untouched")

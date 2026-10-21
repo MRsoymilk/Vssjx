@@ -16,6 +16,7 @@ var inspect_panel:Panel
 var hint:Label
 var caption:Label
 var picker:SkillPicker
+var item_picker:BattleItemPicker
 var effects:BattleEffects
 var move_callout:BattleMoveCallout
 var _effect_wait:=""
@@ -64,6 +65,9 @@ func _ready()->void:
 	inspect_panel=preload("res://scenes/ui/battle_inspect.tscn").instantiate();add_child(inspect_panel);inspect_panel.size.y=140;inspect_panel.hide()
 	var close:=OriginalSceneChrome.button(inspect_panel,"返回",Rect2(57,112,50,24),12);close.add_theme_color_override("font_color",Color("654518"));close.pressed.connect(inspect_panel.hide)
 	picker=SkillPicker.new();add_child(picker);picker.position.y=-28;picker.hide();picker.chosen.connect(func(id:String)->void:picker.hide();_send("skill",id));picker.dismissed.connect(picker.hide)
+	item_picker=BattleItemPicker.new();add_child(item_picker);item_picker.hide()
+	item_picker.chosen.connect(func(id:String)->void:if id=="potion":item_picker.hide();_send("potion"))
+	item_picker.dismissed.connect(func()->void:item_picker.hide();_menu_dismissed=false;_refresh_controls())
 	result=preload("res://scenes/ui/battle_result.tscn").instantiate();add_child(result)
 	result.finished.connect(_dismiss);result.get_node("Return").pressed.connect(_dismiss)
 	model.changed.connect(present)
@@ -82,6 +86,7 @@ func _dismiss()->void:
 	_closed=battle_id;_cancel();hide();dismissed.emit()
 func _cancel()->void:
 	_effect_wait=""
+	if is_instance_valid(item_picker):item_picker.hide()
 	if is_instance_valid(move_callout):move_callout.clear()
 	if is_instance_valid(effects):effects.clear()
 	if motion!=null:motion.cancel()
@@ -170,9 +175,15 @@ func _choose(action:String)->void:
 	if action=="skill":
 		for f in model.battle().fighters:
 			if f.id==model.character_id:picker.present(int(f.job),int(f.school),int(f.level),int(f.mp),[],false,f.stats,f.effects);picker.show();return
+	if action=="potion":
+		picker.hide();inspect_panel.hide()
+		for f in model.battle().fighters:
+			if f.id==model.character_id:item_picker.present(int(f.potions),int(f.hp),int(f.stats.hp),SkillBalance.potion(f.stats));return
+		return
 	_send(action)
 func _send(action:String,skill:String="")->void:
 	if action!="flee" and not model.my_turn():return
+	item_picker.hide()
 	model.submit(action,selected if action in ["attack","skill"] else "",skill)
 func _refresh_controls()->void:
 	var b:Dictionary=model.battle()
@@ -196,9 +207,14 @@ func _refresh_controls()->void:
 	for i in action_buttons.size():action_buttons[i].disabled=not model.active() or not model.can_submit() or motion!=null or not queue.is_empty() or not _effect_wait.is_empty() or effects.has_reactions() or (not model.my_turn() if i<4 else (not model.party().get("leader",false) if i==5 else false))
 	hint.visible=not hint.text.is_empty() and not executing
 	var can_choose:bool=model.active() and model.can_submit() and model.my_turn() and not model.pending() and not executing
+	if item_picker.visible:
+		if not can_choose:item_picker.hide()
+		else:
+			for f in b.fighters:
+				if f.id==model.character_id:item_picker.refresh_values(int(f.potions),int(f.hp),int(f.stats.hp),SkillBalance.potion(f.stats))
 	if can_choose and not _could_choose:_menu_dismissed=false
 	_could_choose=can_choose
-	menu.visible=can_choose and not automatic and not _menu_dismissed and not picker.visible and not inspect_panel.visible
+	menu.visible=can_choose and not automatic and not _menu_dismissed and not picker.visible and not item_picker.visible and not inspect_panel.visible
 	countdown.visible=model.active() and not executing and left>0
 	countdown.value=str(left);countdown.queue_redraw()
 	auto_button.visible=b.get("solo",false) and model.active()
@@ -208,10 +224,10 @@ func _refresh_controls()->void:
 
 func _toggle_auto()->void:
 	if not model.active() or not model.battle().get("solo",false):return
-	automatic=not automatic;auto_elapsed=0.0;_menu_dismissed=false;menu.hide();_refresh_controls()
+	automatic=not automatic;auto_elapsed=0.0;_menu_dismissed=false;menu.hide();item_picker.hide();_refresh_controls()
 
 func _unhandled_key_input(event:InputEvent)->void:
-	if not visible or not event is InputEventKey or not event.pressed or picker.visible:return
+	if not visible or not event is InputEventKey or not event.pressed or picker.visible or item_picker.visible:return
 	if event.keycode==KEY_0:_toggle_auto();get_viewport().set_input_as_handled()
 	elif event.keycode>=KEY_1 and event.keycode<=KEY_6:
 		_choose(["attack","skill","guard","potion","inspect","flee"][event.keycode-KEY_1]);get_viewport().set_input_as_handled()

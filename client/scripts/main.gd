@@ -170,6 +170,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 	if is_instance_valid(map_transition) and map_transition.blocking: return
 	if get_viewport().gui_get_focus_owner() is LineEdit: return
 	if not event is InputEventKey or not event.pressed or event.echo: return
+	if mode=="battle" and modal!=null and modal.has_node("BattleItemPicker"):return
 	if mode == "battle_loading":
 		get_viewport().set_input_as_handled()
 		return
@@ -195,7 +196,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 			KEY_1: _battle_turn("attack")
 			KEY_2: _battle_skills()
 			KEY_3: _battle_turn("guard")
-			KEY_4: _battle_turn("potion")
+			KEY_4: _battle_items()
 			KEY_5: _battle_inspect()
 			KEY_6: _battle_turn("flee")
 			KEY_0: _toggle_auto()
@@ -1131,6 +1132,7 @@ func _start_battle(enemy: Dictionary) -> void:
 		var button: Button = action_menu.get_node("BattleButtons%d" % i)
 		if commands[i] == "inspect": button.pressed.connect(_battle_inspect)
 		elif commands[i]=="skill":button.pressed.connect(_battle_skills)
+		elif commands[i]=="potion":button.pressed.connect(_battle_items)
 		else: button.pressed.connect(_battle_turn.bind(commands[i]))
 		battle_buttons.append(button)
 	battle_move_callout = load("res://scenes/ui/battle_move_callout.tscn").instantiate()
@@ -1182,6 +1184,20 @@ func _battle_skills()->void:
 	picker.dismissed.connect(func()->void:_close_modal();_battle_menu())
 	picker.chosen.connect(func(id:String)->void:_close_modal();battle.selected_skill=id;_battle_turn("skill",id))
 	picker.present(int(Game.player.job),int(Game.player.school),int(Game.player.level),battle.mp,[],false,battle.frozen_stats,battle.skills)
+
+func _battle_items()->void:
+	if mode!="battle" or battle.phase!="select" or modal!=null:return
+	if action_menu!=null:action_menu.hide()
+	modal=preload("res://scenes/ui/modal_overlay.tscn").instantiate();ui.add_child(modal)
+	modal.get_node("Shade").hide()
+	var items:=BattleItemPicker.new();modal.add_child(items)
+	var active_battle:=battle
+	items.dismissed.connect(func()->void:_close_modal();_battle_menu())
+	items.chosen.connect(func(id:String)->void:
+		if id!="potion" or battle!=active_battle or mode!="battle" or battle.phase!="select":return
+		_close_modal();_battle_turn("potion")
+	)
+	items.present(battle.potions,battle.hp,int(battle.frozen_stats.hp),SkillBalance.potion(battle.frozen_stats))
 
 func _battle_turn(command: String, skill_id:String="") -> void:
 	if mode != "battle" or battle.phase != "select" or modal != null: return

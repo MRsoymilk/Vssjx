@@ -72,3 +72,12 @@ python tests/run_offscreen.py --path client --rendering-method gl_compatibility 
 ```
 
 不改写任何历史SQL迁移；新增状态随现有`loot_state`和`team_battles.state`事务持久化，旧JSON字段默认保持兼容。临时数据库、测试账号、回包、模拟报告及截图都在隔离环境／忽略目录中，不触碰生产资产。
+
+
+## 养成界面回归（2026-10-21）
+
+使用 Godot 4.7.2 的 OpenGL 兼容渲染执行 `res://tests/crafting_layout_test.tscn`，41项检查通过。测试使用独立临时存档，从装备列表实际打开养成页，覆盖资源图标不遮挡数量、属性与按钮分区、原版主题下拉菜单、强化／洗炼／分解两次确认、精确扣费与实例保存、缺材料、已穿戴、空装备、洗炼索引锁定、大数值及联机待确认锁定。`loot_instances_test.tscn` 的20项实例回归也通过。
+
+实际渲染截图保存在忽略目录 `work/crafting-ready.png`、`work/crafting-dropdown.png`、`work/crafting-confirm.png`、`work/crafting-insufficient.png`、`work/crafting-large-resources.png` 与 `work/crafting-empty.png`。人工检查确认金属锭造型炼材图标、数量、长确认文案和滚动菜单没有重叠。
+
+额外运行管理端 `equipment_appearance_ui_test.tscn`：78项中77项通过，旧测试固定预期262条装备映射的断言失败；当前商城装备目录已有323条。该测试不打开养成页，本阶段未修改外观目录或其固定计数断言，不将其计入养成页通过项。

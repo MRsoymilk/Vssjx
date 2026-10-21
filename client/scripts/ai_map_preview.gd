@@ -9,7 +9,8 @@ static func held_texture(path: String) -> Texture2D:
 var map_data: Dictionary = {}
 
 static func draw_scenery(canvas: CanvasItem, data: Dictionary, start: Vector2, zoom: float) -> void:
-	var props: Array = data.get("scenery",[]).duplicate()
+	var native:=NativeWorldMaps.preview(String(data.get("map_id","")))
+	var props: Array = native.get("scenery",data.get("scenery",[])).duplicate()
 	props.sort_custom(func(a: Dictionary,b: Dictionary)->bool:return a.y<b.y)
 	for prop in props:
 		var info := OriginalArt.actor_info(prop.art)
@@ -42,8 +43,9 @@ func _draw() -> void:
 	draw_rect(Rect2(Vector2.ZERO,size),Color("14282e"))
 	var cell:=minf((size.x-12)/32.0,(size.y-12)/32.0)
 	var start:Vector2=(size-Vector2.ONE*cell*32.0)/2.0
+	var tiles:PackedInt32Array=NativeWorldMaps.preview(String(map_data.map_id)).tiles
 	for index in 1024:
-		var tile:=int(map_data.tiles[index])
+		var tile:=int(tiles[index])
 		draw_texture_rect_region(ATLAS,Rect2(start+Vector2(index%32,index/32)*cell,Vector2.ONE*cell),Rect2(tile%32*16,tile/32*16,16,16))
 	draw_scenery(self,map_data,start,cell/16.0)
 	draw_spawn(self,map_data,start,cell/16.0)

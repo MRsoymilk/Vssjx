@@ -11,7 +11,7 @@ func _run() -> void:
 	view.character_id=OnlineAccount.characters[0].id;add_child(view)
 	view.network.status_changed.connect(func(text: String)->void:print("AI LIVE STATUS: ",text))
 	view.network.status_changed.connect(func(text: String)->void:connection_statuses.append(text))
-	check(await wait_until(func()->bool:return view.network.world_ready and view.network.pve.ready and view.residents.size()==5),"Shared AI map, hash, residents and progress validate")
+	check(await wait_until(func()->bool:return view.network.world_ready and view.network.pve.ready and view.residents.size()==SharedWorldMap.population("ai_001").size()),"Shared AI map, hash, residents and progress (including guardian) validate")
 	if not view.network.pve.ready: print(view._system_text);get_tree().quit(1);return
 	check(view.map_data==SharedWorldMap.load_data("ai_001"),"Offline and online use identical generated layout")
 	check(view.network._maps_version==2,"Real client negotiates expansion support from the ticket capability")
@@ -38,12 +38,12 @@ func _run() -> void:
 	check(await wait_until(func()->bool:return not view.map_transition.blocking),"AI destination is fully synchronized before loading ends")
 	view._close_inventory()
 	view._resident_action("challenge","ai_002_mob")
-	check(await wait_until(func()->bool:return view.network.pve.active() and view.battle_view.visible,30),"New regional monster reaches the real online battle view")
+	check(await wait_until(func()->bool:return view.network.pve.active() and (view.battle_view.visible or view.solo_battle.visible),30),"New regional monster reaches the real online battle view")
 	if view.network.pve.active():
 		check(view.network.pve.state.battle.enemy.art==AIWorld.resident("ai_002_mob").art,"Battle uses the same distinct monster as the map")
 		view.network.pve.submit("flee")
 		check(await wait_until(func()->bool:return not view.network.pve.active() and not view.network.pve.pending()),"New monster battle settles through authoritative protocol")
-		check(await wait_until(func()->bool:return not view.battle_view.visible),"Original result presentation automatically returns to the map")
+		check(await wait_until(func()->bool:return not view.battle_view.visible and not view.solo_battle.visible),"Original result presentation automatically returns to the map")
 	var return_gate: Dictionary=SharedWorldMap.exits("ai_002")[0]
 	view.network.move_to(Vector2i(return_gate.cell[0],return_gate.cell[1]))
 	check(await wait_until(func()->bool:return view.network.world_ready and view.network.pve.ready and not view.network.pve.pending() and view.network.map_id=="qingyun_trail",30),"Return to existing world from generated scene")

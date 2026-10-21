@@ -51,7 +51,7 @@ static func build(terrain: TileMapLayer, grid: AStarGrid2D, data: Dictionary) ->
 	grid.default_compute_heuristic = AStarGrid2D.HEURISTIC_MANHATTAN
 	grid.default_estimate_heuristic = AStarGrid2D.HEURISTIC_MANHATTAN
 	grid.update()
-	NativeWorldMaps.build(terrain,String(data.map_id))
+	NativeWorldMaps.build(terrain,data)
 	for index in data.blocked.size():
 		var point := Vector2i(index % width, index / width)
 		grid.set_point_solid(point, data.blocked[index])

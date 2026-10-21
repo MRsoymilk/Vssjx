@@ -236,7 +236,8 @@ func _draw() -> void:
 	var data: Dictionary = record.data
 	var width := int(data.get("width", 0))
 	var height := int(data.get("height", 0))
-	var tiles: Array = data.get("tiles", [])
+	var native:=NativeWorldMaps.preview(String(data.get("map_id","")))
+	var tiles: Variant = native.get("tiles",data.get("tiles", []))
 	if width <= 0 or height <= 0 or tiles.size() != width * height: return
 	var cell := minf((size.x - 16) / width, (size.y - 16) / height)
 	var start := (size - Vector2(width, height) * cell) * 0.5

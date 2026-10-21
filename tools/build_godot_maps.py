@@ -9,6 +9,11 @@ import hashlib
 import json
 from pathlib import Path
 import struct
+import sys
+from functools import lru_cache
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from original_map_art import rebuild
 
 ROOT = Path(__file__).resolve().parents[1]
 CLIENT = ROOT / 'client'
@@ -20,9 +25,12 @@ def value(data):
     return json.dumps(data, ensure_ascii=False, separators=(',', ': '))
 
 
+@lru_cache(maxsize=1)
 def maps():
     result = [json.loads((ROOT / 'shared/data' / file).read_text())
               for file in ('qingyun-v1.json', 'ancient-ruins-v1.json')]
+    for m,file in zip(result,('qingyun-population-v1.json','ruins-population-v1.json')):
+        m['residents']=json.loads((ROOT/'shared/data'/file).read_text())
     result += json.loads((ROOT / 'shared/data/ai-world-v1.json').read_text())['maps']
     return result
 
@@ -32,14 +40,14 @@ def geometry_hash(m):
                                     sort_keys=True, separators=(',', ':')).encode()).hexdigest()
 
 
-def tile_bytes(tiles, width):
+def tile_bytes(tiles, width, offset=(0,0)):
     # TileMapLayer format 0: LE u16 version, then x/y/source/atlas x/y/alternative.
-    return struct.pack('<H', 0) + b''.join(struct.pack('<hhHHHH', i % width, i // width, 0, t % 32, t // 32, 0)
+    return struct.pack('<H', 0) + b''.join(struct.pack('<hhHHHH', i % width+offset[0], i // width+offset[1], 0, t % 32, t // 32, 0)
                                          for i, t in enumerate(tiles) if t is not None)
 
 
-def tile_layer(name, tiles, width, parent='.'):
-    encoded = base64.b64encode(tile_bytes(tiles, width)).decode()
+def tile_layer(name, tiles, width, parent='.', offset=(0,0)):
+    encoded = base64.b64encode(tile_bytes(tiles, width, offset)).decode()
     return [f'[node name="{name}" type="TileMapLayer" parent="{parent}"]',
             'tile_set = ExtResource("Tiles")', f'tile_map_data = PackedByteArray("{encoded}")', '']
 
@@ -53,8 +61,14 @@ def tileset():
         'tile_size = Vector2i(16, 16)', 'sources/0 = SubResource("Atlas")', ''])
 
 
+@lru_cache(maxsize=216)
+def presentation(map_id):
+    return rebuild(next(m for m in maps() if m['map_id']==map_id))
+
+
 def scene(m):
-    props = m['scenery']
+    art = presentation(m['map_id'])
+    props = art['scenery']
     arts = sorted({p['art'] for p in props})
     lines = [f'[gd_scene load_steps={2 + len(arts)} format=3]', '',
              f'[ext_resource type="TileSet" path="res://{ASSETS}/original_tiles.tres" id="Tiles"]',
@@ -62,12 +76,18 @@ def scene(m):
                for i, art in enumerate(arts)], '', '[node name="WorldMap" type="Node2D"]',
              'texture_filter = 1', 'metadata/map_id = ' + value(m['map_id']),
              'metadata/navigation_sha256 = ' + value(geometry_hash(m)),
+             'metadata/presentation_revision = 2',
              'metadata/provenance = "原包素材；截图局部参考及重建设计，非原版完整布局恢复"', '']
-    lines += tile_layer('Ground', m['tiles'], m['width'])
+    lines += tile_layer('Ground', art['ground'], m['width'])
     lines += ['[node name="Scenery" type="Node2D" parent="."]', 'y_sort_enabled = true', '']
     for i, p in enumerate(props):
         lines += [f'[node name="Prop{i}" parent="Scenery" instance=ExtResource("Prop{arts.index(p["art"])}")]',
                   f'position = Vector2({int(p["x"])}, {int(p["y"])})', '']
+    for i, b in enumerate(art['buildings']):
+        x,y=b['cell'];w,h=b['size']
+        lines += tile_layer('Building'+str(i), b['tiles'], w, 'Scenery', (0,-h))
+        lines += [f'position = Vector2({x*16}, {(y+h)*16})', 'y_sort_enabled = false',
+                  'metadata/building_kind = '+value(b['kind']), '']
     return '\n'.join(lines)
 
 

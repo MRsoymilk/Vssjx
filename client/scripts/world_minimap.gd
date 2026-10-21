@@ -47,17 +47,21 @@ func _draw() -> void:
 	draw_rect(Rect2(0, 0, 80, 82), Color("eef3d3"), false)
 	var origin := Vector2(13, 14)
 	var scale_value := 1.65
+	var data:Dictionary=world.map_data if local else shared_map
+	var native:=NativeWorldMaps.preview(String(data.map_id))
 	for y in 32:
 		for x in 32:
 			var point := Vector2i(x, y)
 			var fill := Color("626653")
-			if (local and world.zone == 0) or (not local and shared_map.get("map_id") == "qingyun_trail"):
-				var index := y * 32 + x
-				var data: Dictionary = world.map_data if local else shared_map
-				var tile := int(data.tiles[index])
-				fill = Color("426969") if tile == 123 else (Color("919279") if tile == 138 or tile in [18, 20, 21, 22, 30, 32, 40, 41, 42] else Color("666e58"))
-				if not local and data.blocked[index]: fill = fill.darkened(0.35)
-			else: fill = Color("666374")
+			var index := y * 32 + x
+			var tile := int(native.tiles[index])
+			if tile in [80,81,82,90,91,92,100,101,102,479]:fill=Color("426969")
+			elif tile in [18,19,20,21,22,30,31,32,40,41,42,72,138,149,325,394]:fill=Color("a19a6d")
+			elif tile>=450 and tile<=513:fill=Color("d0d2c7")
+			elif tile>=685:fill=Color("98614b")
+			elif tile>=219 and tile<=298:fill=Color("666374")
+			else:fill=Color("666e58")
+			if not local and data.blocked[index]:fill=fill.darkened(.35)
 			if local and world.astar.is_point_solid(point): fill = fill.darkened(0.35)
 			draw_rect(Rect2(origin + Vector2(point) * scale_value, Vector2.ONE * scale_value), fill)
 	var map_id: String = world.map_id if local else String(shared_map.map_id)

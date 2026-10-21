@@ -149,6 +149,7 @@ func new_player(nickname: String, job: int, school: int, gender: int = 0) -> voi
 		"ingots": 0, "guild_contribution": 0, "essence": 0,
 		"allocated_attributes": [0,0,0,0,0], "attribute_rules_revision": 3,
 		"corpse":null,
+		"endless_state":EndlessRules.empty(),
 		"balance_revision":1,"balance_respec_available":true
 	}
 	if String(player.name).is_empty():
@@ -272,6 +273,23 @@ func award_loot(enemies:Array,seed:int)->String:
 		boss=boss or enemy.get("kind")=="boss" or enemy.get("id")=="boss";item_level=maxi(item_level,int(enemy.get("level",1)))
 	var gained:=ProgressionRules.reward(player,mini(int(player.level),item_level),boss,seed)
 	return "获得%d件装备与%d炼材%s；满包自动暂存。"%[gained.size(),int(ProgressionRules.rules.boss_scrap if boss else ProgressionRules.rules.victory_scrap),"、1精华" if boss else ""]
+
+func start_endless()->PlatformResult:
+	if storage_busy or _local_roster_busy:return PlatformResult.new(PlatformResult.Status.TEMPORARY_FAILURE,"STORAGE_BUSY","正在保存，请稍候。")
+	if player.is_empty():return PlatformResult.new(PlatformResult.Status.INVALID_DATA,"EMPTY_PLAYER","没有本地角色。")
+	if is_soul():return PlatformResult.new(PlatformResult.Status.INVALID_DATA,"SOUL_STATE",OnlinePve.error_text("SOUL_STATE"))
+	if local_battle_active():return PlatformResult.new(PlatformResult.Status.INVALID_DATA,"BATTLE_ACTIVE",OnlinePve.error_text("BATTLE_ACTIVE"))
+	var point:Array=EndlessRules.rules.npc.cell
+	if AIWorld.local_map_id()!=EndlessRules.rules.map_id or absi(int(player.cell[0])-int(point[0]))+absi(int(player.cell[1])-int(point[1]))>2:return PlatformResult.new(PlatformResult.Status.INVALID_DATA,"ENDLESS_NPC_REQUIRED",OnlinePve.error_text("ENDLESS_NPC_REQUIRED"))
+	if not ProgressionRules.can_fight(player.get("loot_state",{})):return PlatformResult.new(PlatformResult.Status.INVALID_DATA,"LOOT_STORAGE_FULL",OnlinePve.error_text("LOOT_STORAGE_FULL"))
+	var before:=player.duplicate(true);var generation:=_player_generation;var path:=save_path
+	player.endless_state=EndlessRules.progress(player).duplicate(true)
+	var started:=EndlessRules.begin(player.endless_state,int(player.level))
+	if started.has("error"):player=before;return PlatformResult.new(PlatformResult.Status.INVALID_DATA,started.error,OnlinePve.error_text(started.error))
+	var result:=await save_game()
+	if generation!=_player_generation or path!=save_path:return PlatformResult.new(PlatformResult.Status.CANCELLED,"STALE_LOAD","角色已切换。")
+	if not result.ok:player=before;return result
+	return PlatformResult.success(started)
 
 
 func allocate_attributes(points: Array) -> PlatformResult:
@@ -566,13 +584,14 @@ func load_game() -> PlatformResult:
 		return _finish_storage(_invalid_save(), generation)
 	_migrate_school_membership(data)
 	_migrate_balance(data)
-	var loot_migration:bool=not data.has("loot_state") or data.get("local_characters",{}).get("characters",[]).any(func(e:Dictionary)->bool:return not e.data.has("loot_state"))
+	var interrupted_endless:=EndlessRules.recover_local(data)
+	var loot_migration:bool=interrupted_endless or not data.has("loot_state") or data.get("local_characters",{}).get("characters",[]).any(func(e:Dictionary)->bool:return not e.data.has("loot_state"))
 	if loot_migration:
 		_migrate_loot(data)
 		var migrated:=await _await_storage(Platform.context.storage.write(_operation_path,JSON.stringify(data,"\t")))
 		if not migrated.ok:return _finish_storage(migrated,generation)
 		if not migrated.value is Dictionary or migrated.value.get("written")!=true or migrated.value.get("durability") not in ["native_file","browser_sync"]:
-			return _finish_storage(PlatformResult.new(PlatformResult.Status.TEMPORARY_FAILURE,"SAVE_UNCONFIRMED","装备迁移尚未确认保存，请重试。"),generation)
+			return _finish_storage(PlatformResult.new(PlatformResult.Status.TEMPORARY_FAILURE,"SAVE_UNCONFIRMED","试炼中断记录尚未确认保存，请重试。" if interrupted_endless else "装备迁移尚未确认保存，请重试。"),generation)
 		if generation!=_player_generation or epoch!=_load_epoch or _operation_path!=save_path:return _finish_storage(PlatformResult.new(PlatformResult.Status.CANCELLED,"STALE_LOAD","角色已切换。"),generation)
 	player = data
 	last_save_receipt = {}
@@ -599,6 +618,7 @@ func valid_save(data: Variant) -> bool:
 	if not data is Dictionary:
 		return false
 	if not ShopRules._integer(data.get("balance_revision",0),0,1) or not data.get("balance_respec_available",true) is bool:return false
+	if data.has("endless_state") and not EndlessRules.valid(data.endless_state):return false
 	if data.has("ai_map") and (not data.ai_map is String or (not data.ai_map.is_empty() and AIWorld.map_data(data.ai_map).is_empty())): return false
 	if data.has("ai_progress") and not AIWorld.valid_progress(data.ai_progress): return false
 	if data.get("corpse")!=null:

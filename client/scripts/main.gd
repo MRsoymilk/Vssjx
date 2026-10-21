@@ -710,6 +710,14 @@ func _local_npc_action(action: String, target: String) -> void:
 	if not dialog.allows(action,target):return
 	var point: Array=AIWorld.resident(dialog.target).get("cell",[10,13])
 	if absi(world.cell.x-int(point[0]))+absi(world.cell.y-int(point[1]))>2:return
+	if action=="endless":
+		dialog.approaching=true;dialog.refresh()
+		var result:=await Game.start_endless()
+		if not is_instance_valid(dialog) or _closing:return
+		dialog.approaching=false
+		if result.ok:_start_local_encounter([result.value.enemy],false,result.value.run)
+		else:dialog.refresh();dialog.hint.text=result.message
+		return
 	if action=="school_join":
 		if AIWorld.local_map_id()!="qingyun_trail" or dialog.target!="qingwei":return
 		dialog.approaching=true;dialog.refresh()
@@ -1040,7 +1048,7 @@ func _encounter_battle(enemy: Dictionary) -> void:
 	if not _encounter_current(epoch, world_id): return
 	_start_local_encounter(opponents,true)
 
-func _start_local_encounter(opponents:Array,record_hunt:bool=false)->void:
+func _start_local_encounter(opponents:Array,record_hunt:bool=false,endless:Dictionary={})->void:
 	if not ProgressionRules.can_fight(Game.player.get("loot_state",{})):_encounter_failed(OnlinePve.error_text("LOOT_STORAGE_FULL"));return
 	var elite:=false
 	if record_hunt:
@@ -1050,10 +1058,11 @@ func _start_local_encounter(opponents:Array,record_hunt:bool=false)->void:
 		if not result.ok:_encounter_failed(result.message);return
 		elite=result.value.elite
 	world.pause_moving();mode="local_encounter";_clear_ui()
-	local_encounter=SoloEncounter.new();local_encounter.start(opponents,elite)
+	local_encounter=SoloEncounter.new();local_encounter.start(opponents,elite,endless)
 	Game.local_combat=weakref(local_encounter)
 	chrome=preload("res://scenes/ui/battle_chrome.tscn").instantiate();ui.add_child(chrome)
 	chrome.log_label.text="[系统] 遭遇%d名敌人，点击目标选择指令。"%opponents.size()
+	if not endless.is_empty():chrome.log_label.text="[系统] 无尽试炼第%d层，每次胜利后的下一层更强。"%int(endless.stage)
 	local_encounter_view=preload("res://scenes/ui/team_battle_view.tscn").instantiate();local_encounter_view.model=local_encounter;ui.add_child(local_encounter_view)
 	local_encounter.message.connect(func(text:String)->void:
 		if is_instance_valid(chrome):chrome.log_label.text="[系统] "+text.replace("\n","\n[系统] ")
@@ -1380,6 +1389,8 @@ func _close_requested() -> void:
 	if mode != "online_world" and not Game.player.is_empty():
 		if mode=="local_encounter" and local_encounter!=null and local_encounter.active():
 			Game.player.hp=local_encounter.engine.hp;Game.player.mp=local_encounter.engine.mp;Game.player.potions=local_encounter.engine.potions
+			# Keep the run active until exit succeeds; loading recovers abandoned trials.
+			# A failed close/save must still allow this battle to settle normally.
 		if mode == "battle" and battle != null:
 			if battle.finished and battle.phase == "settlement":
 				battle.finish_round()

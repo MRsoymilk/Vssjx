@@ -30,7 +30,9 @@ func battle()->Dictionary:
 	if pve!=null:
 		var b:Dictionary=pve.state.get("battle",{}) if pve.state.get("battle") is Dictionary else {}
 		if not b.get("formation") is Dictionary:return {}
-		var copy:Dictionary=b.formation.duplicate(true);copy.erase("commands");copy.solo=true;return copy
+		var copy:Dictionary=b.formation.duplicate(true);copy.erase("commands");copy.solo=true
+		if b.has("endless"):copy.endless=b.endless.duplicate(true)
+		return copy
 	return state
 func party()->Dictionary:return {"leader":true}
 func active()->bool:return battle().get("outcome")=="active"
@@ -43,7 +45,7 @@ func auto_command()->Dictionary:
 		var id:=engine.selected_skill
 		if not id.is_empty() and engine.mp>=SkillBalance.cost(SkillRules.item(id),engine.frozen_stats) and SkillRules.remaining(engine.skills,id)==0:return {"action":"skill","skill":id}
 	return {"action":"attack","skill":""}
-func start(opponents:Array,elite:bool=false)->void:
+func start(opponents:Array,elite:bool=false,endless:Dictionary={})->void:
 	sources=opponents.duplicate(true);rng.randomize();engine=ShushanBattle.new(sources[0])
 	var enemies:Array=[]
 	for i in sources.size():
@@ -65,6 +67,7 @@ func start(opponents:Array,elite:bool=false)->void:
 		enemies[0].elite={"party_size":1,"revives_left":MonsterCombat.elite_n(1,"revives")}
 	var f:Dictionary={"id":character_id,"name":Game.player.name,"job":Game.player.job,"gender":Game.player.gender,"school":Game.player.school,"level":Game.player.level,"appearance":LootRules.look(Game.player.get("loot_state",{}),ShopRules.appearance(ShopRules.local_state(Game.player))),"stats":engine.frozen_stats,"hp":engine.hp,"mp":engine.mp,"potions":engine.potions,"effects":engine.skills}
 	state={"id":"local-%d"%Time.get_ticks_usec(),"solo":true,"fighters":[f],"enemies":enemies,"turn":0,"round":1,"revision":0,"events_revision":0,"deadline_ms":0,"outcome":"active","events":[],"lines":[],"wounds":{},"monster_revision":2 if elite else 1}
+	if not endless.is_empty():state.endless=endless.duplicate(true)
 	if elite:state.lines.append("同图同种怪连续挑战达到5场，精英现身！警惕连击、暴击、流血与妖躯复生。")
 	_sync()
 func _sync()->void:
@@ -169,13 +172,18 @@ func _commit()->void:
 		var gold:=0;var xp:=0;var recorded:={}
 		for d in sources:
 			gold+=int(d.gold);xp+=int(d.xp)
-			if not recorded.has(d.id):Game.finish_enemy(d);recorded[d.id]=true
+			if state.has("endless"):Game.add_rewards(int(d.gold),int(d.xp))
+			elif not recorded.has(d.id):Game.finish_enemy(d);recorded[d.id]=true
 			else:Game.add_rewards(int(d.gold),int(d.xp))
 		state.lines.append("战斗胜利！获得%d铜钱、%d修为。"%[gold,xp])
 		var loot_sources:Array=sources.duplicate(true)
 		if state.enemies[0].has("elite"):loot_sources[0].kind="boss"
 		state.lines.append(Game.award_loot(loot_sources,rng.randi()))
 	elif state.outcome=="defeat":Game.become_soul()
+	if state.has("endless"):
+		var done:=EndlessRules.finish(Game.player.endless_state,state.endless,state.outcome=="victory")
+		assert(done,"Endless settlement must match the saved character run")
+		state.lines.append("无尽第%d层已通过，下次挑战第%d层；最高已过%d层。"%[int(state.endless.stage),int(Game.player.endless_state.stage),int(Game.player.endless_state.best)] if state.outcome=="victory" else "本轮无尽试炼结束，下次从第1层开始；最高已过%d层。"%int(Game.player.endless_state.best))
 	save_result=await Game.save_game();saving=false
 	if not save_result.ok:state.lines.append("保存未确认："+save_result.message)
 	message.emit("\n".join(PackedStringArray(state.lines)));changed.emit()

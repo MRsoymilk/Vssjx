@@ -7,6 +7,15 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class BalanceContract(unittest.TestCase):
+    def test_endless_mirror_and_growth_contract(self):
+        source=(ROOT/'shared/data/endless-v1.json').read_bytes()
+        self.assertEqual(source,(ROOT/'client/assets/data/endless-v1.json').read_bytes())
+        data=json.loads(source)
+        self.assertEqual(data['map_id'],'ai_001')
+        self.assertGreater(data['hp_step_bp'],0)
+        self.assertGreater(data['attack_step_bp'],0)
+        self.assertGreater(data['defense_step_bp'],0)
+        self.assertEqual(data['npc']['kind'],'npc')
     def test_progression_catalog_mirror_and_finite_economy(self):
         source=(ROOT/'shared/data/progression-v1.json').read_bytes()
         self.assertEqual(source,(ROOT/'client/assets/data/progression-v1.json').read_bytes())

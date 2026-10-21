@@ -6,6 +6,7 @@ pub mod loot;
 pub mod builds;
 pub mod progression;
 pub mod team_loot;
+pub mod endless;
 pub mod soul;
 pub mod social;
 pub mod team_rules;

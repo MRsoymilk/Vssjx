@@ -89,6 +89,10 @@ func valid(value: Variant) -> bool:
 		for id in progress.respawns:
 			if not seen.has(id) or not integer(progress.respawns[id], 0, mini(253402300799999, int(value.server_time_ms) + 30000)): return false
 	if value.has("hunt_pressure") and not MonsterCombat.pressure_valid(value.hunt_pressure):return false
+	if value.has("endless"):
+		if not EndlessRules.valid_view(value.endless):return false
+		var running:bool=value.get("battle") is Dictionary and value.battle.has("endless") and value.battle.get("outcome")=="active"
+		if value.endless.progress.in_progress!=running:return false
 	if not value.has("battle"): return false
 	var battle: Variant = value.battle
 	if battle == null: return true
@@ -100,8 +104,21 @@ func valid(value: Variant) -> bool:
 	if not battle.get("enemy") is Dictionary: return false
 	var enemy: Dictionary = battle.enemy
 	if not enemy.get("id") is String: return false
-	if (not enemy.get("id") in ["wolf_a", "wolf_b", "wolf_c", "spirit", "guardian", "boss"] and AIWorld.resident(enemy.get("id", "")).is_empty()) or not enemy.get("name") is String or enemy.name.length() > 24: return false
-	if not AIWorld.resident(enemy.id).is_empty():
+	if not enemy.get("name") is String or enemy.name.length()>24:return false
+	if battle.has("endless"):
+		if not value.has("endless") or not battle.endless is Dictionary:return false
+		var expected:=EndlessRules.monster(battle.endless)
+		if expected.is_empty():return false
+		if SkillBalance.revised(value.stats):expected=SkillBalance.monster(expected)
+		for key in ["id","name","art","kind","hp","attack","defense","level","gold","xp","cell"]:
+			if enemy.get(key)!=expected[key]:return false
+		if battle.outcome=="active" and (battle.endless.stage!=value.endless.progress.stage or battle.endless.level!=value.endless.progress.level):return false
+		if not battle.get("formation") is Dictionary or not battle.formation.get("enemies") is Array or battle.formation.enemies.size()!=1:return false
+		if not battle.formation.enemies[0] is Dictionary or not battle.formation.enemies[0].get("definition") is Dictionary:return false
+		for key in ["id","name","art","kind","hp","attack","defense","level","gold","xp"]:
+			if battle.formation.enemies[0].definition.get(key)!=expected[key]:return false
+	elif (not enemy.get("id") in ["wolf_a", "wolf_b", "wolf_c", "spirit", "guardian", "boss"] and AIWorld.resident(enemy.get("id", "")).is_empty()):return false
+	elif not AIWorld.resident(enemy.id).is_empty():
 		var definition := AIWorld.resident(enemy.id)
 		if SkillBalance.revised(value.stats):definition=SkillBalance.monster(definition)
 		if SkillBalance.revised(value.stats) and int(battle.get("loot_revision",0))>=1:definition=ProgressionRules.monster(definition)
@@ -137,6 +154,8 @@ func receive(packet: Dictionary) -> bool:
 		var previous_skills:Dictionary=state.get("skills",{})
 		var previous_ai: Dictionary = state.get("ai_world", {})
 		var previous_loot:Dictionary=state.get("loot",{})
+		var previous_endless:Dictionary=state.get("endless",{})
+		var keep_endless:bool=state.has("endless") and not packet.state.has("endless") and packet.state.character.state_revision==state.character.state_revision
 		var keep_loot:bool=state.has("loot") and not packet.state.has("loot") and packet.state.character.state_revision==state.character.state_revision
 		var keep_ai: bool = state.has("ai_world") and not packet.state.has("ai_world") and packet.state.character.state_revision==state.character.state_revision
 		var keep_skills:bool=state.has("skills") and not packet.state.has("skills") and packet.state.character.state_revision==state.character.state_revision
@@ -148,6 +167,7 @@ func receive(packet: Dictionary) -> bool:
 		state = packet.state.duplicate(true)
 		if keep_ai: state.ai_world = previous_ai.duplicate(true)
 		if keep_loot:state.loot=previous_loot.duplicate(true)
+		if keep_endless:state.endless=previous_endless.duplicate(true)
 		if keep_skills:state.skills=previous_skills.duplicate(true)
 		if keep_shop: state.shop = previous_shop.duplicate(true)
 		if keep_equipment: state.equipment = previous_equipment.duplicate(true)
@@ -202,6 +222,7 @@ func submit(action: String, target: String = "", points: Array = [], count: int=
 	if is_soul() and action!="revive":return false
 	if action=="revive" and (not is_soul() or target!=state.character.corpse.id):return false
 	if action=="school_join" and (active() or int(state.character.school)!=SchoolRules.UNJOINED or SchoolRules.index(target)<0):return false
+	if action=="endless" and (active() or not state.has("endless") or state.endless.progress.in_progress or target!=EndlessRules.rules.npc.id or state.character.map_id!=EndlessRules.rules.map_id or count!=1 or not points.is_empty()):return false
 	if action in ["gear_focus","gear_salvage","gear_reroll","gear_upgrade"] and state.get("loot",{}).get("progression_sha256")!=ProgressionRules.catalog_hash:return false
 	if action=="gear_focus" and (active() or not state.has("loot") or (target!="any" and target not in ShopRules.SLOTS) or count!=1 or not points.is_empty()):return false
 	if action in ["gear_equip","gear_unequip","gear_claim","gear_salvage","gear_reroll","gear_upgrade"]:
@@ -240,7 +261,7 @@ func submit(action: String, target: String = "", points: Array = [], count: int=
 	elif action=="respec":
 		if active() or not state.character.get("balance_respec_available",false):return false
 		command.expected_revision=state.character.state_revision
-	elif action in ["buy", "equip", "unequip", "use", "discard","school_join","revive","gear_equip","gear_unequip","gear_claim","gear_salvage","gear_reroll","gear_upgrade","gear_focus"]:
+	elif action in ["buy", "equip", "unequip", "use", "discard","school_join","revive","endless","gear_equip","gear_unequip","gear_claim","gear_salvage","gear_reroll","gear_upgrade","gear_focus"]:
 		command.target = target
 		if count!=1 or action=="gear_reroll": command.quantity=count
 		command.expected_revision = state.character.state_revision
@@ -252,7 +273,7 @@ func submit(action: String, target: String = "", points: Array = [], count: int=
 	elif active():
 		command.battle_id = state.battle.id
 		command.expected_revision = state.battle.revision
-	if action=="challenge":command.encounter_version=2
+	if action in ["challenge","endless"]:command.encounter_version=2
 	if not enemy_slot.is_empty():command.enemy_slot=enemy_slot
 	OnlineAccount.pending_pve = {"realm": realm, "character": character_id, "command": command}
 	retry()
@@ -275,6 +296,8 @@ func quest_text() -> String:
 	return "古剑遗迹 · 已完成\n妖气已散，可返回青云山道恢复元气，或继续探索遗迹。"
 
 static func error_text(code: String) -> String:
+	var endless:={"ENDLESS_NPC_REQUIRED":"请到主城灵空台，与守境人交谈开启无尽试炼。","ENDLESS_NOT_READY":"请先停稳，再进入试炼。","ENDLESS_SOLO_ONLY":"无尽试炼为单人模式，请先退出队伍。","ENDLESS_LIMIT":"已到达当前数值安全极限，最高纪录已保留。","INVALID_ENDLESS_STATE":"试炼记录异常，请重新同步后重试。","STALE_ENDLESS":"试炼记录已更新，请重新确认挑战。"}
+	if endless.has(code):return endless[code]
 	var crafting:={"LOOT_STORAGE_FULL":"装备暂存空间不足，请领取或分解后再战。","LEGACY_CRAFT_LOCKED":"原有固定装备保留原数值，不参与分解、洗炼或强化。","UPGRADE_LIMIT":"已达到+6强化上限。","NO_AFFIXES":"普通装备没有可洗炼的词条。","REROLL_LIMIT":"此装备已达到20次洗炼上限。","UNEQUIP_BEFORE_SALVAGE":"请先卸下装备，再确认分解。","MATERIALS_INSUFFICIENT":"炼材或精华不足，请先战斗或分解闲置装备。","INVALID_AFFIX_INDEX":"请选择有效的词条。","REROLL_SLOT_LOCKED":"此装备已锁定另一条洗炼词条。"}
 	if crafting.has(code):return crafting[code]
 	var loot:={"INSTANCE_NOT_OWNED":"没有这件装备实例，请重新同步。","EQUIPMENT_LEVEL_REQUIRED":"等级不足，暂时不能装备。","NOT_EQUIPPED":"这件装备尚未穿戴。","INVALID_LOOT_COMMAND":"无效的装备操作。"}

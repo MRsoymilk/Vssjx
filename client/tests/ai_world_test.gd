@@ -38,7 +38,7 @@ func _run() -> void:
 	check(saved.ok and loaded.ok and AIWorld.local_map_id()=="ai_001" and AIWorld.progress().active.has("ai_001_q2"),"Map and objectives survive storage roundtrip")
 	var app: Control=load("res://scenes/main.tscn").instantiate()
 	add_child(app);app._enter_world()
-	check(app.world.ai_npcs.size()==3 and app.world.enemy_nodes.size()==1,"AI map renders NPCs and hides defeated monster")
+	check(app.world.ai_npcs.size()==4 and app.world.ai_npcs.has(EndlessRules.rules.npc.id) and app.world.enemy_nodes.size()==1,"AI map renders its existing NPCs plus the endless keeper and hides defeated monster")
 	var names: Control=app.world_view.get_node("WorldNameplates")
 	for facing in [true,false]:
 		app.world._face_actor(app.world.hero,facing)

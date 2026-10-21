@@ -5,7 +5,11 @@ use std::{collections::BTreeMap, sync::LazyLock};
 use sha2::{Digest, Sha256};
 
 pub const BYTES: &str = include_str!("../../shared/data/ai-world-v1.json");
-pub static CATALOG: LazyLock<Value> = LazyLock::new(|| serde_json::from_str(BYTES).expect("AI world bundle"));
+pub static CATALOG: LazyLock<Value> = LazyLock::new(|| {
+    let mut value:Value=serde_json::from_str(BYTES).expect("AI world bundle");
+    let home=value["maps"].as_array_mut().unwrap().iter_mut().find(|m|m["map_id"]==crate::endless::map()).expect("endless home map");
+    home["residents"].as_array_mut().unwrap().push(crate::endless::DATA["npc"].clone());value
+});
 static HASH: LazyLock<String> = LazyLock::new(||format!("{:x}",Sha256::digest(BYTES.replace("\r\n","\n").as_bytes())));
 static MONSTER_COUNT: LazyLock<usize> = LazyLock::new(||maps().iter().flat_map(|m|m["residents"].as_array().unwrap()).filter(|r|r["kind"]!="npc").count());
 pub fn hash() -> String { HASH.clone() }

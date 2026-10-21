@@ -945,6 +945,7 @@ func _auto_transfer() -> bool:
 func _npc_action_chosen(action: String, target: String) -> void:
 	if not npc_dialog.visible or not _approach.is_empty() or not network.world_ready or not network.pve.ready or network.pve.pending() or network.pve.active(): return
 	if not npc_dialog.allows(action,target): return
+	if action=="endless" and not team.party().is_empty():npc_dialog.hint.text=OnlinePve.error_text("ENDLESS_SOLO_ONLY");return
 	_resident_action(action, target)
 	npc_dialog.approaching = true
 	npc_dialog.refresh()

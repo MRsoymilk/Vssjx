@@ -34,6 +34,7 @@ pub enum Action {
     Claim,
     Restore,
     Challenge,
+    Endless,
     Attack,
     Skill,
     Guard,
@@ -92,6 +93,7 @@ pub fn mask(id: &str) -> Option<i32> {
 }
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Battle {
+    #[serde(default,skip_serializing_if="Option::is_none")] pub endless:Option<crate::endless::Run>,
     #[serde(default)] pub loot_revision:u8,
     pub id: Uuid,
     pub enemy: ResidentDefinition,
@@ -114,6 +116,7 @@ pub struct Battle {
 impl Battle {
     pub fn new(enemy: ResidentDefinition, hp: i32, mp: i32, potions: i32) -> Self {
         Self {
+            endless:None,
             loot_revision:1,
             id: Uuid::new_v4(),
             enemy_hp: enemy.hp,

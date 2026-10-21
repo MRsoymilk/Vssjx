@@ -69,7 +69,8 @@ def main():
             a.walk([10,13]);value,_=a.command('ai_travel','ai_001',ok=False);assert value['code']=='PORTAL_TOO_FAR'
             a.walk([3,16]);a.command('ai_travel','ancient_ruins',ok=False)
             a.command('ai_travel','ai_001');a.close();a=join(session,cid)
-            assert a.ready['map_id']=='ai_001' and len(a.population)==5
+            assert a.ready['map_id']=='ai_001' and len(a.population)==len(AI_MAPS['ai_001']['residents'])+1
+            assert a.population['ai_001_endless']['kind']=='npc'
             a.flush();b.ws.snapshot(lambda entities:cid not in entities,limit=500)
             assert other_id not in a.ws.entities and cid not in b.ws.entities
             value,_=a.command('ai_accept','ai_001_q1',ok=False);assert value['code']=='RESIDENT_TOO_FAR'
@@ -114,10 +115,14 @@ def main():
             a.close();a=join(session,cid)
             while int(time.time()*1000)<=deadline:
                 a.ws.send(dict(type='ping'));a.until('pong');time.sleep(.5)
+            # Respawn creates a fresh moving resident; do not approach its stale
+            # pre-respawn cell from the previous population snapshot.
+            a.until('population.state')
             a.approach('ai_001_mob');a.command('challenge','ai_001_mob')
             while a.state['battle']['outcome']=='active':a.command('attack');time.sleep(.06)
             assert a.state['ai_world']['active']['ai_001_q2']==[2]
             a.approach('ai_001_guide');a.command('ai_claim','ai_001_q2');a.command('ai_accept','ai_001_q3')
+            a.command('ai_restore','ai_001_guide')
             a.approach('ai_001_boss');a.command('challenge','ai_001_boss')
             while a.state['battle']['outcome']=='active':a.command('attack');time.sleep(.06)
             assert a.state['battle']['outcome']=='victory'

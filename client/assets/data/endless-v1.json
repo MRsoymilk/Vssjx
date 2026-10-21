@@ -1,0 +1,8 @@
+{
+  "version":"endless-v1","map_id":"ai_001","max_stage":1000000,"max_stat":100000,
+  "npc":{"id":"ai_001_endless","name":"守境人","kind":"npc","art":"hero/mfs","cell":[12,15],"level":1,"hp":85,"attack":0,"defense":0,"gold":0,"xp":0,"service_label":"无尽试炼","dialogue":"幻境无尽，一层更比一层强。胜利后可继续，失败或撤退结束本轮，最高纪录保留。"},
+  "monster_id":"endless_echo","arts":["monster/langw","monster/hs1","monster/xt1","monster/nt1"],
+  "hp_base":45,"hp_per_level":20,"attack_base":8,"attack_per_level":3,"defense_base":1,"defense_per_level":1,
+  "hp_step_bp":2000,"attack_step_bp":1000,"defense_step_bp":800,
+  "gold_base":8,"gold_per_level":2,"xp_base":12,"xp_per_level":3
+}

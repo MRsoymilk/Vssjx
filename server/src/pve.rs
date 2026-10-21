@@ -37,6 +37,7 @@ pub struct Context {
 }
 #[derive(Clone)]
 struct Loaded {
+    endless:crate::endless::Progress,
     hunt_pressure: crate::monster_combat::HuntPressure,
     ai: crate::ai_world::Progress,
     character: Character,
@@ -66,7 +67,7 @@ async fn load(tx: &mut Transaction<'_, Postgres>, context: &Context) -> Result<L
     load_character(tx,context.character,account,Some(context.owner)).await
 }
 async fn load_character(tx:&mut Transaction<'_,Postgres>,character_id:Uuid,account:Uuid,owner:Option<i64>)->Result<Loaded,AuthError>{
-    let row=sqlx::query(&format!("SELECT {CHARACTER_COLUMNS},loot_state,ai_progress,defeated_mask,monster_respawns,active_battle_id,owner_epoch,allocated_attributes,hunt_pressure FROM characters WHERE id=$1 AND account_id=$2 FOR UPDATE"))
+    let row=sqlx::query(&format!("SELECT {CHARACTER_COLUMNS},endless_state,loot_state,ai_progress,defeated_mask,monster_respawns,active_battle_id,owner_epoch,allocated_attributes,hunt_pressure FROM characters WHERE id=$1 AND account_id=$2 FOR UPDATE"))
         .bind(character_id).bind(account).fetch_optional(&mut **tx).await.map_err(database)?
         .ok_or(AuthError(StatusCode::FORBIDDEN,"FORBIDDEN"))?;
     if owner.is_some_and(|owner|row.get::<i64, _>("owner_epoch") != owner) {
@@ -109,6 +110,7 @@ async fn load_character(tx:&mut Transaction<'_,Postgres>,character_id:Uuid,accou
     let ai:crate::ai_world::Progress=serde_json::from_value(row.get::<Json<Value>,_>("ai_progress").0).map_err(|_|unavailable())?;
     if !ai.valid(){return Err(unavailable());}
     let mut loaded = Loaded {
+        endless:serde_json::from_value(row.get::<Json<Value>,_>("endless_state").0).map_err(|_|unavailable())?,
         hunt_pressure:serde_json::from_value(row.get::<Json<Value>,_>("hunt_pressure").0).map_err(|_|unavailable())?,
         loot:serde_json::from_value(row.get::<Json<Value>,_>("loot_state").0).map_err(|_|unavailable())?,
         ai,
@@ -127,6 +129,9 @@ async fn load_character(tx:&mut Transaction<'_,Postgres>,character_id:Uuid,accou
             .map_err(|_| unavailable())?,
     };
     if !loaded.hunt_pressure.valid(){return Err(unavailable());}
+    if !loaded.endless.valid(){return Err(unavailable());}
+    let active_run=loaded.battle.as_ref().and_then(|b|b.endless);
+    if loaded.endless.in_progress!=active_run.is_some()||active_run.is_some_and(|r|r.stage!=loaded.endless.stage||r.level!=loaded.endless.level||r.monster().is_err()){return Err(unavailable());}
     if !loaded.loot.valid(loaded.character.job,loaded.character.gender){return Err(unavailable());}
     let previous_loot=loaded.loot.clone();
     loaded.loot.sync_legacy(&loaded.gear,loaded.character.job,loaded.character.gender);
@@ -184,6 +189,7 @@ impl Loaded {
         for key in ["physical_defense","magic_defense"] { profile["combat"][key] = json!(self.stats().defense); }
         if self.stats().balance.is_some(){profile=crate::attributes::profile_for(self.stats(),self.character.job,self.character.level,self.allocated);}
         json!({"rules_version":pve_rules::RULES,"character":self.character,"potions":self.potions,
+            "endless":self.endless.view(),
             "equipment":{"version":"equipment-v1","weapon_owned":self.weapon_owned,"weapon":if self.equipped {Some("sword")} else {None}},
             "stats":self.stats(),"hunt_pressure":self.hunt_pressure,
             "loot":self.loot.view(crate::shop::appearance(&self.gear)),
@@ -224,7 +230,7 @@ impl Loaded {
         if context.moving {
             return Err("PLAYER_MOVING");
         }
-        if command.encounter_version.is_some() && (!matches!(command.encounter_version,Some(1|2))||command.action!=Action::Challenge){return Err("INVALID_PVE_COMMAND");}
+        if command.encounter_version.is_some() && (!matches!(command.encounter_version,Some(1|2))||!matches!(command.action,Action::Challenge|Action::Endless)){return Err("INVALID_PVE_COMMAND");}
         if command.enemy_slot.is_some() && (!matches!(command.action,Action::Attack|Action::Skill) || self.battle.as_ref().is_none_or(|b|b.formation.is_none())){return Err("INVALID_BATTLE_TARGET");}
         if let Some(corpse)=self.character.corpse.as_ref() {
             if command.action!=Action::Revive { return Err("SOUL_STATE"); }
@@ -237,6 +243,21 @@ impl Loaded {
             return Ok(vec!["你寻回了自己的尸体，灵魂与肉身重新合一，气血与灵力恢复。".into()]);
         }
         if command.action==Action::Revive {return Err("NO_CORPSE");}
+        if command.action==Action::Endless{
+            if self.battle.is_some(){return Err("BATTLE_ACTIVE");}
+            if context.map_id!=crate::endless::map()||command.target.as_deref()!=Some(crate::endless::npc()){return Err("ENDLESS_NPC_REQUIRED");}
+            if command.expected_revision.as_deref()!=Some(&self.character.state_revision){return Err("STALE_ENDLESS");}
+            if command.battle_id.is_some()||command.attributes.is_some()||command.quantity.is_some()||command.enemy_slot.is_some()||command.encounter_version!=Some(2){return Err("INVALID_PVE_COMMAND");}
+            let point=context.target_cell.ok_or("ENDLESS_NPC_REQUIRED")?;
+            if (point[0]-context.cell[0]).abs()+(point[1]-context.cell[1]).abs()>2{return Err("RESIDENT_TOO_FAR");}
+            if context.moving{return Err("ENDLESS_NOT_READY");}
+            if !self.loot.can_fight(){return Err("LOOT_STORAGE_FULL");}
+            let run=self.endless.begin(self.character.level)?;let source=run.monster()?;let stats=self.stats();let c=&self.character;
+            let fighter=crate::team_rules::Fighter{id:c.id,name:c.display_name.clone(),job:c.job,gender:c.gender,school:c.school,level:c.level,appearance:self.loot.look(crate::shop::appearance(&self.gear)),stats,hp:c.hp,mp:c.mp,potions:self.potions,effects:crate::skills::State::new(c.job,c.school,c.level,run.level),guarding:false};
+            let mut b=Battle::new_formation(context.map_id.clone(),fighter,vec![source],unix_ms());b.endless=Some(run);
+            let line=format!("无尽试炼第{}层开始！每次胜利后的下一层更强，最高纪录永久保留。",run.stage);
+            b.formation.as_mut().unwrap().lines.push(line.clone());self.battle=Some(b);return Ok(vec![line]);
+        }
         if matches!(command.action,Action::GearEquip|Action::GearUnequip|Action::GearClaim|Action::GearFocus|Action::GearSalvage|Action::GearReroll|Action::GearUpgrade){
             if self.battle.is_some(){return Err("BATTLE_ACTIVE");}
             if command.expected_revision.as_deref()!=Some(&self.character.state_revision){return Err("STALE_EQUIPMENT");}
@@ -547,6 +568,7 @@ impl Loaded {
                 self.character.hp = battle.hp.max(1);
                 self.character.mp = battle.mp;
                 self.potions = battle.potions;
+                let endless_run=battle.endless;let outcome=battle.outcome.clone();
                 if battle.outcome == "victory" {
                     if let Some(arena)=battle.formation.as_ref().filter(|a|a.elite_hunt()) {
                         self.hunt_pressure.cleared(&arena.map_id,&arena.enemies[0].definition.art);
@@ -558,7 +580,7 @@ impl Loaded {
                     let gold=defeated.iter().map(|d|d.gold).sum();let xp=defeated.iter().map(|d|d.xp).sum();
                     let killed_boss=defeated.iter().any(|d|d.id=="boss");
                     let mut recorded=std::collections::HashSet::new();
-                    for enemy in defeated {
+                    for enemy in defeated.into_iter().filter(|_|endless_run.is_none()) {
                         if !recorded.insert(enemy.id.clone()){continue;}
                         if crate::ai_world::resident(&enemy.id).is_some(){self.ai.event("kill",&enemy.id);self.ai.respawns.insert(enemy.id.clone(),unix_ms()+MONSTER_RESPAWN_MS);}
                         else{self.defeated|=pve_rules::mask(&enemy.id).ok_or("INVALID_RESIDENT")?;self.respawns.insert(enemy.id,unix_ms()+MONSTER_RESPAWN_MS);}
@@ -580,6 +602,12 @@ impl Loaded {
                 } else if battle.outcome == "defeat" {
                     self.die(context.cell)?;
                     lines.push("你在本地图复活点化为灵魂，请返回坟堆寻回尸体。".into());
+                }
+                if let Some(run)=endless_run.filter(|_|outcome!="active"){
+                    self.endless.finish(run,outcome=="victory")?;
+                    let line=if outcome=="victory"{format!("无尽第{}层已通过，下次挑战第{}层；最高已过{}层。",run.stage,self.endless.stage,self.endless.best)}else{format!("本轮无尽试炼结束，下次从第1层开始；最高已过{}层。",self.endless.best)};
+                    if let Some(arena)=self.battle.as_mut().and_then(|b|b.formation.as_mut()){arena.lines.push(line.clone());}
+                    lines.push(line);
                 }
                 Ok(lines)
             }
@@ -654,7 +682,7 @@ pub async fn execute(
     let before = crate::security::state_summary(&original.state());
     let team_active:bool=sqlx::query_scalar("SELECT EXISTS(SELECT 1 FROM team_members m JOIN team_battles b ON b.team_id=m.team_id AND b.active WHERE m.character_id=$1)").bind(context.character).fetch_one(&mut *tx).await.map_err(database)?;
     let in_team:bool=sqlx::query_scalar("SELECT EXISTS(SELECT 1 FROM team_members WHERE character_id=$1)").bind(context.character).fetch_one(&mut *tx).await.map_err(database)?;
-    let applied = if team_active {Err("TEAM_BATTLE_ACTIVE")}else if context.duel_active {Err("DUEL_ACTIVE")}else if in_team&&command.action==Action::Challenge{Err("TEAM_CHALLENGE_REQUIRED")}else{loaded.apply(command, context)};
+    let applied = if team_active {Err("TEAM_BATTLE_ACTIVE")}else if context.duel_active {Err("DUEL_ACTIVE")}else if in_team&&command.action==Action::Endless{Err("ENDLESS_SOLO_ONLY")}else if in_team&&command.action==Action::Challenge{Err("TEAM_CHALLENGE_REQUIRED")}else{loaded.apply(command, context)};
     if applied.is_err() {
         loaded = original;
     }
@@ -696,9 +724,9 @@ pub async fn execute(
         }
         let character_id = loaded.character.id;
         let c = &loaded.character;
-        let revision:i64=sqlx::query_scalar("UPDATE characters SET level=$2,xp=$3,gold=$4,hp=$5,mp=$6,quest_stage=$7,defeated_mask=$8,active_battle_id=$9,allocated_attributes=$10,monster_respawns=$11,ai_progress=$12,school=$13,corpse=$14,balance_respec_available=$15,hunt_pressure=$16,state_revision=state_revision+1 WHERE id=$1 RETURNING state_revision")
+        let revision:i64=sqlx::query_scalar("UPDATE characters SET level=$2,xp=$3,gold=$4,hp=$5,mp=$6,quest_stage=$7,defeated_mask=$8,active_battle_id=$9,allocated_attributes=$10,monster_respawns=$11,ai_progress=$12,school=$13,corpse=$14,balance_respec_available=$15,hunt_pressure=$16,endless_state=$17,state_revision=state_revision+1 WHERE id=$1 RETURNING state_revision")
             .bind(c.id).bind(c.level).bind(c.xp).bind(c.gold).bind(c.hp).bind(c.mp).bind(c.quest_stage).bind(loaded.defeated).bind(active).bind(loaded.allocated.to_vec()).bind(Json(&loaded.respawns))
-            .bind(Json(&loaded.ai)).bind(c.school).bind(&c.corpse).bind(c.balance_respec_available).bind(Json(&loaded.hunt_pressure)).fetch_one(&mut *tx).await.map_err(database)?;
+            .bind(Json(&loaded.ai)).bind(c.school).bind(&c.corpse).bind(c.balance_respec_available).bind(Json(&loaded.hunt_pressure)).bind(Json(&loaded.endless)).fetch_one(&mut *tx).await.map_err(database)?;
         loaded.character.state_revision = revision.to_string();
         if loaded.potions == 0 {
             sqlx::query(

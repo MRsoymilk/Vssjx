@@ -15,6 +15,7 @@ static func prepare() -> void:
 	catalog_hash = raw.sha256_text()
 	var catalog: Dictionary = JSON.parse_string(raw)
 	for entry in catalog.maps:
+		if entry.map_id==EndlessRules.rules.map_id:entry.residents.append(EndlessRules.rules.npc.duplicate(true))
 		maps[entry.map_id] = entry
 		var count: int=entry.residents.filter(func(r: Dictionary)->bool:return r.kind!="npc").size()
 		monster_count += count

@@ -130,7 +130,7 @@ func present()->void:
 			_display(f.id,f.name+" Lv."+str(int(f.level)),int(f.hp),int(f.stats.hp))
 			actors[f.id].mp.max_value=f.stats.mp;actors[f.id].mp.value=f.mp
 	for e in b.enemies:
-		if updating:_display(e.slot,MonsterCombat.enemy_name(e)+" Lv."+str(int(e.definition.level)),int(e.hp),int(e.definition.hp))
+		if updating:_display(e.slot,("试炼幻影" if b.has("endless") else MonsterCombat.enemy_name(e))+" Lv."+str(int(e.definition.level)),int(e.hp),int(e.definition.hp))
 	if not actors.has(selected) or actors[selected].dead:
 		for e in b.enemies:
 			if e.hp>0:selected=e.slot;break
@@ -165,6 +165,7 @@ func _refresh_controls()->void:
 	if b.is_empty():return
 	var executing:=motion!=null or not queue.is_empty() or not _effect_wait.is_empty() or effects.has_reactions()
 	caption.text=("精英遭遇" if int(b.get("monster_revision",0))==2 else ("单人遭遇" if b.fighters.size()==1 else "队伍战斗"))+" · 第%d回合 · %d名敌人"%[maxi(1,int(b.round)-(1 if executing and (b.has("commands") or b.get("solo",false)) else 0)),b.enemies.size()]
+	if b.has("endless"):caption.text="无尽第%d层 · 第%d回合"%[int(b.endless.stage),maxi(1,int(b.round)-(1 if executing else 0))]
 	var left:=maxi(0,ceili((int(b.deadline_ms)-model.server_time-(Time.get_ticks_msec()-model.received_at))/1000.0))
 	var message:="等待确认" if model.pending() else ("轮到你行动" if model.my_turn() else "等待队友")
 	if b.has("commands"):
@@ -259,7 +260,7 @@ func _sync_final_resources()->void:
 	for f in b.fighters:
 		_display(f.id,f.name+" Lv."+str(int(f.level)),int(f.hp),int(f.stats.hp))
 		actors[f.id].mp.max_value=f.stats.mp;actors[f.id].mp.value=f.mp
-	for e in b.enemies:_display(e.slot,MonsterCombat.enemy_name(e)+" Lv."+str(int(e.definition.level)),int(e.hp),int(e.definition.hp))
+	for e in b.enemies:_display(e.slot,("试炼幻影" if b.has("endless") else MonsterCombat.enemy_name(e))+" Lv."+str(int(e.definition.level)),int(e.hp),int(e.definition.hp))
 	if not actors.has(selected) or actors[selected].dead:
 		for e in b.enemies:
 			if int(e.hp)>0:selected=e.slot;break

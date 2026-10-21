@@ -8,7 +8,8 @@ import threading
 import time
 from uuid import uuid4
 from pg_fixture import PostgresFixture
-from run_online_pve import ROOT, Player, api
+from run_online_pve import ROOT, api
+from run_loot_instances import LootPlayer
 from run_account_auth import stop
 from run_server_connection import wait_for_server
 
@@ -45,10 +46,10 @@ def main():
             check(status == 201, created)
             char = created['character']['id']
             db.query(f"UPDATE characters SET level=60,hp=1000,mp=400,quest_stage=1 WHERE id='{char}'")
-            a = Player(base, session, char)
+            a = LootPlayer(base, session, char)
             a.approach('wolf_a')
             for _ in range(40):
-                value, challenge = a.command('', request=dict(operation_id=str(uuid4()), action='challenge', target='wolf_a', encounter_version=1))
+                value, challenge = a.command('', request=dict(operation_id=str(uuid4()), action='challenge', target='wolf_a', encounter_version=2))
                 b = value['state']['battle']
                 check(1 <= len(b['formation']['enemies']) <= 3, 'bounded solo population')
                 replay, _ = a.command('', request=challenge)
@@ -58,7 +59,7 @@ def main():
                 a.command('flee')
             check(len(b['formation']['enemies']) > 1, 'actual challenge can create reinforcements')
             ids = [e['definition']['id'] for e in b['formation']['enemies']]
-            check(len(set(ids)) == len(ids) and ids[0] == 'wolf_a', 'unique residents with requested primary')
+            check(set(ids)<= {'wolf_a','wolf_b','wolf_c','spirit'} and ids[0] == 'wolf_a', 'same-map residents with requested primary; reinforcements may repeat a template')
             operation = dict(operation_id=str(uuid4()), action='attack', battle_id=b['id'], expected_revision=b['revision'], enemy_slot='m9')
             rejected, _ = a.command('', request=operation, ok=False)
             check(rejected['code'] == 'INVALID_BATTLE_TARGET' and rejected['state']['battle'] == b, 'invalid slot is atomic')
@@ -73,7 +74,7 @@ def main():
             check(rejected['code'] == 'STALE_BATTLE' and rejected['state']['battle'] == value['state']['battle'], 'stale turn spends nothing')
             saved = copy.deepcopy(value['state']['battle'])
             a.close(); a = None; stop(process)
-            process, base = start(); a = Player(base, session, char)
+            process, base = start(); a = LootPlayer(base, session, char)
             check(a.state['battle'] == saved, 'restart restores formation, HP, effects and events exactly')
             # Set only enemy current HP in the disposable DB, preserving frozen templates/rules.
             a.close(); a = None
@@ -84,7 +85,7 @@ def main():
             stored = copy.deepcopy(saved)
             stored['revision'] = int(saved['revision'])
             db.query(f"UPDATE pve_battles SET state=$owned${json.dumps(stored)}$owned$::jsonb WHERE id='{saved['id']}'")
-            a = Player(base, session, char)
+            a = LootPlayer(base, session, char)
             fixture = ROOT / 'work/solo-server-state.json'
             fixture.write_text(json.dumps(a.state, ensure_ascii=False), encoding='utf8')
             if os.environ.get('GODOT_BIN'):
@@ -118,13 +119,19 @@ def main():
             stop(process); process, base = start()
             a = AIPlayer(base, session, char)
             for _ in range(40):
-                a.command('', request=dict(operation_id=str(uuid4()), action='challenge', target=boss['id'], encounter_version=1))
+                # This regression checks ordinary boss budgets, not hunt-pressure
+                # elite empowerment (covered independently).
+                db.query(f"UPDATE characters SET hunt_pressure='{{}}'::jsonb WHERE id='{char}'")
+                a.command('', request=dict(operation_id=str(uuid4()), action='challenge', target=boss['id'], encounter_version=2))
                 if len(a.state['battle']['formation']['enemies']) > 1:
                     break
                 a.command('flee')
             group = a.state['battle']['formation']
             check(len(group['enemies']) > 1 and sum(e['definition']['kind']=='boss' for e in group['enemies']) == 1, 'expansion reinforcements never duplicate the boss')
-            check(sum(e['hp'] for e in group['enemies']) == boss['hp']*4 and a.state['battle']['enemy']['hp'] == boss['hp']*4, 'boss budget and legacy primary template are both preserved')
+            skills=json.loads((ROOT/'shared/data/skill-balance-v1.json').read_text())
+            progression=json.loads((ROOT/'shared/data/progression-v1.json').read_text())
+            budget=boss['hp']*skills['boss_hp_multiplier']*progression['boss_hp_budget_bp']//10000
+            check(sum(e['hp'] for e in group['enemies']) == budget and a.state['battle']['enemy']['hp'] == budget, 'current boss budget and primary compatibility template are both preserved')
             if os.environ.get('GODOT_BIN'):
                 fixture.write_text(json.dumps(a.state, ensure_ascii=False), encoding='utf8')
                 result = subprocess.run([os.environ['GODOT_BIN'], '--headless', '--path', str(ROOT/'client'), 'res://tests/solo_wire_test.tscn'],

@@ -21,6 +21,7 @@ func _ready() -> void:
 	$Dismiss.pressed.connect(dismiss)
 	quest_button.pressed.connect(func() -> void:
 		if quest_button.disabled:return
+		if target==EndlessRules.rules.npc.id:action_requested.emit("endless",target);return
 		if ai_mode:action_requested.emit(selected_action,selected_target)
 		else:action_requested.emit("accept" if _legacy_stage()==0 else "claim",target)
 	)
@@ -78,6 +79,7 @@ func _restore_full() -> bool:
 
 func allows(action: String, destination: String) -> bool:
 	if not visible or _locked():return false
+	if target==EndlessRules.rules.npc.id:return action=="endless" and destination==target and not quest_button.disabled
 	if action=="school_join":return not ai_mode and target=="qingwei" and _school()==SchoolRules.UNJOINED and SchoolRules.index(destination)>=0
 	if action==("ai_restore" if ai_mode else "restore"):return destination==target and restore_button.visible and not restore_button.disabled
 	if not ai_mode:return destination==target and action==("accept" if _legacy_stage()==0 else "claim") and not quest_button.disabled
@@ -86,6 +88,7 @@ func allows(action: String, destination: String) -> bool:
 	return false
 
 func refresh() -> void:
+	if target==EndlessRules.rules.npc.id:_refresh_endless();return
 	if ai_mode:_refresh_ai();return
 	if not local_mode and (model == null or model.state.is_empty()): return
 	_reset_paper()
@@ -109,6 +112,23 @@ func refresh() -> void:
 	elif model.last_action in ["accept", "claim", "restore"] and not model.last_code.is_empty(): hint.text = OnlinePve.error_text(model.last_code)
 	_refresh_school(locked)
 	if model.last_action=="school_join" and not model.last_code.is_empty():hint.text=OnlinePve.error_text(model.last_code)
+
+func _refresh_endless()->void:
+	_reset_paper();restore_button.hide()
+	$Paper/Name.text=String(EndlessRules.rules.npc.name)+" · 无尽试炼"
+	$Paper/Greeting.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+	$Paper/Greeting.text="一层更比一层强。胜利后继续，失败或撤退结束本轮，最高纪录保留。"
+	$Paper/Greeting.size=Vector2(284,48);$Paper/Rule.position.y=86;quest_button.position.y=94
+	$Paper.size.y=207;$Paper.position.y=95;hint.position.y=129;hint.size=Vector2(284,63);hint.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+	$Paper/BL.position.y=193;$Paper/BR.position.y=193
+	var supported:bool=local_mode or (model!=null and model.state.has("endless"))
+	var progress:Dictionary=EndlessRules.progress(Game.player) if local_mode else (model.state.get("endless",{}).get("progress",EndlessRules.empty()) if model!=null else EndlessRules.empty())
+	quest_button.text="挑战第%d层 · 最高已过%d层"%[int(progress.stage),int(progress.best)]
+	quest_button.disabled=_locked() or not supported or progress.in_progress or (Game.is_soul() if local_mode else model.is_soul())
+	hint.text="每层：气血+20%／攻击+10%／防御+8%（按首层基数）。单人挑战，不自动补满血蓝。"
+	if not supported:hint.text="当前服务器尚未开放无尽试炼，请等待服务器更新。"
+	elif not local_mode and not model.last_code.is_empty() and model.last_action=="endless":hint.text=OnlinePve.error_text(model.last_code)
+	elif _locked():hint.text="正在准备试炼，请稍候……"
 
 func _school() -> int:
 	return int(Game.player.get("school",SchoolRules.UNJOINED)) if local_mode else int(model.state.character.get("school",SchoolRules.UNJOINED))

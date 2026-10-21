@@ -1,4 +1,18 @@
 {
   "format_version": 1,
-  "parts": {}
+  "parts": {
+    "boneglow/wzs/wzst2": {
+      "offsets": [
+        [
+          0,
+          2
+        ],
+        [
+          0,
+          2
+        ]
+      ],
+      "texture": "res://assets/edited/equipment/c6ba9124cc62-7ef55d98f17d69f6c660.png"
+    }
+  }
 }

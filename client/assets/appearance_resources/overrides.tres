@@ -1,8 +1,12 @@
-[gd_resource type="Resource" script_class="NativeAppearanceOverrides" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="NativeAppearanceOverrides" format=3]
 
-[ext_resource type="Script" path="res://scripts/resources/appearance_overrides.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/resources/appearance_overrides.gd" id="1_v3co8"]
 
 [resource]
-script = ExtResource("1")
-format_version = 1
-parts = {}
+script = ExtResource("1_v3co8")
+parts = {
+"boneglow/wzs/wzst2": {
+"offsets": [[0, 2], [0, 2]],
+"texture": "res://assets/edited/equipment/c6ba9124cc62-7ef55d98f17d69f6c660.png"
+}
+}

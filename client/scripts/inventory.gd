@@ -4,6 +4,7 @@ extends Control
 
 signal back_requested
 signal changed
+signal travel_requested(map_id: String)
 const CELL_SCENE := preload("res://scenes/ui/inventory_cell.tscn")
 const EQUIPMENT := ["武器", "腰佩", "衣服", "手腕", "腰带", "裤子", "鞋子", "戒指", "项链", "帽子"]
 const WINDOW := Rect2(36, 63, 248, 353)
@@ -24,6 +25,7 @@ var slot_icons: Dictionary = {}
 var slot_levels: Dictionary = {}
 var items: Array[Dictionary] = []
 var loot_panel:Control
+var travel_picker:AIWorldPanel
 @onready var description: Label = $Description
 @onready var tooltip: Panel = $Tooltip
 @onready var tooltip_label: Label = $Tooltip/TooltipLabel
@@ -286,6 +288,9 @@ func use_item() -> void:
 	if item.is_empty() or item.get("slot")!="consumable": return
 	var code:=ShopRules.use_error(item,_display_player(),_display_stats(),_allocated_points())
 	if not code.is_empty(): description.text=OnlinePve.error_text(code);return
+	if item.get("effect")=="teleport":
+		_open_travel_picker()
+		return
 	if item.get("effect")=="reset_attributes":
 		close_menu()
 		item_menu=_box(Rect2(59,248,203,119),Color("fff2af"),Color("765322"),1)
@@ -297,6 +302,26 @@ func use_item() -> void:
 		_button("取消",Rect2(121,86,64,24),true,item_menu).pressed.connect(close_menu)
 		return
 	await _use_item_id(item.id)
+
+func _open_travel_picker()->void:
+	if is_instance_valid(travel_picker):return
+	close_menu();tooltip.hide();set_process_unhandled_key_input(false)
+	travel_picker=AIWorldPanel.new();travel_picker.name="TravelPicker";travel_picker.travel_action="scroll_travel"
+	travel_picker.allow_ruins=int(Game.player.get("quest",0) if online_model==null else online_model.state.character.quest_stage)>=3
+	var current:String=AIWorld.local_map_id() if online_model==null else online_model.state.character.map_id
+	travel_picker.present(current,{},int(_display_player().level));add_child(travel_picker)
+	travel_picker.back_requested.connect(func()->void:
+		travel_picker.queue_free();travel_picker=null;set_process_unhandled_key_input(true))
+	travel_picker.requested.connect(func(_action:String,destination:String)->void:
+		if travel_picker.busy:return
+		travel_picker.busy=true;travel_picker.notice="正在确认传送……";travel_picker.refresh()
+		if online_model!=null:
+			if not online_model.submit("scroll_travel",destination):finish_scroll_travel("暂时无法传送，请确认神行符数量和角色状态。")
+		else:travel_requested.emit(destination))
+
+func finish_scroll_travel(message:String)->void:
+	if not is_instance_valid(travel_picker):return
+	travel_picker.busy=false;travel_picker.notice=message;travel_picker.refresh()
 
 func _allocated_points() -> Array:
 	return Game.allocated_attributes() if online_model==null else online_model.state.get("attributes",{}).get("allocated",[0,0,0,0,0])

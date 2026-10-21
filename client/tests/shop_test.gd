@@ -35,7 +35,8 @@ func _run() -> void:
 	check(Game.appearance_key()=="hero/mck_w2_c1" and Game.stats().defense==7,"Armor changes appearance and defense")
 	check(Game.attribute_profile().combat.physical_attack==31 and Game.attribute_profile().combat.physical_defense==7,"Property page and combat share gear bonuses")
 	var equipped := Game.player.duplicate(true)
-	check((await Game.load_game()).ok and Game.player == JSON.parse_string(JSON.stringify(equipped)),"Purchases and loadout survive reload")
+	# Compare JSON values: loading normalizes HP/MP to ints while JSON parses numbers as floats.
+	check((await Game.load_game()).ok and JSON.parse_string(JSON.stringify(Game.player)) == JSON.parse_string(JSON.stringify(equipped)),"Purchases and loadout survive reload")
 	var invalid := Game.player.duplicate(true)
 	invalid.shop_owned = "weapon_3"
 	check(not Game.valid_save(invalid),"Malformed owned list is rejected safely")

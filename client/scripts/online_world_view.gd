@@ -201,7 +201,7 @@ func _ready() -> void:
 	)
 	network.pve.changed.connect(_pve_changed)
 	network.pve.message.connect(func(text: String) -> void:
-		if network.pve.last_action in ["transfer", "ai_travel", "school_join"] and not network.pve.last_code.is_empty(): map_transition.cancel()
+		if network.pve.last_action in ["transfer", "ai_travel", "school_join", "scroll_travel"] and not network.pve.last_code.is_empty(): map_transition.cancel()
 		_pve_log = text
 		_system_text = text
 		expanded_chat.add_system(text)
@@ -319,7 +319,7 @@ func _status_changed(text_value: String) -> void:
 	_chat_changed()
 
 func _map_command_sent(packet: Dictionary) -> void:
-	if packet.get("command", {}).get("action") in ["transfer", "ai_travel", "school_join"]:
+	if packet.get("command", {}).get("action") in ["transfer", "ai_travel", "school_join", "scroll_travel"]:
 		_begin_map_transition()
 
 func _select_player(id: String) -> void:

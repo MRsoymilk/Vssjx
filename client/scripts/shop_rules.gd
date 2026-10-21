@@ -5,6 +5,7 @@ static var catalog: Dictionary = JSON.parse_string(FileAccess.get_file_as_string
 static var catalog_hash: String = FileAccess.get_file_as_string("res://assets/data/shop-v2.json").replace("\r\n","\n").sha256_text()
 static var _index: Dictionary = {}
 const SLOTS := ["weapon","pendant","armor","wrist","belt","pants","boots","ring","necklace","hat"]
+const TRAVEL_SCROLL := "restored/shenxing_scroll"
 static var APPEARANCE_LIMITS: Array = GeneratedEquipment.appearance_limits()
 
 static func valid_appearance(look: Variant) -> bool:
@@ -100,6 +101,7 @@ static func bag_item(id: String, job: int=1) -> Dictionary:
 static func description(id: String) -> String:
 	var entry := item(id)
 	if entry.is_empty(): return ""
+	if entry.get("effect")=="teleport":return "自选已开放地图；成功耗1张，取消不消耗。"
 	if entry.get("effect")=="reset_attributes": return "返还全部属性点；耗1颗，保留气血灵力比例。"
 	if is_equipment(entry): return ("攻击 +%d"%int(entry.attack)) if entry.slot=="weapon" else ("防御 +%d"%int(entry.defense))
 	if entry.slot=="consumable":
@@ -112,6 +114,7 @@ static func description(id: String) -> String:
 static func use_error(entry: Dictionary, player: Dictionary, limits: Dictionary, points: Array=[]) -> String:
 	if player.get("corpse") is Dictionary: return "SOUL_STATE"
 	if entry.get("slot")!="consumable" or limits.is_empty(): return "ITEM_NOT_USABLE"
+	if entry.get("effect")=="teleport":return ""
 	if entry.get("effect")=="reset_attributes":
 		var allocated:Array=points if not points.is_empty() else player.get("allocated_attributes",[0,0,0,0,0])
 		return "" if allocated.any(func(value:Variant)->bool:return int(value)>0) else "NO_ALLOCATED_ATTRIBUTES"
@@ -142,6 +145,7 @@ static func _store(player: Dictionary, gear: Dictionary) -> void:
 
 static func apply_local(player: Dictionary, action: String, id: String, count: int=1, limits: Dictionary={}) -> String:
 	if player.get("corpse") is Dictionary:return "SOUL_STATE"
+	if action=="scroll_travel":return _travel_local(player,id,count)
 	var gear := local_state(player)
 	var entry := item(id)
 	if entry.is_empty(): return "INVALID_EQUIPMENT"
@@ -161,6 +165,7 @@ static func apply_local(player: Dictionary, action: String, id: String, count: i
 	if quantity(gear,id)<count: return "WEAPON_NOT_OWNED"
 	if action=="use":
 		if count!=1: return "INVALID_QUANTITY"
+		if entry.get("effect")=="teleport":return "TRAVEL_DESTINATION_REQUIRED"
 		var error:=use_error(entry,player,limits)
 		if not error.is_empty(): return error
 		if entry.get("effect")=="reset_attributes":
@@ -187,4 +192,29 @@ static func apply_local(player: Dictionary, action: String, id: String, count: i
 	if not on and bag_slots(gear,int(player.potions))+LootRules.extra_bag(player.get("loot_state",{}))>=60: return "BAG_FULL"
 	gear.slots[entry.slot]=id if on else null
 	_store(player,gear)
+	return ""
+
+static func travel_error(destination:String,current:String,quest_stage:int)->String:
+	if destination==current:return "AI_SAME_MAP"
+	if destination=="ancient_ruins" and quest_stage<3:return "QUEST_REQUIRED"
+	if destination not in ["qingyun_trail","ancient_ruins"] and AIWorld.map_data(destination).is_empty():return "AI_INVALID_TARGET"
+	return ""
+
+static func _travel_local(player:Dictionary,destination:String,count:int)->String:
+	if count!=1:return "INVALID_QUANTITY"
+	var current:String=player.get("ai_map","")
+	if current.is_empty():current="qingyun_trail" if int(player.get("zone",0))==0 else "ancient_ruins"
+	var error:=travel_error(destination,current,int(player.get("quest",0)))
+	if not error.is_empty():return error
+	var gear:=local_state(player)
+	var left:=quantity(gear,TRAVEL_SCROLL)
+	if left<1:return "TRAVEL_SCROLL_REQUIRED"
+	var data:=SharedWorldMap.load_data(destination)
+	if data.is_empty():return "AI_INVALID_TARGET"
+	if left==1:gear.quantities.erase(TRAVEL_SCROLL);gear.owned.erase(TRAVEL_SCROLL)
+	else:gear.quantities[TRAVEL_SCROLL]=left-1
+	_store(player,gear)
+	player.ai_map=destination if destination.begins_with("ai_") else ""
+	player.zone=1 if destination=="ancient_ruins" else 0
+	player.cell=data.spawn.duplicate();player.hunt_pressure={}
 	return ""

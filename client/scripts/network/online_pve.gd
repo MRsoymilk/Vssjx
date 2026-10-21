@@ -228,6 +228,9 @@ func submit(action: String, target: String = "", points: Array = [], count: int=
 	if is_soul() and action!="revive":return false
 	if action=="revive" and (not is_soul() or target!=state.character.corpse.id):return false
 	if action=="school_join" and (active() or int(state.character.school)!=SchoolRules.UNJOINED or SchoolRules.index(target)<0):return false
+	if action=="scroll_travel":
+		if active() or not state.has("shop") or state.shop.version!="shop-v2" or ShopRules.quantity(state.shop,ShopRules.TRAVEL_SCROLL)<1 or count!=1 or not points.is_empty():return false
+		if not ShopRules.travel_error(target,String(state.character.map_id),int(state.character.quest_stage)).is_empty():return false
 	if action=="endless" and (active() or not state.has("endless") or state.endless.progress.in_progress or target!=EndlessRules.rules.npc.id or state.character.map_id!=EndlessRules.rules.map_id or count!=1 or not points.is_empty()):return false
 	if action in ["gear_focus","gear_salvage","gear_reroll","gear_upgrade"] and state.get("loot",{}).get("progression_sha256")!=ProgressionRules.catalog_hash:return false
 	if action=="gear_focus" and (active() or not state.has("loot") or (target!="any" and target not in ShopRules.SLOTS) or count!=1 or not points.is_empty()):return false
@@ -267,7 +270,7 @@ func submit(action: String, target: String = "", points: Array = [], count: int=
 	elif action=="respec":
 		if active() or not state.character.get("balance_respec_available",false):return false
 		command.expected_revision=state.character.state_revision
-	elif action in ["buy", "equip", "unequip", "use", "discard","school_join","revive","endless","gear_equip","gear_unequip","gear_claim","gear_salvage","gear_reroll","gear_upgrade","gear_focus"]:
+	elif action in ["buy", "equip", "unequip", "use", "discard","school_join","scroll_travel","revive","endless","gear_equip","gear_unequip","gear_claim","gear_salvage","gear_reroll","gear_upgrade","gear_focus"]:
 		command.target = target
 		if count!=1 or action=="gear_reroll": command.quantity=count
 		command.expected_revision = state.character.state_revision
@@ -302,6 +305,8 @@ func quest_text() -> String:
 	return "古剑遗迹 · 已完成\n妖气已散，可返回青云山道恢复元气，或继续探索遗迹。"
 
 static func error_text(code: String) -> String:
+	if code=="TRAVEL_SCROLL_REQUIRED":return "神行符不足，请先到商店购买。"
+	if code=="TRAVEL_DESTINATION_REQUIRED":return "请先选择神行符的传送目的地。"
 	var endless:={"ENDLESS_NPC_REQUIRED":"请到主城灵空台，与守境人交谈开启无尽试炼。","ENDLESS_NOT_READY":"请先停稳，再进入试炼。","ENDLESS_SOLO_ONLY":"无尽试炼为单人模式，请先退出队伍。","ENDLESS_LIMIT":"已到达当前数值安全极限，最高纪录已保留。","INVALID_ENDLESS_STATE":"试炼记录异常，请重新同步后重试。","STALE_ENDLESS":"试炼记录已更新，请重新确认挑战。"}
 	if endless.has(code):return endless[code]
 	var crafting:={"LOOT_STORAGE_FULL":"装备暂存空间不足，请领取或分解后再战。","LEGACY_CRAFT_LOCKED":"原有固定装备保留原数值，不参与分解、洗炼或强化。","UPGRADE_LIMIT":"已达到+6强化上限。","NO_AFFIXES":"普通装备没有可洗炼的词条。","REROLL_LIMIT":"此装备已达到20次洗炼上限。","UNEQUIP_BEFORE_SALVAGE":"请先卸下装备，再确认分解。","MATERIALS_INSUFFICIENT":"炼材或精华不足，请先战斗或分解闲置装备。","INVALID_AFFIX_INDEX":"请选择有效的词条。","REROLL_SLOT_LOCKED":"此装备已锁定另一条洗炼词条。"}

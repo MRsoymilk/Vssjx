@@ -249,7 +249,7 @@ func _process(_delta: float) -> void:
 	if socket != polled_socket: return
 	if socket_state == WebSocketPeer.STATE_CLOSED:
 		if socket.get_available_packet_count() > 0: return
-		if world_ready and pve.pending() and OnlineAccount.pending_pve.command.action in ["transfer", "ai_travel", "school_join"]:
+		if world_ready and pve.pending() and OnlineAccount.pending_pve.command.action in ["transfer", "ai_travel", "school_join", "scroll_travel"]:
 			# A lost receipt is still pending. Rejoin and replay its UUID to confirm the outcome.
 			_reconnect_map()
 		else: _failed("DISCONNECTED", true)

@@ -863,6 +863,18 @@ func _bag() -> void:
 	modal.add_child(backpack)
 	backpack.back_requested.connect(_close_modal)
 	backpack.changed.connect(_refresh_hud)
+	backpack.travel_requested.connect(_local_scroll_travel)
+
+func _local_scroll_travel(destination:String)->void:
+	if _closing:return
+	if Game.storage_busy:
+		if is_instance_valid(backpack):backpack.finish_scroll_travel("正在处理存档，请稍后再试。")
+		return
+	var epoch:=_ui_epoch
+	var result:=await Game.shop_command("scroll_travel",destination)
+	if epoch!=_ui_epoch or _closing:return
+	if result.ok:_enter_world()
+	elif is_instance_valid(backpack):backpack.finish_scroll_travel(result.message)
 
 func _open_world_map() -> void:
 	if modal is OriginalWorldMap:

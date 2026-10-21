@@ -11,6 +11,7 @@ pub enum ItemEffect {
     #[default]
     None,
     ResetAttributes,
+    Teleport,
 }
 #[derive(Deserialize)]
 pub struct Item {
@@ -113,7 +114,7 @@ mod tests {
             gear.insert(format!("ai/boneglow/{stem}/hat"),true);
             assert_eq!(appearance(&gear),[34+index as i32,18+index as i32,10+index as i32]);
         }
-        assert_eq!(ITEMS.len(),396);
+        assert_eq!(ITEMS.len(),397);
     }
     #[test]
     fn eva01_sets_preserve_role_restrictions_and_mix_with_previous_families(){
@@ -161,6 +162,15 @@ mod tests {
         assert_eq!((entry.restore_hp,entry.restore_mp),(0,0));
         assert!(!entry.equipment());
         assert_eq!(item("potion").unwrap().effect,ItemEffect::None);
+    }
+    #[test]
+    fn travel_talisman_is_a_typed_consumable_without_healing(){
+        let entry=item("restored/shenxing_scroll").unwrap();
+        assert_eq!((entry.name.as_str(),entry.price),("神行符",30));
+        assert_eq!(entry.effect,ItemEffect::Teleport);
+        assert_eq!(entry.slot,"consumable");
+        assert_eq!((entry.restore_hp,entry.restore_mp),(0,0));
+        assert!(!entry.equipment());
     }
     #[test]
     fn legacy_wire_response_never_rewrites_full_receipt_or_exposes_unknown_items(){

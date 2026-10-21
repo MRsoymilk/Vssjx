@@ -18,6 +18,7 @@ pub enum Action {
     Respec,
     Revive,
     SchoolJoin,
+    ScrollTravel,
     AiAccept,
     AiClaim,
     AiInteract,

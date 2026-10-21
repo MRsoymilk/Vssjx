@@ -10,12 +10,15 @@ ROOT=Path(__file__).resolve().parents[1]
 class FullShopTests(unittest.TestCase):
     def test_generated_families_coexist_without_replacing_original_items(self):
         catalog=json.loads((ROOT/'client/assets/data/shop-v2.json').read_text('utf8'))
-        self.assertEqual(len(catalog['items']),396)
+        self.assertEqual(len(catalog['items']),397)
         self.assertEqual(len([i for i in catalog['items'] if i['id']=='ai/legendary/potian_axe']),1)
         self.assertEqual(len([i for i in catalog['items'] if i['id'].startswith('ai/gravebloom/')]),60)
         self.assertEqual(len([i for i in catalog['items'] if i['id'].startswith('ai/boneglow/')]),60)
         self.assertEqual(len([i for i in catalog['items'] if i['id'].startswith('ai/eva01/')]),60)
-        self.assertEqual(len({i['id'] for i in catalog['items']}),396)
+        self.assertEqual(len({i['id'] for i in catalog['items']}),397)
+        scroll=next(i for i in catalog['items'] if i['id']=='restored/shenxing_scroll')
+        self.assertEqual((scroll['name'],scroll['price'],scroll['effect']),('神行符',30,'teleport'))
+        self.assertIn('rare',scroll['sections'])
 
     def test_every_original_member_is_available_once(self):
         original=json.loads((ROOT/'client/assets/data/original_items.json').read_text('utf8'))['items']

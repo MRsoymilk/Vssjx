@@ -1054,7 +1054,7 @@ async fn connection(socket: WebSocket, auth: AuthService, hub: Arc<WorldHub>, an
                 }
                 else if let ClientMessage::Pve{command}=&input {
                     if pve_version != 1 { fail(&mut socket,"PVE_UNSUPPORTED").await;break; }
-                    if (command.action == crate::pve_rules::Action::Transfer && maps_version < 1) || (matches!(command.action,crate::pve_rules::Action::AiTravel|crate::pve_rules::Action::SchoolJoin)&&maps_version<2) { fail(&mut socket,"MAP_UPDATE_REQUIRED").await; continue; }
+                    if (command.action == crate::pve_rules::Action::Transfer && maps_version < 1) || (matches!(command.action,crate::pve_rules::Action::AiTravel|crate::pve_rules::Action::SchoolJoin|crate::pve_rules::Action::ScrollTravel)&&maps_version<2) { fail(&mut socket,"MAP_UPDATE_REQUIRED").await; continue; }
                     let result = {
                         let _business = owner.business.lock().await;
                         match hub.pve_context(&owner,if command.action==crate::pve_rules::Action::SchoolJoin {Some("qingwei")}else{command.target.as_deref()}) {

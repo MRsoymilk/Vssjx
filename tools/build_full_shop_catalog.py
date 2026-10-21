@@ -11,6 +11,7 @@ from build_gravebloom_equipment import equipment_items as gravebloom_items
 from build_eva01_equipment import equipment_items as eva01_items
 from build_legendary_equipment import equipment_items as legendary_items
 from build_rebirth_item import catalog_item as rebirth_item
+from build_travel_scroll import catalog_item as travel_item
 
 ROOT = Path(__file__).resolve().parents[1]
 SLOTS = ['weapon','pendant','armor','wrist','belt','pants','boots','ring','necklace','hat']
@@ -88,7 +89,7 @@ def build():
     assert {r['source_member'] for r in items}=={r['source_member'] for r in original['items']}
     return {'version':'shop-v2','provenance':'全量原包图标；显示名、分类和玩法数值为显式重建规则',
             'slots':SLOTS,'slot_labels':LABELS,'tabs':[['hot','热卖'],['rare','奇珍'],['craft','炼制'],['elixir','仙丹']],
-            'items':items+legacy+equipment_items()+gravebloom_items()+eva01_items()+legendary_items()+[rebirth_item()]}
+            'items':items+legacy+equipment_items()+gravebloom_items()+eva01_items()+legendary_items()+[rebirth_item(),travel_item()]}
 
 
 if __name__=='__main__':

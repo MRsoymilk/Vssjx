@@ -13,6 +13,10 @@ var npc_id := ""
 var body: VBoxContainer
 var paper: PanelContainer
 var search := ""
+var travel_action := "ai_travel"
+var allow_ruins := false
+var busy := false
+var notice := ""
 const INK := Color("654518")
 
 func _ready() -> void:
@@ -57,7 +61,7 @@ func _label(parent: Node, text: String, font_size: int = 12) -> Label:
 
 func _button(parent: Node, text: String, callback: Callable, disabled: bool = false) -> Button:
 	var button := Button.new(); button.text = text; button.custom_minimum_size = Vector2(mini(160,maxi(54,text.length()*10)),30)
-	button.add_theme_font_size_override("font_size", 12); button.clip_text = true; button.disabled = disabled
+	button.add_theme_font_size_override("font_size", 12); button.clip_text = true; button.disabled = disabled or busy
 	for state in ["normal","hover","pressed","focus","disabled"]:
 		var style := StyleBoxFlat.new(); style.bg_color = Color("e3d4a6") if state=="disabled" else (Color("f5d181") if state in ["hover","pressed"] else Color("fff0b8"))
 		style.border_color = Color("b77c20"); style.set_border_width_all(1)
@@ -75,12 +79,14 @@ func refresh() -> void:
 	AIWorld.prepare()
 	for child in body.get_children(): body.remove_child(child); child.queue_free()
 	var top := HBoxContainer.new(); body.add_child(top)
-	var title := _label(top, "蜀山驿路 · AI生成", 16); title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var scroll_mode:=travel_action=="scroll_travel"
+	var title := _label(top, "神行符 · 选择目的地" if scroll_mode else "蜀山驿路 · AI生成", 16); title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_button(top, "关闭", func() -> void: back_requested.emit())
-	_label(body, "地名参考原包；布局、NPC布置、剧情与奖励为AI生成。", 11)
+	_label(body, "确认传送成功才消耗1张；取消不消耗。" if scroll_mode else "地名参考原包；布局、NPC布置、剧情与奖励为AI生成。", 11)
+	if not notice.is_empty():_label(body,notice,11)
 	var tabs := HBoxContainer.new(); body.add_child(tabs)
 	_button(tabs, "地图 214", func() -> void: page="maps"; selected_map=""; selected_quest=""; npc_id=""; refresh())
-	_button(tabs, "任务 %d/3" % progress.get("active", {}).size(), func() -> void: page="quests"; selected_quest=""; refresh())
+	if not scroll_mode:_button(tabs, "任务 %d/3" % progress.get("active", {}).size(), func() -> void: page="quests"; selected_quest=""; refresh())
 	if not selected_quest.is_empty(): _quest_detail(); return
 	if page == "quests": _quests(); return
 	if not selected_map.is_empty(): _map_detail(); return
@@ -89,11 +95,15 @@ func refresh() -> void:
 	var rows := _scroll()
 	input.text_changed.connect(func(value: String) -> void: search=value; _map_rows(rows))
 	_map_rows(rows)
-	_label(body, "传送会先走近当前地图的蜀山驿石；高等级区域请谨慎。", 11)
+	_label(body, "无需靠近驿石；未开放的古剑遗迹暂不可选。" if scroll_mode else "传送会先走近当前地图的蜀山驿石；高等级区域请谨慎。", 11)
 
 func _map_rows(rows: VBoxContainer) -> void:
 	for child in rows.get_children(): rows.remove_child(child); child.queue_free()
-	_button(rows, "返回青云山道", func() -> void: requested.emit("ai_travel", "qingyun_trail"), map_id=="qingyun_trail")
+	_button(rows, "青云山道" if travel_action=="scroll_travel" else "返回青云山道", func() -> void:
+		if travel_action=="scroll_travel":selected_map="qingyun_trail";refresh()
+		else:requested.emit(travel_action,"qingyun_trail"), map_id=="qingyun_trail")
+	if travel_action=="scroll_travel":
+		_button(rows,"古剑遗迹" if allow_ruins else "古剑遗迹（尚未开放）",func()->void:selected_map="ancient_ruins";refresh(),not allow_ruins or map_id=="ancient_ruins")
 	var current := AIWorld.map_data(map_id)
 	var neighbors: Array = current.get("recommended_maps",current.get("neighbors", ["ai_001","ai_002","ai_004"]))
 	var ids: Array = neighbors.duplicate()
@@ -108,6 +118,12 @@ func _map_rows(rows: VBoxContainer) -> void:
 func _map_detail() -> void:
 	var m := AIWorld.map_data(selected_map)
 	var rows := _scroll()
+	if m.is_empty():
+		_label(rows,SharedWorldMap.title(selected_map),16)
+		_label(rows,"确认后消耗1张神行符，抵达此地图的安全落点。")
+		_button(body,"消耗1张并传送",func()->void:requested.emit(travel_action,selected_map),selected_map==map_id)
+		_button(body,"返回目录",func()->void:selected_map="";refresh())
+		return
 	_label(rows, "%s #%03d · %s · %d～%d级" % [m.name,int(m.original_map_id),m.get("layout_name",m.biome_name),int(m.level_min),int(m.level_max)], 14)
 	var preview := preload("res://scripts/ai_map_preview.gd").new()
 	preview.custom_minimum_size = Vector2(0, 170); rows.add_child(preview)
@@ -117,7 +133,7 @@ func _map_detail() -> void:
 	for r in m.residents: names.append(r.name)
 	_label(rows, "NPC / 妖物：" + "、".join(names), 11)
 	_label(rows, "三段任务：访迹 → 护路 → 镇脉\n场景布局与任务均为AI生成。", 11)
-	_button(body, "沿驿路前往" if selected_map!=map_id else "当前地图", func() -> void: requested.emit("ai_travel",selected_map), selected_map==map_id)
+	_button(body, ("消耗1张并传送" if travel_action=="scroll_travel" else "沿驿路前往") if selected_map!=map_id else "当前地图", func() -> void: requested.emit(travel_action,selected_map), selected_map==map_id)
 	_button(body, "返回目录", func() -> void: selected_map=""; refresh())
 
 func _quests() -> void:
@@ -155,4 +171,5 @@ func _quest_detail() -> void:
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and event.keycode==KEY_ESCAPE:
-		back_requested.emit(); get_viewport().set_input_as_handled()
+		if not busy:back_requested.emit()
+		get_viewport().set_input_as_handled()

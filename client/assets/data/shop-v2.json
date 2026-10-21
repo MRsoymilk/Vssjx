@@ -9822,6 +9822,31 @@
       "art_source": "原包图标",
       "rules_basis": "名称及重新分配属性点用途据原版tips0.txt第006条；售价200铜钱及消耗规则为重建玩法。",
       "appearance_basis": "复用原包ix64丹丸状图标作为重建映射，尚未确认此图标就是原版重生再造丹。"
+    },
+    {
+      "id": "restored/shenxing_scroll",
+      "name": "神行符",
+      "slot": "consumable",
+      "category": "特殊",
+      "price": 30,
+      "attack": 0,
+      "defense": 0,
+      "visual": 0,
+      "head_visual": 0,
+      "level": 1,
+      "job": -1,
+      "gender": -1,
+      "restore_hp": 0,
+      "restore_mp": 0,
+      "effect": "teleport",
+      "icon": "res://assets/items/original/ix6.png",
+      "sections": [
+        "hot",
+        "rare"
+      ],
+      "art_source": "原包图标",
+      "rules_basis": "按用户要求重建：30铜钱一张，自选已开放地图，成功传送消耗一张。",
+      "appearance_basis": "复用原包ix6符纸图标，尚未确认其原版道具身份。"
     }
   ]
 }

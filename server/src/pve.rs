@@ -293,6 +293,22 @@ impl Loaded {
             self.character.balance_respec_available=false;
             return Ok(vec!["已使用一次免费重置，全部属性点退回，气血和灵力按比例保留。".into()]);
         }
+        if command.action==Action::ScrollTravel {
+            if self.battle.is_some(){return Err("BATTLE_ACTIVE");}
+            if command.battle_id.is_some()||command.attributes.is_some()||command.quantity.is_some(){return Err("INVALID_PVE_COMMAND");}
+            if command.expected_revision.as_deref()!=Some(&self.character.state_revision){return Err("STALE_EQUIPMENT");}
+            let destination=command.target.as_deref().ok_or("AI_INVALID_TARGET")?;
+            if destination==context.map_id{return Err("AI_SAME_MAP");}
+            if destination=="ancient_ruins"&&self.character.quest_stage<3{return Err("QUEST_REQUIRED");}
+            if !matches!(destination,"qingyun_trail"|"ancient_ruins")&&crate::ai_world::map(destination).is_none(){return Err("AI_INVALID_TARGET");}
+            let map=crate::world_map::WorldMap::load(destination).ok_or("AI_INVALID_TARGET")?;
+            let id="restored/shenxing_scroll";
+            let count=self.quantities.get(id).copied().unwrap_or(0);
+            if count<1{return Err("TRAVEL_SCROLL_REQUIRED");}
+            if count==1{self.quantities.remove(id);self.gear.remove(id);}else{self.quantities.insert(id.into(),count-1);}
+            self.character.map_id=destination.into();self.character.cell_x=map.spawn[0];self.character.cell_y=map.spawn[1];
+            return Ok(vec!["神行符化作一道灵光，你已抵达所选地图，消耗1张神行符。".into()]);
+        }
         if command.action==Action::SchoolJoin {
             if self.battle.is_some(){return Err("BATTLE_ACTIVE");}
             if command.battle_id.is_some()||command.attributes.is_some()||command.quantity.is_some(){return Err("INVALID_PVE_COMMAND");}
@@ -363,6 +379,7 @@ impl Loaded {
             if matches!(command.action,Action::Use|Action::Discard) {
                 if command.action==Action::Use {
                     if item.slot!="consumable"{return Err("ITEM_NOT_USABLE");}
+                    if item.effect==crate::shop::ItemEffect::Teleport{return Err("TRAVEL_DESTINATION_REQUIRED");}
                     if item.effect==crate::shop::ItemEffect::ResetAttributes {
                         if crate::attributes::unallocated(&self.allocated){return Err("NO_ALLOCATED_ATTRIBUTES");}
                         let before=self.stats();self.allocated=[0;5];let next=self.stats();

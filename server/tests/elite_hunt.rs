@@ -32,11 +32,25 @@ fn party_elite_is_tougher_and_specials_respect_silence(){
 }
 #[test]
 fn death_revives_before_victory_and_saved_remaining_lives_are_finite(){
-    let mut b=arena(1);b.enemies[0].hp=1;turn(&mut b,"attack",99);
+    fn landed_turn(b:&mut Battle){
+        // Hit rolls are authoritative and independent of the skill-proc roll.
+        // A legal miss must not make this finite-revival test intermittently fail.
+        for _ in 0..16{
+            let lives=b.enemies[0].elite.as_ref().unwrap().revives_left;
+            turn(b,"attack",99);
+            let attack=b.events.iter().find(|e|e.action=="attack"&&e.target=="m0").unwrap();
+            if !attack.missed{return;}
+            assert_eq!(attack.damage,0);
+            assert_eq!(b.enemies[0].elite.as_ref().unwrap().revives_left,lives);
+            assert!(!b.events.iter().any(|e|e.action=="revive"));
+        }
+        panic!("No landed attack in sixteen independent trials");
+    }
+    let mut b=arena(1);b.enemies[0].hp=1;landed_turn(&mut b);
     assert!(b.active());assert_eq!(b.enemies[0].elite.as_ref().unwrap().revives_left,0);
     assert!(b.events.iter().any(|e|e.action=="revive"&&e.healed>0));
     let mut b:Battle=serde_json::from_value(serde_json::to_value(b).unwrap()).unwrap();
-    b.enemies[0].hp=1;turn(&mut b,"attack",99);assert_eq!(b.outcome,"victory");assert!(!b.events.iter().any(|e|e.action=="revive"));
+    b.enemies[0].hp=1;landed_turn(&mut b);assert_eq!(b.outcome,"victory");assert!(!b.events.iter().any(|e|e.action=="revive"));
 }
 #[test]
 fn dot_death_revives_and_defeat_never_reanimates_the_winner(){

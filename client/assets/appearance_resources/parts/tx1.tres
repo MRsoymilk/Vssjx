@@ -4,5 +4,6 @@
 
 [resource]
 script = ExtResource("1")
+source_id = "tx1"
 texture_path = "res://assets/hero_parts/tx1.png"
 regions = Array[Rect2i]([Rect2i(0, 0, 81, 14), Rect2i(81, 0, 51, 8), Rect2i(162, 0, 58, 10)])

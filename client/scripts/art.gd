@@ -12,6 +12,7 @@ static var _metadata_bytes := 0
 static var _native_catalog: Dictionary = {}
 static var _scene_paths: Dictionary = {}
 static var _edit_revision := -1
+static var _appearance_revision := -1
 const ACTOR_SCENE := preload("res://scenes/actors/original_actor.tscn")
 const INDEX_PATH := "res://assets/actor_resources/catalog.tres"
 
@@ -33,7 +34,8 @@ static func _prepare_index() -> void:
 
 static func scene_path(key:String) -> String:
 	_prepare_index()
-	var base:="hero/"+key.trim_prefix("hero/").get_slice("_",0) if not HeroAppearance.composition_key(key).is_empty() else key
+	var outfit:=HeroAppearance.outfit_for_key(key)
+	var base:="hero/"+outfit.stem if outfit!=null else key
 	return _scene_paths.get(base,"")
 
 static func has_actor(key: String) -> bool:
@@ -48,18 +50,22 @@ static func actor_info(key: String) -> Dictionary:
 	if catalog.has(key): return catalog[key]
 	var composition:=HeroAppearance.composition_key(key)
 	if not composition.is_empty():
-		var base := _native_info("hero/"+key.trim_prefix("hero/").get_slice("_",0))
+		var base := _native_info("hero/"+HeroAppearance.outfit_for_key(key).stem)
 		var prepared := HeroAppearance.build(composition,base)
 		if prepared.is_empty(): return {}
 		catalog[key] = prepared.info
 		return prepared.info
-	var info:=_native_info(key)
+	var outfit:=HeroAppearance.outfit_for_key(key)
+	_prepare_index()
+	var native_key:="hero/"+outfit.stem if outfit!=null and not _index.has(key) else key
+	var info:=_native_info(native_key)
 	if not info.is_empty(): catalog[key]=info
 	return info
 
 static func _native_info(key: String) -> Dictionary:
 	if _native_catalog.has(key): return _native_catalog[key]
-	if not has_actor(key): return {}
+	_prepare_index()
+	if not _index.has(key): return {}
 	var path: Variant = _index[key]
 	if not path is String or path != "res://assets/actor_resources/" + key + ".tres": return {}
 	var definition:=load(path) as NativeActorDefinition
@@ -72,13 +78,13 @@ static func _native_info(key: String) -> Dictionary:
 
 static func _sync_edits() -> void:
 	AppearanceEdits.ensure_loaded()
-	if _edit_revision==AppearanceEdits.revision: return
-	_edit_revision=AppearanceEdits.revision
+	if _edit_revision==AppearanceEdits.revision and _appearance_revision==AppearanceResources.revision: return
+	_edit_revision=AppearanceEdits.revision;_appearance_revision=AppearanceResources.revision
 	# Invalidate strong AND weak sprite-frame caches, including native hero aliases.
 	for key in catalog.keys():
-		if key.begins_with("hero/"): catalog.erase(key)
+		if key.begins_with("hero/") or key.begins_with("creation/"): catalog.erase(key)
 	for key in cached.keys():
-		if key.begins_with("hero/"): cached.erase(key)
+		if key.begins_with("hero/") or key.begins_with("creation/"): cached.erase(key)
 	_dynamic_weak.clear();_dynamic_order.clear()
 
 static func metadata_stats() -> Dictionary:
@@ -132,7 +138,7 @@ static func actor(key: String) -> AnimatedSprite2D:
 			var previous:SpriteFrames=_dynamic_weak[key].get_ref()
 			if previous!=null:cached[key]=previous
 		if not cached.has(key):
-			var prepared:=HeroAppearance.build(composition,_native_info("hero/"+key.trim_prefix("hero/").get_slice("_",0)))
+			var prepared:=HeroAppearance.build(composition,_native_info("hero/"+HeroAppearance.outfit_for_key(key).stem))
 			cached[key]=_composed_frames(info,prepared.texture)
 		sprite.sprite_frames=cached[key]
 		sprite.offset=Vector2(info.origin[0]-info.get("anchor_x",0),info.origin[1])
@@ -141,34 +147,12 @@ static func actor(key: String) -> AnimatedSprite2D:
 		while _dynamic_order.size()>6:cached.erase(_dynamic_order.pop_front())
 	sprite.set_meta("appearance_edit_revision",AppearanceEdits.revision)
 	if key.begins_with("hero/"):sprite.set_meta("ground_pose_x",info.get("native_battle",{}).get("pose_x",{}))
+	if sprite is NativeHeroSprite:sprite.configure(HeroAppearance.outfit_for_key(key),sprite.sprite_frames,info,key)
 	sprite.play("idle")
 	return sprite
 
 static func _composed_frames(info:Dictionary,texture:Texture2D) -> SpriteFrames:
-	# Only live equipment combinations need a newly packed atlas. Their source
-	# parts and recipes are native Resources; static actors never take this path.
-	var frames:=SpriteFrames.new()
-	frames.remove_animation("default")
-	var regions:Array[AtlasTexture]=[]
-	for i in int(info.count):
-		var region:=AtlasTexture.new();region.atlas=texture;region.filter_clip=true
-		var r:Array=info.frame_regions[i]
-		region.region=Rect2(r[0],r[1],r[2],r[3])
-		region.margin=Rect2(r[4],r[5],int(info.width)-int(r[2]),int(info.height)-int(r[3]))
-		regions.append(region)
-	for i in info.sequences.size():
-		var animation:="source_%d"%i;frames.add_animation(animation);frames.set_animation_speed(animation,10.0)
-		for step in source_steps(info,i):frames.add_frame(animation,regions[int(step[0])],maxf(1.0,float(step[1])))
-	var modes:=["idle","walk","attack"]
-	for optional in ["cast","hurt"]:
-		if info.get("playback",{}).has(optional):modes.append(optional)
-	for mode in modes:
-		frames.add_animation(mode);frames.set_animation_speed(mode,6.0 if mode=="idle" else (8.0 if mode=="cast" else 10.0));frames.set_animation_loop(mode,mode in ["idle","walk"])
-		var seq_index:=maxi(0,info.sequences.size()-(6 if mode=="attack" else 1))
-		var steps:Array=info.get("playback",{}).get(mode,source_steps(info,seq_index))
-		if steps.is_empty():steps=[[0,1]]
-		for step in steps:frames.add_frame(mode,regions[int(step[0])],maxf(1.0,float(step[1])))
-	return frames
+	return HeroAppearance.sprite_frames(info,texture)
 
 static func battle_actor(key: String) -> AnimatedSprite2D:
 	var sprite := actor(key)
@@ -212,6 +196,9 @@ static func apply_appearance(sprite: AnimatedSprite2D, key: String) -> void:
 	sprite.set_meta("art_key",key)
 	if sprite is NativeActorSprite:
 		sprite.art_key=key;sprite.definition=replacement.definition
+	if sprite is NativeHeroSprite and replacement is NativeHeroSprite:
+		sprite.actor_stem=replacement.actor_stem;sprite.base_frames=replacement.base_frames
+		sprite.configure(replacement.outfit,replacement.sprite_frames,actor_info(key),key)
 	sprite.set_meta("appearance_edit_revision",AppearanceEdits.revision)
 	sprite.set_meta("ground_pose_x",replacement.get_meta("ground_pose_x",{}))
 	sprite.play(animation if sprite.sprite_frames.has_animation(animation) else &"idle")

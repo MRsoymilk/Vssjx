@@ -1,6 +1,16 @@
 extends Node
 var checks := 0
 var failures := 0
+var _frame_images:Dictionary={}
+func flat_frame(texture:AtlasTexture)->PackedByteArray:
+	var id:=texture.get_instance_id()
+	if _frame_images.has(id):return _frame_images[id]
+	var source:=texture.atlas.get_image()
+	if source.is_compressed():source.decompress()
+	var canvas:=Image.create(int(texture.get_width()),int(texture.get_height()),false,Image.FORMAT_RGBA8)
+	var crop:=source.get_region(Rect2i(texture.region))
+	canvas.fill(Color.BLACK);canvas.blend_rect(crop,Rect2i(Vector2i.ZERO,crop.get_size()),Vector2i(texture.margin.position))
+	_frame_images[id]=canvas.get_data();return _frame_images[id]
 func check(ok:bool,text:String)->void:
 	checks+=1
 	if not ok:failures+=1;push_error("FAIL: "+text)
@@ -41,23 +51,29 @@ func _run()->void:
 	for key in appearance.parts:
 		check(JSON.parse_string(JSON.stringify(AppearanceResources.part(key).to_spec()))==appearance.parts[key],"Native part Resource preserves exact texture and regions: "+key)
 	for key in source:
+		_frame_images.clear()
 		var expected:Dictionary=JSON.parse_string(FileAccess.get_file_as_string(source[key]))
 		var definition:NativeActorDefinition=load(registry.definitions[key])
 		check(JSON.parse_string(JSON.stringify(definition.to_info()))==expected,"Native editable metadata preserves source motion and provenance: "+key)
 		var native:NativeActorSprite=load(registry.scenes[key]).instantiate()
 		native.initialize()
+		if native is NativeHeroSprite:
+			native.outfit=HeroAppearance.outfit_for_key(key);native._refresh_outfit()
 		var runtime:=OriginalArt.actor(key)
-		check(runtime is NativeActorSprite and runtime.scene_file_path==registry.scenes[key] and runtime.sprite_frames==native.sprite_frames,"Production factory actually instantiates the native scene and shared SpriteFrames: "+key)
+		check(runtime is NativeActorSprite and runtime.scene_file_path==registry.scenes[key] and runtime.get_meta("art_key")==key and (runtime is NativeHeroSprite or runtime.sprite_frames==native.sprite_frames),"Production factory uses the base scene/preset and preserves the legacy appearance key: "+key)
+		if runtime is NativeHeroSprite:
+			check(JSON.parse_string(JSON.stringify(OriginalArt.actor_info(key).native_battle))==expected.native_battle,"Legacy base/head0 looks also preserve every battle root/impact/recoil offset, not just atlas pixels: "+key)
 		runtime.free()
 		var legacy:=legacy_actor(expected)
-		check(native.art_key==key and native.offset==legacy.offset and native.centered==legacy.centered and native.texture_filter==legacy.texture_filter,"Directly instanced native scene preserves anchor and pixel sampling: "+key)
+		check((native is NativeHeroSprite or native.art_key==key) and native.offset==legacy.offset and native.centered==legacy.centered and native.texture_filter==legacy.texture_filter,"Directly instanced base scene/preset preserves anchor and pixel sampling: "+key)
 		var a:=native.sprite_frames;var b:=legacy.sprite_frames
 		check(a.get_animation_names()==b.get_animation_names(),"Native SpriteFrames exposes every action and source sequence: "+key)
 		for name in b.get_animation_names():
 			check(a.get_animation_loop(name)==b.get_animation_loop(name) and a.get_animation_speed(name)==b.get_animation_speed(name) and a.get_frame_count(name)==b.get_frame_count(name),"Action duration, frame count and looping agree: "+key+"/"+name)
 			for i in b.get_frame_count(name):
 				var x:AtlasTexture=a.get_frame_texture(name,i);var y:AtlasTexture=b.get_frame_texture(name,i)
-				check(x.atlas.resource_path==y.atlas.resource_path and x.region==y.region and x.margin==y.margin and x.filter_clip==y.filter_clip and a.get_frame_duration(name,i)==b.get_frame_duration(name,i),"Every native animation frame uses the exact source pixels and timing: "+key+"/"+name+"/"+str(i))
+				var pixels:bool=(x.atlas.resource_path==y.atlas.resource_path and x.region==y.region and x.margin==y.margin) or (x.get_size()==y.get_size() and flat_frame(x)==flat_frame(y))
+				check(pixels and x.filter_clip==y.filter_clip and a.get_frame_duration(name,i)==b.get_frame_duration(name,i),"Every base-scene preset preserves the exact source pixels and timing: "+key+"/"+name+"/"+str(i))
 		native.free();legacy.free()
 	var viewport:=SubViewport.new();viewport.size=Vector2i(320,480);viewport.transparent_bg=true;viewport.render_target_update_mode=SubViewport.UPDATE_ALWAYS;add_child(viewport)
 	var examples:Array=["hero/mfs","hero/wzs_w2_c1","monster/langw","monster/nt1"]
@@ -66,7 +82,7 @@ func _run()->void:
 	for mode in ["idle","attack"]:
 		for index in examples.size():
 			for column in 2:
-				var sprite:AnimatedSprite2D=legacy_actor(JSON.parse_string(FileAccess.get_file_as_string(source[examples[index]]))) if column==0 else load(registry.scenes[examples[index]]).instantiate()
+				var sprite:AnimatedSprite2D=legacy_actor(JSON.parse_string(FileAccess.get_file_as_string(source[examples[index]]))) if column==0 else OriginalArt.actor(examples[index])
 				viewport.add_child(sprite);sprite.position=Vector2(80+160*column,70+65*index)
 				sprite.play(mode);sprite.pause();sprite.frame=mini(3,sprite.sprite_frames.get_frame_count(mode)-1)
 		for i in 3:await get_tree().process_frame

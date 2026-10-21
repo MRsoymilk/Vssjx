@@ -29,19 +29,14 @@ static func variant(entry: Dictionary, job: int, gender: int, full_set: bool = f
 	var sources: Array = parts().recipes[stem].sources
 	var before := {"头饰":[sources[0]], "衣服":[sources[1],sources[3],sources[4]], "武器":[]}
 	var after: Dictionary = before.duplicate(true)
-	if int(look[0]) > 0: after["武器"] = ["e" + stem.substr(1) + str(int(look[0]))]
-	var clothing := int(look[1])
-	if clothing > 0 and clothing <= 11:
-		var body := clothing - 2 if clothing >= 3 else clothing + (2 if stem.ends_with("fs") else 1)
-		after["衣服"] = [stem+str(body), stem+str(body)+"q", stem+str(body)+"x"]
-	if int(look[2]) > 0 and int(look[2]) <= 9: after["头饰"] = [stem+"t"+str(int(look[2]))]
-	var generated := GeneratedEquipment.replacements(stem, int(look[0]), clothing, int(look[2]), sources)
-	if generated.has(sources[0]): after["头饰"] = [generated[sources[0]]]
-	if generated.has(sources[1]): after["衣服"] = [generated[sources[1]],generated[sources[3]],generated[sources[4]]]
-	if generated.has(sources[2]): after["武器"] = [generated[sources[2]]]
+	var outfit:=AppearanceResources.outfit(stem,look if look.size()==3 else [look[0],look[1],0])
+	if outfit==null:return {}
+	after["武器"]=outfit.weapon.parts.map(func(part:NativeAppearancePart)->String:return part.source_id)
+	after["衣服"]=outfit.clothing.parts.map(func(part:NativeAppearancePart)->String:return part.source_id)
+	after["头饰"]=outfit.head.parts.map(func(part:NativeAppearancePart)->String:return part.source_id)
 	var resources := {}
-	for group in after.values():
-		for id in group: resources[id] = GeneratedEquipment.manifest().parts.get(id, parts().parts.get(id, {})).get("texture", "缺少部件资源")
+	for component in [outfit.weapon,outfit.clothing,outfit.head]:
+		for part in component.parts:resources[part.source_id]=part.texture_path
 	return {"职业":JOBS[job], "性别":"男" if gender == 0 else "女", "外观编码":look,
 		"装备前动画":before_key, "装备后动画":key, "装备前部件":before, "装备后部件":after,
 		"部件贴图":resources, "原始配方":"ssjx/hero.mrp:"+stem+".ani"}

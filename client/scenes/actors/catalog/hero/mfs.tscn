@@ -1,8 +1,11 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/actors/native_actor.tscn" id="1"]
 [ext_resource type="SpriteFrames" path="res://assets/actor_resources/hero/mfs_frames.tres" id="2"]
 [ext_resource type="Resource" path="res://assets/actor_resources/hero/mfs.tres" id="3"]
+
+[ext_resource type="Script" path="res://scripts/hero_actor.gd" id="HeroScript"]
+[ext_resource type="Resource" path="res://assets/appearance_resources/outfits/mfs.tres" id="Outfit"]
 
 [node name="mfs" instance=ExtResource("1")]
 sprite_frames = ExtResource("2")
@@ -11,3 +14,7 @@ autoplay = "idle"
 offset = Vector2(-75, -60)
 definition = ExtResource("3")
 art_key = "hero/mfs"
+script = ExtResource("HeroScript")
+base_frames = ExtResource("2")
+outfit = ExtResource("Outfit")
+actor_stem = "mfs"

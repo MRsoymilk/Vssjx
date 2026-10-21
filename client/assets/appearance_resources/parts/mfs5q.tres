@@ -4,5 +4,6 @@
 
 [resource]
 script = ExtResource("1")
+source_id = "mfs5q"
 texture_path = "res://assets/hero_parts/mfs5q.png"
 regions = Array[Rect2i]([Rect2i(0, 0, 11, 5), Rect2i(31, 0, 3, 4), Rect2i(62, 0, 31, 23)])

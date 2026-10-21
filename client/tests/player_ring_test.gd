@@ -99,7 +99,7 @@ func _run() -> void:
 	await capture("online-world-player-ring")
 	var model := OnlinePve.new()
 	model.ready = true
-	model.state = {"character":{"job":1,"gender":1,"level":1,"hp":95,"mp":45,"display_name":"自己"},"stats":{"hp":95,"mp":45},"potions":6,
+	model.state = {"character":{"job":1,"gender":1,"school":0,"level":1,"hp":95,"mp":45,"display_name":"自己"},"stats":{"hp":95,"mp":45},"potions":6,
 		"battle":{"id":"ring-battle","revision":"1","outcome":"active","enemy_hp":62,"hp":95,"mp":45,"enemy":{"art":"monster/langw","name":"山狼","level":1,"hp":62,"attack":13,"defense":3}}}
 	var battle_view := view.battle_view
 	battle_view.set_process(false)

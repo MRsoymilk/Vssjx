@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="NativeHeroOutfit" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/hero_outfit.gd" id="1"]
+[ext_resource type="Resource" path="res://assets/appearance_resources/recipes/wzs.tres" id="Recipe"]
+[ext_resource type="Resource" path="res://assets/appearance_resources/equipment/wzs/weapon/1.tres" id="weapon"]
+[ext_resource type="Resource" path="res://assets/appearance_resources/equipment/wzs/clothing/0.tres" id="clothing"]
+[ext_resource type="Resource" path="res://assets/appearance_resources/equipment/wzs/head/0.tres" id="head"]
+
+[resource]
+script = ExtResource("1")
+stem = "wzs"
+recipe = ExtResource("Recipe")
+weapon = ExtResource("weapon")
+clothing = ExtResource("clothing")
+head = ExtResource("head")
+baked_signature = "a4418c98968d6c0e9d60616b5878589728fa2c69017a9425f47c3b90bc3050f3"

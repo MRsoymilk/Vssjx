@@ -6,31 +6,39 @@ static var _parts: Dictionary = {}
 static var _prepared: Dictionary = {}
 static var _order: Array[String] = []
 static var _edit_revision := -1
+static var _resource_revision := -1
+
+static func outfit_for_key(key:String)->NativeHeroOutfit:
+	var parsed:=RegEx.create_from_string("^(hero|creation)/([mw](zs|ck|fs))(_w([0-9]{1,3})_c([0-9]{1,3})(_h([0-9]{1,3}))?)?$").search(key)
+	if parsed==null:return null
+	if parsed.get_string(1)=="creation" and parsed.get_string(4).is_empty():return AppearanceResources.creation_outfit(parsed.get_string(2))
+	var codes:=[1,0,0] if parsed.get_string(4).is_empty() else [int(parsed.get_string(5)),int(parsed.get_string(6)),0 if parsed.get_string(8).is_empty() else int(parsed.get_string(8))]
+	return AppearanceResources.outfit(parsed.get_string(2),codes)
 
 static func composition_key(key: String) -> String:
-	if is_key(key): return key
-	if not AppearanceEdits.any(): return ""
-	var parsed:=RegEx.create_from_string("^hero/([mw](zs|ck|fs))(_w([0-9]{1,3})_c([0-9]{1,3}))?$").search(key)
-	if parsed==null: return ""
-	var weapon:=1 if parsed.get_string(3).is_empty() else int(parsed.get_string(4))
-	var clothing:=0 if parsed.get_string(3).is_empty() else int(parsed.get_string(5))
-	var result:="hero/%s_w%d_c%d_h0"%[parsed.get_string(1),weapon,clothing]
-	return result if is_key(result) else ""
+	var outfit:=outfit_for_key(key)
+	return "" if outfit==null or outfit.uses_baked() else outfit.key()
 
 static func is_key(key: String) -> bool:
-	var parsed := RegEx.create_from_string("^hero/([mw](zs|ck|fs))_w([0-9]{1,3})_c([0-9]{1,3})_h([0-9]{1,3})$").search(key)
-	return parsed != null and GeneratedEquipment.valid_key(parsed.get_string(1),[int(parsed.get_string(3)),int(parsed.get_string(4)),int(parsed.get_string(5))])
+	return outfit_for_key(key)!=null
 
-static func _part(source: String, frame: int, transform: int) -> Image:
-	var id := "%s:%d:%d" % [source,frame,transform]
+static func _part(entry:NativeAppearancePart, frame: int, transform: int) -> Image:
+	if entry==null or frame>=entry.regions.size():return null
+	var source:=entry.source_id
+	var id := "%s:%s:%s:%d:%d" % [source,entry.texture_path,str(entry.regions),frame,transform]
 	if _parts.has(id): return _parts[id]
-	var entry:=AppearanceResources.part(source)
-	if entry==null or frame>=entry.regions.size(): return null
-	if not _images.has(source):
+	var image_key:=entry.texture_path+"|"+source
+	if not _images.has(image_key):
 		var image:=AppearanceEdits.image_for(source)
-		if image==null: image=AppearanceEdits.source_image(source)
-		_images[source] = image
-	var part: Image = _images[source].get_region(entry.regions[frame])
+		if image==null:
+			var texture:=load(entry.texture_path) as Texture2D
+			if texture==null:return null
+			image=texture.get_image()
+			if image.is_compressed():image.decompress()
+			image.convert(Image.FORMAT_RGBA8)
+		_images[image_key] = image
+	if not Rect2i(Vector2i.ZERO,_images[image_key].get_size()).encloses(entry.regions[frame]):return null
+	var part: Image = _images[image_key].get_region(entry.regions[frame])
 	match transform:
 		1: part.rotate_90(CLOCKWISE)
 		2: part.rotate_180()
@@ -43,27 +51,20 @@ static func _part(source: String, frame: int, transform: int) -> Image:
 	return part
 
 static func build(key: String, base: Dictionary) -> Dictionary:
+	var outfit:=outfit_for_key(key)
+	return {} if outfit==null else build_outfit(outfit,base)
+
+static func build_outfit(outfit:NativeHeroOutfit,base:Dictionary)->Dictionary:
 	AppearanceEdits.ensure_loaded()
-	if _edit_revision!=AppearanceEdits.revision:
+	if _edit_revision!=AppearanceEdits.revision or _resource_revision!=AppearanceResources.revision:
 		_images.clear();_parts.clear();_prepared.clear();_order.clear()
-		_edit_revision=AppearanceEdits.revision
+		_edit_revision=AppearanceEdits.revision;_resource_revision=AppearanceResources.revision
+	if outfit==null or not outfit.valid():return {}
+	if outfit.recipe.frames.size()!=int(base.get("count",0)):return {}
+	var key:=outfit.signature()
 	if _prepared.has(key): return _prepared[key]
-	if not is_key(key): return {}
-	var fields := key.trim_prefix("hero/").split("_")
-	var stem: String = fields[0]
-	var weapon := int(fields[1].trim_prefix("w"))
-	var clothing := int(fields[2].trim_prefix("c"))
-	var head := int(fields[3].trim_prefix("h"))
-	var recipe:=AppearanceResources.recipe(stem)
-	var replacements := {recipe.sources[2]:"e"+stem.substr(1)+str(weapon)}
-	if clothing > 0 and clothing <= 11:
-		var body := clothing - 2 if clothing >= 3 else clothing + (2 if stem.ends_with("fs") else 1)
-		for i in [[1,""],[3,"q"],[4,"x"]]: replacements[recipe.sources[i[0]]] = stem+str(body)+i[1]
-	if head > 0 and head <= 9: replacements[recipe.sources[0]] = stem+"t"+str(head)
-	var generated := GeneratedEquipment.replacements(stem, weapon, clothing, head, recipe.sources)
-	# A foreign set code must not silently fall back to a native part.
-	if (weapon >= 28 and not generated.has(recipe.sources[2])) or (clothing >= 12 and not generated.has(recipe.sources[1])) or (head >= 10 and not generated.has(recipe.sources[0])): return {}
-	replacements.merge(generated, true)
+	var recipe:=outfit.recipe
+	var replacements:=outfit.replacements()
 	var frames: Array = []
 	var centers: Array = []
 	var left := 0;var top := 0;var right := 1;var bottom := 1
@@ -71,12 +72,12 @@ static func build(key: String, base: Dictionary) -> Dictionary:
 		var images: Array = []
 		var center := 0
 		for layer in layers:
-			if weapon == 0 and layer.source == recipe.sources[2]: continue
-			var source: String = replacements.get(layer.source,layer.source)
+			if outfit.weapon.parts.is_empty() and layer.source == recipe.sources[2]: continue
+			var source:NativeAppearancePart=replacements.get(layer.source,AppearanceResources.part(layer.source))
 			var part := _part(source,int(layer.frame),int(layer.transform))
 			if part == null: return {}
 			if layer.source == recipe.sources[0] and int(layer.frame) == 0: center = int(layer.x) + part.get_width()/2
-			var shift:=AppearanceEdits.offset_for(source,int(layer.frame),int(layer.transform))
+			var shift:=AppearanceEdits.offset_for(source.source_id,int(layer.frame),int(layer.transform))
 			images.append([part,int(layer.x)+shift.x,int(layer.y)+shift.y])
 		centers.append(center)
 		for image in images:
@@ -103,9 +104,35 @@ static func build(key: String, base: Dictionary) -> Dictionary:
 	info.frame_regions = placements
 	# Head replacement changes the stabilization center. Ground and recoil anchors
 	# must use that same source center; attack root translation is unchanged.
-	for animation in info.playback:
-		info.native_battle.pose_x[animation] = info.playback[animation].map(func(step: Array) -> int: return int(centers[int(step[0])]))
+	# Fixed legacy looks kept the original head: changing only weapon/clothing
+	# must not add new attack/cast root offsets when their atlases become dynamic.
+	# Non-default heads retain the existing head-replacement stabilization rules.
+	if outfit.head.visual_code!=0 or outfit.head.parts[0].source_id!=recipe.sources[0]:
+		for animation in info.playback:
+			info.native_battle.pose_x[animation] = info.playback[animation].map(func(step: Array) -> int: return int(centers[int(step[0])]))
 	var result := {"info":info,"texture":ImageTexture.create_from_image(atlas)}
 	_prepared[key] = result;_order.append(key)
 	while _order.size()>6: _prepared.erase(_order.pop_front())
 	return result
+
+static func source_steps(info:Dictionary,index:int)->Array:
+	var count:=int(info.get("native_battle",{}).get("source_frame_count",info.count));var steps:Array=[]
+	for step in info.sequences[index]:steps.append([count-1-int(step[0]),step[1]])
+	return steps
+
+static func sprite_frames(info:Dictionary,texture:Texture2D)->SpriteFrames:
+	var frames:=SpriteFrames.new();frames.remove_animation("default")
+	var regions:Array[AtlasTexture]=[]
+	for i in int(info.count):
+		var region:=AtlasTexture.new();region.atlas=texture;region.filter_clip=true
+		var r:Array=info.frame_regions[i];region.region=Rect2(r[0],r[1],r[2],r[3]);region.margin=Rect2(r[4],r[5],int(info.width)-int(r[2]),int(info.height)-int(r[3]));regions.append(region)
+	for i in info.sequences.size():
+		var name:="source_%d"%i;frames.add_animation(name);frames.set_animation_speed(name,10)
+		for step in source_steps(info,i):frames.add_frame(name,regions[int(step[0])],maxf(1,float(step[1])))
+	for mode in ["idle","walk","attack","cast","hurt"]:
+		if mode in ["cast","hurt"] and not info.get("playback",{}).has(mode):continue
+		frames.add_animation(mode);frames.set_animation_speed(mode,6 if mode=="idle" else (8 if mode=="cast" else 10));frames.set_animation_loop(mode,mode in ["idle","walk"])
+		var steps:Array=info.get("playback",{}).get(mode,source_steps(info,maxi(0,info.sequences.size()-(6 if mode=="attack" else 1))))
+		if steps.is_empty():steps=[[0,1]]
+		for step in steps:frames.add_frame(mode,regions[int(step[0])],maxf(1,float(step[1])))
+	return frames

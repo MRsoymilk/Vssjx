@@ -4,5 +4,6 @@
 
 [resource]
 script = ExtResource("1")
+source_id = "gravebloom/mzs/mzs1x"
 texture_path = "res://assets/generated/equipment/gravebloom/mzs/parts/mzs1x.png"
 regions = Array[Rect2i]([Rect2i(0, 0, 25, 15), Rect2i(26, 0, 26, 14), Rect2i(52, 0, 22, 13), Rect2i(78, 0, 20, 15), Rect2i(104, 0, 19, 14), Rect2i(130, 0, 22, 13)])

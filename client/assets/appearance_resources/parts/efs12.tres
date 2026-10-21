@@ -4,5 +4,6 @@
 
 [resource]
 script = ExtResource("1")
+source_id = "efs12"
 texture_path = "res://assets/hero_parts/efs12.png"
 regions = Array[Rect2i]([Rect2i(0, 0, 40, 40), Rect2i(49, 0, 49, 32)])

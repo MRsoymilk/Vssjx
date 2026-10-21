@@ -35,6 +35,22 @@ class NativeActorResources(unittest.TestCase):
     def test_invalid_actor_paths_are_rejected(self):
         with self.assertRaises(ValueError):builder.actor_files('../escape',{})
 
+    def test_only_six_base_hero_scenes_and_no_combination_scenes(self):
+        files=builder.build_files()
+        expected={f'scenes/actors/catalog/hero/{stem}.tscn' for stem in ['mzs','wzs','mck','wck','mfs','wfs']}
+        self.assertEqual({name for name in files if name.startswith('scenes/actors/catalog/hero/')},expected)
+        self.assertEqual({str(path.relative_to(ROOT/'client')) for path in (ROOT/'client/scenes/actors/catalog/hero').glob('*.tscn')},expected)
+        self.assertEqual(list((ROOT/'client/scenes/actors/catalog/creation').glob('*.tscn')),[])
+        for name in expected:
+            self.assertIn('hero_actor.gd',files[name])
+            self.assertIn('outfit = ExtResource("Outfit")',files[name])
+
+    def test_original_import_tool_cannot_recreate_combination_scenes(self):
+        files=builder.build_files()
+        for name in files:
+            self.assertFalse(name.startswith('scenes/actors/catalog/hero/') and name.endswith('.tscn') and '_w' in Path(name).name)
+            self.assertFalse(name.startswith('assets/actor_resources/hero/') and '_w' in name and name.endswith('_frames.tres'))
+
     def test_visual_runtime_has_no_legacy_json_loader(self):
         for name in ['art','hero_appearance','generated_equipment','appearance_resources','appearance_edits','boneglow_equipment']:
             text=(ROOT/f'client/scripts/{name}.gd').read_text()

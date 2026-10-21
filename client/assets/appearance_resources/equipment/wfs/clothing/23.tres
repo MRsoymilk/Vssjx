@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="NativeHeroEquipment" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/hero_equipment.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/resources/appearance_part.gd" id="PartType"]
+[ext_resource type="Resource" path="res://assets/appearance_resources/parts/gravebloom/wfs/wfs2.tres" id="Part_0"]
+[ext_resource type="Resource" path="res://assets/appearance_resources/parts/gravebloom/wfs/wfs2q.tres" id="Part_1"]
+[ext_resource type="Resource" path="res://assets/appearance_resources/parts/gravebloom/wfs/wfs2x.tres" id="Part_2"]
+
+[resource]
+script = ExtResource("1")
+stem = "wfs"
+slot = "clothing"
+visual_code = 23
+parts = Array[ExtResource("PartType")]([ExtResource("Part_0"), ExtResource("Part_1"), ExtResource("Part_2")])

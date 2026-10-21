@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="NativeHeroOutfit" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/hero_outfit.gd" id="1"]
+[ext_resource type="Resource" path="res://assets/appearance_resources/recipes/mfs.tres" id="Recipe"]
+[ext_resource type="Resource" path="res://assets/appearance_resources/equipment/mfs/weapon/1.tres" id="weapon"]
+[ext_resource type="Resource" path="res://assets/appearance_resources/equipment/mfs/clothing/0.tres" id="clothing"]
+[ext_resource type="Resource" path="res://assets/appearance_resources/equipment/mfs/head/0.tres" id="head"]
+
+[resource]
+script = ExtResource("1")
+stem = "mfs"
+recipe = ExtResource("Recipe")
+weapon = ExtResource("weapon")
+clothing = ExtResource("clothing")
+head = ExtResource("head")
+baked_signature = "0995a5aeb4f7f10a6e7f356d700d423a667639690438f8d59a54c326c7bb4272"

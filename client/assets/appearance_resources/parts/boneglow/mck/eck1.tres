@@ -4,5 +4,6 @@
 
 [resource]
 script = ExtResource("1")
+source_id = "boneglow/mck/eck1"
 texture_path = "res://assets/generated/equipment/boneglow/mck/parts/eck1.png"
 regions = Array[Rect2i]([Rect2i(0, 0, 41, 14), Rect2i(41, 0, 30, 30)])

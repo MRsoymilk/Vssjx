@@ -206,7 +206,7 @@ func _sync_enemies() -> void:
 		sprite.position = cell_center(home)
 		actors.add_child(sprite)
 		enemy_nodes[enemy.id] = sprite
-		_name_tag(sprite, String(enemy.name), Color("ffb29a"))
+		_name_tag(sprite, "%d级 %s" % [int(enemy.level), String(enemy.name)], Color("ff3030"))
 		if not enabled: sprite.pause()
 		if enemy.kind == "wolf":
 			var rng := RandomNumberGenerator.new()

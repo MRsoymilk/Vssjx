@@ -21,10 +21,13 @@ python -m unittest discover -s tests -p 'test_ai_world*.py'
 python -m unittest discover -s tests -p 'test_recovered_npc_maps.py'
 cargo test --manifest-path server/Cargo.toml --target-dir work/npc-map-cargo --test ai_world
 & 'E:/Godot_v4.7.1-stable_win64.exe/Godot_v4.7.1-stable_win64_console.exe' --headless --path client res://tests/map_distribution_test.tscn
+& 'E:/Godot_v4.7.1-stable_win64.exe/Godot_v4.7.1-stable_win64_console.exe' --headless --path client res://tests/population_test.tscn
 ```
 
 地图场景检查在真实客户端创建 13 张地图，核对地形碰撞、NPC/怪物外观与出生点，并用 Godot AStar 验证避开巡游区的办事路线。
 
-设置 `SSJX_MAP_CAPTURE_PATH` 为已存在的绝对目录，以 `gl_compatibility` 运行同一场景可输出 13 张真实地图截图；Windows 自动截图应使用 `Start-Process -WindowStyle Hidden`。无渲染检查 433 项；真实渲染加截图检查 446 项。
+设置 `SSJX_MAP_CAPTURE_PATH` 为已存在的绝对目录，以 `gl_compatibility` 运行同一场景可输出 13 张真实地图截图；Windows 自动截图应使用 `Start-Process -WindowStyle Hidden`。无渲染检查 491 项；真实渲染加截图检查 504 项。
+
+怪物与首领头顶统一使用红色 `#ff3030`，显示实际配置或服务端数据中的“等级＋名字”，例如“10级 寒谷怨灵”。本地地图检查覆盖 13 张图的全部怪物；联机人口检查覆盖服务端等级、名字、颜色和 UI 分辨率姓名层同步，NPC 名字与颜色保留。联机无渲染检查 27 项；设置 `SSJX_POPULATION_CAPTURE_PATH` 后的实际渲染检查 28 项。
 
 客户端须重新启动以加载更新后的地图目录；服务端使用嵌入式地图数据，现有服务进程需要在后续明确部署时重建并重启。本轮不改动正在运行的服务。

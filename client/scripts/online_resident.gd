@@ -13,9 +13,9 @@ func receive(value: Dictionary, grid: AStarGrid2D) -> void:
 	if sprite == null:
 		sprite = OriginalArt.actor(value.art)
 		$Sprite.add_child(sprite)
-		$Name.text = value.name + (" · AI" if not AIWorld.resident(value.id).is_empty() else "")
+		$Name.text = "%d级 %s" % [int(value.level), String(value.name)] if value.kind!="npc" else value.name + (" · AI" if not AIWorld.resident(value.id).is_empty() else "")
 		$Name.position.y=-74
-		preload("res://scripts/world_nameplate.gd").apply($Name,Color("ffb29a") if value.kind!="npc" else Color("ffe095"))
+		preload("res://scripts/world_nameplate.gd").apply($Name,Color("ff3030") if value.kind!="npc" else Color("ffe095"))
 		var definition := AIWorld.resident(value.id)
 		if value.kind=="npc" and not String(definition.get("service_label","")).is_empty():
 			$QuestMarker.position.y=-114

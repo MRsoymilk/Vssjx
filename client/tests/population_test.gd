@@ -25,6 +25,12 @@ func _run() -> void:
 	check(view.residents.size() == 5 and view.actors.size() == 1 and view.count_label.text == "同图1人", "Five server residents appear without changing online player counts")
 	for resident in view.residents.values():
 		check(resident.scene_file_path == "res://scenes/actors/online_resident.tscn" and resident.sprite is AnimatedSprite2D and resident.sprite.is_playing(), "Resident scene uses animated original art and static name label")
+		var tag: Label=resident.get_node("Name")
+		if resident.data.kind!="npc":
+			check(tag.text=="%d级 %s" % [int(resident.data.level),String(resident.data.name)],"Online monster name shows its authoritative level")
+			check(tag.get_theme_color("font_color")==Color("ff3030"),"Online monsters have red names")
+		else:
+			check(tag.text==resident.data.name and tag.get_theme_color("font_color")==Color("ffe095"),"NPC name and color remain unchanged")
 	check(view.screen.hud.get_node("Minimap").shared_population.size() == 5, "NPC and monster markers reach the minimap")
 	var invalid := residents_packet(2)
 	invalid.entities[1].art = "res://scripts/main.gd"
@@ -46,6 +52,7 @@ func _run() -> void:
 	var source: Label=wolf.get_node("Name")
 	var proxy: Label=names.entries[source.get_instance_id()].proxy
 	check(proxy.get_viewport()!=source.get_viewport() and proxy.text==source.text and source.self_modulate.a==0,"Names render once at UI resolution outside the low-resolution world texture")
+	check(proxy.get_theme_color("font_color")==Color("ff3030"),"UI-resolution nameplate preserves the monster's red name and level")
 	var name_before:=proxy.position
 	wolf.position+=Vector2(5,3);names._process(0.0)
 	check(proxy.position.is_equal_approx(name_before+Vector2(5,3)),"Readable text continues following the moving monster")

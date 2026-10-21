@@ -33,6 +33,9 @@ func _run() -> void:
 			check(sprite.position==world.cell_center(point),"Runtime uses shared cell: "+r.id)
 			check(sprite.get_meta("art_key")==r.art,"Appearance retained: "+r.id)
 			if r.kind!="npc":
+				var tag: Label=sprite.get_child(0)
+				check(tag.text=="%d级 %s" % [int(r.level),String(r.name)],"Local monster name shows its configured level: "+r.id)
+				check(tag.get_theme_color("font_color")==Color("ff3030"),"Local monster name is red: "+r.id)
 				for y in range(point.y-2,point.y+3):
 					for x in range(point.x-2,point.x+3):
 						if world.astar.is_in_boundsv(Vector2i(x,y)): world.astar.set_point_solid(Vector2i(x,y),true)

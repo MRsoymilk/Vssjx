@@ -51,24 +51,10 @@ static func build(terrain: TileMapLayer, grid: AStarGrid2D, data: Dictionary) ->
 	grid.default_compute_heuristic = AStarGrid2D.HEURISTIC_MANHATTAN
 	grid.default_estimate_heuristic = AStarGrid2D.HEURISTIC_MANHATTAN
 	grid.update()
-	var tiles := TileSet.new()
-	tiles.tile_size = Vector2i(cell_size, cell_size)
-	var atlas := TileSetAtlasSource.new()
-	atlas.texture = load("res://assets/tiles/original_tiles.png")
-	atlas.texture_region_size = tiles.tile_size
-	for index in 756: atlas.create_tile(Vector2i(index % 32, index / 32))
-	tiles.add_source(atlas, 0)
-	terrain.clear()
-	terrain.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-	terrain.tile_set = tiles
-	for index in data.tiles.size():
+	NativeWorldMaps.build(terrain,String(data.map_id))
+	for index in data.blocked.size():
 		var point := Vector2i(index % width, index / width)
-		var tile := int(data.tiles[index])
-		terrain.set_cell(point, 0, Vector2i(tile % 32, tile / 32))
 		grid.set_point_solid(point, data.blocked[index])
 
 static func add_scenery(parent: Node2D, data: Dictionary) -> void:
-	for prop in data.scenery:
-		var actor := OriginalArt.actor(prop.art)
-		actor.position = Vector2(prop.x, prop.y)
-		parent.add_child(actor)
+	NativeWorldMaps.add_scenery(parent,String(data.map_id))

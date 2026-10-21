@@ -22,5 +22,18 @@ func _run()->void:
 	check(notices[-1]=="连接中断：INVALID_PVE","Other malformed PVE packets retain strict generic rejection")
 	wire.world_ready=false;wire._receive({"type":"pve.state","state":stale},PackedByteArray())
 	check(notices[-1]=="连接中断：INVALID_PVE","PVE received before world readiness cannot reuse a previous mismatch code")
+	var shop_good:=good.duplicate(true)
+	shop_good.shop=ShopRules.local_state({});shop_good.shop.catalog_sha256=ShopRules.catalog_hash
+	check(model.receive({"type":"pve.state","state":shop_good}),"Matching shop catalog installs normally")
+	original=model.state.duplicate(true)
+	var old_shop:=shop_good.duplicate(true);old_shop.shop.catalog_sha256="0".repeat(64)
+	check(not model.receive({"type":"pve.state","state":old_shop}) and model.validation_error=="SHOP_CATALOG_MISMATCH" and model.state==original,"Stale shop identifies the mismatched catalog without changing confirmed state")
+	wire.world_ready=true;wire._receive({"type":"pve.state","state":old_shop},PackedByteArray())
+	check(notices[-1].contains("商城数据版本不一致"),"Network layer explains that the server must be rebuilt and restarted")
+	check(model.valid(shop_good) and model.validation_error.is_empty(),"Matching shop snapshot clears diagnostic")
+	var invalid_shop:=shop_good.duplicate(true);invalid_shop.shop.slots={}
+	check(not model.valid(invalid_shop) and model.validation_error.is_empty(),"Malformed inventory is still strictly rejected")
+	invalid_shop=shop_good.duplicate(true);invalid_shop.shop.erase("catalog_sha256")
+	check(not model.valid(invalid_shop) and model.validation_error.is_empty(),"Missing fingerprint cannot be mistaken for a stale server")
 	wire.free();OnlineAccount.pending_pve=saved
 	print("PVE CATALOG MISMATCH: %d checks, %d failures"%[checks,failures]);get_tree().quit(0 if failures==0 else 1)

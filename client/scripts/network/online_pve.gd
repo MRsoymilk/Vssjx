@@ -69,6 +69,9 @@ func valid(value: Variant) -> bool:
 		return false
 	if value.has("attributes") and not valid_attributes(value.attributes, value): return false
 	if value.has("shop"):
+		if value.shop is Dictionary and value.shop.get("version")=="shop-v2" and value.shop.get("catalog_sha256") is String and value.shop.catalog_sha256!=ShopRules.catalog_hash:
+			validation_error="SHOP_CATALOG_MISMATCH"
+			return false
 		if not ShopRules.valid_gear(value.shop): return false
 		if value.shop.version=="shop-v2" and value.shop.get("catalog_sha256")!=ShopRules.catalog_hash: return false
 	if value.has("loot"):

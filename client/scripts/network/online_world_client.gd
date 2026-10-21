@@ -124,7 +124,7 @@ func _failed(code: String, retry: bool = false) -> void:
 	_net_ids = {}
 	if socket != null: socket.close()
 	socket = null
-	var messages := {"WORLD_PROTOCOL_MISMATCH": "世界协议版本不一致，请更新客户端。", "CHARACTER_BUSY": "该角色已在另一登录会话中在线。", "SESSION_REPLACED": "连接已被同会话的新连接接管。", "SESSION_REVOKED": "账号会话失效，请重新登录。", "CONFIG_MISMATCH": "地图版本不一致，请更新客户端。", "WORLD_FULL": "服务器人数已满，请稍后再试。", "DATABASE_UNAVAILABLE": "数据库暂不可用，移动已停止。", "PVE_CATALOG_MISMATCH": "客户端与服务器的地图数据版本不一致，请同步更新后重试。"}
+	var messages := {"WORLD_PROTOCOL_MISMATCH": "世界协议版本不一致，请更新客户端。", "CHARACTER_BUSY": "该角色已在另一登录会话中在线。", "SESSION_REPLACED": "连接已被同会话的新连接接管。", "SESSION_REVOKED": "账号会话失效，请重新登录。", "CONFIG_MISMATCH": "地图版本不一致，请更新客户端。", "WORLD_FULL": "服务器人数已满，请稍后再试。", "DATABASE_UNAVAILABLE": "数据库暂不可用，移动已停止。", "PVE_CATALOG_MISMATCH": "客户端与服务器的地图数据版本不一致，请同步更新后重试。", "SHOP_CATALOG_MISMATCH": "客户端与服务器的商城数据版本不一致，请重新编译并重启服务器；打包客户端也需同步更新。"}
 	status_changed.emit(String(messages.get(code, "连接中断：" + code)))
 	if retry and _attempts < 3 and OnlineAccount.is_logged_in():
 		_attempts += 1

@@ -44,3 +44,16 @@ godot --path client --rendering-method gl_compatibility res://tests/battle_hud_a
 ```
 
 实际攻击截图与过程日志保存在忽略的 `work/battle-hud-anchor.png`、`work/hud-anchor-*`，未重新导出或部署客户端。
+
+
+## 原版战斗布局回归（2026-10-21）
+
+`battle_reference_layout_test.tscn` 通过实际本地游戏入口展示森林之王单人战斗，并展示完整五人五怪组队。验证中央菜单默认显示、绿色倒计时、原版手形选中光标、待机／逃跑文字、技能返回、自动模式切换、行动期间隐藏指令、共享回合提交后锁定、紧凑等级血条、完整姓名悬停及大型怪物的头顶空间。单人三怪与现有选目标、技能群攻、伤害／暴击、血条随动作、闪避、死亡／复活继续由原专项验证。
+
+真实OpenGL布局专项36项、组队69项、共享回合54项、单人55项、血条54项、闪避28项、遇敌过渡171项、精英22项，共489项通过。布局变更直接显示六项指令，删除冗余的“战斗指令”按钮，旧布局断言同步更新；战斗事件与数值断言保留。
+
+```powershell
+godot --path client --rendering-method gl_compatibility res://tests/battle_reference_layout_test.tscn
+```
+
+截图位于 `work/battle-reference-single.png`、`work/battle-reference-party.png`、`work/solo-formation.png`，不提交运行截图或本地测试存档。

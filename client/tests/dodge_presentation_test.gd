@@ -30,7 +30,7 @@ func _run()->void:
 	view.motion.advance(view.motion.duration);view._process(0)
 	view.queue=[{"actor":SELF,"target":"m0","action":"attack","skill":"","damage":1,"healed":0,"critical":false}]
 	view._process(0.10)
-	check(view.motion==null and view.queue.size()==1 and view.command_toggle.disabled,"Next action waits for dodge recovery")
+	check(view.motion==null and view.queue.size()==1 and view.action_buttons[0].disabled,"Next action waits for dodge recovery")
 	check(hero.sprite.position.x>home.x and absf(hero.hp.position.x+hero.hp.size.x/2-view._actor_hud_anchor(hero).x)<0.01,"Retreat keeps character bars aligned")
 	if DisplayServer.get_name()!="headless":
 		await RenderingServer.frame_post_draw

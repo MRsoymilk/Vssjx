@@ -8,7 +8,10 @@ var events_revision:=-1
 var selected:="m0"
 var actors_layer:Node2D
 var menu:Control
-var command_toggle:Button
+var countdown:OriginalNumber
+var menu_cursor:TextureRect
+var _menu_dismissed:=false
+var _could_choose:=false
 var inspect_panel:Panel
 var hint:Label
 var caption:Label
@@ -35,22 +38,28 @@ func _ready()->void:
 	target_marker=Node2D.new();add_child(target_marker)
 	for i in 4:
 		var part:=Sprite2D.new();part.texture=load("res://assets/ui/select_%d.png"%i);part.position=[Vector2(0,-9),Vector2(0,8),Vector2(-15,0),Vector2(15,0)][i];target_marker.add_child(part)
-	actors_layer=Node2D.new();add_child(actors_layer)
+	actors_layer=Node2D.new();actors_layer.y_sort_enabled=true;add_child(actors_layer)
 	effects=BattleEffects.new();add_child(effects)
 	move_callout=preload("res://scenes/ui/battle_move_callout.tscn").instantiate();add_child(move_callout)
-	caption=OriginalSceneChrome.label(self,"",Rect2(4,3,312,25),12,Color("654518"))
-	hint=OriginalSceneChrome.label(self,"",Rect2(4,286,312,29),11,Color("654518"));hint.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+	caption=OriginalSceneChrome.label(self,"",Rect2(40,42,240,16),10,Color("654518"));caption.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
+	countdown=OriginalNumber.new();countdown.name="Countdown";countdown.color_set="green";countdown.align_right=false;countdown.position=Vector2(147,13);countdown.size=Vector2(25,22);add_child(countdown)
+	hint=OriginalSceneChrome.label(self,"",Rect2(10,349,300,20),10,Color("654518"));hint.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;hint.mouse_filter=Control.MOUSE_FILTER_IGNORE
 	var original_hud:Control=preload("res://scenes/ui/battle_hud.tscn").instantiate()
 	menu=original_hud.get_node("ActionMenu");menu.theme=original_hud.theme;original_hud.remove_child(menu);menu.owner=null
 	for child in menu.find_children("*","",true,false):child.owner=null
-	add_child(menu);original_hud.free();menu.hide()
+	add_child(menu);menu.position=Vector2(117,121);menu.size=Vector2(86,192);menu.z_index=3;menu.hide()
+	auto_button=original_hud.get_node("AutoButton");auto_button.theme=original_hud.theme;original_hud.remove_child(auto_button);auto_button.owner=null;add_child(auto_button)
+	auto_button.position=Vector2(124,374);auto_button.size=Vector2(72,20);auto_button.text="自动战斗";auto_button.z_index=3
+	original_hud.free()
 	var commands:Array=["attack","skill","guard","potion","inspect","flee"]
 	for i in 6:
 		var button:Button=menu.get_node("BattleButtons%d"%i);action_buttons.append(button);button.pressed.connect(_choose.bind(commands[i]))
-	action_buttons[2].text="3 防御";action_buttons[5].text="6 撤退"
-	command_toggle=_compact_button("战斗指令",Vector2(84,350))
-	command_toggle.pressed.connect(func()->void:menu.visible=not menu.visible)
-	auto_button=_compact_button("自动战斗",Vector2(164,350))
+		button.position=Vector2(3,3+i*31);button.size=Vector2(80,30);button.add_theme_font_size_override("font_size",14)
+		button.mouse_entered.connect(_highlight.bind(i))
+		if i>0:
+			var line:=ColorRect.new();line.position=Vector2(3,2+i*31);line.size=Vector2(80,1);line.color=Color(1,0.985,0.85,0.9);line.mouse_filter=Control.MOUSE_FILTER_IGNORE;menu.add_child(line)
+	menu_cursor=TextureRect.new();menu_cursor.texture=preload("res://assets/ui/create_cursor.png");menu_cursor.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;menu_cursor.size=Vector2(13,14);menu_cursor.position.x=78;menu_cursor.mouse_filter=Control.MOUSE_FILTER_IGNORE;menu.add_child(menu_cursor)
+	_highlight(0)
 	auto_button.hide();auto_button.pressed.connect(_toggle_auto)
 	inspect_panel=preload("res://scenes/ui/battle_inspect.tscn").instantiate();add_child(inspect_panel);inspect_panel.size.y=140;inspect_panel.hide()
 	var close:=OriginalSceneChrome.button(inspect_panel,"返回",Rect2(57,112,50,24),12);close.add_theme_color_override("font_color",Color("654518"));close.pressed.connect(inspect_panel.hide)
@@ -58,16 +67,17 @@ func _ready()->void:
 	result=preload("res://scenes/ui/battle_result.tscn").instantiate();add_child(result)
 	result.finished.connect(_dismiss);result.get_node("Return").pressed.connect(_dismiss)
 	model.changed.connect(present)
-func _compact_button(text:String,point:Vector2)->Button:
-	var button:Button=preload("res://scripts/social_chrome.gd").placed_button(self,text,Rect2(point,Vector2(72,22)))
-	button.custom_minimum_size=Vector2.ZERO
-	button.add_theme_font_size_override("font_size",11)
-	for state_name in ["normal","hover","pressed","disabled"]:
-		var style:StyleBox=button.get_theme_stylebox(state_name).duplicate()
-		style.content_margin_top=2;style.content_margin_bottom=2
-		button.add_theme_stylebox_override(state_name,style)
-	button.size=Vector2(72,22)
-	return button
+func _highlight(index:int)->void:
+	menu_cursor.position.y=13+index*31
+	for i in action_buttons.size():
+		action_buttons[i].add_theme_stylebox_override("normal",action_buttons[i].get_theme_stylebox("hover") if i==index else StyleBoxEmpty.new())
+func _open_menu()->void:
+	_menu_dismissed=false;_refresh_controls()
+func _station(index:int,count:int,enemy:bool)->Vector2:
+	# Keep the reference duel pose; larger formations fan out on the same two sides.
+	if count==1:return Vector2(59,246) if enemy else Vector2(265,252)
+	var x:=44.0 if index%2==0 else 82.0
+	return Vector2(x if enemy else 320-x,234-(count-1)*20+index*40)
 func _dismiss()->void:
 	_closed=battle_id;_cancel();hide();dismissed.emit()
 func _cancel()->void:
@@ -83,19 +93,22 @@ func _clear()->void:
 	_cancel()
 	for child in actors_layer.get_children():actors_layer.remove_child(child);child.queue_free()
 	actors={}
-func _actor(id:String,key:String,point:Vector2,enemy:bool)->void:
+func _actor(id:String,key:String,point:Vector2,enemy:bool,level:int,compact:bool)->void:
 	var sprite:=OriginalArt.battle_actor(key);sprite.position=point
 	if enemy:sprite.scale.x=-1
 	actors_layer.add_child(sprite)
-	var nameplate:=OriginalSceneChrome.label(self,"",Rect2(0,0,74,15),10,Color("742a22") if enemy else Color("2f593c"));nameplate.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;nameplate.clip_text=true
+	var nameplate:=OriginalSceneChrome.label(self,"",Rect2(0,0,74,15),10,Color("742a22") if enemy else Color("2f593c"));nameplate.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;nameplate.clip_text=true;nameplate.visible=not compact
 	var hp:=OriginalSceneChrome.progress(self,Rect2(0,0,48,4),Color("d9f13c"))
+	if compact:hp.size.x=35
+	var level_badge:=OriginalSceneChrome.label(self,str(level),Rect2(0,0,11,8),8,Color("fffbdb"));level_badge.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;level_badge.visible=compact;level_badge.mouse_filter=Control.MOUSE_FILTER_IGNORE
+	var level_bg:=StyleBoxFlat.new();level_bg.bg_color=Color("292a17");level_badge.add_theme_stylebox_override("normal",level_bg)
 	var mp:ProgressBar=null
-	if not enemy:mp=OriginalSceneChrome.progress(self,Rect2(0,0,48,3),Color("3bd8ec"))
+	if not enemy:mp=OriginalSceneChrome.progress(self,Rect2(0,0,35 if compact else 48,3),Color("3bd8ec"))
 	var hit:=Button.new();hit.flat=true;hit.size=Vector2(65,65);hit.mouse_default_cursor_shape=Control.CURSOR_POINTING_HAND;add_child(hit)
-	if enemy:hit.pressed.connect(func()->void:selected=id;_refresh_controls();menu.show())
-	else:hit.pressed.connect(func()->void:menu.show())
+	if enemy:hit.pressed.connect(func()->void:selected=id;_open_menu())
+	else:hit.pressed.connect(_open_menu)
 	var info:=OriginalArt.actor_info(key)
-	actors[id]={"base_offset_x":float(info.origin[0])-float(info.get("anchor_x",0)),"sprite":sprite,"key":key,"tag":nameplate,"hp":hp,"mp":mp,"hit":hit,"home":point,"dead":false}
+	actors[id]={"base_offset_x":float(info.origin[0])-float(info.get("anchor_x",0)),"sprite":sprite,"key":key,"tag":nameplate,"level":level_badge,"hp":hp,"mp":mp,"hit":hit,"home":point,"dead":false,"hud_height":maxf(67,-float(info.origin[1])+18) if enemy else 67.0}
 func present()->void:
 	if not is_node_ready():return
 	if model.has_method("presentation_ready") and not model.presentation_ready():return
@@ -106,18 +119,18 @@ func present()->void:
 	if b.outcome!="active" and (b.id==_closed or b.id!=battle_id):return
 	if b.id!=battle_id:
 		for a in actors.values():
-			a.tag.queue_free();a.hp.queue_free();a.hit.queue_free()
+			a.tag.queue_free();a.level.queue_free();a.hp.queue_free();a.hit.queue_free()
 			if a.mp!=null:a.mp.queue_free()
-		_clear();battle_id=b.id;revision=-1;events_revision=int(b.get("events_revision",b.revision));result.reset();selected="m0";menu.hide();inspect_panel.hide();picker.hide()
+		_clear();battle_id=b.id;revision=-1;events_revision=int(b.get("events_revision",b.revision));result.reset();selected="m0";solo_countdown=30.0;auto_elapsed=0.0;_could_choose=false;_menu_dismissed=false;_highlight(0);menu.hide();inspect_panel.hide();picker.hide()
 		for i in b.fighters.size():
 			var f:Dictionary=b.fighters[i]
-			_actor(f.id,ShopRules.actor_key(int(f.job),int(f.gender),f.appearance),Vector2(220+(i%2)*53,96+floori(float(i)/2)*78+(i%2)*30),false)
+			_actor(f.id,ShopRules.actor_key(int(f.job),int(f.gender),f.appearance),_station(i,b.fighters.size(),false),false,int(f.level),b.fighters.size()>1)
 		for i in b.enemies.size():
 			var e:Dictionary=b.enemies[i]
-			_actor(e.slot,e.definition.art,Vector2(44+(i%2)*56,96+floori(float(i)/2)*78+(i%2)*30),true)
+			_actor(e.slot,e.definition.art,_station(i,b.enemies.size(),true),true,int(e.definition.level),b.enemies.size()>1)
 	var packet_events:=int(b.get("events_revision",b.revision))
 	if events_revision!=packet_events:
-		solo_countdown=30.0;auto_elapsed=0.0
+		solo_countdown=30.0;auto_elapsed=0.0;_menu_dismissed=false
 		if revision>=0:
 			# Play already-authoritative events; never compute damage locally.
 			for event in b.events:
@@ -139,6 +152,7 @@ func present()->void:
 func _display(id:String,text:String,hp:int,max_hp:int)->void:
 	if not actors.has(id):return
 	var a:Dictionary=actors[id];a.tag.text=text;a.hp.max_value=max_hp;a.hp.value=hp;a.hp.tooltip_text="%s %d/%d"%[text,hp,max_hp]
+	a.hit.tooltip_text=a.hp.tooltip_text
 	a.dead=hp==0
 func _choose(action:String)->void:
 	if motion!=null or not queue.is_empty() or not _effect_wait.is_empty() or effects.has_reactions() or model.pending() or not model.active():return
@@ -164,40 +178,47 @@ func _refresh_controls()->void:
 	var b:Dictionary=model.battle()
 	if b.is_empty():return
 	var executing:=motion!=null or not queue.is_empty() or not _effect_wait.is_empty() or effects.has_reactions()
-	caption.text=("精英遭遇" if int(b.get("monster_revision",0))==2 else ("单人遭遇" if b.fighters.size()==1 else "队伍战斗"))+" · 第%d回合 · %d名敌人"%[maxi(1,int(b.round)-(1 if executing and (b.has("commands") or b.get("solo",false)) else 0)),b.enemies.size()]
-	if b.has("endless"):caption.text="无尽第%d层 · 第%d回合"%[int(b.endless.stage),maxi(1,int(b.round)-(1 if executing else 0))]
+	caption.text="精英遭遇" if int(b.get("monster_revision",0))==2 else ""
+	if b.has("endless"):caption.text="无尽第%d层"%int(b.endless.stage)
+	caption.visible=not caption.text.is_empty()
 	var left:=maxi(0,ceili((int(b.deadline_ms)-model.server_time-(Time.get_ticks_msec()-model.received_at))/1000.0))
+	if b.get("solo",false):left=ceili(solo_countdown)
 	var message:="等待确认" if model.pending() else ("轮到你行动" if model.my_turn() else "等待队友")
 	if b.has("commands"):
 		var alive:=0
 		for f in b.fighters:
 			if f.hp>0:alive+=1
 		message="已提交 %d/%d · %s"%[b.commands.size(),alive,"请选择指令" if model.my_turn() else ("已锁定，等待队友" if b.commands.has(model.character_id) else "等待指令窗口")]
-		if motion!=null or not queue.is_empty() or not _effect_wait.is_empty() or effects.has_reactions() or model.server_time+Time.get_ticks_msec()-model.received_at<int(b.selection_starts_ms):message="逐个执行中 · 下轮指令共用30秒";left=0
+		if motion!=null or not queue.is_empty() or not _effect_wait.is_empty() or effects.has_reactions() or model.server_time+Time.get_ticks_msec()-model.received_at<int(b.selection_starts_ms):message="行动中";left=0
 	hint.text=message if left==0 and b.has("commands") else "%s · %d秒"%[message,left]
-	if b.get("solo",false):hint.text="逐个行动中" if executing else ("等待确认" if model.pending() else "点击敌人选定目标，再选择指令")
+	if b.get("solo",false):hint.text="逐个行动中" if executing else ("等待确认" if model.pending() else "")
 	if b.get("wounds",{}).has(model.character_id):hint.text+=" · 流血%d回合"%int(b.wounds[model.character_id][0])
 	for i in action_buttons.size():action_buttons[i].disabled=not model.active() or not model.can_submit() or motion!=null or not queue.is_empty() or not _effect_wait.is_empty() or effects.has_reactions() or (not model.my_turn() if i<4 else (not model.party().get("leader",false) if i==5 else false))
-	command_toggle.disabled=not model.active() or model.pending() or motion!=null or not queue.is_empty() or not _effect_wait.is_empty() or effects.has_reactions()
+	hint.visible=not hint.text.is_empty() and not executing
+	var can_choose:bool=model.active() and model.can_submit() and model.my_turn() and not model.pending() and not executing
+	if can_choose and not _could_choose:_menu_dismissed=false
+	_could_choose=can_choose
+	menu.visible=can_choose and not automatic and not _menu_dismissed and not picker.visible and not inspect_panel.visible
+	countdown.visible=model.active() and not executing and left>0
+	countdown.value=str(left);countdown.queue_redraw()
 	auto_button.visible=b.get("solo",false) and model.active()
-	command_toggle.position.x=84 if b.get("solo",false) else 124
 	auto_button.text="手动战斗" if automatic else "自动战斗"
 	auto_button.disabled=model.pending()
 	if not model.active():menu.hide();inspect_panel.hide();picker.hide()
 
 func _toggle_auto()->void:
 	if not model.active() or not model.battle().get("solo",false):return
-	automatic=not automatic;auto_elapsed=0.0;menu.hide();_refresh_controls()
+	automatic=not automatic;auto_elapsed=0.0;_menu_dismissed=false;menu.hide();_refresh_controls()
 
 func _unhandled_key_input(event:InputEvent)->void:
 	if not visible or not event is InputEventKey or not event.pressed or picker.visible:return
 	if event.keycode==KEY_0:_toggle_auto();get_viewport().set_input_as_handled()
 	elif event.keycode>=KEY_1 and event.keycode<=KEY_6:
 		_choose(["attack","skill","guard","potion","inspect","flee"][event.keycode-KEY_1]);get_viewport().set_input_as_handled()
-	elif event.keycode==KEY_ESCAPE:menu.hide();inspect_panel.hide();get_viewport().set_input_as_handled()
+	elif event.keycode==KEY_ESCAPE:_menu_dismissed=true;menu.hide();inspect_panel.hide();get_viewport().set_input_as_handled()
 func _process(delta:float)->void:
 	if not visible:return
-	if model.has_method("connected") and not model.connected():_cancel();hint.text="连接中断，正在恢复战斗……";return
+	if model.has_method("connected") and not model.connected():_cancel();menu.hide();countdown.hide();hint.show();hint.text="连接中断，正在恢复战斗……";return
 	effects.advance_reactions(delta)
 	move_callout.update_anchor()
 	_refresh_actor_anchors()
@@ -247,10 +268,12 @@ func _actor_hud_anchor(a:Dictionary)->Vector2:
 func _refresh_actor_anchors()->void:
 	for a in actors.values():
 		var point:=_actor_hud_anchor(a)
-		a.tag.position=point+Vector2(-a.tag.size.x/2,-67)
-		a.hp.position=point+Vector2(-a.hp.size.x/2,-50)
+		var top:float=a.hud_height
+		a.tag.position=point+Vector2(-a.tag.size.x/2,-top)
+		a.hp.position=point+Vector2(-a.hp.size.x/2,17-top)
+		a.level.position=a.hp.position+Vector2(-12,-1)
 		a.hit.position=point+Vector2(-a.hit.size.x/2,-60)
-		if a.mp!=null:a.mp.position=point+Vector2(-a.mp.size.x/2,-44)
+		if a.mp!=null:a.mp.position=point+Vector2(-a.mp.size.x/2,23-top)
 	if is_instance_valid(target_marker):
 		target_marker.visible=actors.has(selected) and not actors[selected].dead
 		if target_marker.visible:target_marker.position=_actor_hud_anchor(actors[selected])+Vector2(0,4)

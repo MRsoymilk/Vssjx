@@ -76,7 +76,7 @@ func _run() -> void:
 			index += 1
 			await get_tree().create_timer(1.0 / 30.0).timeout
 		check(app.mode == "local_encounter" and app.local_encounter.sources[0].id == enemy.id and int(app.local_encounter.state.round)==1, "Prepared encounter enters exactly the intended battle at round zero")
-		check(ready_seen and app.battle_transition == null and not app.local_encounter_view.menu.visible, "Completion removes loading UI without opening commands or auto-attacking")
+		check(ready_seen and app.battle_transition == null and app.local_encounter_view.menu.visible, "Completion removes loading UI and shows original commands without auto-attacking")
 		for field in resources: check(Game.player[field] == resources[field], "Encounter presentation never spends resources or awards loot")
 		var required: Array[String]=[Game.appearance_key(),String(enemy.art),BattleDeathPlayback.ART_KEY]
 		required.append_array(BattleEffects.preload_keys(int(Game.player.job),int(Game.player.school),int(Game.player.level)))

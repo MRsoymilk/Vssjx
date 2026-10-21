@@ -575,7 +575,7 @@ async fn public_profile(
     online: &HashSet<Uuid>,
 ) -> Result<Value, AuthError> {
     // Allowlist only: never serialize Character or an account/session/inventory row.
-    let row=sqlx::query("SELECT c.id,c.display_name,c.job,c.gender,c.school,c.level,c.allocated_attributes,COALESCE((SELECT jsonb_object_agg(i.definition_id,true) FROM inventory_items i WHERE i.character_id=c.id AND i.equipped),'{}'::jsonb) AS gear,(SELECT jsonb_build_object('id',g.id,'name',g.name,'role',m.role) FROM guild_members m JOIN guilds g ON g.id=m.guild_id WHERE m.character_id=c.id) AS guild FROM characters c JOIN accounts a ON a.id=c.account_id WHERE c.id=$1 AND NOT a.disabled")
+    let row=sqlx::query("SELECT c.id,c.display_name,c.job,c.gender,c.school,c.level,c.balance_revision,c.loot_state,c.allocated_attributes,COALESCE((SELECT jsonb_object_agg(i.definition_id,true) FROM inventory_items i WHERE i.character_id=c.id AND i.equipped),'{}'::jsonb) AS gear,(SELECT jsonb_build_object('id',g.id,'name',g.name,'role',m.role) FROM guild_members m JOIN guilds g ON g.id=m.guild_id WHERE m.character_id=c.id) AS guild FROM characters c JOIN accounts a ON a.id=c.account_id WHERE c.id=$1 AND NOT a.disabled")
         .bind(id).fetch_optional(db).await.map_err(database)?;
     let Some(r) = row else { return Ok(Value::Null) };
     let gear: BTreeMap<String, bool> = r.get::<DbJson<BTreeMap<String, bool>>, _>("gear").0;
@@ -593,11 +593,19 @@ async fn public_profile(
     for k in ["physical_defense", "magic_defense"] {
         stats[k] = json!(stats[k].as_i64().unwrap() + i64::from(defense));
     }
-    let equipped: BTreeMap<_, _> = crate::shop::SLOTS
+    let loot:crate::loot::State=serde_json::from_value(r.get::<DbJson<Value>,_>("loot_state").0).map_err(|_|invalid())?;
+    if !loot.valid(job,r.get("gender")){return Err(invalid());}
+    if r.get::<i16,_>("balance_revision")==1{
+        let mut s=crate::attributes::balanced_stats(job,level,false,allocated);
+        crate::attributes::gear_bonus(&mut s,attack,defense);loot.apply_stats(&mut s,job);
+        stats=crate::attributes::profile_for(s,job,level,allocated)["combat"].clone();
+    }
+    let mut equipped: BTreeMap<String,Option<String>> = crate::shop::SLOTS
         .into_iter()
-        .map(|s| (s, crate::shop::equipped(&gear, s)))
+        .map(|s| (s.into(), crate::shop::equipped(&gear, s).map(str::to_owned)))
         .collect();
+    for i in loot.items.iter().filter(|i|i.equipped&&!i.legacy){equipped.insert(i.slot().into(),Some(i.template.clone()));}
     Ok(
-        json!({"id":id,"display_name":r.get::<String,_>("display_name"),"job":job,"gender":r.get::<i16,_>("gender"),"school":r.get::<i16,_>("school"),"level":level,"online":online.contains(&id),"appearance":crate::shop::appearance(&gear),"combat":stats,"equipment":equipped,"guild":r.get::<Option<DbJson<Value>>,_>("guild").map(|v|v.0)}),
+        json!({"id":id,"display_name":r.get::<String,_>("display_name"),"job":job,"gender":r.get::<i16,_>("gender"),"school":r.get::<i16,_>("school"),"level":level,"online":online.contains(&id),"appearance":loot.look(crate::shop::appearance(&gear)),"combat":stats,"equipment":equipped,"guild":r.get::<Option<DbJson<Value>>,_>("guild").map(|v|v.0)}),
     )
 }

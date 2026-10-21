@@ -390,6 +390,7 @@ impl Battle {
                     _ => 0,
                 };
                 let raw=if balanced{raw*crate::skill_balance::n("pvp_damage_bp")/10000}else{raw};
+                let raw=crate::attributes::extra_reduction(raw,enemy.stats);
                 let incoming = if enemy.guarding { raw / 2 } else { raw };
                 (damage, reflected) = if incoming > 0 {
                     enemy
@@ -440,8 +441,8 @@ impl Battle {
             for (i,f) in self.fighters.iter_mut().enumerate(){
                 if crate::skill_balance::revised(f.stats){let before=f.hp;dots[i]=f.effects.end_balance_round(&mut f.hp,f.stats.hp)*crate::skill_balance::n("pvp_damage_bp")/10000;f.hp=before+(f.hp-before)*crate::skill_balance::n("pvp_heal_bp")/10000;f.effects.tick_balance();}
             }
-            self.fighters[0].hp=(self.fighters[0].hp-dots[1]).max(0);
-            self.fighters[1].hp=(self.fighters[1].hp-dots[0]).max(0);
+            self.fighters[0].hp=(self.fighters[0].hp-crate::attributes::extra_reduction(dots[1],self.fighters[0].stats)).max(0);
+            self.fighters[1].hp=(self.fighters[1].hp-crate::attributes::extra_reduction(dots[0],self.fighters[1].stats)).max(0);
             for f in &mut self.fighters {
                 if f.effects.balance.is_none()&&f.effects.regen > 0 {
                     let heal = f.effects.regen_amount.min(f.stats.hp - f.hp);

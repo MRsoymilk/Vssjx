@@ -38,6 +38,9 @@ func active() -> bool:
 func is_soul() -> bool:
 	return state.get("character",{}).get("corpse") is Dictionary
 
+func appearance()->Array:
+	return state.loot.appearance.duplicate() if state.has("loot") else (ShopRules.appearance(state.shop) if state.has("shop") else [1,0,0])
+
 static func integer(value: Variant, low: int, high: int) -> bool:
 	return (value is int or value is float) and is_finite(float(value)) and float(value) == floor(float(value)) and value >= low and value <= high
 
@@ -62,6 +65,10 @@ func valid(value: Variant) -> bool:
 	if value.has("shop"):
 		if not ShopRules.valid_gear(value.shop): return false
 		if value.shop.version=="shop-v2" and value.shop.get("catalog_sha256")!=ShopRules.catalog_hash: return false
+	if value.has("loot"):
+		if not value.has("shop") or not LootRules.valid_view(value.loot,value.shop,int(value.character.job),int(value.character.gender)):return false
+		for i in value.loot.state.items:
+			if i.equipped and int(i.level)>int(value.character.level):return false
 	if value.has("equipment"):
 		var gear: Variant = value.equipment
 		if not gear is Dictionary or gear.get("version") != "equipment-v1" or not gear.get("weapon_owned") is bool: return false
@@ -128,6 +135,8 @@ func receive(packet: Dictionary) -> bool:
 		var previous_shop: Dictionary = state.get("shop", {})
 		var previous_skills:Dictionary=state.get("skills",{})
 		var previous_ai: Dictionary = state.get("ai_world", {})
+		var previous_loot:Dictionary=state.get("loot",{})
+		var keep_loot:bool=state.has("loot") and not packet.state.has("loot") and packet.state.character.state_revision==state.character.state_revision
 		var keep_ai: bool = state.has("ai_world") and not packet.state.has("ai_world") and packet.state.character.state_revision==state.character.state_revision
 		var keep_skills:bool=state.has("skills") and not packet.state.has("skills") and packet.state.character.state_revision==state.character.state_revision
 		var keep_shop: bool = state.has("shop") and not packet.state.has("shop") and packet.state.character.state_revision == state.character.state_revision
@@ -137,6 +146,7 @@ func receive(packet: Dictionary) -> bool:
 		var previous_time: int = int(state.get("server_time_ms", 0))
 		state = packet.state.duplicate(true)
 		if keep_ai: state.ai_world = previous_ai.duplicate(true)
+		if keep_loot:state.loot=previous_loot.duplicate(true)
 		if keep_skills:state.skills=previous_skills.duplicate(true)
 		if keep_shop: state.shop = previous_shop.duplicate(true)
 		if keep_equipment: state.equipment = previous_equipment.duplicate(true)
@@ -152,6 +162,7 @@ func receive(packet: Dictionary) -> bool:
 			state.attributes.recommended = normalized_points(state.attributes.recommended)
 		var character: Dictionary = state.character.duplicate(true)
 		if state.has("shop"): character.appearance_v2 = ShopRules.appearance(state.shop)
+		if state.has("loot"):character.appearance_v2=state.loot.appearance.duplicate()
 		var found := false
 		for i in OnlineAccount.characters.size():
 			if OnlineAccount.characters[i].id == character.id:
@@ -190,6 +201,10 @@ func submit(action: String, target: String = "", points: Array = [], count: int=
 	if is_soul() and action!="revive":return false
 	if action=="revive" and (not is_soul() or target!=state.character.corpse.id):return false
 	if action=="school_join" and (active() or int(state.character.school)!=SchoolRules.UNJOINED or SchoolRules.index(target)<0):return false
+	if action in ["gear_equip","gear_unequip","gear_claim"]:
+		if active() or not state.has("loot") or not uuid(target) or count!=1 or not points.is_empty():return false
+		var source:Array=state.loot.state.pending if action=="gear_claim" else state.loot.state.items
+		if not source.any(func(i:Dictionary)->bool:return i.id==target):return false
 	if action=="skill" and not target.is_empty():
 		if not active() or not state.has("skills") or not target in state.skills.available:return false
 		if not SkillRules.check(target,int(state.character.job),int(state.character.school),int(state.character.level)).is_empty():return false
@@ -221,7 +236,7 @@ func submit(action: String, target: String = "", points: Array = [], count: int=
 	elif action=="respec":
 		if active() or not state.character.get("balance_respec_available",false):return false
 		command.expected_revision=state.character.state_revision
-	elif action in ["buy", "equip", "unequip", "use", "discard","school_join","revive"]:
+	elif action in ["buy", "equip", "unequip", "use", "discard","school_join","revive","gear_equip","gear_unequip","gear_claim"]:
 		command.target = target
 		if count!=1: command.quantity=count
 		command.expected_revision = state.character.state_revision
@@ -256,6 +271,8 @@ func quest_text() -> String:
 	return "古剑遗迹 · 已完成\n妖气已散，可返回青云山道恢复元气，或继续探索遗迹。"
 
 static func error_text(code: String) -> String:
+	var loot:={"INSTANCE_NOT_OWNED":"没有这件装备实例，请重新同步。","EQUIPMENT_LEVEL_REQUIRED":"等级不足，暂时不能装备。","NOT_EQUIPPED":"这件装备尚未穿戴。","INVALID_LOOT_COMMAND":"无效的装备操作。"}
+	if loot.has(code):return loot[code]
 	if code=="NO_ALLOCATED_ATTRIBUTES": return "尚未分配属性点，无需使用重生再造丹；道具未消耗。"
 	if code=="CLIENT_UPDATE_REQUIRED":return "连续挑战已触发精英，请更新客户端后继续。"
 	if code=="SKILL_COOLDOWN":return "技能尚在冷却，请选择其他指令。"

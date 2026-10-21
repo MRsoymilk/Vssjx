@@ -112,7 +112,7 @@ static func cast(skill:Dictionary,state:Dictionary,stats:Dictionary,hp:int,mp:in
 	match String(skill.effect):
 		"bleed","poison":
 			state["enemy_"+skill.effect]=int(SkillBalance.rules.dot_ticks) if revised else duration
-			state[skill.effect+"_damage"]=CharacterAttributeRules.direct_damage(stats,enemy_defense,int(SkillBalance.rules.dot_tick_bp)) if revised else maxi(1,int(stats.attack)*value/100)
+			state[skill.effect+"_damage"]=CharacterAttributeRules.dot_damage(stats,enemy_defense,int(SkillBalance.rules.dot_tick_bp)) if revised else maxi(1,int(stats.attack)*value/100)
 		"sleep","silence":
 			if roll<(int(SkillBalance.rules.control_chance) if revised else int(skill.chance)) and int(state.get("balance",{}).get("control_protection",0))==0:
 				state["enemy_"+skill.effect]=int(SkillBalance.rules.control_duration) if revised else duration

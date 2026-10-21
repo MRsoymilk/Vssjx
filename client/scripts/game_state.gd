@@ -156,6 +156,7 @@ func new_player(nickname: String, job: int, school: int, gender: int = 0) -> voi
 	restore()
 	player.weapon_owned = true
 	player.bag_order = ["potion", "sword"]
+	LootRules.sync_legacy(player)
 
 func bag_items() -> Array[Dictionary]:
 	var items: Array[Dictionary] = []
@@ -180,15 +181,16 @@ func bag_items() -> Array[Dictionary]:
 			var entry := ShopRules.bag_item(id,int(player.job))
 			entry.count=ShopRules.quantity(gear,id)
 			items.append(entry)
+	for i in player.get("loot_state",{}).get("items",[]):
+		if not i.legacy and not i.equipped:items.append(LootRules.bag_item(i))
 	return items
 
 func bag_buy_potion() -> bool:
 	if is_soul():return false
 	if int(player.gold) < 8: return false
-	# An unequipped sword also occupies one of the sixty inventory slots.
 	var gear := ShopRules.local_state(player)
-	var gear_slots: int = gear.owned.filter(func(id: String) -> bool: return gear.weapon != id and gear.armor != id).size()
-	if int(player.potions) >= (60 - gear_slots) * 99: return false
+	var used:=ShopRules.bag_slots(gear,int(player.potions))+LootRules.extra_bag(player.get("loot_state",{}))
+	if int(player.potions)%99==0 and used>=60:return false
 	player.gold = int(player.gold) - 8
 	player.potions = int(player.potions) + 1
 	return true
@@ -201,6 +203,7 @@ func stats() -> Dictionary:
 	var value: Dictionary = ATTRIBUTE_RULES.balanced_stats(int(player.get("job",1)),int(player.get("level",1)),bool(player.get("equipped",false)),allocated_attributes()) if player.get("balance_revision",0)==1 else ATTRIBUTE_RULES.stats(int(player.get("job",1)),int(player.get("level",1)),bool(player.get("equipped",false)),allocated_attributes())
 	var gear_bonus := ShopRules.bonus(ShopRules.local_state(player))
 	ATTRIBUTE_RULES.gear_bonus(value,gear_bonus.x-(5 if player.get("equipped",false) else 0),gear_bonus.y)
+	LootRules.apply_stats(player.get("loot_state",{}),value,int(player.get("job",1)))
 	return value
 
 func allocated_attributes() -> Array:
@@ -217,7 +220,7 @@ func attribute_profile() -> Dictionary:
 	return value
 
 func appearance_key() -> String:
-	return ShopRules.actor_key(int(player.get("job",0)),int(player.get("gender",0)),ShopRules.appearance(ShopRules.local_state(player)))
+	return ShopRules.actor_key(int(player.get("job",0)),int(player.get("gender",0)),LootRules.look(player.get("loot_state",{}),ShopRules.appearance(ShopRules.local_state(player))))
 
 func shop_command(action: String, id: String, count: int=1) -> PlatformResult:
 	if is_soul():return PlatformResult.new(PlatformResult.Status.INVALID_DATA,"SOUL_STATE",OnlinePve.error_text("SOUL_STATE"))
@@ -227,9 +230,33 @@ func shop_command(action: String, id: String, count: int=1) -> PlatformResult:
 	var path := save_path
 	var code := ShopRules.apply_local(player,action,id,count,stats())
 	if not code.is_empty(): return PlatformResult.new(PlatformResult.Status.INVALID_DATA,code,OnlinePve.error_text(code))
+	if action=="equip":
+		for i in player.get("loot_state",{}).get("items",[]):
+			if ShopRules.item(i.template).slot==ShopRules.item(id).slot:i.equipped=false
+	LootRules.sync_legacy(player)
+	var limits:=stats();player.hp=mini(int(player.hp),int(limits.hp));player.mp=mini(int(player.mp),int(limits.mp))
 	var result := await save_game()
 	if not result.ok and generation == _player_generation and path == save_path: player = before
 	return result
+
+func loot_command(action:String,id:String)->PlatformResult:
+	if storage_busy or _local_roster_busy:return PlatformResult.new(PlatformResult.Status.TEMPORARY_FAILURE,"STORAGE_BUSY","正在保存，请稍候")
+	if player.is_empty():return PlatformResult.new(PlatformResult.Status.INVALID_DATA,"EMPTY_PLAYER","没有离线角色")
+	var before:=player.duplicate(true);var generation:=_player_generation;var path:=save_path
+	var code:=LootRules.apply_local(player,action,id)
+	if not code.is_empty():
+		player=before
+		return PlatformResult.new(PlatformResult.Status.INVALID_DATA,code,OnlinePve.error_text(code))
+	var limits:=stats();player.hp=mini(int(player.hp),int(limits.hp));player.mp=mini(int(player.mp),int(limits.mp))
+	var result:=await save_game()
+	if not result.ok and generation==_player_generation and path==save_path:player=before
+	return result
+
+func _migrate_loot(data:Dictionary)->void:
+	LootRules.sync_legacy(data)
+	for entry in data.get("local_characters",{}).get("characters",[]):
+		if entry.id==data.local_characters.active_id:entry.data.loot_state=data.loot_state.duplicate(true)
+		else:LootRules.sync_legacy(entry.data)
 
 
 func allocate_attributes(points: Array) -> PlatformResult:
@@ -349,6 +376,10 @@ func set_local_test_level(level: int) -> PlatformResult:
 	if player.is_empty() or level < 1 or level > 60:
 		return PlatformResult.new(PlatformResult.Status.INVALID_DATA,"INVALID_TEST_LEVEL","本地测试等级范围为1～60。")
 	var before := player.duplicate(true)
+	var high:Array=player.get("loot_state",{}).get("items",[]).filter(func(i:Dictionary)->bool:return i.equipped and int(i.level)>level)
+	if ShopRules.bag_slots(ShopRules.local_state(player),int(player.potions))+LootRules.extra_bag(player.get("loot_state",{}))+high.size()>60:
+		return PlatformResult.new(PlatformResult.Status.INVALID_DATA,"BAG_FULL","降级需先卸下高物等装备，请清理背包后重试。")
+	for i in high:i.equipped=false
 	var generation := _player_generation
 	var path := save_path
 	player.level = level
@@ -480,6 +511,7 @@ func save_game() -> PlatformResult:
 	if player.is_empty():
 		return _finish_storage(PlatformResult.new(PlatformResult.Status.INVALID_DATA, "EMPTY_PLAYER", "没有可保存的离线角色。"), generation)
 	# Serialize now: delayed IO must not observe subsequent dictionary mutations.
+	LootRules.sync_legacy(player)
 	var payload := _save_payload()
 	var result := await _await_storage(Platform.context.storage.write(_operation_path, JSON.stringify(payload, "\t")))
 	if result.ok:
@@ -519,6 +551,14 @@ func load_game() -> PlatformResult:
 		return _finish_storage(_invalid_save(), generation)
 	_migrate_school_membership(data)
 	_migrate_balance(data)
+	var loot_migration:bool=not data.has("loot_state") or data.get("local_characters",{}).get("characters",[]).any(func(e:Dictionary)->bool:return not e.data.has("loot_state"))
+	if loot_migration:
+		_migrate_loot(data)
+		var migrated:=await _await_storage(Platform.context.storage.write(_operation_path,JSON.stringify(data,"\t")))
+		if not migrated.ok:return _finish_storage(migrated,generation)
+		if not migrated.value is Dictionary or migrated.value.get("written")!=true or migrated.value.get("durability") not in ["native_file","browser_sync"]:
+			return _finish_storage(PlatformResult.new(PlatformResult.Status.TEMPORARY_FAILURE,"SAVE_UNCONFIRMED","装备迁移尚未确认保存，请重试。"),generation)
+		if generation!=_player_generation or epoch!=_load_epoch or _operation_path!=save_path:return _finish_storage(PlatformResult.new(PlatformResult.Status.CANCELLED,"STALE_LOAD","角色已切换。"),generation)
 	player = data
 	last_save_receipt = {}
 	if not player.has("gender"): player.gender = 0
@@ -592,6 +632,10 @@ func valid_save(data: Variant) -> bool:
 	if int(data.quest) > 4 or int(data.kills) > 3: return false
 	if int(data.level) < 1 or int(data.level) > 60: return false
 	if not ATTRIBUTE_RULES.valid_points(data.get("allocated_attributes",[0,0,0,0,0]),int(data.level)): return false
+	if data.has("loot_state"):
+		if not LootRules.valid(data.loot_state,int(data.job),int(gender)) or not LootRules.consistent(data.loot_state,local_gear,int(data.job),int(gender)):return false
+		for i in data.loot_state.items:
+			if i.equipped and int(i.level)>int(data.level):return false
 	if not data.cell is Array or data.cell.size() != 2: return false
 	for value in data.cell:
 		if not (value is float or value is int) or not is_finite(float(value)): return false

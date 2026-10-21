@@ -23,6 +23,7 @@ var armor_icon: TextureRect
 var slot_icons: Dictionary = {}
 var slot_levels: Dictionary = {}
 var items: Array[Dictionary] = []
+var loot_panel:Control
 @onready var description: Label = $Description
 @onready var tooltip: Panel = $Tooltip
 @onready var tooltip_label: Label = $Tooltip/TooltipLabel
@@ -85,6 +86,23 @@ func _display_player() -> Dictionary:
 func _display_stats() -> Dictionary:
 	return Game.stats() if online_model == null else online_model.state.get("stats", {"hp": 1, "mp": 1})
 
+func _loot()->Dictionary:
+	return Game.player.get("loot_state",{}) if online_model==null else online_model.state.get("loot",{}).get("state",{})
+
+func _slot_item(slot:String)->Dictionary:
+	var instance:=LootRules.equipped(_loot(),slot)
+	if not instance.is_empty() and not instance.legacy:return LootRules.bag_item(instance)
+	var id:Variant=ShopRules.equipped_id(_gear(),slot)
+	return {} if id==null else ShopRules.bag_item(id,int(_display_player().job))
+
+func open_loot()->void:
+	if is_instance_valid(loot_panel):return
+	close_menu();tooltip.hide()
+	loot_panel=load("res://scripts/loot_panel.gd").new();loot_panel.online_model=online_model
+	add_child(loot_panel);set_process_unhandled_key_input(false)
+	loot_panel.changed.connect(func()->void:refresh();changed.emit())
+	loot_panel.back_requested.connect(func()->void:loot_panel.queue_free();loot_panel=null;set_process_unhandled_key_input(true);refresh())
+
 func _display_items() -> Array[Dictionary]:
 	if online_model == null: return Game.bag_items()
 	var player := _display_player()
@@ -102,6 +120,8 @@ func _display_items() -> Array[Dictionary]:
 			var entry := ShopRules.bag_item(id,int(player.job))
 			entry.count=ShopRules.quantity(gear,id)
 			result.append(entry)
+	for i in _loot().get("items",[]):
+		if not i.legacy and not i.equipped:result.append(LootRules.bag_item(i))
 	if _online_sorted: result.reverse()
 	return result
 
@@ -131,16 +151,16 @@ func refresh() -> void:
 	mp_bar.max_value = values.mp
 	mp_bar.value = int(player.mp)
 	var gear := _gear()
-	OriginalArt.apply_appearance(preview,ShopRules.actor_key(int(player.job),int(player.get("gender",0)),ShopRules.appearance(gear)))
-	if gear.get("weapon") != null: equipment_icon.texture = load(ShopRules.bag_item(gear.weapon,int(player.job)).icon)
+	OriginalArt.apply_appearance(preview,ShopRules.actor_key(int(player.job),int(player.get("gender",0)),LootRules.look(_loot(),ShopRules.appearance(gear))))
+	var weapon:=_slot_item("weapon")
+	if not weapon.is_empty():equipment_icon.texture=load(weapon.icon)
 	for slot in slot_icons:
-		var id: Variant = ShopRules.equipped_id(gear,slot)
-		slot_icons[slot].visible=id!=null
-		slot_levels[slot].visible=id!=null
-		if id!=null: slot_icons[slot].texture=load(ShopRules.bag_item(id,int(player.job)).icon)
-	equipment_icon.visible = bool(player.equipped)
-	equipment_level.visible = bool(player.equipped)
-	if ShopRules.equipped_id(gear,selected_slot) == null: selected_equipment = false
+		var entry:=_slot_item(slot)
+		slot_icons[slot].visible=not entry.is_empty();slot_levels[slot].visible=not entry.is_empty()
+		if not entry.is_empty():slot_icons[slot].texture=load(entry.icon);slot_levels[slot].value=str(int(entry.get("level",1)));slot_levels[slot].queue_redraw()
+	equipment_icon.visible=not weapon.is_empty();equipment_level.visible=not weapon.is_empty()
+	equipment_level.value=str(int(weapon.get("level",1)));equipment_level.queue_redraw()
+	if _slot_item(selected_slot).is_empty(): selected_equipment = false
 	scrollbar.max_value = maxi(60, items.size())
 	_render_grid()
 	_description()
@@ -201,7 +221,7 @@ func select_item(index: int, hover: bool = false) -> void:
 func _select_equipment(index: int) -> void:
 	if index<0 or index>=10: return
 	selected_slot=ShopRules.SLOTS[index]
-	if ShopRules.equipped_id(_gear(),selected_slot)==null: return
+	if _slot_item(selected_slot).is_empty(): return
 	selected_equipment = true
 	cursor.hide()
 	tooltip.hide()
@@ -209,8 +229,7 @@ func _select_equipment(index: int) -> void:
 	open_menu()
 
 func _selected() -> Dictionary:
-	if selected_equipment and ShopRules.equipped_id(_gear(),selected_slot)!=null:
-		return ShopRules.bag_item(ShopRules.equipped_id(_gear(),selected_slot),int(_display_player().job))
+	if selected_equipment and not _slot_item(selected_slot).is_empty():return _slot_item(selected_slot)
 	if selected_index >= 0 and selected_index < items.size(): return items[selected_index]
 	return {}
 
@@ -230,7 +249,8 @@ func open_menu() -> void:
 		if item.slot=="consumable":
 			if online_model==null or online_model.state.get("shop",{}).get("version")=="shop-v2": actions.append({"name":"使用","call":use_item})
 		elif ShopRules.is_equipment(item): actions.append({"name":"卸下" if selected_equipment else "装备","call":equip_item})
-		if online_model==null or online_model.state.get("shop",{}).get("version")=="shop-v2": actions.append({"name":"丢弃","call":confirm_discard})
+		if not item.has("instance_id") and (online_model==null or online_model.state.get("shop",{}).get("version")=="shop-v2"): actions.append({"name":"丢弃","call":confirm_discard})
+	actions.append({"name":"装备实例","call":open_loot})
 	actions.append({"name": "整理背包", "call": sort_items})
 	if online_model == null: actions.append({"name": "购药 · 8 铜钱", "call": buy_potion})
 	for i in actions.size():
@@ -257,7 +277,7 @@ func show_item() -> void:
 	var item := _selected()
 	if item.is_empty(): return
 	tooltip.position = Vector2(61, 284)
-	tooltip_label.text = "%s  等级：1\n%s" % [item.name, ShopRules.description(item.id)]
+	tooltip_label.text=LootRules.describe(item.instance) if item.has("instance_id") else "%s  等级：1\n%s" % [item.name, ShopRules.description(item.id)]
 	tooltip.show()
 	move_child(tooltip, get_child_count() - 1)
 
@@ -300,11 +320,13 @@ func equip_item() -> void:
 	var item := _selected()
 	if item.is_empty() or not ShopRules.is_equipment(item): return
 	var action := "unequip" if selected_equipment else "equip"
+	if item.has("instance_id"):action="gear_"+action
+	var target:String=item.get("instance_id",item.id)
 	if online_model != null:
-		online_model.submit(action,item.id)
+		online_model.submit(action,target)
 		return
 	if Game.storage_busy: return
-	var result := await Game.shop_command(action,item.id)
+	var result:PlatformResult=await Game.loot_command(action,target) if item.has("instance_id") else await Game.shop_command(action,target)
 	if not is_inside_tree(): return
 	close_menu()
 	selected_equipment = false
@@ -337,6 +359,7 @@ func confirm_discard() -> void:
 	if online_model!=null and online_model.state.get("shop",{}).get("version")!="shop-v2": return
 	var item := _selected().duplicate()
 	if item.is_empty(): return
+	if item.has("instance_id"):open_loot();return
 	close_menu()
 	item_menu=_box(Rect2(65,264,191,89),Color("fff2af"),Color("765322"),1)
 	item_menu.mouse_filter=Control.MOUSE_FILTER_STOP

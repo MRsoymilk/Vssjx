@@ -63,7 +63,7 @@ func start(opponents:Array,elite:bool=false)->void:
 	if elite:
 		enemies[0].definition=MonsterCombat.empower(enemies[0].definition,1);enemies[0].hp=enemies[0].definition.hp
 		enemies[0].elite={"party_size":1,"revives_left":MonsterCombat.elite_n(1,"revives")}
-	var f:Dictionary={"id":character_id,"name":Game.player.name,"job":Game.player.job,"gender":Game.player.gender,"school":Game.player.school,"level":Game.player.level,"appearance":ShopRules.appearance(ShopRules.local_state(Game.player)),"stats":engine.frozen_stats,"hp":engine.hp,"mp":engine.mp,"potions":engine.potions,"effects":engine.skills}
+	var f:Dictionary={"id":character_id,"name":Game.player.name,"job":Game.player.job,"gender":Game.player.gender,"school":Game.player.school,"level":Game.player.level,"appearance":LootRules.look(Game.player.get("loot_state",{}),ShopRules.appearance(ShopRules.local_state(Game.player))),"stats":engine.frozen_stats,"hp":engine.hp,"mp":engine.mp,"potions":engine.potions,"effects":engine.skills}
 	state={"id":"local-%d"%Time.get_ticks_usec(),"solo":true,"fighters":[f],"enemies":enemies,"turn":0,"round":1,"revision":0,"events_revision":0,"deadline_ms":0,"outcome":"active","events":[],"lines":[],"wounds":{},"monster_revision":2 if elite else 1}
 	if elite:state.lines.append("同图同种怪连续挑战达到5场，精英现身！警惕连击、暴击、流血与妖躯复生。")
 	_sync()

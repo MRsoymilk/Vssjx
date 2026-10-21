@@ -150,7 +150,7 @@ static func apply_local(player: Dictionary, action: String, id: String, count: i
 		if is_equipment(entry) and gear.owned.has(id): return "ITEM_ALREADY_OWNED"
 		if quantity(gear,id)+count>99: return "BAG_FULL"
 		if int(player.gold)<int(entry.price)*count: return "GOLD_INSUFFICIENT"
-		if quantity(gear,id)==0 and bag_slots(gear,int(player.potions))>=60: return "BAG_FULL"
+		if quantity(gear,id)==0 and bag_slots(gear,int(player.potions))+LootRules.extra_bag(player.get("loot_state",{}))>=60: return "BAG_FULL"
 		player.gold=int(player.gold)-int(entry.price)*count
 		if id=="potion": player.potions=int(player.potions)+count
 		else:
@@ -184,7 +184,7 @@ static func apply_local(player: Dictionary, action: String, id: String, count: i
 		if not restriction.is_empty(): return restriction
 	var on: bool = action=="equip"
 	if (gear.slots[entry.slot]==id)==on: return "EQUIPMENT_UNCHANGED"
-	if not on and bag_slots(gear,int(player.potions))>=60: return "BAG_FULL"
+	if not on and bag_slots(gear,int(player.potions))+LootRules.extra_bag(player.get("loot_state",{}))>=60: return "BAG_FULL"
 	gear.slots[entry.slot]=id if on else null
 	_store(player,gear)
 	return ""

@@ -58,6 +58,8 @@ static func balanced_stats(job:int,level:int,equipped:bool,a:Array)->Dictionary:
 	var p:Dictionary=CombatBalance.profile(job,level,a).value
 	var result:Dictionary={"hp":p.hp,"mp":p.mp,"attack":p.magic_attack if job==2 else p.physical_attack,"defense":p.physical_defense,"attributes":a.duplicate(),
 		"balance":{"skills_revision":1,"level":level,"physical_attack":p.physical_attack,"magic_attack":p.magic_attack,"physical_defense":p.physical_defense,"magic_defense":p.magic_defense,"ratings":[int(a[3]),int(a[4])]}}
+	for key in ["crit_bonus","hit_bonus","evade_bonus"]:result.balance[key]=[0,0]
+	for key in ["crit_damage_bp","increased_bp","dot_bp","penetration_bp","reduction_bp"]:result.balance[key]=0
 	if equipped:gear_bonus(result,5,0)
 	return result
 
@@ -70,6 +72,13 @@ static func valid_balance(stats:Dictionary)->bool:
 		if not OnlinePve.integer(rating,0,1000000):return false
 	for key in ["physical_attack","magic_attack","physical_defense","magic_defense"]:
 		if not OnlinePve.integer(b.get(key),0,1000000):return false
+	for key in ["crit_bonus","hit_bonus","evade_bonus"]:
+		var ratings:Variant=b.get(key,[0,0])
+		if not ratings is Array or ratings.size()!=2:return false
+		for n in ratings:
+			if not OnlinePve.integer(n,0,1000000):return false
+	for key in ["crit_damage_bp","increased_bp","dot_bp","penetration_bp","reduction_bp"]:
+		if not OnlinePve.integer(b.get(key,0),0,1000000):return false
 	return b.physical_defense==stats.get("defense")
 
 static func gear_bonus(s:Dictionary,attack:int,defense:int)->void:
@@ -87,15 +96,22 @@ static func profile_for(s:Dictionary,job:int,level:int,a:Array)->Dictionary:
 	p.recommended=recommended
 	for key in ["hp","mp"]:p.combat[key]=s[key]
 	for key in ["physical_attack","magic_attack","physical_defense","magic_defense"]:p.combat[key]=s.balance[key]
+	for i in 2:
+		var prefix:String=["physical_","magic_"][i]
+		var rating:=int(s.balance.ratings[i])
+		p.combat[prefix+"crit"]=rating+int(s.balance.get("crit_bonus",[0,0])[i])
+		p.combat[prefix+"hit"]=rating+int(s.balance.get("hit_bonus",[0,0])[i])
+		p.combat[prefix+"evasion"]=rating+int(s.balance.get("evade_bonus",[0,0])[i])
+	p.combat.damage_reduction=mini(2500,int(s.balance.get("reduction_bp",0)))/100
 	return p
 
 static func direct_damage(s:Dictionary,defense:int,coefficient:int=10000,variance:int=0)->int:
-	if s.has("balance"):return int(CombatBalance.damage({"attack":maxi(0,int(s.attack)+variance),"defense":maxi(0,defense),"level":int(s.balance.level),"coefficient_bp":coefficient}).value.damage)
+	if s.has("balance"):return int(CombatBalance.damage({"attack":maxi(0,int(s.attack)+variance),"defense":maxi(0,defense),"level":int(s.balance.level),"coefficient_bp":coefficient,"increased_bp":int(s.balance.get("increased_bp",0)),"penetration_bp":int(s.balance.get("penetration_bp",0))}).value.damage)
 	return maxi(1,int(s.attack)*coefficient/10000-defense+variance)
 
 static func incoming(attack:int,level:int,defender:Dictionary,magical:bool=false,variance:int=0)->int:
 	if defender.has("balance"):
-		return int(CombatBalance.damage({"attack":maxi(0,attack+variance),"defense":int(defender.balance.magic_defense if magical else defender.balance.physical_defense),"level":clampi(level,1,60)}).value.damage)
+		return int(CombatBalance.damage({"attack":maxi(0,attack+variance),"defense":int(defender.balance.magic_defense if magical else defender.balance.physical_defense),"level":clampi(level,1,60),"extra_reduction_bp":int(defender.balance.get("reduction_bp",0))}).value.damage)
 	return maxi(1,attack-int(defender.defense)+variance)
 
 static func power(values:Dictionary,job:int,magical:bool)->Dictionary:
@@ -110,13 +126,19 @@ static func power(values:Dictionary,job:int,magical:bool)->Dictionary:
 static func hit_chance(attacker:Dictionary,defender:Dictionary,magical:bool=false)->int:
 	if attacker.has("balance") or defender.has("balance"):
 		var a:Dictionary=attacker.get("balance",{});var d:Dictionary=defender.get("balance",{})
-		return int(CombatBalance.hit_chance(int(a.get("level",d.get("level",1))),int(a.get("ratings",[0,0])[1 if magical else 0]),int(d.get("ratings",[0,0])[1 if magical else 0])).value)
+		var index:=1 if magical else 0
+		return int(CombatBalance.hit_chance(int(a.get("level",d.get("level",1))),int(a.get("ratings",[0,0])[index])+int(a.get("hit_bonus",[0,0])[index]),int(d.get("ratings",[0,0])[index])+int(d.get("evade_bonus",[0,0])[index])).value)
 	var i:=4 if magical else 3
 	return clampi(10000+(int(attacker.get("attributes",[0,0,0,0,0])[i])-int(defender.get("attributes",[0,0,0,0,0])[i]))*10,5000,10000)
 
 static func critical_at(values:Dictionary,magical:bool,state:Dictionary,damage:int,roll:int)->int:
 	var rating:=int(values.get("attributes",[0,0,0,0,0])[4 if magical else 3])
 	var buff:=int(state.crit_chance)*100 if int(state.crit)>0 else 0
-	var chance:=int(CombatBalance.critical_chance(int(values.balance.level),int(values.balance.ratings[1 if magical else 0]),buff).value) if values.has("balance") else clampi(rating*10+buff,0,7500)
+	var chance:=int(CombatBalance.critical_chance(int(values.balance.level),int(values.balance.ratings[1 if magical else 0])+int(values.balance.get("crit_bonus",[0,0])[1 if magical else 0]),buff).value) if values.has("balance") else clampi(rating*10+buff,0,7500)
 	state.last_critical=damage>0 and roll<chance
-	return damage*3/2 if state.last_critical else damage
+	return damage*mini(22500,15000+int(values.get("balance",{}).get("crit_damage_bp",0)))/10000 if state.last_critical else damage
+
+static func dot_damage(stats:Dictionary,defense:int,coefficient:int)->int:
+	var s:=stats.duplicate(true)
+	if s.has("balance"):s.balance.increased_bp=int(s.balance.get("increased_bp",0))+int(s.balance.get("dot_bp",0))
+	return direct_damage(s,defense,coefficient)

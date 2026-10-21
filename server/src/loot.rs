@@ -4,7 +4,9 @@ use serde::{Serialize,Deserialize};
 use serde_json::{Value,json};
 use std::{collections::{BTreeMap,BTreeSet},sync::LazyLock};
 use uuid::Uuid;
+use sha2::{Digest,Sha256};
 pub static DATA:LazyLock<Value>=LazyLock::new(||serde_json::from_str(include_str!("../../shared/data/loot-v1.json")).unwrap());
+static HASH:LazyLock<String>=LazyLock::new(||format!("{:x}",Sha256::digest(include_str!("../../shared/data/loot-v1.json").replace("\r\n","\n").as_bytes())));
 fn n(key:&str)->i32{DATA[key].as_i64().unwrap() as i32}
 #[derive(Clone,Debug,Serialize,Deserialize,PartialEq)]
 pub struct Affix{pub kind:String,pub value:i32}
@@ -36,10 +38,12 @@ impl Item{
     pub fn slot(&self)->&str{&self.definition().slot}
     pub fn valid(&self,job:i16,gender:i16)->bool{
         let Some(d)=shop::item(&self.template)else{return false;};
-        if !d.equipment()||d.equip_error(job,gender).is_some()||self.id.get_version_num()!=4||!(1..=60).contains(&self.level)||!(0..=6).contains(&self.upgrade){return false;}
+        if !d.equipment()||d.equip_error(job,gender).is_some()||self.id.get_version_num()!=4||self.id.get_variant()!=uuid::Variant::RFC4122||!(1..=60).contains(&self.level)||!(0..=6).contains(&self.upgrade){return false;}
+        if !matches!(self.quality.as_str(),"legacy"|"white"|"blue"|"yellow"){return false;}
         let Some(count)=DATA["quality_affixes"].get(&self.quality).and_then(Value::as_u64)else{return false;};
         if self.legacy!=(self.quality=="legacy")||self.affixes.len()!=count as usize{return false;}
         if self.legacy&&(self.level!=1||self.upgrade!=0||self.legacy_attack!=d.attack||self.legacy_defense!=d.defense){return false;}
+        if !self.legacy&&(self.legacy_attack!=0||self.legacy_defense!=0){return false;}
         if self.legendary.is_some()||self.set_id.is_some(){return false;} // Activated with the build catalog in stage C.
         if self.reroll_index.is_some_and(|i|i>=self.affixes.len()){return false;}
         if let Some(skin)=&self.skin{if shop::item(skin).is_none_or(|s|s.slot!=d.slot||s.equip_error(job,gender).is_some()){return false;}}
@@ -54,7 +58,7 @@ impl Item{
 }
 pub fn roll(template:&str,level:i32,quality:&str,seed:u32,id:Uuid)->Result<Item,&'static str>{
     let d=shop::item(template).filter(|d|d.equipment()).ok_or("INVALID_EQUIPMENT")?;
-    if !(1..=60).contains(&level)||!matches!(quality,"white"|"blue"|"yellow"){return Err("INVALID_LOOT_QUALITY");}
+    if !(1..=60).contains(&level)||!matches!(quality,"white"|"blue"|"yellow")||id.get_version_num()!=4||id.get_variant()!=uuid::Variant::RFC4122{return Err("INVALID_LOOT_QUALITY");}
     let count=DATA["quality_affixes"][quality].as_u64().unwrap() as usize;
     let mut dice=Dice(seed);let mut pool:Vec<String>=DATA["pools"][&d.slot].as_array().unwrap().iter().map(|v|v.as_str().unwrap().into()).collect();let mut affixes=vec![];
     for _ in 0..count{let kind=pool.remove(dice.next(pool.len()));let (lo,hi)=range(&kind,level).unwrap();let value=lo+dice.next((hi-lo+1) as usize) as i32;affixes.push(Affix{kind,value});}
@@ -64,6 +68,7 @@ impl State{
     pub fn valid(&self,job:i16,gender:i16)->bool{
         if self.version!=1||self.items.len()>90||self.pending.len()>20||!(0..=1000000000).contains(&self.scrap)||!(0..=1000000000).contains(&self.essence)||!(0..=1000000000).contains(&self.kills)||!(0..=1000000000).contains(&self.bosses)||!(1..=3).contains(&self.difficulty){return false;}
         let mut ids=BTreeSet::new();let mut slots=BTreeSet::new();let mut legacy=BTreeSet::new();
+        if self.pending.iter().any(|i|i.legacy||i.equipped){return false;}
         for i in self.items.iter().chain(self.pending.iter()){
             if !i.valid(job,gender)||!ids.insert(i.id)||i.legacy&&!legacy.insert(&i.template){return false;}
             if i.equipped&&(!slots.insert(i.slot())||self.pending.iter().any(|p|p.id==i.id)){return false;}
@@ -91,6 +96,7 @@ impl State{
         let item=self.items.iter().find(|i|i.id==id).cloned().ok_or("INSTANCE_NOT_OWNED")?;
         if item.level>level&&action=="gear_equip"{return Err("EQUIPMENT_LEVEL_REQUIRED");}
         if action=="gear_equip"{
+            if item.equipped{return Err("EQUIPMENT_UNCHANGED");}
             self.empty_slot(item.slot());
             for (key,on) in gear.iter_mut(){if shop::item(key).is_some_and(|d|d.slot==item.slot()){*on=false;}}
             self.items.iter_mut().find(|i|i.id==id).unwrap().equipped=true;
@@ -122,7 +128,7 @@ impl State{
         for i in self.items.iter().filter(|i|i.equipped&&!i.legacy){let d=shop::item(i.skin.as_deref().unwrap_or(&i.template)).unwrap();match i.slot(){"weapon"=>original[0]=d.visual,"armor"=>original[1]=d.visual,"hat"=>original[2]=d.head_visual,_=>()}}
         original
     }
-    pub fn view(&self,original:[i32;3])->Value{json!({"version":"loot-v1","state":self,"appearance":self.look(original)})}
+    pub fn view(&self,original:[i32;3])->Value{json!({"version":"loot-v1","catalog_sha256":*HASH,"state":self,"appearance":self.look(original)})}
     pub fn apply_stats(&self,s:&mut Stats,job:i16){
         let mut hp=0;let mut mp=0;let mut hp_percent=0;
         for i in self.items.iter().filter(|i|i.equipped&&!i.legacy){

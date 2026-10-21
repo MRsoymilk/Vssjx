@@ -101,13 +101,15 @@ pub(crate) async fn list(
     let account = auth.me(auth::bearer(&headers)?).await?;
     // Single query: no mixed-version attributes/inventory snapshot.
     let rows = sqlx::query(&format!(
-        "SELECT {CHARACTER_COLUMNS},COALESCE((SELECT jsonb_object_agg(definition_id,equipped) FROM inventory_items WHERE character_id=characters.id AND definition_id<>'potion'),'{{}}'::jsonb) AS gear FROM characters WHERE account_id=$1 ORDER BY slot,id"
+        "SELECT {CHARACTER_COLUMNS},loot_state,COALESCE((SELECT jsonb_object_agg(definition_id,equipped) FROM inventory_items WHERE character_id=characters.id AND definition_id<>'potion'),'{{}}'::jsonb) AS gear FROM characters WHERE account_id=$1 ORDER BY slot,id"
     )).bind(account.id).fetch_all(auth.pool()).await.map_err(database_error)?;
     let characters: Vec<Value> = rows.iter().map(|row| {
         let character = Character::from_row(row).map_err(database_error)?;
         let gear = row.get::<DbJson<std::collections::BTreeMap<String,bool>>,_>("gear").0;
         let mut value = json!(character);
-        let look=crate::shop::appearance(&gear);
+        let loot:crate::loot::State=serde_json::from_value(row.get::<DbJson<Value>,_>("loot_state").0).map_err(|_|AuthError(StatusCode::SERVICE_UNAVAILABLE,"PVE_STATE_UNAVAILABLE"))?;
+        if !loot.valid(character.job,character.gender){return Err(AuthError(StatusCode::SERVICE_UNAVAILABLE,"PVE_STATE_UNAVAILABLE"));}
+        let look=loot.look(crate::shop::appearance(&gear));
         value["appearance"] = json!([if look[0]<=3{look[0]}else{1},if look[1]<=2{look[1]}else{0}]);
         value["appearance_v2"]=json!(look);
         Ok(value)

@@ -73,7 +73,7 @@ func _render() -> void:
 		if not present: continue
 		var character: Dictionary = characters[index]
 		var keys := ["mzs", "mck", "mfs"] if int(character.get("gender", 0)) == 0 else ["wzs", "wck", "wfs"]
-		var look: Array = character.get("appearance_v2",character.get("appearance",[1,0])) if online_mode else ShopRules.appearance(ShopRules.local_state(character))
+		var look: Array = character.get("appearance_v2",character.get("appearance",[1,0])) if online_mode else LootRules.look(character.get("loot_state",{}),ShopRules.appearance(ShopRules.local_state(character)))
 		var actor := OriginalArt.actor(ShopRules.actor_key(int(character.get("job",0)),int(character.get("gender",0)),look))
 		previews[i].sprite_frames = actor.sprite_frames
 		previews[i].offset = actor.offset

@@ -54,6 +54,13 @@ pub fn incoming(attack:i32,level:i32,defender:Stats,magical:bool,variance:i32)->
     if let Some(b)=defender.balance{crate::combat_balance::damage(&crate::combat_balance::Hit{attack:(attack+variance).max(0) as i64,defense:defense(defender,magical).max(0) as i64,level:level.clamp(1,60) as i64,extra_reduction_bp:b.reduction_bp as i64,..Default::default()}).expect("bounded monster").damage as i32}
     else{(attack-defender.defense+variance).max(1)}
 }
+pub fn dot_damage(mut stats:Stats,defense:i32,coefficient:i32)->i32{
+    if let Some(b)=stats.balance.as_mut(){b.increased_bp+=b.dot_bp;}
+    direct_damage(stats,defense,coefficient,0)
+}
+pub fn extra_reduction(damage:i32,defender:Stats)->i32{
+    (i64::from(damage)*i64::from(10000-defender.balance.map_or(0,|b|b.reduction_bp.clamp(0,2500)))/10000) as i32
+}
 pub const VERSION: &str = "attributes-v1";
 pub fn stats(job: i16, level: i32, equipped: bool, a: [i32; 5]) -> Stats {
     let mut s = pve_rules::stats(job, level, equipped);

@@ -184,11 +184,11 @@ impl State {
         match s.effect.as_str() {
             "bleed" => {
                 self.enemy_bleed = if revised{crate::skill_balance::n("dot_ticks")}else{s.duration};
-                self.bleed_damage = if revised{crate::attributes::direct_damage(stats,enemy_defense,crate::skill_balance::n("dot_tick_bp"),0)}else{(stats.attack * s.value / 100).max(1)};
+                self.bleed_damage = if revised{crate::attributes::dot_damage(stats,enemy_defense,crate::skill_balance::n("dot_tick_bp"))}else{(stats.attack * s.value / 100).max(1)};
             }
             "poison" => {
                 self.enemy_poison = if revised{crate::skill_balance::n("dot_ticks")}else{s.duration};
-                self.poison_damage = if revised{crate::attributes::direct_damage(stats,enemy_defense,crate::skill_balance::n("dot_tick_bp"),0)}else{(stats.attack * s.value / 100).max(1)};
+                self.poison_damage = if revised{crate::attributes::dot_damage(stats,enemy_defense,crate::skill_balance::n("dot_tick_bp"))}else{(stats.attack * s.value / 100).max(1)};
             }
             "sleep" => {
                 if roll < if revised{crate::skill_balance::n("control_chance")}else{s.chance} && self.balance.as_ref().is_none_or(|b|b.control_protection==0) {

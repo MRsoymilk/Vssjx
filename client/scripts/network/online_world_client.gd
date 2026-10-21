@@ -241,7 +241,7 @@ func _process(_delta: float) -> void:
 		if not data is Dictionary:
 			_failed("INVALID_PACKET")
 			return
-		if raw.size() > 32768 and data.get("type") not in ["world.appearance","world.team"]:
+		if not valid_packet_size(data,raw.size()):
 			_failed("INVALID_PACKET"); return
 		_receive(data, raw)
 	# A transfer receipt and the old room's close can arrive in the same poll.
@@ -265,6 +265,15 @@ func _process(_delta: float) -> void:
 	duel.tick()
 	if pve.ready and pve.pending() and now - pve.sent_at > 8.0: _failed("TIMEOUT", true)
 	_flush_motion()
+
+static func valid_packet_size(data:Dictionary,bytes:int)->bool:
+	if bytes<0 or bytes>131072:return false
+	if bytes<=32768 or data.get("type") in ["world.appearance","world.team"]:return true
+	# Full instance inventories exceed the old fixed-item envelope. They retain
+	# the existing hard 128KiB bound and must still pass OnlinePve.valid in _receive.
+	if data.get("type") not in ["pve.state","pve.result"] or not data.get("state") is Dictionary:return false
+	var loot:Variant=data.state.get("loot")
+	return loot is Dictionary and loot.get("version")=="loot-v1"
 
 func _exchange_packet() -> Dictionary:
 	var packet := {"type": "auth.exchange", "ticket": _ticket, "protocol_version": 1, "config_hash": config_hash, "world_sync_version": 2}

@@ -2,9 +2,12 @@ class_name LootRules
 extends RefCounted
 ## Offline and wire validation for character-owned equipment; never invents online loot.
 static var rules:Dictionary=JSON.parse_string(FileAccess.get_file_as_string("res://assets/data/loot-v1.json"))
-static var catalog_hash:String=FileAccess.get_file_as_string("res://assets/data/loot-v1.json").sha256_text()
+static var catalog_hash:String=FileAccess.get_file_as_string("res://assets/data/loot-v1.json").replace("\r\n","\n").sha256_text()
+static var _uuid_pattern:RegEx=RegEx.create_from_string("^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\\z")
 static func uuid()->String:
-	var bytes:=Crypto.new().generate_random_bytes(16);bytes[6]=(bytes[6]&15)|64;bytes[8]=(bytes[8]&63)|128
+	var bytes:=Crypto.new().generate_random_bytes(16)
+	if bytes.size()!=16:return ""
+	bytes[6]=(bytes[6]&15)|64;bytes[8]=(bytes[8]&63)|128
 	var h:=bytes.hex_encode();return "%s-%s-%s-%s-%s"%[h.substr(0,8),h.substr(8,4),h.substr(12,4),h.substr(16,4),h.substr(20,12)]
 static func empty()->Dictionary:return {"version":1,"items":[],"pending":[],"scrap":0,"essence":0,"kills":0,"bosses":0,"difficulty":1,"skins":[]}
 static func bounds(kind:String,level:int)->Vector2i:
@@ -14,8 +17,10 @@ static func _draw(dice:Array,limit:int)->int:
 	return int(dice[0])%limit
 static func roll(template:String,level:int,quality:String,seed:int,id:String="")->Dictionary:
 	var d:=ShopRules.item(template)
-	if not ShopRules.is_equipment(d) or level<1 or level>60 or quality not in ["white","blue","yellow"]:return {}
-	var result:Dictionary={"id":uuid() if id.is_empty() else id,"template":template,"level":level,"quality":quality,"equipped":false,"legacy":false,"affixes":[],"upgrade":0,"reroll_index":null,"legendary":null,"set_id":null,"skin":null,"legacy_attack":0,"legacy_defense":0}
+	if not ShopRules.is_equipment(d) or level<1 or level>60 or quality not in ["white","blue","yellow"] or seed<0 or seed>0xffffffff:return {}
+	if id.is_empty():id=uuid()
+	if _uuid_pattern.search(id)==null:return {}
+	var result:Dictionary={"id":id,"template":template,"level":level,"quality":quality,"equipped":false,"legacy":false,"affixes":[],"upgrade":0,"reroll_index":null,"legendary":null,"set_id":null,"skin":null,"legacy_attack":0,"legacy_defense":0}
 	var dice:=[seed];var pool:Array=rules.pools[d.slot].duplicate()
 	for i in int(rules.quality_affixes[quality]):
 		var kind:String=pool.pop_at(_draw(dice,pool.size()));var r:=bounds(kind,level)
@@ -25,11 +30,12 @@ static func valid_item(i:Variant,job:int,gender:int)->bool:
 	if not i is Dictionary:return false
 	var d:=ShopRules.item(str(i.get("template","")))
 	if not ShopRules.is_equipment(d) or not ShopRules.equipment_error(d,job,gender).is_empty():return false
-	if not i.get("id") is String or RegEx.create_from_string("^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$").search(i.id)==null:return false
-	if not ShopRules._integer(i.get("level"),1,60) or not ShopRules._integer(i.get("upgrade",0),0,6) or not i.get("quality") in rules.quality_affixes:return false
+	if not i.get("id") is String or _uuid_pattern.search(i.id)==null:return false
+	if not ShopRules._integer(i.get("level"),1,60) or not ShopRules._integer(i.get("upgrade",0),0,6) or not i.get("quality") in ["legacy","white","blue","yellow"]:return false
 	if not i.get("equipped") is bool or not i.get("legacy") is bool or i.legacy!=(i.quality=="legacy"):return false
 	if not i.get("affixes") is Array or i.affixes.size()!=int(rules.quality_affixes[i.quality]):return false
 	if i.legacy and (i.level!=1 or i.upgrade!=0 or i.get("legacy_attack")!=d.attack or i.get("legacy_defense")!=d.defense):return false
+	if not i.legacy and (i.get("legacy_attack",0)!=0 or i.get("legacy_defense",0)!=0):return false
 	if i.get("legendary")!=null or i.get("set_id")!=null:return false
 	if i.get("reroll_index")!=null and not ShopRules._integer(i.reroll_index,0,i.affixes.size()-1):return false
 	if i.get("skin")!=null:
@@ -48,6 +54,8 @@ static func valid(s:Variant,job:int,gender:int)->bool:
 		if not ShopRules._integer(s.get(key),0,1000000000):return false
 	if not ShopRules._integer(s.get("difficulty"),1,3) or not s.get("skins") is Array or s.skins.size()>ShopRules.catalog.items.size():return false
 	var ids:={};var slots:={};var legacy:={};var skins:={}
+	for i in s.pending:
+		if not i is Dictionary or i.get("legacy")!=false or i.get("equipped")!=false:return false
 	for i in s.items+s.pending:
 		if not valid_item(i,job,gender) or ids.has(i.id):return false
 		ids[i.id]=true
@@ -70,7 +78,7 @@ static func sync_legacy(player:Dictionary)->void:
 	s.items=s.items.filter(func(i:Dictionary)->bool:return not i.legacy or gear.owned.has(i.template))
 	for id in gear.owned:
 		var d:=ShopRules.item(id)
-		if not ShopRules.is_equipment(d) or not ShopRules.equipment_error(d,int(player.job),int(player.gender)).is_empty():continue
+		if not ShopRules.is_equipment(d) or not ShopRules.equipment_error(d,int(player.job),int(player.get("gender",0))).is_empty():continue
 		if not s.skins.has(id):s.skins.append(id)
 		var found:Dictionary={}
 		for i in s.items:
@@ -139,3 +147,46 @@ static func apply_local(player:Dictionary,action:String,id:String)->String:
 	else:return "INVALID_LOOT_COMMAND"
 	gear.weapon=gear.slots.weapon;gear.armor=gear.slots.armor;ShopRules._store(player,gear)
 	return ""
+
+static func consistent(s:Dictionary,gear:Dictionary,job:int,gender:int)->bool:
+	# Legacy rows mirror fixed ownership; rolled rows never secretly leave an
+	# equipped legacy definition in the same slot (which would double its stats).
+	var imported:={}
+	for i in s.items:
+		var slot:String=ShopRules.item(i.template).slot
+		if i.legacy:
+			if not gear.owned.has(i.template) or i.equipped!=(ShopRules.equipped_id(gear,slot)==i.template):return false
+			imported[i.template]=true
+		elif i.equipped and ShopRules.equipped_id(gear,slot)!=null:return false
+	for id in gear.owned:
+		var d:=ShopRules.item(id)
+		if ShopRules.is_equipment(d) and ShopRules.equipment_error(d,job,gender).is_empty() and not imported.has(id):return false
+	return true
+
+static func valid_view(v:Variant,gear:Dictionary,job:int,gender:int)->bool:
+	if not v is Dictionary or v.get("version")!="loot-v1" or not valid(v.get("state"),job,gender):return false
+	if v.has("catalog_sha256") and v.catalog_sha256!=catalog_hash:return false
+	if not consistent(v.state,gear,job,gender) or not ShopRules.valid_appearance(v.get("appearance")):return false
+	var expected:=look(v.state,ShopRules.appearance(gear))
+	for index in 3:
+		if int(v.appearance[index])!=int(expected[index]):return false
+	return true
+
+static func equipped(s:Dictionary,slot:String)->Dictionary:
+	for i in s.get("items",[]):
+		if i.equipped and ShopRules.item(i.template).slot==slot:return i
+	return {}
+
+static func bag_item(i:Dictionary)->Dictionary:
+	var entry:=ShopRules.bag_item(i.template)
+	entry.instance_id=i.id;entry.instance=i;entry.level=int(i.level);entry.count=1
+	return entry
+
+static func describe(i:Dictionary)->String:
+	var d:=ShopRules.item(i.template);var v:=base(i)
+	var parts:Array[String]=["%s · %s · 物等%d"%[d.name,{"legacy":"原有固定装备","white":"普通","blue":"魔法","yellow":"稀有","orange":"传奇","green":"套装"}.get(i.quality,i.quality),int(i.level)]]
+	parts.append("主攻+%d  双防+%d  气血+%d  灵力+%d"%v)
+	for a in i.affixes:
+		parts.append("%s +%s"%[rules.affix_names[a.kind],("%.2f%%"%(int(a.value)/100.0)) if a.kind in ["hp_percent","crit_damage","penetration","damage","dot","reduction"] else str(int(a.value))])
+	parts.append("编号 "+String(i.id).right(8))
+	return "\n".join(parts)

@@ -216,6 +216,7 @@ func _test_inventory_and_battle() -> void:
 	app._close_modal()
 	Game.player.quest = 1
 	var duel := ShushanBattle.new(ShushanWorld.ENEMIES[0])
+	duel.rng.seed=1 # Legal deterministic hit; random dodge is covered separately.
 	duel.enemy_hp = 1
 	duel.action("attack")
 	var results: Array = []
@@ -234,8 +235,9 @@ func _test_inventory_and_battle() -> void:
 	awarded_stats.erase("local_characters")
 	check(results[0].ok and confirmed == awarded_stats, "Retrying persistence updates roster bookkeeping without rerunning gameplay settlement")
 	Game.player.quest = 2
+	app.world.cell=Vector2i(10,13);Game.player.cell=[10,13]
 	app._npc()
-	var reward := _button(app.modal, "领取奖励")
+	var reward:Button=app.modal.quest_button
 	var before_reward := int(Game.player.gold)
 	reward.pressed.emit()
 	reward.pressed.emit()
@@ -252,10 +254,15 @@ func _test_inventory_and_battle() -> void:
 	app._close_modal()
 	Game.player.quest = 3
 	app._world_interaction("portal", {})
+	await get_tree().process_frame # Current travel presents its cover before starting IO.
+	if DisplayServer.get_name()!="headless":await RenderingServer.frame_post_draw
 	var target: Array = JSON.parse_string(storage.operations[0].text).cell
 	check(int(target[0]) == 5 and int(target[1]) == 16, "Pausing input must not overwrite the destination cell during a portal save")
 	storage.complete(receipt())
 	check(Game.player.zone == 1 and app.world.cell == Vector2i(5, 16), "Confirmed delayed portal change reaches the correct destination")
+	await get_tree().process_frame
+	if app.map_transition.blocking:await app.map_transition.finished
+	await get_tree().process_frame # Leave the transition's signal stack before the close fixture frees its owner.
 
 func _test_close() -> void:
 	app._save_feedback()

@@ -844,7 +844,7 @@ func _pve_changed() -> void:
 		_cancel_battle_preparation()
 	if not model.state.is_empty():
 		_character = model.state.character.duplicate(true)
-		_character.appearance = ShopRules.appearance(model.state.shop) if model.state.has("shop") else [1,0]
+		_character.appearance = model.appearance()
 		_character.max_hp = model.state.stats.hp
 		_character.max_mp = model.state.stats.mp
 		_character.next_xp = int(_character.level) * 40
@@ -1059,7 +1059,7 @@ func _prepare_battle(snapshot: Dictionary) -> void:
 	if not _battle_preparation_current(epoch, id): return
 	var c: Dictionary = network.pve.state.character
 	var key: String = (["mzs", "mck", "mfs"] if int(c.gender) == 0 else ["wzs", "wck", "wfs"])[int(c.job)]
-	var keys: Array[String] = [ShopRules.actor_key(int(c.job),int(c.gender),ShopRules.appearance(network.pve.state.shop)) if network.pve.state.has("shop") else "hero/" + key, String(snapshot.enemy.art), "effect/flash", BattleDeathPlayback.ART_KEY]
+	var keys: Array[String] = [ShopRules.actor_key(int(c.job),int(c.gender),network.pve.appearance()) if network.pve.state.has("shop") else "hero/" + key, String(snapshot.enemy.art), "effect/flash", BattleDeathPlayback.ART_KEY]
 	if snapshot.get("formation") is Dictionary:
 		for e in snapshot.formation.enemies:
 			if not keys.has(String(e.definition.art)):keys.append(String(e.definition.art))

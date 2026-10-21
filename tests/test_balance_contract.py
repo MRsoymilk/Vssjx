@@ -7,6 +7,19 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class BalanceContract(unittest.TestCase):
+    def test_loot_mirror_and_slot_pools(self):
+        source=(ROOT/'shared/data/loot-v1.json').read_bytes()
+        self.assertEqual(source,(ROOT/'client/assets/data/loot-v1.json').read_bytes())
+        rules=json.loads(source)
+        self.assertEqual(set(rules['base']),set(rules['pools']))
+        self.assertEqual(len(rules['pools']),10)
+        for pool in rules['pools'].values():
+            self.assertEqual(len(pool),len(set(pool)))
+            self.assertGreaterEqual(len(pool),rules['quality_affixes']['yellow'])
+            for kind in pool:
+                low,high=rules['affixes'][kind]
+                self.assertGreater(low,0)
+                self.assertGreaterEqual(high,low)
     def test_skill_budget_mirror(self):
         self.assertEqual((ROOT/'shared/data/skill-balance-v1.json').read_bytes(),(ROOT/'client/assets/data/skill-balance-v1.json').read_bytes())
     def test_runtime_mirror(self):

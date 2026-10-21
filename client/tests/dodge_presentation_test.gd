@@ -2,7 +2,7 @@ extends "res://tests/team_test.gd"
 func _run()->void:
 	await Platform.when_ready();await Game.when_ready()
 	var old:=Game.player.duplicate(true)
-	var a:=OriginalArt.battle_actor("hero/mck_w1_c0");var b:=OriginalArt.battle_actor("monster/langw");add_child(a);add_child(b)
+	var a:=OriginalArt.battle_actor(ShopRules.actor_key(1,0,[1,0,0]));var b:=OriginalArt.battle_actor("monster/langw");add_child(a);add_child(b)
 	a.position=Vector2(220,180);b.position=Vector2(40,180);b.scale.x=-1
 	var fx:=BattleEffects.new();add_child(fx)
 	for subject in [a,b]:

@@ -130,8 +130,10 @@ async fn load_character(tx:&mut Transaction<'_,Postgres>,character_id:Uuid,accou
     if !loaded.loot.valid(loaded.character.job,loaded.character.gender){return Err(unavailable());}
     let previous_loot=loaded.loot.clone();
     loaded.loot.sync_legacy(&loaded.gear,loaded.character.job,loaded.character.gender);
+    if !loaded.loot.valid(loaded.character.job,loaded.character.gender)||loaded.loot.items.iter().any(|i|i.equipped&&i.level>loaded.character.level){return Err(unavailable());}
     if previous_loot!=loaded.loot{
-        sqlx::query("UPDATE characters SET loot_state=$2 WHERE id=$1").bind(character_id).bind(Json(&loaded.loot)).execute(&mut **tx).await.map_err(database)?;
+        let revision:i64=sqlx::query_scalar("UPDATE characters SET loot_state=$2,state_revision=state_revision+1 WHERE id=$1 RETURNING state_revision").bind(character_id).bind(Json(&loaded.loot)).fetch_one(&mut **tx).await.map_err(database)?;
+        loaded.character.state_revision=revision.to_string();
     }
     if loaded.character.balance_revision==0&&loaded.battle.is_none(){
         let team_active:bool=sqlx::query_scalar("SELECT EXISTS(SELECT 1 FROM team_members m JOIN team_battles b ON b.team_id=m.team_id AND b.active WHERE m.character_id=$1)").bind(character_id).fetch_one(&mut **tx).await.map_err(database)?;
@@ -638,6 +640,9 @@ pub async fn execute(
     }
     if applied.is_ok() {
         loaded.loot.sync_legacy(&loaded.gear,loaded.character.job,loaded.character.gender);
+        let maxima=loaded.stats();
+        loaded.character.hp=loaded.character.hp.min(maxima.hp);
+        loaded.character.mp=loaded.character.mp.min(maxima.mp);
         if !loaded.hunt_pressure.valid(){return Err(unavailable());}
         if !loaded.loot.valid(loaded.character.job,loaded.character.gender){return Err(unavailable());}
         sqlx::query("UPDATE characters SET loot_state=$2 WHERE id=$1").bind(context.character).bind(Json(&loaded.loot)).execute(&mut *tx).await.map_err(database)?;

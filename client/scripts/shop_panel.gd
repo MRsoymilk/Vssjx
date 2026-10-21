@@ -134,11 +134,14 @@ func _character() -> Dictionary:
 	return Game.player if online_model==null else online_model.state.get("character",{})
 func _appearance() -> String:
 	var character:=_character();var gear:=_gear().duplicate(true);var entry:=ShopRules.item(selected)
+	var loot:Dictionary=(Game.player.get("loot_state",{}) if online_model==null else online_model.state.get("loot",{}).get("state",{})).duplicate(true)
 	if not gear.is_empty() and ShopRules.is_equipment(entry) and ShopRules.equipment_error(entry,int(character.get("job",0)),int(character.get("gender",0))).is_empty():
+		for i in loot.get("items",[]):
+			if ShopRules.item(i.template).slot==entry.slot:i.equipped=false
 		if not gear.has("slots"):gear.slots={}
 		gear.slots[entry.slot]=selected
 		if entry.slot in ["weapon","armor"]:gear[entry.slot]=selected
-	return ShopRules.actor_key(int(character.get("job",0)),int(character.get("gender",0)),ShopRules.appearance(gear))
+	return ShopRules.actor_key(int(character.get("job",0)),int(character.get("gender",0)),LootRules.look(loot,ShopRules.appearance(gear)))
 
 func _filter() -> void:
 	var character := _character()

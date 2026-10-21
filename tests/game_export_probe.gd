@@ -15,6 +15,7 @@ func check(value: bool, description: String) -> void:
 
 func _verify() -> void:
 	check(FileAccess.file_exists("res://project.binary"), "Running from packed project settings")
+	check(ProjectSettings.get_setting("application/config/version","")=="0.1.2","Packed project reports release version 0.1.2")
 	for path in ["res://scenes/admin/data_browser.tscn", "res://scenes/admin/world_overview.tscn", "res://scripts/admin/data_browser.gd", "res://scripts/admin/admin_window_layout.gd", "res://tests/data_browser_test.tscn"]:
 		check(not ResourceLoader.exists(path), "Developer resource is absent: " + path)
 	for path in ["res://scenes/admin", "res://scripts/admin", "res://assets/admin", "res://tests"]:
@@ -33,11 +34,12 @@ func _verify() -> void:
 	var skill_rules = load("res://scripts/skill_rules.gd")
 	check(skill_rules.list_for(1, 0, 50).size() == 8 and skill_rules.list_for(1, 3, 50) == skill_rules.list_for(1, 0, 50), "Packed skills unlock by job and level for all schools")
 	var shop_rules = load("res://scripts/shop_rules.gd")
-	check(shop_rules.catalog.items.size()==334,"Original goods and both approved equipment collections are in the packed catalog")
+	check(shop_rules.catalog.items.size()==397,"All original goods, approved collections and travel talisman are in the packed catalog")
+	check(shop_rules.item("restored/shenxing_scroll").get("effect")=="teleport","Packed travel talisman retains destination selection semantics")
 	for item in shop_rules.catalog.items:
 		check(ResourceLoader.exists(item.icon),"Packed product icon: "+item.id)
 	var art=load("res://scripts/art.gd")
-	for collection in ["boneglow","gravebloom"]:
+	for collection in ["boneglow","gravebloom","eva01"]:
 		for stem in ["mzs","wzs","mck","wck","mfs","wfs"]:
 			var prefix:String="ai/%s/%s/"%[collection,stem]
 			for slot in shop_rules.SLOTS:
@@ -99,9 +101,10 @@ func _verify() -> void:
 	var restored = await game.load_game()
 	check(restored.ok and game.player.gold == 30 and game.player.version == 1, "Packed async read preserves v1 save compatibility")
 	game.player.gold = 200
+	var base_stats:Dictionary=game.stats().duplicate(true)
 	check((await game.shop_command("buy","weapon_2")).ok and (await game.shop_command("buy","armor_2")).ok, "Packed shop purchases use actual persistent storage")
 	check((await game.shop_command("equip","weapon_2")).ok and (await game.shop_command("equip","armor_2")).ok, "Packed equipment can be equipped")
-	check(game.appearance_key() == "hero/mck_w2_c1" and game.stats().attack == 31 and game.stats().defense == 7, "Packed gear changes appearance and combat stats")
+	check(game.appearance_key() == "hero/mck_w2_c1" and game.stats().attack == base_stats.attack+8 and game.stats().defense == base_stats.defense+3, "Packed gear changes appearance and combat stats with the current balance profile")
 	check((await game.load_game()).ok and game.player.gold == 125 and game.appearance_key() == "hero/mck_w2_c1", "Packed purchase and appearance survive reload")
 	check(DirAccess.remove_absolute(game.save_path) == OK, "Remove only the owned export save fixture")
 	game.save_path = original_path

@@ -7,7 +7,7 @@ extends AnimatedSprite2D
 
 func initialize() -> void:
 	set_meta("art_key",art_key)
-	if definition!=null and art_key.begins_with("hero/"):
+	if definition!=null and art_key.begins_with("hero/") and not has_meta("ground_pose_x"):
 		set_meta("ground_pose_x",definition.native_battle.get("pose_x",{}))
 	if not animation_finished.is_connected(_return_to_idle): animation_finished.connect(_return_to_idle)
 

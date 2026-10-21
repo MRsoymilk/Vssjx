@@ -2,10 +2,10 @@ class_name GeneratedEquipment
 extends RefCounted
 ## Data-driven native-layer registry for all additional equipment families.
 const FAMILIES := [
-	{"id":"boneglow","name":"骨甲幽光","path":"res://assets/data/boneglow-equipment.json"},
-	{"id":"gravebloom","name":"冥林异装","path":"res://assets/data/gravebloom-equipment.json"},
-	{"id":"eva01","name":"初号机","path":"res://assets/data/eva01-equipment.json"},
-	{"id":"legendary","name":"传世兵器","path":"res://assets/data/legendary-equipment.json"}
+	{"id":"boneglow","name":"骨甲幽光","path":"res://assets/appearance_resources/families/boneglow.tres"},
+	{"id":"gravebloom","name":"冥林异装","path":"res://assets/appearance_resources/families/gravebloom.tres"},
+	{"id":"eva01","name":"初号机","path":"res://assets/appearance_resources/families/eva01.tres"},
+	{"id":"legendary","name":"传世兵器","path":"res://assets/appearance_resources/families/legendary.tres"}
 ]
 const NATIVE_LIMITS := [27,11,9]
 static var _data: Dictionary = {}
@@ -14,10 +14,10 @@ static func manifest() -> Dictionary:
 	if _data.is_empty():
 		_data = {"sets":[],"weapons":[],"parts":{}}
 		for family in FAMILIES:
-			var source: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(family.path))
+			var source:NativeEquipmentFamily=load(family.path)
 			_data.sets.append_array(source.sets)
-			_data.weapons.append_array(source.get("weapons",[]))
-			_data.parts.merge(source.parts)
+			_data.weapons.append_array(source.weapons)
+			_data.parts.merge(AppearanceResources.part_specs(source.parts))
 	return _data
 
 static func appearance_limits() -> Array:

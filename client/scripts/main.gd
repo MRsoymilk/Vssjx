@@ -1024,7 +1024,9 @@ func _encounter_battle(enemy: Dictionary) -> void:
 			return
 		var path := String(info.texture)
 		if not paths.has(path): paths.append(path)
-	var request := Platform.context.resource_loader.prepare(PackedStringArray(paths), battle_transition, epoch)
+		var scene_path:=OriginalArt.scene_path(key)
+		if not paths.has(scene_path):paths.append(scene_path)
+	var request := Platform.context.resource_loader.prepare(PackedStringArray(paths), battle_transition, epoch,"Resource")
 	battle_resource_request = request
 	while not request.is_finished():
 		battle_transition.set_progress(0.75 * request.progress, "准备战斗图像与场景")

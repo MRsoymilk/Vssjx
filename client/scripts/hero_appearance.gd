@@ -1,7 +1,6 @@
 class_name HeroAppearance
 extends RefCounted
 ## Compose original layers on demand, rather than shipping thousands of combinations.
-static var _data: Dictionary = {}
 static var _images: Dictionary = {}
 static var _parts: Dictionary = {}
 static var _prepared: Dictionary = {}
@@ -25,15 +24,13 @@ static func is_key(key: String) -> bool:
 static func _part(source: String, frame: int, transform: int) -> Image:
 	var id := "%s:%d:%d" % [source,frame,transform]
 	if _parts.has(id): return _parts[id]
-	if not _data.parts.has(source): return null
-	var entry: Dictionary = _data.parts[source]
-	if frame >= entry.frames.size(): return null
+	var entry:=AppearanceResources.part(source)
+	if entry==null or frame>=entry.regions.size(): return null
 	if not _images.has(source):
 		var image:=AppearanceEdits.image_for(source)
 		if image==null: image=AppearanceEdits.source_image(source)
 		_images[source] = image
-	var r: Array = entry.frames[frame]
-	var part: Image = _images[source].get_region(Rect2i(int(r[0]),int(r[1]),int(r[2]),int(r[3])))
+	var part: Image = _images[source].get_region(entry.regions[frame])
 	match transform:
 		1: part.rotate_90(CLOCKWISE)
 		2: part.rotate_180()
@@ -52,15 +49,12 @@ static func build(key: String, base: Dictionary) -> Dictionary:
 		_edit_revision=AppearanceEdits.revision
 	if _prepared.has(key): return _prepared[key]
 	if not is_key(key): return {}
-	if _data.is_empty():
-		_data = JSON.parse_string(FileAccess.get_file_as_string("res://assets/data/hero-parts.json"))
-		_data.parts.merge(GeneratedEquipment.manifest().parts)
 	var fields := key.trim_prefix("hero/").split("_")
 	var stem: String = fields[0]
 	var weapon := int(fields[1].trim_prefix("w"))
 	var clothing := int(fields[2].trim_prefix("c"))
 	var head := int(fields[3].trim_prefix("h"))
-	var recipe: Dictionary = _data.recipes[stem]
+	var recipe:=AppearanceResources.recipe(stem)
 	var replacements := {recipe.sources[2]:"e"+stem.substr(1)+str(weapon)}
 	if clothing > 0 and clothing <= 11:
 		var body := clothing - 2 if clothing >= 3 else clothing + (2 if stem.ends_with("fs") else 1)

@@ -16,10 +16,10 @@ func _ready() -> void:
 	var info := OriginalArt.actor_info("hero/mfs")
 	var cold_us := Time.get_ticks_usec() - cold_started
 	var first := OriginalArt.metadata_stats()
-	var expected_count:int=JSON.parse_string(FileAccess.get_file_as_string("res://assets/data/actors.json")).actors.size()
-	check(first.indexed_actors == expected_count and first.loaded_actors == 1 and first.json_files_read == 2, "First lookup reads only index and requested actor")
-	var expected_bytes:=FileAccess.get_file_as_bytes("res://assets/data/actors.json").size()+FileAccess.get_file_as_bytes("res://assets/data/actors/hero/mfs.json").size()
-	check(first.json_bytes_read == expected_bytes and first.json_bytes_read < 50026, "First lookup reads only manifest and requested shard, below the full legacy catalog")
+	var expected_count:int=(load(OriginalArt.INDEX_PATH) as NativeActorCatalog).definitions.size()
+	check(first.indexed_actors == expected_count and first.loaded_actors == 1 and first.resource_files_loaded == 2 and first.json_files_read==0, "First lookup loads only native index and requested lightweight Resource, no JSON")
+	var expected_bytes:=FileAccess.get_file_as_bytes(OriginalArt.INDEX_PATH).size()+FileAccess.get_file_as_bytes("res://assets/actor_resources/hero/mfs.tres").size()
+	check(first.resource_bytes == expected_bytes and first.json_bytes_read == 0, "Native metadata loading does not read legacy JSON or load textures")
 	check(not OriginalArt.catalog.has("hero/wfs") and not OriginalArt.catalog.has("creation/mfs") and not OriginalArt.catalog.has("effect/t47"), "Unrequested categories remain unloaded")
 	check(info.playback.has("cast") and not info.sequences.is_empty() and OriginalArt.cached.is_empty(), "Metadata lookup retains all sequences without building SpriteFrames")
 	var warm_started := Time.get_ticks_usec()
@@ -31,7 +31,7 @@ func _ready() -> void:
 	var actor := OriginalArt.actor("hero/mfs")
 	var second := OriginalArt.actor("hero/mfs")
 	check(actor.sprite_frames == second.sprite_frames and actor.sprite_frames == OriginalArt.cached["hero/mfs"], "SpriteFrames cache is still shared")
-	check(OriginalArt.metadata_stats().json_files_read == 2, "SpriteFrames creation does not reload metadata")
+	check(OriginalArt.metadata_stats().resource_files_loaded == 2 and actor is NativeActorSprite and actor.scene_file_path==OriginalArt.scene_path("hero/mfs"), "Native PackedScene instantiation reuses lightweight metadata and authored SpriteFrames")
 	check(actor.sprite_frames.has_animation("cast") and not actor.sprite_frames.get_animation_loop("cast") and not actor.sprite_frames.get_animation_loop("attack"), "Mage one-shot modes preserved")
 	check(actor.sprite_frames.get_frame_count("walk") == 6 and actor.sprite_frames.has_animation("source_0"), "Native walking and original numbered sequences preserved")
 	var first_actor_stats := OriginalArt.metadata_stats()
@@ -58,7 +58,7 @@ func _ready() -> void:
 			monolithic.append(Time.get_ticks_usec() - started)
 			check(old is Dictionary and old.size() == 33, "Benchmark baseline contains all legacy metadata")
 			OriginalArt.catalog.clear()
-			OriginalArt._index.clear()
+			OriginalArt._index={};OriginalArt._native_catalog={};OriginalArt._scene_paths={}
 			OriginalArt._index_loaded = false
 			started = Time.get_ticks_usec()
 			OriginalArt.actor_info("hero/mfs")

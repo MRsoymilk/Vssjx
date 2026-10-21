@@ -35,5 +35,36 @@ class NativeActorResources(unittest.TestCase):
     def test_invalid_actor_paths_are_rejected(self):
         with self.assertRaises(ValueError):builder.actor_files('../escape',{})
 
+    def test_visual_runtime_has_no_legacy_json_loader(self):
+        for name in ['art','hero_appearance','generated_equipment','appearance_resources','appearance_edits','boneglow_equipment']:
+            text=(ROOT/f'client/scripts/{name}.gd').read_text()
+            self.assertNotIn('JSON.parse',text,name)
+            self.assertNotIn('hero-parts.json',text,name)
+            self.assertNotIn('actors.json',text,name)
+
+    def test_every_export_preset_excludes_legacy_visual_json(self):
+        import configparser
+        config=configparser.ConfigParser()
+        config.read(ROOT/'client/export_presets.cfg')
+        for name in config.sections():
+            if name.endswith('.options'):continue
+            excluded=config[name]['exclude_filter']
+            for path in ['assets/data/actors.json','assets/data/actors/*','assets/data/hero-parts.json','assets/data/*-equipment.json','assets/data/appearance-edits.json']:
+                self.assertIn(path,excluded,name)
+
+    def test_reimport_preserves_native_pixel_editor_overrides(self):
+        import tempfile
+        import shutil
+        with tempfile.TemporaryDirectory(prefix='native-appearance-',dir='/tmp/opencode') as scratch:
+            client=Path(scratch)
+            (client/'assets/data').mkdir(parents=True)
+            for name in ['hero-parts.json','appearance-edits.json',*[family+'-equipment.json' for family in ['boneglow','gravebloom','eva01','legendary']]]:
+                shutil.copyfile(ROOT/'client/assets/data'/name,client/'assets/data'/name)
+            target=client/'assets/appearance_resources/overrides.tres'
+            target.parent.mkdir(parents=True)
+            target.write_text('user-owned-native-overrides')
+            self.assertNotIn('assets/appearance_resources/overrides.tres',builder.appearance_files(client))
+            self.assertEqual(target.read_text(),'user-owned-native-overrides')
+
 
 if __name__=='__main__':unittest.main()

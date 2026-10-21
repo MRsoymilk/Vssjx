@@ -25,7 +25,7 @@ func _run() -> void:
 	await Platform.when_ready()
 	var config: Dictionary = GeneratedEquipment.FAMILIES.filter(func(value: Dictionary)->bool:return value.id==family)[0]
 	family_name = config.name
-	var definitions: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(config.path))
+	var definitions:NativeEquipmentFamily=load(config.path)
 	var previous := Game.player.duplicate(true)
 	var previous_path := Game.save_path
 	var previous_hash := FileAccess.get_sha256(previous_path) if FileAccess.file_exists(previous_path) else ""

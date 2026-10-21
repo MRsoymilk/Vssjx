@@ -328,7 +328,10 @@ def build(args):
             assert assets and 'assets/project.binary' in assets
             for name in assets:
                 assert not re.search(r'/(admin|tests)/|\.env|\.(keystore|jks|pem)$', name), name
-            for name in ['assets/assets/data/actors.json', 'assets/assets/fonts/OFL.txt', 'assets/assets/licenses/PROJECT-LICENSE.txt', 'assets/assets/licenses/GODOT-NOTICES.txt']:
+            native_catalog='assets/assets/actor_resources/catalog.tres'
+            assert native_catalog in names or native_catalog+'.remap' in names, native_catalog
+            assert 'assets/assets/data/actors.json' not in names, 'Legacy actor JSON must not be packaged'
+            for name in ['assets/assets/fonts/OFL.txt', 'assets/assets/licenses/PROJECT-LICENSE.txt', 'assets/assets/licenses/GODOT-NOTICES.txt']:
                 assert name in names, name
             # Repackage actual APK assets for native inspection, never call this Android execution.
             with ZipFile(probes / 'android-assets.zip', 'w', ZIP_DEFLATED) as pack:

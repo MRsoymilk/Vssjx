@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="NativeAppearancePart" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/appearance_part.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+texture_path = "res://assets/generated/equipment/boneglow/mck/parts/mck1x.png"
+regions = Array[Rect2i]([Rect2i(0, 0, 15, 13), Rect2i(16, 0, 16, 13), Rect2i(32, 0, 14, 13), Rect2i(48, 0, 13, 13), Rect2i(64, 0, 13, 13), Rect2i(80, 0, 14, 13)])

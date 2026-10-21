@@ -26,7 +26,7 @@ func _run()->void:
 	var source_hash:=FileAccess.get_sha256(original_path)
 	fixture="user://pixel_editor_test_"+str(Time.get_ticks_usec())
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(fixture))
-	AppearanceEdits.manifest_path=fixture+"/manifest.json"
+	AppearanceEdits.manifest_path=fixture+"/manifest.tres"
 	AppearanceEdits.image_folder=fixture+"/images"
 	AppearanceEdits.reload_saved()
 	var doc:=DOCUMENT.new();doc.open(PART)
@@ -82,8 +82,9 @@ func _run()->void:
 	default_actor.free();AppearanceEdits.clear_draft()
 	await _test_ui()
 	# Invalid manifest paths cannot redirect image loading outside edited assets.
-	file=FileAccess.open(AppearanceEdits.manifest_path,FileAccess.WRITE)
-	file.store_string(JSON.stringify({"format_version":1,"parts":{PART:{"texture":"res://project.godot","offsets":[[0,0],[0,0]]}}}));file.close()
+	var unsafe:=NativeAppearanceOverrides.new()
+	unsafe.parts={PART:{"texture":"res://project.godot","offsets":[[0,0],[0,0]]}}
+	ResourceSaver.save(unsafe,AppearanceEdits.manifest_path)
 	AppearanceEdits.reload_saved()
 	check(AppearanceEdits.image_for(PART)==null and not AppearanceEdits.load_error.is_empty(),"Reject unsafe texture path")
 	AppearanceEdits.clear_draft()

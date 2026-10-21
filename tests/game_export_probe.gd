@@ -19,15 +19,17 @@ func _verify() -> void:
 		check(not ResourceLoader.exists(path), "Developer resource is absent: " + path)
 	for path in ["res://scenes/admin", "res://scripts/admin", "res://assets/admin", "res://tests"]:
 		check(not DirAccess.dir_exists_absolute(path), "Developer directory is absent: " + path)
-	var manifest: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://assets/data/actors.json"))
-	check(manifest.get("actors", {}).size() >= 100 and manifest.actors.has("main/death") and manifest.actors.has("main/ltz_win") and manifest.actors.has("main/ltz_lose"), "Actor index includes death, battle results, equipment and expanded monsters")
-	for path in manifest.actors.values():
-		check(FileAccess.file_exists(path), "Dynamically loaded actor JSON is included: " + path)
+	var manifest=load("res://assets/actor_resources/catalog.tres")
+	check(manifest.scenes.size() >= 100 and manifest.scenes.has("main/death") and manifest.scenes.has("main/ltz_win") and manifest.scenes.has("main/ltz_lose"), "Native actor index includes death, battle results, equipment, NPCs and expanded monsters")
+	for path in manifest.scenes.values()+manifest.definitions.values():
+		check(ResourceLoader.exists(path), "Dynamically loaded native actor resource is included: " + path)
+	for path in ["res://assets/data/actors.json","res://assets/data/hero-parts.json","res://assets/data/appearance-edits.json"]:
+		check(not FileAccess.file_exists(path),"Legacy visual import JSON is excluded: "+path)
 	var ai_world: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://assets/data/ai-world-v1.json"))
 	check(ai_world.maps.size() == 214, "All generated map definitions are included")
 	for map in ai_world.maps:
 		for resident in map.residents:
-			check(manifest.actors.has(resident.art), "Packed resident actor: " + resident.id)
+			check(manifest.scenes.has(resident.art), "Packed resident actor: " + resident.id)
 	var skill_rules = load("res://scripts/skill_rules.gd")
 	check(skill_rules.list_for(1, 0, 50).size() == 8 and skill_rules.list_for(1, 3, 50) == skill_rules.list_for(1, 0, 50), "Packed skills unlock by job and level for all schools")
 	var shop_rules = load("res://scripts/shop_rules.gd")
@@ -52,9 +54,11 @@ func _verify() -> void:
 		var stream=audio.stream(id)
 		check(stream is AudioStreamWAV and stream.format==AudioStreamWAV.FORMAT_16_BITS and stream.stereo and stream.mix_rate==48000,"Packed skill audio retains original PCM: "+id)
 	check(ResourceLoader.exists("res://assets/ui/team_waiting.tres"),"Yellow unready team flag material is packaged")
-	var parts:Dictionary=JSON.parse_string(FileAccess.get_file_as_string("res://assets/data/hero-parts.json"))
-	check(parts.parts.size()==299,"All original appearance parts are packaged")
-	for part in parts.parts.values():check(ResourceLoader.exists(part.texture),"Packed original part: "+part.texture)
+	var parts=load("res://assets/appearance_resources/catalog.tres")
+	check(parts.parts.size()>=299,"All native appearance parts are packaged")
+	for path in parts.parts.values():
+		var part=load(path)
+		check(ResourceLoader.exists(part.texture_path),"Packed original part: "+part.texture_path)
 	for stem in ["mzs","wzs","mck","wck","mfs","wfs"]:
 		var key:String="hero/%s_w19_c11_h9"%stem
 		var actor=art.actor(key)
@@ -65,9 +69,9 @@ func _verify() -> void:
 			for weapon in 4:
 				for armor in 3:
 					var key: String = shop_rules.actor_key(job,gender,[weapon,armor])
-					check(manifest.actors.has(key), "Packed appearance metadata: " + key)
-					var info: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(manifest.actors[key]))
-					check(ResourceLoader.exists(info.texture), "Packed appearance texture: " + key)
+					check(manifest.scenes.has(key), "Packed appearance scene: " + key)
+					var info=load(manifest.definitions[key])
+					check(ResourceLoader.exists(info.texture_path), "Packed appearance texture: " + key)
 	check(ResourceLoader.exists("res://scenes/ui/shop_panel.tscn"), "Shop interface is included")
 	check(FileAccess.file_exists("res://assets/data/original_world.json"), "Shared game world data is still included")
 	check(ResourceLoader.exists("res://scenes/main.tscn"), "Game main scene is included")

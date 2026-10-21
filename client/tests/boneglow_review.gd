@@ -5,7 +5,7 @@ var capture_path := ""
 
 func _ready() -> void:
 	var config: Dictionary = GeneratedEquipment.FAMILIES.filter(func(value: Dictionary)->bool:return value.id==family)[0]
-	var definitions: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(config.path))
+	var definitions:NativeEquipmentFamily=load(config.path)
 	preload("res://scripts/admin/admin_window_layout.gd").configure_scene(self,config.name+" · 游戏内动画核对",Vector2i(1100,760))
 	$Layout/Title.text = config.name+" · 原生分层动画"
 	$Layout/Hint.text = "原生 ANI 动作 · 头部 / 衣服 / 武器独立换装 · 商城分类："+config.name+" · 本角色"

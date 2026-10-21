@@ -12,7 +12,7 @@
 - 撤销／重做（Ctrl+Z／Ctrl+Y）、恢复源图、位置归零；关闭有未保存改动时提示。可切换待机、行走、攻击、施法和受击的实际可用动作，暂停后逐帧检查整个人物。
 - “保存并应用”（Ctrl+S）保存真实PNG及位置数据，管理预览立即读取。重新运行本项目游戏后，本地／联网角色均使用相同资源；已发布网页和APK需要后续重新打包分发。管理器不修改线上服务、数据库、装备属性、玩家存档或其他客户端。
 
-保存位置：`client/assets/data/appearance-edits.json` 和 `client/assets/edited/equipment/`。PNG使用内容摘要命名，保留原图、原帧区域、原配方及旧版本；旧清单存入覆盖资源目录的`history/`。清单通过临时文件替换，保存前校验外部修改以避免旧窗口覆盖。后续重新生成源资源时不覆盖这些手工版本。提交或分发时需携带清单和其引用PNG，正常Godot导入后即可进入游戏导出。
+保存位置：`client/assets/appearance_resources/overrides.tres` 和 `client/assets/edited/equipment/`。原JSON表现清单已迁移为Godot原生Resource（见 [原生资源迁移](native_actor_resources.md)）。PNG使用内容摘要命名，保留原图、原帧区域、原配方及旧版本；旧清单以`.tres`存入覆盖资源目录的`history/`。清单通过临时资源文件替换，保存前校验外部修改以避免旧窗口覆盖。后续重新生成源资源时不覆盖这些手工版本。提交或分发时需携带清单和其引用PNG，正常Godot导入后即可进入游戏导出。
 
 运行时位于`scripts/appearance_edits.gd`，编辑窗口及画布位于`scripts/admin/`。游戏只读取覆盖数据，编辑UI仍仅为本地桌面管理工具，继续由既有导出配置排除。默认清单为空，未编辑时保持现有素材表现。保存会刷新强缓存及弱缓存；基础人物、旧外观键和新增装备均可读取手工版本。
 

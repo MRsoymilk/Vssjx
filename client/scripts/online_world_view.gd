@@ -1078,7 +1078,9 @@ func _prepare_battle(snapshot: Dictionary) -> void:
 			_battle_preparation_failed()
 			return
 		if not paths.has(info.texture): paths.append(info.texture)
-	var request := Platform.context.resource_loader.prepare(PackedStringArray(paths), self, epoch)
+		var scene_path:=OriginalArt.scene_path(actor_key)
+		if not paths.has(scene_path):paths.append(scene_path)
+	var request := Platform.context.resource_loader.prepare(PackedStringArray(paths), self, epoch,"Resource")
 	_battle_resource_request = request
 	while not request.is_finished():
 		encounter.set_progress(0.75 * request.progress, "准备战斗图像与场景")

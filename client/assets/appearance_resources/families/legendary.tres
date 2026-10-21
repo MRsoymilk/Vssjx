@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="NativeEquipmentFamily" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/equipment_family.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+sets = []
+weapons = [{"id": "legendary/potian_axe","name": "破天斧","stem": "mzs","job": 0,"gender": 0,"weapon_code": 46,"weapon": "legendary/potian_axe"},{"id": "legendary/potian_axe","name": "破天斧","stem": "wzs","job": 0,"gender": 1,"weapon_code": 46,"weapon": "legendary/potian_axe"}]
+parts = ["legendary/potian_axe"]

@@ -13,6 +13,7 @@ func _run() -> void:
 	check(page.get_node("Details/Name").text == "青云剑客" and page.get_node("Details/Level").text == "7" and page.get_node("Details/School").text == "昆仑派", "Details display selected character's actual values")
 	var expected_look := ShopRules.appearance(ShopRules.local_state(records[0]))
 	check(page.previews[1].sprite_frames == OriginalArt.cached[ShopRules.actor_key(1,0,expected_look)] and page.previews[1].is_playing(), "Authored AnimatedSprite2D plays actual avatar with current equipment appearance")
+	check(page.previews[1] is NativeActorSprite and page.previews[1].scene_file_path==OriginalArt.scene_path(ShopRules.actor_key(1,0,expected_look)),"Character selection instances the corresponding native actor scene, not an empty sprite with copied frames")
 	page.step(1)
 	check(page.get_node("Details/Name").text == "花间修士" and page.get_node("Details/Gender").text == "女" and page.get_node("Details/Job").text == "隐者", "Paging changes selected data and gender")
 	check(page.previews[0].visible and page.previews[1].visible and page.previews[2].visible, "Three real neighbors populate reference carousel")

@@ -1,11 +1,11 @@
 extends RefCounted
 ## Read-only explanation of the same single-item looks used by ShopRules.
-const PARTS_PATH := "res://assets/data/hero-parts.json"
+const PARTS_PATH := "res://assets/appearance_resources/catalog.tres"
 const JOBS := ["力士", "侠客", "隐者"]
 static var _parts: Dictionary = {}
 
 static func parts() -> Dictionary:
-	if _parts.is_empty(): _parts = JSON.parse_string(FileAccess.get_file_as_string(PARTS_PATH))
+	if _parts.is_empty(): _parts = {"recipes":AppearanceResources.recipe_specs(),"parts":AppearanceResources.part_specs()}
 	return _parts
 
 static func changes(entry: Dictionary) -> String:

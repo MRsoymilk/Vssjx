@@ -7,7 +7,7 @@
 [ext_resource type="Texture2D" path="res://assets/ui/attribute_spiral.png" id="Spiral"]
 [ext_resource type="Texture2D" path="res://assets/ui/chat_frame_corner.svg" id="Corner"]
 [ext_resource type="Texture2D" path="res://assets/ui/create_arrow.png" id="Arrow"]
-[ext_resource type="PackedScene" path="res://scenes/actors/original_actor.tscn" id="Actor"]
+[ext_resource type="PackedScene" path="res://scenes/actors/native_actor.tscn" id="Actor"]
 [sub_resource type="SystemFont" id="Font"]
 script = ExtResource("BundledCjk")
 font_names = PackedStringArray("SimHei", "Microsoft YaHei", "sans-serif")

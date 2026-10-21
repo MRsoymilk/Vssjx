@@ -100,12 +100,10 @@ func reload() -> void:
 	_load_maps()
 	_load_original_world()
 	_load_ai_world()
-	var manifest := _read_json(ART.INDEX_PATH)
-	var actors: Dictionary = manifest.get("actors", {})
-	for key in actors:
-		var info := _read_json(actors[key])
+	for key in ART.actor_keys():
+		var info := ART.actor_info(key)
 		if info.is_empty(): continue
-		_add("art", key, key, "%s 帧 · %s × %s" % [info.get("count", 0), info.get("width", 0), info.get("height", 0)], "资源", actors[key], info, {"kind": "actor", "art": key})
+		_add("art", key, key, "Godot场景 · %s 帧 · %s × %s" % [info.get("count", 0), info.get("width", 0), info.get("height", 0)], "资源", ART.scene_path(key), info, {"kind": "actor", "art": key})
 
 func _load_audio() -> void:
 	for entry in GameAudio.catalog.items:

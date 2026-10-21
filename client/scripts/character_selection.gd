@@ -75,10 +75,10 @@ func _render() -> void:
 		var keys := ["mzs", "mck", "mfs"] if int(character.get("gender", 0)) == 0 else ["wzs", "wck", "wfs"]
 		var look: Array = character.get("appearance_v2",character.get("appearance",[1,0])) if online_mode else LootRules.look(character.get("loot_state",{}),ShopRules.appearance(ShopRules.local_state(character)))
 		var actor := OriginalArt.actor(ShopRules.actor_key(int(character.get("job",0)),int(character.get("gender",0)),look))
-		previews[i].sprite_frames = actor.sprite_frames
-		previews[i].offset = actor.offset
-		actor.free()
-		previews[i].play("idle")
+		var previous:=previews[i];var parent:=previous.get_parent();var child_index:=previous.get_index()
+		actor.name="Preview";actor.transform=previous.transform
+		parent.remove_child(previous);previous.queue_free()
+		parent.add_child(actor);parent.move_child(actor,child_index);previews[i]=actor
 	for i in 5:
 		get_node("Dot%d" % i).modulate = Color("ffe563") if i == selected_index and not characters.is_empty() else (Color("937c3c") if i < characters.size() else Color("58504a"))
 	for key in ["Name", "Level", "Job", "Gender", "School", "Scene"]: get_node("Details/" + key).text = "—"

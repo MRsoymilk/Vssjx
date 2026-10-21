@@ -10,26 +10,35 @@ static var _index_loaded := false
 static var _metadata_reads := 0
 static var _metadata_bytes := 0
 static var _native_catalog: Dictionary = {}
+static var _scene_paths: Dictionary = {}
 static var _edit_revision := -1
 const ACTOR_SCENE := preload("res://scenes/actors/original_actor.tscn")
-const INDEX_PATH := "res://assets/data/actors.json"
+const INDEX_PATH := "res://assets/actor_resources/catalog.tres"
 
-static func _read_metadata(path: String) -> Dictionary:
-	var file := FileAccess.open(path, FileAccess.READ)
-	if file == null: return {}
-	_metadata_reads += 1
-	_metadata_bytes += file.get_length()
-	var parser := JSON.new()
-	if parser.parse(file.get_as_text()) != OK or not parser.data is Dictionary: return {}
-	return parser.data
+static func _record_metadata(path:String) -> void:
+	_metadata_reads+=1
+	var file:=FileAccess.open(path,FileAccess.READ)
+	if file!=null:_metadata_bytes+=file.get_length()
+
+static func actor_keys() -> Array:
+	_prepare_index()
+	return _index.keys()
+
+static func _prepare_index() -> void:
+	if _index_loaded:return
+	var registry:=load(INDEX_PATH) as NativeActorCatalog
+	if registry==null:return
+	_record_metadata(INDEX_PATH)
+	_index=registry.definitions;_scene_paths=registry.scenes;_index_loaded=true
+
+static func scene_path(key:String) -> String:
+	_prepare_index()
+	var base:="hero/"+key.trim_prefix("hero/").get_slice("_",0) if not HeroAppearance.composition_key(key).is_empty() else key
+	return _scene_paths.get(base,"")
 
 static func has_actor(key: String) -> bool:
 	if HeroAppearance.is_key(key): return true
-	if not _index_loaded:
-		var manifest := _read_metadata(INDEX_PATH)
-		if manifest.get("format_version") != 2 or not manifest.get("actors") is Dictionary: return false
-		_index = manifest.actors
-		_index_loaded = true
+	_prepare_index()
 	return _index.has(key)
 
 static func actor_info(key: String) -> Dictionary:
@@ -52,8 +61,11 @@ static func _native_info(key: String) -> Dictionary:
 	if _native_catalog.has(key): return _native_catalog[key]
 	if not has_actor(key): return {}
 	var path: Variant = _index[key]
-	if not path is String or path != "res://assets/data/actors/" + key + ".json": return {}
-	var info := _read_metadata(path)
+	if not path is String or path != "res://assets/actor_resources/" + key + ".tres": return {}
+	var definition:=load(path) as NativeActorDefinition
+	if definition==null:return {}
+	_record_metadata(path)
+	var info:=definition.to_info()
 	if not _valid_info(info): return {}
 	_native_catalog[key] = info
 	return info
@@ -70,7 +82,7 @@ static func _sync_edits() -> void:
 	_dynamic_weak.clear();_dynamic_order.clear()
 
 static func metadata_stats() -> Dictionary:
-	return {"indexed_actors": _index.size(), "loaded_actors": catalog.size(), "sprite_frames": cached.size(), "json_files_read": _metadata_reads, "json_bytes_read": _metadata_bytes}
+	return {"indexed_actors": _index.size(), "loaded_actors": catalog.size(), "sprite_frames": cached.size(), "json_files_read":0,"json_bytes_read":0,"resource_files_loaded":_metadata_reads,"resource_bytes":_metadata_bytes}
 
 static func _integer(value: Variant, minimum: int, maximum: int) -> bool:
 	return (value is int or value is float) and is_finite(float(value)) and value >= minimum and value <= maximum and float(value) == floor(float(value))
@@ -97,71 +109,66 @@ static func _valid_info(info: Dictionary) -> bool:
 	return true
 
 static func actor(key: String) -> AnimatedSprite2D:
-	var sprite: AnimatedSprite2D = ACTOR_SCENE.instantiate()
 	var info := actor_info(key)
 	if info.is_empty():
 		push_error("Missing original actor: " + key)
-		return sprite
-	if not cached.has(key) and _dynamic_weak.has(key):
-		var previous: SpriteFrames = _dynamic_weak[key].get_ref()
-		if previous != null: cached[key] = previous
-	if not cached.has(key):
-		var frames := SpriteFrames.new()
-		frames.remove_animation("default")
-		var composition:=HeroAppearance.composition_key(key)
-		var prepared: Dictionary = HeroAppearance.build(composition,_native_info("hero/"+key.trim_prefix("hero/").get_slice("_",0))) if not composition.is_empty() else {}
-		var texture: Texture2D = prepared.texture if not prepared.is_empty() else load(info.texture)
-		var regions: Array[AtlasTexture] = []
-		for i in int(info.count):
-			var region := AtlasTexture.new()
-			region.atlas = texture
-			region.filter_clip = true
-			if info.has("frame_regions"):
-				var r: Array = info.frame_regions[i]
-				region.region = Rect2(r[0],r[1],r[2],r[3])
-				region.margin = Rect2(r[4],r[5],int(info.width)-int(r[2]),int(info.height)-int(r[3]))
-			else: region.region = Rect2((i % int(info.columns)) * int(info.width), (i / int(info.columns)) * int(info.height), info.width, info.height)
-			regions.append(region)
-		var sequences: Array = info.sequences
-		for i in sequences.size():
-			var animation := "source_%d" % i
-			frames.add_animation(animation)
-			frames.set_animation_speed(animation, 10.0)
-			for step in source_steps(info, i):
-				frames.add_frame(animation, regions[int(step[0])], maxf(1.0, float(step[1])))
-		var modes := ["idle", "walk", "attack"]
-		for optional in ["cast", "hurt"]:
-			if info.get("playback", {}).has(optional): modes.append(optional)
-		for mode in modes:
-			frames.add_animation(mode)
-			frames.set_animation_speed(mode, 6.0 if mode == "idle" else (8.0 if mode == "cast" else 10.0))
-			frames.set_animation_loop(mode, mode in ["idle", "walk"])
-			var seq_index := maxi(0, sequences.size() - 1)
-			if mode == "attack":
-				seq_index = maxi(0, sequences.size() - 6)
-			var steps: Array = info.get("playback", {}).get(mode, source_steps(info, seq_index))
-			if steps.is_empty():
-				steps = [[0, 1]]
-			for step in steps:
-				frames.add_frame(mode, regions[int(step[0])], maxf(1.0, float(step[1])))
-		cached[key] = frames
-	if not HeroAppearance.composition_key(key).is_empty():
-		_dynamic_weak[key] = weakref(cached[key])
+		return ACTOR_SCENE.instantiate()
+	var path:=scene_path(key)
+	var scene:=load(path) as PackedScene if not path.is_empty() else null
+	if scene==null:
+		push_error("Missing native actor scene: "+key)
+		return ACTOR_SCENE.instantiate()
+	var sprite:NativeActorSprite=scene.instantiate()
+	# Direct scene previews autoplay. The game factory owns playback instead:
+	# callers may pause before entering the tree (hit tests, battle sampling).
+	sprite.autoplay=""
+	sprite.art_key=key;sprite.initialize()
+	var composition:=HeroAppearance.composition_key(key)
+	if composition.is_empty():
+		# Static actors are authored SpriteFrames, not reconstructed JSON animations.
+		cached[key]=sprite.sprite_frames
+	else:
+		if not cached.has(key) and _dynamic_weak.has(key):
+			var previous:SpriteFrames=_dynamic_weak[key].get_ref()
+			if previous!=null:cached[key]=previous
+		if not cached.has(key):
+			var prepared:=HeroAppearance.build(composition,_native_info("hero/"+key.trim_prefix("hero/").get_slice("_",0)))
+			cached[key]=_composed_frames(info,prepared.texture)
+		sprite.sprite_frames=cached[key]
+		sprite.offset=Vector2(info.origin[0]-info.get("anchor_x",0),info.origin[1])
+		_dynamic_weak[key]=weakref(cached[key])
 		_dynamic_order.erase(key);_dynamic_order.append(key)
-		while _dynamic_order.size()>6: cached.erase(_dynamic_order.pop_front())
-	sprite.set_meta("art_key",key)
+		while _dynamic_order.size()>6:cached.erase(_dynamic_order.pop_front())
 	sprite.set_meta("appearance_edit_revision",AppearanceEdits.revision)
-	sprite.sprite_frames = cached[key]
-	sprite.offset = Vector2(info.origin[0] - info.get("anchor_x", 0), info.origin[1])
-	if key.begins_with("hero/"):
-		# The atlas removes these source head translations to stabilize walking.
-		# Ground markers must undo that same translation to stay under the feet.
-		sprite.set_meta("ground_pose_x", info.get("native_battle", {}).get("pose_x", {}))
-	sprite.animation_finished.connect(func() -> void:
-		if sprite.animation in ["attack", "cast", "hurt"]: sprite.play("idle")
-	)
+	if key.begins_with("hero/"):sprite.set_meta("ground_pose_x",info.get("native_battle",{}).get("pose_x",{}))
 	sprite.play("idle")
 	return sprite
+
+static func _composed_frames(info:Dictionary,texture:Texture2D) -> SpriteFrames:
+	# Only live equipment combinations need a newly packed atlas. Their source
+	# parts and recipes are native Resources; static actors never take this path.
+	var frames:=SpriteFrames.new()
+	frames.remove_animation("default")
+	var regions:Array[AtlasTexture]=[]
+	for i in int(info.count):
+		var region:=AtlasTexture.new();region.atlas=texture;region.filter_clip=true
+		var r:Array=info.frame_regions[i]
+		region.region=Rect2(r[0],r[1],r[2],r[3])
+		region.margin=Rect2(r[4],r[5],int(info.width)-int(r[2]),int(info.height)-int(r[3]))
+		regions.append(region)
+	for i in info.sequences.size():
+		var animation:="source_%d"%i;frames.add_animation(animation);frames.set_animation_speed(animation,10.0)
+		for step in source_steps(info,i):frames.add_frame(animation,regions[int(step[0])],maxf(1.0,float(step[1])))
+	var modes:=["idle","walk","attack"]
+	for optional in ["cast","hurt"]:
+		if info.get("playback",{}).has(optional):modes.append(optional)
+	for mode in modes:
+		frames.add_animation(mode);frames.set_animation_speed(mode,6.0 if mode=="idle" else (8.0 if mode=="cast" else 10.0));frames.set_animation_loop(mode,mode in ["idle","walk"])
+		var seq_index:=maxi(0,info.sequences.size()-(6 if mode=="attack" else 1))
+		var steps:Array=info.get("playback",{}).get(mode,source_steps(info,seq_index))
+		if steps.is_empty():steps=[[0,1]]
+		for step in steps:frames.add_frame(mode,regions[int(step[0])],maxf(1.0,float(step[1])))
+	return frames
 
 static func battle_actor(key: String) -> AnimatedSprite2D:
 	var sprite := actor(key)
@@ -203,6 +210,8 @@ static func apply_appearance(sprite: AnimatedSprite2D, key: String) -> void:
 	sprite.sprite_frames = replacement.sprite_frames
 	sprite.offset = replacement.offset
 	sprite.set_meta("art_key",key)
+	if sprite is NativeActorSprite:
+		sprite.art_key=key;sprite.definition=replacement.definition
 	sprite.set_meta("appearance_edit_revision",AppearanceEdits.revision)
 	sprite.set_meta("ground_pose_x",replacement.get_meta("ground_pose_x",{}))
 	sprite.play(animation if sprite.sprite_frames.has_animation(animation) else &"idle")

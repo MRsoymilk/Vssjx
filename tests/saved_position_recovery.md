@@ -28,4 +28,4 @@ python -X utf8 tests/run_character_deletion.py
 ```
 
 配合 [PvE审计超限修复](pve_audit_bounds.md)，只需更新服务端，现有客户端兼容。
-这里记录源码验证，不代表线上服务已经更新。
+本文件记录源码验证；后续线上更新见 [部署记录](stall_hotfix_20261022.md)。

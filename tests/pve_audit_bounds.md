@@ -39,4 +39,4 @@ python -X utf8 tests/run_security_admin.py
 python -X utf8 tests/run_solo_encounters.py
 ```
 
-本文件记录源码验证，不代表已经更新线上进程；部署状态另行确认。
+本文件记录源码验证；后续线上更新见 [部署记录](stall_hotfix_20261022.md)。

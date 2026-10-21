@@ -69,10 +69,15 @@ func _run() -> void:
 	var count:=sent.size()
 	view.duel_battle.choose("attack")
 	check(sent.size()==count+1 and sent[-1].command.expected_revision=="0","Local decision uses a stable round token")
+	check(view.duel_battle.waiting_panel.visible and view.duel_battle.waiting_text.text.contains("确认指令") and not view.duel_battle.get_node("Hud/ActionMenu").visible,"Pending action replaces the command menu with confirmation status")
 	duel.receive({"type":"duel.result","request_id":duel.request.request_id,"ok":true,"code":"OK","retry_after_ms":0})
 	view.duel_battle.choose("attack")
 	check(sent.size()==count+1 and not duel.can_decide(),"Acknowledged decision stays locked even before the next state packet")
-	check(view.duel_battle.get_node("Hud/ActionMenu").visible and not view.duel_battle.buttons[5].disabled,"A committed player can still surrender while waiting")
+	check(not view.duel_battle.get_node("Hud/ActionMenu").visible and view.duel_battle.waiting_panel.visible and view.duel_battle.waiting_text.text=="等待对方操作","Committed player sees an explicit waiting state instead of a disabled action menu")
+	check(not view.duel_battle.waiting_surrender.disabled,"Waiting state retains a separate, secondary surrender action")
+	view.duel_battle._open_menu()
+	check(not view.duel_battle.get_node("Hud/ActionMenu").visible,"Actor taps cannot reopen locked decision commands")
+	await capture("pk-waiting")
 	combat.revision="4";combat.battle.revision="1";combat.battle.submitted=[true,false];combat.battle.your_choice={"action":"attack","skill":null}
 	check(duel.receive(combat) and view.duel_battle.animation_time==0,"A single hidden commitment cannot animate or damage the opponent")
 	var leak:=combat.duplicate(true);leak.battle.choices=["attack","skill"]
@@ -83,11 +88,13 @@ func _run() -> void:
 	combat.battle.events=[{"actor":OTHER,"action":"attack","skill":"","damage":20,"reflected":0,"fighters":first},{"actor":SELF,"action":"attack","skill":"","damage":20,"reflected":0,"fighters":second}]
 	check(duel.receive(combat) and view.duel_battle._playing.actor==OTHER,"Faster opponent animates before the local player")
 	check(view.duel_battle.buttons[0].disabled and view.duel_battle.adapter.playing,"Inputs lock during ordered playback")
+	check(not view.duel_battle.waiting_panel.visible,"Resolving actions hide the opponent-waiting notice")
 	combat.revision="6";combat.battle.revision="4";combat.battle.phase="planning";combat.battle.round=2;combat.battle.decision_revision="1";combat.battle.submitted=[false,false];combat.battle.your_choice=null
 	check(duel.receive(combat),"Next simultaneous round can arrive during playback")
 	check(await wait_until(func()->bool:return view.duel_battle._playing.is_empty() and view.duel_battle._queue.is_empty()),"Both queued actions finish without interruption")
 	check(view.duel_battle.played_order==[OTHER,SELF],"Playback order matches server initiative without skipping either action")
 	check(not view.duel_battle.buttons[0].disabled,"Next planning phase enables local choice only after playback")
+	check(not view.duel_battle.waiting_panel.visible and view.duel_battle.get_node("Hud/ActionMenu").visible,"Next decision window restores the normal six-command menu")
 	view.duel_battle.choose("potion")
 	check(not view.duel_battle.get_node("Choice").visible and not duel.pending(),"Disabled item shortcut cannot open or send a PvE potion action")
 	view.duel_battle.choose("skill")
@@ -97,10 +104,14 @@ func _run() -> void:
 	await capture("pk-battle")
 	duel.disconnect_channel()
 	check(view.duel_battle.adapter.ready==false and "恢复决斗" in view.duel_battle.get_node("Hint").text,"Disconnected combat locks input and explains recovery")
+	check(not view.duel_battle.waiting_panel.visible,"Disconnect does not misleadingly claim to be waiting for the opponent")
 	duel.request={}
 	combat.revision="7";combat.battle.revision="5";combat.battle.submitted=[true,false];combat.battle.your_choice={"action":"skill","skill":"legacy_0"}
 	check(duel.receive(combat) and not duel.can_decide(),"Reconnect preserves the server-confirmed locked choice")
 	check(view.duel_battle._playing.is_empty() and view.duel_battle._queue.is_empty() and view.duel_battle.animation_time==0,"Reconnect installs the current baseline without replaying earlier round events")
+	check(view.duel_battle.waiting_panel.visible and view.duel_battle.waiting_text.text=="等待对方操作","Reconnect to a committed round restores the waiting notice")
+	count=sent.size();view.duel_battle.waiting_surrender.pressed.emit()
+	check(sent.size()==count+1 and sent[-1].command.action=="flee","Secondary surrender button preserves the existing server command")
 	duel.disconnect_channel()
 	check(duel.receive(state(0)),"Server restart resets stream revision and replaces an abandoned duel with an empty baseline")
 	check(not view.duel_battle.visible and view.screen.hud.visible,"Missing battle after reconnect releases the old combat UI")

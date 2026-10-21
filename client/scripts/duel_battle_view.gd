@@ -5,6 +5,9 @@ var adapter := DuelBattleModel.new()
 var opponent: Dictionary = {}
 var hero_name: Label
 var enemy_name: Label
+var waiting_panel: Panel
+var waiting_text: Label
+var waiting_surrender: Button
 var _latest:Dictionary={}
 var _queue:Array[Dictionary]=[]
 var _playing:Dictionary={}
@@ -20,6 +23,14 @@ func _ready() -> void:
 	hero_name = OriginalSceneChrome.label(self,"",Rect2(HERO_NAME_HOME,Vector2(110,18)),11,Color("613e26"))
 	enemy_name = OriginalSceneChrome.label(self,"",Rect2(ENEMY_NAME_HOME,Vector2(110,18)),11,Color("613e26"))
 	for tag in [hero_name,enemy_name]:tag.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
+	waiting_panel=OriginalSceneChrome.panel(self,Rect2(88,177,144,72),Color("fff3ad"),Color("6c542a"))
+	waiting_panel.name="WaitingForOpponent"
+	waiting_text=OriginalSceneChrome.label(waiting_panel,"等待对方操作",Rect2(6,9,132,22),13,Color("654518"))
+	waiting_text.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
+	waiting_surrender=OriginalSceneChrome.button(waiting_panel,"认输",Rect2(47,40,50,23),11)
+	waiting_surrender.add_theme_color_override("font_color",Color("8b6c3a"))
+	waiting_surrender.pressed.connect(choose.bind("flee"))
+	waiting_panel.hide()
 
 func present_duel(duel:OnlineDuel)->void:
 	channel=duel;adapter.channel=duel
@@ -87,24 +98,37 @@ func refresh()->void:
 	status_hero.position=hero_name.position+Vector2((hero_name.size.x-status_hero.size.x)/2,-19)
 	status_enemy.position=enemy_name.position+Vector2((enemy_name.size.x-status_enemy.size.x)/2,-19)
 	$Hud/AutoButton.hide()
+	var was_waiting:=waiting_panel.visible
+	waiting_panel.hide()
 	if channel.active():
 		countdown=maxf(0,(float(_latest.remaining_ms)-(Time.get_ticks_msec()-channel.received_at))/1000.0)
 		if not channel.connected:$Hint.text="连接中断，正在恢复决斗……"
 		elif adapter.playing or _latest.phase=="resolving":$Hint.text="第%d回合 · 按敏捷结算双方行动"%int(_latest.round)
 		elif channel.pending():$Hint.text="正在确认本回合指令……"
-		elif not channel.can_decide():$Hint.text="指令已锁定 · 等待对方选择"
+		elif not channel.can_decide():$Hint.text="指令已锁定 · 等待对方操作"
 		else:
 			var me:Dictionary=_latest.fighters[0] if _latest.fighters[0].id==channel.character_id else _latest.fighters[1]
 			$Hint.text="第%d回合 · 双方同时决策 · 速度%d"%[int(_latest.round),int(me.speed)]
-		if adapter.playing or _latest.phase=="resolving":
+		if not channel.connected or adapter.playing or animation_time>0 or _latest.phase=="resolving":
 			$Hud/ActionMenu.hide();skill_picker.hide();$Choice.hide()
-		elif not channel.can_decide():
-			$Hud/ActionMenu.show();skill_picker.hide();$Choice.hide()
+		elif channel.pending() or not channel.can_decide():
+			$Hud/ActionMenu.hide();skill_picker.hide();$Choice.hide();$Inspect.hide()
+			waiting_text.text="正在确认指令…" if channel.pending() else "等待对方操作"
+			waiting_surrender.disabled=buttons[5].disabled
+			waiting_panel.show()
+		elif was_waiting:
+			super._open_menu()
 		$Countdown.visible=_latest.phase=="planning" and not adapter.playing
 		$Countdown.value=str(maxi(0,ceili(countdown)));$Countdown.queue_redraw()
 	else:$Hint.text="切磋不消耗日常血蓝与物品，无胜负奖励。"
 
 	if channel.active() and Time.get_ticks_msec()<_status_notice_until:$Hint.text=_status_notice
+
+func _open_menu()->void:
+	# Actor taps and popup close callbacks must respect the locked decision.
+	if channel!=null and channel.active() and (not channel.connected or channel.pending() or not channel.can_decide() or adapter.playing or animation_time>0):
+		refresh();return
+	super._open_menu()
 
 func _status_sources()->Array:
 	# enemy_* fields live on their caster in the duel protocol, not the victim.

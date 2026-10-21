@@ -124,7 +124,7 @@ func _failed(code: String, retry: bool = false) -> void:
 	_net_ids = {}
 	if socket != null: socket.close()
 	socket = null
-	var messages := {"WORLD_PROTOCOL_MISMATCH": "世界协议版本不一致，请更新客户端。", "CHARACTER_BUSY": "该角色已在另一登录会话中在线。", "SESSION_REPLACED": "连接已被同会话的新连接接管。", "SESSION_REVOKED": "账号会话失效，请重新登录。", "CONFIG_MISMATCH": "地图版本不一致，请更新客户端。", "WORLD_FULL": "服务器人数已满，请稍后再试。", "DATABASE_UNAVAILABLE": "数据库暂不可用，移动已停止。"}
+	var messages := {"WORLD_PROTOCOL_MISMATCH": "世界协议版本不一致，请更新客户端。", "CHARACTER_BUSY": "该角色已在另一登录会话中在线。", "SESSION_REPLACED": "连接已被同会话的新连接接管。", "SESSION_REVOKED": "账号会话失效，请重新登录。", "CONFIG_MISMATCH": "地图版本不一致，请更新客户端。", "WORLD_FULL": "服务器人数已满，请稍后再试。", "DATABASE_UNAVAILABLE": "数据库暂不可用，移动已停止。", "PVE_CATALOG_MISMATCH": "客户端与服务器的地图数据版本不一致，请同步更新后重试。"}
 	status_changed.emit(String(messages.get(code, "连接中断：" + code)))
 	if retry and _attempts < 3 and OnlineAccount.is_logged_in():
 		_attempts += 1
@@ -358,8 +358,10 @@ func _receive(data: Dictionary, raw: PackedByteArray) -> void:
 		changed.emit(entities)
 		return
 	if kind in ["pve.state", "pve.result"]:
-		if not world_ready or _pve_version != 1 or not pve.receive(data):
+		if not world_ready or _pve_version != 1:
 			_failed("INVALID_PVE")
+		elif not pve.receive(data):
+			_failed(pve.validation_error if not pve.validation_error.is_empty() else "INVALID_PVE")
 		elif pve.state.character.map_id != map_id:
 			_reconnect_map()
 		return

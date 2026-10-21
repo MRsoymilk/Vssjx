@@ -11,6 +11,7 @@ var realm := ""
 var sent_at := 0.0
 var last_action := ""
 var last_code := ""
+var validation_error := ""
 var _server_clock_ms := 0
 var _server_clock_tick := 0
 
@@ -51,6 +52,7 @@ static func decimal(value: Variant) -> bool:
 	return value is String and RegEx.create_from_string("^(0|[1-9][0-9]{0,18})\\z").search(value) != null and (value.length() < 19 or value <= "9223372036854775807")
 
 func valid(value: Variant) -> bool:
+	validation_error = ""
 	if not value is Dictionary or value.get("rules_version") != "qingyun-pve-v1": return false
 	if not OnlineAccount._valid_character(value.get("character")) or value.character.id != character_id or value.character.quest_stage > 4: return false
 	if not integer(value.get("potions"), 0, 99): return false
@@ -60,7 +62,11 @@ func valid(value: Variant) -> bool:
 		if not integer(value.stats.get(key), 1, 10000): return false
 	if value.character.hp > value.stats.hp or value.character.mp > value.stats.mp: return false
 	if value.has("skills") and not SkillRules.valid_view(value.skills,value.character):return false
-	if value.has("ai_world") and not AIWorld.valid_progress(value.ai_world, true): return false
+	if value.has("ai_world") and not AIWorld.valid_progress(value.ai_world, true):
+		# Retain strict validation, but distinguish stale content from corrupt PVE.
+		if value.ai_world is Dictionary and value.ai_world.get("version")=="ai-world-v1" and value.ai_world.get("catalog_sha256") is String and value.ai_world.catalog_sha256!=AIWorld.catalog_hash:
+			validation_error="PVE_CATALOG_MISMATCH"
+		return false
 	if value.has("attributes") and not valid_attributes(value.attributes, value): return false
 	if value.has("shop"):
 		if not ShopRules.valid_gear(value.shop): return false

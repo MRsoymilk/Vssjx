@@ -69,3 +69,16 @@ godot --path client --rendering-method gl_compatibility res://tests/battle_statu
 ```
 
 原包素材对应表为本次语义适配，未声称恢复原服状态编号。实际截图 `work/battle-status-party.png` 不纳入Git。
+
+
+## 本地旧服务导致 INVALID_PVE（2026-10-21）
+
+故障复现条件为：客户端已更新地图，8080进程仍使用旧地图目录编译的二进制。HTTP探活和发现均为200，其余商城／技能等主要目录一致，但已运行程序内嵌的 `ai-world-v1.json` 与当前客户端不同，因此 `AIWorld.valid_progress` 拒绝初始PVE快照。修复为使用已提交源码隔离构建、运行真实数据库／WebSocket专项后重新启动本地服务；原数据库完整备份，账号／角色／背包数量与金币／经验汇总核对保留。没有清空账号、迁移本地测试账号到公网或跳过数据校验。
+
+客户端新增明确的 `PVE_CATALOG_MISMATCH` 提示，仅在有效版本声明的地图目录指纹不匹配时使用；损坏任务进度、未就绪世界、其他畸形状态继续按原规则拒绝。`pve_catalog_mismatch_test.tscn` 验证匹配接收、不匹配拒绝且不覆盖已确认数据、后续合法数据清除诊断、其他错误不被误分类，以及实际网络层的可读提示，8项通过。既有联机PVE界面71项、单人遭遇55项及真实服务端／数据库／WebSocket精英专项41项通过。
+
+```powershell
+godot --headless --path client res://tests/pve_catalog_mismatch_test.tscn
+```
+
+构建、验证日志及数据库备份位于忽略的 `work/local-server-sync-*`；本地8080的健康检查和发现返回200，当前服务程序内嵌地图与编辑器客户端一致。未重新导出网页／Android包或更新公网服务器。

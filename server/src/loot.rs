@@ -39,12 +39,13 @@ impl Item{
     pub fn valid(&self,job:i16,gender:i16)->bool{
         let Some(d)=shop::item(&self.template)else{return false;};
         if !d.equipment()||d.equip_error(job,gender).is_some()||self.id.get_version_num()!=4||self.id.get_variant()!=uuid::Variant::RFC4122||!(1..=60).contains(&self.level)||!(0..=6).contains(&self.upgrade){return false;}
-        if !matches!(self.quality.as_str(),"legacy"|"white"|"blue"|"yellow"){return false;}
+        if !matches!(self.quality.as_str(),"legacy"|"white"|"blue"|"yellow"|"orange"|"green"){return false;}
         let Some(count)=DATA["quality_affixes"].get(&self.quality).and_then(Value::as_u64)else{return false;};
         if self.legacy!=(self.quality=="legacy")||self.affixes.len()!=count as usize{return false;}
         if self.legacy&&(self.level!=1||self.upgrade!=0||self.legacy_attack!=d.attack||self.legacy_defense!=d.defense){return false;}
         if !self.legacy&&(self.legacy_attack!=0||self.legacy_defense!=0){return false;}
-        if self.legendary.is_some()||self.set_id.is_some(){return false;} // Activated with the build catalog in stage C.
+        if (self.quality=="orange")!=self.legendary.is_some()||(self.quality=="green")!=self.set_id.is_some(){return false;}
+        if self.legendary.as_deref().is_some_and(|id|!crate::builds::compatible(id,job,&d.slot,true))||self.set_id.as_deref().is_some_and(|id|!crate::builds::compatible(id,job,&d.slot,false)){return false;}
         if self.reroll_index.is_some_and(|i|i>=self.affixes.len()){return false;}
         if let Some(skin)=&self.skin{if shop::item(skin).is_none_or(|s|s.slot!=d.slot||s.equip_error(job,gender).is_some()){return false;}}
         let mut seen=BTreeSet::new();
@@ -128,7 +129,7 @@ impl State{
         for i in self.items.iter().filter(|i|i.equipped&&!i.legacy){let d=shop::item(i.skin.as_deref().unwrap_or(&i.template)).unwrap();match i.slot(){"weapon"=>original[0]=d.visual,"armor"=>original[1]=d.visual,"hat"=>original[2]=d.head_visual,_=>()}}
         original
     }
-    pub fn view(&self,original:[i32;3])->Value{json!({"version":"loot-v1","catalog_sha256":*HASH,"state":self,"appearance":self.look(original)})}
+    pub fn view(&self,original:[i32;3])->Value{json!({"version":"loot-v1","catalog_sha256":*HASH,"builds_sha256":*crate::builds::HASH,"state":self,"appearance":self.look(original)})}
     pub fn apply_stats(&self,s:&mut Stats,job:i16){
         let mut hp=0;let mut mp=0;let mut hp_percent=0;
         for i in self.items.iter().filter(|i|i.equipped&&!i.legacy){
@@ -143,5 +144,18 @@ impl State{
         }
         s.hp=((s.hp+hp) as i64*(10000+hp_percent.min(4000)) as i64/10000).min(1000000) as i32;s.mp=(s.mp+mp).min(1000000);
         if let Some(b)=s.balance{s.attack=if job==2{b.magic_attack}else{b.physical_attack};}
+        crate::builds::aggregate(self,s);
     }
+}
+pub fn roll_special(template:&str,level:i32,quality:&str,build:&str,seed:u32,id:Uuid)->Result<Item,&'static str>{
+    if !matches!(quality,"orange"|"green"){return Err("INVALID_LOOT_QUALITY");}
+    let d=shop::item(template).ok_or("INVALID_EQUIPMENT")?;
+    let i=crate::builds::index(build).ok_or("INVALID_BUILD")?;
+    let job=crate::builds::DATA["items"][i]["job"].as_i64().unwrap() as i16;
+    if d.equip_error(job,0).is_some()&&d.equip_error(job,1).is_some(){return Err("INVALID_BUILD_SLOT");}
+    if !crate::builds::compatible(build,job,&d.slot,quality=="orange"){return Err("INVALID_BUILD_SLOT");}
+    let mut item=roll(template,level,"yellow",seed,id)?;
+    item.quality=quality.into();item.affixes.truncate(3);
+    if quality=="orange"{item.legendary=Some(build.into());}else{item.set_id=Some(build.into());}
+    Ok(item)
 }

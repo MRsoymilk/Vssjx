@@ -43,6 +43,7 @@ static func valid_view(view:Variant,character:Dictionary)->bool:
 	return true
 
 static func valid_state(state:Variant)->bool:
+	if state is Dictionary and state.has("builds") and not BuildRules.valid_progress(state.builds):return false
 	if not state is Dictionary or not state.get("last_skill") is String or not state.get("last_enemy_acted") is bool:return false
 	for key in ["last_missed","last_enemy_missed"]:
 		if state.has(key) and not state[key] is bool:return false
@@ -71,6 +72,7 @@ static func new_state(job:int,school:int,level:int,enemy_level:int=1)->Dictionar
 	return state
 
 static func reset_turn(state:Dictionary)->void:
+	if state.has("builds"):state.builds.used=false;state.builds.bonus_bp=0;state.builds.dot_bp=0
 	if state.has("balance"):state.balance.last_enemy_magical=false
 	state.erase("last_missed");state.erase("last_enemy_missed")
 	state.erase("last_critical")
@@ -109,6 +111,8 @@ static func cast(skill:Dictionary,state:Dictionary,stats:Dictionary,hp:int,mp:in
 	var value:=int(skill.value);var duration:=int(skill.duration)
 	# Direct damage wakes existing sleep before this action can apply new sleep.
 	if damage>0:state.enemy_sleep=0
+	var stolen_amount:=0
+	var control_applied:=false
 	match String(skill.effect):
 		"bleed","poison":
 			state["enemy_"+skill.effect]=int(SkillBalance.rules.dot_ticks) if revised else duration
@@ -116,6 +120,7 @@ static func cast(skill:Dictionary,state:Dictionary,stats:Dictionary,hp:int,mp:in
 		"sleep","silence":
 			if roll<(int(SkillBalance.rules.control_chance) if revised else int(skill.chance)) and int(state.get("balance",{}).get("control_protection",0))==0:
 				state["enemy_"+skill.effect]=int(SkillBalance.rules.control_duration) if revised else duration
+				control_applied=true
 				if state.has("balance"):state.balance.control_protection=int(SkillBalance.rules.control_protection)
 		"regen":state.regen=duration;state.regen_amount=maxi(1,int(stats.hp)*value/100)
 		"defense":state.defense=duration;state.defense_percent=value
@@ -124,9 +129,10 @@ static func cast(skill:Dictionary,state:Dictionary,stats:Dictionary,hp:int,mp:in
 		"reflect_magic":state.reflect_magic=duration;state.magic_percent=value
 		"mana_steal":
 			var stolen:=mini(value,int(state.enemy_mp));state.enemy_mp=int(state.enemy_mp)-stolen
+			stolen_amount=stolen
 			mp=mini(int(stats.mp),mp+stolen)
 	state.last_healed=int(state.last_healed)+healed
-	return {"damage":damage,"hp":hp,"mp":mp}
+	return BuildRules.cast(skill,stats,state,hp,mp,damage,stolen_amount,control_applied)
 
 static func after_player(state:Dictionary,hp:int,max_hp:int)->Dictionary:
 	if state.has("balance"):return {"damage":0,"hp":hp}
@@ -157,4 +163,7 @@ static func status_text(state:Dictionary)->String:
 	var parts:Array[String]=[]
 	for row in [["enemy_bleed","流血"],["enemy_poison","中毒"],["enemy_sleep","睡眠"],["enemy_silence","沉默"],["regen","回春"],["defense","护体"],["crit","暴击"],["reflect_physical","物反"],["reflect_magic","法反"]]:
 		if int(state.get(row[0],0))>0:parts.append("%s%d"%[row[1],int(state[row[0]])])
+	if state.has("builds"):
+		for i in [0,2,4,5]:
+			if int(state.builds.charges[i])>0:parts.append("%s%d"%[{0:"反击蓄势",2:"剑势",4:"凝元",5:"汲咒"}[i],int(state.builds.charges[i])])
 	return " · ".join(parts)

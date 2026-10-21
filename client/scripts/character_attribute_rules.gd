@@ -79,6 +79,7 @@ static func valid_balance(stats:Dictionary)->bool:
 			if not OnlinePve.integer(n,0,1000000):return false
 	for key in ["crit_damage_bp","increased_bp","dot_bp","penetration_bp","reduction_bp"]:
 		if not OnlinePve.integer(b.get(key,0),0,1000000):return false
+	if b.has("builds") and not BuildRules.valid_snapshot(b.builds):return false
 	return b.physical_defense==stats.get("defense")
 
 static func gear_bonus(s:Dictionary,attack:int,defense:int)->void:

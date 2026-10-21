@@ -396,8 +396,10 @@ impl Battle {
                     let mut temporary_mp = crate::skill_balance::cost(s,ally.stats);
                     let cooldowns=ally.effects.balance.as_ref().map(|b|b.cooldowns.clone());
                     let old = ally.hp;
+                    let mut cast_stats=ally.stats;
+                    if ally.id!=who{if let Some(b)=cast_stats.balance.as_mut(){b.builds=Default::default();}}
                     ally.effects
-                        .cast(s, ally.stats, &mut ally.hp, &mut temporary_mp, 0, roll);
+                        .cast(s, cast_stats, &mut ally.hp, &mut temporary_mp, 0, roll);
                     if ally.id!=who{if let Some(b)=ally.effects.balance.as_mut(){b.cooldowns=cooldowns.unwrap_or_default();}}
                     self.events.push(Event {missed:false,
                         actor: who.to_string(),

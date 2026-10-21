@@ -18,11 +18,12 @@ pub struct BalanceStats {
     #[serde(default)] pub dot_bp:i32,
     #[serde(default)] pub penetration_bp:i32,
     #[serde(default)] pub reduction_bp:i32,
+    #[serde(default,skip_serializing_if="crate::builds::Snapshot::empty")] pub builds:crate::builds::Snapshot,
 }
 pub fn balanced_stats(job:i16,level:i32,equipped:bool,a:[i32;5])->Stats{
     let p=crate::combat_balance::profile(job as i64,level as i64,a.map(i64::from)).expect("validated character attributes");
     let mut s=Stats{hp:p.hp as i32,mp:p.mp as i32,attack:if job==2{p.magic_attack}else{p.physical_attack} as i32,defense:p.physical_defense as i32,attributes:a,
-        balance:Some(BalanceStats{skills_revision:1,level,physical_attack:p.physical_attack as i32,magic_attack:p.magic_attack as i32,physical_defense:p.physical_defense as i32,magic_defense:p.magic_defense as i32,ratings:[a[3],a[4]],crit_bonus:[0;2],hit_bonus:[0;2],evade_bonus:[0;2],crit_damage_bp:0,increased_bp:0,dot_bp:0,penetration_bp:0,reduction_bp:0})};
+        balance:Some(BalanceStats{skills_revision:1,level,physical_attack:p.physical_attack as i32,magic_attack:p.magic_attack as i32,physical_defense:p.physical_defense as i32,magic_defense:p.magic_defense as i32,ratings:[a[3],a[4]],crit_bonus:[0;2],hit_bonus:[0;2],evade_bonus:[0;2],crit_damage_bp:0,increased_bp:0,dot_bp:0,penetration_bp:0,reduction_bp:0,builds:Default::default()})};
     if equipped{gear_bonus(&mut s,5,0);}
     s
 }

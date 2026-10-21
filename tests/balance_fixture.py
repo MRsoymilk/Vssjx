@@ -5,6 +5,8 @@ import subprocess
 import threading
 import queue
 import re
+import socket
+import time
 from uuid import uuid4
 from pg_fixture import PostgresFixture
 from run_account_auth import stop
@@ -35,6 +37,16 @@ class BalanceFixture:
         threading.Thread(target=drain,daemon=True).start()
         self.base=addresses.get(timeout=20)
         if self.base is None:raise RuntimeError('Owned server failed to start; see work/combat-balance-v1/fixture-server.log')
+        # The log announces the address just before binding; restart regressions
+        # must wait for the actual socket, not race the first HTTP request.
+        host,port=self.base.removeprefix('http://').split(':')
+        deadline=time.monotonic()+5
+        while True:
+            try:
+                with socket.create_connection((host,int(port)),timeout=.2):break
+            except OSError:
+                if process.poll() is not None or time.monotonic()>deadline:raise
+                time.sleep(.02)
     def restart(self):
         for p in self.clients:p.close()
         self.clients=[];stop(self.process);self.start()

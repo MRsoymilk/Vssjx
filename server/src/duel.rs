@@ -369,6 +369,7 @@ impl Battle {
                             actor.effects.last_skill = s.id.clone();
                             0
                         } else {
+                            let before_hp=actor.hp;let before_healed=actor.effects.last_healed;
                             let hit = actor.effects.cast(
                                 s,
                                 crate::attributes::for_attack(actor.stats, actor.job, magical),
@@ -377,6 +378,10 @@ impl Battle {
                                 crate::attributes::defense(enemy.stats,magical),
                                 roll,
                             );
+                            if balanced{
+                                let actual=(actor.hp-before_hp)*crate::skill_balance::n("pvp_heal_bp")/10000;
+                                actor.hp=before_hp+actual;actor.effects.last_healed=before_healed+actual;
+                            }
                             if s.effect == "mana_steal" {
                                 enemy.mp = actor.effects.enemy_mp;
                             }

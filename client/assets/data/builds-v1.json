@@ -1,0 +1,11 @@
+{
+  "version":"builds-v1","final_bonus_cap_bp":5000,"set_slots":["armor","hat","wrist","boots"],
+  "items":[
+    {"id":"rampart","name":"铁壁反击","job":0,"legend_slot":"pendant","legend_name":"回山印","two":{"reduction":300},"description":"护体或反射技能蓄势；下一次伤害技能增伤30%，恢复3%气血。传奇与四件同时激活时为45%／5%。","bonus":[3000,4500],"heal":[300,500]},
+    {"id":"rend","name":"赤血斩","job":0,"legend_slot":"weapon","legend_name":"饮赤刃","two":{"dot":800},"description":"流血压缩为两次，每次原伤害150%；施加流血恢复3%气血。传奇与四件同时激活时每次200%、恢复5%。","tick":[15000,20000],"heal":[300,500]},
+    {"id":"tempo","name":"连影剑","job":1,"legend_slot":"weapon","legend_name":"叠影锋","two":{"crit":25},"description":"单体伤害技能积一层剑势（至多两层）；群攻消耗剑势，每层增伤12%。传奇与四件同时激活时每层18%。","bonus":[1200,1800]},
+    {"id":"venom","name":"毒行控场","job":1,"legend_slot":"ring","legend_name":"缚魂环","two":{"hit":25},"description":"对中毒目标成功施加睡眠时，附带一次毒伤且不唤醒睡眠。传奇与四件同时激活时附带两次毒伤；持续时钟不变。","ticks":[1,2]},
+    {"id":"focus","name":"凝元术","job":2,"legend_slot":"pendant","legend_name":"凝元符","two":{"mana":80},"description":"回春技能蓄元；下一次伤害技能增伤30%，返还3%最大灵力。传奇与四件同时激活时为45%／5%。","bonus":[3000,4500],"refund":[300,500]},
+    {"id":"siphon","name":"汲灵咒","job":2,"legend_slot":"weapon","legend_name":"噬灵杖","two":{"dot":800},"description":"夺灵成功按夺取量两倍回血（最多5%气血），并蓄咒；下一次流血技能的持续伤害增加40%。传奇与四件同时激活时回血上限8%、持续伤害增加60%。","dot":[4000,6000],"heal_cap":[500,800]}
+  ]
+}

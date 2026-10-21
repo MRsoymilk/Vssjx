@@ -69,6 +69,8 @@ pub fn view(job: i16, school: i16, level: i32) -> Value {
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 #[serde(default)]
 pub struct State {
+    #[serde(default,skip_serializing_if="Option::is_none")]
+    pub builds:Option<crate::builds::Progress>,
     #[serde(skip_serializing_if="not_critical")]
     pub last_missed: bool,
     #[serde(skip_serializing_if="not_critical")]
@@ -138,6 +140,7 @@ impl State {
         state
     }
     pub fn reset_turn(&mut self) {
+        if let Some(p)=self.builds.as_mut(){p.used=false;p.bonus_bp=0;p.dot_bp=0;}
         if let Some(b)=self.balance.as_mut(){b.last_enemy_magical=false;}
         self.last_critical = false;
         self.last_missed=false;self.last_enemy_missed=false;
@@ -181,6 +184,8 @@ impl State {
         if damage > 0 {
             self.enemy_sleep = 0;
         }
+        let mut stolen_amount=0;
+        let mut control_applied=false;
         match s.effect.as_str() {
             "bleed" => {
                 self.enemy_bleed = if revised{crate::skill_balance::n("dot_ticks")}else{s.duration};
@@ -193,12 +198,14 @@ impl State {
             "sleep" => {
                 if roll < if revised{crate::skill_balance::n("control_chance")}else{s.chance} && self.balance.as_ref().is_none_or(|b|b.control_protection==0) {
                     self.enemy_sleep = if revised{crate::skill_balance::n("control_duration")}else{s.duration};
+                    control_applied=true;
                     if let Some(b)=self.balance.as_mut(){b.control_protection=crate::skill_balance::n("control_protection");}
                 }
             }
             "silence" => {
                 if roll < if revised{crate::skill_balance::n("control_chance")}else{s.chance} && self.balance.as_ref().is_none_or(|b|b.control_protection==0) {
                     self.enemy_silence = if revised{crate::skill_balance::n("control_duration")}else{s.duration};
+                    control_applied=true;
                     if let Some(b)=self.balance.as_mut(){b.control_protection=crate::skill_balance::n("control_protection");}
                 }
             }
@@ -224,12 +231,13 @@ impl State {
             }
             "mana_steal" => {
                 let stolen = s.value.min(self.enemy_mp);
+                stolen_amount=stolen;
                 self.enemy_mp -= stolen;
                 *mp = (*mp + stolen).min(stats.mp);
             }
             _ => {}
         }
-        damage
+        crate::builds::cast(s,stats,self,hp,mp,damage,stolen_amount,control_applied)
     }
     pub fn after_player(&mut self, hp: &mut i32, max_hp: i32) -> i32 {
         if self.balance.is_some(){return 0;}

@@ -7,6 +7,14 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class BalanceContract(unittest.TestCase):
+    def test_build_catalog_mirror_and_six_styles(self):
+        source=(ROOT/'shared/data/builds-v1.json').read_bytes()
+        self.assertEqual(source,(ROOT/'client/assets/data/builds-v1.json').read_bytes())
+        data=json.loads(source)
+        self.assertEqual(len(data['items']),6)
+        self.assertEqual(len({d['id'] for d in data['items']}),6)
+        for job in range(3):self.assertEqual(sum(d['job']==job for d in data['items']),2)
+        self.assertEqual(len(set(data['set_slots'])),4)
     def test_loot_mirror_and_slot_pools(self):
         source=(ROOT/'shared/data/loot-v1.json').read_bytes()
         self.assertEqual(source,(ROOT/'client/assets/data/loot-v1.json').read_bytes())

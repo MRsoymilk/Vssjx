@@ -31,12 +31,14 @@ static func valid_item(i:Variant,job:int,gender:int)->bool:
 	var d:=ShopRules.item(str(i.get("template","")))
 	if not ShopRules.is_equipment(d) or not ShopRules.equipment_error(d,job,gender).is_empty():return false
 	if not i.get("id") is String or _uuid_pattern.search(i.id)==null:return false
-	if not ShopRules._integer(i.get("level"),1,60) or not ShopRules._integer(i.get("upgrade",0),0,6) or not i.get("quality") in ["legacy","white","blue","yellow"]:return false
+	if not ShopRules._integer(i.get("level"),1,60) or not ShopRules._integer(i.get("upgrade",0),0,6) or not i.get("quality") in rules.quality_affixes:return false
 	if not i.get("equipped") is bool or not i.get("legacy") is bool or i.legacy!=(i.quality=="legacy"):return false
 	if not i.get("affixes") is Array or i.affixes.size()!=int(rules.quality_affixes[i.quality]):return false
 	if i.legacy and (i.level!=1 or i.upgrade!=0 or i.get("legacy_attack")!=d.attack or i.get("legacy_defense")!=d.defense):return false
 	if not i.legacy and (i.get("legacy_attack",0)!=0 or i.get("legacy_defense",0)!=0):return false
-	if i.get("legendary")!=null or i.get("set_id")!=null:return false
+	if (i.quality=="orange")!=(i.get("legendary")!=null) or (i.quality=="green")!=(i.get("set_id")!=null):return false
+	for key in ["legendary","set_id"]:
+		if i.get(key)!=null and (not i[key] is String or not BuildRules.compatible(i[key],job,d.slot,key=="legendary")):return false
 	if i.get("reroll_index")!=null and not ShopRules._integer(i.reroll_index,0,i.affixes.size()-1):return false
 	if i.get("skin")!=null:
 		var skin:=ShopRules.item(str(i.skin))
@@ -119,6 +121,7 @@ static func apply_stats(s:Dictionary,stats:Dictionary,job:int)->void:
 					var key:String={"crit_damage":"crit_damage_bp","damage":"increased_bp","dot":"dot_bp","penetration":"penetration_bp","reduction":"reduction_bp"}[a.kind]
 					b[key]+=value
 	stats.hp=mini(1000000,(int(stats.hp)+hp)*(10000+mini(percent,4000))/10000);stats.mp=mini(1000000,int(stats.mp)+mp);stats.attack=b[channel]
+	BuildRules.aggregate(s,stats)
 static func apply_local(player:Dictionary,action:String,id:String)->String:
 	if player.get("corpse") is Dictionary:return "SOUL_STATE"
 	sync_legacy(player)
@@ -166,6 +169,7 @@ static func consistent(s:Dictionary,gear:Dictionary,job:int,gender:int)->bool:
 static func valid_view(v:Variant,gear:Dictionary,job:int,gender:int)->bool:
 	if not v is Dictionary or v.get("version")!="loot-v1" or not valid(v.get("state"),job,gender):return false
 	if v.has("catalog_sha256") and v.catalog_sha256!=catalog_hash:return false
+	if v.has("builds_sha256") and v.builds_sha256!=BuildRules.catalog_hash:return false
 	if not consistent(v.state,gear,job,gender) or not ShopRules.valid_appearance(v.get("appearance")):return false
 	var expected:=look(v.state,ShopRules.appearance(gear))
 	for index in 3:
@@ -179,6 +183,7 @@ static func equipped(s:Dictionary,slot:String)->Dictionary:
 
 static func bag_item(i:Dictionary)->Dictionary:
 	var entry:=ShopRules.bag_item(i.template)
+	if i.get("legendary")!=null:entry.name=BuildRules.rules.items[BuildRules.index(i.legendary)].legend_name+" · "+entry.name
 	entry.instance_id=i.id;entry.instance=i;entry.level=int(i.level);entry.count=1
 	return entry
 
@@ -189,4 +194,18 @@ static func describe(i:Dictionary)->String:
 	for a in i.affixes:
 		parts.append("%s +%s"%[rules.affix_names[a.kind],("%.2f%%"%(int(a.value)/100.0)) if a.kind in ["hp_percent","crit_damage","penetration","damage","dot","reduction"] else str(int(a.value))])
 	parts.append("编号 "+String(i.id).right(8))
+	var build:String=i.legendary if i.get("legendary")!=null else (i.set_id if i.get("set_id")!=null else "")
+	if not build.is_empty():
+		var entry:Dictionary=BuildRules.rules.items[BuildRules.index(build)]
+		parts.append((entry.legend_name if i.quality=="orange" else entry.name+" · 2/4件套")+"\n"+entry.description)
 	return "\n".join(parts)
+
+static func roll_special(template:String,level:int,quality:String,build:String,seed:int,id:String="")->Dictionary:
+	var index:=BuildRules.index(build);var d:=ShopRules.item(template)
+	if quality not in ["orange","green"] or index<0 or not ShopRules.is_equipment(d) or not BuildRules.compatible(build,int(BuildRules.rules.items[index].job),d.slot,quality=="orange"):return {}
+	var job:=int(BuildRules.rules.items[index].job)
+	if not ShopRules.equipment_error(d,job,0).is_empty() and not ShopRules.equipment_error(d,job,1).is_empty():return {}
+	var item:=roll(template,level,"yellow",seed,id)
+	if item.is_empty():return {}
+	item.quality=quality;item.affixes.resize(3);item["legendary" if quality=="orange" else "set_id"]=build
+	return item

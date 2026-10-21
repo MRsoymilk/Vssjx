@@ -22,6 +22,7 @@ func _ready()->void:
 	paper.add_theme_stylebox_override("panel",style);add_child(paper)
 	OriginalSceneChrome.label(self,"装备实例 · 独立编号／随机词缀",Rect2(16,69,288,24),14,INK)
 	summary=OriginalSceneChrome.label(self,"",Rect2(16,94,288,22),11,INK)
+	var builds:=OriginalSceneChrome.button(self,"流派",Rect2(255,94,49,21),11);builds.name="BuildOverview";builds.pressed.connect(show_builds)
 	list=ItemList.new();list.name="Instances";list.position=Vector2(16,117);list.size=Vector2(288,117);list.add_theme_font_size_override("font_size",12);list.add_theme_color_override("font_color",INK);add_child(list)
 	var slot:=StyleBoxFlat.new();slot.bg_color=Color("fff8d4");slot.border_color=Color("b18b48");slot.set_border_width_all(1);list.add_theme_stylebox_override("panel",slot)
 	var selected:=slot.duplicate();selected.bg_color=Color("f1d16a");list.add_theme_stylebox_override("selected",selected);list.add_theme_stylebox_override("selected_focus",selected);list.add_theme_color_override("font_selected_color",INK)
@@ -31,7 +32,7 @@ func _ready()->void:
 	equip=OriginalSceneChrome.button(self,"装备",Rect2(16,356,87,25),12);equip.name="Equip";equip.pressed.connect(_action.bind("toggle"))
 	claim=OriginalSceneChrome.button(self,"领取暂存",Rect2(111,356,93,25),12);claim.name="Claim";claim.pressed.connect(_action.bind("gear_claim"))
 	var back:=OriginalSceneChrome.button(self,"返回背包",Rect2(211,356,93,25),12);back.pressed.connect(func()->void:back_requested.emit())
-	for button in [equip,claim,back]:
+	for button in [equip,claim,back,builds]:
 		var normal:=StyleBoxFlat.new();normal.bg_color=Color("f6ce76");normal.border_color=Color("906329");normal.set_border_width_all(1)
 		var hover:=normal.duplicate();hover.bg_color=Color("ffe5a2")
 		var disabled:=normal.duplicate();disabled.bg_color=Color("d8cda6");disabled.border_color=Color("baa672")
@@ -51,13 +52,24 @@ func refresh()->void:
 	var pending:Array=s.get("pending",[])
 	for i in rows:
 		var prefix:="[暂存] " if pending.has(i) else ("[已穿] " if i.equipped else "")
-		list.add_item(prefix+ShopRules.item(i.template).name+" · "+("固定" if i.legacy else "Lv.%d"%int(i.level))+" · "+String(i.id).right(6))
+		list.add_item(prefix+LootRules.bag_item(i).name+" · "+("固定" if i.legacy else "Lv.%d"%int(i.level))+" · "+String(i.id).right(6))
+		if i.quality in ["orange","green"]:list.set_item_custom_fg_color(list.item_count-1,Color("a54b06") if i.quality=="orange" else Color("266522"))
 		if i.id==selected_id:list.select(list.item_count-1)
 	if not rows.is_empty() and list.get_selected_items().is_empty():list.select(0);selected_id=rows[0].id
 	var gear:Dictionary=ShopRules.local_state(Game.player) if online_model==null else online_model.state.get("shop",{})
 	var potions:int=int(Game.player.get("potions",0)) if online_model==null else int(online_model.state.get("potions",0))
 	summary.text="背包 %d/60 · 暂存 %d/20"%[ShopRules.bag_slots(gear,potions)+LootRules.extra_bag(s),pending.size()] if not s.is_empty() else "当前服务尚未开放装备实例"
 	_describe()
+func show_builds()->void:
+	var stats:Dictionary=Game.stats() if online_model==null else online_model.state.get("stats",{})
+	var active:=BuildRules.describe(stats.get("balance",{}).get("builds",{}))
+	var descriptions:Array[String]=["当前：\n"+("尚未激活流派。" if active.is_empty() else active),"\n职业流派（装备自动激活）"]
+	for entry in BuildRules.rules.items:
+		if int(entry.job)!=int(_character().get("job",0)):continue
+		descriptions.append("\n"+entry.name+" · 传奇："+entry.legend_name)
+		descriptions.append("2件："+BuildRules.two_text(entry)+"\n4件或传奇："+entry.description)
+	details.text="\n".join(descriptions)
+	status.text="2件提供属性；4件或传奇开启打法，二者同穿升为2阶。"
 func _describe()->void:
 	var selection:Dictionary={}
 	for i in rows:

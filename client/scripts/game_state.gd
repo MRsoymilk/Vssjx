@@ -117,6 +117,42 @@ func select_local_character(id: String) -> PlatformResult:
 	_local_roster_busy = false
 	return result
 
+func delete_local_character(id: String, expected_name: String) -> PlatformResult:
+	if _local_roster_busy or storage_busy: return PlatformResult.new(PlatformResult.Status.TEMPORARY_FAILURE, "STORAGE_BUSY", "正在处理存档，请稍候。")
+	_local_roster_busy = true
+	var result := await load_game()
+	if not result.ok:
+		_local_roster_busy = false
+		return result
+	var before := player.duplicate(true)
+	var entries := local_character_entries()
+	var index := -1
+	for i in entries.size():
+		if entries[i].id == id and entries[i].data.name == expected_name: index = i
+	if index < 0:
+		_local_roster_busy = false
+		return PlatformResult.new(PlatformResult.Status.INVALID_DATA, "CHARACTER_NOT_FOUND", "角色已更新，请重新选择。")
+	entries.remove_at(index)
+	var active := active_local_character_id()
+	if entries.is_empty():
+		# Keep an explicit empty roster, so legacy migration cannot restore the deleted role.
+		new_player("无角色", 0, SchoolRules.UNJOINED)
+		active = ""
+	elif active == id:
+		var next: Dictionary = entries[mini(index, entries.size() - 1)]
+		player = next.data.duplicate(true)
+		active = next.id
+	player.local_characters = {"version": 1, "active_id": active, "characters": entries}
+	_player_generation += 1
+	var generation := _player_generation
+	var path := save_path
+	result = await save_game()
+	if not result.ok and generation == _player_generation and path == save_path:
+		player = before
+		_player_generation += 1
+	_local_roster_busy = false
+	return result
+
 func invalidate_load() -> void:
 	_load_epoch += 1
 
@@ -702,7 +738,8 @@ func valid_save(data: Variant) -> bool:
 func _valid_local_roster(data: Dictionary) -> bool:
 	var roster: Variant = data.local_characters
 	if not roster is Dictionary or roster.get("version") != 1 or not roster.get("active_id") is String or not roster.get("characters") is Array: return false
-	if roster.characters.is_empty() or roster.characters.size() > MAX_LOCAL_CHARACTERS: return false
+	if roster.characters.size() > MAX_LOCAL_CHARACTERS: return false
+	if roster.characters.is_empty(): return roster.active_id.is_empty()
 	var ids := {}
 	var active_found := false
 	var current := data.duplicate(true)

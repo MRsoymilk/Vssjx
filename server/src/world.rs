@@ -132,7 +132,7 @@ pub struct WorldHub {
     pub(crate) team_updates: AsyncMutex<()>,
     metrics: Arc<Observability>,
     data: Mutex<StateData>,
-    admissions: AsyncMutex<()>,
+    pub(crate) admissions: AsyncMutex<()>,
     map: WorldMap,
     ruins: WorldMap,
     ai_maps: HashMap<String,WorldMap>,
@@ -208,6 +208,10 @@ impl WorldHub {
     }
     pub(crate) fn online_characters(&self) -> std::collections::HashSet<Uuid> {
         self.data.lock().expect("world state").actors.values().filter(|a|a.connected).map(|a|a.id).collect()
+    }
+    pub(crate) fn has_character(&self, id: Uuid) -> bool {
+        // Disconnected actors still own their state during the reconnect grace period.
+        self.data.lock().expect("world state").actors.contains_key(&id)
     }
     pub(crate) fn chat_snapshot(&self) -> (Uuid, Vec<crate::chat::ChatMessage>) {
         let state = self.data.lock().expect("world state");
@@ -443,7 +447,7 @@ impl WorldHub {
                 return Err(error(503, "WORLD_FULL"));
             }
         }
-        let row=sqlx::query("UPDATE characters c SET owner_epoch=owner_epoch+1,position_revision=0 WHERE c.id=$1 AND (map_id='qingyun_trail' OR ($3>=1 AND map_id='ancient_ruins') OR ($3>=2 AND map_id LIKE 'ai_%')) AND owner_epoch<9223372036854775807 AND EXISTS(SELECT 1 FROM sessions s JOIN accounts a ON a.id=s.account_id WHERE s.id=$2 AND s.account_id=c.account_id AND NOT a.disabled AND s.revoked_at IS NULL AND s.access_expires_at>clock_timestamp() AND s.refresh_expires_at>clock_timestamp()) RETURNING display_name,job,gender,cell_x,cell_y,owner_epoch,active_battle_id,map_id,corpse IS NOT NULL AS soul")
+        let row=sqlx::query("UPDATE characters c SET owner_epoch=owner_epoch+1,position_revision=0 WHERE c.id=$1 AND c.deleted_at IS NULL AND (map_id='qingyun_trail' OR ($3>=1 AND map_id='ancient_ruins') OR ($3>=2 AND map_id LIKE 'ai_%')) AND owner_epoch<9223372036854775807 AND EXISTS(SELECT 1 FROM sessions s JOIN accounts a ON a.id=s.account_id WHERE s.id=$2 AND s.account_id=c.account_id AND NOT a.disabled AND s.revoked_at IS NULL AND s.access_expires_at>clock_timestamp() AND s.refresh_expires_at>clock_timestamp()) RETURNING display_name,job,gender,cell_x,cell_y,owner_epoch,active_battle_id,map_id,corpse IS NOT NULL AS soul")
             .bind(id).bind(session).bind(maps_version as i32).fetch_optional(auth.pool()).await.map_err(db_error)?.ok_or(error(403,"WORLD_UNAVAILABLE"))?;
         let cell = [row.get("cell_x"), row.get("cell_y")];
         let teaming:bool=sqlx::query_scalar("SELECT EXISTS(SELECT 1 FROM team_members m JOIN team_battles b ON b.team_id=m.team_id AND b.active WHERE m.character_id=$1 AND b.state->'fighters' @> jsonb_build_array(jsonb_build_object('id',m.character_id)))").bind(id).fetch_one(auth.pool()).await.map_err(db_error)?;
@@ -721,7 +725,7 @@ pub(crate) async fn ticket(
     }
     let raw = auth::token();
     let mut tx = auth.pool().begin().await.map_err(db_error)?;
-    let session:Option<Uuid>=sqlx::query_scalar("SELECT s.id FROM sessions s JOIN characters c ON c.account_id=s.account_id WHERE s.access_digest=$1 AND c.id=$2 AND c.account_id=$3 AND s.revoked_at IS NULL AND s.access_expires_at>clock_timestamp() AND s.refresh_expires_at>clock_timestamp() FOR UPDATE OF s")
+    let session:Option<Uuid>=sqlx::query_scalar("SELECT s.id FROM sessions s JOIN characters c ON c.account_id=s.account_id WHERE s.access_digest=$1 AND c.id=$2 AND c.account_id=$3 AND c.deleted_at IS NULL AND s.revoked_at IS NULL AND s.access_expires_at>clock_timestamp() AND s.refresh_expires_at>clock_timestamp() FOR UPDATE OF s")
         .bind(auth::token_digest(bearer)?).bind(request.character_id).bind(account.id).fetch_optional(&mut *tx).await.map_err(db_error)?;
     let session = session.ok_or(error(403, "FORBIDDEN"))?;
     sqlx::query("DELETE FROM world_tickets WHERE expires_at<=NOW()")

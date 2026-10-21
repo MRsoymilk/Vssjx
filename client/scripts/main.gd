@@ -407,10 +407,31 @@ func _local_character_selection(has_character: bool = true) -> void:
 	ui.add_child(character_selection)
 	character_selection.display_characters(Game.local_characters() if has_character else [])
 	character_selection.set_controls(false, not has_character or Game.local_characters().size() < Game.MAX_LOCAL_CHARACTERS)
-	character_selection.status.text = "请选择角色后进入游戏" if has_character else "尚无本地角色，请从菜单创建角色"
+	character_selection.status.text = "请选择角色后进入游戏" if has_character and not Game.local_characters().is_empty() else "尚无本地角色，请从菜单创建角色"
 	character_selection.enter_requested.connect(_continue)
 	character_selection.create_requested.connect(_create)
+	character_selection.delete_requested.connect(_delete_local_character)
 	character_selection.back_requested.connect(_return_to_server_login)
+
+func _delete_local_character(id: String, character_name: String) -> void:
+	if _closing: return
+	if Game.storage_busy:
+		character_selection.finish_delete()
+		character_selection.status.text = "正在处理存档，请稍后重试"
+		return
+	var epoch := _ui_epoch
+	character_selection.set_controls(true, false)
+	character_selection.status.text = "正在删除角色……"
+	var result := await Game.delete_local_character(id, character_name)
+	if epoch != _ui_epoch or _closing: return
+	if result.ok:
+		_local_character_selection()
+		if not Game.local_characters().is_empty(): character_selection.status.text = "角色已删除，请选择角色"
+	else:
+		character_selection.finish_delete()
+		character_selection.set_controls(false, Game.local_characters().size() < Game.MAX_LOCAL_CHARACTERS)
+		character_selection.status.text = "删除失败，请重试"
+		_message("删除角色失败", result.message)
 
 func _online_creation() -> void:
 	mode = "online_create"
@@ -493,6 +514,9 @@ func _continue(character_id: String = "") -> void:
 	var result := await Game.load_game() if character_id.is_empty() else await Game.select_local_character(character_id)
 	if epoch != _ui_epoch or result.status == PlatformResult.Status.CANCELLED or _closing: return
 	if result.ok:
+		if Game.local_characters().is_empty():
+			_local_character_selection()
+			return
 		if int(Game.player.hp) == 0 and not Game.is_soul(): Game.restore()
 		_enter_world()
 	else:

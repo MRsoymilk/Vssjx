@@ -101,7 +101,7 @@ pub(crate) async fn list(
     let account = auth.me(auth::bearer(&headers)?).await?;
     // Single query: no mixed-version attributes/inventory snapshot.
     let rows = sqlx::query(&format!(
-        "SELECT {CHARACTER_COLUMNS},loot_state,COALESCE((SELECT jsonb_object_agg(definition_id,equipped) FROM inventory_items WHERE character_id=characters.id AND definition_id<>'potion'),'{{}}'::jsonb) AS gear FROM characters WHERE account_id=$1 ORDER BY slot,id"
+        "SELECT {CHARACTER_COLUMNS},loot_state,COALESCE((SELECT jsonb_object_agg(definition_id,equipped) FROM inventory_items WHERE character_id=characters.id AND definition_id<>'potion'),'{{}}'::jsonb) AS gear FROM characters WHERE account_id=$1 AND deleted_at IS NULL ORDER BY slot,id"
     )).bind(account.id).fetch_all(auth.pool()).await.map_err(database_error)?;
     let characters: Vec<Value> = rows.iter().map(|row| {
         let character = Character::from_row(row).map_err(database_error)?;
@@ -190,13 +190,21 @@ pub(crate) async fn create(
     if let Some(row) = sqlx::query("SELECT request_digest, http_status, result FROM account_operation_receipts WHERE account_id=$1 AND operation_id=$2")
         .bind(account.id).bind(payload.operation_id).fetch_optional(&mut *tx).await.map_err(database_error)? {
         let conflict = row.get::<Vec<u8>, _>("request_digest") != digest;
+        let prior = row.get::<DbJson<Value>, _>("result").0;
+        if !conflict && let Some(id) = prior["character"]["id"].as_str().and_then(|id| Uuid::parse_str(id).ok()) {
+            let deleted: bool = sqlx::query_scalar("SELECT deleted_at IS NOT NULL FROM characters WHERE id=$1")
+                .bind(id).fetch_one(&mut *tx).await.map_err(database_error)?;
+            if deleted {
+                return Ok(receipt_response(409, json!({"code":"CHARACTER_DELETED","operation_id":payload.operation_id}), true));
+            }
+        }
         crate::security::append(&mut *tx, crate::security::Event{account:Some(account.id),character:None,session:None,operation:Some(payload.operation_id),action:"character.create",outcome:if conflict {"rejected"} else {"replayed"},code:if conflict {"IDEMPOTENCY_CONFLICT"} else {"OK"},details:json!({"changed":false})}).await.map_err(database_error)?;
         tx.commit().await.map_err(database_error)?;
         if conflict { return Err(AuthError(StatusCode::CONFLICT, "IDEMPOTENCY_CONFLICT")); }
         return Ok(receipt_response(row.get("http_status"), row.get::<DbJson<Value>, _>("result").0, true));
     }
     let slot: Option<i32> =
-        sqlx::query_scalar("SELECT candidate FROM generate_series(0,$2-1) AS candidate WHERE NOT EXISTS(SELECT 1 FROM characters WHERE account_id=$1 AND slot=candidate) ORDER BY candidate LIMIT 1")
+        sqlx::query_scalar("SELECT candidate FROM generate_series(0,$2-1) AS candidate WHERE NOT EXISTS(SELECT 1 FROM characters WHERE account_id=$1 AND slot=candidate AND deleted_at IS NULL) ORDER BY candidate LIMIT 1")
             .bind(account.id)
             .bind(MAX_CHARACTERS)
             .fetch_optional(&mut *tx)
@@ -246,4 +254,79 @@ pub(crate) async fn create(
     crate::security::append(&mut *tx, crate::security::Event{account:Some(account.id),character:result["character"]["id"].as_str().and_then(|v|Uuid::parse_str(v).ok()),session:None,operation:Some(payload.operation_id),action:"character.create",outcome:if status==201 {"accepted"} else {"rejected"},code:result["code"].as_str().unwrap_or("OK"),details:json!({"character":result.get("character")})}).await.map_err(database_error)?;
     tx.commit().await.map_err(database_error)?;
     Ok(receipt_response(status, result, false))
+}
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct DeleteCharacter {
+    #[serde(deserialize_with = "operation_id")]
+    operation_id: Uuid,
+    character_id: Uuid,
+    character_name: String,
+}
+
+pub(crate) async fn delete(
+    State(state): State<Arc<AppState>>,
+    peer: Peer,
+    headers: HeaderMap,
+    payload: Result<Json<DeleteCharacter>, JsonRejection>,
+) -> Result<Response, AuthError> {
+    let auth = auth::service(&state)?;
+    auth.admit(auth::peer_ip(peer), None)?;
+    let bearer = auth::bearer(&headers)?;
+    let account = auth.me(bearer).await?;
+    let Json(payload) = payload.map_err(|_| AuthError(StatusCode::BAD_REQUEST, "INVALID_REQUEST"))?;
+    if payload.character_name.len() > 128 {
+        return Err(AuthError(StatusCode::BAD_REQUEST, "INVALID_REQUEST"));
+    }
+    let digest = Sha256::digest(serde_json::to_vec(&(
+        "character.delete:v1", payload.character_id, &payload.character_name,
+    )).expect("typed deletion")).to_vec();
+    // Same order as join: serialize world admission, then team and database work.
+    let hub = state.world.as_ref().ok_or(AuthError(StatusCode::SERVICE_UNAVAILABLE, "WORLD_UNAVAILABLE"))?;
+    let _admission = hub.admissions.lock().await;
+    let _team = hub.team_updates.lock().await;
+    let mut tx = auth.pool().begin().await.map_err(database_error)?;
+    sqlx::query("SET LOCAL lock_timeout='3s'").execute(&mut *tx).await.map_err(database_error)?;
+    // Social/team handlers acquire these gates before authorizing the account.
+    for lock in [773913018_i64, 773913019_i64] {
+        sqlx::query("SELECT pg_advisory_xact_lock($1)").bind(lock).execute(&mut *tx).await.map_err(database_error)?;
+    }
+    sqlx::query("SELECT id FROM accounts WHERE id=$1 FOR UPDATE").bind(account.id).fetch_one(&mut *tx).await.map_err(database_error)?;
+    auth.authorize_in(&mut tx, bearer).await?;
+    if let Some(row) = sqlx::query("SELECT request_digest,http_status,result FROM account_operation_receipts WHERE account_id=$1 AND operation_id=$2")
+        .bind(account.id).bind(payload.operation_id).fetch_optional(&mut *tx).await.map_err(database_error)? {
+        if row.get::<Vec<u8>,_>("request_digest") != digest {
+            return Err(AuthError(StatusCode::CONFLICT, "IDEMPOTENCY_CONFLICT"));
+        }
+        return Ok(receipt_response(row.get("http_status"), row.get::<DbJson<Value>,_>("result").0, true));
+    }
+    let row = sqlx::query("SELECT display_name,active_battle_id,deleted_at IS NOT NULL AS deleted FROM characters WHERE id=$1 AND account_id=$2 FOR UPDATE")
+        .bind(payload.character_id).bind(account.id).fetch_optional(&mut *tx).await.map_err(database_error)?
+        .ok_or(AuthError(StatusCode::NOT_FOUND, "CHARACTER_NOT_FOUND"))?;
+    if row.get::<bool,_>("deleted") {
+        return Err(AuthError(StatusCode::NOT_FOUND, "CHARACTER_NOT_FOUND"));
+    }
+    if row.get::<String,_>("display_name") != payload.character_name {
+        return Err(AuthError(StatusCode::CONFLICT, "CHARACTER_CHANGED"));
+    }
+    if hub.has_character(payload.character_id) || row.get::<Option<Uuid>,_>("active_battle_id").is_some() {
+        return Err(AuthError(StatusCode::CONFLICT, "CHARACTER_BUSY"));
+    }
+    for (table, code) in [("guild_members", "CHARACTER_IN_GUILD"), ("team_members", "CHARACTER_IN_TEAM")] {
+        let present: bool = sqlx::query_scalar(&format!("SELECT EXISTS(SELECT 1 FROM {table} WHERE character_id=$1)"))
+            .bind(payload.character_id).fetch_one(&mut *tx).await.map_err(database_error)?;
+        if present { return Err(AuthError(StatusCode::CONFLICT, code)); }
+    }
+    sqlx::query("UPDATE characters SET deleted_at=clock_timestamp() WHERE id=$1").bind(payload.character_id).execute(&mut *tx).await.map_err(database_error)?;
+    sqlx::query("DELETE FROM friendships WHERE low_id=$1 OR high_id=$1").bind(payload.character_id).execute(&mut *tx).await.map_err(database_error)?;
+    sqlx::query("DELETE FROM guild_applications WHERE character_id=$1").bind(payload.character_id).execute(&mut *tx).await.map_err(database_error)?;
+    sqlx::query("DELETE FROM team_invites WHERE target=$1").bind(payload.character_id).execute(&mut *tx).await.map_err(database_error)?;
+    sqlx::query("DELETE FROM world_tickets WHERE character_id=$1").bind(payload.character_id).execute(&mut *tx).await.map_err(database_error)?;
+    let result = json!({"operation_id":payload.operation_id,"character_id":payload.character_id,"deleted":true});
+    sqlx::query("INSERT INTO account_operation_receipts(account_id,operation_id,operation_type,request_digest,http_status,result) VALUES($1,$2,'character.delete',$3,200,$4)")
+        .bind(account.id).bind(payload.operation_id).bind(digest).bind(DbJson(&result)).execute(&mut *tx).await.map_err(database_error)?;
+    crate::security::append(&mut *tx, crate::security::Event{account:Some(account.id),character:Some(payload.character_id),session:None,operation:Some(payload.operation_id),action:"character.delete",outcome:"accepted",code:"OK",details:json!({"display_name":payload.character_name})}).await.map_err(database_error)?;
+    tx.commit().await.map_err(database_error)?;
+    Ok(receipt_response(200, result, false))
 }

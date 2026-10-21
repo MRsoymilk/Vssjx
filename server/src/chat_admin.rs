@@ -39,7 +39,7 @@ pub(crate) async fn history(State(state): State<Arc<AppState>>, Query(query): Qu
         if !q.is_empty() && ![message.text.to_lowercase(),message.display_name.to_lowercase(),value["username"].as_str().unwrap_or("").to_lowercase()].iter().any(|s|s.contains(&q)) { return None; }
         Some(value)
     }).collect();
-    let accounts=sqlx::query("SELECT a.id,a.username,COALESCE(a.chat_muted_until>clock_timestamp(),FALSE) AS muted,(extract(epoch FROM a.chat_muted_until)*1000)::bigint::text AS muted_until_ms,COALESCE((SELECT c.display_name FROM characters c WHERE c.account_id=a.id ORDER BY c.slot LIMIT 1),'某玩家') AS display_name FROM accounts a WHERE ($1::uuid IS NOT NULL AND a.id=$1) OR ($1::uuid IS NULL AND (($2<>'' AND (strpos(a.username,lower($2))>0 OR EXISTS(SELECT 1 FROM characters c WHERE c.account_id=a.id AND strpos(c.name_key,lower($2))>0))) OR ($2='' AND a.chat_muted_until>clock_timestamp()))) ORDER BY a.username LIMIT 20")
+    let accounts=sqlx::query("SELECT a.id,a.username,COALESCE(a.chat_muted_until>clock_timestamp(),FALSE) AS muted,(extract(epoch FROM a.chat_muted_until)*1000)::bigint::text AS muted_until_ms,COALESCE((SELECT c.display_name FROM characters c WHERE c.deleted_at IS NULL AND c.account_id=a.id ORDER BY c.slot LIMIT 1),'某玩家') AS display_name FROM accounts a WHERE ($1::uuid IS NOT NULL AND a.id=$1) OR ($1::uuid IS NULL AND (($2<>'' AND (strpos(a.username,lower($2))>0 OR EXISTS(SELECT 1 FROM characters c WHERE c.deleted_at IS NULL AND c.account_id=a.id AND strpos(c.name_key,lower($2))>0))) OR ($2='' AND a.chat_muted_until>clock_timestamp()))) ORDER BY a.username LIMIT 20")
         .bind(query.account_id).bind(query.q.trim()).fetch_all(auth.pool()).await.map_err(database)?;
     let accounts:Vec<Value>=accounts.iter().map(|r|json!({"account_id":r.get::<Uuid,_>("id"),"username":r.get::<String,_>("username"),"display_name":r.get::<String,_>("display_name"),"muted":r.get::<bool,_>("muted"),"muted_until_ms":r.get::<Option<String>,_>("muted_until_ms"),"deleted":true})).collect();
     Ok(Json(json!({"channel_epoch":epoch,"messages":values,"accounts":accounts,"csrf_token":state.operator_token,"history_limit":100})))
@@ -78,7 +78,7 @@ pub(crate) async fn act(State(state): State<Arc<AppState>>, headers: HeaderMap, 
     }
     let account=sqlx::query_scalar::<_,Uuid>("SELECT id FROM accounts WHERE id=$1 FOR UPDATE").bind(p.account_id).fetch_optional(&mut *tx).await.map_err(database)?;
     if account.is_none() { return Err(error(StatusCode::NOT_FOUND,"ACCOUNT_NOT_FOUND")); }
-    let characters=sqlx::query("SELECT id,display_name FROM characters WHERE account_id=$1 ORDER BY slot").bind(p.account_id).fetch_all(&mut *tx).await.map_err(database)?;
+    let characters=sqlx::query("SELECT id,display_name FROM characters WHERE account_id=$1 AND deleted_at IS NULL ORDER BY slot").bind(p.account_id).fetch_all(&mut *tx).await.map_err(database)?;
     let ids:Vec<Uuid>=characters.iter().map(|r|r.get("id")).collect();
     let (epoch,messages)=world.chat_snapshot();
     if epoch!=p.channel_epoch { return Err(error(StatusCode::CONFLICT,"CHAT_EPOCH_CHANGED")); }

@@ -67,7 +67,7 @@ async fn load(tx: &mut Transaction<'_, Postgres>, context: &Context) -> Result<L
     load_character(tx,context.character,account,Some(context.owner)).await
 }
 async fn load_character(tx:&mut Transaction<'_,Postgres>,character_id:Uuid,account:Uuid,owner:Option<i64>)->Result<Loaded,AuthError>{
-    let row=sqlx::query(&format!("SELECT {CHARACTER_COLUMNS},endless_state,loot_state,ai_progress,defeated_mask,monster_respawns,active_battle_id,owner_epoch,allocated_attributes,hunt_pressure FROM characters WHERE id=$1 AND account_id=$2 FOR UPDATE"))
+    let row=sqlx::query(&format!("SELECT {CHARACTER_COLUMNS},endless_state,loot_state,ai_progress,defeated_mask,monster_respawns,active_battle_id,owner_epoch,allocated_attributes,hunt_pressure FROM characters WHERE id=$1 AND account_id=$2 AND deleted_at IS NULL FOR UPDATE"))
         .bind(character_id).bind(account).fetch_optional(&mut **tx).await.map_err(database)?
         .ok_or(AuthError(StatusCode::FORBIDDEN,"FORBIDDEN"))?;
     if owner.is_some_and(|owner|row.get::<i64, _>("owner_epoch") != owner) {

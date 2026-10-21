@@ -19,6 +19,7 @@ var _action := ""
 var _target := ""
 var characters: Array = []
 var pending_creation: Dictionary = {}
+var pending_deletion: Dictionary = {}
 var pending_pve: Dictionary = {}
 var pending_social: Dictionary = {}
 var pending_team: Dictionary = {}
@@ -62,6 +63,7 @@ func clear() -> void:
 	_refresh_expires_at = 0.0
 	characters = []
 	pending_creation = {}
+	pending_deletion = {}
 	pending_pve = {}
 	pending_social = {}
 	pending_team = {}
@@ -69,6 +71,23 @@ func clear() -> void:
 
 func list_characters() -> void:
 	_send("characters", server_address, {}, true)
+
+func delete_character(character_id: String, character_name: String) -> void:
+	if busy: return
+	if not pending_deletion.is_empty() and (pending_deletion.character_id != character_id or pending_deletion.character_name != character_name):
+		completed.emit("character_delete", {"ok": false, "code": "DELETE_RETRY_REQUIRED"})
+		return
+	if pending_deletion.is_empty():
+		var bytes := Crypto.new().generate_random_bytes(16)
+		if bytes.size() != 16:
+			completed.emit("character_delete", {"ok": false, "code": "SERVER_BUSY"})
+			return
+		bytes[6] = (bytes[6] & 15) | 64
+		bytes[8] = (bytes[8] & 63) | 128
+		var hex := bytes.hex_encode()
+		var operation_id := "%s-%s-%s-%s-%s" % [hex.substr(0,8),hex.substr(8,4),hex.substr(12,4),hex.substr(16,4),hex.substr(20,12)]
+		pending_deletion = {"operation_id": operation_id, "character_id": character_id, "character_name": character_name}
+	_send("character_delete", server_address, pending_deletion, true)
 
 func social_request(payload: Dictionary) -> void:
 	_send("social", server_address, payload, true)
@@ -162,6 +181,7 @@ func _send(action: String, address: String, payload: Dictionary, bearer: bool = 
 	var body := "" if payload.is_empty() else JSON.stringify(payload)
 	var route := "/api/v1/auth/" + action
 	if action in ["characters", "character_create"]: route = "/api/v1/characters"
+	if action == "character_delete": route = "/api/v1/characters/delete"
 	if action == "world_ticket": route = "/api/v1/world/ticket"
 	if action == "social": route = "/api/v1/social"
 	if action == "teams": route = "/api/v1/teams"
@@ -204,9 +224,18 @@ func _on_response(result: int, code: int, _headers: PackedStringArray, body: Pac
 			_finish({"ok": true, "ticket": data.ticket, "announcement_version": 1 if data.get("announcement_version") == 1 else 0, "population_version": 1 if data.get("population_version") == 1 else 0, "pve_version": 1 if data.get("pve_version") == 1 else 0, "maps_version": 2 if data.get("ai_world_version")==1 else (1 if data.get("maps_version")==1 else 0), "shop_version": int(data.shop_version) if data.get("shop_version")==1 or data.get("shop_version")==2 else 0, "duel_version":2 if data.get("duel_version")==2 else 0,"team_version":1 if data.get("team_version")==1 else 0})
 		return
 	if code not in [200, 201]:
+		if _action == "character_delete" and code in [400,404,409,422]: pending_deletion = {}
 		if _action == "character_create" and code in [409, 422] and data.get("operation_id") == pending_creation.get("operation_id"): pending_creation = {}
-		if code == 401 and _action in ["refresh", "me", "characters", "character_create"]: clear()
+		if code == 401 and _action in ["refresh", "me", "characters", "character_create", "character_delete"]: clear()
 		_finish({"ok": false, "code": data.get("code", "SERVER_ERROR")})
+		return
+	if _action == "character_delete":
+		if data.get("deleted") != true or not data.get("replayed") is bool or data.get("operation_id") != pending_deletion.get("operation_id") or data.get("character_id") != pending_deletion.get("character_id"):
+			_finish({"ok": false, "code": "INVALID_RESPONSE"})
+			return
+		characters = characters.filter(func(character: Dictionary) -> bool: return character.id != pending_deletion.character_id)
+		pending_deletion = {}
+		_finish({"ok": true})
 		return
 	if _action in ["social","teams"]:
 		_finish(data)
@@ -242,7 +271,9 @@ func _on_response(result: int, code: int, _headers: PackedStringArray, body: Pac
 					return
 				characters.append(values[0].duplicate(true))
 			pending_creation = {}
-		else: characters = values.duplicate(true)
+		else:
+			characters = values.duplicate(true)
+			if not pending_deletion.is_empty() and not characters.any(func(character: Dictionary) -> bool: return character.id == pending_deletion.character_id): pending_deletion = {}
 		_finish({"ok": true, "characters": characters.duplicate(true), "character_id": values[0].id if _action == "character_create" else ""})
 		return
 	var identity: Variant = data.get("account")

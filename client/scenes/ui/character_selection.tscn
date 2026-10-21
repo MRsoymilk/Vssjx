@@ -513,7 +513,7 @@ text = "返回"
 
 [node name="Options" type="Panel" parent="."]
 offset_left = 3.0
-offset_top = 354.0
+offset_top = 324.0
 offset_right = 114.0
 offset_bottom = 450.0
 visible = false
@@ -539,9 +539,65 @@ text = "刷新角色"
 
 [node name="Back" type="Button" parent="Options"]
 offset_left = 3.0
+offset_top = 93.0
+offset_right = 108.0
+offset_bottom = 123.0
+focus_mode = 0
+theme_override_font_sizes/font_size = 14
+text = "返回登陆"
+
+[node name="Delete" type="Button" parent="Options"]
+offset_left = 3.0
 offset_top = 63.0
 offset_right = 108.0
 offset_bottom = 93.0
 focus_mode = 0
 theme_override_font_sizes/font_size = 14
-text = "返回登陆"
+text = "删除角色"
+
+[node name="DeleteConfirmation" type="ColorRect" parent="."]
+visible = false
+offset_right = 320.0
+offset_bottom = 480.0
+color = Color(0, 0, 0, 0.65)
+
+[node name="Panel" type="Panel" parent="DeleteConfirmation"]
+offset_left = 16.0
+offset_top = 157.0
+offset_right = 304.0
+offset_bottom = 332.0
+theme_override_styles/panel = SubResource("Paper")
+
+[node name="Title" type="Label" parent="DeleteConfirmation/Panel"]
+offset_left = 12.0
+offset_top = 10.0
+offset_right = 276.0
+offset_bottom = 35.0
+text = "确认删除角色"
+horizontal_alignment = 1
+
+[node name="Description" type="Label" parent="DeleteConfirmation/Panel"]
+offset_left = 16.0
+offset_top = 43.0
+offset_right = 272.0
+offset_bottom = 121.0
+theme_override_font_sizes/font_size = 13
+autowrap_mode = 3
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Cancel" type="Button" parent="DeleteConfirmation/Panel"]
+offset_left = 23.0
+offset_top = 130.0
+offset_right = 130.0
+offset_bottom = 163.0
+focus_mode = 0
+text = "取消"
+
+[node name="Confirm" type="Button" parent="DeleteConfirmation/Panel"]
+offset_left = 158.0
+offset_top = 130.0
+offset_right = 265.0
+offset_bottom = 163.0
+focus_mode = 0
+text = "确定删除"

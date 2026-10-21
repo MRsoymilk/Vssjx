@@ -105,7 +105,7 @@ pub(crate) async fn command(
         .map_err(database)?;
     auth.authorize_in(&mut tx, bearer).await?;
     let owned: bool =
-        sqlx::query_scalar("SELECT EXISTS(SELECT 1 FROM characters WHERE id=$1 AND account_id=$2)")
+        sqlx::query_scalar("SELECT EXISTS(SELECT 1 FROM characters WHERE id=$1 AND account_id=$2 AND deleted_at IS NULL)")
             .bind(c.character_id)
             .bind(account.id)
             .fetch_one(&mut *tx)
@@ -125,7 +125,7 @@ pub(crate) async fn command(
         if matches!(c.action, Action::Profile | Action::Find) {
             let target = if matches!(c.action, Action::Find) {
                 let (_, key) = crate::characters::canonical_name(&c.name)?;
-                sqlx::query_scalar("SELECT id FROM characters WHERE name_key=$1")
+                sqlx::query_scalar("SELECT id FROM characters WHERE name_key=$1 AND deleted_at IS NULL")
                     .bind(key)
                     .fetch_optional(&mut *tx)
                     .await
@@ -251,7 +251,7 @@ async fn apply(db: &mut PgConnection, c: &Command) -> Result<&'static str, AuthE
         if other == me {
             return Ok("SELF_TARGET");
         }
-        if count(db,"SELECT count(*) FROM characters c JOIN accounts a ON a.id=c.account_id WHERE c.id=$1 AND NOT a.disabled",other).await?==0{return Ok("PLAYER_NOT_FOUND");}
+        if count(db,"SELECT count(*) FROM characters c JOIN accounts a ON a.id=c.account_id WHERE c.id=$1 AND c.deleted_at IS NULL AND NOT a.disabled",other).await?==0{return Ok("PLAYER_NOT_FOUND");}
         let (lo, hi) = if me < other { (me, other) } else { (other, me) };
         let row=sqlx::query("SELECT requester_id,status,updated_at>clock_timestamp()-interval '5 minutes' AS cooling FROM friendships WHERE low_id=$1 AND high_id=$2")
             .bind(lo).bind(hi).fetch_optional(&mut *db).await.map_err(database)?;
@@ -309,7 +309,7 @@ async fn apply(db: &mut PgConnection, c: &Command) -> Result<&'static str, AuthE
         let Ok((name, key)) = crate::characters::canonical_name(&c.name) else {
             return Ok("INVALID_NAME");
         };
-        if sqlx::query_scalar::<_, bool>("SELECT EXISTS(SELECT 1 FROM guilds WHERE name_key=$1)")
+        if sqlx::query_scalar::<_, bool>("SELECT EXISTS(SELECT 1 FROM guilds WHERE name_key=$1 AND deleted_at IS NULL)")
             .bind(&key)
             .fetch_one(&mut *db)
             .await
@@ -575,7 +575,7 @@ async fn public_profile(
     online: &HashSet<Uuid>,
 ) -> Result<Value, AuthError> {
     // Allowlist only: never serialize Character or an account/session/inventory row.
-    let row=sqlx::query("SELECT c.id,c.display_name,c.job,c.gender,c.school,c.level,c.balance_revision,c.loot_state,c.allocated_attributes,COALESCE((SELECT jsonb_object_agg(i.definition_id,true) FROM inventory_items i WHERE i.character_id=c.id AND i.equipped),'{}'::jsonb) AS gear,(SELECT jsonb_build_object('id',g.id,'name',g.name,'role',m.role) FROM guild_members m JOIN guilds g ON g.id=m.guild_id WHERE m.character_id=c.id) AS guild FROM characters c JOIN accounts a ON a.id=c.account_id WHERE c.id=$1 AND NOT a.disabled")
+    let row=sqlx::query("SELECT c.id,c.display_name,c.job,c.gender,c.school,c.level,c.balance_revision,c.loot_state,c.allocated_attributes,COALESCE((SELECT jsonb_object_agg(i.definition_id,true) FROM inventory_items i WHERE i.character_id=c.id AND i.equipped),'{}'::jsonb) AS gear,(SELECT jsonb_build_object('id',g.id,'name',g.name,'role',m.role) FROM guild_members m JOIN guilds g ON g.id=m.guild_id WHERE m.character_id=c.id) AS guild FROM characters c JOIN accounts a ON a.id=c.account_id WHERE c.id=$1 AND c.deleted_at IS NULL AND NOT a.disabled")
         .bind(id).fetch_optional(db).await.map_err(database)?;
     let Some(r) = row else { return Ok(Value::Null) };
     let gear: BTreeMap<String, bool> = r.get::<DbJson<BTreeMap<String, bool>>, _>("gear").0;

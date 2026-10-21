@@ -135,6 +135,7 @@ pub fn apps(
             "/api/v1/character-operations/{operation_id}",
             get(characters::receipt),
         )
+        .route("/api/v1/characters/delete", post(characters::delete))
         .fallback(|| async { (StatusCode::NOT_FOUND, Json(ApiError { code: "NOT_FOUND" })) })
         .layer(DefaultBodyLimit::max(4096))
         .layer(middleware::map_response(no_store))

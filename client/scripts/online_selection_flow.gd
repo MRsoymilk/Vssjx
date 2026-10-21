@@ -16,6 +16,7 @@ func _start() -> void:
 	page.enter_requested.connect(_enter)
 	page.create_requested.connect(_create)
 	page.refresh_requested.connect(_refresh)
+	page.delete_requested.connect(_delete)
 	set_process(true)
 	_refresh()
 
@@ -24,8 +25,20 @@ func _process(_delta: float) -> void: _update_controls()
 func _update_controls() -> void:
 	var locked := OnlineAccount.busy or not OnlineAccount.is_logged_in() or _entering
 	page.set_controls(locked or not _loaded, _loaded and (OnlineAccount.characters.size() < OnlineAccount.MAX_CHARACTERS or not OnlineAccount.pending_creation.is_empty()))
-	page.get_node("Options/Refresh").disabled = locked
+	page.get_node("Options/Refresh").disabled = locked or page._deleting or not page._delete_target.is_empty()
 	page.get_node("Options/Create").text = "继续创建" if not OnlineAccount.pending_creation.is_empty() else "创建角色"
+	if not OnlineAccount.pending_creation.is_empty(): page.get_node("Options/Delete").disabled = true
+	if not OnlineAccount.pending_deletion.is_empty():
+		page.get_node("Options/Create").disabled = true
+		if not page.characters.is_empty() and page.characters[page.selected_index].id != OnlineAccount.pending_deletion.character_id: page.get_node("Options/Delete").disabled = true
+
+func _delete(id: String, character_name: String) -> void:
+	if not _loaded or OnlineAccount.busy or not OnlineAccount.is_logged_in():
+		page.finish_delete()
+		return
+	page.status.text = "正在删除角色……"
+	OnlineAccount.delete_character(id, character_name)
+	_update_controls()
 
 func _refresh() -> void:
 	if OnlineAccount.busy: return
@@ -56,6 +69,27 @@ func _enter(id: String) -> void:
 	_update_controls()
 
 func _result(action: String, result: Dictionary) -> void:
+	if action == "character_delete":
+		page.finish_delete()
+		if result.ok:
+			page.display_characters(OnlineAccount.characters)
+			_refresh()
+		else:
+			page.status.text = {
+				"CHARACTER_BUSY": "角色仍在游戏中，请退出并稍后重试",
+				"CHARACTER_IN_GUILD": "请先退出公会，或转让会长并退出",
+				"CHARACTER_IN_TEAM": "请先退出队伍后再删除角色",
+				"CHARACTER_NOT_FOUND": "角色已更新，请从菜单刷新",
+				"CHARACTER_CHANGED": "角色已更新，请从菜单刷新",
+				"DELETE_RETRY_REQUIRED": "请先重试上次删除，或刷新角色列表",
+				"NOT_FOUND": "服务器尚不支持删除角色，请更新服务端",
+			}.get(result.get("code", ""), "删除未确认，请刷新或选择原角色重试")
+			if not OnlineAccount.is_logged_in():
+				_loaded = false
+				page.display_characters([])
+				page.status.text = "登陆已失效，请返回重新登陆。"
+		_update_controls()
+		return
 	if action == "refresh" and result.ok:
 		if not _loaded: call_deferred("_refresh")
 		return

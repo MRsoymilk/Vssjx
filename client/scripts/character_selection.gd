@@ -3,6 +3,7 @@ extends Control
 signal enter_requested(character_id: String)
 signal create_requested
 signal refresh_requested
+signal delete_requested(character_id: String, character_name: String)
 signal back_requested
 @export var online_mode := false
 var characters: Array = []
@@ -11,6 +12,8 @@ var preferred_id := ""
 var locked := true
 var can_create := false
 var _entering := false
+var _deleting := false
+var _delete_target: Dictionary = {}
 var previews: Array[AnimatedSprite2D] = []
 @onready var enter_button: Button = $Enter
 @onready var status: Label = $Status
@@ -27,10 +30,15 @@ func _ready() -> void:
 	$Menu.pressed.connect(func() -> void: $Options.visible = not $Options.visible)
 	$Options/Create.pressed.connect(func() -> void: $Options.hide(); create_requested.emit())
 	$Options/Refresh.pressed.connect(func() -> void: $Options.hide(); refresh_requested.emit())
+	$Options/Delete.pressed.connect(_ask_delete)
+	$DeleteConfirmation/Panel/Cancel.pressed.connect(_cancel_delete)
+	$DeleteConfirmation/Panel/Confirm.pressed.connect(_confirm_delete)
 	$Options/Back.pressed.connect(func() -> void: back_requested.emit())
 	_render()
 
 func display_characters(values: Array) -> void:
+	if is_node_ready(): _cancel_delete()
+	_deleting = false
 	var selected := String(characters[selected_index].get("id", "")) if not characters.is_empty() else ""
 	if not preferred_id.is_empty(): selected = preferred_id
 	preferred_id = ""
@@ -45,22 +53,28 @@ func set_controls(is_locked: bool, allow_create: bool) -> void:
 	locked = is_locked
 	can_create = allow_create
 	if not is_node_ready(): return
-	enter_button.disabled = locked or _entering or characters.is_empty()
-	$Previous.disabled = locked or _entering or characters.size() < 2
+	var blocked := locked or _entering or _deleting or not _delete_target.is_empty()
+	enter_button.disabled = blocked or characters.is_empty()
+	$Previous.disabled = blocked or characters.size() < 2
 	$Next.disabled = $Previous.disabled
-	$Options/Create.disabled = locked or not can_create
-	$Options/Refresh.disabled = locked or not online_mode
-	for i in 3: get_node("Slot%d/Choose" % i).disabled = locked or _entering or selected_index + i - 1 < 0 or selected_index + i - 1 >= characters.size()
+	$Options/Create.disabled = blocked or not can_create
+	$Options/Refresh.disabled = blocked or not online_mode
+	$Options/Delete.disabled = blocked or characters.is_empty()
+	$Back.disabled = _deleting
+	$Menu.disabled = blocked
+	$Options/Back.disabled = blocked
+	$DeleteConfirmation/Panel/Confirm.disabled = locked or _delete_target.is_empty()
+	for i in 3: get_node("Slot%d/Choose" % i).disabled = blocked or selected_index + i - 1 < 0 or selected_index + i - 1 >= characters.size()
 
 func select_index(offset: int) -> void:
-	if locked or _entering or characters.is_empty(): return
+	if locked or _entering or _deleting or not _delete_target.is_empty() or characters.is_empty(): return
 	var index := selected_index + offset
 	if index < 0 or index >= characters.size(): return
 	selected_index = index
 	_render()
 
 func step(delta: int) -> void:
-	if locked or _entering or characters.size() < 2: return
+	if locked or _entering or _deleting or not _delete_target.is_empty() or characters.size() < 2: return
 	selected_index = posmod(selected_index + delta, characters.size())
 	_render()
 
@@ -102,8 +116,38 @@ func _enter() -> void:
 	set_controls(locked, can_create)
 	enter_requested.emit(String(characters[selected_index].get("id", "local")))
 
+func _ask_delete() -> void:
+	if $Options/Delete.disabled: return
+	var character: Dictionary = characters[selected_index]
+	_delete_target = {"id": String(character.id), "name": String(character.get("display_name", character.get("name", "")))}
+	$Options.hide()
+	$DeleteConfirmation/Panel/Description.text = "删除 %s（%d级）？\n角色的进度和道具将无法恢复。" % [_delete_target.name, int(character.get("level", 1))]
+	$DeleteConfirmation.show()
+	set_controls(locked, can_create)
+
+func _cancel_delete() -> void:
+	_delete_target = {}
+	$DeleteConfirmation.hide()
+	set_controls(locked, can_create)
+
+func _confirm_delete() -> void:
+	if locked or _deleting or $DeleteConfirmation/Panel/Confirm.disabled or _delete_target.is_empty(): return
+	var target := _delete_target.duplicate()
+	_deleting = true
+	_cancel_delete()
+	delete_requested.emit(target.id, target.name)
+
+func finish_delete() -> void:
+	_deleting = false
+	set_controls(locked, can_create)
+
 func _unhandled_key_input(event: InputEvent) -> void:
 	if not event is InputEventKey or not event.pressed or event.echo: return
+	if _deleting: get_viewport().set_input_as_handled(); return
+	if not _delete_target.is_empty():
+		if event.keycode == KEY_ESCAPE: _cancel_delete()
+		get_viewport().set_input_as_handled()
+		return
 	var input_viewport := get_viewport()
 	match event.keycode:
 		KEY_LEFT: step(-1)

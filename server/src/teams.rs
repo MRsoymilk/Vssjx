@@ -167,7 +167,7 @@ pub(crate) async fn command(
         .await
         .map_err(db)?;
     let owned: bool =
-        sqlx::query_scalar("SELECT EXISTS(SELECT 1 FROM characters WHERE id=$1 AND account_id=$2)")
+        sqlx::query_scalar("SELECT EXISTS(SELECT 1 FROM characters WHERE id=$1 AND account_id=$2 AND deleted_at IS NULL)")
             .bind(c.character_id)
             .bind(account.id)
             .fetch_one(&mut *tx)

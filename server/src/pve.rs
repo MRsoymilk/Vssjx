@@ -237,11 +237,23 @@ impl Loaded {
             return Ok(vec!["你寻回了自己的尸体，灵魂与肉身重新合一，气血与灵力恢复。".into()]);
         }
         if command.action==Action::Revive {return Err("NO_CORPSE");}
-        if matches!(command.action,Action::GearEquip|Action::GearUnequip|Action::GearClaim){
+        if matches!(command.action,Action::GearEquip|Action::GearUnequip|Action::GearClaim|Action::GearFocus|Action::GearSalvage|Action::GearReroll|Action::GearUpgrade){
             if self.battle.is_some(){return Err("BATTLE_ACTIVE");}
             if command.expected_revision.as_deref()!=Some(&self.character.state_revision){return Err("STALE_EQUIPMENT");}
-            if command.quantity.is_some()||command.battle_id.is_some()||command.attributes.is_some(){return Err("INVALID_LOOT_COMMAND");}
+            if (command.quantity.is_some()&&command.action!=Action::GearReroll)||command.battle_id.is_some()||command.attributes.is_some()||command.enemy_slot.is_some()||command.encounter_version.is_some(){return Err("INVALID_LOOT_COMMAND");}
+            if command.action==Action::GearFocus{
+                let target=command.target.as_deref().ok_or("INVALID_LOOT_COMMAND")?;
+                if target!="any"&&!crate::shop::SLOTS.contains(&target){return Err("INVALID_LOOT_COMMAND");}
+                self.loot.focus=if target=="any"{String::new()}else{target.into()};return Ok(vec!["掉落定向已保存；保底流派装备可能跨部位。".into()]);
+            }
             let id=Uuid::parse_str(command.target.as_deref().ok_or("INVALID_LOOT_COMMAND")?).map_err(|_|"INVALID_LOOT_COMMAND")?;
+            if matches!(command.action,Action::GearSalvage|Action::GearReroll|Action::GearUpgrade){
+                let action=match command.action{Action::GearSalvage=>"gear_salvage",Action::GearReroll=>"gear_reroll",_=>"gear_upgrade"};
+                let index=if command.action==Action::GearReroll{let n=command.quantity.ok_or("INVALID_AFFIX_INDEX")?;if !(1..=4).contains(&n){return Err("INVALID_AFFIX_INDEX");}Some((n-1) as usize)}else{None};
+                crate::progression::craft(&mut self.loot,id,action,index,&mut self.character.gold,rand::random())?;
+                let stats=self.stats();self.character.hp=self.character.hp.min(stats.hp);self.character.mp=self.character.mp.min(stats.mp);
+                return Ok(vec!["装备养成与材料消耗已保存。".into()]);
+            }
             let action=match command.action{Action::GearEquip=>"gear_equip",Action::GearUnequip=>"gear_unequip",_=>"gear_claim"};
             let bag=self.bag_count();
             self.loot.apply(action,id,&mut self.gear,self.character.level,bag)?;
@@ -425,6 +437,7 @@ impl Loaded {
                     return Err("RESIDENT_TOO_FAR");
                 }
                 if command.action == Action::Challenge {
+                    if !self.loot.can_fight(){return Err("LOOT_STORAGE_FULL");}
                     let definition = population::definitions_for(&context.map_id)
                         .into_iter()
                         .find(|d| Some(&d.id) == command.target.as_ref() && d.kind != "npc")
@@ -446,7 +459,7 @@ impl Loaded {
                     let frozen=self.stats();
                     // Clients must opt into formation rendering; old clients retain solo-v1.
                     if command.encounter_version.is_none(){
-                        let definition=if self.character.balance_revision==1{crate::skill_balance::monster(definition)}else{definition};
+                        let definition=if self.character.balance_revision==1{crate::progression::monster(crate::skill_balance::monster(definition))}else{definition};
                         let mut battle=Battle::new(definition,self.character.hp,self.character.mp,self.potions);
                         if frozen.balance.is_some(){battle.frozen_stats=Some(frozen);}
                         self.battle=Some(battle);
@@ -539,6 +552,9 @@ impl Loaded {
                         self.hunt_pressure.cleared(&arena.map_id,&arena.enemies[0].definition.art);
                     }
                     let defeated=battle.defeated_enemies();
+                    let loot_enabled=battle.loot_revision>=1;
+                    let boss_loot=defeated.iter().any(|d|d.kind=="boss"||d.id=="boss")||battle.formation.as_ref().is_some_and(|a|a.elite_hunt());
+                    let loot_level=defeated.iter().map(|d|d.level).max().unwrap_or(1).min(self.character.level);
                     let gold=defeated.iter().map(|d|d.gold).sum();let xp=defeated.iter().map(|d|d.xp).sum();
                     let killed_boss=defeated.iter().any(|d|d.id=="boss");
                     let mut recorded=std::collections::HashSet::new();
@@ -556,6 +572,10 @@ impl Loaded {
                         lines.push("赤焰妖王已被击败，古剑遗迹的妖气消散了。".into());
                     }
                     self.rewards(gold, xp)?;
+                    if loot_enabled{
+                        let gained=self.loot.reward(self.character.job,self.character.gender,loot_level,boss_loot,self.bag_count(),rand::random());
+                        lines.push(format!("获得{}件装备及炼材{}、精华{}；满包装备存入暂存。",gained.len(),if boss_loot{crate::progression::n("boss_scrap")}else{crate::progression::n("victory_scrap")},if boss_loot{crate::progression::n("boss_essence")}else{0}));
+                    }
                     lines.push(format!("获得{gold}铜钱、{xp}修为。"));
                 } else if battle.outcome == "defeat" {
                     self.die(context.cell)?;
@@ -589,7 +609,7 @@ pub async fn execute(
     command: &Command,
 ) -> Result<Value, AuthError> {
     if command.operation_id.get_version_num() != 4
-        || command.target.as_ref().is_some_and(|id| id.len() > if matches!(command.action,Action::Revive|Action::GearEquip|Action::GearUnequip|Action::GearClaim){36}else{32})
+        || command.target.as_ref().is_some_and(|id| id.len() > if matches!(command.action,Action::Revive|Action::GearEquip|Action::GearUnequip|Action::GearClaim|Action::GearSalvage|Action::GearReroll|Action::GearUpgrade){36}else{32})
     {
         return Err(AuthError(StatusCode::BAD_REQUEST, "INVALID_PVE_COMMAND"));
     }
@@ -711,6 +731,7 @@ pub async fn execute(
 pub(crate) async fn team_fighter(tx:&mut Transaction<'_,Postgres>,context:&Context)->Result<(crate::team_rules::Fighter,std::collections::HashSet<String>),AuthError>{
     let a=load(tx,context).await?;
     if a.character.corpse.is_some(){return Err(AuthError(StatusCode::CONFLICT,"SOUL_STATE"));}
+    if !a.loot.can_fight(){return Err(AuthError(StatusCode::CONFLICT,"LOOT_STORAGE_FULL"));}
     if a.battle.is_some()||context.duel_active{return Err(AuthError(StatusCode::CONFLICT,"TEAM_BUSY"));}
     if context.map_id!=a.character.map_id||context.moving{return Err(AuthError(StatusCode::CONFLICT,"TEAM_NOT_READY"));}
     // Freeze the actual encounter origin, not an older periodic position save.
@@ -740,15 +761,47 @@ pub(crate) async fn team_save(tx:&mut Transaction<'_,Postgres>,f:&crate::team_ru
         let total_gold:i32=b.enemies.iter().map(|e|e.definition.gold).sum();
         let total_xp:i32=b.enemies.iter().map(|e|e.definition.xp).sum();
         a.rewards(total_gold/n+i32::from(index<total_gold%n),total_xp/n+i32::from(index<total_xp%n)).map_err(|c|AuthError(StatusCode::CONFLICT,c))?;
+        if b.loot_revision>=1{
+            let boss=b.elite_hunt()||b.enemies.iter().any(|e|e.definition.kind=="boss"||e.definition.id=="boss");
+            crate::progression::credit(&mut a.loot,boss);
+        }
     }
     if settle&&f.hp==0&&a.character.corpse.is_none(){
         let point=[a.character.cell_x,a.character.cell_y];
         a.die(point).map_err(|code|AuthError(StatusCode::CONFLICT,code))?;
     }
+    sqlx::query("UPDATE characters SET loot_state=$2 WHERE id=$1").bind(f.id).bind(Json(&a.loot)).execute(&mut **tx).await.map_err(database)?;
     sqlx::query("UPDATE characters SET hp=$2,mp=$3,level=$4,xp=$5,gold=$6,quest_stage=$7,defeated_mask=$8,monster_respawns=$9,ai_progress=$10,position_revision=position_revision+CASE WHEN corpse IS NULL AND $11::jsonb IS NOT NULL THEN 1 ELSE 0 END,corpse=$11,cell_x=$12,cell_y=$13,hunt_pressure=$14,state_revision=state_revision+1 WHERE id=$1")
         .bind(f.id).bind(a.character.hp).bind(a.character.mp).bind(a.character.level).bind(a.character.xp).bind(a.character.gold).bind(a.character.quest_stage).bind(a.defeated).bind(Json(a.respawns)).bind(Json(a.ai)).bind(a.character.corpse).bind(a.character.cell_x).bind(a.character.cell_y).bind(Json(&a.hunt_pressure)).execute(&mut **tx).await.map_err(database)?;
     if a.potions==0{sqlx::query("DELETE FROM inventory_items WHERE character_id=$1 AND definition_id='potion'").bind(f.id).execute(&mut **tx).await.map_err(database)?;}
     else{sqlx::query("INSERT INTO inventory_items(id,character_id,definition_id,quantity) VALUES($1,$2,'potion',$3) ON CONFLICT(character_id,definition_id) DO UPDATE SET quantity=EXCLUDED.quantity").bind(Uuid::new_v4()).bind(f.id).bind(a.potions).execute(&mut **tx).await.map_err(database)?;}
+    Ok(())
+}
+
+pub(crate) async fn team_loot_pool(tx:&mut Transaction<'_,Postgres>,b:&crate::team_rules::Battle,now:i64)->Result<crate::team_loot::Pool,AuthError>{
+    let ids:Vec<_>=b.fighters.iter().map(|f|f.id).collect();
+    let rows=sqlx::query("SELECT id,loot_state FROM characters WHERE id=ANY($1) ORDER BY id FOR UPDATE").bind(&ids).fetch_all(&mut **tx).await.map_err(database)?;
+    let mut states=std::collections::BTreeMap::new();
+    for row in rows{let state:crate::loot::State=serde_json::from_value(row.get::<Json<Value>,_>("loot_state").0).map_err(|_|unavailable())?;states.insert(row.get::<Uuid,_>("id"),state);}
+    let mut scratch=crate::loot::State::default();
+    let boss=b.elite_hunt()||b.enemies.iter().any(|e|e.definition.kind=="boss"||e.definition.id=="boss");
+    scratch.kills=if states.values().any(|s|(s.kills+1)%crate::progression::n("normal_pity")==0){crate::progression::n("normal_pity")-1}else{states.values().map(|s|s.kills).max().unwrap_or(0)};
+    scratch.bosses=if states.values().any(|s|(s.bosses+1)%crate::progression::n("boss_pity")==0){crate::progression::n("boss_pity")-1}else{states.values().map(|s|s.bosses).max().unwrap_or(0)};
+    scratch.focus=states.get(&b.fighters[0].id).ok_or_else(unavailable)?.focus.clone();
+    let f=&b.fighters[rand::thread_rng().gen_range(0..b.fighters.len())];
+    let level=b.enemies.iter().map(|e|e.definition.level).max().unwrap_or(1).min(f.level);
+    scratch.reward(f.job,f.gender,level,boss,0,rand::random());
+    Ok(crate::team_loot::Pool::new(scratch.items,&b.fighters,now))
+}
+pub(crate) async fn team_loot_award(tx:&mut Transaction<'_,Postgres>,id:Uuid,item:&crate::loot::Item)->Result<(),AuthError>{
+    let account=sqlx::query_scalar("SELECT account_id FROM characters WHERE id=$1").bind(id).fetch_one(&mut **tx).await.map_err(database)?;
+    let mut a=load_character(tx,id,account,None).await?;
+    if !item.valid(a.character.job,a.character.gender)||item.level>a.character.level{return Err(unavailable());}
+    if a.loot.items.iter().chain(a.loot.pending.iter()).any(|i|i.id==item.id){return Err(unavailable());}
+    a.loot.skins.insert(item.template.clone());
+    if a.bag_count()<60{a.loot.items.push(item.clone());}else if a.loot.pending.len()<20{a.loot.pending.push(item.clone());}else{return Err(AuthError(StatusCode::CONFLICT,"LOOT_STORAGE_FULL"));}
+    if !a.loot.valid(a.character.job,a.character.gender){return Err(unavailable());}
+    sqlx::query("UPDATE characters SET loot_state=$2,state_revision=state_revision+1 WHERE id=$1").bind(id).bind(Json(a.loot)).execute(&mut **tx).await.map_err(database)?;
     Ok(())
 }
 

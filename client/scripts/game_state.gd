@@ -223,6 +223,7 @@ func appearance_key() -> String:
 	return ShopRules.actor_key(int(player.get("job",0)),int(player.get("gender",0)),LootRules.look(player.get("loot_state",{}),ShopRules.appearance(ShopRules.local_state(player))))
 
 func shop_command(action: String, id: String, count: int=1) -> PlatformResult:
+	if local_battle_active():return PlatformResult.new(PlatformResult.Status.INVALID_DATA,"BATTLE_ACTIVE",OnlinePve.error_text("BATTLE_ACTIVE"))
 	if is_soul():return PlatformResult.new(PlatformResult.Status.INVALID_DATA,"SOUL_STATE",OnlinePve.error_text("SOUL_STATE"))
 	if storage_busy or _local_roster_busy: return PlatformResult.new(PlatformResult.Status.TEMPORARY_FAILURE,"STORAGE_BUSY","正在保存，请稍候")
 	var before := player.duplicate(true)
@@ -239,11 +240,12 @@ func shop_command(action: String, id: String, count: int=1) -> PlatformResult:
 	if not result.ok and generation == _player_generation and path == save_path: player = before
 	return result
 
-func loot_command(action:String,id:String)->PlatformResult:
+func loot_command(action:String,id:String,count:int=1)->PlatformResult:
+	if local_battle_active():return PlatformResult.new(PlatformResult.Status.INVALID_DATA,"BATTLE_ACTIVE",OnlinePve.error_text("BATTLE_ACTIVE"))
 	if storage_busy or _local_roster_busy:return PlatformResult.new(PlatformResult.Status.TEMPORARY_FAILURE,"STORAGE_BUSY","正在保存，请稍候")
 	if player.is_empty():return PlatformResult.new(PlatformResult.Status.INVALID_DATA,"EMPTY_PLAYER","没有离线角色")
 	var before:=player.duplicate(true);var generation:=_player_generation;var path:=save_path
-	var code:=LootRules.apply_local(player,action,id)
+	var code:=LootRules.apply_local(player,action,id,count)
 	if not code.is_empty():
 		player=before
 		return PlatformResult.new(PlatformResult.Status.INVALID_DATA,code,OnlinePve.error_text(code))
@@ -257,6 +259,19 @@ func _migrate_loot(data:Dictionary)->void:
 	for entry in data.get("local_characters",{}).get("characters",[]):
 		if entry.id==data.local_characters.active_id:entry.data.loot_state=data.loot_state.duplicate(true)
 		else:LootRules.sync_legacy(entry.data)
+
+var local_combat:WeakRef
+func local_battle_active()->bool:
+	var owner:Variant=local_combat.get_ref() if local_combat!=null else null
+	if owner==null:return false
+	return owner.active() if owner.has_method("active") else not owner.finished
+
+func award_loot(enemies:Array,seed:int)->String:
+	var boss:=false;var item_level:=1
+	for enemy in enemies:
+		boss=boss or enemy.get("kind")=="boss" or enemy.get("id")=="boss";item_level=maxi(item_level,int(enemy.get("level",1)))
+	var gained:=ProgressionRules.reward(player,mini(int(player.level),item_level),boss,seed)
+	return "获得%d件装备与%d炼材%s；满包自动暂存。"%[gained.size(),int(ProgressionRules.rules.boss_scrap if boss else ProgressionRules.rules.victory_scrap),"、1精华" if boss else ""]
 
 
 func allocate_attributes(points: Array) -> PlatformResult:

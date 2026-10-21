@@ -21,6 +21,7 @@ var auto_elapsed:=0.0
 var solo_countdown:=30.0
 var auto_button:Button
 var result:BattleResultView
+var _loot_opened:=""
 var queue:Array=[]
 var motion:BattleActionPlayback
 var deaths:Array=[]
@@ -223,6 +224,9 @@ func _process(delta:float)->void:
 			var saved:=true
 			if model is SoloEncounter and model.pve==null and model.save_result!=null:saved=model.save_result.ok
 			result.present(model.battle().outcome,details,saved)
+			if model is OnlineTeamModel and model.loot_pending() and _loot_opened!=model.battle().id:
+				_loot_opened=model.battle().id
+				var loot:=TeamLootPanel.new();loot.model=model;add_child(loot)
 	for death in deaths:death.advance(delta)
 	_refresh_actor_anchors()
 	_refresh_controls()

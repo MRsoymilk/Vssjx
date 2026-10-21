@@ -53,6 +53,8 @@ pub struct Event {
 }
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Battle {
+    #[serde(default,skip_serializing_if="Option::is_none")] pub loot_pool:Option<crate::team_loot::Pool>,
+    #[serde(default)] pub loot_revision:u8,
     pub id: Uuid,
     pub map_id: String,
     pub fighters: Vec<Fighter>,
@@ -94,7 +96,7 @@ impl Battle {
             .take(5)
             .enumerate()
             .map(|(i, mut d)| {
-                if balanced{d=crate::skill_balance::monster(d);}
+                if balanced{d=crate::progression::monster(crate::skill_balance::monster(d));}
                 if !balanced{
                     d.hp = (d.hp * (100 + 35 * extra) + 99) / 100;
                     d.attack = (d.attack * (100 + 15 * extra) + 99) / 100;
@@ -121,6 +123,8 @@ impl Battle {
             }
         }
         Self {
+            loot_pool:None,
+            loot_revision:1,
             id: Uuid::new_v4(),
             map_id,
             fighters,

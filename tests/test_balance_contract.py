@@ -7,6 +7,14 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class BalanceContract(unittest.TestCase):
+    def test_progression_catalog_mirror_and_finite_economy(self):
+        source=(ROOT/'shared/data/progression-v1.json').read_bytes()
+        self.assertEqual(source,(ROOT/'client/assets/data/progression-v1.json').read_bytes())
+        data=json.loads(source)
+        self.assertEqual(data['max_upgrade'],6)
+        self.assertEqual(data['max_rerolls'],20)
+        self.assertEqual(sum(data['normal_weights'].values()),100)
+        self.assertEqual(sum(data['boss_weights'].values()),100)
     def test_build_catalog_mirror_and_six_styles(self):
         source=(ROOT/'shared/data/builds-v1.json').read_bytes()
         self.assertEqual(source,(ROOT/'client/assets/data/builds-v1.json').read_bytes())

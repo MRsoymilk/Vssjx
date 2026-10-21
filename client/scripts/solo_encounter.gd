@@ -47,7 +47,7 @@ func start(opponents:Array,elite:bool=false)->void:
 	sources=opponents.duplicate(true);rng.randomize();engine=ShushanBattle.new(sources[0])
 	var enemies:Array=[]
 	for i in sources.size():
-		var d:Dictionary=SkillBalance.monster(sources[i]) if engine.frozen_stats.has("balance") else sources[i].duplicate(true)
+		var d:Dictionary=ProgressionRules.monster(SkillBalance.monster(sources[i])) if engine.frozen_stats.has("balance") else sources[i].duplicate(true)
 		var effects:=SkillRules.new_state(0,3,1,int(d.level));SkillRules.activate(effects,engine.frozen_stats)
 		enemies.append({"slot":"m%d"%i,"definition":d,"hp":int(d.hp),"effects":effects})
 	if engine.frozen_stats.has("balance"):
@@ -172,6 +172,9 @@ func _commit()->void:
 			if not recorded.has(d.id):Game.finish_enemy(d);recorded[d.id]=true
 			else:Game.add_rewards(int(d.gold),int(d.xp))
 		state.lines.append("战斗胜利！获得%d铜钱、%d修为。"%[gold,xp])
+		var loot_sources:Array=sources.duplicate(true)
+		if state.enemies[0].has("elite"):loot_sources[0].kind="boss"
+		state.lines.append(Game.award_loot(loot_sources,rng.randi()))
 	elif state.outcome=="defeat":Game.become_soul()
 	save_result=await Game.save_game();saving=false
 	if not save_result.ok:state.lines.append("保存未确认："+save_result.message)

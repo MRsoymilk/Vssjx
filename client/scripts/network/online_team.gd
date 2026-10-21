@@ -13,6 +13,7 @@ var received_at:=0
 var server_time:=0
 var supported:=true
 const ROUND_ERRORS:={"TEAM_COMMAND_LOCKED":"本轮指令已锁定，等待全员提交。","TEAM_PLAYBACK_ACTIVE":"正在逐个执行行动，请等待下一轮指令窗口。","TEAM_ROUND_EXPIRED":"本轮30秒已结束，未提交者自动防御。","TEAM_NOT_PARTICIPATING":"你已倒下或未参战，不能提交本轮指令。","SOUL_STATE":"灵魂状态，请先寻回自己的尸体。"}
+const LOOT_ERRORS:={"TEAM_LOOT_PENDING":"请先完成战利品ROLL／放弃，再开始新战斗或更改队伍。","TEAM_LOOT_EXPIRED":"ROLL时间已结束，未选择者自动放弃。","TEAM_LOOT_DECIDED":"这件战利品已选择，不能重掷或改选。","TEAM_LOOT_INELIGIBLE":"这件装备的职业、性别或等级不适用，已自动放弃。","TEAM_LOOT_NOT_FOUND":"本场没有这件待分配战利品。","LOOT_STORAGE_FULL":"装备暂存空间不足，请先整理背包。"}
 const ERRORS:={"TEAM_MEMBER_REQUIRED":"队长负责带队，无需跟随。","CLIENT_UPDATE_REQUIRED":"连续挑战已触发精英，请更新客户端后继续。","TEAM_NOT_READY":"在线跟随队员尚未准备，请停稳后在队伍窗口准备。","TEAM_NOT_TOGETHER":"请参战队员在同一地图、队长附近集合并停稳。","TEAM_LEADER_REQUIRED":"只能由队长进行此操作。","TEAM_LEADER_MUST_TRANSFER":"请先移交队长，或解散队伍。","TEAM_PLAYER_OFFLINE":"队友已离线，请等待重连或调整队伍。","TEAM_BUSY":"有队员正在单人战斗或决斗中。","TEAM_FULL":"队伍最多5人。","TEAM_NEEDS_MEMBERS":"至少两人组队才能共同战斗。","TEAM_BATTLE_ACTIVE":"正在组队战斗，不能更改队伍。","TEAM_NOT_YOUR_TURN":"请等待当前队友行动。","INVALID_BATTLE_TARGET":"目标已倒下，请重新选择。","TEAM_INVITE_EXPIRED":"邀请已过期或已被处理。","TEAM_INVITE_PENDING":"已发送邀请，请等待对方确认。","TEAM_INVITE_COOLDOWN":"对方已拒绝，请5分钟后再邀请。","ALREADY_IN_TEAM":"你或对方已加入队伍。","MONSTER_RESPAWNING":"有队员的怪物尚未刷新，请稍候。","RESIDENT_TOO_FAR":"请队长靠近怪物。","QUEST_REQUIRED":"有队员尚未领取入门任务，请先找清微道人。","STALE_BATTLE":"战场已更新，请重新选择指令。","NO_ACTIVE_BATTLE":"战斗已经结束。","NOT_IN_TEAM":"尚未加入队伍。","MP_INSUFFICIENT":"灵力不足。","NO_POTION":"没有回春散。","HP_FULL":"气血已满。","NOT_FOUND":"服务尚未支持组队，需要更新游戏服务。","RATE_LIMITED":"操作过快，请稍候。","SESSION_REPLACED":"当前角色已在另一会话进入游戏。"}
 func bind_character(id:String)->void:
 	character_id=id;request={};queued_command={};inflight=false;next_poll=0;state={"team":null,"incoming":[]}
@@ -21,6 +22,8 @@ func bind_character(id:String)->void:
 func party()->Dictionary:return state.team if state.get("team") is Dictionary else {}
 func battle()->Dictionary:return party().get("battle",{}) if party().get("battle") is Dictionary else {}
 func active()->bool:return battle().get("outcome")=="active"
+func loot_pool()->Dictionary:return battle().get("loot_pool",{})
+func loot_pending()->bool:return TeamLootRules.pending(loot_pool())
 func pending()->bool:return not queued_command.is_empty() or (not request.is_empty() and request.action!="snapshot")
 func can_submit()->bool:return not pending() and (not inflight or request.get("action")=="snapshot")
 func my_turn()->bool:
@@ -34,7 +37,14 @@ func my_turn()->bool:
 	return false
 func submit(action:String,target:String="",skill:String="",ready:Variant=null)->bool:
 	if not can_submit():return false
-	if action not in ["follow","create","invite","accept","reject","cancel","leave","kick","transfer","disband","ready","challenge","attack","skill","guard","potion","flee"]:return false
+	if action not in ["follow","create","invite","accept","reject","cancel","leave","kick","transfer","disband","ready","challenge","attack","skill","guard","potion","flee","loot_roll","loot_pass"]:return false
+	if action in ["loot_roll","loot_pass"]:
+		var pool:=loot_pool()
+		if active() or pool.is_empty():return false
+		var drop:Dictionary={}
+		for d in pool.drops:
+			if d.item.id==target:drop=d;break
+		if drop.is_empty() or drop.resolved or character_id not in drop.eligible or drop.choices.has(character_id):return false
 	var bytes:=Crypto.new().generate_random_bytes(16)
 	if bytes.size()!=16:return false
 	bytes[6]=(bytes[6]&15)|64;bytes[8]=(bytes[8]&63)|128;var hex:=bytes.hex_encode()
@@ -47,6 +57,7 @@ func submit(action:String,target:String="",skill:String="",ready:Variant=null)->
 		if not active():return false
 		if action!="flee" and not my_turn():return false
 		command.battle_id=battle().id;command.expected_revision=int(battle().revision)
+	if action in ["loot_roll","loot_pass"]:command.battle_id=battle().id;command.expected_revision=int(loot_pool().revision)
 	if inflight:queued_command=command
 	else:request=command
 	OnlineAccount.pending_team={"server":OnlineAccount.server_address,"session":OnlineAccount.login_session_id,"request":command.duplicate(true)}
@@ -76,8 +87,8 @@ func receive(result:Dictionary)->bool:
 		changed.emit();return false
 	state=result.state.duplicate(true);server_time=int(result.server_time_ms);received_at=Time.get_ticks_msec()
 	if wrote:OnlineAccount.pending_team={}
-	request={};_promote_queued();next_poll=0 if pending() else received_at+(1000 if active() else 5000)
-	if not result.ok:message.emit(ROUND_ERRORS.get(result.code,ERRORS.get(result.code,"组队操作未完成。")))
+	request={};_promote_queued();next_poll=0 if pending() else received_at+(1000 if active() or loot_pending() else 5000)
+	if not result.ok:message.emit(LOOT_ERRORS.get(result.code,ROUND_ERRORS.get(result.code,ERRORS.get(result.code,"组队操作未完成。"))))
 	elif wrote:message.emit("队伍状态已更新。")
 	changed.emit();return true
 func _promote_queued()->void:
@@ -151,6 +162,7 @@ static func valid_battle(b:Variant,character_id:String,ids:Dictionary)->bool:
 		if event is Dictionary and event.has("critical") and not event.critical is bool:return false
 		if not event is Dictionary or not (fighters.has(event.get("actor")) or enemies.has(event.get("actor"))) or not (fighters.has(event.get("target")) or enemies.has(event.get("target"))) or event.get("action") not in ["attack","skill","potion","guard","dot","regen","revive"] or not event.get("skill") is String or not OnlinePve.integer(event.get("damage"),0,100000) or not OnlinePve.integer(event.get("healed"),0,100000):return false
 		if event.action=="revive" and (event.actor!=event.target or not enemies.has(event.actor) or event.skill!="monster_rebirth" or int(event.damage)!=0 or int(event.healed)<1 or not b.enemies.any(func(e:Dictionary)->bool:return e.slot==event.actor and e.has("elite"))):return false
+	if b.has("loot_pool") and (b.outcome!="victory" or not TeamLootRules.valid(b.loot_pool,b.fighters)):return false
 	return true
 
 static func valid_look(look:Array)->bool:

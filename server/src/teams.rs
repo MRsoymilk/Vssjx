@@ -36,7 +36,9 @@ pub struct Command {
     #[serde(default)]
     pub ready: Option<bool>,
 }
-const ACTIONS: [&str; 16] = [
+const ACTIONS: [&str; 18] = [
+    "loot_roll",
+    "loot_pass",
     "snapshot",
     "follow",
     "create",
@@ -99,13 +101,18 @@ async fn save_battle(
     b: &Battle,
     settle: bool,
 ) -> Result<(), AuthError> {
+    let mut saved=b.clone();
+    if settle&&b.outcome=="victory"&&b.loot_revision>=1&&saved.loot_pool.is_none(){
+        let now:i64=sqlx::query_scalar("SELECT (extract(epoch FROM clock_timestamp())*1000)::bigint").fetch_one(&mut **tx).await.map_err(db)?;
+        saved.loot_pool=Some(crate::pve::team_loot_pool(tx,b,now).await?);
+    }
     let mut fighters = b.fighters.iter().collect::<Vec<_>>();
     fighters.sort_by_key(|f| f.id);
     for f in fighters {
         crate::pve::team_save(tx, f, b, settle).await?;
     }
     sqlx::query("INSERT INTO team_battles(id,team_id,active,state,deadline_ms) VALUES($1,$2,$3,$4,$5) ON CONFLICT(id) DO UPDATE SET active=EXCLUDED.active,state=EXCLUDED.state,deadline_ms=EXCLUDED.deadline_ms,updated_at=clock_timestamp()")
-        .bind(b.id).bind(team).bind(b.active()).bind(DbJson(b)).bind(b.deadline_ms).execute(&mut **tx).await.map_err(db)?;
+        .bind(b.id).bind(team).bind(b.active()).bind(DbJson(&saved)).bind(b.deadline_ms).execute(&mut **tx).await.map_err(db)?;
     if !b.active() {
         sqlx::query("UPDATE team_members SET ready=FALSE WHERE team_id=$1")
             .bind(team)
@@ -114,6 +121,13 @@ async fn save_battle(
             .map_err(db)?;
     }
     Ok(())
+}
+async fn save_loot(tx:&mut Transaction<'_,Postgres>,b:&mut Battle)->Result<(),AuthError>{
+    if let Some(pool)=b.loot_pool.as_mut(){
+        let mut indices:Vec<_>=pool.drops.iter().enumerate().filter(|(_,d)|d.resolved&&!d.delivered&&d.winner.is_some()).map(|(i,d)|(d.winner.unwrap(),i)).collect();indices.sort();
+        for (winner,i) in indices{crate::pve::team_loot_award(tx,winner,&pool.drops[i].item).await?;pool.drops[i].delivered=true;pool.revision+=1;}
+    }
+    sqlx::query("UPDATE team_battles SET state=$2,updated_at=clock_timestamp() WHERE id=$1").bind(b.id).bind(DbJson(b)).execute(&mut **tx).await.map_err(db)?;Ok(())
 }
 pub(crate) async fn command(
     State(state): State<Arc<AppState>>,
@@ -201,6 +215,7 @@ pub(crate) async fn command(
         None
     };
     let mut dirty = false;
+    let was_active=current.as_ref().is_some_and(|b|b.active());
     if let Some(b) = current
         .as_mut()
         .filter(|b| b.active() && b.deadline_ms <= now)
@@ -210,6 +225,10 @@ pub(crate) async fn command(
         save_battle(&mut tx, team.unwrap(), b, !b.active()).await?;
         crate::security::append(&mut *tx,crate::security::Event{account:None,character:Some(actor),session:None,operation:None,action:"team.timeout",outcome:"accepted",code:if b.active(){"AUTO_GUARD"}else{"BATTLE_ENDED"},details:json!({"battle_id":b.id,"revision":b.revision,"requested_by":c.character_id})}).await.map_err(db)?;
         dirty = true;
+    }
+    if let Some(b)=current.as_mut().filter(|b|b.loot_pool.as_ref().is_some_and(|p|p.pending()&&p.deadline_ms<=now)){
+        b.loot_pool.as_mut().unwrap().resolve(now);save_loot(&mut tx,b).await?;dirty=true;
+        crate::security::append(&mut *tx,crate::security::Event{account:None,character:Some(c.character_id),session:None,operation:None,action:"team.loot_timeout",outcome:"accepted",code:"OK",details:json!({"battle_id":b.id,"loot":b.loot_pool})}).await.map_err(db)?;
     }
     let mut reservation = None;
     let mut code = "OK".to_owned();
@@ -290,7 +309,7 @@ pub(crate) async fn command(
     let roster=if let Some(t)=final_team {crate::world::team_bridge::roster(&mut tx,t).await?}else{vec![]};
     tx.commit().await.map_err(db)?;
     hub.team_roster_sync(&affected,roster);
-    hub.team_sync(&affected, final_battle.as_ref(), dirty);
+    hub.team_sync(&affected, final_battle.as_ref().filter(|b|b.active()||was_active), dirty);
     Ok(Json(
         json!({"version":"team-v1","character_id":c.character_id,"operation_id":c.operation_id,"ok":code=="OK","code":code,"replayed":replayed,"server_time_ms":now,"state":response}),
     ))
@@ -309,6 +328,18 @@ async fn apply(
     if context.session != session {
         return Err(err("SESSION_REPLACED"));
     }
+    if let Some((t,_))=own_membership{
+        if let Some(mut b)=battle(tx,t).await?.filter(|b|!b.active()&&b.loot_pool.is_some()){
+            if matches!(c.action.as_str(),"loot_roll"|"loot_pass"){
+                if c.battle_id!=Some(b.id)||c.skill.is_some()||c.ready.is_some()||c.expected_revision.is_none_or(|r|r>b.loot_pool.as_ref().unwrap().revision){return Err(err("STALE_BATTLE"));}
+                let id=target(c)?;
+                let roll=if c.action=="loot_roll"{Some(rand::thread_rng().gen_range(1..=100))}else{None};
+                b.loot_pool.as_mut().unwrap().choose(me,id,roll,now).map_err(err)?;save_loot(tx,&mut b).await?;return Ok(true);
+            }
+            if b.loot_pool.as_ref().unwrap().pending(){return Err(err("TEAM_LOOT_PENDING"));}
+        }
+    }
+    if matches!(c.action.as_str(),"loot_roll"|"loot_pass"){return Err(err("TEAM_LOOT_NOT_FOUND"));}
     if let Some((t, _)) = own_membership {
         if let Some(b) = battle(tx, t).await?.filter(|b| b.active()) {
             if !matches!(

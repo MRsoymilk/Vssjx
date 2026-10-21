@@ -31,7 +31,7 @@ static func action_name(command: String, job: int, skill_id:String="") -> String
 
 func _init(opponent: Dictionary) -> void:
 	enemy = opponent.duplicate(true)
-	if Game.player.get("balance_revision",0)==1:enemy=SkillBalance.monster(enemy)
+	if Game.player.get("balance_revision",0)==1:enemy=ProgressionRules.monster(SkillBalance.monster(enemy))
 	enemy_hp = int(enemy.hp)
 	hp = int(Game.player.hp)
 	mp = int(Game.player.mp)
@@ -195,7 +195,10 @@ func commit() -> bool:
 	var leveled := false
 	if victory:
 		leveled = Game.finish_enemy(enemy)
+		loot_message=Game.award_loot([enemy],rng.randi())
 	elif not escaped:
 		Game.become_soul()
 	save_result = await Game.save_game()
 	return leveled
+
+var loot_message:=""

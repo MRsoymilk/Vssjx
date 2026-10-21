@@ -56,7 +56,7 @@ fn dot_ticks_once_per_complete_round_and_independent_teammates_keep_their_source
 fn monster_spell_turns_respect_silence_and_boss_budget_counts_the_whole_encounter(){
     let spirit=population::definitions().into_iter().find(|r|r.id=="spirit").unwrap();
     assert!(b::monster_magical(&spirit,3,100,false));assert!(!b::monster_magical(&spirit,3,100,true));assert!(!b::monster_magical(&spirit,2,100,false));
-    let boss=population::definitions_for("ancient_ruins").into_iter().find(|r|r.id=="boss").unwrap();let single=b::monster(boss.clone()).hp;
+    let boss=population::definitions_for("ancient_ruins").into_iter().find(|r|r.id=="boss").unwrap();let single=vssjx_server::progression::monster(b::monster(boss.clone())).hp;
     let battle=team_rules::Battle::new("ancient_ruins".into(),(0..5).map(|_|fighter(1)).collect(),vec![boss,spirit],1000);
     assert_eq!(battle.enemies.iter().map(|e|e.hp).sum::<i32>(),single*42/10);
 }

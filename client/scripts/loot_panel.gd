@@ -23,6 +23,7 @@ func _ready()->void:
 	OriginalSceneChrome.label(self,"装备实例 · 独立编号／随机词缀",Rect2(16,69,288,24),14,INK)
 	summary=OriginalSceneChrome.label(self,"",Rect2(16,94,288,22),11,INK)
 	var builds:=OriginalSceneChrome.button(self,"流派",Rect2(255,94,49,21),11);builds.name="BuildOverview";builds.pressed.connect(show_builds)
+	var crafting:=OriginalSceneChrome.button(self,"养成",Rect2(201,94,49,21),11);crafting.name="Crafting";crafting.pressed.connect(open_crafting)
 	list=ItemList.new();list.name="Instances";list.position=Vector2(16,117);list.size=Vector2(288,117);list.add_theme_font_size_override("font_size",12);list.add_theme_color_override("font_color",INK);add_child(list)
 	var slot:=StyleBoxFlat.new();slot.bg_color=Color("fff8d4");slot.border_color=Color("b18b48");slot.set_border_width_all(1);list.add_theme_stylebox_override("panel",slot)
 	var selected:=slot.duplicate();selected.bg_color=Color("f1d16a");list.add_theme_stylebox_override("selected",selected);list.add_theme_stylebox_override("selected_focus",selected);list.add_theme_color_override("font_selected_color",INK)
@@ -32,7 +33,7 @@ func _ready()->void:
 	equip=OriginalSceneChrome.button(self,"装备",Rect2(16,356,87,25),12);equip.name="Equip";equip.pressed.connect(_action.bind("toggle"))
 	claim=OriginalSceneChrome.button(self,"领取暂存",Rect2(111,356,93,25),12);claim.name="Claim";claim.pressed.connect(_action.bind("gear_claim"))
 	var back:=OriginalSceneChrome.button(self,"返回背包",Rect2(211,356,93,25),12);back.pressed.connect(func()->void:back_requested.emit())
-	for button in [equip,claim,back,builds]:
+	for button in [equip,claim,back,builds,crafting]:
 		var normal:=StyleBoxFlat.new();normal.bg_color=Color("f6ce76");normal.border_color=Color("906329");normal.set_border_width_all(1)
 		var hover:=normal.duplicate();hover.bg_color=Color("ffe5a2")
 		var disabled:=normal.duplicate();disabled.bg_color=Color("d8cda6");disabled.border_color=Color("baa672")
@@ -60,6 +61,11 @@ func refresh()->void:
 	var potions:int=int(Game.player.get("potions",0)) if online_model==null else int(online_model.state.get("potions",0))
 	summary.text="背包 %d/60 · 暂存 %d/20"%[ShopRules.bag_slots(gear,potions)+LootRules.extra_bag(s),pending.size()] if not s.is_empty() else "当前服务尚未开放装备实例"
 	_describe()
+func open_crafting()->void:
+	if has_node("CraftingPanel"):return
+	var panel:Control=load("res://scripts/crafting_panel.gd").new();panel.name="CraftingPanel";panel.online_model=online_model;panel.selected_id=selected_id;add_child(panel)
+	panel.changed.connect(func()->void:refresh();changed.emit())
+	panel.back_requested.connect(func()->void:panel.queue_free();refresh())
 func show_builds()->void:
 	var stats:Dictionary=Game.stats() if online_model==null else online_model.state.get("stats",{})
 	var active:=BuildRules.describe(stats.get("balance",{}).get("builds",{}))
@@ -75,7 +81,7 @@ func _describe()->void:
 	for i in rows:
 		if i.id==selected_id:selection=i;break
 	var c:=_character()
-	var locked:bool=busy or (Game.storage_busy if online_model==null else not online_model.ready or online_model.pending() or online_model.active()) or c.get("corpse") is Dictionary
+	var locked:bool=busy or (Game.storage_busy or Game.local_battle_active() if online_model==null else not online_model.ready or online_model.pending() or online_model.active()) or c.get("corpse") is Dictionary
 	equip.disabled=true;claim.disabled=true
 	if selection.is_empty():details.text="暂无装备实例。已有固定装备会迁移为独立编号，原属性不变。";return
 	details.text=LootRules.describe(selection)

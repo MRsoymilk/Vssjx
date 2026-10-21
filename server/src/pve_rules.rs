@@ -11,6 +11,10 @@ pub enum Action {
     GearEquip,
     GearUnequip,
     GearClaim,
+    GearFocus,
+    GearSalvage,
+    GearReroll,
+    GearUpgrade,
     Respec,
     Revive,
     SchoolJoin,
@@ -88,6 +92,7 @@ pub fn mask(id: &str) -> Option<i32> {
 }
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Battle {
+    #[serde(default)] pub loot_revision:u8,
     pub id: Uuid,
     pub enemy: ResidentDefinition,
     pub hp: i32,
@@ -109,6 +114,7 @@ pub struct Battle {
 impl Battle {
     pub fn new(enemy: ResidentDefinition, hp: i32, mp: i32, potions: i32) -> Self {
         Self {
+            loot_revision:1,
             id: Uuid::new_v4(),
             enemy_hp: enemy.hp,
             enemy,
@@ -131,7 +137,7 @@ impl Battle {
     }
     pub fn new_formation(map: String, fighter: crate::team_rules::Fighter, sources: Vec<ResidentDefinition>, now: i64) -> Self {
         let stats=fighter.stats;
-        let primary=if stats.balance.is_some(){crate::skill_balance::monster(sources[0].clone())}else{sources[0].clone()};
+        let primary=if stats.balance.is_some(){crate::progression::monster(crate::skill_balance::monster(sources[0].clone()))}else{sources[0].clone()};
         let arena=crate::team_rules::Battle::new(map,vec![fighter],sources,now);
         let f=&arena.fighters[0];
         let mut b=Self::new(primary,f.hp,f.mp,f.potions);

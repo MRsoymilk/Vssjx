@@ -582,7 +582,10 @@ func _scene_action(action: String) -> void:
 			var help:ControlHelp=preload("res://scenes/ui/control_help.tscn").instantiate()
 			modal=help;ui.add_child(help);help.dismissed.connect(_close_modal)
 		"shop": _shop()
-		"craft", "trade":
+		"craft":
+			if mode!="world":_message("装备养成",OnlinePve.error_text("BATTLE_ACTIVE"));return
+			_bag();backpack.open_loot();backpack.loot_panel.status.text="选择一件装备，再点“养成”；旧固定装备数值不改。"
+		"trade":
 			var titles := {"shop": "商城", "craft": "炼制", "team": "队伍", "guild": "帮会", "trade": "交易"}
 			_message(titles[action], titles[action] + "暂未开放。")
 		"reward":
@@ -981,6 +984,7 @@ func _encounter_failed(explanation: String = "本地战斗资源未能准备完�
 	_message("无法进入战斗", explanation + "\n当前角色资源没有扣除。")
 
 func _encounter_battle(enemy: Dictionary) -> void:
+	if not ProgressionRules.can_fight(Game.player.get("loot_state",{})):_message("装备暂存已满",OnlinePve.error_text("LOOT_STORAGE_FULL"));return
 	if Game.is_soul():return
 	if mode != "world" or modal != null or not is_instance_valid(world): return
 	world.pause_moving()
@@ -1037,6 +1041,7 @@ func _encounter_battle(enemy: Dictionary) -> void:
 	_start_local_encounter(opponents,true)
 
 func _start_local_encounter(opponents:Array,record_hunt:bool=false)->void:
+	if not ProgressionRules.can_fight(Game.player.get("loot_state",{})):_encounter_failed(OnlinePve.error_text("LOOT_STORAGE_FULL"));return
 	var elite:=false
 	if record_hunt:
 		var epoch:=_ui_epoch
@@ -1046,6 +1051,7 @@ func _start_local_encounter(opponents:Array,record_hunt:bool=false)->void:
 		elite=result.value.elite
 	world.pause_moving();mode="local_encounter";_clear_ui()
 	local_encounter=SoloEncounter.new();local_encounter.start(opponents,elite)
+	Game.local_combat=weakref(local_encounter)
 	chrome=preload("res://scenes/ui/battle_chrome.tscn").instantiate();ui.add_child(chrome)
 	chrome.log_label.text="[系统] 遭遇%d名敌人，点击目标选择指令。"%opponents.size()
 	local_encounter_view=preload("res://scenes/ui/team_battle_view.tscn").instantiate();local_encounter_view.model=local_encounter;ui.add_child(local_encounter_view)
@@ -1060,10 +1066,12 @@ func _start_local_encounter(opponents:Array,record_hunt:bool=false)->void:
 	chrome.update_header(local_encounter.engine.hp,local_encounter.engine.mp,0)
 
 func _start_battle(enemy: Dictionary) -> void:
+	if not ProgressionRules.can_fight(Game.player.get("loot_state",{})):_encounter_failed(OnlinePve.error_text("LOOT_STORAGE_FULL"));return
 	world.pause_moving()
 	mode = "battle"
 	_clear_ui()
 	battle = ShushanBattle.new(enemy)
+	Game.local_combat=weakref(battle)
 	battle_stage = "select"
 	battle_committed = false
 	battle_auto = false
@@ -1336,6 +1344,7 @@ func _battle_result() -> void:
 	var outcome := "victory" if battle.victory else ("fled" if battle.escaped else "defeat")
 	var description := "战斗结束，你获得了胜利。\n获得 %d 铜钱、%d 修为。" % [int(battle.enemy.gold), int(battle.enemy.xp)] if battle.victory else ("战斗结束，你撤离了战场。" if battle.escaped else "战斗结束，你战败了。\n灵魂在本地图复活点醒来，请到坟堆旁寻回尸体。")
 	if leveled: description += "\n境界提升！生命与灵力已恢复。"
+	if battle.victory and not battle.loot_message.is_empty():description+="\n"+battle.loot_message
 	if battle.save_result != null and not battle.save_result.ok: description += "\n保存未确认：" + battle.save_result.message
 	battle_log.text="[系统] "+description.replace("\n","\n[系统] ")
 	_local_messages.append({"message_id":"battle-%d"%Time.get_ticks_usec(),"channel":"system","display_name":"系统","text":description})

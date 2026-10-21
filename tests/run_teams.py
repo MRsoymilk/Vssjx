@@ -44,6 +44,7 @@ def main():
                 db.query(f"UPDATE characters SET level=20,hp=437,mp=197,quest_stage=1,cell_x=22,cell_y=9 WHERE id='{cid}'")
                 return s,cid
             a,b,c=[create('team_'+s) for s in ['a','b','c']]
+            db.query(f"UPDATE characters SET loot_state=jsonb_set(loot_state,'{{kills}}','7') WHERE id IN ('{a[1]}','{b[1]}')")
             for s,cid in [a,b,c]:players.append(TeamPlayer(base,s,cid))
             def send(who,action,expected='OK',request=None,**fields):
                 for p in players:
@@ -114,9 +115,18 @@ def main():
                 fixtures.append(result)
                 if result['state']['team']['battle']['outcome']=='victory':victory_request=actor,cmd;break
             check(victory_request is not None,'Cooperative encounter finishes with team victory')
-            totals=db.query('SELECT id,hp,mp,gold,xp,quest_stage FROM characters ORDER BY id')
+            for who in [a,b]:
+                loot=json.loads(db.query(f"SELECT loot_state FROM characters WHERE id='{who[1]}'"))
+                check(loot['kills']==8 and loot['scrap']==1 and len([i for i in loot['items'] if not i['legacy']])+len(loot['pending'])==0,'Participants receive materials and pity progress, not duplicated personal copies of shared loot')
+            check(json.loads(db.query(f"SELECT loot_state FROM characters WHERE id='{c[1]}'"))['kills']==0,'Absent team invitees receive no equipment, materials or pity progress')
+            totals=db.query('SELECT id,hp,mp,gold,xp,quest_stage,loot_state FROM characters ORDER BY id')
             send(victory_request[0],'attack',request=victory_request[1])
-            check(db.query('SELECT id,hp,mp,gold,xp,quest_stage FROM characters ORDER BY id')==totals,'Victory replay cannot award resources twice')
+            check(db.query('SELECT id,hp,mp,gold,xp,quest_stage,loot_state FROM characters ORDER BY id')==totals,'Victory replay cannot award resources or random loot twice')
+            shared=send(a,'snapshot')[0]['state']['team']['battle'];pool=shared['loot_pool'];check(len(pool['drops'])==1,'One common pity drop is shared by the whole party')
+            item_id=pool['drops'][0]['item']['id']
+            send(a,'loot_roll',target=item_id,battle_id=shared['id'],expected_revision=pool['revision'])
+            distributed,_=send(b,'loot_pass',target=item_id,battle_id=shared['id'],expected_revision=pool['revision'])
+            check(distributed['state']['team']['battle']['loot_pool']['drops'][0]['winner']==a[1],'ROLL plus pass awards exactly the shared instance to the roller')
             send(a,'ready',ready=True);send(b,'ready',ready=True)
             send(a,'challenge','MONSTER_RESPAWNING',target='spirit')
             db.query("UPDATE characters SET monster_respawns='{}'::jsonb")

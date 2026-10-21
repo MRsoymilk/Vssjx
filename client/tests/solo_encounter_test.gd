@@ -34,7 +34,7 @@ func _run()->void:
 	check(not local.submit("attack","m0"),"A dead target cannot be attacked")
 	var boss:Dictionary=SharedWorldMap.population("ancient_ruins").filter(func(d:Dictionary)->bool:return d.id=="boss")[0].duplicate(true);boss.hp=10000
 	var boss_group:=SoloEncounter.new();boss_group.start([boss,pool[0]])
-	check(int(boss_group.state.enemies[0].hp)+int(boss_group.state.enemies[1].hp)==int(SkillBalance.monster(boss).hp),"Boss reinforcements share the same single-player HP budget")
+	check(int(boss_group.state.enemies[0].hp)+int(boss_group.state.enemies[1].hp)==int(ProgressionRules.monster(SkillBalance.monster(boss)).hp),"Boss reinforcements share the same revised single-player HP budget")
 	var observed:={}
 	for seed_value in 100:
 		var strong:=SoloEncounter.new();strong.start([boss]);strong.rng.seed=seed_value;strong.engine.rng.seed=seed_value;strong.submit("guard")

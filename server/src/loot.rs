@@ -16,6 +16,7 @@ pub struct Item{
     pub legacy:bool,pub affixes:Vec<Affix>,
     #[serde(default)] pub upgrade:i32,
     #[serde(default)] pub reroll_index:Option<usize>,
+    #[serde(default,skip_serializing_if="is_zero")] pub rerolls:i32,
     #[serde(default)] pub legendary:Option<String>,
     #[serde(default)] pub set_id:Option<String>,
     #[serde(default)] pub skin:Option<String>,
@@ -25,10 +26,12 @@ pub struct Item{
 #[derive(Clone,Debug,Serialize,Deserialize,PartialEq)]
 #[serde(default)]
 pub struct State{
+    #[serde(default,skip_serializing_if="String::is_empty")] pub focus:String,
     pub version:i32,pub items:Vec<Item>,pub pending:Vec<Item>,pub scrap:i32,pub essence:i32,
     pub kills:i32,pub bosses:i32,pub difficulty:i32,pub skins:BTreeSet<String>,
 }
-impl Default for State{fn default()->Self{Self{version:1,items:vec![],pending:vec![],scrap:0,essence:0,kills:0,bosses:0,difficulty:1,skins:BTreeSet::new()}}}
+fn is_zero(n:&i32)->bool{*n==0}
+impl Default for State{fn default()->Self{Self{version:1,items:vec![],pending:vec![],scrap:0,essence:0,kills:0,bosses:0,difficulty:1,skins:BTreeSet::new(),focus:String::new()}}}
 #[derive(Clone)]
 pub struct Dice(pub u32);
 impl Dice{pub fn next(&mut self,limit:usize)->usize{self.0=self.0.wrapping_mul(1664525).wrapping_add(1013904223);self.0 as usize%limit}}
@@ -47,13 +50,15 @@ impl Item{
         if (self.quality=="orange")!=self.legendary.is_some()||(self.quality=="green")!=self.set_id.is_some(){return false;}
         if self.legendary.as_deref().is_some_and(|id|!crate::builds::compatible(id,job,&d.slot,true))||self.set_id.as_deref().is_some_and(|id|!crate::builds::compatible(id,job,&d.slot,false)){return false;}
         if self.reroll_index.is_some_and(|i|i>=self.affixes.len()){return false;}
+        if !(0..=crate::progression::n("max_rerolls")).contains(&self.rerolls)||self.legacy&&(self.rerolls!=0||self.reroll_index.is_some()){return false;}
+        if self.rerolls>0&&self.reroll_index.is_none(){return false;}
         if let Some(skin)=&self.skin{if shop::item(skin).is_none_or(|s|s.slot!=d.slot||s.equip_error(job,gender).is_some()){return false;}}
         let mut seen=BTreeSet::new();
         self.affixes.iter().all(|a|seen.insert(&a.kind)&&DATA["pools"][&d.slot].as_array().unwrap().iter().any(|v|v.as_str()==Some(&a.kind))&&range(&a.kind,self.level).is_some_and(|(lo,hi)|a.value>=lo&&a.value<=hi))
     }
     pub fn base(&self)->(i32,i32,i32,i32){
         if self.legacy{return (self.legacy_attack,self.legacy_defense,0,0);}
-        let d=&DATA["base"][self.slot()];let v=|key:&str|d[key].as_i64().unwrap() as i32;let scale=100+2*self.upgrade;
+        let d=&DATA["base"][self.slot()];let v=|key:&str|d[key].as_i64().unwrap() as i32;let scale=100+crate::progression::n("upgrade_step_percent")*self.upgrade;
         ((v("power_base")+self.level*v("power_step"))*scale/100,(v("defense_base")+self.level*v("defense_step_bp")/10000)*scale/100,self.level*v("hp_step")*scale/100,self.level*v("mp_step")*scale/100)
     }
 }
@@ -63,10 +68,11 @@ pub fn roll(template:&str,level:i32,quality:&str,seed:u32,id:Uuid)->Result<Item,
     let count=DATA["quality_affixes"][quality].as_u64().unwrap() as usize;
     let mut dice=Dice(seed);let mut pool:Vec<String>=DATA["pools"][&d.slot].as_array().unwrap().iter().map(|v|v.as_str().unwrap().into()).collect();let mut affixes=vec![];
     for _ in 0..count{let kind=pool.remove(dice.next(pool.len()));let (lo,hi)=range(&kind,level).unwrap();let value=lo+dice.next((hi-lo+1) as usize) as i32;affixes.push(Affix{kind,value});}
-    Ok(Item{id,template:template.into(),level,quality:quality.into(),equipped:false,legacy:false,affixes,upgrade:0,reroll_index:None,legendary:None,set_id:None,skin:None,legacy_attack:0,legacy_defense:0})
+    Ok(Item{id,template:template.into(),level,quality:quality.into(),equipped:false,legacy:false,affixes,upgrade:0,reroll_index:None,rerolls:0,legendary:None,set_id:None,skin:None,legacy_attack:0,legacy_defense:0})
 }
 impl State{
     pub fn valid(&self,job:i16,gender:i16)->bool{
+        if !self.focus.is_empty()&&!shop::SLOTS.contains(&self.focus.as_str()){return false;}
         if self.version!=1||self.items.len()>90||self.pending.len()>20||!(0..=1000000000).contains(&self.scrap)||!(0..=1000000000).contains(&self.essence)||!(0..=1000000000).contains(&self.kills)||!(0..=1000000000).contains(&self.bosses)||!(1..=3).contains(&self.difficulty){return false;}
         let mut ids=BTreeSet::new();let mut slots=BTreeSet::new();let mut legacy=BTreeSet::new();
         if self.pending.iter().any(|i|i.legacy||i.equipped){return false;}
@@ -82,7 +88,7 @@ impl State{
             let Some(d)=shop::item(id).filter(|d|d.equipment()&&d.equip_error(job,gender).is_none())else{continue;};
             self.skins.insert(id.clone());
             if let Some(i)=self.items.iter_mut().find(|i|i.legacy&&i.template==*id){i.equipped=*on;}
-            else{self.items.push(Item{id:Uuid::new_v4(),template:id.clone(),level:1,quality:"legacy".into(),equipped:*on,legacy:true,affixes:vec![],upgrade:0,reroll_index:None,legendary:None,set_id:None,skin:None,legacy_attack:d.attack,legacy_defense:d.defense});}
+            else{self.items.push(Item{id:Uuid::new_v4(),template:id.clone(),level:1,quality:"legacy".into(),equipped:*on,legacy:true,affixes:vec![],upgrade:0,reroll_index:None,rerolls:0,legendary:None,set_id:None,skin:None,legacy_attack:d.attack,legacy_defense:d.defense});}
         }
     }
     pub fn extra_bag(&self)->usize{self.items.iter().filter(|i|!i.legacy&&!i.equipped).count()}
@@ -111,25 +117,13 @@ impl State{
         Ok(())
     }
     pub fn reward(&mut self,job:i16,gender:i16,level:i32,boss:bool,bag_count:usize,seed:u32)->Vec<Uuid>{
-        let mut dice=Dice(seed);self.kills=(self.kills+1).min(1000000000);if boss{self.bosses=(self.bosses+1).min(1000000000);}
-        if !boss&&dice.next(100)>=n("normal_drop_percent") as usize{return vec![];}
-        let count=if boss{n("boss_drops")}else{1};let mut gained=vec![];let mut used=bag_count;
-        for _ in 0..count{
-            let exact=dice.next(100)<80;
-            let candidates:Vec<_>=shop::ITEMS.iter().filter(|d|d.equipment()&&d.equip_error(job,gender).is_none()&&if exact{d.job==job}else{d.job<0}).collect();
-            let candidates=if candidates.is_empty(){shop::ITEMS.iter().filter(|d|d.equipment()&&d.equip_error(job,gender).is_none()).collect()}else{candidates};
-            let d=candidates[dice.next(candidates.len())];let quality=match dice.next(100){0..=24=>"white",25..=69=>"blue",_=>"yellow"};
-            let item=roll(&d.id,level.clamp(1,60),quality,dice.next(u32::MAX as usize) as u32,Uuid::new_v4()).unwrap();
-            self.skins.insert(d.id.clone());gained.push(item.id);
-            if used<60{self.items.push(item);used+=1;}else{assert!(self.pending.len()<20,"reserved loot storage");self.pending.push(item);}
-        }
-        gained
+        crate::progression::reward(self,job,gender,level,boss,bag_count,seed)
     }
     pub fn look(&self,mut original:[i32;3])->[i32;3]{
         for i in self.items.iter().filter(|i|i.equipped&&!i.legacy){let d=shop::item(i.skin.as_deref().unwrap_or(&i.template)).unwrap();match i.slot(){"weapon"=>original[0]=d.visual,"armor"=>original[1]=d.visual,"hat"=>original[2]=d.head_visual,_=>()}}
         original
     }
-    pub fn view(&self,original:[i32;3])->Value{json!({"version":"loot-v1","catalog_sha256":*HASH,"builds_sha256":*crate::builds::HASH,"state":self,"appearance":self.look(original)})}
+    pub fn view(&self,original:[i32;3])->Value{json!({"version":"loot-v1","catalog_sha256":*HASH,"builds_sha256":*crate::builds::HASH,"progression_sha256":*crate::progression::HASH,"state":self,"appearance":self.look(original)})}
     pub fn apply_stats(&self,s:&mut Stats,job:i16){
         let mut hp=0;let mut mp=0;let mut hp_percent=0;
         for i in self.items.iter().filter(|i|i.equipped&&!i.legacy){

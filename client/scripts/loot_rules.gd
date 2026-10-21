@@ -40,6 +40,8 @@ static func valid_item(i:Variant,job:int,gender:int)->bool:
 	for key in ["legendary","set_id"]:
 		if i.get(key)!=null and (not i[key] is String or not BuildRules.compatible(i[key],job,d.slot,key=="legendary")):return false
 	if i.get("reroll_index")!=null and not ShopRules._integer(i.reroll_index,0,i.affixes.size()-1):return false
+	if not ShopRules._integer(i.get("rerolls",0),0,int(ProgressionRules.rules.max_rerolls)) or (i.legacy and (int(i.get("rerolls",0))!=0 or i.get("reroll_index")!=null)):return false
+	if int(i.get("rerolls",0))>0 and i.get("reroll_index")==null:return false
 	if i.get("skin")!=null:
 		var skin:=ShopRules.item(str(i.skin))
 		if skin.get("slot")!=d.slot or not ShopRules.equipment_error(skin,job,gender).is_empty():return false
@@ -55,6 +57,7 @@ static func valid(s:Variant,job:int,gender:int)->bool:
 	for key in ["scrap","essence","kills","bosses"]:
 		if not ShopRules._integer(s.get(key),0,1000000000):return false
 	if not ShopRules._integer(s.get("difficulty"),1,3) or not s.get("skins") is Array or s.skins.size()>ShopRules.catalog.items.size():return false
+	if s.has("focus") and (not s.focus is String or (not s.focus.is_empty() and s.focus not in ShopRules.SLOTS)):return false
 	var ids:={};var slots:={};var legacy:={};var skins:={}
 	for i in s.pending:
 		if not i is Dictionary or i.get("legacy")!=false or i.get("equipped")!=false:return false
@@ -91,7 +94,7 @@ static func sync_legacy(player:Dictionary)->void:
 static func extra_bag(s:Dictionary)->int:return s.get("items",[]).filter(func(i:Dictionary)->bool:return not i.legacy and not i.equipped).size()
 static func base(i:Dictionary)->Array:
 	if i.legacy:return [int(i.legacy_attack),int(i.legacy_defense),0,0]
-	var d:Dictionary=rules.base[ShopRules.item(i.template).slot];var l:=int(i.level);var scale:=100+2*int(i.upgrade)
+	var d:Dictionary=rules.base[ShopRules.item(i.template).slot];var l:=int(i.level);var scale:=100+int(ProgressionRules.rules.upgrade_step_percent)*int(i.upgrade)
 	return [(int(d.power_base)+l*int(d.power_step))*scale/100,(int(d.defense_base)+l*int(d.defense_step_bp)/10000)*scale/100,l*int(d.hp_step)*scale/100,l*int(d.mp_step)*scale/100]
 static func look(s:Dictionary,original:Array)->Array:
 	var result:=original.duplicate()
@@ -122,9 +125,14 @@ static func apply_stats(s:Dictionary,stats:Dictionary,job:int)->void:
 					b[key]+=value
 	stats.hp=mini(1000000,(int(stats.hp)+hp)*(10000+mini(percent,4000))/10000);stats.mp=mini(1000000,int(stats.mp)+mp);stats.attack=b[channel]
 	BuildRules.aggregate(s,stats)
-static func apply_local(player:Dictionary,action:String,id:String)->String:
+static func apply_local(player:Dictionary,action:String,id:String,count:int=1)->String:
 	if player.get("corpse") is Dictionary:return "SOUL_STATE"
+	if count<1 or count>4 or (action!="gear_reroll" and count!=1):return "INVALID_LOOT_COMMAND"
 	sync_legacy(player)
+	if action=="gear_focus":
+		if id!="any" and id not in ShopRules.SLOTS:return "INVALID_LOOT_COMMAND"
+		player.loot_state.focus="" if id=="any" else id;return ""
+	if action in ["gear_salvage","gear_upgrade","gear_reroll"]:return ProgressionRules.craft(player,id,action,count-1 if action=="gear_reroll" else -1,randi())
 	var s:Dictionary=player.loot_state;var gear:=ShopRules.local_state(player);var bag:=ShopRules.bag_slots(gear,int(player.potions))+extra_bag(s)
 	if action=="gear_claim":
 		if bag>=60:return "BAG_FULL"
@@ -170,6 +178,7 @@ static func valid_view(v:Variant,gear:Dictionary,job:int,gender:int)->bool:
 	if not v is Dictionary or v.get("version")!="loot-v1" or not valid(v.get("state"),job,gender):return false
 	if v.has("catalog_sha256") and v.catalog_sha256!=catalog_hash:return false
 	if v.has("builds_sha256") and v.builds_sha256!=BuildRules.catalog_hash:return false
+	if v.has("progression_sha256") and v.progression_sha256!=ProgressionRules.catalog_hash:return false
 	if not consistent(v.state,gear,job,gender) or not ShopRules.valid_appearance(v.get("appearance")):return false
 	var expected:=look(v.state,ShopRules.appearance(gear))
 	for index in 3:
@@ -192,13 +201,17 @@ static func describe(i:Dictionary)->String:
 	var parts:Array[String]=["%s · %s · 物等%d"%[d.name,{"legacy":"原有固定装备","white":"普通","blue":"魔法","yellow":"稀有","orange":"传奇","green":"套装"}.get(i.quality,i.quality),int(i.level)]]
 	parts.append("主攻+%d  双防+%d  气血+%d  灵力+%d"%v)
 	for a in i.affixes:
-		parts.append("%s +%s"%[rules.affix_names[a.kind],("%.2f%%"%(int(a.value)/100.0)) if a.kind in ["hp_percent","crit_damage","penetration","damage","dot","reduction"] else str(int(a.value))])
+		parts.append(affix_text(a))
 	parts.append("编号 "+String(i.id).right(8))
+	if not i.legacy:parts.append("强化+%d/6 · 洗炼%d/20%s"%[int(i.upgrade),int(i.get("rerolls",0))," · 锁定第%d词条"%(int(i.reroll_index)+1) if i.get("reroll_index")!=null else ""])
 	var build:String=i.legendary if i.get("legendary")!=null else (i.set_id if i.get("set_id")!=null else "")
 	if not build.is_empty():
 		var entry:Dictionary=BuildRules.rules.items[BuildRules.index(build)]
 		parts.append((entry.legend_name if i.quality=="orange" else entry.name+" · 2/4件套")+"\n"+entry.description)
 	return "\n".join(parts)
+
+static func affix_text(a:Dictionary)->String:
+	return "%s +%s"%[rules.affix_names[a.kind],("%.2f%%"%(int(a.value)/100.0)) if a.kind in ["hp_percent","crit_damage","penetration","damage","dot","reduction"] else str(int(a.value))]
 
 static func roll_special(template:String,level:int,quality:String,build:String,seed:int,id:String="")->Dictionary:
 	var index:=BuildRules.index(build);var d:=ShopRules.item(template)

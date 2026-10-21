@@ -104,6 +104,7 @@ func valid(value: Variant) -> bool:
 	if not AIWorld.resident(enemy.id).is_empty():
 		var definition := AIWorld.resident(enemy.id)
 		if SkillBalance.revised(value.stats):definition=SkillBalance.monster(definition)
+		if SkillBalance.revised(value.stats) and int(battle.get("loot_revision",0))>=1:definition=ProgressionRules.monster(definition)
 		if battle.get("formation") is Dictionary and battle.formation.get("monster_revision")==2:definition=MonsterCombat.empower(definition,1)
 		for key in ["art", "kind", "hp", "attack", "defense", "level", "gold", "xp"]:
 			if enemy.get(key) != definition[key]: return false
@@ -201,8 +202,11 @@ func submit(action: String, target: String = "", points: Array = [], count: int=
 	if is_soul() and action!="revive":return false
 	if action=="revive" and (not is_soul() or target!=state.character.corpse.id):return false
 	if action=="school_join" and (active() or int(state.character.school)!=SchoolRules.UNJOINED or SchoolRules.index(target)<0):return false
-	if action in ["gear_equip","gear_unequip","gear_claim"]:
-		if active() or not state.has("loot") or not uuid(target) or count!=1 or not points.is_empty():return false
+	if action in ["gear_focus","gear_salvage","gear_reroll","gear_upgrade"] and state.get("loot",{}).get("progression_sha256")!=ProgressionRules.catalog_hash:return false
+	if action=="gear_focus" and (active() or not state.has("loot") or (target!="any" and target not in ShopRules.SLOTS) or count!=1 or not points.is_empty()):return false
+	if action in ["gear_equip","gear_unequip","gear_claim","gear_salvage","gear_reroll","gear_upgrade"]:
+		if active() or not state.has("loot") or not uuid(target) or (count!=1 and action!="gear_reroll") or not points.is_empty():return false
+		if action=="gear_reroll" and (count<1 or count>4):return false
 		var source:Array=state.loot.state.pending if action=="gear_claim" else state.loot.state.items
 		if not source.any(func(i:Dictionary)->bool:return i.id==target):return false
 	if action=="skill" and not target.is_empty():
@@ -236,9 +240,9 @@ func submit(action: String, target: String = "", points: Array = [], count: int=
 	elif action=="respec":
 		if active() or not state.character.get("balance_respec_available",false):return false
 		command.expected_revision=state.character.state_revision
-	elif action in ["buy", "equip", "unequip", "use", "discard","school_join","revive","gear_equip","gear_unequip","gear_claim"]:
+	elif action in ["buy", "equip", "unequip", "use", "discard","school_join","revive","gear_equip","gear_unequip","gear_claim","gear_salvage","gear_reroll","gear_upgrade","gear_focus"]:
 		command.target = target
-		if count!=1: command.quantity=count
+		if count!=1 or action=="gear_reroll": command.quantity=count
 		command.expected_revision = state.character.state_revision
 	elif action=="skill" and active():
 		if not target.is_empty():command.target=target
@@ -271,6 +275,8 @@ func quest_text() -> String:
 	return "古剑遗迹 · 已完成\n妖气已散，可返回青云山道恢复元气，或继续探索遗迹。"
 
 static func error_text(code: String) -> String:
+	var crafting:={"LOOT_STORAGE_FULL":"装备暂存空间不足，请领取或分解后再战。","LEGACY_CRAFT_LOCKED":"原有固定装备保留原数值，不参与分解、洗炼或强化。","UPGRADE_LIMIT":"已达到+6强化上限。","NO_AFFIXES":"普通装备没有可洗炼的词条。","REROLL_LIMIT":"此装备已达到20次洗炼上限。","UNEQUIP_BEFORE_SALVAGE":"请先卸下装备，再确认分解。","MATERIALS_INSUFFICIENT":"炼材或精华不足，请先战斗或分解闲置装备。","INVALID_AFFIX_INDEX":"请选择有效的词条。","REROLL_SLOT_LOCKED":"此装备已锁定另一条洗炼词条。"}
+	if crafting.has(code):return crafting[code]
 	var loot:={"INSTANCE_NOT_OWNED":"没有这件装备实例，请重新同步。","EQUIPMENT_LEVEL_REQUIRED":"等级不足，暂时不能装备。","NOT_EQUIPPED":"这件装备尚未穿戴。","INVALID_LOOT_COMMAND":"无效的装备操作。"}
 	if loot.has(code):return loot[code]
 	if code=="NO_ALLOCATED_ATTRIBUTES": return "尚未分配属性点，无需使用重生再造丹；道具未消耗。"

@@ -20,7 +20,11 @@
 
 ## 接口与客户端
 
-`POST /api/v1/teams` 使用现有 Bearer 会话，角色归属和世界会话须匹配。闭集动作：snapshot/create/invite/accept/reject/cancel/ready/leave/kick/transfer/disband/challenge/attack/skill/guard/potion/flee。写入须带 UUIDv4 operation_id；回合指令还需 battle_id、expected_revision。请求不能携带生命、伤害、奖励或成员权限。
+`POST /api/v1/teams` 使用现有 Bearer 会话，角色归属和世界会话须匹配。闭集动作：snapshot/create/invite/accept/reject/cancel/ready/leave/kick/transfer/disband/challenge/attack/skill/guard/potion/flee/loot_roll/loot_pass。写入须带 UUIDv4 operation_id；回合指令还需 battle_id、expected_revision。ROLL操作的target是公共物品UUID，修订取战利品池；不同成员可从相同修订并发选择，但同一人不能改选或重掷。请求不能携带生命、伤害、奖励、骰子点数或成员权限。
+
+### 公共装备分配
+
+2026-10-21起，装备采用[公共ROLL／放弃](../tests/team_loot.md)，不再按参战人数复制个人装备掉落。服务端生成1～100点，最高分获奖，同点自动加骰；独立60秒超时放弃，满包暂存，重连保留点数和期限，全员放弃则无人获得。仅实际参战且装备适用者可ROLL，死亡不取消参战资格，队长不能指定归属。队长定向决定公共掉落偏向。铜钱／修为仍按原规则分摊，炼材／首领精华给实际参战者各一份。待分配期间冻结换队／踢人／解散及下一场战斗，不能覆盖未发出的公共物品。
 
 战场JSON增加 `commands`（本轮已提交指令）、`round_revision`（当前输入轮次修订下界）、`events_revision`（最新已执行事件修订）与 `selection_starts_ms`（下一指令窗口起点）。`expected_revision` 只要属于同一轮次即可提交，因此多人同时使用同一已同步快照不会相互判过期；跨轮次旧指令拒绝。旧JSON缺失字段时由服务端默认值兼容读取，新时序需要同步更新客户端和服务端。指令、原截止时间和已执行事件随战场JSON同事务持久化，不增加数据库列。
 

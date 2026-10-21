@@ -30,8 +30,12 @@ fn combo_has_separate_hits_and_sweep_hits_every_living_fighter(){
 #[test]
 fn sleep_prevents_specials_and_criticals_are_saved_in_events(){
     let mut b=battle(1);b.enemies[0].effects.enemy_sleep=1;turn(&mut b,0);assert!(!b.events.iter().any(|e|e.actor=="m0"));
-    let mut b=battle(1);turn(&mut b,0);assert!(b.events.iter().any(|e|e.actor=="m0"&&e.critical));
-    let restored:Battle=serde_json::from_value(serde_json::to_value(&b).unwrap()).unwrap();assert_eq!(restored.monster_revision,1);assert!(restored.events.iter().any(|e|e.critical));
+    for _ in 0..16{
+        let mut b=battle(1);turn(&mut b,0);
+        if !b.events.iter().any(|e|e.actor=="m0"&&e.critical){continue;} // A legal independent miss is not a critical hit.
+        let restored:Battle=serde_json::from_value(serde_json::to_value(&b).unwrap()).unwrap();assert_eq!(restored.monster_revision,1);assert!(restored.events.iter().any(|e|e.critical));return;
+    }
+    panic!("No landed critical in sixteen independent trials");
 }
 #[test]
 fn bleed_persists_ticks_once_per_round_and_expires(){
@@ -67,7 +71,7 @@ fn solo_formation_targets_aoe_and_saved_rounds_are_authoritative(){
     b.turn_formation(Action::Flee,None,None,2002,99).unwrap();assert_eq!(b.outcome,"fled");
     let before=serde_json::to_value(&b).unwrap();assert_eq!(b.turn_formation(Action::Attack,None,Some("m0"),2003,99),Err("BATTLE_FINISHED"));assert_eq!(serde_json::to_value(&b).unwrap(),before);
     let boss=population::definitions_for("ancient_ruins").into_iter().find(|d|d.id=="boss").unwrap();
-    let budget=vssjx_server::skill_balance::monster(boss.clone()).hp;
+    let budget=vssjx_server::progression::monster(vssjx_server::skill_balance::monster(boss.clone())).hp;
     let guard=population::definitions_for("ancient_ruins").into_iter().find(|d|d.id=="guardian").unwrap();
     let b=Solo::new_formation("ancient_ruins".into(),fighter(),vec![boss,guard],1000);
     assert_eq!(b.enemy.hp,budget,"Legacy envelope keeps the primary template for client validation");

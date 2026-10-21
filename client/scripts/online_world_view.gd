@@ -289,6 +289,11 @@ func _scene_action(action: String) -> void:
 	if action == "bag":
 		_open_inventory()
 		return
+	if action=="craft":
+		if network.team.active() or network.duel.active():chat_status.text=OnlinePve.error_text("BATTLE_ACTIVE");return
+		_open_inventory()
+		if backpack!=null:backpack.open_loot();backpack.loot_panel.status.text="选择一件装备，再点“养成”。"
+		return
 	var titles := {"system": "系统", "properties": "人物属性", "quest": "任务", "bag": "背包", "map": "地图", "mail": "邮件", "reward": "奖励", "shop": "商城", "craft": "炼制", "team": "队伍", "guild": "帮会", "trade": "交易"}
 	$Menu/Panel/Title.text = titles.get(action, "提示")
 	var body := "同图%d人 · 点击地图移动 / WASD\n公共消息在底部直接发送。\n线上进度由服务器保存。" % actors.size()

@@ -3,6 +3,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 PAIRS = (
+    ('shared/data/progression-v1.json', 'client/assets/data/progression-v1.json'),
+    ('shared/data/builds-v1.json', 'client/assets/data/builds-v1.json'),
     ('shared/data/monster-combat-v1.json', 'client/assets/data/monster-combat-v1.json'),
     ('shared/data/loot-v1.json', 'client/assets/data/loot-v1.json'),
     ('shared/data/skill-balance-v1.json', 'client/assets/data/skill-balance-v1.json'),

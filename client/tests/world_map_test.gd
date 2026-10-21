@@ -13,12 +13,14 @@ func _run() -> void:
 	var old_characters := OnlineAccount.characters.duplicate(true)
 	Game.save_path = "user://world_map_%d.json" % OS.get_process_id()
 	Game.new_player("地图修士",1,2)
+	Game.player.ai_map="ai_001";Game.player.cell=[7,21]
 	var app: Control = load("res://scenes/main.tscn").instantiate()
 	add_child(app)
 	app._enter_world()
-	app._scene_action("map")
+	app.minimap.gui_input.emit(mouse_event(Vector2(25,25),true))
 	var page: OriginalWorldMap = app.modal
 	check(page != null and page.scene_file_path == "res://scenes/ui/world_map.tscn" and not app.world.enabled, "Map entry opens authored overview and pauses local world")
+	check(app.minimap.size==Vector2(80,82),"Clicking the minimap opens the map without collapsing the HUD")
 	var before := Game.player.duplicate(true)
 	check(page.locations.size() == 79 and page.graph.get_node("Locations").get_child_count() == 79 and page.graph.get_node("Routes").get_child_count() == 78, "Overview preserves all recovered locations and routes")
 	var source: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://assets/data/original_world.json"))
@@ -32,7 +34,9 @@ func _run() -> void:
 		var line: Line2D = page.graph.get_node("Routes/Route%d" % int(route.index))
 		valid = valid and line.points[0] == Vector2(route["from"][0],route["from"][1])*page.STEP+page.PADDING and line.points[1] == Vector2(route.to[0],route.to[1])*page.STEP+page.PADDING
 	check(valid, "Authored lines preserve original endpoints without inventing connections")
-	check(page.selected_id == 14 and page.tooltip.get_node("Name").text == "卧云镇北" and page.tooltip.get_node("Level").text == "20～25级", "Reference selected location shows actual recovered name and levels")
+	check(page.selected_id == 1 and page.tooltip.get_node("Name").text == "灵空台" and page.tooltip.get_node("Level").text == "1～5级", "Opening selects the player's actual map and its recovered levels")
+	check((page.graph.position+page.location_point(1)).is_equal_approx(page.map_area.size/2.0),"Current map is centered in the visible graph")
+	check(page.get_node("CurrentLocation").text=="当前位置：灵空台 (7,21)","Current location includes the live player cell")
 	check(page.get_node("Header/Wild").text == "野外" and page.get_node("Header/City").text == "城市" and page.get_node("Header/School").text == "门派", "Header matches reference legend")
 	check(page.get_node("Footer/Travel").disabled and page.get_node("Footer/TravelCount").text == "—", "Unknown travel item count cannot be fabricated or spent")
 	output = OS.get_environment("SSJX_WORLD_MAP_CAPTURE_PATH") if DisplayServer.get_name() != "headless" else ""
@@ -73,12 +77,18 @@ func _run() -> void:
 	check(Game.player == before, "Overview browsing does not change offline inventory, position or progress")
 	page.get_node("Footer/Back").pressed.emit()
 	check(app.modal == null and app.world.enabled, "Back resumes same local world")
+	app.world.cell=Vector2i(11,23);app.world.hero.position=app.world.cell_center(app.world.cell);Game.player.cell=[11,23]
 	key.keycode = KEY_3
 	app._unhandled_key_input(key)
 	check(app.modal is OriginalWorldMap and not app.world.enabled, "Three key opens world map")
+	check(app.modal.selected_id==1 and app.modal.get_node("CurrentLocation").text=="当前位置：灵空台 (11,23)","Reopening follows the latest cell instead of the last browsed city")
 	key.keycode = KEY_ESCAPE
 	app.modal._unhandled_key_input(key)
 	check(app.modal == null and app.world.enabled, "Map Escape closes without consuming input through a detached node")
+	var local_touch:=InputEventScreenTouch.new();local_touch.pressed=true;local_touch.position=Vector2(20,20)
+	app.minimap.gui_input.emit(local_touch)
+	check(app.modal is OriginalWorldMap and app.modal.selected_id==1,"Touching the minimap opens the same current location")
+	app._close_modal()
 	app.queue_free()
 	await get_tree().process_frame
 	await online_map()
@@ -97,14 +107,17 @@ func online_map() -> void:
 	var view: OnlineWorldView = app.ui.get_node("OnlineWorld")
 	view.network.set_process(false)
 	view.network.world_ready = true
-	view.network.entities = {SELF:entity(SELF,1,"联网修士",1,0,[10,16])}
+	view._map_changed("ai_007")
+	view.network.entities = {SELF:entity(SELF,1,"联网修士",1,0,[6,18])}
 	view.network.changed.emit(view.network.entities)
 	var chat_id := view.chat_panel.get_instance_id()
 	view.chat_input.text = "未发送的聊天草稿"
 	view.move_target.set_destination(Vector2i(14,16))
-	view._scene_action("map")
+	view.screen.hud.get_node("Minimap").gui_input.emit(mouse_event(Vector2(25,25),true))
 	var page := view.world_map
 	check(page.visible and page.scene_file_path == "res://scenes/ui/world_map.tscn" and not view.details.visible, "Online map entry opens shared reference scene instead of text dialog")
+	check(page.selected_id==7 and page.get_node("CurrentLocation").text=="当前位置：天化村 (6,18)","Online location uses the current server map and own entity, not the offline character")
+	check((page.graph.position+page.location_point(7)).is_equal_approx(page.map_area.size/2.0),"Online map centers on the current location")
 	check(view.network._pending_motion.get("type") == "world.stop" and not view.move_target.visible, "Online map stops movement and clears destination marker")
 	check(page.locations.size() == 79 and page.graph.get_node("Routes").get_child_count() == 78, "Online map uses full recovered world graph")
 	var timer := view._key_timer
@@ -115,14 +128,23 @@ func online_map() -> void:
 	check(view.network._pending_motion == pending, "Clicks browsing world map cannot move the character underneath")
 	await capture("online_world_map")
 	page.get_node("MainCity").pressed.emit()
+	page.get_node("CurrentLocation").pressed.emit()
+	check(page.selected_id==7,"Current-location control returns from browsing to the player's map")
 	page.get_node("Footer/Back").pressed.emit()
 	check(not page.visible and view.network.world_ready and view.chat_panel.get_instance_id() == chat_id and view.chat_input.text == "未发送的聊天草稿", "Return keeps current online session, shared chat and input draft")
-	check(view.network.entities[SELF].cell == [10,16] and Game.player == offline, "Map browsing neither teleports online character nor changes offline state")
+	check(view.network.entities[SELF].cell == [6,18] and Game.player == offline, "Map browsing neither teleports online character nor changes offline state")
 	var key := InputEventKey.new(); key.keycode = KEY_3; key.pressed = true
 	view._unhandled_key_input(key)
-	check(page.visible, "Online three key opens world map")
+	check(page.visible and page.selected_id==7, "Online three key opens at the player's current map")
 	page._unhandled_key_input(key)
 	check(not page.visible, "Three key returns from online world map")
+	view._map_changed("qingyun_trail");view.network.entities[SELF].cell=[14,17]
+	view._scene_action("map")
+	check(page.selected_id==-1 and not page.selection.visible and not page.tooltip.visible,"Unlisted map never retains another location's selection")
+	check(page.get_node("CurrentLocation").text=="当前位置：青云山道 (14,17) · 总图未标注","Unlisted map still shows its real name and live coordinates")
+	page.present("ai_213",Vector2i(15,26))
+	check(page.selected_id==-1 and page.get_node("CurrentLocation").text.contains("守方基地 (15,26)"),"Extended regions without overview nodes keep their own location context")
+	view._close_world_map()
 	view._scene_action("map")
 	view._scene_action("properties")
 	check(not page.visible and view.attributes.visible, "Online properties dismiss world map before opening")

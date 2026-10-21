@@ -8,6 +8,9 @@ const PADDING := Vector2(24, 24)
 const GRAPH_SIZE := Vector2(1060, 1448)
 var locations: Dictionary = {}
 var selected_id := 14
+var current_map_id := ""
+var current_cell := Vector2i(-1,-1)
+var ai_button: Button
 var _dragging := false
 var _drag_distance := 0.0
 var _touch_index := -1
@@ -30,7 +33,8 @@ func _ready() -> void:
 	$MapMenu/Details.pressed.connect(func() -> void: popup.hide(); _place_selection())
 	$MapMenu/City.pressed.connect(func() -> void: popup.hide(); cycle_kind(1))
 	$MapMenu/Close.pressed.connect(func() -> void: back_requested.emit())
-	var ai_button := Button.new()
+	$CurrentLocation.pressed.connect(_locate_current)
+	ai_button = Button.new()
 	ai_button.text = "AI生成 · 驿路目录"
 	ai_button.position = Vector2(130, 404); ai_button.size = Vector2(180, 30)
 	ai_button.add_theme_font_size_override("font_size", 12)
@@ -38,12 +42,29 @@ func _ready() -> void:
 	ai_button.pressed.connect(func() -> void: ai_requested.emit("ai_%03d" % selected_id))
 	select_location(selected_id, true)
 
-func present() -> void:
+func present(map_id: String = "", cell: Vector2i = Vector2i(-1,-1)) -> void:
 	popup.hide()
 	_dragging = false
+	_drag_distance = 0.0
 	_touch_index = -1
+	current_map_id=map_id;current_cell=cell
 	show()
-	_place_selection()
+	$CurrentLocation.visible=not map_id.is_empty()
+	if map_id.is_empty():_place_selection()
+	else:_locate_current()
+
+func _locate_current() -> void:
+	var data:=AIWorld.map_data(current_map_id)
+	var id:=int(data.get("original_map_id",-1))
+	var known:=locations.has(id)
+	var location_name:=String(data.get("name",SharedWorldMap.title(current_map_id)))
+	var coordinates:=" (%d,%d)"%[current_cell.x,current_cell.y] if current_cell.x>=0 and current_cell.y>=0 else ""
+	$CurrentLocation.text="当前位置："+location_name+coordinates+("" if known else " · 总图未标注")
+	$CurrentLocation.disabled=not known
+	if known:select_location(id,true)
+	else:
+		selected_id=-1
+		_place_selection()
 
 func select_location(id: int, center: bool = false) -> void:
 	if not locations.has(id): return
@@ -52,7 +73,7 @@ func select_location(id: int, center: bool = false) -> void:
 	tooltip.get_node("Name").text = node.name
 	tooltip.get_node("Level").text = "%d～%d级" % [int(node.level_min), int(node.level_max)]
 	if center:
-		graph.position = Vector2(170, 240) - location_point(id)
+		graph.position = map_area.size/2.0 - location_point(id)
 		_clamp_pan()
 	_place_selection()
 
@@ -78,7 +99,10 @@ func _clamp_pan() -> void:
 	graph.position.y = roundf(clampf(graph.position.y, map_area.size.y - GRAPH_SIZE.y, 0))
 
 func _place_selection() -> void:
-	if not locations.has(selected_id): return
+	ai_button.disabled=not locations.has(selected_id)
+	if not locations.has(selected_id):
+		selection.hide();tooltip.hide()
+		return
 	var point := graph.position + location_point(selected_id)
 	var onscreen := Rect2(Vector2.ZERO, map_area.size).grow(-12).has_point(point)
 	selection.visible = onscreen

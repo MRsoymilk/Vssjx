@@ -1,9 +1,8 @@
 class_name OriginalWorldMinimap
 extends Control
 
-signal toggle_requested
+signal map_requested
 var world: ShushanWorld
-var expanded := true
 var shared_map: Dictionary = {}
 var shared_entities: Dictionary = {}
 var shared_population: Dictionary = {}
@@ -24,10 +23,8 @@ func _ready() -> void:
 	size = Vector2(80, 82)
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	gui_input.connect(func(event: InputEvent) -> void:
-		if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-			expanded = not expanded
-			size = Vector2(80, 82) if expanded else Vector2(26, 17)
-			queue_redraw()
+		if (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT) or (event is InputEventScreenTouch and event.pressed):
+			map_requested.emit()
 			accept_event()
 	)
 
@@ -37,12 +34,6 @@ func _process(_delta: float) -> void:
 func _draw() -> void:
 	var local := world != null and is_instance_valid(world)
 	if not local and shared_map.is_empty(): return
-	if not expanded:
-		draw_rect(Rect2(0, 0, 26, 17), Color("152424"))
-		draw_rect(Rect2(0, 0, 26, 17), Color("e6efc8"), false)
-		for y in 3:
-			for x in 4: draw_rect(Rect2(5 + x * 4, 4 + y * 3, 2, 2), Color("c1d3b7"))
-		return
 	draw_rect(Rect2(0, 0, 80, 82), Color(0.03, 0.05, 0.04, 0.83))
 	draw_rect(Rect2(0, 0, 80, 82), Color("eef3d3"), false)
 	var origin := Vector2(13, 14)

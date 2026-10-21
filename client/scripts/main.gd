@@ -547,6 +547,7 @@ func _world_ui() -> void:
 	var hud: Control = screen.hud
 	minimap = hud.get_node("Minimap")
 	minimap.world = world
+	minimap.map_requested.connect(_scene_action.bind("map"))
 	map_name = hud.get_node("MapName")
 	map_name.text = SharedWorldMap.title(AIWorld.local_map_id())
 	if not AIWorld.map_data(AIWorld.local_map_id()).is_empty(): map_name.size.x=220
@@ -854,7 +855,7 @@ func _open_world_map() -> void:
 		_open_ai("maps")
 		if modal is AIWorldPanel: modal.selected_map=id; modal.refresh()
 	)
-	page.present()
+	page.present(world.map_id,world.cell)
 
 func _open_ai(section: String = "maps", npc: String = "") -> void:
 	if section=="quests" and not npc.is_empty():_open_ai_npc(npc);return

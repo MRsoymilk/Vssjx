@@ -148,6 +148,7 @@ func _ready() -> void:
 	screen.action_requested.connect(_scene_action)
 	screen.hud.get_node("MapName").text = "青云山道"
 	screen.hud.get_node("Minimap").set_shared_world(map_data, {}, character_id)
+	screen.hud.get_node("Minimap").map_requested.connect(_scene_action.bind("map"))
 	menu.chosen.connect(func(action: String)->void:_scene_action("friends" if action=="social" else action))
 	attributes.back_requested.connect(_close_attributes)
 	world_map.back_requested.connect(_close_world_map)
@@ -1208,7 +1209,9 @@ func _open_world_map() -> void:
 	if (battle_view.visible or solo_battle.visible) or network.pve.active(): return
 	details.hide()
 	Platform.context.text_input.release_focus(chat_input)
-	world_map.present()
+	var own:Dictionary=network.entities.get(character_id,{})
+	var cell:=Vector2i(own.cell[0],own.cell[1]) if own.has("cell") else Vector2i(-1,-1)
+	world_map.present(String(map_data.map_id),cell)
 	battle_view.set_process_unhandled_key_input(false)
 
 func _open_shop() -> void:

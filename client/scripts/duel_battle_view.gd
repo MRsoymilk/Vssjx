@@ -84,6 +84,8 @@ func refresh()->void:
 	buttons[5].disabled=not channel.connected or channel.pending() or not channel.active() or adapter.playing or animation_time>0
 	if hero!=null:_follow_level(hero_name,hero,$Hero,HERO_NAME_HOME)
 	if enemy!=null:_follow_level(enemy_name,enemy,$Enemy,ENEMY_NAME_HOME)
+	status_hero.position=hero_name.position+Vector2((hero_name.size.x-status_hero.size.x)/2,-19)
+	status_enemy.position=enemy_name.position+Vector2((enemy_name.size.x-status_enemy.size.x)/2,-19)
 	$Hud/AutoButton.hide()
 	if channel.active():
 		countdown=maxf(0,(float(_latest.remaining_ms)-(Time.get_ticks_msec()-channel.received_at))/1000.0)
@@ -102,6 +104,15 @@ func refresh()->void:
 		$Countdown.value=str(maxi(0,ceili(countdown)));$Countdown.queue_redraw()
 	else:$Hint.text="切磋不消耗日常血蓝与物品，无胜负奖励。"
 
+	if channel.active() and Time.get_ticks_msec()<_status_notice_until:$Hint.text=_status_notice
+
+func _status_sources()->Array:
+	# enemy_* fields live on their caster in the duel protocol, not the victim.
+	var mine:Dictionary=model.state.battle.get("skills",{})
+	var theirs:Dictionary=opponent.get("effects",{})
+	var hero_rows:=BattleStatusStrip.harmful(theirs);hero_rows.append_array(BattleStatusStrip.beneficial(mine))
+	var enemy_rows:=BattleStatusStrip.harmful(mine);enemy_rows.append_array(BattleStatusStrip.beneficial(theirs))
+	return [hero_rows,enemy_rows]
 func toggle_auto()->void:pass
 
 func choose(action:String)->void:

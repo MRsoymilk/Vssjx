@@ -57,3 +57,15 @@ godot --path client --rendering-method gl_compatibility res://tests/battle_refer
 ```
 
 截图位于 `work/battle-reference-single.png`、`work/battle-reference-party.png`、`work/solo-formation.png`，不提交运行截图或本地测试存档。
+
+
+## 异常与增益图标回归（2026-10-21）
+
+`battle_status_test.tscn` 使用真实战斗视图验证：原图字节与来源记录一致，人物流血不混入其施加给敌人的中毒，按来源保存的DOT取最长时长，空DOT表清除残留兼容字段，行动队列结束前不展示最终状态，图标跟随人物位移，点击说明和超出三种状态的切换可用，死亡隐藏，旧单怪PVE及切磋按正确归属显示。状态专项27项与相关回归合计385项通过，无需服务端／数据库变更。
+
+```powershell
+python tools/build_battle_status_icons.py
+godot --path client --rendering-method gl_compatibility res://tests/battle_status_test.tscn
+```
+
+原包素材对应表为本次语义适配，未声称恢复原服状态编号。实际截图 `work/battle-status-party.png` 不纳入Git。

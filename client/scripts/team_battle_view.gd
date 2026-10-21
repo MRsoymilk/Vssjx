@@ -33,6 +33,8 @@ var playing:Dictionary={}
 var action_buttons:Array[Button]=[]
 var target_marker:Node2D
 var _closed:=""
+var _status_notice:=""
+var _status_notice_until:=0
 func _ready()->void:
 	z_index=15
 	var field:=OriginalBattleField.new();field.kind="arena";add_child(field)
@@ -112,8 +114,10 @@ func _actor(id:String,key:String,point:Vector2,enemy:bool,level:int,compact:bool
 	var hit:=Button.new();hit.flat=true;hit.size=Vector2(65,65);hit.mouse_default_cursor_shape=Control.CURSOR_POINTING_HAND;add_child(hit)
 	if enemy:hit.pressed.connect(func()->void:selected=id;_open_menu())
 	else:hit.pressed.connect(_open_menu)
+	var status:=BattleStatusStrip.new();add_child(status);status.z_index=2
+	status.selected.connect(func(text:String)->void:_status_notice=actors[id].tag.text+" · "+text;_status_notice_until=Time.get_ticks_msec()+4000;_refresh_controls())
 	var info:=OriginalArt.actor_info(key)
-	actors[id]={"base_offset_x":float(info.origin[0])-float(info.get("anchor_x",0)),"sprite":sprite,"key":key,"tag":nameplate,"level":level_badge,"hp":hp,"mp":mp,"hit":hit,"home":point,"dead":false,"hud_height":maxf(67,-float(info.origin[1])+18) if enemy else 67.0}
+	actors[id]={"base_offset_x":float(info.origin[0])-float(info.get("anchor_x",0)),"sprite":sprite,"key":key,"tag":nameplate,"status":status,"level":level_badge,"hp":hp,"mp":mp,"hit":hit,"home":point,"dead":false,"hud_height":maxf(67,-float(info.origin[1])+18) if enemy else 67.0}
 func present()->void:
 	if not is_node_ready():return
 	if model.has_method("presentation_ready") and not model.presentation_ready():return
@@ -124,9 +128,9 @@ func present()->void:
 	if b.outcome!="active" and (b.id==_closed or b.id!=battle_id):return
 	if b.id!=battle_id:
 		for a in actors.values():
-			a.tag.queue_free();a.level.queue_free();a.hp.queue_free();a.hit.queue_free()
+			a.tag.queue_free();a.status.queue_free();a.level.queue_free();a.hp.queue_free();a.hit.queue_free()
 			if a.mp!=null:a.mp.queue_free()
-		_clear();battle_id=b.id;revision=-1;events_revision=int(b.get("events_revision",b.revision));result.reset();selected="m0";solo_countdown=30.0;auto_elapsed=0.0;_could_choose=false;_menu_dismissed=false;_highlight(0);menu.hide();inspect_panel.hide();picker.hide()
+		_clear();battle_id=b.id;revision=-1;events_revision=int(b.get("events_revision",b.revision));result.reset();selected="m0";_status_notice="";_status_notice_until=0;solo_countdown=30.0;auto_elapsed=0.0;_could_choose=false;_menu_dismissed=false;_highlight(0);menu.hide();inspect_panel.hide();picker.hide()
 		for i in b.fighters.size():
 			var f:Dictionary=b.fighters[i]
 			_actor(f.id,ShopRules.actor_key(int(f.job),int(f.gender),f.appearance),_station(i,b.fighters.size(),false),false,int(f.level),b.fighters.size()>1)
@@ -135,7 +139,7 @@ func present()->void:
 			_actor(e.slot,e.definition.art,_station(i,b.enemies.size(),true),true,int(e.definition.level),b.enemies.size()>1)
 	var packet_events:=int(b.get("events_revision",b.revision))
 	if events_revision!=packet_events:
-		solo_countdown=30.0;auto_elapsed=0.0;_menu_dismissed=false
+		solo_countdown=30.0;auto_elapsed=0.0;_status_notice_until=0;_menu_dismissed=false
 		if revision>=0:
 			# Play already-authoritative events; never compute damage locally.
 			for event in b.events:
@@ -152,6 +156,7 @@ func present()->void:
 	if not actors.has(selected) or actors[selected].dead:
 		for e in b.enemies:
 			if e.hp>0:selected=e.slot;break
+	if updating and _effect_wait.is_empty() and not effects.has_reactions():_sync_statuses()
 	_refresh_actor_anchors()
 	show();_refresh_controls()
 func _display(id:String,text:String,hp:int,max_hp:int)->void:
@@ -205,6 +210,7 @@ func _refresh_controls()->void:
 	if b.get("solo",false):hint.text="逐个行动中" if executing else ("等待确认" if model.pending() else "")
 	if b.get("wounds",{}).has(model.character_id):hint.text+=" · 流血%d回合"%int(b.wounds[model.character_id][0])
 	for i in action_buttons.size():action_buttons[i].disabled=not model.active() or not model.can_submit() or motion!=null or not queue.is_empty() or not _effect_wait.is_empty() or effects.has_reactions() or (not model.my_turn() if i<4 else (not model.party().get("leader",false) if i==5 else false))
+	if Time.get_ticks_msec()<_status_notice_until:hint.text=_status_notice
 	hint.visible=not hint.text.is_empty() and not executing
 	var can_choose:bool=model.active() and model.can_submit() and model.my_turn() and not model.pending() and not executing
 	if item_picker.visible:
@@ -288,11 +294,19 @@ func _refresh_actor_anchors()->void:
 		a.tag.position=point+Vector2(-a.tag.size.x/2,-top)
 		a.hp.position=point+Vector2(-a.hp.size.x/2,17-top)
 		a.level.position=a.hp.position+Vector2(-12,-1)
+		a.status.position=point+Vector2(-a.status.size.x/2,-top-(18 if a.tag.visible else 1))
+		a.status.visible=not a.dead and not a.status.entries.is_empty()
 		a.hit.position=point+Vector2(-a.hit.size.x/2,-60)
 		if a.mp!=null:a.mp.position=point+Vector2(-a.mp.size.x/2,23-top)
 	if is_instance_valid(target_marker):
 		target_marker.visible=actors.has(selected) and not actors[selected].dead
 		if target_marker.visible:target_marker.position=_actor_hud_anchor(actors[selected])+Vector2(0,4)
+func _sync_statuses()->void:
+	var b:Dictionary=model.battle()
+	for f in b.fighters:
+		actors[f.id].status.set_statuses(BattleStatusStrip.fighter(f.effects,b.get("wounds",{}).get(f.id,[])))
+	for e in b.enemies:
+		actors[e.slot].status.set_statuses(BattleStatusStrip.harmful(e.effects,e.get("dots")))
 func _sync_final_resources()->void:
 	var b:Dictionary=model.battle()
 	if b.is_empty():return
@@ -303,6 +317,7 @@ func _sync_final_resources()->void:
 	if not actors.has(selected) or actors[selected].dead:
 		for e in b.enemies:
 			if int(e.hp)>0:selected=e.slot;break
+	_sync_statuses()
 func _start_deaths()->void:
 	for a in actors.values():
 		if a.dead and a.sprite.visible:

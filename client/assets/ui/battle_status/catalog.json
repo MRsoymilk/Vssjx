@@ -1,0 +1,97 @@
+{
+  "version": "battle-status-v1",
+  "original_binding_recovered": false,
+  "basis": "原包图像逐字节复制；状态对应、位置与回合角标为本次语义适配",
+  "icons": {
+    "bleed": {
+      "name": "流血",
+      "texture": "res://assets/ui/battle_status/bleed.png",
+      "source_frame": "analysis/decoded_png/ssjx/effect/tx37_frame000.png",
+      "source_member": "ssjx/effect.mrp/tx37.imgs",
+      "source_sha256": "07850a7f56973ef1e064e9f597299a296673891dafa6a653855698a5d630b3ea",
+      "decoded_sha256": "3d3e349ace5686c94220a9032ff5a7474ee5a9ed418b8772975835c9586c0536",
+      "reference_animation": "t03",
+      "visual": "红色血痕"
+    },
+    "poison": {
+      "name": "中毒",
+      "texture": "res://assets/ui/battle_status/poison.png",
+      "source_frame": "analysis/decoded_png/ssjx/effect/tx55_frame004.png",
+      "source_member": "ssjx/effect.mrp/tx55.imgs",
+      "source_sha256": "514303a04eae0b133bde80596b05719d7b8f2d59b458e7d9b4a9c26a6e440c87",
+      "decoded_sha256": "04f410fc4fa15aba485a40fed0c5e479249304ef0b149539ea2dffe15258dd8f",
+      "reference_animation": "t25",
+      "visual": "绿色毒泡"
+    },
+    "sleep": {
+      "name": "睡眠",
+      "texture": "res://assets/ui/battle_status/sleep.png",
+      "source_frame": "analysis/decoded_png/ssjx/effect/tx48_frame002.png",
+      "source_member": "ssjx/effect.mrp/tx48.imgs",
+      "source_sha256": "942acb11167f69b2a486dd504722940894649ea1f26d073863bc522a214a569b",
+      "decoded_sha256": "d6f0b4f5f6caa8d12728390de03acb2f04e83ffde795d9c3b52a844502bb788b",
+      "reference_animation": "t15",
+      "visual": "绿色Z字"
+    },
+    "silence": {
+      "name": "封印",
+      "texture": "res://assets/ui/battle_status/silence.png",
+      "source_frame": "analysis/decoded_png/ssjx/effect/tx34_frame000.png",
+      "source_member": "ssjx/effect.mrp/tx34.imgs",
+      "source_sha256": "31f644e484b648fc410841ba2ee5dfe49b705a15ee8038c4256f069ac4ba9319",
+      "decoded_sha256": "29f6a5aa87bd6c5b8ab9bf24667d92cd5c6cc879f5d5435a690af92b0531fd91",
+      "reference_animation": "t00",
+      "visual": "红色嘴形"
+    },
+    "regen": {
+      "name": "回春",
+      "texture": "res://assets/ui/battle_status/regen.png",
+      "source_frame": "analysis/decoded_png/ssjx/effect/tx7_frame001.png",
+      "source_member": "ssjx/effect.mrp/tx7.imgs",
+      "source_sha256": "06447159540a39de8fe3b5bc32a16e3776a9c058bd989d278cb2009cf2ef308f",
+      "decoded_sha256": "fab0d84b322996978d87c8ee9822422e18be91fac4b32dad8d5a602b4b7816cb",
+      "reference_animation": "t18",
+      "visual": "绿色回复十字"
+    },
+    "defense": {
+      "name": "护体",
+      "texture": "res://assets/ui/battle_status/defense.png",
+      "source_frame": "analysis/decoded_png/ssjx/effect/tx15_frame001.png",
+      "source_member": "ssjx/effect.mrp/tx15.imgs",
+      "source_sha256": "5c8a4da2b384b7301b1e504598f89712fe3dc57dcaa98b7dcc9d47eed2d1df70",
+      "decoded_sha256": "af4b83656bc97ce414326d44f49926c070a3b9089ac1a14fd05fe3b59cfc45fd",
+      "reference_animation": "t11",
+      "visual": "蓝色盾牌"
+    },
+    "crit": {
+      "name": "暴击提升",
+      "texture": "res://assets/ui/battle_status/crit.png",
+      "source_frame": "analysis/decoded_png/ssjx/effect/tx41_frame000.png",
+      "source_member": "ssjx/effect.mrp/tx41.imgs",
+      "source_sha256": "31f313a3ccf7deaa12d85db1bf7030cce0927c79b6387e1942e486c62261aa2e",
+      "decoded_sha256": "b7520ac0becd15adb0071c56bfbd879e0269d38906fbdb0c6a1d271174f72b3e",
+      "reference_animation": "t14",
+      "visual": "金色星芒"
+    },
+    "reflect_physical": {
+      "name": "物理反伤",
+      "texture": "res://assets/ui/battle_status/reflect_physical.png",
+      "source_frame": "analysis/decoded_png/ssjx/effect/tx16_frame000.png",
+      "source_member": "ssjx/effect.mrp/tx16.imgs",
+      "source_sha256": "4435a168ebf805a3796a94989396e5105e40c9fab78d5c15ba02fafbdaa8618f",
+      "decoded_sha256": "cd0461300ba148b7d3250b561ea30edee17f02e14f4d8b639f08975de65d7f64",
+      "reference_animation": "t12",
+      "visual": "蓝色护环"
+    },
+    "reflect_magic": {
+      "name": "法术反伤",
+      "texture": "res://assets/ui/battle_status/reflect_magic.png",
+      "source_frame": "analysis/decoded_png/ssjx/effect/tx27_frame001.png",
+      "source_member": "ssjx/effect.mrp/tx27.imgs",
+      "source_sha256": "a2f0d686a3f75601717ac75d668ac04ad42767640d49f1d01c6c479b16e5ee4d",
+      "decoded_sha256": "114cf65efd961deb1850e7a99754fea5ff4f6deeda79bad2cd4ba1d6d1e8b56f",
+      "reference_animation": "t1",
+      "visual": "紫色法印"
+    }
+  }
+}

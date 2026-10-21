@@ -30,6 +30,10 @@ var choice_action := ""
 var buttons: Array[Button] = []
 var skill_picker:SkillPicker
 var move_callout:BattleMoveCallout
+var status_hero:BattleStatusStrip
+var status_enemy:BattleStatusStrip
+var _status_notice:=""
+var _status_notice_until:=0
 var effects:BattleEffects
 @onready var _hero_hp_home:Vector2=$Hud/BattleHeroHp.position
 @onready var _hero_mp_home:Vector2=$Hud/BattleHeroMp.position
@@ -39,6 +43,10 @@ var effects:BattleEffects
 const ACTIONS := ["attack", "skill", "guard", "potion", "inspect", "flee"]
 
 func _ready() -> void:
+	status_hero=BattleStatusStrip.new();add_child(status_hero)
+	status_enemy=BattleStatusStrip.new();add_child(status_enemy)
+	for strip in [status_hero,status_enemy]:
+		strip.selected.connect(func(text:String)->void:_status_notice=text;_status_notice_until=Time.get_ticks_msec()+4000)
 	effects=BattleEffects.new();$Hud/EffectsLayer.add_child(effects)
 	skill_picker=SkillPicker.new();add_child(skill_picker);skill_picker.position.y=-28;skill_picker.hide()
 	skill_picker.dismissed.connect(_open_menu)
@@ -77,6 +85,7 @@ func present(pve: OnlinePve) -> void:
 	var c: Dictionary = model.state.character
 	if battle_id != b.id:
 		_cancel_motion()
+		status_hero.set_statuses([]);status_enemy.set_statuses([]);_status_notice="";_status_notice_until=0
 		battle_id = b.id
 		revision = ""
 		_previous_enemy_hp = -1
@@ -102,6 +111,7 @@ func present(pve: OnlinePve) -> void:
 		$Enemy.add_child(enemy)
 		_highlight(0)
 	if revision != b.revision:
+		_status_notice_until=0
 		countdown = 30.0
 		auto_time = 0.0
 		if not revision.is_empty() and model.last_code.is_empty():
@@ -239,6 +249,16 @@ func _follow_level(label: Control, actor: Node2D, station: Node2D, home: Vector2
 	var resting := to_parent * station.get_global_transform_with_canvas().origin
 	label.position = home + current - resting
 
+func _status_sources()->Array:
+	var state:Dictionary=model.state.battle.get("skills",{})
+	return [BattleStatusStrip.beneficial(state),BattleStatusStrip.harmful(state)]
+func _refresh_statuses()->void:
+	if model.ready and animation_time<=0 and not effects.has_reactions():
+		var rows:=_status_sources();status_hero.set_statuses(rows[0]);status_enemy.set_statuses(rows[1])
+	status_hero.position=$Hud/BattleHeroHp.position+$Hud.position+Vector2(($Hud/BattleHeroHp.size.x-status_hero.size.x)/2,-20)
+	status_enemy.position=$Hud/BattleEnemyHp.position+$Hud.position+Vector2(($Hud/BattleEnemyHp.size.x-status_enemy.size.x)/2,-20)
+	status_hero.visible=model.ready and _shown_hero_hp>0 and not status_hero.entries.is_empty()
+	status_enemy.visible=model.ready and _shown_enemy_hp>0 and not status_enemy.entries.is_empty()
 func refresh() -> void:
 	if model == null or not model.state.get("battle") is Dictionary: return
 	_follow_level($Hud/BattleHeroHp,hero,$Hero,_hero_hp_home)
@@ -251,6 +271,7 @@ func refresh() -> void:
 		_shown_enemy_hp = int(model.state.battle.enemy_hp)
 	$Hud/BattleHeroHp.value = _shown_hero_hp
 	$Hud/BattleEnemyHp.value = _shown_enemy_hp
+	_refresh_statuses()
 	var locked := not model.ready or model.pending() or animation_time > 0
 	skill_picker.locked = locked or not model.active()
 	for button in buttons: button.disabled = locked or not model.active()
@@ -279,6 +300,7 @@ func refresh() -> void:
 			$Result.present(outcome,{"victory":"战斗结束，你获得了胜利。", "defeat":"战斗结束，你战败了。", "fled":"战斗结束，你撤离了战场。"}.get(outcome,"战斗结束"))
 		else: $Result.hide()
 	else: $Hint.text = SkillRules.status_text(model.state.battle.get("skills",{}))
+	if model.active() and Time.get_ticks_msec()<_status_notice_until:$Hint.text=_status_notice
 	var hero_attacking := _hero_motion != null and _hero_motion.active and _hero_motion.action == &"attack"
 	$Hud/BattleHeroHp.visible = not hero_attacking and _hero_death == null
 	$Hud/BattleHeroMp.visible = not hero_attacking and _hero_death == null

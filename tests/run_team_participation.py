@@ -104,14 +104,24 @@ def main():
                     if battle['outcome'] != 'active':
                         break
                     if battle.get('selection_starts_ms',0)>int(time.time()*1000):
-                        # Owned fixture only: skip presentation, retain the complete input-window invariant.
-                        db.query("UPDATE team_battles SET state=jsonb_set(jsonb_set(state,'{selection_starts_ms}',to_jsonb((extract(epoch FROM statement_timestamp())*1000)::bigint-1)),'{deadline_ms}',to_jsonb((extract(epoch FROM statement_timestamp())*1000)::bigint+29999)),deadline_ms=(extract(epoch FROM statement_timestamp())*1000)::bigint+29999 WHERE active")
+                        for peer in participants:
+                            if any(f['id']==peer[1] and f['hp']>0 for f in battle['fighters']):
+                                result,_=send(peer,'playback_done',battle_id=battle['id'],expected_revision=battle['round_revision'])
+                                battle=result['state']['team']['battle']
                     who = next(p for p in participants if p[1] == battle['fighters'][battle['turn']]['id'])
                     result, request = send(who, 'attack', battle_id=battle['id'], expected_revision=battle['revision'],
                                            target=next(e['slot'] for e in battle['enemies'] if e['hp'] > 0))
                     battle = result['state']['team']['battle']
                     last = who, request
                 check(battle['outcome'] == 'victory', 'Actual participants can finish the encounter')
+                # Modern encounters can roll shared loot. Settle it explicitly
+                # before testing follow/leave, without relying on a random drop.
+                for drop in battle.get('loot_pool',{}).get('drops',[]):
+                    for peer in participants:
+                        current=party(leader)['battle'];pool=current['loot_pool']
+                        item=next(d for d in pool['drops'] if d['item']['id']==drop['item']['id'])
+                        if not item['resolved'] and peer[1] in item['eligible'] and peer[1] not in item['choices']:
+                            send(peer,'loot_pass',target=item['item']['id'],battle_id=current['id'],expected_revision=pool['revision'])
                 return battle, last
 
             a, b, c = [create('party_'+suffix) for suffix in ('a', 'b', 'c')]
@@ -132,7 +142,12 @@ def main():
             check([f['id'] for f in battle['fighters']] == [a[1], c[1]], 'Offline, unready member is excluded; leader needs no extra ready click')
             check(len(initial['state']['team']['members']) == 3, 'Excluded member keeps team membership')
             original = next(d for d in json.loads((ROOT/'shared/data/qingyun-population-v1.json').read_text()) if d['id'] == 'spirit')
-            check(battle['enemies'][0]['definition']['hp'] == (original['hp']*135+99)//100, 'Scaling uses two actual participants, not three roster slots')
+            # Current balanced characters use the shared monster profile; the
+            # +35% HP party multiplier belongs only to frozen legacy battles.
+            modern=all(f['stats'].get('balance',{}).get('skills_revision',0)>=1 for f in battle['fighters'])
+            expected=original.copy()
+            if modern:expected['defense']*=json.loads((ROOT/'shared/data/skill-balance-v1.json').read_text())['monster_defense_multiplier']
+            check(battle['enemies'][0]['definition']['hp'] == (expected['hp'] if modern else (original['hp']*135+99)//100), 'Monster scaling respects the frozen rule profile and two actual participants')
             # Expire retained ownership so join() reloads the battle fence from DB.
             time.sleep(1.2)
             cb = connect(b)
@@ -143,6 +158,7 @@ def main():
             check(any(v.get('code') == 'TEAM_FOLLOWING' for v in cb.events), 'Reloaded nonparticipant has the ordinary follow gate, not a false combat fence')
             send(b, 'guard', 'TEAM_NOT_PARTICIPATING', battle_id=battle['id'], expected_revision=battle['revision'])
             completed, _ = win(a, [a, c])
+            check(next(m for m in party(a)['members'] if m['id']==c[1])['ready'],'Victory preserves the participating follower readiness')
             check(resources(b) == absent, 'Absent member gets no costs, recovery, quest progress or rewards')
             check(not party(b)['battle_active'], 'Nonparticipant sees that the encounter has ended')
 
@@ -156,8 +172,8 @@ def main():
             db.query(f"UPDATE characters SET monster_respawns='{{}}' WHERE id='{a[1]}'")
             lone, request = send(a, 'challenge', target='spirit')
             battle = lone['state']['team']['battle']
-            check(len(battle['fighters']) == len(battle['enemies']) == 1 and battle['fighters'][0]['id'] == a[1], 'Offline and temporarily absent members permit a lone leader encounter')
-            check(all(battle['enemies'][0]['definition'][k] == original[k] for k in ('hp', 'attack', 'defense')), 'Lone leader fights one monster with base statistics')
+            check(len(battle['fighters']) == 1 and 1<=len(battle['enemies'])<=3 and battle['fighters'][0]['id'] == a[1], 'Offline and temporarily absent members permit a lone leader with the current solo encounter size')
+            check(all(battle['enemies'][0]['definition'][k] == expected[k] for k in ('hp', 'attack', 'defense')), 'Lone leader uses the frozen solo monster profile')
             replay, _ = send(a, 'challenge', request=request)
             check(replay['replayed'] and replay['state']['team']['battle']['id'] == battle['id'], 'Entry retry keeps the same participant set and battle')
             solo, last = win(a, [a])

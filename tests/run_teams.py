@@ -56,6 +56,32 @@ def main():
                 assert status==200 and v['code']==expected,(status,v,expected,action)
                 check(v['ok']==(expected=='OK'),action+': '+expected)
                 return v,payload
+            def finish_playback(battle):
+                if battle['selection_starts_ms']<=int(time.time()*1000):return battle
+                before=db.query('SELECT id,hp,mp,gold,xp,state_revision FROM characters ORDER BY id')
+                old_start=battle['selection_starts_ms']; events=battle['events'];round_revision=battle['round_revision']
+                participants=[who for who in [a,b] if any(f['id']==who[1] and f['hp']>0 for f in battle['fighters'])]
+                if not getattr(finish_playback,'rollback_tested',False):
+                    fields=dict(battle_id=battle['id'],expected_revision=round_revision)
+                    send(participants[0],'playback_done','INVALID_TEAM_COMMAND',target='m0',**fields)
+                    send(participants[0],'playback_done','STALE_BATTLE',battle_id=battle['id'],expected_revision=round_revision-1)
+                    persisted=db.query('SELECT state,deadline_ms FROM team_battles ORDER BY id')
+                    db.query("CREATE FUNCTION reject_playback_audit() RETURNS trigger LANGUAGE plpgsql AS $$BEGIN IF NEW.action='team.playback_done' THEN RAISE EXCEPTION 'owned playback failure'; END IF; RETURN NEW; END$$; CREATE TRIGGER reject_playback BEFORE INSERT ON security_audit FOR EACH ROW EXECUTE FUNCTION reject_playback_audit();")
+                    request=dict(character_id=participants[0][1],operation_id=str(uuid4()),action='playback_done',**fields)
+                    check(api(base,'/api/v1/teams',request,participants[0][0]['access_token'])[0]==503,'Uncommitted playback release cannot be acknowledged')
+                    check(db.query('SELECT state,deadline_ms FROM team_battles ORDER BY id')==persisted,'Failed playback audit rolls back acknowledgements and deadline together')
+                    db.query('DROP TRIGGER reject_playback ON security_audit; DROP FUNCTION reject_playback_audit();')
+                    finish_playback.rollback_tested=True
+                for index,who in enumerate(participants):
+                    result,request=send(who,'playback_done',battle_id=battle['id'],expected_revision=round_revision)
+                    battle=result['state']['team']['battle'];fixtures.append(result)
+                    if index+1<len(participants):check(battle['selection_starts_ms']==old_start,'One finished peer cannot truncate another peer playback')
+                    duplicate,_=send(who,'playback_done',request=request)
+                    check(duplicate['replayed'] and duplicate['state']['team']['battle']==battle,'Playback receipt replay cannot change the window or replay events')
+                check(battle['selection_starts_ms']<old_start and battle['selection_starts_ms']<=result['server_time_ms'],'All peers finished: next round opens before the conservative playback estimate')
+                check(battle['deadline_ms']-battle['selection_starts_ms']==30000 and battle['events']==events,'Early release preserves the complete selection window and authoritative events')
+                check(db.query('SELECT id,hp,mp,gold,xp,state_revision FROM characters ORDER BY id')==before,'Playback acknowledgements never mutate resources or character revisions')
+                return battle
             check(api(base,'/api/v1/teams',dict(character_id=a[1],action='snapshot'),b[0]['access_token'])[0]==403,'Cannot act as another account character')
             check(api(base,'/api/v1/teams',dict(character_id=a[1],action='attack',damage=99999),a[0]['access_token'])[0]==400,'Injected combat values rejected')
             send(a,'invite',target=b[1])
@@ -107,8 +133,7 @@ def main():
             for _ in range(60):
                 battle=send(a,'snapshot')[0]['state']['team']['battle']
                 if battle['outcome']!='active':break
-                if battle['selection_starts_ms']>int(time.time()*1000):
-                    db.query("UPDATE team_battles SET state=jsonb_set(jsonb_set(state,'{selection_starts_ms}',to_jsonb((extract(epoch FROM statement_timestamp())*1000)::bigint-1)),'{deadline_ms}',to_jsonb((extract(epoch FROM statement_timestamp())*1000)::bigint+29999)),deadline_ms=(extract(epoch FROM statement_timestamp())*1000)::bigint+29999 WHERE active")
+                battle=finish_playback(battle)
                 actor=next(who for who in [a,b] if who[1]==battle['fighters'][battle['turn']]['id'])
                 target=next(e['slot'] for e in battle['enemies'] if e['hp']>0)
                 result,cmd=send(actor,'attack',battle_id=battle['id'],expected_revision=battle['revision'],target=target)
@@ -127,7 +152,10 @@ def main():
             send(a,'loot_roll',target=item_id,battle_id=shared['id'],expected_revision=pool['revision'])
             distributed,_=send(b,'loot_pass',target=item_id,battle_id=shared['id'],expected_revision=pool['revision'])
             check(distributed['state']['team']['battle']['loot_pool']['drops'][0]['winner']==a[1],'ROLL plus pass awards exactly the shared instance to the roller')
-            send(a,'ready',ready=True);send(b,'ready',ready=True)
+            check(all(m['ready'] for m in distributed['state']['team']['members']),'Victory retains the members standing readiness')
+            send(b,'ready',ready=False)
+            send(a,'challenge','TEAM_NOT_READY',target='spirit')
+            send(b,'ready',ready=True)
             send(a,'challenge','MONSTER_RESPAWNING',target='spirit')
             db.query("UPDATE characters SET monster_respawns='{}'::jsonb")
             again,_=send(a,'challenge',target='spirit')
@@ -159,7 +187,7 @@ def main():
             # Exercise a real 30-second collection window, not a synthetic clock jump.
             players[0].approach('spirit')
             time.sleep(1)  # Let the ordinary-speed follower finish its last segment before preparing.
-            send(a,'ready',ready=True);send(b,'ready',ready=True)
+            check(all(m['ready'] for m in send(a,'snapshot')[0]['state']['team']['members']),'Retreat retains readiness without asking the members to prepare again')
             real,_=send(a,'challenge',target='spirit')
             real_battle=real['state']['team']['battle'];deadline=real_battle['deadline_ms']
             submitted,_=send(b,'guard',battle_id=real_battle['id'],expected_revision=real_battle['revision'])
@@ -238,6 +266,8 @@ def main():
                                 if len(party['members'])==2 and not next(m for m in party['members'] if m['id']==ub[1])['ready'] and fight is None:
                                     send(ub,'ready',ready=True)
                                 elif fight is None and len(party['members'])==2 and all(m['ready'] for m in party['members']):send(ub,'challenge',target='spirit')
+                                elif fight and fight['outcome']=='active' and fight.get('events_revision',0)>0 and ub[1] not in fight.get('playback_ready',[]) and int(time.time()*1000)<fight['selection_starts_ms']:
+                                    send(ub,'playback_done',battle_id=fight['id'],expected_revision=fight['round_revision'])
                                 elif fight and fight['outcome']=='active' and ub[1] not in fight['commands'] and int(time.time()*1000)>=fight['selection_starts_ms']:
                                     send(ub,'attack',battle_id=fight['id'],expected_revision=fight['revision'],target=next(e['slot'] for e in fight['enemies'] if e['hp']>0))
                                 elif fight and fight['outcome']=='victory':return
@@ -250,6 +280,7 @@ def main():
                 print(result.stdout)
                 if result.stderr:print(result.stderr)
                 check(result.returncode==0 and '0 failures' in result.stdout and 'SCRIPT ERROR' not in result.stderr and not errors,'Real Godot client and independent peer complete team battle')
+                check(int(db.query(f"SELECT count(*) FROM security_audit WHERE character_id='{ua[1]}' AND action='team.playback_done' AND outcome='accepted'"))>0,'Actual Godot animation completion emits a server-confirmed playback acknowledgement')
             output=ROOT/'work/soul-recovery/team-server-fixtures.json'
             output.parent.mkdir(parents=True,exist_ok=True)
             # Fixture consumers validate snapshots, not an operation outbox.

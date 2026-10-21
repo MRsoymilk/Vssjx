@@ -36,7 +36,8 @@ pub struct Command {
     #[serde(default)]
     pub ready: Option<bool>,
 }
-const ACTIONS: [&str; 18] = [
+const ACTIONS: [&str; 19] = [
+    "playback_done",
     "loot_roll",
     "loot_pass",
     "snapshot",
@@ -113,13 +114,8 @@ async fn save_battle(
     }
     sqlx::query("INSERT INTO team_battles(id,team_id,active,state,deadline_ms) VALUES($1,$2,$3,$4,$5) ON CONFLICT(id) DO UPDATE SET active=EXCLUDED.active,state=EXCLUDED.state,deadline_ms=EXCLUDED.deadline_ms,updated_at=clock_timestamp()")
         .bind(b.id).bind(team).bind(b.active()).bind(DbJson(&saved)).bind(b.deadline_ms).execute(&mut **tx).await.map_err(db)?;
-    if !b.active() {
-        sqlx::query("UPDATE team_members SET ready=FALSE WHERE team_id=$1")
-            .bind(team)
-            .execute(&mut **tx)
-            .await
-            .map_err(db)?;
-    }
+    // Readiness is the member's standing preference, cancelled explicitly or
+    // when changing follow mode. Finishing an encounter must not revoke it.
     Ok(())
 }
 async fn save_loot(tx:&mut Transaction<'_,Postgres>,b:&mut Battle)->Result<(),AuthError>{
@@ -344,7 +340,7 @@ async fn apply(
         if let Some(b) = battle(tx, t).await?.filter(|b| b.active()) {
             if !matches!(
                 c.action.as_str(),
-                "attack" | "skill" | "guard" | "potion" | "flee"
+                "attack" | "skill" | "guard" | "potion" | "flee" | "playback_done"
             ) {
                 return Err(err("TEAM_BATTLE_ACTIVE"));
             }
@@ -352,7 +348,17 @@ async fn apply(
                 return Err(err("STALE_BATTLE"));
             }
             let mut b = b;
-            if c.action == "flee" {
+            if c.action == "playback_done" {
+                if c.target.is_some() || c.skill.is_some() || c.ready.is_some() {
+                    return Err(err("INVALID_TEAM_COMMAND"));
+                }
+                b.acknowledge_playback(me, c.expected_revision.unwrap(), now).map_err(err)?;
+                // Presentation receipts must not rewrite character resources,
+                // issue rewards or advance movement/character revisions.
+                sqlx::query("UPDATE team_battles SET state=$2,deadline_ms=$3,updated_at=clock_timestamp() WHERE id=$1")
+                    .bind(b.id).bind(DbJson(&b)).bind(b.deadline_ms).execute(&mut **tx).await.map_err(db)?;
+                return Ok(false);
+            } else if c.action == "flee" {
                 if !own_membership.unwrap().1 {
                     return Err(err("TEAM_LEADER_REQUIRED"));
                 }
@@ -375,7 +381,7 @@ async fn apply(
     }
     if matches!(
         c.action.as_str(),
-        "attack" | "skill" | "guard" | "potion" | "flee"
+        "attack" | "skill" | "guard" | "potion" | "flee" | "playback_done"
     ) {
         return Err(err("NO_ACTIVE_BATTLE"));
     }

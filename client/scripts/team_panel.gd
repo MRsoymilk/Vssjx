@@ -73,7 +73,7 @@ func refresh()->void:
 	for m in p.get("members",[]):
 		if m.online and (m.leader or (m.get("following",true) and m.ready)):ready_count+=1
 	summary.text="尚未组队 · 最多五人同行" if p.is_empty() else "%d / 5 人　·　%d 人已准备"%[p.members.size(),ready_count]
-	tip.text="离线、暂离不参战；队长迎战，跟随队员需准备。"
+	tip.text="准备一次持续参战；取消或暂离可退出后续战斗。"
 	if model.has_method("loot_pending") and model.loot_pending():tip.text="战利品待ROLL／放弃，60秒超时自动放弃。"
 	if p.get("battle_active",false) and not model.active():tip.text="队友正在战斗；本轮未参战，结束后可重新集合。"
 	if not confirmation.is_empty():

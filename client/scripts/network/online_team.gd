@@ -35,9 +35,15 @@ func my_turn()->bool:
 	for f in b.fighters:
 		if f.id==character_id:return f.hp>0
 	return false
+func finish_playback()->bool:
+	var b:=battle()
+	if not active() or not b.has("playback_ready") or int(b.get("events_revision",0))==0 or character_id in b.playback_ready or not can_submit():return false
+	if server_time+Time.get_ticks_msec()-received_at>=int(b.selection_starts_ms):return false
+	if not b.fighters.any(func(f:Dictionary)->bool:return f.id==character_id and int(f.hp)>0):return false
+	return submit("playback_done")
 func submit(action:String,target:String="",skill:String="",ready:Variant=null)->bool:
 	if not can_submit():return false
-	if action not in ["follow","create","invite","accept","reject","cancel","leave","kick","transfer","disband","ready","challenge","attack","skill","guard","potion","flee","loot_roll","loot_pass"]:return false
+	if action not in ["playback_done","follow","create","invite","accept","reject","cancel","leave","kick","transfer","disband","ready","challenge","attack","skill","guard","potion","flee","loot_roll","loot_pass"]:return false
 	if action in ["loot_roll","loot_pass"]:
 		var pool:=loot_pool()
 		if active() or pool.is_empty():return false
@@ -53,6 +59,9 @@ func submit(action:String,target:String="",skill:String="",ready:Variant=null)->
 	if not target.is_empty():command.target=target
 	if not skill.is_empty():command.skill=skill
 	if ready is bool:command.ready=ready
+	if action=="playback_done":
+		if not active() or not battle().has("playback_ready") or not battle().fighters.any(func(f:Dictionary)->bool:return f.id==character_id and int(f.hp)>0):return false
+		command.battle_id=battle().id;command.expected_revision=int(battle().round_revision)
 	if action in ["attack","skill","guard","potion","flee"]:
 		if not active():return false
 		if action!="flee" and not my_turn():return false
@@ -73,6 +82,7 @@ func receive(result:Dictionary)->bool:
 	inflight=false
 	# A queued write is not the response being acknowledged by this read.
 	var wrote:bool=not request.is_empty() and request.action!="snapshot"
+	var playback_response:bool=request.get("action")=="playback_done"
 	if result.get("version")!="team-v1" or not valid(result):
 		var code:String=result.get("code","INVALID_RESPONSE")
 		if wrote and code not in ["INVALID_REQUEST","INVALID_TEAM_TARGET","FORBIDDEN","UNAUTHORIZED","IDEMPOTENCY_CONFLICT","NOT_FOUND"]:message.emit("操作结果未确认，将按原编号重试。")
@@ -89,7 +99,7 @@ func receive(result:Dictionary)->bool:
 	if wrote:OnlineAccount.pending_team={}
 	request={};_promote_queued();next_poll=0 if pending() else received_at+(1000 if active() or loot_pending() else 5000)
 	if not result.ok:message.emit(LOOT_ERRORS.get(result.code,ROUND_ERRORS.get(result.code,ERRORS.get(result.code,"组队操作未完成。"))))
-	elif wrote:message.emit("队伍状态已更新。")
+	elif wrote and not playback_response:message.emit("队伍状态已更新。")
 	changed.emit();return true
 func _promote_queued()->void:
 	if request.is_empty() and not queued_command.is_empty():request=queued_command;queued_command={}
@@ -128,6 +138,12 @@ static func valid_battle(b:Variant,character_id:String,ids:Dictionary)->bool:
 		if not OnlinePve.integer(f.get("hp"),0,int(f.stats.hp)) or not OnlinePve.integer(f.get("mp"),0,int(f.stats.mp)) or not OnlinePve.integer(f.get("potions"),0,999):return false
 		if b.outcome=="active" and not ids.has(f.id):return false
 	if not fighters.has(character_id):return false
+	if b.has("playback_ready"):
+		if not b.has("commands") or not b.playback_ready is Array or b.playback_ready.size()>fighters.size():return false
+		var seen_ready:={}
+		for id in b.playback_ready:
+			if not id is String or not fighters.has(id) or seen_ready.has(id):return false
+			seen_ready[id]=true
 	if b.has("commands"):
 		if not b.commands is Dictionary or b.commands.size()>b.fighters.size() or not OnlinePve.integer(b.get("round_revision"),0,int(b.revision)) or not OnlinePve.integer(b.get("events_revision"),0,int(b.revision)) or not OnlinePve.integer(b.get("selection_starts_ms"),0,int(b.deadline_ms)) or int(b.deadline_ms)-int(b.selection_starts_ms)!=30000:return false
 		for id in b.commands:

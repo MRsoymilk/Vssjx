@@ -240,6 +240,58 @@ fn whole_round_uses_one_deadline_and_accepts_any_player_first() {
     );
 }
 #[test]
+fn actual_playback_completion_opens_a_full_window_without_estimated_wait() {
+    let mut b = encounter();
+    complete(&mut b, 2000);
+    let original_start = b.selection_starts_ms;
+    let round = b.round_revision;
+    let events = serde_json::to_value(&b.events).unwrap();
+    b.acknowledge_playback(b.fighters[0].id, round, 3000).unwrap();
+    assert_eq!(b.selection_starts_ms, original_start);
+    let after_first = b.revision;
+    b.acknowledge_playback(b.fighters[0].id, round, 3100).unwrap();
+    assert_eq!(b.revision, after_first);
+    // A process restart preserves the first member's acknowledgement.
+    b = serde_json::from_value(serde_json::to_value(&b).unwrap()).unwrap();
+    b.acknowledge_playback(b.fighters[1].id, round, 4000).unwrap();
+    assert!(b.selection_starts_ms < original_start);
+    assert_eq!(b.selection_starts_ms, 4000);
+    assert_eq!(b.deadline_ms, 34000);
+    assert_eq!(serde_json::to_value(&b.events).unwrap(), events);
+    b.acknowledge_playback(b.fighters[1].id, round, 5000).unwrap();
+    assert_eq!(b.deadline_ms, 34000);
+    b.act(b.fighters[0].id, "guard", None, None, 4001, 99).unwrap();
+}
+#[test]
+fn playback_acknowledgements_are_fenced_to_living_fighters_and_current_round() {
+    let mut b = encounter();
+    assert_eq!(b.acknowledge_playback(b.fighters[0].id, 0, 1001), Err("STALE_BATTLE"));
+    complete(&mut b, 2000);
+    let round = b.round_revision;
+    assert_eq!(b.acknowledge_playback(Uuid::new_v4(), round, 3000), Err("TEAM_NOT_PARTICIPATING"));
+    assert_eq!(b.acknowledge_playback(b.fighters[0].id, round - 1, 3000), Err("STALE_BATTLE"));
+    b.fighters[1].hp = 0;
+    assert_eq!(b.acknowledge_playback(b.fighters[1].id, round, 3000), Err("TEAM_NOT_PARTICIPATING"));
+    b.acknowledge_playback(b.fighters[0].id, round, 4000).unwrap();
+    assert_eq!(b.selection_starts_ms, 4000);
+    complete(&mut b, 5000);
+    assert!(b.playback_ready.is_empty());
+    assert_eq!(b.acknowledge_playback(b.fighters[0].id, round, 6000), Err("STALE_BATTLE"));
+}
+#[test]
+fn older_or_disconnected_clients_keep_bounded_playback_fallback() {
+    let mut b = encounter();
+    complete(&mut b, 2000);
+    let start = b.selection_starts_ms;
+    let deadline = b.deadline_ms;
+    b.acknowledge_playback(b.fighters[0].id, b.round_revision, 3000).unwrap();
+    assert!(!b.expire(start, 99));
+    b.act(b.fighters[1].id, "guard", None, None, start, 99).unwrap();
+    b.acknowledge_playback(b.fighters[0].id, b.round_revision, start + 1).unwrap();
+    assert_eq!(b.deadline_ms, deadline);
+    assert!(b.expire(deadline, 99));
+}
+#[test]
 fn timeout_executes_every_missing_player_and_monster_once() {
     let mut b = encounter();
     b.act(b.fighters[1].id, "attack", Some("m0"), None, 2000, 99)

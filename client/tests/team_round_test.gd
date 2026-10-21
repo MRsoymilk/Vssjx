@@ -48,6 +48,7 @@ func _run()->void:
 			if f.id not in [SELF,OTHER]:packet.team.members.append(member(f.id))
 		check(not model.valid(response(model,packet)),"Malformed queued intents cannot reach skill or target rendering")
 	var resolved:=b.duplicate(true);resolved.commands={};resolved.revision=6;resolved.round_revision=6;resolved.events_revision=6;resolved.round=2
+	resolved.playback_ready=[]
 	resolved.selection_starts_ms=42000;resolved.deadline_ms=72000;resolved.events=[]
 	for i in 5:
 		resolved.enemies[i].hp-=40;resolved.fighters[i].hp-=9
@@ -59,6 +60,7 @@ func _run()->void:
 	for i in 10:
 		view._process(0)
 		check(view.motion!=null and view.playing.actor==resolved.events[i].actor,"Only the next authoritative actor begins: %d"%i)
+		check(not model.pending(),"Playback completion cannot be sent while actions remain: %d"%i)
 		actors_seen.append(view.playing.actor)
 		var duration:float=view.motion.duration
 		check(duration<=3.0,"Native action fits the separate server presentation allowance")
@@ -71,9 +73,19 @@ func _run()->void:
 		if i==5:await capture("round-monster-action")
 		view._process(duration)
 	check(actors_seen.size()==10 and view.queue.is_empty() and view.motion==null,"All ten actions finish one at a time without truncation")
+	check(model.request.get("action")=="playback_done" and model.request.expected_revision==6 and model.request.battle_id==BATTLE,"Final animation immediately acknowledges this round without waiting for the estimated playback deadline")
+	resolved.playback_ready=[SELF]
 	view._process(0)
 	check(view.actors.m4.hp.value==70,"Visible resources reconcile after complete playback")
 	check(receive_b(model,resolved) and view.queue.is_empty(),"Repeated poll of the same event revision cannot replay attacks")
+	check(not model.finish_playback(),"Accepted playback acknowledgement cannot be submitted twice")
+	for invalid_ready in [[SELF,SELF],[TEAM],"invalid"]:
+		var malformed:=resolved.duplicate(true);malformed.playback_ready=invalid_ready
+		model.request={"action":"snapshot"}
+		var snapshot:=state(malformed)
+		for f in b.fighters:
+			if f.id not in [SELF,OTHER]:snapshot.team.members.append(member(f.id))
+		check(not model.valid(response(model,snapshot)),"Invalid playback acknowledgements cannot bypass packet validation")
 	resolved.revision=7;resolved.commands[OTHER]={"action":"guard","target":null,"skill":null}
 	check(receive_b(model,resolved) and view.queue.is_empty(),"Next-round intent revisions never replay the preceding round")
 	model.server_time=42000;model.received_at=Time.get_ticks_msec()

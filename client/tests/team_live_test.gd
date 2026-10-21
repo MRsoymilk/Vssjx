@@ -29,13 +29,19 @@ func _run()->void:
 	check(view.team_battle.visible and view.team_battle.actors.size()>=4 and view.network.team_active,"Multiple monsters and both players render while map movement is gated")
 	var deadline:=Time.get_ticks_msec()+45000
 	var acted:=false
+	var guarded:=false
 	while view.team.active() and Time.get_ticks_msec()<deadline:
 		if view.team.my_turn() and not view.team.pending() and not view.team.inflight and view.team_battle.motion==null and view.team_battle.queue.is_empty():
+			# Force a second round so real production playback must acknowledge
+			# completion, rather than allowing a one-round victory to skip it.
+			if not guarded:
+				guarded=view.team.submit("guard");await get_tree().process_frame;continue
 			for e in view.team.battle().enemies:
 				if e.hp>0:
 					acted=view.team.submit("attack",e.slot) or acted;break
 		await get_tree().process_frame
 	check(acted and view.team.battle().get("outcome")=="victory","Client and independent peer take turns and reach a shared victory")
+	check(view.team.party().members.all(func(m:Dictionary)->bool:return m.ready),"Victory keeps the original readiness preference")
 	check(await until(func()->bool:return not view.team_battle.visible,10),"Original result animation returns to the map")
 	check(not view.network.team_active and view.network.world_ready,"Victory releases map without disconnecting")
 	check(Game.player==old,"Online team does not overwrite local character")

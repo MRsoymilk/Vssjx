@@ -272,6 +272,8 @@ func _process(delta:float)->void:
 				_loot_opened=model.battle().id
 				var loot:=TeamLootPanel.new();loot.model=model;add_child(loot)
 	for death in deaths:death.advance(delta)
+	if motion==null and queue.is_empty() and _effect_wait.is_empty() and not effects.has_reactions() and deaths.all(func(d:BattleDeathPlayback)->bool:return not d.active) and model.has_method("finish_playback"):
+		model.finish_playback()
 	_refresh_actor_anchors()
 	_refresh_controls()
 	if model.battle().get("solo",false) and model.my_turn() and motion==null and queue.is_empty() and _effect_wait.is_empty() and not effects.has_reactions() and not picker.visible:

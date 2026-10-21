@@ -1,7 +1,7 @@
 //! Cooperative, server-owned PvE. Multipliers and five-seat cap are reconstruction.
 use crate::{population::ResidentDefinition, pve_rules::Stats, skills};
 use serde::{Deserialize, Serialize};
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 use uuid::Uuid;
 pub const MAX_MEMBERS: usize = 5;
 pub const TURN_MS: i64 = 30_000;
@@ -75,6 +75,10 @@ pub struct Battle {
     pub events_revision: u64,
     #[serde(default)]
     pub selection_starts_ms: i64,
+    // Also advertises completion acknowledgements to upgraded clients. Older
+    // clients and disconnected members retain the bounded timed fallback.
+    #[serde(default)]
+    pub playback_ready: BTreeSet<Uuid>,
     #[serde(default)]
     pub monster_revision: u8,
     #[serde(default, skip_serializing_if="BTreeMap::is_empty")]
@@ -141,6 +145,7 @@ impl Battle {
             round_revision: 0,
             events_revision: 0,
             selection_starts_ms: now,
+            playback_ready: BTreeSet::new(),
             monster_revision: 1,
             wounds: BTreeMap::new(),
         }
@@ -170,6 +175,19 @@ impl Battle {
     }
     pub fn active(&self) -> bool {
         self.outcome == "active"
+    }
+    pub fn acknowledge_playback(&mut self, who: Uuid, revision: u64, now: i64) -> Result<(), &'static str> {
+        if !self.active() { return Err("BATTLE_FINISHED"); }
+        if revision != self.round_revision || self.events_revision == 0 { return Err("STALE_BATTLE"); }
+        if !self.fighters.iter().any(|f| f.id == who && f.hp > 0) { return Err("TEAM_NOT_PARTICIPATING"); }
+        // A late or repeated acknowledgement cannot extend an open window.
+        if now >= self.selection_starts_ms || !self.playback_ready.insert(who) { return Ok(()); }
+        self.revision += 1;
+        if self.fighters.iter().filter(|f| f.hp > 0).all(|f| self.playback_ready.contains(&f.id)) {
+            self.selection_starts_ms = now;
+            self.deadline_ms = now + TURN_MS;
+        }
+        Ok(())
     }
     pub fn finish(&mut self, outcome: &str) {
         self.outcome = outcome.into();
@@ -295,6 +313,7 @@ impl Battle {
         true
     }
     fn resolve_round(&mut self, now: i64, roll: i32) {
+        self.playback_ready.clear();
         self.events.clear();
         self.lines = vec![format!(
             "第{}回合 · 指令收集结束，按站位依次行动。",

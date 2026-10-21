@@ -301,9 +301,11 @@ impl Loaded {
             if context.map_id!="qingyun_trail"{return Err("INVALID_SCHOOL_NPC");}
             let npc=context.target_cell.ok_or("INVALID_SCHOOL_NPC")?;
             if (npc[0]-context.cell[0]).abs()+(npc[1]-context.cell[1]).abs()>2{return Err("RESIDENT_TOO_FAR");}
-            let school=match command.target.as_deref(){Some("emei")=>0,Some("huajian")=>1,Some("kunlun")=>2,_=>return Err("INVALID_SCHOOL")};
+            let (school,destination)=match command.target.as_deref(){Some("emei")=>(0,"ai_004"),Some("huajian")=>(1,"ai_021"),Some("kunlun")=>(2,"ai_032"),_=>return Err("INVALID_SCHOOL")};
+            let map=crate::world_map::WorldMap::load(destination).ok_or("INVALID_SCHOOL")?;
             self.character.school=school;
-            return Ok(vec![format!("经清微道人引荐，你已正式拜入{}。技能暂按职业和等级开放，不受门派限制。",["峨眉派","花涧派","昆仑派"][school as usize])]);
+            self.character.map_id=destination.into();self.character.cell_x=map.spawn[0];self.character.cell_y=map.spawn[1];
+            return Ok(vec![format!("经清微道人引荐，你已正式拜入{}，并抵达门派驻地。技能暂按职业和等级开放，不受门派限制。",["峨眉派","花涧派","昆仑派"][school as usize])]);
         }
         self.ai.respawns.retain(|_,deadline|*deadline>unix_ms());
         if matches!(command.action,Action::AiTravel|Action::AiAccept|Action::AiClaim|Action::AiInteract|Action::AiRestore) {

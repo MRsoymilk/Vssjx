@@ -18,11 +18,16 @@ func _run()->void:
 	if not view.npc_dialog.visible:view.queue_free();get_tree().quit(1);return
 	check(view.npc_dialog.extra_buttons.size()==3,"NPC displays all three school choices")
 	view.npc_dialog.extra_buttons[2].pressed.emit()
-	check(await wait_until(func()->bool:return view.network.pve.ready and not view.network.pve.pending() and view.network.pve.state.character.school==2),"Real dialog button completes authoritative admission")
+	check(await wait_until(func()->bool:return view.network.world_ready and view.network.pve.ready and not view.network.pve.pending() and view.network.pve.state.character.school==2 and view.network.map_id=="ai_032" and not view.map_transition.blocking),"Real dialog button joins, reconnects to Kunlun and completes the map transition")
+	check(view.map_data.map_id=="ai_032" and view.network.pve.state.character.map_id=="ai_032" and view.network.entities[view.character_id].cell==SharedWorldMap.load_data("ai_032").spawn,"Terrain, authoritative character and world position agree on the school destination")
 	check(not view.npc_dialog.visible and view.screen.hud.get_node("WorldIdentity").text.contains("昆仑派"),"Receipt closes dialogue and refreshes membership")
 	check(view.network.pve.state.skills.available.size()==8 and view.network.pve.state.skills.available.has("sheet_004"),"Admission preserves all level 50 job skills")
 	check(not view.network.pve.submit("school_join","emei"),"Joined UI blocks direct faction switching")
 	check(Game.player==old,"Online admission never changes the offline player")
+	var folder:=OS.get_environment("SSJX_SCHOOL_CAPTURE_PATH")
+	if not folder.is_empty() and DisplayServer.get_name()!="headless":
+		await RenderingServer.frame_post_draw
+		check(get_viewport().get_texture().get_image().save_png(folder.path_join("online-kunlun-arrival.png"))==OK,"Real online school arrival is rendered")
 	view.network.leave();view.queue_free();await get_tree().process_frame
 	OnlineAccount.clear()
 	print("SCHOOL LIVE: %d checks, %d failures"%[checks,failures]);get_tree().quit(1 if failures else 0)

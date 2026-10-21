@@ -751,9 +751,9 @@ func _local_npc_action(action: String, target: String) -> void:
 		if not is_instance_valid(dialog):return
 		dialog.approaching=false
 		if joined.ok:
-			_local_messages.append({"message_id":"school-%d"%Time.get_ticks_usec(),"channel":"system","display_name":"系统","text":"经清微道人引荐，你已正式拜入%s。技能暂按职业和等级开放，不受门派限制。"%SchoolRules.label(int(Game.player.school))})
+			_local_messages.append({"message_id":"school-%d"%Time.get_ticks_usec(),"channel":"system","display_name":"系统","text":"经清微道人引荐，你已正式拜入%s，并抵达门派驻地。技能暂按职业和等级开放，不受门派限制。"%SchoolRules.label(int(Game.player.school))})
 			while _local_messages.size()>LocalWorldChat.LIMIT:_local_messages.pop_front()
-			_world_ui()
+			_enter_world()
 		else:dialog.refresh();dialog.hint.text=joined.message
 		return
 	var error := ""

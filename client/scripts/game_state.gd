@@ -383,10 +383,13 @@ func join_local_school(school: int) -> PlatformResult:
 	if school<0 or school>2:return PlatformResult.new(PlatformResult.Status.INVALID_DATA,"INVALID_SCHOOL","请选择有效门派。")
 	if int(player.get("school",SchoolRules.UNJOINED))!=SchoolRules.UNJOINED:
 		return PlatformResult.new(PlatformResult.Status.INVALID_DATA,"SCHOOL_ALREADY_JOINED","已加入门派，不能重复入派。")
+	var destination:=SharedWorldMap.load_data(SchoolRules.map_id(school))
+	if destination.is_empty():return PlatformResult.new(PlatformResult.Status.INVALID_DATA,"INVALID_SCHOOL","门派地图暂不可用，请重试。")
 	var before:=player.duplicate(true)
 	var generation:=_player_generation
 	var path:=save_path
 	player.school=school;player.school_membership_version=1
+	player.ai_map=SchoolRules.map_id(school);player.zone=0;player.cell=destination.spawn.duplicate();player.hunt_pressure={}
 	var result:=await save_game()
 	if not result.ok and generation==_player_generation and path==save_path:player=before
 	return result

@@ -77,6 +77,12 @@ func _run() -> void:
 	view.character_id = "owned-transition-test"
 	view._character = {"job": 0, "gender": 1, "appearance": [2, 1]}
 	check(not view.map_transition.blocking, "Initial online join has no false map animation")
+	view._map_command_sent({"command":{"action":"school_join"}})
+	check(view.map_transition.blocking,"School admission starts the same protected map transition")
+	view.network.pve.last_action="school_join";view.network.pve.last_code="STALE_SCHOOL"
+	view.network.pve.message.emit("角色状态已变化")
+	check(not view.map_transition.blocking,"Refused admission cancels loading and leaves the original map usable")
+	view.network.pve.last_action="";view.network.pve.last_code=""
 	view._map_command_sent({"command": {"action": "ai_travel"}})
 	var runner := view.map_transition.runner
 	check(view.map_transition.blocking and runner.get_meta("art_key") == ShopRules.actor_key(0, 1, [2, 1]), "Online transfer animates the current gender and equipment")

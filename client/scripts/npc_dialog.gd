@@ -139,14 +139,14 @@ func _refresh_school(locked: bool) -> void:
 		var button:Button=quest_button.duplicate(0)
 		$Paper.add_child(button);extra_buttons.append(button)
 		button.position=Vector2(12,126+index*30);button.size=Vector2(284,27)
-		button.text="拜入%s（确认加入）"%SchoolRules.label(index)
+		button.text="拜入%s（入派并传送）"%SchoolRules.label(index)
 		button.disabled=locked
 		button.pressed.connect(func()->void:
 			if not button.disabled:action_requested.emit("school_join",SchoolRules.TARGETS[index]))
 	$Paper.position.y=64;$Paper.size.y=247
 	hint.position.y=220
 	$Paper/BL.position.y=233;$Paper/BR.position.y=233
-	if not locked:hint.text="闲云野鹤：可选择门派，技能暂按职业和等级开放。"
+	if not locked:hint.text="入派后自动前往门派驻地；技能仍按职业和等级开放。"
 
 func _refresh_ai() -> void:
 	_clear_extras()

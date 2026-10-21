@@ -8,6 +8,7 @@ from uuid import uuid4
 from pg_fixture import PostgresFixture
 from run_account_auth import stop
 from run_online_maps import MapPlayer
+from run_ai_world import AIPlayer, AI_MAPS
 from run_online_pve import api
 from run_server_connection import wait_for_server
 
@@ -25,18 +26,18 @@ def main():
             return p,base
         process,base=start()
         sockets=[]
-        def create(name):
+        def create(name,level=50):
             password='owned-school-password'
             assert api(base,'/api/v1/auth/register',dict(username=name,password=password))[0]==201
             code,session=api(base,'/api/v1/auth/login',dict(username=name,password=password));assert code==200
             # Even old clients requesting a school cannot bypass NPC admission.
-            code,data=api(base,'/api/v1/characters',dict(operation_id=str(uuid4()),display_name=name,job=1,gender=1,school=2,rules_version='creation-v1'),session['access_token'])
+            code,data=api(base,'/api/v1/characters',dict(operation_id=str(uuid4()),display_name=name[:12],job=1,gender=1,school=2,rules_version='creation-v1'),session['access_token'])
             assert code==201 and data['character']['school']==3,data
             cid=data['character']['id']
-            db.query(f"UPDATE characters SET level=50,gold=91,quest_stage=4 WHERE id='{cid}'")
+            db.query(f"UPDATE characters SET level={level},gold=91,quest_stage=4 WHERE id='{cid}'")
             return session,cid
         def join(session,cid):
-            player=MapPlayer(base,session,cid,shop_version=2);sockets.append(player);return player
+            player=AIPlayer(base,session,cid);sockets.append(player);return player
         def command(player,target,ok=True,revision=None):
             return player.command('',request=dict(operation_id=str(uuid4()),action='school_join',target=target,expected_revision=revision or player.state['character']['state_revision']),ok=ok)
         try:
@@ -50,14 +51,21 @@ def main():
             refused,_=command(a,'kunlun',ok=False,revision='9999');assert refused['code']=='STALE_SCHOOL'
             before={k:a.state['character'][k] for k in ['level','xp','gold','hp','mp','quest_stage']}
             admitted,request=command(a,'kunlun')
-            assert admitted['state']['character']['school']==2
+            assert admitted['state']['character']['school']==2 and admitted['state']['character']['map_id']=='ai_032'
+            assert [admitted['state']['character'][k] for k in ['cell_x','cell_y']]==AI_MAPS['ai_032']['spawn']
             assert {k:a.state['character'][k] for k in before}==before
             assert a.state['skills']['available']==unjoined_skills and 'sheet_004' in unjoined_skills and 'sheet_008' not in unjoined_skills
+            a.close();a=join(session,cid)
+            assert a.ready['map_id']=='ai_032' and a.state['character']['map_id']=='ai_032'
             replay,_=a.command('',request=request);assert replay['replayed'] and replay['state']==admitted['state']
             for target in ['kunlun','emei']:
                 refused,_=command(a,target,ok=False);assert refused['code']=='SCHOOL_ALREADY_JOINED'
             assert db.query(f"SELECT school||':'||level||':'||gold||':'||quest_stage FROM characters WHERE id='{cid}'")=='2:50:91:4'
             assert db.query(f"SELECT count(*) FROM security_audit WHERE character_id='{cid}' AND action='pve.school_join' AND outcome='accepted'")=='1'
+            # Return deliberately for the pre-existing tutorial combat checks.
+            a.walk(AI_MAPS['ai_032']['portal']['cell']);a.command('ai_travel','qingyun_trail')
+            a.close();a=join(session,cid)
+            a.approach('qingwei');a.command('restore','qingwei')
             a.approach('wolf_a');a.command('challenge','wolf_a')
             refused,_=command(a,'emei',ok=False);assert refused['code']=='BATTLE_ACTIVE'
             battle=a.state['battle']
@@ -75,12 +83,48 @@ def main():
             upgrade=db.query('BEGIN;'+migration+f" SELECT school||':'||level||':'||gold||':'||quest_stage FROM characters WHERE id='{cid}';ROLLBACK;")
             assert '3:'+permanent in upgrade,upgrade
             assert db.query(f"SELECT school FROM characters WHERE id='{cid}'")=='2'
+            # Low-level recruitment still has no destination recommendation-level gate.
+            for school,target,destination in [(0,'emei','ai_004'),(1,'huajian','ai_021')]:
+                member,member_id=create('school_'+target,level=1)
+                traveler=join(member,member_id);traveler.approach('qingwei')
+                operation=dict(operation_id=str(uuid4()),action='school_join',target=target,expected_revision=traveler.state['character']['state_revision'])
+                if school==0:
+                    # A receipt failure rolls back the school, destination and position together.
+                    point=traveler.ws.entities[member_id]['cell']
+                    db.query(f"UPDATE characters SET cell_x={point[0]},cell_y={point[1]} WHERE id='{member_id}'")
+                    before=db.query(f"SELECT school||':'||map_id||':'||cell_x||':'||cell_y FROM characters WHERE id='{member_id}'")
+                    db.query("CREATE FUNCTION reject_school_receipt() RETURNS trigger LANGUAGE plpgsql AS $$BEGIN RAISE EXCEPTION 'owned admission rollback'; END$$; CREATE TRIGGER school_receipt BEFORE INSERT ON pve_operation_receipts FOR EACH ROW EXECUTE FUNCTION reject_school_receipt();")
+                    traveler.ws.send(dict(type='pve.command',command=operation))
+                    assert traveler.until('error')['code']=='DATABASE_UNAVAILABLE'
+                    assert db.query(f"SELECT school||':'||map_id||':'||cell_x||':'||cell_y FROM characters WHERE id='{member_id}'")==before
+                    assert db.query(f"SELECT count(*) FROM pve_operation_receipts WHERE character_id='{member_id}' AND operation_id='{operation['operation_id']}'")=='0'
+                    db.query('DROP TRIGGER school_receipt ON pve_operation_receipts; DROP FUNCTION reject_school_receipt();')
+                    traveler.close();traveler=join(member,member_id)
+                landed,_=traveler.command('',request=operation)
+                assert landed['state']['character']['school']==school and landed['state']['character']['map_id']==destination
+                traveler.close();traveler=join(member,member_id)
+                assert traveler.ready['map_id']==destination and traveler.state['character']['level']==1
+                assert traveler.ws.entities[member_id]['cell']==AI_MAPS[destination]['spawn']
+                # Restart with an unacknowledged success: replay remains on the saved school map.
+                traveler.close();stop(process);process,base=start();traveler=join(member,member_id)
+                receipt,_=traveler.command('',request=operation)
+                assert receipt['replayed'] and receipt['state']==landed['state']
+                assert traveler.ready['map_id']==destination
+                assert db.query(f"SELECT count(*) FROM security_audit WHERE character_id='{member_id}' AND action='pve.school_join' AND outcome='accepted'")=='1'
+                traveler.close()
+            old_session,old_id=create('school_old')
+            old_client=MapPlayer(base,old_session,old_id,maps_version=1,shop_version=2);sockets.append(old_client)
+            old_client.approach('qingwei')
+            old_client.ws.send(dict(type='pve.command',command=dict(operation_id=str(uuid4()),action='school_join',target='emei',expected_revision=old_client.state['character']['state_revision'])))
+            assert old_client.until('error')['code']=='MAP_UPDATE_REQUIRED'
+            assert db.query(f"SELECT school||':'||map_id FROM characters WHERE id='{old_id}'")=='3:qingyun_trail'
+            old_client.close()
             if os.environ.get('GODOT_BIN'):
                 create('school_ui')
                 result=subprocess.run([os.environ['GODOT_BIN'],'--headless','--path',str(ROOT/'client'),'--quit-after','6000','res://tests/school_membership_live_test.tscn'],env=dict(os.environ,SSJX_SCHOOL_TEST_BASE=base,SSJX_CONNECTION_PATH=str(ROOT/'work/school-membership/test-connection.cfg')),capture_output=True,text=True,encoding='utf8',timeout=80)
                 print(result.stdout,flush=True);print(result.stderr,flush=True)
                 assert result.returncode==0 and '0 failures' in result.stdout and 'SCRIPT ERROR' not in result.stderr
-            print('SCHOOL SERVER: unjoined creation, one-time migration, proximity, revision, admission, receipts, audit, shared job skills, battle lock, persistence and real client passed',flush=True)
+            print('SCHOOL SERVER: three school destinations, atomic admission/transfer rollback, restart/replay, capability gate, proximity, shared skills, battle lock and real client passed',flush=True)
         finally:
             for player in sockets:
                 try:player.close()

@@ -30,17 +30,20 @@ func _run()->void:
 	dialog.extra_buttons[2].pressed.emit()
 	await get_tree().process_frame
 	check(Game.player.school==2 and app.modal==null and app.world_identity.text.contains("昆仑派"),"Nearby NPC confirms admission only after saving and refreshes the local map")
+	check(app.world.map_id=="ai_032" and Game.player.ai_map=="ai_032" and Game.player.cell==SharedWorldMap.load_data("ai_032").spawn,"Successful NPC admission immediately rebuilds the actual Kunlun map at its spawn")
+	await capture("joined-school-map")
 	check(Game.player.level==50 and Game.player.gold==77 and Game.player.quest==4,"Admission preserves level, money and quest progress")
 	check(SkillRules.list_for(1,2,50).size()==8 and not SkillRules.list_for(1,2,50).any(func(s:Dictionary)->bool:return s.id=="sheet_008"),"Admission retains the same job skills without opening level 55 skill")
 	check(not (await Game.join_local_school(1)).ok and Game.player.school==2,"Already admitted characters cannot switch schools directly")
-	check((await Game.load_game()).ok and Game.player.school==2,"Admitted membership survives reopening; reset is not repeated")
+	check((await Game.load_game()).ok and Game.player.school==2 and Game.player.ai_map=="ai_032" and Game.player.cell==SharedWorldMap.load_data("ai_032").spawn,"Admitted membership and destination survive reopening together")
 	app._attributes();app.attributes.select_tab(2)
 	await capture("joined-skills")
 	app._home()
-	var previous:=Game.player.duplicate(true);legacy(previous)
+	var previous:=Game._save_payload();legacy(previous)
 	FileAccess.open(Game.save_path,FileAccess.WRITE).store_string(JSON.stringify(previous))
 	check((await Game.load_game()).ok and Game.player.school==SchoolRules.UNJOINED and Game.player.level==50 and Game.player.gold==77,"Legacy save resets membership once without resetting progress")
 	check(Game.local_character_entries().all(func(entry:Dictionary)->bool:return entry.data.school==SchoolRules.UNJOINED and entry.data.school_membership_version==1),"All stored local roster entries receive the one-time membership reset")
+	Game.player.ai_map="";Game.player.zone=0;Game.player.cell=[10,14]
 	var context:=Platform.context
 	var storage:=DELAYED.new()
 	Platform.context=PlatformContext.new("school-save-test",storage,context.runtime_config,context.display,context.lifecycle,context.resource_loader,context.text_input,context.system_actions)
@@ -49,9 +52,15 @@ func _run()->void:
 	_join(results)
 	check(Game.storage_busy and results.is_empty(),"Admission waits for actual persistence")
 	storage.complete(PlatformResult.new(PlatformResult.Status.TEMPORARY_FAILURE,"SYNC_FAILED","保存失败"))
-	check(results.size()==1 and not results[0].ok and Game.player==before,"Failed admission rolls back membership atomically")
+	check(results.size()==1 and not results[0].ok and Game.player==before and AIWorld.local_map_id()=="qingyun_trail","Failed admission rolls back membership and destination atomically")
 	Platform.context=context
 	app.free()
+	for school in 3:
+		Game.new_player("三派传送%d"%school,1,SchoolRules.UNJOINED,1)
+		Game.player.gold=93;Game.player.potions=4
+		var destination:=SharedWorldMap.load_data(SchoolRules.map_id(school))
+		check((await Game.join_local_school(school)).ok and int(Game.player.school)==school and Game.player.ai_map==destination.map_id and Game.player.cell==destination.spawn,"Each school joins and arrives at its corresponding map without a level gate")
+		check((await Game.load_game()).ok and Game.player.ai_map==destination.map_id and Game.player.gold==93 and Game.player.potions==4,"Each school's saved arrival preserves money and items")
 	var model:=OnlinePve.new();model.bind_character(SELF,"http://127.0.0.1:9999");model.ready=true
 	model.state=pve_state();model.state.character.school=SchoolRules.UNJOINED;model.state.character.level=50
 	model.state.skills={"version":"skills-v1","catalog_sha256":SkillRules.catalog_hash,"available":SkillRules.list_for(1,SchoolRules.UNJOINED,50).map(func(s:Dictionary)->String:return s.id)}

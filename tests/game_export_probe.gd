@@ -17,6 +17,7 @@ func _verify() -> void:
 	check(FileAccess.file_exists("res://project.binary"), "Running from packed project settings")
 	check(ProjectSettings.get_setting("application/config/version","")=="0.1.2","Packed project reports release version 0.1.2")
 	check(ResourceLoader.exists("res://shaders/soul_grayscale.gdshader"),"Soul grayscale shader is included in the exported project")
+	check(not ResourceLoader.exists("res://assets/recovered/ssjx_pic/npcs/zhi-xian.png"),"High-resolution NPC production originals are excluded from the game package")
 	for path in ["res://scenes/admin/data_browser.tscn", "res://scenes/admin/world_overview.tscn", "res://scripts/admin/data_browser.gd", "res://scripts/admin/admin_window_layout.gd", "res://tests/data_browser_test.tscn"]:
 		check(not ResourceLoader.exists(path), "Developer resource is absent: " + path)
 	for path in ["res://scenes/admin", "res://scripts/admin", "res://assets/admin", "res://tests"]:
@@ -135,6 +136,11 @@ func _verify() -> void:
 	check(web_config.local_path("save").value == "offline://save-v1" and not web_config.local_path("save", "user://override.json").ok, "Packed Web configuration pins the logical slot")
 	web_storage.close()
 	scene._close_modal()
+	# The probe exits immediately after boot; release looping playback before
+	# disposing the root so the audio mixer can drain its owned stream handles.
+	scene.get_node("BackgroundMusic").stop()
+	scene.get_node("BackgroundMusic").stream=null
+	await process_frame
 	scene.queue_free()
 	await process_frame
 	await process_frame

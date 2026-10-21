@@ -41,6 +41,7 @@ class GameExportPolicyTests(unittest.TestCase):
             exclusions = {item.strip() for item in json.loads(config[section]['exclude_filter']).split(',')}
             self.assertTrue({'scenes/admin/*', 'scripts/admin/*', 'assets/admin/*', 'tests/*'} <= exclusions, section)
             self.assertIn('assets/data/*.json', json.loads(config[section]['include_filter']))
+            self.assertIn('assets/recovered/*', exclusions, section)
 
     def test_runtime_does_not_reference_developer_pages(self):
         sources = [CLIENT / 'project.godot']

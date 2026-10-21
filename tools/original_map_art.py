@@ -66,7 +66,9 @@ def rebuild(m):
     protected = [m['spawn'],*[r['cell'] for r in m.get('residents',[])]]
     protected += [p for gate in m.get('exits',[]) for p in gate.get('cells',[gate['cell']])]
     if 'original_map_id' not in m:protected += [[3,16],[28,16],[12,16],[10,13]]
-    if m['map_id']=='ai_001': protected.append([12,15])
+    if m['map_id']=='ai_001':
+        protected.append([12,15])
+        protected += [[x,y] for x in (10,12) for y in (22,25,29)]
     for y in range(32):
         for x in range(32):
             s = g[y][x]; i=y*32+x; patch=field(x,y,seed)

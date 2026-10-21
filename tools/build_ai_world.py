@@ -162,7 +162,11 @@ def build():
                     score=edge*7+((x-want[0])**2+(y-want[1])**2)*.12+(0 if road else 8)
                     body_clear=not any(abs(x-r['cell'][0])<=(2 if r['kind']=='npc' else 4) and 0<=r['cell'][1]-y<=(4 if r['kind']=='npc' else 6) for r in m['residents'])
                     candidates.append(((not body_clear,edge>8,not road,score),[x,y]))
-            point=min(candidates)[1];occupied.append(point)
+            point=min(candidates)[1]
+            # A new grass stair in the tutorial is not a new map exit. Keep
+            # the established eastern transfer point after the local terrain edit.
+            if m['original_map_id']==1 and target=='ai_002':point=[29,28]
+            occupied.append(point)
             m['exits'].append(dict(id='exit_'+target,cell=point,target_map=target,name=other['name'],source='AI生成连接，方向参考总图坐标'))
         if m['original_map_id']==21:
             for gate in m['exits']:
@@ -176,7 +180,7 @@ def build():
         ref=screenshot_reference(m['original_map_id'])
         if ref:m['screenshot_reference']=ref
         arrange_population(m)
-    return dict(version="ai-world-v1",label="AI生成·蜀山补全试验",layout_revision=5,npc_revision=2,monster_revision=2,portal_revision=4,seed=20261018,
+    return dict(version="ai-world-v1",label="AI生成·蜀山补全试验",layout_revision=6,npc_revision=2,monster_revision=2,portal_revision=4,seed=20261018,
                 disclaimer="地名、等级与总览坐标参考原包；场景布局、NPC布置、任务剧情与奖励均为AI生成。不是恢复出的原版内容。",maps=maps)
 
 def main():

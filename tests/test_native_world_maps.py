@@ -83,6 +83,34 @@ class NativeWorldMapsTests(unittest.TestCase):
             if m.get('biome')=='snow' and m.get('layout_archetype')!='earth_gate_sect':
                 self.assertIn(474,builder.presentation(m['map_id'])['ground'])
 
+    def test_lingkong_south_stairs_have_flat_landings_and_no_canopy_obstruction(self):
+        m=next(v for v in builder.maps() if v['map_id']=='ai_001')
+        art=builder.presentation('ai_001')
+        steps=[[50,51,52],[60,61,62],[70,71,72]]
+        for dy,row in enumerate(steps):
+            for dx,tile in enumerate(row):
+                x,y=10+dx,24+dy
+                self.assertEqual(art['ground'][y*32+x],tile)
+                self.assertFalse(m['blocked'][y*32+x])
+        for y in range(22,30):
+            for x in range(10,13):
+                self.assertFalse(m['blocked'][y*32+x],'Three-cell route through both landings')
+                for p in art['scenery']:
+                    self.assertFalse(abs(x-p['x']//16)<=3 and 0<=p['y']//16-y<=6,'Canopy hides stair approach')
+        for x in (8,9,13,14):
+            self.assertTrue(m['blocked'][25*32+x],'Cliff faces cannot be walked across')
+            self.assertFalse(m['blocked'][26*32+x],'Ground below the cliff is walkable')
+        self.assertEqual(art['ground'][25*32+9],270)
+        self.assertEqual(art['ground'][26*32+9],88)
+        for y in (22,23):
+            self.assertEqual(art['ground'][y*32+8],257)
+            self.assertEqual(art['ground'][y*32+14],259)
+        self.assertEqual(m['spawn'],[5,16])
+        self.assertEqual({r['id']:r['cell'] for r in m['residents']},
+            {'ai_001_guide':[10,13],'ai_001_courier':[23,9],'ai_001_survey':[22,24],
+             'ai_001_mob':[20,13],'ai_001_boss':[25,23]})
+        self.assertEqual([g['cell'] for g in m['exits']],[[4,16],[29,28]])
+
 
 if __name__ == '__main__':
     unittest.main()

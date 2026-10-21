@@ -49,3 +49,19 @@ python tools/review_native_maps.py
 - 临时PostgreSQL＋真实服务器＋真实Godot客户端：扩展地图25项、旧两图往返25项通过；扩展协议完整任务链、持久刷新、重启、等级门槛、事务回滚、回执重放及花涧派非中央出口格通过。旧实景测试更新了固定居民数和只检测旧单怪界面的断言，兼容已经存在的守境人和阵列战斗，没有改动生产战斗逻辑。
 - 另执行旧`run_online_maps.py`完整服务端脚本，在连续挑战守卫和妖首的第二次胜利断言失败（其进入Godot UI前的旧角色战斗夹具）；未改数值来迁就该断言。该脚本的`SSJX_MAP_UI_ONLY=1`真实切图／退战／继续移动25项全部通过，扩展完整协议脚本亦通过。
 - 共享JSON、服务器源码、任务ID、居民ID、装备、存档、协议哈希均未改动。未推送、打包或部署。
+
+## 灵空台南侧高台（2026-10-21）
+
+根据用户圈出的南侧草坡，将重复的草坡边角改为完整的小高台：7×5格的草坪台面与连续石质基座，南侧3格宽台阶连接上下层。台沿、转角和正面使用同一组石壁图块，去掉草坡侧边与底部紫色阴影的错接。石壁与台沿设为阻挡，草坪、台阶和下方落脚区可行走。移除遮住入口的原有树木，并为入口预留原生场景的边界树冠缓冲。
+
+本阶段更新共享地形及几何指纹，只重新生成 `ai_001.tscn`；其余213张扩展地图逐项不变，灵空台NPC、怪物、任务、出生点和两个传送点坐标不变。布局修订号为6。现有在线服务须后续重建、重启以加载嵌入式共享地形，本轮不操作运行中的服务。
+
+```powershell
+python -X utf8 -m unittest discover -s tests -p 'test_native_world_maps.py'
+python -X utf8 -m unittest discover -s tests -p 'test_ai_world.py'
+& 'E:/Godot_v4.7.1-stable_win64.exe/Godot_v4.7.1-stable_win64_console.exe' --headless --path client res://tests/lingkong_terrace_test.tscn
+```
+
+新增专项检查完整台阶拼块、三格宽上下通路、石壁阻挡、原截图位置到台面的可达性，以及角色实际行走上台。设置 `SSJX_LINGKONG_CAPTURE` 为已存在的目录，可用同一场景的 OpenGL 模式输出完整地图与局部实景；当前产物在 `work/lingkong-terrace/full.png`、`detail.png`。专项39项，实际渲染含两张截图41项。
+
+本阶段验证：Python原生地图8项与共享世界9项、Godot全图455,194项与任务/存档2,075项、Rust地图/任务2项通过；单独比对确认只有灵空台局部36格通行状态变化。

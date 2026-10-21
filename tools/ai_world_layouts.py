@@ -10,7 +10,7 @@ from collections import deque
 import screenshot_map_profiles as screenshots
 
 SIZE=32
-SOLID={"water","void","lava","ice","hill","sand_hill","building","tree"}
+SOLID={"water","void","lava","ice","hill","sand_hill","building","tree","terrace_rim"}
 FLOOR={"grass":13,"path":18,"water":91,"void":219,"lava":685,"ice":479,
        "hill":52,"rock":258,"volcanic":687,"snow":456,"paving":149,
        "stone":258,"wood":138,"dark":544,"sand":325,"dirt":394,"sand_hill":355,"sand_steps":373}
@@ -263,7 +263,44 @@ class Layout:
         self.place_sites()
         self.connect()
         self.props()
+        if self.num==1:self.lingkong_south_terrace()
         return self.finish()
+
+    def lingkong_south_terrace(self):
+        # The southern mound used a cliff corner as its interior, creating a
+        # scalloped carpet that looked passable but blocked the player's route.
+        # Edit after prop generation to keep the rest of this tutorial intact.
+        removed=[];retained=[]
+        for prop in self.scenery:
+            x,y=prop['x']//16,prop['y']//16
+            (removed if 6<=x<=16 and 21<=y<=29 else retained).append(prop)
+        self.scenery=retained
+        cleared={(p['x']//16,p['y']//16) for p in removed}
+        cleared.update((x,y) for y in range(20,28) for x in range(7,16) if self.g[y][x]=='hill')
+        cleared.update((x,y) for y in range(22,30) for x in range(10,13))
+        for x,y in cleared:
+            self.g[y][x]='terrace';self.override[x,y]=88
+        # A grass deck with a rim and a visible stone foundation gives the
+        # stairs an actual upper landing. Vertical cliff faces cannot be crossed.
+        for y in range(21,27):
+            for x in range(8,15):
+                self.g[y][x]='terrace';self.override[x,y]=88
+                if y==21:
+                    self.g[y][x]='terrace_rim';self.override[x,y]=238 if x==8 else 239 if x==14 else 248
+                elif y<=24 and x in (8,14):
+                    self.g[y][x]='terrace_rim';self.override[x,y]=257 if x==8 else 259
+                elif y==24:
+                    self.g[y][x]='terrace_rim';self.override[x,y]=268
+                elif y==25:
+                    self.g[y][x]='terrace_rim';self.override[x,y]=273 if x==8 else 274 if x==14 else 270
+        steps=[[50,51,52],[60,61,62],[70,71,72]]
+        for dy,row in enumerate(steps):
+            for dx,tile in enumerate(row):
+                x,y=10+dx,24+dy
+                self.g[y][x]='terrace';self.override[x,y]=tile
+        self.landmark('lingkong_raised_terrace',[8,21],[7,5])
+        self.landmark('lingkong_south_steps',[10,24],[3,3])
+        self.landmark('lingkong_south_landing',[10,27],[3,3])
 
     def showcase_scene(self):
         if self.num==213:

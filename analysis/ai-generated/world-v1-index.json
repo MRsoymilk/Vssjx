@@ -1,10 +1,10 @@
 {
   "version": "ai-world-v1",
-  "layout_revision": 5,
+  "layout_revision": 6,
   "source": "AI生成",
   "disclaimer": "地名、等级与总览坐标参考原包；场景布局、NPC布置、任务剧情与奖励均为AI生成。不是恢复出的原版内容。",
   "catalog": "shared/data/ai-world-v1.json",
-  "catalog_sha256": "08064507d2f9272128111f9e33df491ae0e562f9caa09bd7ed5234bcd4d0fd2f",
+  "catalog_sha256": "2ef846eaeec43f54900017f020fef413f88883aa57867d3b3186506bb3e97fdf",
   "map_count": 214,
   "quest_count": 642,
   "layout_count": 33,
@@ -39,6 +39,39 @@
           "size": [
             11,
             9
+          ]
+        },
+        {
+          "kind": "lingkong_raised_terrace",
+          "cell": [
+            8,
+            21
+          ],
+          "size": [
+            7,
+            5
+          ]
+        },
+        {
+          "kind": "lingkong_south_steps",
+          "cell": [
+            10,
+            24
+          ],
+          "size": [
+            3,
+            3
+          ]
+        },
+        {
+          "kind": "lingkong_south_landing",
+          "cell": [
+            10,
+            27
+          ],
+          "size": [
+            3,
+            3
           ]
         }
       ],

@@ -82,7 +82,7 @@ def write_review(root, data):
         map_count=len(data['maps']),rearranged_map_count=sum('population_layout' in m for m in data['maps']),
         monster_count=sum(r['kind']!='npc' for m in data['maps'] for r in m['residents']),
         resident_definition_sha256_excluding_cell=hashlib.sha256(json.dumps(definitions,ensure_ascii=False,sort_keys=True,separators=(',',':')).encode()).hexdigest(),
-        scope='仅局部截图地貌参考；怪物坐标为设计补全，无原始全图或精确刷新点数据。教程地图保留。',
+        scope='仅局部截图地貌参考；怪物坐标为设计补全，无原始全图或精确刷新点数据。教程任务和坐标保留；灵空台南侧为独立局部地形优化。',
         screenshot_profiles=refs,
         placements=[dict(map_id=m['map_id'],name=m['name'],policy=m['population_layout'],
             monsters=[dict(id=r['id'],name=r['name'],level=r['level'],art=r['art'],cell=r['cell']) for r in m['residents'] if r['kind']!='npc'])

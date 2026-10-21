@@ -1,11 +1,11 @@
 {
-  "layout_revision": 5,
+  "layout_revision": 6,
   "monster_revision": 2,
   "map_count": 214,
   "rearranged_map_count": 213,
   "monster_count": 454,
   "resident_definition_sha256_excluding_cell": "4e76abe7a880a03afc7ad0946f88be04a195b96f065f01774eaeb566939cd4da",
-  "scope": "仅局部截图地貌参考；怪物坐标为设计补全，无原始全图或精确刷新点数据。教程地图保留。",
+  "scope": "仅局部截图地貌参考；怪物坐标为设计补全，无原始全图或精确刷新点数据。教程任务和坐标保留；灵空台南侧为独立局部地形优化。",
   "screenshot_profiles": [
     {
       "map_id": "ai_007",

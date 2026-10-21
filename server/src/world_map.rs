@@ -56,6 +56,34 @@ impl WorldMap {
             && cell[1] < self.height
             && !self.blocked[(cell[1] * self.width + cell[0]) as usize]
     }
+    /// Old map revisions can leave a saved character inside new scenery.
+    /// Choose the nearest cell in the spawn's reachable component, avoiding
+    /// exits so admission cannot accidentally transfer the character again.
+    pub fn recover_position(&self, saved: [i32; 2]) -> Option<[i32; 2]> {
+        if self.walkable(saved) { return Some(saved); }
+        if !self.walkable(self.spawn) { return None; }
+        let distance = |cell: [i32; 2]| {
+            (i64::from(cell[0])-i64::from(saved[0])).abs()
+                + (i64::from(cell[1])-i64::from(saved[1])).abs()
+        };
+        let index = |c: [i32; 2]| (c[1]*self.width+c[0]) as usize;
+        let mut visited = vec![false; self.blocked.len()];
+        let mut queue = VecDeque::from([self.spawn]);
+        let mut best = self.spawn;
+        visited[index(self.spawn)] = true;
+        while let Some(cell) = queue.pop_front() {
+            if distance(cell) < distance(best) { best = cell; }
+            for delta in [[0,-1],[1,0],[0,1],[-1,0]] {
+                let next = [cell[0]+delta[0],cell[1]+delta[1]];
+                if self.walkable(next) && !visited[index(next)]
+                    && crate::ai_world::exit_target(&self.map_id,next).is_none() {
+                    visited[index(next)] = true;
+                    queue.push_back(next);
+                }
+            }
+        }
+        Some(best)
+    }
     pub fn route(&self, start: [i32; 2], goal: [i32; 2]) -> Option<VecDeque<[i32; 2]>> {
         if !self.walkable(start) || !self.walkable(goal) {
             return None;

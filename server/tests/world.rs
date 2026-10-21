@@ -3,6 +3,24 @@ use vssjx_server::{
     world_map::{Motion, WorldMap},
 };
 #[test]
+fn blocked_saved_positions_recover_nearby_without_entering_an_exit() {
+    let map = WorldMap::load("ai_214").unwrap();
+    assert!(!map.walkable([29,23]));
+    let recovered = map.recover_position([29,23]).unwrap();
+    assert_eq!((recovered[0]-29).abs()+(recovered[1]-23).abs(),1);
+    assert!(map.route(map.spawn,recovered).is_some());
+    assert!(vssjx_server::ai_world::exit_target(&map.map_id,recovered).is_none());
+    assert_eq!(map.recover_position([29,23]),Some(recovered));
+    assert_eq!(map.recover_position(recovered),Some(recovered));
+    for id in ["qingyun_trail","ancient_ruins","ai_001","ai_214"] {
+        let map = WorldMap::load(id).unwrap();
+        assert_eq!(map.recover_position(map.spawn),Some(map.spawn));
+        let recovered = map.recover_position([i32::MIN,i32::MAX]).unwrap();
+        assert!(map.walkable(recovered));
+        assert!(map.route(map.spawn,recovered).is_some());
+    }
+}
+#[test]
 fn click_routes_do_not_enter_a_different_portal_on_the_way_to_the_goal() {
     let ruins = WorldMap::load("ancient_ruins").unwrap();
     for (start, goal) in [([5,16],[17,19]), ([17,19],[3,16])] {

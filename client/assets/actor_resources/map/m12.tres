@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="NativeActorDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/actor_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+texture_path = "res://assets/actors/map_m12.png"
+frame_size = Vector2i(53, 66)
+columns = 1
+frame_count = 1
+origin = Vector2i(-24, -65)
+anchor_x = 0
+sequences = [[[0,1]]]
+playback = {}
+native_battle = {}
+extra = {}

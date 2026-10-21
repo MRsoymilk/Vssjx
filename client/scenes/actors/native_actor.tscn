@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/native_actor.gd" id="1"]
+
+[node name="NativeActor" type="AnimatedSprite2D"]
+texture_filter = 1
+centered = false
+script = ExtResource("1")

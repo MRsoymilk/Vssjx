@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="NativeActorDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/actor_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+texture_path = "res://assets/actors/npc_ssjx_tianchi_shangren.png"
+frame_size = Vector2i(34, 60)
+columns = 1
+frame_count = 1
+origin = Vector2i(-17, -58)
+anchor_x = 0
+sequences = [[[0,1]]]
+playback = {"idle": [[0,1]],"walk": [[0,1]],"attack": [[0,1]]}
+native_battle = {}
+extra = {"provenance": {"source": "ssjx_pic截图 + AI辅助抠图/补全","source_asset": "client/assets/recovered/ssjx_pic/npcs/tianchi-shangren.png","source_sha256": "fcc28014d048755716397871903e192f93ac5aea320c800c65fc5c26991d4176","asset_id": "tianchi-shangren","repair_type": "background_removal","alpha_bounds": [196,159,853,1385],"preparation": "alpha>=16 bounds; nearest-neighbor resize; 2px padding; feet at y=0","original_animation_recovered": false}}

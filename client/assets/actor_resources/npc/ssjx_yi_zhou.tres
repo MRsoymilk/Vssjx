@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="NativeActorDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/actor_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+texture_path = "res://assets/actors/npc_ssjx_yi_zhou.png"
+frame_size = Vector2i(39, 60)
+columns = 1
+frame_count = 1
+origin = Vector2i(-20, -58)
+anchor_x = 0
+sequences = [[[0,1]]]
+playback = {"idle": [[0,1]],"walk": [[0,1]],"attack": [[0,1]]}
+native_battle = {}
+extra = {"provenance": {"source": "ssjx_pic截图 + AI辅助抠图/补全","source_asset": "client/assets/recovered/ssjx_pic/npcs/yi-zhou.png","source_sha256": "766ba318fd27b530529840f10c269c475466dfd3cba3d77c619a4883d8b7ed9b","asset_id": "yi-zhou","repair_type": "edge_completion","alpha_bounds": [192,89,975,1328],"preparation": "alpha>=16 bounds; nearest-neighbor resize; 2px padding; feet at y=0","original_animation_recovered": false}}

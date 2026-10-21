@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="NativeActorDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/actor_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+texture_path = "res://assets/actors/npc_ssjx_grocery_boss.png"
+frame_size = Vector2i(36, 60)
+columns = 1
+frame_count = 1
+origin = Vector2i(-18, -58)
+anchor_x = 0
+sequences = [[[0,1]]]
+playback = {"idle": [[0,1]],"walk": [[0,1]],"attack": [[0,1]]}
+native_battle = {}
+extra = {"provenance": {"source": "ssjx_pic截图 + AI辅助抠图/补全","source_asset": "client/assets/recovered/ssjx_pic/npcs/grocery-boss.png","source_sha256": "d0443ac3b78569418782d4189614f60fd63e9a663ff2cc5e877a6f5f0488b1dd","asset_id": "grocery-boss","repair_type": "occlusion_fill","alpha_bounds": [284,138,917,1246],"preparation": "alpha>=16 bounds; nearest-neighbor resize; 2px padding; feet at y=0","original_animation_recovered": false}}

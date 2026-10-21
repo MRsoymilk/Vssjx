@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="NativeActorDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/actor_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+texture_path = "res://assets/actors/effect_t93.png"
+frame_size = Vector2i(49, 58)
+columns = 5
+frame_count = 5
+origin = Vector2i(-29, -44)
+anchor_x = 0
+sequences = [[[0,1],[1,1],[2,1],[3,1],[4,1]]]
+playback = {}
+native_battle = {}
+extra = {}

@@ -1,0 +1,16 @@
+[gd_resource type="SpriteFrames" load_steps=3 format=3]
+
+[ext_resource type="Texture2D" path="res://assets/actors/npc_ssjx_tianchi_shangren.png" id="1"]
+
+[sub_resource type="AtlasTexture" id="Frame_0"]
+atlas = ExtResource("1")
+filter_clip = true
+region = Rect2(0, 0, 34, 60)
+
+[resource]
+animations = [
+{"frames": [{"duration": 1.0, "texture": SubResource("Frame_0")}], "loop": true, "name": &"source_0", "speed": 10.0},
+{"frames": [{"duration": 1.0, "texture": SubResource("Frame_0")}], "loop": true, "name": &"idle", "speed": 6.0},
+{"frames": [{"duration": 1.0, "texture": SubResource("Frame_0")}], "loop": true, "name": &"walk", "speed": 10.0},
+{"frames": [{"duration": 1.0, "texture": SubResource("Frame_0")}], "loop": false, "name": &"attack", "speed": 10.0}
+]

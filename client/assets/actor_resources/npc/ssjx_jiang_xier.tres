@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="NativeActorDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/actor_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+texture_path = "res://assets/actors/npc_ssjx_jiang_xier.png"
+frame_size = Vector2i(49, 54)
+columns = 1
+frame_count = 1
+origin = Vector2i(-25, -52)
+anchor_x = 0
+sequences = [[[0,1]]]
+playback = {"idle": [[0,1]],"walk": [[0,1]],"attack": [[0,1]]}
+native_battle = {}
+extra = {"provenance": {"source": "ssjx_pic截图 + AI辅助抠图/补全","source_asset": "client/assets/recovered/ssjx_pic/npcs/jiang-xier.png","source_sha256": "14e9b4726d9abeaa87eda81a725972cd68831f54deb0b5cc4a31200db24d74b3","asset_id": "jiang-xier","repair_type": "edge_completion","alpha_bounds": [86,53,1131,1211],"preparation": "alpha>=16 bounds; nearest-neighbor resize; 2px padding; feet at y=0","original_animation_recovered": false}}

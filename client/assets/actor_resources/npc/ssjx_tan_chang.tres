@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="NativeActorDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/actor_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+texture_path = "res://assets/actors/npc_ssjx_tan_chang.png"
+frame_size = Vector2i(47, 60)
+columns = 1
+frame_count = 1
+origin = Vector2i(-24, -58)
+anchor_x = 0
+sequences = [[[0,1]]]
+playback = {"idle": [[0,1]],"walk": [[0,1]],"attack": [[0,1]]}
+native_battle = {}
+extra = {"provenance": {"source": "ssjx_pic截图 + AI辅助抠图/补全","source_asset": "client/assets/recovered/ssjx_pic/npcs/tan-chang.png","source_sha256": "70c39dbfa5152dd8dbadfc2645d46f7f1add4c7336cba47dbd72c99ddbad7203","asset_id": "tan-chang","repair_type": "edge_completion","alpha_bounds": [185,49,1054,1193],"preparation": "alpha>=16 bounds; nearest-neighbor resize; 2px padding; feet at y=0","original_animation_recovered": false}}

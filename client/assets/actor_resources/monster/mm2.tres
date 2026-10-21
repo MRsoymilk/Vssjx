@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="NativeActorDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/actor_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+texture_path = "res://assets/actors/monster_mm2.png"
+frame_size = Vector2i(128, 65)
+columns = 8
+frame_count = 23
+origin = Vector2i(-52, -63)
+anchor_x = 0
+sequences = [[[17,2],[18,1],[19,1],[20,1],[21,1],[22,2]],[[2,1],[14,1],[15,1],[16,1]],[[6,1],[7,1],[8,2],[9,1],[10,1],[11,1],[12,1],[13,2],[7,1],[6,1]],[[0,2],[1,1],[0,5],[2,8]],[[3,2],[4,1],[3,5],[5,8]],[[0,2],[1,1],[0,5],[2,8]],[],[]]
+playback = {"idle": [[22,2],[21,1],[22,5],[20,8]],"walk": [[22,2],[21,1],[22,5],[20,8]],"attack": [[16,1],[15,1],[14,2],[13,1],[12,1],[11,1],[10,1],[9,2],[15,1],[16,1]],"hurt": [[20,1],[8,1],[7,1],[6,1]]}
+native_battle = {"indexing": "reverse_serialized_tables","source_frame_count": 23,"sequence_ids": {"idle": 4,"walk": 4,"attack": 5,"hurt": 6},"impact_steps": {"idle": [],"walk": [],"attack": [3],"hurt": []},"attack_x": [109,77,32,22,21,20,19,18,77,109],"pose_x": {"idle": [2,2,2,2],"walk": [2,2,2,2],"hurt": [2,6,6,5]},"attack_basis": "target","cast_mapping": null}
+extra = {"alignment": {"source": "AI接入，原生动作槽4/5/6","primary_source": "mm2","body_frame": 0,"combat_extent_frames": [],"source_sha256": "7748a954babcdb6e155a1333dfebd294d3fe99425e82e67b11fae090117c4f8a"}}

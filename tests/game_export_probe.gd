@@ -16,6 +16,7 @@ func check(value: bool, description: String) -> void:
 func _verify() -> void:
 	check(FileAccess.file_exists("res://project.binary"), "Running from packed project settings")
 	check(ProjectSettings.get_setting("application/config/version","")=="0.1.2","Packed project reports release version 0.1.2")
+	check(ResourceLoader.exists("res://shaders/soul_grayscale.gdshader"),"Soul grayscale shader is included in the exported project")
 	for path in ["res://scenes/admin/data_browser.tscn", "res://scenes/admin/world_overview.tscn", "res://scripts/admin/data_browser.gd", "res://scripts/admin/admin_window_layout.gd", "res://tests/data_browser_test.tscn"]:
 		check(not ResourceLoader.exists(path), "Developer resource is absent: " + path)
 	for path in ["res://scenes/admin", "res://scripts/admin", "res://assets/admin", "res://tests"]:
@@ -136,5 +137,6 @@ func _verify() -> void:
 	scene._close_modal()
 	scene.queue_free()
 	await process_frame
+	await process_frame
 	print("GAME EXPORT: %d checks, 0 failures" % checks)
-	quit()
+	quit.call_deferred()

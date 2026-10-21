@@ -74,7 +74,7 @@ def build(output, template=None, debug=False, loopback=False):
         return [name for name in names if name.startswith('.') or name in ['admin', 'tests']
                 or name.endswith('.tmp') or (name.endswith('.import') and not name.endswith('.wav.import'))]
 
-    for name in ['scripts', 'assets', 'scenes', 'web']:
+    for name in ['scripts', 'assets', 'scenes', 'web', 'shaders']:
         shutil.copytree(ROOT / 'client' / name, project / name, ignore=ignored)
     if loopback:
         profile = project / 'scripts/interface/profiles/web_runtime.tres'

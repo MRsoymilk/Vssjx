@@ -138,7 +138,7 @@ def build(args):
     project.mkdir()
     for name in ['project.godot', 'export_presets.cfg']:
         shutil.copy2(ROOT / 'client' / name, project / name)
-    for name in ['scripts', 'assets', 'scenes', 'web']:
+    for name in ['scripts', 'assets', 'scenes', 'web', 'shaders']:
         shutil.copytree(ROOT / 'client' / name, project / name, ignore=public_ignore)
     env = {key: value for key, value in os.environ.items() if not key.startswith('SSJX_')}
     env.update(XDG_DATA_HOME=str(output / 'userdata'), XDG_CONFIG_HOME=str(output / 'config'), XDG_CACHE_HOME=str(output / 'cache'))

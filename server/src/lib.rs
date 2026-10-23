@@ -21,6 +21,7 @@ mod chat_admin;
 pub mod config;
 pub mod logging;
 mod monitor;
+mod online_stats;
 mod monitor_pages;
 mod security;
 mod user_admin;

@@ -1,4 +1,9 @@
 <p id="notice" role="status">正在获取状态…</p><section id="cards" class="cards" aria-label="服务概况"></section>
+<section class="panel daily-online-panel"><div class="daily-heading"><h2 id="daily-online-title">每日在线人数</h2><label>统计范围 <select id="daily-online-range"><option value="7">最近 7 天</option><option value="30" selected>最近 30 天</option><option value="90">最近 90 天</option></select></label></div>
+<p>按北京时间自然日去重账号：同账号多角色、重复登录只计 1 人，持续在线跨日会补记；不是同时在线峰值。</p>
+<p id="daily-online-status" role="status">正在获取每日在线统计…</p><div id="daily-online-chart" class="daily-chart"></div>
+<p>绿色点为全天统计，黄色点为当日累计或不完整记录。旧日期由已有游戏入场／活动记录回填，可能不完整；未采集日期留空，不显示为 0。今日数据持续累计，启用统计首日也不代表完整全天。窄屏可左右滑动图表。</p>
+<details><summary>查看每日人数明细</summary><div class="scroll"><table><thead><tr><th>日期（北京时间）</th><th>在线人数（去重账号）</th><th>数据覆盖</th></tr></thead><tbody id="daily-online-rows"></tbody></table></div></details></section>
 <section class="panel"><h2>近期趋势 <small>仅当前浏览器保留最近 5 分钟</small></h2><div id="trend" class="trend" aria-label="在线人数趋势"></div><p id="rates"></p></section>
 <div class="columns"><section class="panel"><h2>同步与连接</h2><dl id="world"></dl></section><section class="panel"><h2>数据库与日志</h2><dl id="database"></dl></section></div>
 <section class="panel"><h2>HTTP 请求 <small>自进程启动累计；延迟不包含 WebSocket 生命周期</small></h2><div class="scroll"><table><thead><tr><th>接口</th><th>请求</th><th>4xx</th><th>5xx</th><th>平均 ms</th><th>p95 桶上界 ms</th><th>最大 ms</th></tr></thead><tbody id="http"></tbody></table></div></section>

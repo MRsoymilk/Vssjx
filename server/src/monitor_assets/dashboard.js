@@ -48,3 +48,63 @@ async function refresh() {
 }
 $("refresh").addEventListener("click", refresh);
 refresh(); setInterval(refresh, 5000);
+
+let dailyVersion = 0, dailyHasData = false;
+const coverage = {historical: "历史记录回填，可能不完整", partial: "当日累计／启用首日，非完整全天", complete: "全天统计"};
+function svgNode(tag, attributes, text) {
+    const element = document.createElementNS("http://www.w3.org/2000/svg", tag);
+    for (const [key, value] of Object.entries(attributes)) element.setAttribute(key, String(value));
+    if (text != null) element.textContent = text;
+    return element;
+}
+function renderDaily(days) {
+    const svg = svgNode("svg", {viewBox: "0 0 1000 280", role: "img", "aria-labelledby": "daily-chart-description"});
+    svg.append(svgNode("title", {id: "daily-chart-description"}, "每日在线人数折线图，按北京时间去重账号；完整数据见下方明细，空缺日期不连线。"));
+    const max = Math.max(1, ...days.map(day => day.users ?? 0));
+    const top = Math.max(1, Math.ceil(max / 4)) * 4;
+    const x = index => 64 + index * 910 / Math.max(1, days.length - 1);
+    const y = count => 232 - count / top * 204;
+    for (let i = 0; i <= 4; i++) {
+        const value = top * i / 4;
+        svg.append(svgNode("line", {x1:64, x2:974, y1:y(value), y2:y(value), class:"daily-grid"}));
+        svg.append(svgNode("text", {x:54, y:y(value)+4, "text-anchor":"end", class:"daily-axis"}, number(value)));
+    }
+    let path = "", connected = false;
+    days.forEach((day, index) => {
+        if (day.users == null) { connected = false; return; }
+        path += `${connected ? "L" : "M"}${x(index)},${y(day.users)} `;
+        connected = true;
+    });
+    svg.append(svgNode("path", {d:path, class:"daily-line"}));
+    days.forEach((day, index) => {
+        if (day.users != null) {
+            const point = svgNode("circle", {cx:x(index), cy:y(day.users), r:4, class:day.coverage==="complete"?"daily-point":"daily-point daily-partial"});
+            point.append(svgNode("title", {}, `${day.date}：${number(day.users)} 人 · ${coverage[day.coverage]}`));
+            svg.append(point);
+        }
+        if (index===0 || index===days.length-1 || index%Math.ceil((days.length-1)/6)===0)
+            svg.append(svgNode("text", {x:x(index), y:260, "text-anchor":"middle", class:"daily-axis"}, day.date.slice(5)));
+    });
+    $("daily-online-chart").replaceChildren(svg);
+    $("daily-online-rows").replaceChildren();
+    for (const day of days) row($("daily-online-rows"), [day.date, day.users==null?"未采集":number(day.users), coverage[day.coverage]]);
+}
+async function refreshDaily() {
+    const current = ++dailyVersion, days = $("daily-online-range").value;
+    $("daily-online-status").textContent = dailyHasData ? "正在刷新每日统计，图表暂为上次数据…" : "正在获取每日在线统计…";
+    try {
+        const response = await fetch(`/api/online/daily?days=${days}`, {cache:"no-store", signal:AbortSignal.timeout(5000)});
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data = await response.json();
+        if (current !== dailyVersion) return;
+        renderDaily(data.days); dailyHasData = true;
+        const today = data.days.at(-1);
+        $("daily-online-status").textContent = `最近 ${days} 天 · 今日累计 ${number(today.users)} 人 · 北京时间（UTC+8） · 更新于 ${new Date().toLocaleTimeString()}${data.days.some(day=>day.users==null)?" · 部分日期未采集":""}`;
+    } catch (error) {
+        if (current !== dailyVersion) return;
+        $("daily-online-status").textContent = `每日在线统计获取失败：${error.message}${dailyHasData?"；图表保留上次数据（可能属于上次选择的范围）":"；暂不显示人数"}`;
+    }
+}
+$("daily-online-range").addEventListener("change", refreshDaily);
+$("refresh").addEventListener("click", refreshDaily);
+refreshDaily(); setInterval(refreshDaily, 60000);

@@ -1036,6 +1036,8 @@ async fn connection(socket: WebSocket, auth: AuthService, hub: Arc<WorldHub>, an
     let mut duel_revision=None;
     let mut team_revision=None;
     crate::security::connection_event(&auth,owner.session,owner.id,"world.join","OK",json!({"map_id":owner.map_id,"connection_id":id})).await;
+    let mut presence=crate::online_stats::Presence::default();
+    presence.record_if_due(auth.pool(),owner.id).await;
     let mut audit_since = Instant::now();
     let mut move_accepted = 0_u32;
     let mut move_rejected = 0_u32;
@@ -1160,6 +1162,9 @@ async fn connection(socket: WebSocket, auth: AuthService, hub: Arc<WorldHub>, an
                     match auth.live_session(owner.session).await{Ok(true)=>{},Ok(false)=>{fail(&mut socket,"SESSION_REVOKED").await;leave=true;break},Err(_)=>{fail(&mut socket,"DATABASE_UNAVAILABLE").await;break}}
                     checked=Instant::now();
                 }
+                // Once per Beijing day, including idle players crossing midnight.
+                // Analytics failures never revoke a valid game connection; retry boundedly.
+                presence.record_if_due(auth.pool(),owner.id).await;
                 if audit_since.elapsed()>=Duration::from_secs(10) {
                     if move_accepted+move_rejected>0 {crate::security::connection_event(&auth,owner.session,owner.id,"world.movement","OK",json!({"accepted":move_accepted,"rejected":move_rejected,"last_rejection":last_move_code,"window_seconds":audit_since.elapsed().as_secs(),"map_id":owner.map_id})).await;}
                     move_accepted=0;move_rejected=0;last_move_code="OK";audit_since=Instant::now();

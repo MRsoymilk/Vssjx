@@ -31,6 +31,7 @@ func run()->void:
 	check(not Game.valid_save(bad),"Corrupt out-of-range material stacks are rejected")
 	var legacy:=Game.player.duplicate(true);legacy.erase("gathering")
 	check(Game.valid_save(legacy),"Existing saves without gathering remain valid")
+	await combat_lifecycle_checks()
 	await craft_checks()
 	var bag:=GatheringMaterialBag.new();add_child(bag)
 	check(bag.rows.text.contains(GatheringRules.MATERIALS[node.material]),"Local material bag shows persisted gathering materials")
@@ -49,6 +50,30 @@ func run()->void:
 	panel.queue_free();bag.queue_free();await get_tree().process_frame
 	DirAccess.remove_absolute(Game.save_path);Game.player=old;Game.save_path=path;Game.local_combat=combat;Game.local_gather={}
 	print("GATHERING CLIENT: %d checks, %d failures"%[checks,failures]);get_tree().quit(1 if failures else 0)
+
+func combat_lifecycle_checks()->void:
+	var herb:Dictionary=GatheringRules.nodes_for("qingyun_trail")[1]
+	var cell:=Vector2i(herb.cell[0],herb.cell[1])
+	var battle:ShushanBattle=ShushanBattle.new(ShushanWorld.ENEMIES[0])
+	Game.local_combat=weakref(battle)
+	check(Game.begin_gathering(herb.id,cell,"qingyun_trail")=="BATTLE_ACTIVE","A live battle still prevents collection")
+	battle.finished=true
+	check(Game.begin_gathering(herb.id,cell,"qingyun_trail").is_empty(),"A completed battle no longer blocks gathering while its result object remains alive")
+	if not Game.local_gather.is_empty():
+		Game.local_gather.started=Time.get_ticks_msec()-int(herb.duration_ms)-1
+		check((await Game.finish_gathering(cell,"qingyun_trail")).ok,"Gathering can settle after a completed battle")
+	var old_cell:Array=Game.player.cell.duplicate()
+	Game.player.ai_map="ai_001"
+	battle=null
+	check(Game.local_combat!=null and Game.local_combat.get_ref()==null,"Map change fixture retains the real expired battle weak reference")
+	for node in GatheringRules.nodes_for("ai_001"):
+		cell=Vector2i(node.cell[0],node.cell[1]);Game.player.cell=node.cell.duplicate()
+		var started:=Game.begin_gathering(node.id,cell,"ai_001")
+		check(started.is_empty(),"Changing map after battle allows fresh ore and herbs: "+node.id)
+		if not started.is_empty():continue
+		Game.local_gather.started=Time.get_ticks_msec()-int(node.duration_ms)-1
+		check((await Game.finish_gathering(cell,"ai_001")).ok,"Expired battle references cannot block collection rewards: "+node.id)
+	Game.player.ai_map="";Game.player.cell=old_cell;Game.local_combat=null;Game.local_gather={}
 
 func craft_checks()->void:
 	Game.player.gathering.materials={"iron":9,"copper":6,"gancao":6,"danggui":3}
@@ -79,8 +104,12 @@ func craft_checks()->void:
 	check(not (await Game.craft_gathering("smelt_iron",2)).ok and Game.player==before and FileAccess.get_file_as_string(Game.save_path)==raw,"Failed persistent write restores ore and scrap together")
 	check(not (await Game.craft_gathering("brew_potion",2)).ok and Game.player==before and FileAccess.get_file_as_string(Game.save_path)==raw,"Failed persistent write restores both herbs and potions together")
 	Platform.context._storage=storage
-	Game.local_combat=weakref(self)
+	var battle:ShushanBattle=ShushanBattle.new(ShushanWorld.ENEMIES[0]);Game.local_combat=weakref(battle)
 	check((await Game.craft_gathering("smelt_iron")).code=="BATTLE_ACTIVE" and Game.player==before,"Combat cannot process materials")
-	Game.local_combat=null;Game.become_soul();var soul:=Game.player.duplicate(true)
+	battle.finished=true
+	check((await Game.craft_gathering("smelt_iron")).ok,"Finished combat permits material processing")
+	battle=null
+	check((await Game.craft_gathering("smelt_copper")).ok,"Released combat permits material processing")
+	Game.local_combat=null;Game.player=before.duplicate(true);Game.become_soul();var soul:=Game.player.duplicate(true)
 	check((await Game.craft_gathering("smelt_iron")).code=="SOUL_STATE" and Game.player==soul,"Soul state cannot process materials")
 	Game.player=before

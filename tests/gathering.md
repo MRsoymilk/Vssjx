@@ -55,3 +55,11 @@ SSJX_TEST_SERVER_BIN=/path/to/vssjx-server python tests/run_gathering.py
 - `godot --headless --path client res://tests/gathering_overhead_test.tscn`：9项通过；实际OpenGL渲染10项通过，截图 `/tmp/opencode/vssjx-gathering-overhead-captures/gathering-overhead.png` 已查看。覆盖自动开始、头顶坐标、半程填充、方向键／地图点击取消、自动完成入袋和冷却无弹窗。
 - `gathering_live_test.gd` 已更新为自动开始及真实人物头顶坐标断言；本轮尝试 `GODOT_BIN=godot python tests/run_gathering.py` 因环境无Docker socket、无法创建隔离PostgreSQL而未执行到联机测试，不将历史通过结果当作本轮联机通过。
 - 仅修改客户端与验证记录，不推送、打包、部署或修改线上数据库。
+
+## 本地战斗后切图采集修复（2026-10-23）
+
+- 根因：本地战斗结束或释放后，`Game.local_combat` 仍可保留非空 `WeakRef`。开始采集、完成采集、材料加工此前仅判断引用是否非空，将已结束的战斗误判为进行中。三处统一复用 `local_battle_active()`，同时处理已结束对象和失效弱引用，进行中的战斗仍会阻止采集／加工。
+- 修复前专项454项中5项失败，覆盖战斗结束后采集、新地图矿点／药点，以及结束／释放战斗后加工；修复后 `gathering_test.tscn` 457项全部通过。
+- `gathering_overhead_test.tscn` 实际OpenGL渲染40项通过：点击资源、自动寻路、头顶进度和结算，青云山道→`ai_001`→`ai_002`→青云山道往返，失效战斗引用不再拦截，新地图资源独立刷新，返回保留原节点冷却。
+- `GODOT_BIN=godot python3 -B tests/run_gathering.py` 使用隔离PostgreSQL和真实服务端：服务端64项、真实Godot联机66项全部通过，包含三图往返点击采集和材料加工。满背包夹具排除需要实例状态的葫芦，避免将其作为普通装备插表。
+- 本轮日志：`/tmp/opencode/gathering-local-after.log`、`/tmp/opencode/gathering-local-ui.log`、`/tmp/opencode/gathering-transfer-after.log`。

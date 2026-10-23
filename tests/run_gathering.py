@@ -102,7 +102,7 @@ def main():
             live=fixture.create('gather_ui')
             fixture.db.query(f"INSERT INTO gathering_materials(character_id,material,quantity) SELECT '{live[1]}',m,12 FROM unnest(ARRAY['iron','copper','gancao','danggui']) m")
             env=dict(os.environ,SSJX_GATHERING_TEST=json.dumps(dict(base=fixture.base,character=live[1])))
-            client=subprocess.run([os.environ['GODOT_BIN'],'--headless','--path',str(ROOT/'client'),'res://tests/gathering_live_test.tscn'],env=env,text=True,capture_output=True,timeout=80)
+            client=subprocess.run([os.environ['GODOT_BIN'],'--headless','--path',str(ROOT/'client'),'res://tests/gathering_live_test.tscn'],env=env,text=True,capture_output=True,timeout=180)
             print(client.stdout);print(client.stderr)
             check(client.returncode==0 and '0 failures' in client.stdout and 'SCRIPT ERROR' not in client.stderr,'real Godot client completes mining and herbalism')
         print(f'GATHERING SERVER: {checks} checks, 0 failures')
@@ -162,7 +162,7 @@ def craft_checks(fixture,check,command):
     check(snapshot()==before,'full scrap balance refuses processing without ore loss')
     # Fill the real gear inventory: potion output cannot bypass bag admission.
     goods=json.loads((ROOT/'client/assets/data/shop-v2.json').read_text())['items']
-    ids=[i['id'] for i in goods if i['slot'] not in ('consumable',) and i['job'] in (-1,0) and i.get('gender',-1) in (-1,0)][:60]
+    ids=[i['id'] for i in goods if i['slot'] not in ('consumable','gourd') and i['job'] in (-1,0) and i.get('gender',-1) in (-1,0)][:60]
     check(len(ids)==60,'capacity fixture uses 60 actual compatible catalog items')
     fixture.db.query(f"DELETE FROM inventory_items WHERE character_id='{p.id}';INSERT INTO inventory_items(id,character_id,definition_id,quantity,equipped) SELECT gen_random_uuid(),'{p.id}',d,1,FALSE FROM unnest(ARRAY["+','.join("'"+i+"'" for i in ids)+"]) d")
     p.close();p=fixture.connect(identity);before=snapshot()

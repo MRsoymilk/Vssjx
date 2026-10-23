@@ -25,7 +25,7 @@ var local_gather:Dictionary={}
 func begin_gathering(id:String,cell:Vector2i,map_id:String)->String:
 	if storage_busy or not local_gather.is_empty():return "GATHER_BUSY"
 	if is_soul():return "SOUL_STATE"
-	if local_combat!=null:return "BATTLE_ACTIVE"
+	if local_battle_active():return "BATTLE_ACTIVE"
 	var node:=GatheringRules.definition(id)
 	if node.is_empty() or node.map_id!=map_id or AIWorld.local_map_id()!=map_id:return "GATHER_NOT_FOUND"
 	if absi(cell.x-int(node.cell[0]))+absi(cell.y-int(node.cell[1]))>1:return "GATHER_TOO_FAR"
@@ -38,7 +38,7 @@ func begin_gathering(id:String,cell:Vector2i,map_id:String)->String:
 func finish_gathering(cell:Vector2i,map_id:String)->PlatformResult:
 	if storage_busy:return PlatformResult.new(PlatformResult.Status.TEMPORARY_FAILURE,"STORAGE_BUSY","正在保存，请稍候。")
 	var pending:=local_gather.duplicate(true)
-	if pending.is_empty() or pending.cell!=cell or pending.map!=map_id or AIWorld.local_map_id()!=map_id or pending.generation!=_player_generation or pending.path!=save_path or is_soul() or local_combat!=null:return PlatformResult.new(PlatformResult.Status.INVALID_DATA,"GATHER_INTERRUPTED",OnlinePve.error_text("GATHER_INTERRUPTED"))
+	if pending.is_empty() or pending.cell!=cell or pending.map!=map_id or AIWorld.local_map_id()!=map_id or pending.generation!=_player_generation or pending.path!=save_path or is_soul() or local_battle_active():return PlatformResult.new(PlatformResult.Status.INVALID_DATA,"GATHER_INTERRUPTED",OnlinePve.error_text("GATHER_INTERRUPTED"))
 	if Time.get_ticks_msec()-int(pending.started)<int(pending.node.duration_ms):return PlatformResult.new(PlatformResult.Status.INVALID_DATA,"GATHER_NOT_READY",OnlinePve.error_text("GATHER_NOT_READY"))
 	var before:=player.duplicate(true)
 	var data:Dictionary=player.get("gathering",{"materials":{},"respawns":{}}).duplicate(true)
@@ -65,7 +65,7 @@ func discard_gathering(material:String,quantity:int)->PlatformResult:
 func craft_gathering(recipe:String,batches:int=1)->PlatformResult:
 	if storage_busy or _local_roster_busy:return PlatformResult.new(PlatformResult.Status.TEMPORARY_FAILURE,"STORAGE_BUSY","正在保存，请稍候。")
 	if is_soul():return PlatformResult.new(PlatformResult.Status.INVALID_DATA,"SOUL_STATE",OnlinePve.error_text("SOUL_STATE"))
-	if local_combat!=null:return PlatformResult.new(PlatformResult.Status.INVALID_DATA,"BATTLE_ACTIVE",OnlinePve.error_text("BATTLE_ACTIVE"))
+	if local_battle_active():return PlatformResult.new(PlatformResult.Status.INVALID_DATA,"BATTLE_ACTIVE",OnlinePve.error_text("BATTLE_ACTIVE"))
 	var before:=player.duplicate(true);var generation:=_player_generation;var path:=save_path
 	var error:=GatheringRules.craft_local(player,recipe,batches)
 	if not error.is_empty():return PlatformResult.new(PlatformResult.Status.INVALID_DATA,error,OnlinePve.error_text(error))

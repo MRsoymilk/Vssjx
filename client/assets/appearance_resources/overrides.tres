@@ -8,5 +8,9 @@ parts = {
 "boneglow/wzs/wzst2": {
 "offsets": [[0, 2], [0, 2]],
 "texture": "res://assets/edited/equipment/c6ba9124cc62-2ef36b1303954d95e02b.png"
+},
+"gravebloom/wck/wckt5": {
+"offsets": [[0, -1], [0, -1]],
+"texture": "res://assets/edited/equipment/bf91376049d1-37671f5cc1473d5c7f66.png"
 }
 }

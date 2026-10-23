@@ -481,7 +481,7 @@ impl Loaded {
             return Err("INVALID_PVE_COMMAND");
         }
         match command.action {
-            Action::GatherStart|Action::GatherFinish|Action::GatherCancel|Action::GatherDiscard=>Err("INVALID_GATHER_COMMAND"),
+            Action::GatherStart|Action::GatherFinish|Action::GatherCancel|Action::GatherDiscard|Action::GatherCraft=>Err("INVALID_GATHER_COMMAND"),
             Action::Accept | Action::Claim | Action::Restore | Action::Challenge => {
                 if !self.rules.enabled(&context.map_id,command.target.as_deref().unwrap_or("")){return Err("INVALID_RESIDENT");}
                 if self.battle.is_some() {
@@ -721,7 +721,8 @@ pub async fn execute(
     let team_active:bool=sqlx::query_scalar("SELECT EXISTS(SELECT 1 FROM team_members m JOIN team_battles b ON b.team_id=m.team_id AND b.active WHERE m.character_id=$1)").bind(context.character).fetch_one(&mut *tx).await.map_err(database)?;
     let in_team:bool=sqlx::query_scalar("SELECT EXISTS(SELECT 1 FROM team_members WHERE character_id=$1)").bind(context.character).fetch_one(&mut *tx).await.map_err(database)?;
     let applied = if crate::gathering::is_action(command.action) {
-        crate::gathering::apply(&mut tx,&loaded.character,context,command,team_active||loaded.battle.is_some()).await.map_err(database)?
+        let bag_count=loaded.bag_count();
+        crate::gathering::apply(&mut tx,&loaded.character,context,command,team_active||loaded.battle.is_some(),crate::gathering::Inventory{scrap:&mut loaded.loot.scrap,potions:&mut loaded.potions,bag_count}).await.map_err(database)?
     }else if team_active {Err("TEAM_BATTLE_ACTIVE")}else if context.duel_active {Err("DUEL_ACTIVE")}else if in_team&&command.action==Action::Endless{Err("ENDLESS_SOLO_ONLY")}else if in_team&&command.action==Action::Challenge{Err("TEAM_CHALLENGE_REQUIRED")}else{loaded.apply(command, context)};
     if applied.is_err() {
         loaded = original;

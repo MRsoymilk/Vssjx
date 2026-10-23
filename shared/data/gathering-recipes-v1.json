@@ -1,0 +1,1 @@
+{"version":"gathering-recipes-v1","batch_limit":10,"recipes":[{"id":"smelt_iron","name":"铁矿熔炼","materials":{"iron":3},"output":"scrap","quantity":1},{"id":"smelt_copper","name":"铜矿熔炼","materials":{"copper":3},"output":"scrap","quantity":1},{"id":"brew_potion","name":"配制回春散","materials":{"gancao":2,"danggui":1},"output":"potion","quantity":1}]}

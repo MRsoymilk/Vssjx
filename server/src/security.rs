@@ -115,7 +115,7 @@ pub(crate) async fn connection_event(
 }
 
 pub(crate) fn state_summary(state: &Value) -> Value {
-    json!({"character":state["character"],"potions":state["potions"],"gathering_materials":state["gathering"]["materials"],
+    json!({"character":state["character"],"potions":state["potions"],"gathering_materials":state["gathering"]["materials"],"crafting_materials":{"scrap":state["loot"]["state"]["scrap"],"essence":state["loot"]["state"]["essence"]},
         "equipment":state["equipment"],"shop":state["shop"].as_object().map(|s|json!({"owned":s.get("owned"),"weapon":s.get("weapon"),"armor":s.get("armor"),"slots":s.get("slots"),"quantities":s.get("quantities")})),"battle":battle_summary(&state["battle"]),"attributes":state["attributes"]["allocated"],"ai_world":state["ai_world"]})
 }
 
@@ -132,6 +132,7 @@ fn compact_details(details: &Value) -> Value {
         if let Some(state) = details.get(side).filter(|v| v.is_object()) {
             compacted[side] = json!({
                 "character":state["character"],"potions":state["potions"],
+                "gathering_materials":state["gathering_materials"],"crafting_materials":state["crafting_materials"],
                 "equipment":state["equipment"],"attributes":state["attributes"],
                 "battle":state["battle"]
             });
@@ -204,8 +205,8 @@ mod tests {
             json!({"label":"x".repeat(16371)}), // jsonb text is exactly 16384 bytes.
             json!({"label":"x".repeat(16372)}),
             json!({"values":vec![0;6000]}), // compact JSON fits; jsonb spaces do not.
-            json!({"before":{"character":{"gold":30,"hp":95},"shop":{"owned":"汉".repeat(10000)}},
-                   "after":{"character":{"gold":20,"hp":95},"shop":{"owned":"汉".repeat(10000)}}}),
+            json!({"before":{"character":{"gold":30,"hp":95},"gathering_materials":{"iron":3},"crafting_materials":{"scrap":0,"essence":1},"shop":{"owned":"汉".repeat(10000)}},
+                   "after":{"character":{"gold":20,"hp":95},"gathering_materials":{},"crafting_materials":{"scrap":1,"essence":1},"shop":{"owned":"汉".repeat(10000)}}}),
         ];
         for (i, details) in cases.into_iter().enumerate() {
             let bytes:i32 = sqlx::query_scalar("SELECT octet_length($1::jsonb::text)")
@@ -225,6 +226,9 @@ mod tests {
                 if i == 3 {
                     assert_eq!(stored.0["before"]["character"]["gold"], 30);
                     assert_eq!(stored.0["after"]["character"]["gold"], 20);
+                    assert_eq!(stored.0["before"]["gathering_materials"]["iron"], 3);
+                    assert_eq!(stored.0["after"]["gathering_materials"], json!({}));
+                    assert_eq!(stored.0["after"]["crafting_materials"]["scrap"], 1);
                 }
             }
             tx.commit().await.unwrap();

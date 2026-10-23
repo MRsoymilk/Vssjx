@@ -62,6 +62,19 @@ func discard_gathering(material:String,quantity:int)->PlatformResult:
 	if not result.ok and generation==_player_generation and path==save_path:player=before
 	return result
 
+func craft_gathering(recipe:String,batches:int=1)->PlatformResult:
+	if storage_busy or _local_roster_busy:return PlatformResult.new(PlatformResult.Status.TEMPORARY_FAILURE,"STORAGE_BUSY","正在保存，请稍候。")
+	if is_soul():return PlatformResult.new(PlatformResult.Status.INVALID_DATA,"SOUL_STATE",OnlinePve.error_text("SOUL_STATE"))
+	if local_combat!=null:return PlatformResult.new(PlatformResult.Status.INVALID_DATA,"BATTLE_ACTIVE",OnlinePve.error_text("BATTLE_ACTIVE"))
+	var before:=player.duplicate(true);var generation:=_player_generation;var path:=save_path
+	var error:=GatheringRules.craft_local(player,recipe,batches)
+	if not error.is_empty():return PlatformResult.new(PlatformResult.Status.INVALID_DATA,error,OnlinePve.error_text(error))
+	var result:=await save_game()
+	if generation!=_player_generation or path!=save_path:return PlatformResult.new(PlatformResult.Status.TEMPORARY_FAILURE,"STALE_PLAYER","角色已切换。")
+	if not result.ok:player=before
+	else:local_gather={}
+	return result
+
 func _local_snapshot() -> Dictionary:
 	var snapshot := player.duplicate(true)
 	snapshot.erase("local_characters")

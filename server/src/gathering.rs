@@ -2,12 +2,23 @@
 use crate::{characters::Character,pve::Context,pve_rules::{Action,Command}};
 use rand::Rng;
 use serde_json::{Value,json};
+use sha2::{Digest,Sha256};
 use sqlx::{Postgres,Row,Transaction,types::Json};
+use std::{collections::BTreeMap,sync::LazyLock};
 use uuid::Uuid;
 #[derive(serde::Deserialize)]
 struct Frozen { map_id:String,material:String,quantity:i32,respawn_ms:i64,duration_ms:i64 }
 
-pub fn is_action(action:Action)->bool{matches!(action,Action::GatherStart|Action::GatherFinish|Action::GatherCancel|Action::GatherDiscard)}
+const RECIPE_DATA:&str=include_str!("../../shared/data/gathering-recipes-v1.json");
+#[derive(serde::Deserialize)]
+struct Recipes { batch_limit:i32,recipes:Vec<Recipe> }
+#[derive(serde::Deserialize)]
+struct Recipe { id:String,materials:BTreeMap<String,i32>,output:String,quantity:i32 }
+static RECIPES:LazyLock<Recipes>=LazyLock::new(||serde_json::from_str(RECIPE_DATA).expect("fixed gathering recipes"));
+static RECIPE_HASH:LazyLock<String>=LazyLock::new(||format!("{:x}",Sha256::digest(RECIPE_DATA.replace("\r\n","\n").as_bytes())));
+pub struct Inventory<'a> { pub scrap:&'a mut i32,pub potions:&'a mut i32,pub bag_count:usize }
+
+pub fn is_action(action:Action)->bool{matches!(action,Action::GatherStart|Action::GatherFinish|Action::GatherCancel|Action::GatherDiscard|Action::GatherCraft)}
 pub fn material_name(id:&str)->&str{match id{"iron"=>"铁矿","copper"=>"铜矿","gancao"=>"甘草","danggui"=>"当归",_=>"未知材料"}}
 pub async fn view(tx:&mut Transaction<'_,Postgres>,character:Uuid,map:&str)->Result<Value,sqlx::Error>{
     let value:Json<Value>=sqlx::query_scalar(r#"SELECT jsonb_build_object(
@@ -16,14 +27,14 @@ pub async fn view(tx:&mut Transaction<'_,Postgres>,character:Uuid,map:&str)->Res
         'nodes',COALESCE((SELECT jsonb_agg(jsonb_build_object('id',n.id,'map_id',n.map_id,'cell',jsonb_build_array(n.cell_x,n.cell_y),'material',n.material,'duration_ms',n.duration_ms,'respawn_ms',n.respawn_ms,'min_quantity',n.min_quantity,'max_quantity',n.max_quantity,'available_at_ms',COALESCE(c.available_at_ms,0)) ORDER BY n.id) FROM (SELECT * FROM gathering_nodes WHERE map_id=$2 AND enabled ORDER BY id LIMIT 16) n LEFT JOIN gathering_cooldowns c ON c.node_id=n.id AND c.character_id=$1),'[]'::jsonb),
         'active',(SELECT jsonb_build_object('token',g.token,'node_id',g.node_id,'map_id',g.snapshot->>'map_id','material',g.snapshot->>'material','duration_ms',g.snapshot->'duration_ms','ready_at_ms',g.ready_at_ms,'expires_at_ms',g.expires_at_ms,'owner_epoch',g.owner_epoch::text,'connection_epoch',g.connection_epoch::text,'position_revision',g.position_revision::text,'revision',g.character_revision::text,'cell',jsonb_build_array(g.cell_x,g.cell_y)) FROM gathering_active g JOIN characters ch ON ch.id=g.character_id AND ch.state_revision=g.character_revision WHERE g.character_id=$1))"#)
         .bind(character).bind(map).fetch_one(&mut **tx).await?;
-    Ok(value.0)
+    let mut value=value.0;value["recipes_sha256"]=json!(*RECIPE_HASH);Ok(value)
 }
 pub async fn cancel(tx:&mut Transaction<'_,Postgres>,character:Uuid)->Result<(),sqlx::Error>{
     sqlx::query("DELETE FROM gathering_active WHERE character_id=$1").bind(character).execute(&mut **tx).await?;Ok(())
 }
-pub async fn apply(tx:&mut Transaction<'_,Postgres>,c:&Character,ctx:&Context,command:&Command,busy:bool)->Result<Result<Vec<String>,&'static str>,sqlx::Error>{
+pub async fn apply(tx:&mut Transaction<'_,Postgres>,c:&Character,ctx:&Context,command:&Command,busy:bool,inventory:Inventory<'_>)->Result<Result<Vec<String>,&'static str>,sqlx::Error>{
     let now:i64=sqlx::query_scalar("SELECT (extract(epoch FROM clock_timestamp())*1000)::bigint").fetch_one(&mut **tx).await?;
-    if (command.quantity.is_some()&&command.action!=Action::GatherDiscard)||command.attributes.is_some()||command.battle_id.is_some()||command.enemy_slot.is_some()||command.encounter_version.is_some(){return Ok(Err("INVALID_GATHER_COMMAND"));}
+    if (command.quantity.is_some()&&!matches!(command.action,Action::GatherDiscard|Action::GatherCraft))||command.attributes.is_some()||command.battle_id.is_some()||command.enemy_slot.is_some()||command.encounter_version.is_some(){return Ok(Err("INVALID_GATHER_COMMAND"));}
     if command.action==Action::GatherCancel {
         let target=command.target.as_deref().and_then(|s|Uuid::parse_str(s).ok());
         if target.is_none(){return Ok(Err("INVALID_GATHER_COMMAND"));}
@@ -34,6 +45,27 @@ pub async fn apply(tx:&mut Transaction<'_,Postgres>,c:&Character,ctx:&Context,co
     if busy||ctx.duel_active{return Ok(Err("BATTLE_ACTIVE"));}
     if ctx.map_id!=c.map_id||ctx.moving{return Ok(Err("GATHER_INTERRUPTED"));}
     if command.expected_revision.as_deref()!=Some(&c.state_revision){return Ok(Err("STALE_GATHERING"));}
+    if command.action==Action::GatherCraft {
+        let Some(recipe)=RECIPES.recipes.iter().find(|r|Some(r.id.as_str())==command.target.as_deref()) else{return Ok(Err("INVALID_GATHER_COMMAND"));};
+        let batches=command.quantity.unwrap_or(1);
+        if !(1..=RECIPES.batch_limit).contains(&batches){return Ok(Err("INVALID_GATHER_COMMAND"));}
+        let output=recipe.quantity*batches;
+        if recipe.output=="scrap"&&*inventory.scrap>1000000000-output{return Ok(Err("CRAFT_RESOURCE_FULL"));}
+        if recipe.output=="potion"&&(*inventory.potions>99-output||(*inventory.potions==0&&inventory.bag_count>=60)){return Ok(Err("BAG_FULL"));}
+        let rows=sqlx::query("SELECT material,quantity FROM gathering_materials WHERE character_id=$1 ORDER BY material FOR UPDATE").bind(c.id).fetch_all(&mut **tx).await?;
+        let materials:BTreeMap<String,i32>=rows.iter().map(|r|(r.get("material"),r.get("quantity"))).collect();
+        // Validate the entire recipe before writing: rejected commands are receipted
+        // in this same transaction, so a late business error must never leave a debit.
+        if recipe.materials.iter().any(|(id,cost)|materials.get(id).copied().unwrap_or(0)<cost*batches){return Ok(Err("MATERIALS_INSUFFICIENT"));}
+        for (id,cost) in &recipe.materials {
+            let left=materials[id]-cost*batches;
+            if left==0{sqlx::query("DELETE FROM gathering_materials WHERE character_id=$1 AND material=$2").bind(c.id).bind(id).execute(&mut **tx).await?;}
+            else{sqlx::query("UPDATE gathering_materials SET quantity=$3 WHERE character_id=$1 AND material=$2").bind(c.id).bind(id).bind(left).execute(&mut **tx).await?;}
+        }
+        cancel(tx,c.id).await?;
+        if recipe.output=="scrap"{*inventory.scrap+=output;}else{*inventory.potions+=output;}
+        return Ok(Ok(vec![format!("加工完成：获得{} ×{}。",if recipe.output=="scrap"{"炼材"}else{"回春散"},output)]));
+    }
     if command.action==Action::GatherDiscard {
         let material=command.target.as_deref().unwrap_or("");let quantity=command.quantity.unwrap_or(1);
         if !["iron","copper","gancao","danggui"].contains(&material)||!(1..=999).contains(&quantity){return Ok(Err("INVALID_GATHER_COMMAND"));}

@@ -2,6 +2,40 @@ class_name GatheringRules
 extends RefCounted
 const MATERIALS={"iron":"铁矿","copper":"铜矿","gancao":"甘草","danggui":"当归"}
 static var catalog:Dictionary=JSON.parse_string(FileAccess.get_file_as_string("res://assets/data/gathering-v1.json"))
+const RECIPE_PATH="res://assets/data/gathering-recipes-v1.json"
+static var recipes:Dictionary=JSON.parse_string(FileAccess.get_file_as_string(RECIPE_PATH))
+static var recipes_hash:String=FileAccess.get_file_as_string(RECIPE_PATH).replace("\r\n","\n").sha256_text()
+static func recipe(id:String)->Dictionary:
+	for entry in recipes.recipes:
+		if entry.id==id:return entry
+	return {}
+static func recipe_text(id:String,batches:int=1)->String:
+	var entry:=recipe(id);var inputs:=PackedStringArray()
+	if entry.is_empty():return ""
+	for material in entry.materials:inputs.append("%s×%d"%[MATERIALS[material],int(entry.materials[material])*batches])
+	return "%s → %s×%d"%["＋".join(inputs),"炼材" if entry.output=="scrap" else "回春散",int(entry.quantity)*batches]
+static func craft_error(id:String,batches:int,materials:Dictionary,scrap:int,potions:int,bag_count:int)->String:
+	var entry:=recipe(id)
+	if entry.is_empty() or batches<1 or batches>int(recipes.batch_limit):return "INVALID_GATHER_COMMAND"
+	var output:=int(entry.quantity)*batches
+	if entry.output=="scrap" and scrap>1000000000-output:return "CRAFT_RESOURCE_FULL"
+	if entry.output=="potion" and (potions>99-output or (potions==0 and bag_count>=60)):return "BAG_FULL"
+	for material in entry.materials:
+		if int(materials.get(material,0))<int(entry.materials[material])*batches:return "MATERIALS_INSUFFICIENT"
+	return ""
+static func craft_local(player:Dictionary,id:String,batches:int)->String:
+	var gear:=ShopRules.local_state(player)
+	var error:=craft_error(id,batches,player.get("gathering",{}).get("materials",{}),int(player.get("loot_state",{}).get("scrap",0)),int(player.potions),ShopRules.bag_slots(gear,int(player.potions))+LootRules.extra_bag(player.get("loot_state",{})))
+	if not error.is_empty():return error
+	var entry:=recipe(id)
+	for material in entry.materials:
+		player.gathering.materials[material]=int(player.gathering.materials[material])-int(entry.materials[material])*batches
+		if int(player.gathering.materials[material])==0:player.gathering.materials.erase(material)
+	if entry.output=="scrap":
+		if not player.has("loot_state"):player.loot_state=LootRules.empty()
+		player.loot_state.scrap=int(player.loot_state.scrap)+int(entry.quantity)*batches
+	else:player.potions=int(player.potions)+int(entry.quantity)*batches
+	return ""
 static func definition(id:String)->Dictionary:
 	for node in catalog.nodes:
 		if node.id==id:return node
@@ -22,6 +56,7 @@ static func valid_local(value:Variant)->bool:
 static func kind(material:String)->String:return "ore" if material in ["iron","copper"] else "herb"
 static func valid(v:Variant)->bool:
 	if not v is Dictionary or v.get("version")!="gathering-v1" or v.get("stack_limit")!=999 or not v.get("materials") is Dictionary or v.materials.size()>4 or not v.get("nodes") is Array or v.nodes.size()>16 or not v.has("active"):return false
+	if v.has("recipes_sha256") and (not v.recipes_sha256 is String or v.recipes_sha256.length()!=64 or not v.recipes_sha256.is_valid_hex_number()):return false
 	for id in v.materials:
 		if not MATERIALS.has(id) or not OnlinePve.integer(v.materials[id],1,999):return false
 	var seen:={}

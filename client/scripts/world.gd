@@ -71,7 +71,7 @@ func _ready() -> void:
 	portal_marker.set("gate",gate)
 	portal_marker.position = cell_center(Vector2i(gate.cell[0], gate.cell[1]))
 	actors.add_child(portal_marker)
-	_name_tag(portal_marker, gate.name, Color("c2f7f4"))
+	_name_tag(portal_marker, SharedWorldMap.exit_label(gate), Color("c2f7f4"))
 	portal_marker.get_child(0).position.y = -24
 	if not AIWorld.map_data(map_id).is_empty():
 		for exit in SharedWorldMap.exits(map_id).slice(1):
@@ -80,7 +80,7 @@ func _ready() -> void:
 			node.set("gate",exit)
 			node.position=cell_center(Vector2i(exit.cell[0],exit.cell[1]))
 			actors.add_child(node)
-			_name_tag(node,exit.name,Color("c2f7f4"));node.get_child(0).position.y=-24
+			_name_tag(node,SharedWorldMap.exit_label(exit),Color("c2f7f4"));node.get_child(0).position.y=-24
 	var art: String = Game.appearance_key()
 	hero = OriginalArt.actor(art)
 	hero.position = cell_center(cell)

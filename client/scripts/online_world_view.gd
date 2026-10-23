@@ -593,7 +593,7 @@ func _build_portals()->void:
 		var node:=Node2D.new();node.set_script(preload("res://scripts/portal.gd"));node.set("gate",gate);node.set_meta("online_portal",true)
 		node.position=Vector2(gate.cell[0]*16+8,gate.cell[1]*16+8);actor_layer.add_child(node)
 		if portal_marker==null:portal_marker=node
-		var label:=Label.new();label.text=gate.name;label.position=Vector2(-65,-24);label.size=Vector2(130,16);label.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
+		var label:=Label.new();label.text=SharedWorldMap.exit_label(gate);label.position=Vector2(-65,-24);label.size=Vector2(130,16);label.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
 		label.add_theme_font_size_override("font_size",10);preload("res://scripts/world_nameplate.gd").apply(label,Color("c2f7f4"));node.add_child(label)
 
 func _map_changed(id: String) -> void:
@@ -1468,7 +1468,7 @@ func _open_ai(section: String = "maps", npc: String = "") -> void:
 	network.stop_moving(); _was_keyboard=false
 	details.hide(); menu.hide(); npc_dialog.hide()
 	ai_panel = AIWorldPanel.new(); bag_overlay = ai_panel
-	ai_panel.present(String(map_data.map_id),network.pve.state.ai_world,int(_character.get("level",1)),section,npc)
+	ai_panel.present(String(map_data.map_id),network.pve.state.ai_world,int(_character.get("level",1)),section,npc,network.map_rules.exits(String(map_data.map_id)))
 	add_child(ai_panel)
 	ai_panel.back_requested.connect(_close_inventory)
 	ai_panel.requested.connect(_ai_requested)

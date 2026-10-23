@@ -35,6 +35,19 @@ static func title(map_id: String) -> String:
 	if not AIWorld.map_data(map_id).is_empty(): return AIWorld.map_data(map_id).name + " · AI生成"
 	return "青云山道" if map_id == "qingyun_trail" else "古剑遗迹"
 
+static func level_range(map_id:String)->Vector2i:
+	var data:=AIWorld.map_data(map_id)
+	if not data.is_empty():return Vector2i(int(data.level_min),int(data.level_max))
+	var levels:Array=population(map_id).filter(func(r:Dictionary)->bool:return r.kind!="npc").map(func(r:Dictionary)->int:return int(r.level))
+	return Vector2i(int(levels.min()),int(levels.max()))
+
+static func level_text(map_id:String)->String:
+	var levels:=level_range(map_id)
+	return "%d级"%levels.x if levels.x==levels.y else "%d～%d级"%[levels.x,levels.y]
+
+static func exit_label(gate:Dictionary)->String:
+	return "%s · %s"%[gate.name,level_text(gate.target_map)]
+
 static func exists(map_id: Variant) -> bool:
 	return map_id is String and (MAPS.has(map_id) or not AIWorld.map_data(map_id).is_empty())
 

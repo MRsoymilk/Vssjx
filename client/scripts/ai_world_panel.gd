@@ -17,6 +17,7 @@ var travel_action := "ai_travel"
 var allow_ruins := false
 var busy := false
 var notice := ""
+var current_exits:Array=[]
 const INK := Color("654518")
 
 func _ready() -> void:
@@ -50,8 +51,9 @@ func _ready() -> void:
 		corner.flip_h = index%2 == 1; corner.flip_v = index>=2; ornaments.add_child(corner)
 	refresh()
 
-func present(current: String, state: Dictionary, character_level: int, section: String = "maps", npc: String = "") -> void:
+func present(current: String, state: Dictionary, character_level: int, section: String = "maps", npc: String = "", exits_override:Variant=null) -> void:
 	map_id = current; progress = state; level = character_level; page = section; npc_id = npc
+	current_exits=SharedWorldMap.exits(current).duplicate(true) if exits_override==null else exits_override.duplicate(true)
 	if is_node_ready(): refresh()
 
 func _label(parent: Node, text: String, font_size: int = 12) -> Label:
@@ -95,7 +97,23 @@ func refresh() -> void:
 	var rows := _scroll()
 	input.text_changed.connect(func(value: String) -> void: search=value; _map_rows(rows))
 	_map_rows(rows)
-	_label(body, "无需靠近驿石；未开放的古剑遗迹暂不可选。" if scroll_mode else "传送会先走近当前地图的蜀山驿石；高等级区域请谨慎。", 11)
+	_label(body, "无需靠近驿石；未开放的古剑遗迹暂不可选。" if scroll_mode else "出口直达列在前；其余按等级推荐，需经驿石前往。", 11)
+
+func direct_destinations()->Array:
+	return current_exits.filter(func(g:Dictionary)->bool:return g.get("enabled",true)).map(func(g:Dictionary)->String:return g.target_map)
+
+func ordered_maps()->Array:
+	var direct:=direct_destinations();var recommended:Array=AIWorld.map_data(map_id).get("recommended_maps",[])
+	var ids:Array=AIWorld.maps.keys()
+	ids.sort_custom(func(a:String,b:String)->bool:
+		if (a in direct)!=(b in direct):return a in direct
+		var aa:=SharedWorldMap.level_range(a);var bb:=SharedWorldMap.level_range(b)
+		var da:=maxi(aa.x-level,level-aa.y);var db:=maxi(bb.x-level,level-bb.y)
+		if maxi(0,da)!=maxi(0,db):return maxi(0,da)<maxi(0,db)
+		if (a in recommended)!=(b in recommended):return a in recommended
+		return a<b
+	)
+	return ids
 
 func _map_rows(rows: VBoxContainer) -> void:
 	for child in rows.get_children(): rows.remove_child(child); child.queue_free()
@@ -104,16 +122,13 @@ func _map_rows(rows: VBoxContainer) -> void:
 		else:requested.emit(travel_action,"qingyun_trail"), map_id=="qingyun_trail")
 	if travel_action=="scroll_travel":
 		_button(rows,"古剑遗迹" if allow_ruins else "古剑遗迹（尚未开放）",func()->void:selected_map="ancient_ruins";refresh(),not allow_ruins or map_id=="ancient_ruins")
-	var current := AIWorld.map_data(map_id)
-	var neighbors: Array = current.get("recommended_maps",current.get("neighbors", ["ai_001","ai_002","ai_004"]))
-	var ids: Array = neighbors.duplicate()
-	for id in AIWorld.maps:
-		if not ids.has(id): ids.append(id)
-	for id in ids:
+	var direct:=direct_destinations()
+	for id in ordered_maps():
 		var m: Dictionary = AIWorld.maps[id]
 		if not search.is_empty() and not (search in String(m.name) or search in str(int(m.original_map_id))): continue
-		var button := _button(rows, "%s%s #%03d · %d～%d级" % ["邻近 · " if id in neighbors else "",m.name,int(m.original_map_id),int(m.level_min),int(m.level_max)], func() -> void: selected_map=id; refresh())
+		var button := _button(rows, "%s%s #%03d · %s" % ["出口 · " if id in direct else "",m.name,int(m.original_map_id),SharedWorldMap.level_text(id)], func() -> void: selected_map=id; refresh())
 		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		button.tooltip_text=("出口直达" if id in direct else "驿石目录前往")+" · "+SharedWorldMap.level_text(id)
 
 func _map_detail() -> void:
 	var m := AIWorld.map_data(selected_map)
@@ -125,6 +140,13 @@ func _map_detail() -> void:
 		_button(body,"返回目录",func()->void:selected_map="";refresh())
 		return
 	_label(rows, "%s #%03d · %s · %d～%d级" % [m.name,int(m.original_map_id),m.get("layout_name",m.biome_name),int(m.level_min),int(m.level_max)], 14)
+	if level<int(m.level_min):
+		var risk:=_label(rows,"当前%d级，目标区域最低%d级（高出%d级）。"%[level,int(m.level_min),int(m.level_min)-level],12)
+		risk.add_theme_color_override("font_color",Color("a43b27"))
+	if selected_map!=map_id and travel_action!="scroll_travel":
+		_label(rows,"当前地图有出口直达。" if selected_map in direct_destinations() else "当前地图无直达出口，需经驿石目录前往。",11)
+		var back:bool=m.exits.any(func(g:Dictionary)->bool:return g.target_map==map_id)
+		_label(rows,"目录记录有返程出口。" if back else "目录未记录直接返程出口；可从目的地驿石打开目录返回。",11)
 	var preview := preload("res://scripts/ai_map_preview.gd").new()
 	preview.custom_minimum_size = Vector2(0, 170); rows.add_child(preview)
 	preview.display(m)

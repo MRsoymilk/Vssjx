@@ -25,6 +25,7 @@ var slot_icons: Dictionary = {}
 var slot_levels: Dictionary = {}
 var items: Array[Dictionary] = []
 var loot_panel:Control
+var equipment_details:Control
 var material_bag:GatheringMaterialBag
 var travel_picker:AIWorldPanel
 @onready var description: Label = $Description
@@ -206,6 +207,7 @@ func _render_grid() -> void:
 		cursor.position = grid.position + Vector2(local % 6 * 37 + 23, (local / 6) * 37 + 24)
 
 func select_item(index: int, hover: bool = false) -> void:
+	if is_instance_valid(equipment_details):return
 	if hover and item_menu != null: return
 	selected_equipment = false
 	selected_index = clampi(index, 0, maxi(59, items.size() - 1))
@@ -228,6 +230,7 @@ func select_item(index: int, hover: bool = false) -> void:
 	else: tooltip.hide()
 
 func _select_equipment(index: int) -> void:
+	if is_instance_valid(equipment_details):return
 	if index<0 or index>=10: return
 	selected_slot=ShopRules.SLOTS[index]
 	if _slot_item(selected_slot).is_empty(): return
@@ -262,6 +265,7 @@ func toggle_gourd()->void:
 	changed.emit()
 
 func open_menu() -> void:
+	if is_instance_valid(equipment_details):return
 	if item_menu != null and is_instance_valid(item_menu): close_menu(); return
 	tooltip.hide()
 	item_menu = _box(Rect2(85, 246, 150, 140), Color("fff2af"), Color("765322"), 1)
@@ -303,11 +307,34 @@ func show_item() -> void:
 	close_menu()
 	var item := _selected()
 	if item.is_empty(): return
+	if ShopRules.is_equipment(item):
+		if is_instance_valid(equipment_details):return
+		tooltip.hide()
+		equipment_details=preload("res://scripts/equipment_details.gd").new()
+		equipment_details.online_model=online_model;equipment_details.select(item)
+		add_child(equipment_details);set_process_unhandled_key_input(false)
+		equipment_details.back_requested.connect(_close_equipment_details)
+		return
 	tooltip.position = Vector2(61, 284)
 	tooltip_label.text=LootRules.describe(item.instance) if item.has("instance_id") else "%s  等级：1\n%s" % [item.name, ShopRules.description(item.id,_display_stats())]
 	_gourd_tooltip(item)
 	tooltip.show()
 	move_child(tooltip, get_child_count() - 1)
+
+func _close_equipment_details() -> void:
+	var item:Dictionary=equipment_details.item
+	remove_child(equipment_details);equipment_details.queue_free();equipment_details=null
+	set_process_unhandled_key_input(true);refresh()
+	if item.is_empty():return
+	var worn:bool=item.instance.equipped if item.has("instance_id") else ShopRules.equipped_id(_gear(),item.slot)==item.id
+	if worn:
+		selected_equipment=true;selected_slot=item.slot;cursor.hide();_description()
+		return
+	for i in items.size():
+		if items[i].get("instance_id",items[i].id)==item.get("instance_id",item.id):
+			if i<offset or i>=offset+24:scrollbar.value=floori(i/6.0)*6
+			select_item(i)
+			return
 
 func _gourd_tooltip(item:Dictionary)->void:
 	var gourd:bool=item.get("slot")=="gourd"

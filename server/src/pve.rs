@@ -28,6 +28,7 @@ pub struct Context {
     pub character: Uuid,
     pub session: Uuid,
     pub owner: i64,
+    pub connection_epoch:u64,
     pub cell: [i32; 2],
     pub target_cell: Option<[i32; 2]>,
     pub moving: bool,
@@ -37,6 +38,7 @@ pub struct Context {
 }
 #[derive(Clone)]
 struct Loaded {
+    gathering:Value,
     endless:crate::endless::Progress,
     hunt_pressure: crate::monster_combat::HuntPressure,
     ai: crate::ai_world::Progress,
@@ -110,6 +112,7 @@ async fn load_character(tx:&mut Transaction<'_,Postgres>,character_id:Uuid,accou
     let ai:crate::ai_world::Progress=serde_json::from_value(row.get::<Json<Value>,_>("ai_progress").0).map_err(|_|unavailable())?;
     if !ai.valid(){return Err(unavailable());}
     let mut loaded = Loaded {
+        gathering:crate::gathering::view(tx,character_id,&character.map_id).await.map_err(database)?,
         endless:serde_json::from_value(row.get::<Json<Value>,_>("endless_state").0).map_err(|_|unavailable())?,
         hunt_pressure:serde_json::from_value(row.get::<Json<Value>,_>("hunt_pressure").0).map_err(|_|unavailable())?,
         loot:serde_json::from_value(row.get::<Json<Value>,_>("loot_state").0).map_err(|_|unavailable())?,
@@ -188,7 +191,7 @@ impl Loaded {
         for key in ["physical_attack","magic_attack"] { profile["combat"][key] = json!(profile["combat"][key].as_i64().unwrap() + i64::from(attack - if self.equipped {5} else {0})); }
         for key in ["physical_defense","magic_defense"] { profile["combat"][key] = json!(self.stats().defense); }
         if self.stats().balance.is_some(){profile=crate::attributes::profile_for(self.stats(),self.character.job,self.character.level,self.allocated);}
-        json!({"rules_version":pve_rules::RULES,"character":self.character,"potions":self.potions,
+        json!({"rules_version":pve_rules::RULES,"character":self.character,"potions":self.potions,"gathering":self.gathering,
             "endless":self.endless.view(),
             "equipment":{"version":"equipment-v1","weapon_owned":self.weapon_owned,"weapon":if self.equipped {Some("sword")} else {None}},
             "stats":self.stats(),"hunt_pressure":self.hunt_pressure,
@@ -465,6 +468,7 @@ impl Loaded {
             return Err("INVALID_PVE_COMMAND");
         }
         match command.action {
+            Action::GatherStart|Action::GatherFinish|Action::GatherCancel=>Err("INVALID_GATHER_COMMAND"),
             Action::Accept | Action::Claim | Action::Restore | Action::Challenge => {
                 if self.battle.is_some() {
                     return Err("BATTLE_ACTIVE");
@@ -656,7 +660,7 @@ pub async fn execute(
     command: &Command,
 ) -> Result<Value, AuthError> {
     if command.operation_id.get_version_num() != 4
-        || command.target.as_ref().is_some_and(|id| id.len() > if matches!(command.action,Action::Revive|Action::GearEquip|Action::GearUnequip|Action::GearClaim|Action::GearSalvage|Action::GearReroll|Action::GearUpgrade){36}else{32})
+        || command.target.as_ref().is_some_and(|id| id.len() > if matches!(command.action,Action::GatherFinish|Action::GatherCancel|Action::Revive|Action::GearEquip|Action::GearUnequip|Action::GearClaim|Action::GearSalvage|Action::GearReroll|Action::GearUpgrade){36}else{32})
     {
         return Err(AuthError(StatusCode::BAD_REQUEST, "INVALID_PVE_COMMAND"));
     }
@@ -701,11 +705,14 @@ pub async fn execute(
     let before = crate::security::state_summary(&original.state());
     let team_active:bool=sqlx::query_scalar("SELECT EXISTS(SELECT 1 FROM team_members m JOIN team_battles b ON b.team_id=m.team_id AND b.active WHERE m.character_id=$1)").bind(context.character).fetch_one(&mut *tx).await.map_err(database)?;
     let in_team:bool=sqlx::query_scalar("SELECT EXISTS(SELECT 1 FROM team_members WHERE character_id=$1)").bind(context.character).fetch_one(&mut *tx).await.map_err(database)?;
-    let applied = if team_active {Err("TEAM_BATTLE_ACTIVE")}else if context.duel_active {Err("DUEL_ACTIVE")}else if in_team&&command.action==Action::Endless{Err("ENDLESS_SOLO_ONLY")}else if in_team&&command.action==Action::Challenge{Err("TEAM_CHALLENGE_REQUIRED")}else{loaded.apply(command, context)};
+    let applied = if crate::gathering::is_action(command.action) {
+        crate::gathering::apply(&mut tx,&loaded.character,context,command,team_active||loaded.battle.is_some()).await.map_err(database)?
+    }else if team_active {Err("TEAM_BATTLE_ACTIVE")}else if context.duel_active {Err("DUEL_ACTIVE")}else if in_team&&command.action==Action::Endless{Err("ENDLESS_SOLO_ONLY")}else if in_team&&command.action==Action::Challenge{Err("TEAM_CHALLENGE_REQUIRED")}else{loaded.apply(command, context)};
     if applied.is_err() {
         loaded = original;
     }
     if applied.is_ok() {
+        if !crate::gathering::is_action(command.action){crate::gathering::cancel(&mut tx,loaded.character.id).await.map_err(database)?;}
         loaded.loot.sync_legacy(&loaded.gear,loaded.character.job,loaded.character.gender);
         let maxima=loaded.stats();
         loaded.character.hp=loaded.character.hp.min(maxima.hp);
@@ -759,6 +766,7 @@ pub async fn execute(
             sqlx::query("INSERT INTO inventory_items(id,character_id,definition_id,quantity) VALUES($3,$1,'potion',$2) ON CONFLICT(character_id,definition_id) DO UPDATE SET quantity=EXCLUDED.quantity").bind(character_id).bind(loaded.potions).bind(Uuid::new_v4()).execute(&mut *tx).await.map_err(database)?;
         }
     }
+    loaded.gathering=crate::gathering::view(&mut tx,loaded.character.id,&loaded.character.map_id).await.map_err(database)?;
     let result = match applied {
         Ok(lines) => {
             json!({"type":"pve.result","operation_id":command.operation_id,"ok":true,"replayed":false,"lines":lines,"state":loaded.state()})

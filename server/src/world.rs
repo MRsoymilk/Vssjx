@@ -176,7 +176,7 @@ impl WorldHub {
     pub(crate) fn team_context(&self,id:Uuid)->Result<crate::pve::Context,AuthError>{
         let s=self.data.lock().expect("world state");let a=s.actors.get(&id).filter(|a|a.connected).ok_or(error(409,"TEAM_PLAYER_OFFLINE"))?;
         if a.in_battle||s.duels.active(id){return Err(error(409,"TEAM_BUSY"));}
-        Ok(crate::pve::Context{character:id,session:a.session,owner:a.owner,cell:a.motion.cell,moving:a.motion.next.is_some()||!a.motion.route.is_empty(),target_cell:None,map_id:a.map_id.clone(),position_revision:a.motion.revision,duel_active:false})
+        Ok(crate::pve::Context{character:id,session:a.session,owner:a.owner,connection_epoch:a.epoch,cell:a.motion.cell,moving:a.motion.next.is_some()||!a.motion.route.is_empty(),target_cell:None,map_id:a.map_id.clone(),position_revision:a.motion.revision,duel_active:false})
     }
     pub(crate) fn team_enemy(&self,id:Uuid,target:&str)->Result<crate::population::ResidentDefinition,AuthError>{
         let s=self.data.lock().expect("world state");let a=s.actors.get(&id).ok_or(error(409,"TEAM_PLAYER_OFFLINE"))?;
@@ -609,7 +609,7 @@ impl WorldHub {
     fn pve_context(&self, owner: &Ownership, target: Option<&str>) -> Result<crate::pve::Context,AuthError> {
         let state = self.data.lock().expect("world state");
         let actor = state.actors.get(&owner.id).filter(|a|Self::owned(a,owner)).ok_or(error(401,"SESSION_REPLACED"))?;
-        Ok(crate::pve::Context { character: owner.id,session:owner.session,owner:owner.owner,cell:actor.motion.cell,
+        Ok(crate::pve::Context { character: owner.id,session:owner.session,owner:owner.owner,connection_epoch:actor.epoch,cell:actor.motion.cell,
             moving: actor.motion.next.is_some() || !actor.motion.route.is_empty(),
             target_cell:target.and_then(|id|state.population_for(&actor.map_id).get(id).map(|r|r.motion.cell).or_else(||crate::ai_world::target_cell(&actor.map_id,id))),
             map_id: actor.map_id.clone(), position_revision: actor.motion.revision, duel_active:state.duels.active(owner.id) })

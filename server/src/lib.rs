@@ -30,6 +30,7 @@ pub mod population;
 pub mod ai_world;
 pub mod pve_rules;
 pub mod pve;
+mod gathering;
 pub mod duel;
 pub mod world;
 pub mod world_map;

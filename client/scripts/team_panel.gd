@@ -99,5 +99,5 @@ func refresh()->void:
 		_label("已邀请%s，等待确认"%offer.name)
 		_actions([["取消邀请",func()->void:model.submit("cancel",offer.id)]])
 	var actions:Array=[["解散队伍" if p.leader else "退出队伍",func()->void:confirm("disband" if p.leader else "leave","","确定%s当前队伍？"%("解散" if p.leader else "退出"))],["刷新",func()->void:model.refresh()]]
-	if model.has_method("loot_pool") and not model.loot_pool().is_empty():actions.append(["战利品",open_loot])
+	if model.has_method("loot_pool") and not model.loot_pool().get("drops",[]).is_empty():actions.append(["战利品",open_loot])
 	_actions(actions,footer)

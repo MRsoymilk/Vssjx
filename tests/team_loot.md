@@ -43,3 +43,33 @@ python tests/run_offscreen.py --path client --rendering-method gl_compatibility 
 现在战斗页、队伍页均在共同父级打开同一独立弹层，父页面隐藏不影响ROLL；页面销毁时清理弹层，不留遮挡物。超时后显示“正在确认分配”，最终归属仍来自服务器。已明确返回的`LOOT_STORAGE_FULL`清除未提交的待确认指令，提示整理库存，不再无限重试；网络未知结果仍保留原操作编号。
 
 新增实际胜利自动返回后面板仍可见、按钮仍提交原物品选择、关闭队伍页不藏面板、入口不重复创建弹层以及确定拒绝不锁死发件箱的回归。真实服务器18项、Godot逻辑63项通过，实际OpenGL另覆盖完整分配截图。未手动发奖、清空分配记录、修改线上角色或缩短60秒规则。
+
+## 2026-10-23 跨战斗弹层残留修复
+
+使用临时 PostgreSQL、真实三人HTTP／WebSocket流程取得连续战斗回包，再经正式 Godot 校验器和 `OnlineWorldView` 重放。修改前生命周期专项51项中12项失败，实际复现：上一场分配完成后弹层没有关闭，下一场开始仍遮挡；跳过中间战斗快照时，同一旧面板直接切换成新一场装备，旧按钮回调可以提交新池选择；超时禁用的按钮会被 `refresh()` 重新启用。基线日志保留在 `/tmp/opencode/vssjx-loot-lifecycle/baseline.log`。
+
+修复将弹层绑定角色／队伍／战斗ID，失效时同帧隐藏、禁用按钮、清理输入拦截并释放。新战斗没有分配入口，后续池创建新面板；只有同一战斗的窗口可复用。等待中的池收到全部发放确认后展示结果3秒再关闭；重复轮询不重置计时，已完成结果仍可手动打开阅读。超时仍等待服务器确认，刷新和按钮回调都检查截止时间。源码未调整服务端分配算法。
+
+本轮验证（Linux、Godot `4.7.2.stable.gentoo.ed1daf0bf`）：
+
+| 入口 | 结果 |
+| --- | --- |
+| Rust `team_loot` | 4项通过 |
+| `run_team_loot.py` 临时数据库与真实三人请求 | 22项通过 |
+| Godot `team_loot_lifecycle_test` | 54项通过 |
+| Godot 原有分配／队伍／共享回合回归 | 65＋70＋69项通过 |
+| Xvfb＋Mesa llvmpipe 实际OpenGL渲染 | 生命周期56项、原有分配69项通过 |
+
+新增覆盖正常胜利返回、全员完成后自动关闭、手动重看、重复快照、队友立即开战、真实异步资源准备、漏过中间战斗的恢复、超时确认、重连、显式关闭、队伍消失和空池。服务端实际验证待分配时挑战被拒绝，分配完成／超时后可以开新战斗，新战斗不含旧池，旧分配请求不能重复发奖。
+
+已查看 `lifecycle-distributed.png`、`lifecycle-next-battle.png` 与原分配截图：下一场战斗菜单可正常选择，无旧弹层遮挡。截图与运行日志位于 `/tmp/opencode/vssjx-loot-lifecycle/`；本轮真实回包为忽略目录 `work/team-loot/server-fixtures.json`、`lifecycle-fixtures.json`。
+
+```sh
+# 先运行上面的 run_team_loot.py；它现在同时输出 lifecycle-fixtures.json。
+SSJX_TEAM_LOOT_LIFECYCLE_FIXTURES="$PWD/work/team-loot/lifecycle-fixtures.json" \
+  godot --headless --path client res://tests/team_loot_lifecycle_test.tscn
+SSJX_TEAM_LOOT_LIFECYCLE_FIXTURES="$PWD/work/team-loot/lifecycle-fixtures.json" \
+  SSJX_TEAM_LOOT_CAPTURE=/tmp/opencode/vssjx-loot-lifecycle/captures \
+  LIBGL_ALWAYS_SOFTWARE=1 python tests/run_offscreen.py --path client \
+  --rendering-driver opengl3_es res://tests/team_loot_lifecycle_test.tscn
+```

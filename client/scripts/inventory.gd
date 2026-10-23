@@ -195,7 +195,7 @@ func _render_grid() -> void:
 		count.visible = index < items.size()
 		if index < items.size():
 			var item: Dictionary = items[index]
-			icon.texture = load(String(item.icon))
+			icon.texture = load(ShopRules.icon_path(item))
 			count.value = str(int(item.count))
 			count.queue_redraw()
 		var button: Button = cell.get_node("Button")

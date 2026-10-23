@@ -25,6 +25,13 @@ static func item(id: String) -> Dictionary:
 		for entry in catalog.items: _index[entry.id] = entry
 	return _index.get(id,{}).duplicate(true)
 
+static func icon_path(entry: Dictionary) -> String:
+	# Presentation-only overrides keep the server catalog hash and old saves intact.
+	match entry.get("id", ""):
+		"supply/hp_gourd":return "res://assets/items/original/ix62.png"
+		"supply/mp_gourd":return "res://assets/items/original/ix63.png"
+	return String(entry.get("icon", ""))
+
 static func is_equipment(entry: Dictionary) -> bool:
 	return entry.get("slot") in SLOTS
 

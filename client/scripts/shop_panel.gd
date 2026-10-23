@@ -158,7 +158,7 @@ func _filter() -> void:
 		button.set_meta("item_id",id)
 		var icon:=TextureRect.new();icon.name="Icon";icon.position=Vector2(3,3);icon.size=Vector2(29,32)
 		icon.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;icon.stretch_mode=TextureRect.STRETCH_KEEP_ASPECT_CENTERED;icon.mouse_filter=Control.MOUSE_FILTER_IGNORE
-		icon.texture=load(item.icon);button.add_child(icon)
+		icon.texture=load(ShopRules.icon_path(item));button.add_child(icon)
 		_label(item.name,Rect2(36,2,93,16),10,button).name="ItemName"
 		_label("",Rect2(36,19,93,15),9,button).name="Price"
 		button.tooltip_text=item.name+" · "+item.category+"\n"+ShopRules.description(id,stats)

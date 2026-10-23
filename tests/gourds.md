@@ -47,3 +47,11 @@ SSJX_GOURD_FIXTURES="$PWD/work/gourds/server-fixtures.json" \
 ```
 
 商城目录改动会改变 `catalog_sha256`，使用真实快照的旧专项需要重新生成回包后再运行。文档只对本轮改动文件检查链接、锚点和代码围栏；不将全库既有文档失败项计为通过。
+
+## 原包葫芦图标核对（2026-10-23）
+
+- 按用户最后确认的原商城截图，直接复用红色 `ix62.png` 作为气血葫芦、蓝色 `ix63.png` 作为灵力葫芦，不重绘、不重新配色，也不采用最初的外观参考插画。
+- 商城和背包共用 `ShopRules.icon_path()` 的客户端显示映射；原包图片、已有物品ID、旧材料记录、容量、开关与补充规则不变。没有改写 `shop-v2.json`，因此不改变服务端目录摘要，不要求为了替换图标升级数据库或重新生成联机快照。
+- `godot --headless --path client res://tests/gourd_icons_test.tscn` 与实际OpenGL各13项通过：检查原图像素直接复用、红蓝映射、商城／背包实际纹理路径、购买后储量及目录摘要。
+- 完整商城Godot回归1,641项、Python目录回归5项通过。已查看商城和背包截图：`/tmp/opencode/vssjx-gourds-original-captures/`。本轮未重跑依赖隔离PostgreSQL的葫芦服务端专项。
+- 仅替换显示，不推送、打包或部署。

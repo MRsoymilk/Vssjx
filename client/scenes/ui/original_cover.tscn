@@ -64,7 +64,8 @@ flat = true
 position = Vector2(28, 56)
 scale = Vector2(2, 2)
 sprite_frames = ExtResource("Panda")
-animation = &"idle"
+animation = &"roll"
+autoplay = "roll"
 centered = false
 offset = Vector2(-12, -24)
 

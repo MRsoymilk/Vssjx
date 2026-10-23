@@ -31,15 +31,17 @@ func _ready() -> void:
 	panda_button.pressed.connect(_look_back)
 	panda_button.disabled = not active
 	panda.animation_finished.connect(_reset_panda)
+	_reset_panda()
 	_refresh()
 
 func _look_back() -> void:
-	if not active or panda.is_playing(): return
+	if not active or panda.animation == &"look_back": return
 	panda.play(&"look_back")
 
 func _reset_panda() -> void:
 	panda.stop()
-	panda.animation = &"idle"
+	if active: panda.play(&"roll")
+	else: panda.animation = &"idle"
 
 func _refresh() -> void:
 	for i in rows.size():

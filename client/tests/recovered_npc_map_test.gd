@@ -61,7 +61,7 @@ func _run() -> void:
 		check(resident.get_node("ServiceLabel").text==AIWorld.resident(value.id).service_label,"Network service label preserved: "+key)
 		resident.free()
 	var output := OS.get_environment("SSJX_NPC_CAPTURE_PATH")
-	for id in ["ai_007","ai_021","ai_028","ai_032","ai_041"]:
+	for id in ["ai_007","ai_012","ai_021","ai_023","ai_028","ai_032","ai_041","ai_213"]:
 		var data := AIWorld.map_data(id)
 		Game.player.ai_map=id;Game.player.cell=data.spawn.duplicate()
 		var viewport := SubViewport.new()

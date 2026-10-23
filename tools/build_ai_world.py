@@ -180,7 +180,7 @@ def build():
         ref=screenshot_reference(m['original_map_id'])
         if ref:m['screenshot_reference']=ref
         arrange_population(m)
-    return dict(version="ai-world-v1",label="AI生成·蜀山补全试验",layout_revision=6,npc_revision=2,monster_revision=2,portal_revision=4,seed=20261018,
+    return dict(version="ai-world-v1",label="AI生成·蜀山补全试验",layout_revision=6,npc_revision=3,monster_revision=2,portal_revision=4,seed=20261018,
                 disclaimer="地名、等级与总览坐标参考原包；场景布局、NPC布置、任务剧情与奖励均为AI生成。不是恢复出的原版内容。",maps=maps)
 
 def main():

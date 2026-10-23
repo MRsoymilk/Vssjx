@@ -10,7 +10,7 @@ from PIL import Image
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'tools'))
 from build_recovered_npc_art import build_assets, actor_key
-from npc_screenshot_bindings import apply_appearance
+from npc_screenshot_bindings import apply_appearance, ROLE_APPEARANCES, SERVICE_PROFILE
 
 
 class RecoveredNpcMapTests(unittest.TestCase):
@@ -72,6 +72,33 @@ class RecoveredNpcMapTests(unittest.TestCase):
         self.assertEqual(unknown['art'], 'hero/mck')
         with self.assertRaises(ValueError):
             apply_appearance(32, 0, 'snow', dict(role='guide', name='身份已变', source='AI生成'))
+
+    def test_explicit_child_elder_and_female_services_override_every_biome(self):
+        from npc_screenshot_bindings import THEMES
+        for service, expected in [('净水道童', {'zhi-xian', 'jiang-xier'}),
+                                  ('辨草老人', {'tan-chang', 'school-daily', 'zhu-liang'}),
+                                  ('采药苗女', {'zhen-gen', 'qi-xiaer', 'zhou-qingyun'})]:
+            for biome in THEMES:
+                for index in range(9):
+                    person = dict(role='npc10', name='不据名字推定性别', source='AI生成', service_label=service)
+                    apply_appearance(50, index, biome, person)
+                    self.assertIn(person['appearance_reference']['asset_id'], expected)
+                    self.assertEqual(person['service_label'], service)
+
+    def test_runtime_professions_have_reviewed_compatible_appearances(self):
+        from ai_world_npcs import PROFILES
+        self.assertTrue({s for roles in PROFILES.values() for s in roles}.issubset(SERVICE_PROFILE))
+        for m in self.world['maps']:
+            for r in m['residents']:
+                ref = r.get('npc_reference', {}).get('appearance_reference', {})
+                if ref.get('basis') != 'authored_appearance':
+                    continue
+                profile = ref['role_profile']
+                self.assertIn(ref['asset_id'], ROLE_APPEARANCES[profile], r['id'])
+                if profile in ('courier', 'guard', 'commander'):
+                    self.assertNotIn(ref['asset_id'], {'budai-xianren', 'zhi-xian', 'jiang-xier'}, r['id'])
+                if profile == 'artisan':
+                    self.assertIn(ref['asset_id'], {'baishouxian', 'grocery-boss'}, r['id'])
 
 
 if __name__ == '__main__':

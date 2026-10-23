@@ -4,7 +4,7 @@
   "source": "AI生成",
   "disclaimer": "地名、等级与总览坐标参考原包；场景布局、NPC布置、任务剧情与奖励均为AI生成。不是恢复出的原版内容。",
   "catalog": "shared/data/ai-world-v1.json",
-  "catalog_sha256": "2ef846eaeec43f54900017f020fef413f88883aa57867d3b3186506bb3e97fdf",
+  "catalog_sha256": "8bd6afc2bf505cf284071f62611348f3707c2bfe7aacb2586c0ad7c1cadbdc39",
   "map_count": 214,
   "quest_count": 642,
   "layout_count": 33,

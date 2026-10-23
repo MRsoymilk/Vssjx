@@ -84,7 +84,7 @@
         }
       ],
       "runtime_actor": "npc/ssjx_budai_xianren",
-      "runtime_resident_count": 22
+      "runtime_resident_count": 18
     },
     {
       "id": "fashion-vendor",
@@ -150,7 +150,7 @@
         }
       ],
       "runtime_actor": "npc/ssjx_fashion_vendor",
-      "runtime_resident_count": 25
+      "runtime_resident_count": 1
     },
     {
       "id": "baishouxian",
@@ -216,7 +216,7 @@
         }
       ],
       "runtime_actor": "npc/ssjx_baishouxian",
-      "runtime_resident_count": 4
+      "runtime_resident_count": 14
     },
     {
       "id": "crane-daren",
@@ -362,7 +362,7 @@
         }
       ],
       "runtime_actor": "npc/ssjx_tan_chang",
-      "runtime_resident_count": 39
+      "runtime_resident_count": 24
     },
     {
       "id": "zhu-liang",
@@ -428,7 +428,7 @@
         }
       ],
       "runtime_actor": "npc/ssjx_zhu_liang",
-      "runtime_resident_count": 43
+      "runtime_resident_count": 50
     },
     {
       "id": "jiang-xier",
@@ -508,7 +508,7 @@
         }
       ],
       "runtime_actor": "npc/ssjx_jiang_xier",
-      "runtime_resident_count": 24
+      "runtime_resident_count": 1
     },
     {
       "id": "yi-zhou",
@@ -574,7 +574,7 @@
         }
       ],
       "runtime_actor": "npc/ssjx_yi_zhou",
-      "runtime_resident_count": 45
+      "runtime_resident_count": 66
     },
     {
       "id": "yi-jing",
@@ -654,7 +654,7 @@
         }
       ],
       "runtime_actor": "npc/ssjx_yi_jing",
-      "runtime_resident_count": 7
+      "runtime_resident_count": 9
     },
     {
       "id": "zhou-qingyun",
@@ -720,7 +720,7 @@
         }
       ],
       "runtime_actor": "npc/ssjx_zhou_qingyun",
-      "runtime_resident_count": 132
+      "runtime_resident_count": 253
     },
     {
       "id": "jingji-envoy",
@@ -800,7 +800,7 @@
         }
       ],
       "runtime_actor": "npc/ssjx_jingji_envoy",
-      "runtime_resident_count": 47
+      "runtime_resident_count": 1
     },
     {
       "id": "brown-mask-full",
@@ -880,7 +880,7 @@
         }
       ],
       "runtime_actor": "npc/ssjx_brown_mask_full",
-      "runtime_resident_count": 23
+      "runtime_resident_count": 14
     },
     {
       "id": "grocery-boss",
@@ -946,7 +946,7 @@
         }
       ],
       "runtime_actor": "npc/ssjx_grocery_boss",
-      "runtime_resident_count": 25
+      "runtime_resident_count": 54
     },
     {
       "id": "zhi-xian",
@@ -1012,7 +1012,7 @@
         }
       ],
       "runtime_actor": "npc/ssjx_zhi_xian",
-      "runtime_resident_count": 137
+      "runtime_resident_count": 34
     },
     {
       "id": "tianchi-shangren",
@@ -1092,7 +1092,7 @@
         }
       ],
       "runtime_actor": "npc/ssjx_tianchi_shangren",
-      "runtime_resident_count": 132
+      "runtime_resident_count": 189
     },
     {
       "id": "xiaoyue-chanshi",
@@ -1158,7 +1158,7 @@
         }
       ],
       "runtime_actor": "npc/ssjx_xiaoyue_chanshi",
-      "runtime_resident_count": 49
+      "runtime_resident_count": 26
     },
     {
       "id": "zhen-gen",
@@ -1224,7 +1224,7 @@
         }
       ],
       "runtime_actor": "npc/ssjx_zhen_gen",
-      "runtime_resident_count": 134
+      "runtime_resident_count": 218
     },
     {
       "id": "qi-xiaer",
@@ -1304,7 +1304,7 @@
         }
       ],
       "runtime_actor": "npc/ssjx_qi_xiaer",
-      "runtime_resident_count": 144
+      "runtime_resident_count": 115
     },
     {
       "id": "wudu-tianwang",
@@ -1370,7 +1370,7 @@
         }
       ],
       "runtime_actor": "npc/ssjx_wudu_tianwang",
-      "runtime_resident_count": 26
+      "runtime_resident_count": 1
     },
     {
       "id": "school-daily",
@@ -1436,7 +1436,7 @@
         }
       ],
       "runtime_actor": "npc/ssjx_school_daily",
-      "runtime_resident_count": 40
+      "runtime_resident_count": 10
     }
   ],
   "unresolved": [

@@ -287,7 +287,7 @@ func show_item() -> void:
 	var item := _selected()
 	if item.is_empty(): return
 	tooltip.position = Vector2(61, 284)
-	tooltip_label.text=LootRules.describe(item.instance) if item.has("instance_id") else "%s  等级：1\n%s" % [item.name, ShopRules.description(item.id)]
+	tooltip_label.text=LootRules.describe(item.instance) if item.has("instance_id") else "%s  等级：1\n%s" % [item.name, ShopRules.description(item.id,_display_stats())]
 	tooltip.show()
 	move_child(tooltip, get_child_count() - 1)
 

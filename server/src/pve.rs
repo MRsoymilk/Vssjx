@@ -17,6 +17,9 @@ use std::{
 use uuid::Uuid;
 
 pub const MONSTER_RESPAWN_MS: i64 = 30_000;
+#[cfg(test)]
+#[path = "pve_consumable_tests.rs"]
+mod consumable_tests;
 fn unix_ms() -> i64 {
     SystemTime::now()
         .duration_since(UNIX_EPOCH)
@@ -400,7 +403,8 @@ impl Loaded {
                     }else{
                         let limits=self.stats();
                         if (item.restore_hp==0||self.character.hp>=limits.hp)&&(item.restore_mp==0||self.character.mp>=limits.mp){return Err("HP_FULL");}
-                        self.character.hp=(self.character.hp+item.restore_hp).min(limits.hp);
+                        let healing=if id=="potion"{crate::skill_balance::potion(limits)}else{item.restore_hp};
+                        self.character.hp=(self.character.hp+healing).min(limits.hp);
                         self.character.mp=(self.character.mp+item.restore_mp).min(limits.mp);
                     }
                 }

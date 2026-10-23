@@ -98,12 +98,14 @@ static func bag_item(id: String, job: int=1) -> Dictionary:
 	if id.begins_with("weapon_"): entry.icon="res://assets/ui/shop_%s%d.png"%[["ezs","eck","efs"][clampi(job,0,2)],int(entry.visual)]
 	return entry
 
-static func description(id: String) -> String:
+static func description(id: String, stats: Dictionary={}) -> String:
 	var entry := item(id)
 	if entry.is_empty(): return ""
 	if entry.get("effect")=="teleport":return "自选已开放地图；成功耗1张，取消不消耗。"
 	if entry.get("effect")=="reset_attributes": return "返还全部属性点；耗1颗，保留气血灵力比例。"
 	if is_equipment(entry): return ("攻击 +%d"%int(entry.attack)) if entry.slot=="weapon" else ("防御 +%d"%int(entry.defense))
+	if id=="potion" and (stats.is_empty() or SkillBalance.revised(stats)):
+		return "恢复最大气血的%d%%（至少%d点）"%[int(SkillBalance.rules.potion_restore_bp)/100,int(entry.restore_hp)]
 	if entry.slot=="consumable":
 		var parts: Array[String] = []
 		if int(entry.restore_hp)>0: parts.append("恢复%d点气血"%int(entry.restore_hp))
@@ -171,7 +173,8 @@ static func apply_local(player: Dictionary, action: String, id: String, count: i
 		if entry.get("effect")=="reset_attributes":
 			CharacterAttributeRules.reset_allocation(player,limits)
 		else:
-			player.hp=mini(int(limits.hp),int(player.hp)+int(entry.restore_hp))
+			var healing:=SkillBalance.potion(limits) if id=="potion" else int(entry.restore_hp)
+			player.hp=mini(int(limits.hp),int(player.hp)+healing)
 			player.mp=mini(int(limits.mp),int(player.mp)+int(entry.restore_mp))
 	if action in ["use","discard"]:
 		if id=="potion": player.potions=int(player.potions)-count

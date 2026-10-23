@@ -15,16 +15,20 @@ static func valid_points(value: Variant, level: int, minimum: Array = []) -> boo
 	return spent <= level * 5
 
 static func reset_allocation(player: Dictionary, current: Dictionary) -> void:
-	var points:Array=player.get("allocated_attributes",[0,0,0,0,0])
-	var job:=int(player.job);var level:=int(player.level)
-	var old:=balanced_stats(job,level,false,points) if player.get("balance_revision",0)==1 else stats(job,level,false,points)
-	var next:=balanced_stats(job,level,false,[0,0,0,0,0]) if player.get("balance_revision",0)==1 else stats(job,level,false,[0,0,0,0,0])
-	# Preserve any equipment contribution in the provided authoritative local totals.
-	var next_hp:=int(current.hp)+int(next.hp)-int(old.hp)
-	var next_mp:=int(current.mp)+int(next.mp)-int(old.mp)
 	player.allocated_attributes=[0,0,0,0,0]
-	player.hp=clampi(int(player.hp)*next_hp/int(current.hp),1,next_hp)
-	player.mp=clampi(int(player.mp)*next_mp/int(current.mp),0,next_mp)
+	# Reapply flat and percentage gear bonuses to the new base before rescaling.
+	var next:=local_stats(player)
+	player.hp=clampi(int(player.hp)*int(next.hp)/int(current.hp),1,int(next.hp))
+	player.mp=clampi(int(player.mp)*int(next.mp)/int(current.mp),0,int(next.mp))
+
+static func local_stats(player: Dictionary) -> Dictionary:
+	var job:=int(player.get("job",1));var level:=int(player.get("level",1));var equipped:=bool(player.get("equipped",false))
+	var points:Array=player.get("allocated_attributes",[0,0,0,0,0]).map(func(n:Variant)->int:return int(n))
+	var value:=balanced_stats(job,level,equipped,points) if player.get("balance_revision",0)==1 else stats(job,level,equipped,points)
+	var bonus:=ShopRules.bonus(ShopRules.local_state(player))
+	gear_bonus(value,bonus.x-(5 if equipped else 0),bonus.y)
+	LootRules.apply_stats(player.get("loot_state",{}),value,job)
+	return value
 
 static func stats(job: int, level: int, equipped: bool, a: Array) -> Dictionary:
 	var result := {

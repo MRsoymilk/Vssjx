@@ -279,11 +279,7 @@ func actor_key() -> String:
 	return "hero/" + keys[int(player.get("job", 0))]
 
 func stats() -> Dictionary:
-	var value: Dictionary = ATTRIBUTE_RULES.balanced_stats(int(player.get("job",1)),int(player.get("level",1)),bool(player.get("equipped",false)),allocated_attributes()) if player.get("balance_revision",0)==1 else ATTRIBUTE_RULES.stats(int(player.get("job",1)),int(player.get("level",1)),bool(player.get("equipped",false)),allocated_attributes())
-	var gear_bonus := ShopRules.bonus(ShopRules.local_state(player))
-	ATTRIBUTE_RULES.gear_bonus(value,gear_bonus.x-(5 if player.get("equipped",false) else 0),gear_bonus.y)
-	LootRules.apply_stats(player.get("loot_state",{}),value,int(player.get("job",1)))
-	return value
+	return ATTRIBUTE_RULES.local_stats(player)
 
 func allocated_attributes() -> Array:
 	var points: Array = player.get("allocated_attributes", [0,0,0,0,0]).duplicate()

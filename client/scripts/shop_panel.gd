@@ -145,6 +145,7 @@ func _appearance() -> String:
 
 func _filter() -> void:
 	var character := _character()
+	var stats:Dictionary=Game.stats() if online_model==null else online_model.state.get("stats",{})
 	var family := GeneratedEquipment.family_for_category(category)
 	goods=ShopRules.catalog.items.filter(func(item: Dictionary) -> bool:return item.sections.has(section) and (category=="全部" or item.category==category or (not family.is_empty() and item.get("set_id", "").begins_with(family+"/") and ShopRules.equipment_error(item,int(character.get("job",0)),int(character.get("gender",0))).is_empty())))
 	for child in grid.get_children():grid.remove_child(child);child.queue_free()
@@ -160,7 +161,7 @@ func _filter() -> void:
 		icon.texture=load(item.icon);button.add_child(icon)
 		_label(item.name,Rect2(36,2,93,16),10,button).name="ItemName"
 		_label("",Rect2(36,19,93,15),9,button).name="Price"
-		button.tooltip_text=item.name+" · "+item.category+"\n"+ShopRules.description(id)
+		button.tooltip_text=item.name+" · "+item.category+"\n"+ShopRules.description(id,stats)
 		rows.append(button)
 	if goods.is_empty():_label("此分类暂无商品",Rect2(0,0,260,35),12,grid)
 	refresh()
@@ -187,7 +188,7 @@ func refresh() -> void:
 	quantity_box.max_value=1 if equipment or (online_model!=null and gear.get("version")!="shop-v2") else 99
 	quantity_box.editable=not locked and not equipment
 	var amount:=int(quantity_box.value)
-	summary.text=entry.name+" · "+entry.category+"\n"+ShopRules.description(selected)
+	summary.text=entry.name+" · "+entry.category+"\n"+ShopRules.description(selected,Game.stats() if online_model==null else online_model.state.get("stats",{}))
 	if int(entry.job)>=0:summary.text+=" · "+Game.JOBS[int(entry.job)]
 	if int(entry.get("gender",-1))>=0:summary.text+=" · "+("男" if int(entry.gender)==0 else "女")
 	total.text="物品总价：%d铜钱"%(int(entry.price)*amount)

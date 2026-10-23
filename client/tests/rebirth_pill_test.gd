@@ -57,6 +57,8 @@ func _run()->void:
 		legacy.hp=40;legacy.mp=20
 		var limits:=CharacterAttributeRules.stats(job,20,false,legacy.allocated_attributes)
 		check(ShopRules.apply_local(legacy,"use",ITEM,1,limits)=="" and legacy.allocated_attributes==[0,0,0,0,0],"Legacy attribute rule also supports pill")
+	await _equipped_resets()
+	await _potion_recovery()
 	await _ui()
 	var fixture:=OS.get_environment("SSJX_REBIRTH_FIXTURE")
 	if not fixture.is_empty():
@@ -69,6 +71,57 @@ func _run()->void:
 	check((FileAccess.get_sha256(path) if FileAccess.file_exists(path) else "")==hash,"Actual player save untouched")
 	print("REBIRTH PILL: %d checks, %d failures"%[checks,failures])
 	get_tree().quit(1 if failures else 0)
+
+func _equipped_resets()->void:
+	for job in 3:
+		Game.new_player("装备洗点",job,3,0);Game.player.level=60;Game.player.gold=2000
+		Game.player.allocated_attributes=[90,60,90,30,30]
+		for slot in ["armor","hat"]:
+			var template:Dictionary=ShopRules.catalog.items.filter(func(d:Dictionary)->bool:return d.slot==slot and ShopRules.equipment_error(d,job,0).is_empty())[0]
+			var item:=LootRules.roll(template.id,60,"yellow",17);item.upgrade=6
+			item.affixes=[{"kind":"hp_percent","value":400},{"kind":"hp","value":120},{"kind":"mana","value":80},{"kind":"defense","value":40}]
+			Game.player.loot_state.items.append(item)
+			check((await Game.loot_command("gear_equip",item.id)).ok,"Equip valid upgraded percentage-HP and flat HP/MP gear before resetting")
+		check((await Game.shop_command("buy",ITEM,2)).ok,"Purchase reset pills with percentage gear equipped")
+		var loadout:=Game.player.duplicate(true);var before:=Game.stats()
+		for hp in [1,int(before.hp)/2,int(before.hp)-1,int(before.hp)]:
+			Game.player=loadout.duplicate(true);Game.player.hp=hp;Game.player.mp=0 if hp==1 else int(before.mp)/2
+			var previous_mp:=int(Game.player.mp);var equipment:Dictionary=Game.player.loot_state.duplicate(true)
+			check((await Game.shop_command("use",ITEM)).ok,"Reset from minimum, half, almost-full and full health")
+			var after:=Game.stats()
+			check(Game.player.hp==maxi(1,hp*int(after.hp)/int(before.hp)) and Game.player.mp==previous_mp*int(after.mp)/int(before.mp),"Reset preserves ratios after reapplying percentage bonuses and integer rounding")
+			check(Game.player.loot_state==equipment and Game.allocated_attributes()==[0,0,0,0,0],"Reset preserves UUIDs, affixes, upgrade ranks and equipped slots")
+			var result:=[Game.player.hp,Game.player.mp]
+			check((await Game.load_game()).ok and [Game.player.hp,Game.player.mp]==result and ShopRules.quantity(ShopRules.local_state(Game.player),ITEM)==1,"Correct ratios and exactly one consumed pill survive reload")
+		Game.player=loadout.duplicate(true);Game.player.hp=int(before.hp)/2
+		var saved:=Game.player.duplicate(true);var path:=Game.save_path
+		Game.save_path="user://equipped_respec_missing_%d/save.json"%Time.get_ticks_usec()
+		check(not (await Game.shop_command("use",ITEM)).ok and Game.player==saved,"Persistence failure rolls back percentage-gear reset and pill atomically")
+		Game.save_path=path
+
+func _potion_recovery()->void:
+	for revision in [0,1]:
+		for job in 3:
+			for level in [1,60]:
+				Game.new_player("药效验证",job,3,0);Game.player.level=level;Game.player.balance_revision=revision;Game.player.hp=1;Game.player.mp=0;Game.player.potions=6
+				var stats:=Game.stats();var expected:=maxi(45,int(stats.hp)/5) if revision==1 else 45
+				var enemy:Dictionary=ShushanWorld.ENEMIES[0].duplicate(true);enemy.hp=10000
+				var battle:=ShushanBattle.new(enemy)
+				check(battle.begin_action("potion").ok,"Battle accepts potion at low health")
+				battle.resolve_player()
+				check((await Game.shop_command("use","potion")).ok and Game.player.hp==1+expected and battle.hp==Game.player.hp,"World and combat potion amounts agree for every job, low/high level and old/new rules")
+				check(Game.player.potions==5 and battle.potions==5 and Game.player.mp==0,"Each context consumes one potion without restoring mana")
+				var text:=ShopRules.description("potion",stats)
+				check(text.contains("20%") if revision==1 else text=="恢复45点气血","Description follows the active rules")
+				Game.player.hp=int(stats.hp)-1
+				check((await Game.shop_command("use","potion")).ok and Game.player.hp==stats.hp and Game.player.potions==4,"Potion clamps to the real maximum and consumes one")
+				var full:=Game.player.duplicate(true)
+				check(not (await Game.shop_command("use","potion")).ok and Game.player==full,"Full health rejects waste without consuming a potion")
+	Game.player.hp=1
+	var before:=Game.player.duplicate(true);var path:=Game.save_path
+	Game.save_path="user://potion_missing_%d/save.json"%Time.get_ticks_usec()
+	check(not (await Game.shop_command("use","potion")).ok and Game.player==before,"Failed persistence rolls back potion and percentage healing together")
+	Game.save_path=path
 
 func _ui()->void:
 	Game.new_player("洗点演示",0,3,1);Game.player.level=20;Game.player.gold=2000

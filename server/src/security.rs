@@ -115,7 +115,7 @@ pub(crate) async fn connection_event(
 }
 
 pub(crate) fn state_summary(state: &Value) -> Value {
-    json!({"character":state["character"],"potions":state["potions"],"gathering_materials":state["gathering"]["materials"],"crafting_materials":{"scrap":state["loot"]["state"]["scrap"],"essence":state["loot"]["state"]["essence"]},
+    json!({"character":state["character"],"potions":state["potions"],"gourds":state["gourds"],"gathering_materials":state["gathering"]["materials"],"crafting_materials":{"scrap":state["loot"]["state"]["scrap"],"essence":state["loot"]["state"]["essence"]},
         "equipment":state["equipment"],"shop":state["shop"].as_object().map(|s|json!({"owned":s.get("owned"),"weapon":s.get("weapon"),"armor":s.get("armor"),"slots":s.get("slots"),"quantities":s.get("quantities")})),"battle":battle_summary(&state["battle"]),"attributes":state["attributes"]["allocated"],"ai_world":state["ai_world"]})
 }
 
@@ -131,7 +131,7 @@ fn compact_details(details: &Value) -> Value {
     for side in ["before", "after"] {
         if let Some(state) = details.get(side).filter(|v| v.is_object()) {
             compacted[side] = json!({
-                "character":state["character"],"potions":state["potions"],
+                "character":state["character"],"potions":state["potions"],"gourds":state["gourds"],
                 "gathering_materials":state["gathering_materials"],"crafting_materials":state["crafting_materials"],
                 "equipment":state["equipment"],"attributes":state["attributes"],
                 "battle":state["battle"]

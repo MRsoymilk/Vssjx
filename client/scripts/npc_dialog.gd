@@ -69,7 +69,7 @@ func _legacy_stage() -> int:
 	return int(Game.player.get("quest",0)) if local_mode else int(model.state.character.quest_stage)
 
 func _locked() -> bool:
-	return Game.storage_busy or approaching if local_mode else model==null or not model.ready or model.pending() or model.active() or approaching
+	return Game.storage_busy or approaching or Game.local_battle_active() or Game.is_soul() if local_mode else model==null or not model.ready or model.pending() or model.active() or model.is_soul() or approaching
 
 func _restore_full() -> bool:
 	if local_mode:
@@ -80,6 +80,8 @@ func _restore_full() -> bool:
 func allows(action: String, destination: String) -> bool:
 	if not visible or _locked():return false
 	if target==EndlessRules.rules.npc.id:return action=="endless" and destination==target and not quest_button.disabled
+	if action in ["gourd_refill_hp","gourd_refill_mp"]:
+		return destination==target and (target=="qingwei" or target.ends_with("_guide")) and _can_refill(GourdRules.refill_id(action))
 	if action=="school_join":return not ai_mode and target=="qingwei" and _school()==SchoolRules.UNJOINED and SchoolRules.index(destination)>=0
 	if action==("ai_restore" if ai_mode else "restore"):return destination==target and restore_button.visible and not restore_button.disabled
 	if not ai_mode:return destination==target and action==("accept" if _legacy_stage()==0 else "claim") and not quest_button.disabled
@@ -103,6 +105,7 @@ func refresh() -> void:
 	if local_mode:
 		if locked:hint.text="正在保存，请稍候……"
 		_refresh_school(locked)
+		_refresh_gourds()
 		return
 	if not model.ready: hint.text = "连接中断，正在同步任务结果……"
 	elif approaching: hint.text = "正在与道人交谈……"
@@ -111,6 +114,8 @@ func refresh() -> void:
 		hint.text = {"accept":"正在接受任务……", "claim":"正在完成任务……", "restore":"正在恢复元气……","school_join":"正在确认入派……"}.get(action, "正在等待回复……")
 	elif model.last_action in ["accept", "claim", "restore"] and not model.last_code.is_empty(): hint.text = OnlinePve.error_text(model.last_code)
 	_refresh_school(locked)
+	_refresh_gourds()
+	if model.last_action in GourdRules.ACTIONS and not model.last_code.is_empty():hint.text=OnlinePve.error_text(model.last_code)
 	if model.last_action=="school_join" and not model.last_code.is_empty():hint.text=OnlinePve.error_text(model.last_code)
 
 func _refresh_endless()->void:
@@ -125,7 +130,7 @@ func _refresh_endless()->void:
 	var progress:Dictionary=EndlessRules.progress(Game.player) if local_mode else (model.state.get("endless",{}).get("progress",EndlessRules.empty()) if model!=null else EndlessRules.empty())
 	quest_button.text="挑战第%d层 · 最高已过%d层"%[int(progress.stage),int(progress.best)]
 	quest_button.disabled=_locked() or not supported or progress.in_progress or (Game.is_soul() if local_mode else model.is_soul())
-	hint.text="每层：气血+20%／攻击+10%／防御+8%（按首层基数）。单人挑战，不自动补满血蓝。"
+	hint.text="每层：气血+20%／攻击+10%／防御+8%（按首层基数）。仅携带已开启的葫芦可战后自动补给。"
 	if not supported:hint.text="当前服务器尚未开放无尽试炼，请等待服务器更新。"
 	elif not local_mode and not model.last_code.is_empty() and model.last_action=="endless":hint.text=OnlinePve.error_text(model.last_code)
 	elif _locked():hint.text="正在准备试炼，请稍候……"
@@ -180,6 +185,7 @@ func _refresh_ai() -> void:
 	restore_button.visible=target.ends_with("_guide")
 	if restore_button.visible:
 		restore_button.position=Vector2(12,y);restore_button.disabled=locked or _restore_full();y+=30
+		y=_gourd_buttons(y)
 	hint.position=Vector2(12,y+4);hint.size=Vector2(284,24)
 	hint.text="点击任务项接受或完成任务。" if not options.is_empty() else "此刻没有需办理的任务。"
 	if local_mode and locked:hint.text="正在保存，请稍候……"
@@ -188,9 +194,40 @@ func _refresh_ai() -> void:
 		elif approaching:hint.text="正在与人物交谈……"
 		elif model.pending():hint.text="正在等待任务结果……"
 		elif model.last_action.begins_with("ai_") and not model.last_code.is_empty():hint.text=OnlinePve.error_text(model.last_code)
+		elif model.last_action in GourdRules.ACTIONS and not model.last_code.is_empty():hint.text=OnlinePve.error_text(model.last_code)
 	var height := y+31
 	$Paper.position=Vector2(6,(375-height)/2);$Paper.size=Vector2(308,height)
 	$Paper/BL.position.y=height-14;$Paper/BR.position.y=height-14
+
+func _gourds()->Dictionary:
+	return Game.player.get("gourds",{}) if local_mode else model.state.get("gourds",{})
+
+func _can_refill(id:String)->bool:
+	var s:Dictionary=_gourds().get(id,{})
+	return not s.is_empty() and int(s.remaining)<int(ShopRules.item(id).capacity)
+
+func _gourd_buttons(y:float)->float:
+	for id in GourdRules.IDS:
+		var button:Button=quest_button.duplicate(0)
+		$Paper.add_child(button);extra_buttons.append(button)
+		button.name="RefillHp" if id==GourdRules.HP else "RefillMp"
+		button.position=Vector2(12,y);button.size=Vector2(284,27);button.show()
+		button.text="补满%s · 免费"%ShopRules.item(id).name
+		if not _gourds().has(id):button.text+="（未购买）"
+		elif not _can_refill(id):button.text+="（已满）"
+		button.disabled=_locked() or not _can_refill(id)
+		var action:="gourd_refill_hp" if id==GourdRules.HP else "gourd_refill_mp"
+		button.pressed.connect(func()->void:
+			if allows(action,target):action_requested.emit(action,target))
+		y+=30
+	return y
+
+func _refresh_gourds()->void:
+	if target!="qingwei":return
+	var y:=_gourd_buttons(hint.position.y-4)
+	hint.position.y=y+4
+	$Paper.size.y=y+31;$Paper.position.y=maxf(6,(375-$Paper.size.y)/2)
+	$Paper/BL.position.y=$Paper.size.y-14;$Paper/BR.position.y=$Paper.size.y-14
 
 func dismiss() -> void:
 	if local_mode and Game.storage_busy:return

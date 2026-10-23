@@ -56,6 +56,7 @@ struct Loaded {
     allocated: [i32; 5],
     gear: BTreeMap<String,bool>,
     quantities: BTreeMap<String,i32>,
+    gourds:crate::gourds::State,
     loot:crate::loot::State,
 }
 fn database(error: sqlx::Error) -> AuthError {
@@ -73,7 +74,7 @@ async fn load(tx: &mut Transaction<'_, Postgres>, context: &Context) -> Result<L
     load_character(tx,context.character,account,Some(context.owner)).await
 }
 async fn load_character(tx:&mut Transaction<'_,Postgres>,character_id:Uuid,account:Uuid,owner:Option<i64>)->Result<Loaded,AuthError>{
-    let row=sqlx::query(&format!("SELECT {CHARACTER_COLUMNS},endless_state,loot_state,ai_progress,defeated_mask,monster_respawns,active_battle_id,owner_epoch,allocated_attributes,hunt_pressure FROM characters WHERE id=$1 AND account_id=$2 AND deleted_at IS NULL FOR UPDATE"))
+    let row=sqlx::query(&format!("SELECT {CHARACTER_COLUMNS},gourd_state,endless_state,loot_state,ai_progress,defeated_mask,monster_respawns,active_battle_id,owner_epoch,allocated_attributes,hunt_pressure FROM characters WHERE id=$1 AND account_id=$2 AND deleted_at IS NULL FOR UPDATE"))
         .bind(character_id).bind(account).fetch_optional(&mut **tx).await.map_err(database)?
         .ok_or(AuthError(StatusCode::FORBIDDEN,"FORBIDDEN"))?;
     if owner.is_some_and(|owner|row.get::<i64, _>("owner_epoch") != owner) {
@@ -124,6 +125,7 @@ async fn load_character(tx:&mut Transaction<'_,Postgres>,character_id:Uuid,accou
         ai,
         gear,
         quantities,
+        gourds:serde_json::from_value(row.get::<Json<Value>,_>("gourd_state").0).map_err(|_|unavailable())?,
         character,
         defeated: row.get("defeated_mask"),
         respawns,
@@ -137,6 +139,7 @@ async fn load_character(tx:&mut Transaction<'_,Postgres>,character_id:Uuid,accou
             .map_err(|_| unavailable())?,
     };
     if !loaded.hunt_pressure.valid(){return Err(unavailable());}
+    if !loaded.gourds.valid(&loaded.gear,&loaded.quantities){return Err(unavailable());}
     if !loaded.endless.valid(){return Err(unavailable());}
     let active_run=loaded.battle.as_ref().and_then(|b|b.endless);
     if loaded.endless.in_progress!=active_run.is_some()||active_run.is_some_and(|r|r.stage!=loaded.endless.stage||r.level!=loaded.endless.level||r.monster().is_err()){return Err(unavailable());}
@@ -196,7 +199,7 @@ impl Loaded {
         for key in ["physical_attack","magic_attack"] { profile["combat"][key] = json!(profile["combat"][key].as_i64().unwrap() + i64::from(attack - if self.equipped {5} else {0})); }
         for key in ["physical_defense","magic_defense"] { profile["combat"][key] = json!(self.stats().defense); }
         if self.stats().balance.is_some(){profile=crate::attributes::profile_for(self.stats(),self.character.job,self.character.level,self.allocated);}
-        json!({"rules_version":pve_rules::RULES,"character":self.character,"potions":self.potions,"gathering":self.gathering,
+        json!({"rules_version":pve_rules::RULES,"character":self.character,"potions":self.potions,"gathering":self.gathering,"gourds":self.gourds,
             "endless":self.endless.view(),
             "equipment":{"version":"equipment-v1","weapon_owned":self.weapon_owned,"weapon":if self.equipped {Some("sword")} else {None}},
             "stats":self.stats(),"hunt_pressure":self.hunt_pressure,
@@ -231,6 +234,11 @@ impl Loaded {
         self.character.hp = stats.hp;
         self.character.mp = stats.mp;
     }
+    fn auto_supply(&mut self)->bool{
+        let maxima=self.stats();
+        self.gourds.supply(&mut self.character.hp,&mut self.character.mp,maxima,
+            self.character.corpse.is_some()||self.battle.as_ref().is_some_and(|b|b.outcome=="active"))
+    }
     fn apply(&mut self, command: &Command, context: &Context) -> Result<Vec<String>, &'static str> {
         if context.map_id != self.character.map_id {
             return Err("MAP_CHANGED");
@@ -251,6 +259,30 @@ impl Loaded {
             return Ok(vec!["你寻回了自己的尸体，灵魂与肉身重新合一，气血与灵力恢复。".into()]);
         }
         if command.action==Action::Revive {return Err("NO_CORPSE");}
+        if matches!(command.action,Action::GourdEnable|Action::GourdDisable|Action::GourdRefillHp|Action::GourdRefillMp){
+            if self.battle.is_some(){return Err("BATTLE_ACTIVE");}
+            if command.battle_id.is_some()||command.quantity.is_some()||command.attributes.is_some(){return Err("INVALID_PVE_COMMAND");}
+            if command.expected_revision.as_deref()!=Some(&self.character.state_revision){return Err("STALE_EQUIPMENT");}
+            let target=command.target.as_deref().ok_or("GOURD_NOT_OWNED")?;
+            let refill=matches!(command.action,Action::GourdRefillHp|Action::GourdRefillMp);
+            let id=if refill{
+                let point=if target=="qingwei"&&context.map_id=="qingyun_trail"&&self.rules.enabled(&context.map_id,target){context.target_cell.ok_or("GOURD_NPC_REQUIRED")?}
+                else if target.ends_with("_guide")&&self.rules.enabled(&context.map_id,target){
+                    let r=crate::ai_world::resident(target).ok_or("GOURD_NPC_REQUIRED")?;
+                    if !target.starts_with(&context.map_id)||r["kind"]!="npc"{return Err("GOURD_NPC_REQUIRED");}
+                    context.target_cell.ok_or("GOURD_NPC_REQUIRED")?
+                }else{return Err("GOURD_NPC_REQUIRED");};
+                if (point[0]-context.cell[0]).abs()+(point[1]-context.cell[1]).abs()>2{return Err("RESIDENT_TOO_FAR");}
+                if command.action==Action::GourdRefillHp{crate::gourds::HP}else{crate::gourds::MP}
+            }else{target};
+            let supply=self.gourds.0.get_mut(id).ok_or("GOURD_NOT_OWNED")?;
+            let item=crate::shop::item(id).ok_or("GOURD_NOT_OWNED")?;
+            if refill{
+                if supply.remaining==item.capacity{return Err("GOURD_FULL");}
+                supply.remaining=item.capacity;
+            }else{supply.enabled=command.action==Action::GourdEnable;}
+            return Ok(vec![format!("{}已{}。",item.name,if refill{"免费补满储量"}else if supply.enabled{"开启战斗外自动补给"}else{"关闭自动补给"})]);
+        }
         if command.action==Action::Endless{
             if self.battle.is_some(){return Err("BATTLE_ACTIVE");}
             if context.map_id!=crate::endless::map()||command.target.as_deref()!=Some(crate::endless::npc()){return Err("ENDLESS_NPC_REQUIRED");}
@@ -376,18 +408,19 @@ impl Loaded {
             let id=command.target.as_deref().ok_or("INVALID_EQUIPMENT")?;
             let item=crate::shop::item(id).ok_or("INVALID_EQUIPMENT")?;
             let count=command.quantity.unwrap_or(1);
-            if !(1..=99).contains(&count)||(item.equipment()&&count!=1)||(!matches!(command.action,Action::Buy|Action::Discard)&&count!=1){return Err("INVALID_QUANTITY");}
+            if !(1..=99).contains(&count)||(item.unique()&&count!=1)||(!matches!(command.action,Action::Buy|Action::Discard)&&count!=1){return Err("INVALID_QUANTITY");}
             if command.expected_revision.as_deref()!=Some(&self.character.state_revision){return Err("STALE_EQUIPMENT");}
             let current=if id=="potion"{self.potions}else{*self.quantities.get(id).unwrap_or(&0)};
             let bag_count=self.bag_count();
             if command.action==Action::Buy {
-                if item.equipment()&&current>0{return Err("ITEM_ALREADY_OWNED");}
+                if item.unique()&&current>0{return Err("ITEM_ALREADY_OWNED");}
                 if current+count>99||(current==0&&bag_count>=60){return Err("BAG_FULL");}
                 let price=item.price.checked_mul(count).ok_or("INVALID_QUANTITY")?;
                 if self.character.gold<price{return Err("GOLD_INSUFFICIENT");}
                 self.character.gold-=price;
                 if id=="potion"{self.potions+=count;}else{self.quantities.insert(id.into(),current+count);self.gear.entry(id.into()).or_insert(false);}
                 self.weapon_owned=self.gear.contains_key("sword");
+                if item.slot=="gourd"{self.gourds.0.insert(id.into(),crate::gourds::Supply::full(id));}
                 return Ok(vec![format!("购得{}×{}，花费{}铜钱。",item.name,count,price)]);
             }
             if current<count{return Err("WEAPON_NOT_OWNED");}
@@ -409,6 +442,7 @@ impl Loaded {
                     }
                 }
                 if id=="potion"{self.potions-=count;}else if current==count{self.quantities.remove(id);self.gear.remove(id);}else{self.quantities.insert(id.into(),current-count);}
+                if item.slot=="gourd"{self.gourds.0.remove(id);}
                 self.equipped=self.gear.get("sword")==Some(&true);self.weapon_owned=self.gear.contains_key("sword");
                 return Ok(vec![format!("已{}{}×{}。",if command.action==Action::Use{"使用"}else{"丢弃"},item.name,count)]);
             }
@@ -481,6 +515,7 @@ impl Loaded {
             return Err("INVALID_PVE_COMMAND");
         }
         match command.action {
+            Action::GourdEnable|Action::GourdDisable|Action::GourdRefillHp|Action::GourdRefillMp=>Err("INVALID_PVE_COMMAND"),
             Action::GatherStart|Action::GatherFinish|Action::GatherCancel|Action::GatherDiscard|Action::GatherCraft=>Err("INVALID_GATHER_COMMAND"),
             Action::Accept | Action::Claim | Action::Restore | Action::Challenge => {
                 if !self.rules.enabled(&context.map_id,command.target.as_deref().unwrap_or("")){return Err("INVALID_RESIDENT");}
@@ -664,7 +699,13 @@ impl Loaded {
 }
 pub async fn snapshot(auth: &AuthService, context: &Context) -> Result<Value, AuthError> {
     let mut tx = auth.pool().begin().await.map_err(database)?;
-    let loaded = load(&mut tx, context).await?;
+    let mut loaded = load(&mut tx, context).await?;
+    let team_active:bool=sqlx::query_scalar("SELECT EXISTS(SELECT 1 FROM team_members m JOIN team_battles b ON b.team_id=m.team_id AND b.active WHERE m.character_id=$1)").bind(context.character).fetch_one(&mut *tx).await.map_err(database)?;
+    if !team_active&&!context.duel_active&&loaded.auto_supply(){
+        let revision:i64=sqlx::query_scalar("UPDATE characters SET hp=$2,mp=$3,gourd_state=$4,state_revision=state_revision+1 WHERE id=$1 RETURNING state_revision")
+            .bind(context.character).bind(loaded.character.hp).bind(loaded.character.mp).bind(Json(&loaded.gourds)).fetch_one(&mut *tx).await.map_err(database)?;
+        loaded.character.state_revision=revision.to_string();
+    }
     let value = json!({"type":"pve.state","state":loaded.state()});
     tx.commit().await.map_err(database)?;
     Ok(value)
@@ -733,9 +774,11 @@ pub async fn execute(
         let maxima=loaded.stats();
         loaded.character.hp=loaded.character.hp.min(maxima.hp);
         loaded.character.mp=loaded.character.mp.min(maxima.mp);
+        if !team_active&&!context.duel_active{loaded.auto_supply();}
+        if !loaded.gourds.valid(&loaded.gear,&loaded.quantities){return Err(unavailable());}
         if !loaded.hunt_pressure.valid(){return Err(unavailable());}
         if !loaded.loot.valid(loaded.character.job,loaded.character.gender){return Err(unavailable());}
-        sqlx::query("UPDATE characters SET loot_state=$2 WHERE id=$1").bind(context.character).bind(Json(&loaded.loot)).execute(&mut *tx).await.map_err(database)?;
+        sqlx::query("UPDATE characters SET loot_state=$2,gourd_state=$3 WHERE id=$1").bind(context.character).bind(Json(&loaded.loot)).bind(Json(&loaded.gourds)).execute(&mut *tx).await.map_err(database)?;
         if loaded.gear!=previous_gear||loaded.quantities!=previous_quantities {
             sqlx::query("UPDATE inventory_items SET equipped=FALSE WHERE character_id=$1 AND definition_id<>'potion'").bind(context.character).execute(&mut *tx).await.map_err(database)?;
             let ids:Vec<_>=loaded.gear.keys().cloned().collect();
@@ -842,7 +885,8 @@ pub(crate) async fn team_save(tx:&mut Transaction<'_,Postgres>,f:&crate::team_ru
         let point=[a.character.cell_x,a.character.cell_y];
         a.die(point).map_err(|code|AuthError(StatusCode::CONFLICT,code))?;
     }
-    sqlx::query("UPDATE characters SET loot_state=$2 WHERE id=$1").bind(f.id).bind(Json(&a.loot)).execute(&mut **tx).await.map_err(database)?;
+    if settle{a.auto_supply();}
+    sqlx::query("UPDATE characters SET loot_state=$2,gourd_state=$3 WHERE id=$1").bind(f.id).bind(Json(&a.loot)).bind(Json(&a.gourds)).execute(&mut **tx).await.map_err(database)?;
     sqlx::query("UPDATE characters SET hp=$2,mp=$3,level=$4,xp=$5,gold=$6,quest_stage=$7,defeated_mask=$8,monster_respawns=$9,ai_progress=$10,position_revision=position_revision+CASE WHEN corpse IS NULL AND $11::jsonb IS NOT NULL THEN 1 ELSE 0 END,corpse=$11,cell_x=$12,cell_y=$13,hunt_pressure=$14,state_revision=state_revision+1 WHERE id=$1")
         .bind(f.id).bind(a.character.hp).bind(a.character.mp).bind(a.character.level).bind(a.character.xp).bind(a.character.gold).bind(a.character.quest_stage).bind(a.defeated).bind(Json(a.respawns)).bind(Json(a.ai)).bind(a.character.corpse).bind(a.character.cell_x).bind(a.character.cell_y).bind(Json(&a.hunt_pressure)).execute(&mut **tx).await.map_err(database)?;
     if a.potions==0{sqlx::query("DELETE FROM inventory_items WHERE character_id=$1 AND definition_id='potion'").bind(f.id).execute(&mut **tx).await.map_err(database)?;}

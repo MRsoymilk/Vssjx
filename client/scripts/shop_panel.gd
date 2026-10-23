@@ -185,8 +185,8 @@ func refresh() -> void:
 		_refreshing=false;return
 	var equipment:=ShopRules.is_equipment(entry)
 	var count:=ShopRules.quantity(gear,selected)
-	quantity_box.max_value=1 if equipment or (online_model!=null and gear.get("version")!="shop-v2") else 99
-	quantity_box.editable=not locked and not equipment
+	quantity_box.max_value=1 if ShopRules.unique(entry) or (online_model!=null and gear.get("version")!="shop-v2") else 99
+	quantity_box.editable=not locked and not ShopRules.unique(entry)
 	var amount:=int(quantity_box.value)
 	summary.text=entry.name+" · "+entry.category+"\n"+ShopRules.description(selected,Game.stats() if online_model==null else online_model.state.get("stats",{}))
 	if int(entry.job)>=0:summary.text+=" · "+Game.JOBS[int(entry.job)]
@@ -194,12 +194,13 @@ func refresh() -> void:
 	total.text="物品总价：%d铜钱"%(int(entry.price)*amount)
 	OriginalArt.apply_appearance(preview,_appearance())
 	var version_locked: bool=online_model!=null and gear.get("version")!="shop-v2" and selected not in ["potion","sword","weapon_2","weapon_3","armor_2","armor_3"]
-	buy_button.disabled=locked or version_locked or gold<int(entry.price)*amount or (equipment and count>0) or (not equipment and count+amount>99)
+	buy_button.disabled=locked or version_locked or gold<int(entry.price)*amount or (ShopRules.unique(entry) and count>0) or (not equipment and count+amount>99)
 	var incompatible := not ShopRules.equipment_error(entry,int(character.get("job",0)),int(character.get("gender",0))).is_empty()
 	equip_button.disabled=locked or version_locked or not equipment or count==0 or incompatible
 	equip_button.text="卸下" if ShopRules.equipped_id(gear,entry.slot)==selected else "装备"
 	preview_button.disabled=not equipment or incompatible
 	hint.text=notice if not notice.is_empty() else ("此商品需要更新服务端" if version_locked else (entry.get("set_name", "套装")+" · AI新设计 · 数值为重建规则" if String(entry.get("art_source", "")).begins_with("AI") else "原包图标 · 名称、数值和部分换装映射为重建规则"))
+	if notice.is_empty() and not version_locked and entry.slot=="gourd":hint.text="清微道人／各地图巡山人免费补充；背包可开关自动补给。"
 	_refreshing=false
 
 func _online_changed() -> void:

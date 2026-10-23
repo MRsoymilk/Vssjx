@@ -753,6 +753,14 @@ func _local_npc_action(action: String, target: String) -> void:
 	if not dialog.allows(action,target):return
 	var point: Array=AIWorld.resident(dialog.target).get("cell",[10,13])
 	if absi(world.cell.x-int(point[0]))+absi(world.cell.y-int(point[1]))>2:return
+	if action in ["gourd_refill_hp","gourd_refill_mp"]:
+		dialog.approaching=true;dialog.refresh()
+		var refilled:=await Game.shop_command(action,target)
+		if not is_instance_valid(dialog) or _closing:return
+		dialog.approaching=false;dialog.refresh()
+		dialog.hint.text="葫芦储量已补充，已开启的葫芦会自动补给。" if refilled.ok else refilled.message
+		_refresh_hud()
+		return
 	if action=="endless":
 		dialog.approaching=true;dialog.refresh()
 		var result:=await Game.start_endless()

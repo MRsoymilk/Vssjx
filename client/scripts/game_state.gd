@@ -635,6 +635,8 @@ func save_game() -> PlatformResult:
 		return _finish_storage(PlatformResult.new(PlatformResult.Status.INVALID_DATA, "EMPTY_PLAYER", "没有可保存的离线角色。"), generation)
 	# Serialize now: delayed IO must not observe subsequent dictionary mutations.
 	LootRules.sync_legacy(player)
+	var supply_before:={"hp":player.hp,"mp":player.mp,"gourds":player.get("gourds",{}).duplicate(true)}
+	var supplied:=GourdRules.supply(player,stats(),local_battle_active())
 	var payload := _save_payload()
 	var result := await _await_storage(Platform.context.storage.write(_operation_path, JSON.stringify(payload, "\t")))
 	if result.ok:
@@ -643,6 +645,8 @@ func save_game() -> PlatformResult:
 		elif generation == _player_generation and _operation_path == save_path:
 			last_save_receipt = result.value.duplicate(true)
 			if payload.has("local_characters"): player.local_characters = payload.local_characters
+	if not result.ok and supplied and generation==_player_generation and _operation_path==save_path:
+		player.hp=supply_before.hp;player.mp=supply_before.mp;player.gourds=supply_before.gourds
 	return _finish_storage(result, generation)
 
 func probe_save() -> PlatformResult:
@@ -675,9 +679,14 @@ func load_game() -> PlatformResult:
 	_migrate_school_membership(data)
 	_migrate_balance(data)
 	var interrupted_endless:=EndlessRules.recover_local(data)
-	var loot_migration:bool=interrupted_endless or not data.has("loot_state") or data.get("local_characters",{}).get("characters",[]).any(func(e:Dictionary)->bool:return not e.data.has("loot_state"))
+	var supplied:=GourdRules.supply(data,ATTRIBUTE_RULES.local_stats(data),false)
+	var loot_migration:bool=supplied or interrupted_endless or not data.has("loot_state") or data.get("local_characters",{}).get("characters",[]).any(func(e:Dictionary)->bool:return not e.data.has("loot_state"))
 	if loot_migration:
 		_migrate_loot(data)
+		if supplied and data.has("local_characters"):
+			var current:Dictionary=data.duplicate(true);current.erase("local_characters")
+			for entry in data.local_characters.characters:
+				if entry.id==data.local_characters.active_id:entry.data=current
 		var migrated:=await _await_storage(Platform.context.storage.write(_operation_path,JSON.stringify(data,"\t")))
 		if not migrated.ok:return _finish_storage(migrated,generation)
 		if not migrated.value is Dictionary or migrated.value.get("written")!=true or migrated.value.get("durability") not in ["native_file","browser_sync"]:
@@ -729,13 +738,14 @@ func valid_save(data: Variant) -> bool:
 	if data.equipped and not data.get("weapon_owned", true) and not data.has("shop_weapon"): return false
 	if not data.get("shop_owned",[]) is Array or not data.get("shop_slots",{}) is Dictionary or not data.get("shop_quantities",{}) is Dictionary: return false
 	if not ShopRules.valid_gear(ShopRules.local_state(data)): return false
+	if not GourdRules.valid(data.get("gourds",{}),ShopRules.local_state(data)):return false
 	if data.has("shop_owned") and (not data.shop_owned is Array or data.shop_owned.has("sword")): return false
 	if data.has("shop_weapon") and bool(data.equipped) != (data.shop_weapon != null): return false
 	var local_gear := ShopRules.local_state(data)
 	for slot in ["weapon","armor"]:
 		if data.get("shop_slots",{}).has(slot) and data.shop_slots[slot]!=local_gear[slot]: return false
 	for id in data.get("shop_quantities",{}):
-		if not local_gear.owned.has(id) or not ShopRules._integer(data.shop_quantities[id],1,1 if ShopRules.is_equipment(ShopRules.item(id)) else 99): return false
+		if not local_gear.owned.has(id) or not ShopRules._integer(data.shop_quantities[id],1,1 if ShopRules.unique(ShopRules.item(id)) else 99): return false
 	for slot in ShopRules.SLOTS:
 		var id: Variant = ShopRules.equipped_id(local_gear,slot)
 		if id!=null and not ShopRules.equipment_error(ShopRules.item(id),int(data.job),int(data.get("gender",0))).is_empty(): return false

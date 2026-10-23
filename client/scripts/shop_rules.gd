@@ -28,6 +28,9 @@ static func item(id: String) -> Dictionary:
 static func is_equipment(entry: Dictionary) -> bool:
 	return entry.get("slot") in SLOTS
 
+static func unique(entry:Dictionary)->bool:
+	return is_equipment(entry) or entry.get("slot")=="gourd"
+
 static func equipped_id(gear: Dictionary, slot: String) -> Variant:
 	return gear.get(slot) if slot in ["weapon","armor"] else gear.get("slots",{}).get(slot)
 
@@ -58,7 +61,7 @@ static func valid_gear(gear: Variant) -> bool:
 		for id in gear.quantities:
 			if id=="potion":
 				if not _integer(gear.quantities[id],0,1000000): return false
-			elif not seen.has(id) or not _integer(gear.quantities[id],1,1 if is_equipment(item(id)) else 99): return false
+			elif not seen.has(id) or not _integer(gear.quantities[id],1,1 if unique(item(id)) else 99): return false
 		for id in seen:
 			if not gear.quantities.has(id): return false
 	for slot in SLOTS:
@@ -101,6 +104,7 @@ static func bag_item(id: String, job: int=1) -> Dictionary:
 static func description(id: String, stats: Dictionary={}) -> String:
 	var entry := item(id)
 	if entry.is_empty(): return ""
+	if entry.slot=="gourd":return "容量%d；仅战斗外补给，空瓶可补充。"%int(entry.capacity)
 	if entry.get("effect")=="teleport":return "自选已开放地图；成功耗1张，取消不消耗。"
 	if entry.get("effect")=="reset_attributes": return "返还全部属性点；耗1颗，保留气血灵力比例。"
 	if is_equipment(entry): return ("攻击 +%d"%int(entry.attack)) if entry.slot=="weapon" else ("防御 +%d"%int(entry.defense))
@@ -147,13 +151,14 @@ static func _store(player: Dictionary, gear: Dictionary) -> void:
 
 static func apply_local(player: Dictionary, action: String, id: String, count: int=1, limits: Dictionary={}) -> String:
 	if player.get("corpse") is Dictionary:return "SOUL_STATE"
+	if action in GourdRules.ACTIONS:return GourdRules.apply_local(player,action,id) if count==1 else "INVALID_QUANTITY"
 	if action=="scroll_travel":return _travel_local(player,id,count)
 	var gear := local_state(player)
 	var entry := item(id)
 	if entry.is_empty(): return "INVALID_EQUIPMENT"
-	if count<1 or count>99 or (is_equipment(entry) and count!=1): return "INVALID_QUANTITY"
+	if count<1 or count>99 or (unique(entry) and count!=1): return "INVALID_QUANTITY"
 	if action=="buy":
-		if is_equipment(entry) and gear.owned.has(id): return "ITEM_ALREADY_OWNED"
+		if unique(entry) and gear.owned.has(id): return "ITEM_ALREADY_OWNED"
 		if quantity(gear,id)+count>99: return "BAG_FULL"
 		if int(player.gold)<int(entry.price)*count: return "GOLD_INSUFFICIENT"
 		if quantity(gear,id)==0 and bag_slots(gear,int(player.potions))+LootRules.extra_bag(player.get("loot_state",{}))>=60: return "BAG_FULL"
@@ -163,6 +168,9 @@ static func apply_local(player: Dictionary, action: String, id: String, count: i
 			gear.quantities[id]=quantity(gear,id)+count
 			if not gear.owned.has(id): gear.owned.append(id)
 		_store(player,gear)
+		if entry.slot=="gourd":
+			if not player.has("gourds"):player.gourds={}
+			player.gourds[id]={"remaining":int(entry.capacity),"enabled":true}
 		return ""
 	if quantity(gear,id)<count: return "WEAPON_NOT_OWNED"
 	if action=="use":
@@ -177,6 +185,7 @@ static func apply_local(player: Dictionary, action: String, id: String, count: i
 			player.hp=mini(int(limits.hp),int(player.hp)+healing)
 			player.mp=mini(int(limits.mp),int(player.mp)+int(entry.restore_mp))
 	if action in ["use","discard"]:
+		if entry.slot=="gourd":player.get("gourds",{}).erase(id)
 		if id=="potion": player.potions=int(player.potions)-count
 		else:
 			gear.quantities[id]=quantity(gear,id)-count

@@ -222,6 +222,7 @@ func select_item(index: int, hover: bool = false) -> void:
 	if hover and selected_index < items.size():
 		tooltip.position = Vector2(clampf(cursor.position.x - 18, 44, 139), clampf(cursor.position.y + 8, 212, 318))
 		tooltip_label.text = "%s\n等级：%d" % [items[selected_index].name, int(items[selected_index].level)]
+		_gourd_tooltip(items[selected_index])
 		tooltip.show()
 		move_child(tooltip, get_child_count() - 1)
 	else: tooltip.hide()
@@ -244,6 +245,21 @@ func _selected() -> Dictionary:
 func _description() -> void:
 	var item := _selected()
 	description.text = "" if item.is_empty() else "%s  ×%d" % [item.name, int(item.count)]
+	if item.get("slot")=="gourd":description.text=item.name+" · "+GourdRules.status(item.id,_gourds())
+
+func _gourds()->Dictionary:
+	return Game.player.get("gourds",{}) if online_model==null else online_model.state.get("gourds",{})
+
+func toggle_gourd()->void:
+	var item:=_selected()
+	if item.get("slot")!="gourd" or not _gourds().has(item.id):return
+	var action:="gourd_disable" if _gourds()[item.id].enabled else "gourd_enable"
+	if online_model!=null:online_model.submit(action,item.id);return
+	var result:=await Game.shop_command(action,item.id)
+	if not is_inside_tree():return
+	close_menu();refresh()
+	if not result.ok:description.text=result.message
+	changed.emit()
 
 func open_menu() -> void:
 	if item_menu != null and is_instance_valid(item_menu): close_menu(); return
@@ -257,6 +273,7 @@ func open_menu() -> void:
 		if item.slot=="consumable":
 			if online_model==null or online_model.state.get("shop",{}).get("version")=="shop-v2": actions.append({"name":"使用","call":use_item})
 		elif ShopRules.is_equipment(item): actions.append({"name":"卸下" if selected_equipment else "装备","call":equip_item})
+		elif item.slot=="gourd":actions.append({"name":"关闭自动补给" if _gourds().get(item.id,{}).get("enabled",false) else "开启自动补给","call":toggle_gourd})
 		if not item.has("instance_id") and (online_model==null or online_model.state.get("shop",{}).get("version")=="shop-v2"): actions.append({"name":"丢弃","call":confirm_discard})
 	actions.append({"name":"装备实例","call":open_loot})
 	if online_model==null or online_model.state.has("gathering"):actions.append({"name":"采集材料袋","call":open_material_bag})
@@ -266,7 +283,7 @@ func open_menu() -> void:
 		var button := _button(String(actions[i].name), Rect2(3, 3 + i * 26, 144, 25), false, item_menu)
 		button.add_theme_color_override("font_color", Color("705321"))
 		button.pressed.connect(actions[i].call)
-		if online_model != null and button.text in ["装备", "卸下", "使用", "丢弃"]: button.disabled = not online_model.ready or online_model.pending() or online_model.active()
+		if online_model != null and (button.text in ["装备", "卸下", "使用", "丢弃"] or button.text.ends_with("自动补给")): button.disabled = not online_model.ready or online_model.pending() or online_model.active() or online_model.is_soul()
 		if button.text=="使用":
 			var stats := _display_stats()
 			var player := _display_player()
@@ -288,8 +305,18 @@ func show_item() -> void:
 	if item.is_empty(): return
 	tooltip.position = Vector2(61, 284)
 	tooltip_label.text=LootRules.describe(item.instance) if item.has("instance_id") else "%s  等级：1\n%s" % [item.name, ShopRules.description(item.id,_display_stats())]
+	_gourd_tooltip(item)
 	tooltip.show()
 	move_child(tooltip, get_child_count() - 1)
+
+func _gourd_tooltip(item:Dictionary)->void:
+	var gourd:bool=item.get("slot")=="gourd"
+	tooltip.size=Vector2(194,86) if gourd else Vector2(141,41)
+	tooltip_label.size=Vector2(184,78) if gourd else Vector2(132,35)
+	tooltip_label.add_theme_font_size_override("font_size",11 if gourd else 12)
+	if gourd:
+		tooltip.position.x=minf(tooltip.position.x,120)
+		tooltip_label.text="%s\n%s\n仅战斗外补给，空瓶保留。\n找清微道人／各地图巡山人免费补充。"%[item.name,GourdRules.status(item.id,_gourds())]
 
 func use_item() -> void:
 	var item := _selected()

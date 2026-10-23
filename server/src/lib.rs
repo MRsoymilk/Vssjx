@@ -1,4 +1,5 @@
 pub mod shop;
+pub mod gourds;
 pub mod combat_balance;
 pub mod skill_balance;
 pub mod monster_combat;

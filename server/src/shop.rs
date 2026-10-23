@@ -22,10 +22,13 @@ pub struct Item {
     pub gender:i16,
     #[serde(default)]
     pub effect:ItemEffect,
+    #[serde(default)]
+    pub capacity:i32,
 }
 fn any_gender()->i16{-1}
 impl Item {
     pub fn equipment(&self)->bool {SLOTS.contains(&self.slot.as_str())}
+    pub fn unique(&self)->bool {self.equipment()||self.slot=="gourd"}
     pub fn equip_error(&self,job:i16,gender:i16)->Option<&'static str>{
         if self.job>=0&&self.job!=job{return Some("WRONG_JOB");}
         if self.gender>=0&&self.gender!=gender{return Some("WRONG_GENDER");}
@@ -114,7 +117,7 @@ mod tests {
             gear.insert(format!("ai/boneglow/{stem}/hat"),true);
             assert_eq!(appearance(&gear),[34+index as i32,18+index as i32,10+index as i32]);
         }
-        assert_eq!(ITEMS.len(),397);
+        assert_eq!(ITEMS.len(),399);
     }
     #[test]
     fn eva01_sets_preserve_role_restrictions_and_mix_with_previous_families(){

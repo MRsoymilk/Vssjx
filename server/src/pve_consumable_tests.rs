@@ -8,7 +8,7 @@ fn player(job:i16,level:i32,revision:i16)->(Loaded,Context){
         balance_revision:revision,balance_respec_available:false};
     let loaded=Loaded{character,rules:Default::default(),gathering:json!({}),endless:Default::default(),
         hunt_pressure:Default::default(),ai:Default::default(),defeated:0,respawns:Default::default(),battle:None,
-        potions:6,equipped:false,weapon_owned:false,allocated:[0;5],gear:Default::default(),quantities:Default::default(),loot:Default::default()};
+        potions:6,equipped:false,weapon_owned:false,allocated:[0;5],gear:Default::default(),quantities:Default::default(),loot:Default::default(),gourds:Default::default()};
     let context=Context{character:id,session:Uuid::new_v4(),owner:0,connection_epoch:0,cell:[4,4],target_cell:None,
         moving:false,map_id:"qingyun_trail".into(),position_revision:0,duel_active:false};
     (loaded,context)
@@ -75,4 +75,42 @@ fn equipped_percentage_hp_is_recomputed_before_respec_ratios(){
         assert_eq!(loaded.apply(&use_item("restored/rebirth_pill"),&context),Err("NO_ALLOCATED_ATTRIBUTES"));
         assert_eq!(loaded.quantities["restored/rebirth_pill"],1);
     }
+}
+
+#[test]
+fn gourd_purchase_supply_switches_and_empty_containers_are_conservative(){
+    let (mut a,c)=player(0,60,1);let maxima=a.stats();
+    let mut buy=use_item(crate::gourds::HP);buy.action=Action::Buy;
+    a.apply(&buy,&c).unwrap();assert_eq!(a.character.gold,800);
+    assert!(a.auto_supply());assert_eq!(a.character.hp,maxima.hp);assert_eq!(a.character.mp,0);
+    assert_eq!(a.gourds.0[crate::gourds::HP].remaining,10000-maxima.hp+1);
+    let stable=a.gourds.clone();assert!(!a.auto_supply());assert_eq!(a.gourds,stable);
+    assert_eq!(a.apply(&buy,&c),Err("ITEM_ALREADY_OWNED"));
+    let mut toggle=buy.clone();toggle.action=Action::GourdDisable;toggle.quantity=None;
+    a.apply(&toggle,&c).unwrap();a.character.hp=1;assert!(!a.auto_supply());
+    a.gourds.0.get_mut(crate::gourds::HP).unwrap().remaining=7;
+    toggle.action=Action::GourdEnable;a.apply(&toggle,&c).unwrap();assert!(a.auto_supply());
+    assert_eq!(a.character.hp,8);assert_eq!(a.gourds.0[crate::gourds::HP].remaining,0);
+    assert_eq!(a.quantities[crate::gourds::HP],1);assert!(a.gourds.valid(&a.gear,&a.quantities));
+    let mut discard=buy;discard.action=Action::Discard;a.apply(&discard,&c).unwrap();
+    assert!(a.gourds.0.is_empty());assert!(a.gourds.valid(&a.gear,&a.quantities));
+}
+
+#[test]
+fn gourd_supply_cannot_touch_active_battles_or_resurrect_and_refills_require_npc(){
+    let (mut a,mut c)=player(1,30,1);
+    let mut command=use_item(crate::gourds::MP);command.action=Action::Buy;a.apply(&command,&c).unwrap();
+    let enemy=population::definitions().remove(1);a.battle=Some(Battle::new(enemy,1,0,6));
+    assert!(!a.auto_supply());assert_eq!(a.character.mp,0);
+    command.action=Action::GourdDisable;command.quantity=None;assert_eq!(a.apply(&command,&c),Err("BATTLE_ACTIVE"));
+    a.battle.as_mut().unwrap().outcome="fled".into();assert!(a.auto_supply());
+    a.battle=None;a.character.hp=0;a.character.mp=0;assert!(!a.auto_supply());
+    a.character.hp=1;a.die([10,14]).unwrap();assert!(!a.auto_supply());
+    assert_eq!(a.apply(&command,&c),Err("SOUL_STATE"));
+    a.character.corpse=None;a.character.hp=1;
+    command.action=Action::GourdRefillMp;command.target=Some("qingwei".into());c.target_cell=Some([10,13]);
+    assert_eq!(a.apply(&command,&c),Err("RESIDENT_TOO_FAR"));c.cell=[10,14];
+    a.apply(&command,&c).unwrap();assert_eq!(a.gourds.0[crate::gourds::MP].remaining,5000);
+    assert_eq!(a.apply(&command,&c),Err("GOURD_FULL"));
+    command.target=Some("wolf_a".into());assert_eq!(a.apply(&command,&c),Err("GOURD_NPC_REQUIRED"));
 }

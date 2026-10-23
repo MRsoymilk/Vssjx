@@ -74,6 +74,7 @@ func valid(value: Variant) -> bool:
 			return false
 		if not ShopRules.valid_gear(value.shop): return false
 		if value.shop.version=="shop-v2" and value.shop.get("catalog_sha256")!=ShopRules.catalog_hash: return false
+	if not GourdRules.valid(value.get("gourds",{}),value.get("shop",{})):return false
 	if value.has("loot"):
 		if not value.has("shop") or not LootRules.valid_view(value.loot,value.shop,int(value.character.job),int(value.character.gender)):return false
 		for i in value.loot.state.items:
@@ -166,6 +167,8 @@ func receive(packet: Dictionary) -> bool:
 		var previous_loot:Dictionary=state.get("loot",{})
 		var previous_endless:Dictionary=state.get("endless",{})
 		var previous_gathering:Dictionary=state.get("gathering",{})
+		var previous_gourds:Dictionary=state.get("gourds",{})
+		var keep_gourds:bool=state.has("gourds") and not packet.state.has("gourds") and packet.state.character.state_revision==state.character.state_revision
 		var keep_gathering:bool=state.has("gathering") and not packet.state.has("gathering") and packet.state.character.state_revision==state.character.state_revision
 		var keep_endless:bool=state.has("endless") and not packet.state.has("endless") and packet.state.character.state_revision==state.character.state_revision
 		var keep_loot:bool=state.has("loot") and not packet.state.has("loot") and packet.state.character.state_revision==state.character.state_revision
@@ -177,6 +180,7 @@ func receive(packet: Dictionary) -> bool:
 		var keep_respawns: bool = state.has("server_time_ms") and not packet.state.has("server_time_ms") and packet.state.character.state_revision == state.character.state_revision
 		var previous_time: int = int(state.get("server_time_ms", 0))
 		state = packet.state.duplicate(true)
+		if keep_gourds:state.gourds=previous_gourds.duplicate(true)
 		if keep_gathering:state.gathering=previous_gathering.duplicate(true)
 		if keep_ai: state.ai_world = previous_ai.duplicate(true)
 		if keep_loot:state.loot=previous_loot.duplicate(true)
@@ -231,6 +235,13 @@ func unavailable_monsters() -> Array:
 
 func submit(action: String, target: String = "", points: Array = [], count: int=1, enemy_slot:String="") -> bool:
 	if not ready or pending(): return false
+	if action in GourdRules.ACTIONS:
+		if active() or is_soul() or not state.has("gourds") or count!=1 or not points.is_empty():return false
+		var id:=GourdRules.refill_id(action)
+		if id.is_empty():id=target
+		# Character coordinates can lag movement; the server validates the live position.
+		elif target!="qingwei" and (not target.ends_with("_guide") or AIWorld.resident(target).is_empty()):return false
+		if not state.gourds.has(id):return false
 	if action in ["gather_start","gather_finish","gather_cancel","gather_discard","gather_craft"]:
 		if not state.has("gathering") or (count!=1 and action not in ["gather_discard","gather_craft"]) or not points.is_empty():return false
 		if action!="gather_cancel" and (active() or is_soul()):return false
@@ -287,7 +298,7 @@ func submit(action: String, target: String = "", points: Array = [], count: int=
 	elif action=="respec":
 		if active() or not state.character.get("balance_respec_available",false):return false
 		command.expected_revision=state.character.state_revision
-	elif action in ["gather_start","gather_finish","gather_cancel","gather_discard","gather_craft","buy", "equip", "unequip", "use", "discard","school_join","scroll_travel","revive","endless","gear_equip","gear_unequip","gear_claim","gear_salvage","gear_reroll","gear_upgrade","gear_focus"]:
+	elif action in GourdRules.ACTIONS or action in ["gather_start","gather_finish","gather_cancel","gather_discard","gather_craft","buy", "equip", "unequip", "use", "discard","school_join","scroll_travel","revive","endless","gear_equip","gear_unequip","gear_claim","gear_salvage","gear_reroll","gear_upgrade","gear_focus"]:
 		command.target = target
 		if count!=1 or action=="gear_reroll": command.quantity=count
 		command.expected_revision = state.character.state_revision
@@ -322,6 +333,8 @@ func quest_text() -> String:
 	return "古剑遗迹 · 已完成\n妖气已散，可返回青云山道恢复元气，或继续探索遗迹。"
 
 static func error_text(code: String) -> String:
+	var gourds:={"GOURD_NOT_OWNED":"请先在商城购买对应葫芦。","GOURD_FULL":"葫芦储量已满，无需补充。","GOURD_NPC_REQUIRED":"请到清微道人或本地图巡山人处补充葫芦。"}
+	if gourds.has(code):return gourds[code]
 	if code=="MAP_CLOSED":return "目标地图暂时禁止进入，请选择其他目的地；传送道具未消耗。"
 	var gathering:={"INVALID_GATHER_COMMAND":"无效的采集或加工请求。","GATHER_NOT_FOUND":"当前地图没有这个可采集资源。","GATHER_TOO_FAR":"请先走到资源旁并停稳。","GATHER_COOLDOWN":"该资源正在刷新，请稍候。","GATHER_BUSY":"正在采集，请先完成或取消。","GATHER_NOT_READY":"采集尚未完成，请等待进度结束。","GATHER_INTERRUPTED":"操作已中断，请停稳后重新确认。","STALE_GATHERING":"角色状态已变化，请重新确认。","MATERIAL_BAG_FULL":"该材料已接近999份上限，请先整理材料袋。","INVALID_GATHER_STATE":"采集记录异常，请重新同步。","CRAFT_RESOURCE_FULL":"炼材已达容量上限，请先使用后再加工。"}
 	if gathering.has(code):return gathering[code]
@@ -344,7 +357,7 @@ static func error_text(code: String) -> String:
 	if ai.has(code): return ai[code]
 	var skills:={"INVALID_SKILL":"未知技能，请更新客户端。","SKILL_ROLE_MISMATCH":"此技能不属于当前职业。","SKILL_LEVEL_REQUIRED":"角色等级尚未达到技能要求。","PASSIVE_SKILL":"此心法自动生效，无需施展。"}
 	if skills.has(code):return skills[code]
-	var equipment := {"WRONG_JOB":"此装备不适合当前职业。", "WRONG_GENDER":"此装备不适合当前性别。", "INVALID_QUANTITY":"数量无效。", "ITEM_NOT_USABLE":"此物品不能直接使用。","GOLD_INSUFFICIENT":"铜钱不足。", "ITEM_ALREADY_OWNED":"已经拥有这件装备。", "BAG_FULL":"背包或补给已满。","INVALID_EQUIPMENT":"此装备尚未开放。", "STALE_EQUIPMENT":"装备状态已更新，请重新选择。", "WEAPON_NOT_OWNED":"背包中没有这件装备。", "EQUIPMENT_UNCHANGED":"当前已是该装备状态。"}
+	var equipment := {"WRONG_JOB":"此装备不适合当前职业。", "WRONG_GENDER":"此装备不适合当前性别。", "INVALID_QUANTITY":"数量无效。", "ITEM_NOT_USABLE":"此物品不能直接使用。","GOLD_INSUFFICIENT":"铜钱不足。", "ITEM_ALREADY_OWNED":"已拥有此物品，每种限持一个。", "BAG_FULL":"背包或补给已满。","INVALID_EQUIPMENT":"此装备尚未开放。", "STALE_EQUIPMENT":"背包状态已更新，请重新选择。", "WEAPON_NOT_OWNED":"背包中没有这件装备。", "EQUIPMENT_UNCHANGED":"当前已是该装备状态。"}
 	if equipment.has(code): return equipment[code]
 	if code == "PORTAL_LOCKED": return "灵门未开，请完成山狼试炼并向清微道人复命。"
 	if code == "PORTAL_TOO_FAR": return "请走近灵门后再传送。"

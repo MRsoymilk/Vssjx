@@ -46,7 +46,7 @@ func _run() -> void:
 	check(source_count==208,"All recovered items are functional")
 	var page:ShopPanel=load("res://scenes/ui/shop_panel.tscn").instantiate()
 	add_child(page)
-	check(page.rows.size()==397 and page.grid.columns==2,"Complete two-column catalog including respec pill and travel talisman")
+	check(page.rows.size()==399 and page.grid.columns==2,"Complete two-column catalog including reusable supply gourds")
 	for row in page.rows:
 		check(row.get_node("Icon").texture!=null,"Actual product icon "+String(row.get_meta("item_id")))
 	page.category="帽子";page.category_box.select(2);page._filter()
@@ -63,7 +63,7 @@ func _run() -> void:
 	check(not Game.valid_save(bad),"Conflicting equipped slots rejected")
 	check((await Game.load_game()).ok and ShopRules.appearance(ShopRules.local_state(Game.player))[2]>0,"Head appearance persists")
 	page.category="药品";page.category_box.select(11);page.section="elixir";page._filter()
-	check(page.goods.size()>20 and page.goods.all(func(i:Dictionary)->bool:return i.slot=="consumable"),"Medicines have a separate native tab and category")
+	check(page.goods.size()>20 and page.goods.all(func(i:Dictionary)->bool:return i.slot in ["consumable","gourd"]),"Medicines and refillable gourds have a separate native tab and category")
 	var medicine:Dictionary=page.goods.filter(func(i:Dictionary)->bool:return int(i.restore_mp)>0 and int(i.restore_hp)==0)[0]
 	page.selected=medicine.id;page.refresh();page.quantity_box.value=5
 	check(int(page.quantity_box.max_value)==99 and page.total.text.contains(str(int(medicine.price)*5)),"Quantity updates purchase total")

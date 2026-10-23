@@ -1046,8 +1046,8 @@ func _encounter_battle(enemy: Dictionary) -> void:
 	battle_transition = load("res://scenes/ui/battle_encounter_transition.tscn").instantiate()
 	ui.add_child(battle_transition)
 	battle_transition.configure(String(enemy.get("name", "妖物")), point)
-	# A short readable warning, followed by actual texture/cache work.
-	await get_tree().create_timer(0.20).timeout
+	# Draw the warning before cold IO; no fixed delay on every encounter.
+	await get_tree().process_frame
 	if not _encounter_current(epoch, world_id): return
 	var keys: Array[String] = [Game.appearance_key(), String(enemy.get("art", "")), "effect/flash", BattleDeathPlayback.ART_KEY]
 	for d in opponents:
@@ -1055,6 +1055,7 @@ func _encounter_battle(enemy: Dictionary) -> void:
 	keys.append_array(BattleResultView.ART_KEYS)
 	keys.append_array(BattleEffects.preload_keys(int(Game.player.job),int(Game.player.school),int(Game.player.level)))
 	var paths: Array[String] = ["res://assets/tiles/original_tiles.png"]
+	var metadata_frame:=Time.get_ticks_usec()
 	for key in keys:
 		var info := OriginalArt.actor_info(key)
 		if info.is_empty():
@@ -1064,6 +1065,9 @@ func _encounter_battle(enemy: Dictionary) -> void:
 		if not paths.has(path): paths.append(path)
 		var scene_path:=OriginalArt.scene_path(key)
 		if not paths.has(scene_path):paths.append(scene_path)
+		if Time.get_ticks_usec()-metadata_frame>=4000:
+			await get_tree().process_frame;metadata_frame=Time.get_ticks_usec()
+			if not _encounter_current(epoch,world_id):return
 	var request := Platform.context.resource_loader.prepare(PackedStringArray(paths), battle_transition, epoch,"Resource")
 	battle_resource_request = request
 	while not request.is_finished():
@@ -1076,15 +1080,17 @@ func _encounter_battle(enemy: Dictionary) -> void:
 	if not request.result.ok:
 		_encounter_failed(request.result.message)
 		return
+	var frame_started:=Time.get_ticks_usec()
 	for index in keys.size():
 		# Prepare only the actors, outcomes and effects referenced by this encounter.
-		var prepared := OriginalArt.actor(keys[index])
-		prepared.free()
+		if not OriginalArt.is_prepared(keys[index]):
+			var prepared := OriginalArt.actor(keys[index]);prepared.free()
 		battle_transition.set_progress(0.75 + 0.20 * float(index + 1) / keys.size(), "准备角色动作与招式")
-		await get_tree().process_frame
+		if Time.get_ticks_usec()-frame_started>=4000:
+			await get_tree().process_frame;frame_started=Time.get_ticks_usec()
 		if not _encounter_current(epoch, world_id): return
 	battle_transition.set_progress(1.0, "准备就绪")
-	await get_tree().create_timer(0.16).timeout
+	await get_tree().process_frame
 	if not _encounter_current(epoch, world_id): return
 	_start_local_encounter(opponents,true)
 

@@ -13,6 +13,10 @@ static var _native_catalog: Dictionary = {}
 static var _scene_paths: Dictionary = {}
 static var _edit_revision := -1
 static var _appearance_revision := -1
+static var _loaded_scenes:Dictionary={}
+static var _scene_order:Array[String]=[]
+static var _scene_loads:=0
+const MAX_SCENES:=48
 const ACTOR_SCENE := preload("res://scenes/actors/original_actor.tscn")
 const INDEX_PATH := "res://assets/actor_resources/catalog.tres"
 
@@ -88,7 +92,21 @@ static func _sync_edits() -> void:
 	_dynamic_weak.clear();_dynamic_order.clear()
 
 static func metadata_stats() -> Dictionary:
-	return {"indexed_actors": _index.size(), "loaded_actors": catalog.size(), "sprite_frames": cached.size(), "json_files_read":0,"json_bytes_read":0,"resource_files_loaded":_metadata_reads,"resource_bytes":_metadata_bytes}
+	return {"indexed_actors": _index.size(), "loaded_actors": catalog.size(), "sprite_frames": cached.size(), "json_files_read":0,"json_bytes_read":0,"resource_files_loaded":_metadata_reads,"resource_bytes":_metadata_bytes,"scene_loads":_scene_loads,"cached_scenes":_loaded_scenes.size()}
+
+static func is_prepared(key:String)->bool:
+	_sync_edits()
+	return cached.has(key) and _loaded_scenes.has(scene_path(key))
+
+static func _scene(path:String)->PackedScene:
+	if path.is_empty():return null
+	if not _loaded_scenes.has(path):
+		var packed:=load(path) as PackedScene
+		if packed==null:return null
+		_loaded_scenes[path]=packed;_scene_loads+=1
+	_scene_order.erase(path);_scene_order.append(path)
+	while _scene_order.size()>MAX_SCENES:_loaded_scenes.erase(_scene_order.pop_front())
+	return _loaded_scenes[path]
 
 static func _integer(value: Variant, minimum: int, maximum: int) -> bool:
 	return (value is int or value is float) and is_finite(float(value)) and value >= minimum and value <= maximum and float(value) == floor(float(value))
@@ -120,7 +138,7 @@ static func actor(key: String) -> AnimatedSprite2D:
 		push_error("Missing original actor: " + key)
 		return ACTOR_SCENE.instantiate()
 	var path:=scene_path(key)
-	var scene:=load(path) as PackedScene if not path.is_empty() else null
+	var scene:=_scene(path)
 	if scene==null:
 		push_error("Missing native actor scene: "+key)
 		return ACTOR_SCENE.instantiate()

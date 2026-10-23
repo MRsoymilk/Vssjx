@@ -4,38 +4,36 @@ extends Node2D
 
 @export var kind := "courtyard"
 var terrain: TileMapLayer
+const TILE_SET:=preload("res://assets/map_resources/original_tiles.tres")
+static var _terrain_templates:Dictionary={}
 
 func _ready() -> void:
 	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	terrain = TileMapLayer.new()
-	var set := TileSet.new()
-	set.tile_size = Vector2i(16, 16)
-	var atlas := TileSetAtlasSource.new()
-	atlas.texture = load("res://assets/tiles/original_tiles.png")
-	atlas.texture_region_size = Vector2i(16, 16)
-	for i in 756: atlas.create_tile(Vector2i(i % 32, i / 32))
-	set.add_source(atlas)
-	terrain.tile_set = set
+	terrain.tile_set = TILE_SET
 	add_child(terrain)
-	for y in 25:
-		for x in 20:
-			var tile := 159
-			match kind:
-				"courtyard":
-					var lawn := (x < 4 or x > 15) and (y < 7 or y > 17)
-					tile = (14 if (x + y) % 4 else 13) if lawn else [157, 158, 159, 167, 168, 169][x % 3 + (y % 2) * 3]
-					if lawn and (x * 13 + y * 7) % 23 == 0: tile = 3
-				"arena": tile = 325 if (x * 13 + y * 7) % 89 else 329
-				"wilderness":
-					tile = 325 if (x * 13 + y * 7) % 37 else 329
-				"snow": tile = 474 if (x * 5 + y * 3) % 29 else 456
-				"ruins": tile = _ruins_tile(Vector2i(x, y))
-			_put(Vector2i(x, y), tile)
+	var template:=kind if kind in ["courtyard","arena","wilderness","snow","ruins"] else "fallback"
+	if _terrain_templates.has(template):terrain.tile_map_data=_terrain_templates[template]
+	else:
+		for y in 25:
+			for x in 20:
+				var tile := 159
+				match kind:
+					"courtyard":
+						var lawn := (x < 4 or x > 15) and (y < 7 or y > 17)
+						tile = (14 if (x + y) % 4 else 13) if lawn else [157, 158, 159, 167, 168, 169][x % 3 + (y % 2) * 3]
+						if lawn and (x * 13 + y * 7) % 23 == 0: tile = 3
+					"arena": tile = 325 if (x * 13 + y * 7) % 89 else 329
+					"wilderness":tile = 325 if (x * 13 + y * 7) % 37 else 329
+					"snow": tile = 474 if (x * 5 + y * 3) % 29 else 456
+					"ruins": tile = _ruins_tile(Vector2i(x, y))
+				_put(Vector2i(x, y), tile)
+		if kind=="courtyard":_house(Vector2i(0,4));_house(Vector2i(15,19))
+		_terrain_templates[template]=terrain.tile_map_data
 	if kind == "arena":
 		terrain.modulate = Color(0.90, 0.815, 1.03)
 	elif kind == "courtyard":
-		_house(Vector2i(0, 4))
-		_house(Vector2i(15, 19))
+		pass
 	elif kind == "wilderness":
 		_prop("map/m6", Vector2(26, 83))
 		_prop("map/m1", Vector2(299, 349))

@@ -1,6 +1,13 @@
 extends "res://tests/online_maps_live_test.gd"
 
+func check(value:bool,text:String)->void:
+	super.check(value,text)
+	print("AI LIVE CHECK: ",value," ",text)
+	if not value and is_instance_valid(view):
+		print("AI LIVE DIAGNOSTICS: map=",view.network.map_id," approach=",view._approach," own=",view.network.entities.get(view.character_id,{})," status=",view._system_text," pve=",view.network.pve.last_code)
+
 func _run() -> void:
+	await Platform.when_ready()
 	var old := Game.player.duplicate(true)
 	OnlineAccount.login(OS.get_environment("SSJX_AI_TEST_BASE"),"ai_ui","owned-ai-world-password")
 	await OnlineAccount.completed

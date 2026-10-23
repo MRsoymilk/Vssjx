@@ -89,3 +89,9 @@ func _result_overlay_regression(packet:Dictionary)->void:
 		check(not model.pending() and OnlineAccount.pending_team.is_empty(),"Definitive storage rejection cannot trap the durable outbox in endless ambiguous retries")
 		overlay.queue_free()
 	view.queue_free();await get_tree().process_frame
+	var world:OnlineWorldView=load("res://scenes/ui/online_world_view.tscn").instantiate()
+	world.character_id=packet.character_id;add_child(world);world.set_process(false);world.network.set_process(false)
+	world.team.request={"action":"snapshot","operation_id":packet.operation_id};world.team.inflight=true
+	check(world.team.receive(packet),"Reconnect accepts a completed authoritative battle with pending loot")
+	check(world.get_children().any(func(n:Node)->bool:return n is TeamLootPanel and n.is_visible_in_tree()),"Reconnect opens pending loot without needing to replay or reopen the ended battle")
+	world.queue_free();await get_tree().process_frame

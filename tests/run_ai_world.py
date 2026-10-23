@@ -106,7 +106,13 @@ def main():
             # Run the real Godot client while the server-owned respawn clock elapses.
             if os.environ.get('GODOT_BIN'):
                 create('ai_ui',map_id='ai_001')
-                result=subprocess.run([os.environ['GODOT_BIN'],'--headless','--path',str(ROOT/'client'),'--quit-after','18000','res://tests/ai_world_live_test.tscn'],env=dict(os.environ,SSJX_AI_TEST_BASE=base),text=True,encoding='utf8',capture_output=True,timeout=125)
+                try:
+                    result=subprocess.run([os.environ['GODOT_BIN'],'--headless','--path',str(ROOT/'client'),'--quit-after','18000','res://tests/ai_world_live_test.tscn'],env=dict(os.environ,SSJX_AI_TEST_BASE=base),text=True,encoding='utf8',capture_output=True,timeout=125)
+                except subprocess.TimeoutExpired as error:
+                    for output in (error.stdout,error.stderr):
+                        if output:print(output.decode('utf8',errors='replace') if isinstance(output,bytes) else output,flush=True)
+                    print(''.join(process.ai_logs),flush=True)
+                    raise
                 print(result.stdout,flush=True);print(result.stderr,flush=True)
                 if result.returncode!=0 or '0 failures' not in result.stdout or 'SCRIPT ERROR' in result.stderr:
                     print(''.join(process.ai_logs),flush=True)

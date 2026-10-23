@@ -63,20 +63,20 @@ func _run() -> void:
 		var monsters: Dictionary = {}
 		for id in app.world.enemy_nodes: monsters[id] = app.world.enemy_nodes[id].position
 		var previous := 0.0
-		var ready_seen := false
 		var index := 0
 		var deadline := Time.get_ticks_msec() + 18000
 		while app.mode == "battle_loading" and Time.get_ticks_msec() < deadline:
 			check(overlay.progress >= previous and overlay.progress >= 0.0 and overlay.progress <= 1.0, "Resource progress is bounded and never regresses")
 			previous = overlay.progress
-			if overlay.progress == 1.0: ready_seen = true
 			check(app.world.hero.position == hero_position, "Encounter overlay never permits extra player displacement")
 			for id in monsters: check(app.world.enemy_nodes[id].position == monsters[id], "Personal monsters remain paused during preparation")
 			await sample(app, zone, index)
 			index += 1
 			await get_tree().create_timer(1.0 / 30.0).timeout
 		check(app.mode == "local_encounter" and app.local_encounter.sources[0].id == enemy.id and int(app.local_encounter.state.round)==1, "Prepared encounter enters exactly the intended battle at round zero")
-		check(ready_seen and app.battle_transition == null and app.local_encounter_view.menu.visible, "Completion removes loading UI and shows original commands without auto-attacking")
+		# A warm load can complete between 30Hz samples; do not require keeping a
+		# finished loading screen visible just so this observer sees its last frame.
+		check(app.battle_transition == null and app.local_encounter_view.menu.visible, "Completion removes loading UI and shows original commands without auto-attacking")
 		for field in resources: check(Game.player[field] == resources[field], "Encounter presentation never spends resources or awards loot")
 		var required: Array[String]=[Game.appearance_key(),String(enemy.art),BattleDeathPlayback.ART_KEY]
 		required.append_array(BattleEffects.preload_keys(int(Game.player.job),int(Game.player.school),int(Game.player.level)))

@@ -57,6 +57,10 @@ var _loading_battle := ""
 var _battle_load_epoch := 0
 var _battle_resource_request: PlatformResourceRequest
 var _battle_load_failed := false
+var _team_loading:=""
+var _team_load_epoch:=0
+var _team_resource_request:PlatformResourceRequest
+var _restored_loot:=""
 var _hidden_residents: Array = []
 @onready var map_transition: OriginalMapTransition = $MapTransition
 var _transfer_origin := ""
@@ -91,6 +95,7 @@ func _ready() -> void:
 		screen.hud.show();count_label.show();screen.chrome.round_label.text="常规模式";_set_battle_layout(false)
 	)
 	team.bind_character(character_id)
+	team.prepare_battles=true
 	team.send_requested.connect(OnlineAccount.team_request)
 	team_panel=preload("res://scenes/ui/team_panel.tscn").instantiate();team_panel.model=team;add_child(team_panel)
 	team_panel.profile_requested.connect(func(id:String)->void:team_panel.dismiss();_open_social("profile",id))
@@ -359,12 +364,83 @@ func _team_changed()->void:
 		team_notice_text.text="%s 邀请组队"%team.state.incoming[0].name
 		team_confirm.disabled=team.pending() or team.inflight;team_reject.disabled=team_confirm.disabled
 	if team.active():
+		if not team.presentation_ready() and _team_loading!=team.battle().id:_prepare_team_battle(team.battle())
 		network._pending_motion.clear();move_target.clear();_was_keyboard=false;_cancel_approach()
-		_close_inventory();_close_world_map();_close_attributes();menu.hide();details.hide();npc_dialog.hide();encounter.hide()
+		_close_inventory();_close_world_map();_close_attributes();menu.hide();details.hide();npc_dialog.hide()
+		if team.presentation_ready():encounter.hide()
 		if social_panel.visible:social_panel.dismiss()
 		if team_panel.visible:team_panel.dismiss()
 		if expanded_chat.visible:expanded_chat.dismiss()
 		screen.hud.hide();count_label.hide();_set_battle_layout(true);screen.chrome.round_label.text="组队战斗"
+	else:
+		if not _team_loading.is_empty():_cancel_team_preparation()
+		if team.loot_pending() and team_battle.battle_id!=team.battle().id and _restored_loot!=team.battle().id:
+			_restored_loot=team.battle().id;TeamLootPanel.open_for(team_battle,team)
+
+func _cancel_team_preparation()->void:
+	_team_load_epoch+=1
+	if _team_resource_request!=null:_team_resource_request.cancel()
+	_team_resource_request=null;_team_loading=""
+	if is_instance_valid(encounter) and _loading_battle.is_empty():encounter.hide()
+	if is_instance_valid(screen) and not team.active() and not network.pve.active() and not network.duel.active():
+		screen.hud.show();count_label.show();_set_battle_layout(false)
+
+func _team_preparation_current(epoch:int,id:String)->bool:
+	return is_inside_tree() and not is_queued_for_deletion() and epoch==_team_load_epoch and team.active() and team.battle().get("id")==id
+
+func _prepare_team_battle(snapshot:Dictionary)->void:
+	_cancel_team_preparation()
+	team_battle.hide()
+	var epoch:=_team_load_epoch;var id:=String(snapshot.id);_team_loading=id
+	encounter.present("challenge",String(snapshot.enemies[0].definition.name),_hero_screen_point())
+	encounter.set_progress(0.0,"准备队伍战斗资源")
+	await get_tree().process_frame
+	if not _team_preparation_current(epoch,id):return
+	var keys:Array[String]=["effect/flash",BattleDeathPlayback.ART_KEY]
+	keys.append_array(BattleResultView.ART_KEYS)
+	for f in snapshot.fighters:
+		var key:=ShopRules.actor_key(int(f.job),int(f.gender),f.appearance)
+		if not keys.has(key):keys.append(key)
+		for effect in BattleEffects.preload_keys(int(f.job),int(f.school),int(f.level),false):
+			if not keys.has(effect):keys.append(effect)
+	for e in snapshot.enemies:
+		if not keys.has(String(e.definition.art)):keys.append(String(e.definition.art))
+	var paths:Array[String]=["res://assets/tiles/original_tiles.png"]
+	var frame_started:=Time.get_ticks_usec()
+	for key in keys:
+		var info:=OriginalArt.actor_info(key)
+		if info.is_empty():
+			_cancel_team_preparation();chat_status.text="战斗资源读取失败，请检查游戏文件后重试。";return
+		for path in [String(info.texture),OriginalArt.scene_path(key)]:
+			if not paths.has(path):paths.append(path)
+		if Time.get_ticks_usec()-frame_started>=4000:
+			await get_tree().process_frame;frame_started=Time.get_ticks_usec()
+			if not _team_preparation_current(epoch,id):return
+	# Five different jobs/styles can need more than one loader batch.
+	# Keep earlier batches alive until warming consumes their resources; Godot's
+	# resource cache is weak and the next request otherwise releases that batch.
+	var prepared_requests:Array[PlatformResourceRequest]=[]
+	for start in range(0,paths.size(),96):
+		var request:=Platform.context.resource_loader.prepare(PackedStringArray(paths.slice(start,start+96)),self,epoch,"Resource")
+		prepared_requests.append(request)
+		_team_resource_request=request
+		while not request.is_finished():
+			encounter.set_progress(.75*(start+request.progress*min(96,paths.size()-start))/paths.size(),"准备队伍战斗资源")
+			await get_tree().process_frame
+			if not _team_preparation_current(epoch,id):request.cancel();return
+		if not request.result.ok:
+			_cancel_team_preparation();chat_status.text="战斗资源读取失败，进度已保留，正在重试。";return
+	frame_started=Time.get_ticks_usec()
+	for i in keys.size():
+		if not OriginalArt.is_prepared(keys[i]):
+			var actor:=OriginalArt.actor(keys[i]);actor.free()
+		encounter.set_progress(.75+.25*float(i+1)/keys.size(),"准备队友动作与招式")
+		if Time.get_ticks_usec()-frame_started>=4000:
+			await get_tree().process_frame;frame_started=Time.get_ticks_usec()
+			if not _team_preparation_current(epoch,id):return
+	if not _team_preparation_current(epoch,id):return
+	_team_resource_request=null;_team_loading="";team.display_ready=true
+	encounter.hide();team_battle.present()
 
 func _social_changed() -> void:
 	var incoming: Array=[]
@@ -1062,7 +1138,7 @@ func _prepare_battle(snapshot: Dictionary) -> void:
 	_loading_battle = id
 	encounter.present("challenge", snapshot.enemy.name, _hero_screen_point())
 	encounter.set_progress(0.0, "准备战斗图像与场景")
-	await get_tree().create_timer(0.20).timeout
+	await get_tree().process_frame
 	if not _battle_preparation_current(epoch, id): return
 	var c: Dictionary = network.pve.state.character
 	var key: String = (["mzs", "mck", "mfs"] if int(c.gender) == 0 else ["wzs", "wck", "wfs"])[int(c.job)]
@@ -1073,6 +1149,7 @@ func _prepare_battle(snapshot: Dictionary) -> void:
 	keys.append_array(BattleResultView.ART_KEYS)
 	keys.append_array(BattleEffects.preload_keys(int(c.job),int(c.school),int(c.level),not network.pve.state.has("skills")))
 	var paths: Array[String] = ["res://assets/tiles/original_tiles.png"]
+	var metadata_frame:=Time.get_ticks_usec()
 	for actor_key in keys:
 		var info := OriginalArt.actor_info(actor_key)
 		if info.is_empty():
@@ -1081,6 +1158,9 @@ func _prepare_battle(snapshot: Dictionary) -> void:
 		if not paths.has(info.texture): paths.append(info.texture)
 		var scene_path:=OriginalArt.scene_path(actor_key)
 		if not paths.has(scene_path):paths.append(scene_path)
+		if Time.get_ticks_usec()-metadata_frame>=4000:
+			await get_tree().process_frame;metadata_frame=Time.get_ticks_usec()
+			if not _battle_preparation_current(epoch,id):return
 	var request := Platform.context.resource_loader.prepare(PackedStringArray(paths), self, epoch,"Resource")
 	_battle_resource_request = request
 	while not request.is_finished():
@@ -1092,14 +1172,16 @@ func _prepare_battle(snapshot: Dictionary) -> void:
 	if not request.result.ok:
 		_battle_preparation_failed()
 		return
+	var frame_started:=Time.get_ticks_usec()
 	for index in keys.size():
-		var prepared := OriginalArt.actor(keys[index])
-		prepared.free()
+		if not OriginalArt.is_prepared(keys[index]):
+			var prepared := OriginalArt.actor(keys[index]);prepared.free()
 		encounter.set_progress(0.75 + 0.20 * float(index + 1) / keys.size(), "准备角色动作与招式")
-		await get_tree().process_frame
+		if Time.get_ticks_usec()-frame_started>=4000:
+			await get_tree().process_frame;frame_started=Time.get_ticks_usec()
 		if not _battle_preparation_current(epoch, id): return
 	encounter.set_progress(1.0, "准备就绪")
-	await get_tree().create_timer(0.16).timeout
+	await get_tree().process_frame
 	if not _battle_preparation_current(epoch, id): return
 	_battle_resource_request = null
 	_loading_battle = ""
@@ -1119,6 +1201,7 @@ func _present_battle() -> void:
 
 func _exit_tree() -> void:
 	_cancel_battle_preparation()
+	_cancel_team_preparation()
 
 func _web_lifecycle(event: String) -> void:
 	if event not in ["focus_lost", "suspended"]: return

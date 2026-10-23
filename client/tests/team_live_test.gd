@@ -23,15 +23,15 @@ func _run()->void:
 	check(await until(func()->bool:return not view.team.party().is_empty() and not view.team.pending()),"Explicit acceptance joins the server team")
 	view._scene_action("team")
 	check(view.team_panel.visible,"Team menu opens real membership")
-	check(view.team.submit("ready","","",true),"Player independently confirms readiness")
+	check(view.team.party().members.any(func(m:Dictionary)->bool:return m.id==config.character and m.ready and m.following),"Accepted member defaults to prepared without submitting another ready command")
 	check(await until(func()->bool:return view.team.active()),"Leader encounter enters shared battle on this client")
 	if not view.team.active():view.queue_free();get_tree().quit(1);return
-	check(view.team_battle.visible and view.team_battle.actors.size()>=4 and view.network.team_active,"Multiple monsters and both players render while map movement is gated")
+	check(await until(func()->bool:return view.team.presentation_ready() and view.team_battle.visible and view.team_battle.actors.size()>=4 and view.network.team_active),"Multiple monsters and both players render after asynchronous preparation while map movement is gated")
 	var deadline:=Time.get_ticks_msec()+45000
 	var acted:=false
 	var guarded:=false
 	while view.team.active() and Time.get_ticks_msec()<deadline:
-		if view.team.my_turn() and not view.team.pending() and not view.team.inflight and view.team_battle.motion==null and view.team_battle.queue.is_empty():
+		if view.team.presentation_ready() and view.team_battle.visible and view.team.my_turn() and not view.team.pending() and not view.team.inflight and view.team_battle.motion==null and view.team_battle.queue.is_empty():
 			# Force a second round so real production playback must acknowledge
 			# completion, rather than allowing a one-round victory to skip it.
 			if not guarded:

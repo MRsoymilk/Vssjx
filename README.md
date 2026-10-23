@@ -10,7 +10,7 @@
   <a href="https://47.93.114.190/">项目门户</a> ·
   <a href="https://47.93.114.190/webgame/">网页体验</a> ·
   <a href="https://47.93.114.190/downloads/vssjx-arm64.apk">Android 预览版</a> ·
-  <a href="https://47.93.114.190/flarum/">剑侠茶馆</a> ·
+  <a href="https://pd.qq.com/s/a6q695iaf?b=9">剑侠茶馆</a> ·
   <a href="#快速开始">快速开始</a> ·
   <a href="design/README.md">设计文档</a> ·
   <a href="CONTRIBUTING.md">参与贡献</a>
@@ -35,7 +35,7 @@
 
 2026-10-19 仅更新了门户和网页入口：游戏移至 `/webgame/`，原游戏包、APK、后端和数据库保持不变，见 [门户发布记录](tests/portal_release_20261019.md)。
 
-2026-10-20 独立部署了 [Flarum 中文论坛](deploy/FLARUM.md)，门户已开放入口；后续接入 QQ SMTP、确认测试投递后[开放注册](tests/flarum_registration_20261020.md)，保留邮箱验证，不连接游戏账号或数据库。首次部署基线见 [论坛发布记录](tests/flarum_release_20261020.md)。
+社区入口改为腾讯频道【蜀山剑侠归来】，门户保留“剑侠茶馆”原有展示，仅更换跳转链接；自建论坛组件已移除。服务器停用与数据清理结果见 [社区入口调整记录](tests/community_channel_20261023.md)。
 
 ## 快速开始
 

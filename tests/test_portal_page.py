@@ -36,9 +36,10 @@ class PortalPageTests(unittest.TestCase):
         self.assertIn('#game', links)
         self.assertNotIn('#download', links)
         self.assertNotIn('/flarum/', links)
-        self.assertTrue(any(tag == 'button' and 'disabled' in attrs
-                            and attrs.get('aria-describedby') == 'forum-status'
-                            for tag, attrs in self.page.elements))
+        self.assertEqual(links.count('https://pd.qq.com/s/a6q695iaf?b=9'), 3)
+        self.assertIn('<h2>剑侠茶馆</h2>', self.html)
+        self.assertIn('前往剑侠茶馆', self.html)
+        self.assertNotIn('筹备中', self.html)
 
     def test_platforms_share_one_game_entry_without_web_first_navigation(self):
         game = self.html.split('<article class="destination-card game-card"', 1)[1].split('</article>', 1)[0]

@@ -52,7 +52,8 @@ const server = http.createServer((request, response) => {
       await page.goto(base, {waitUntil: 'networkidle'});
       check(await page.title() === '蜀山剑侠 · 归来 — 江湖驿站', name + ': correct title');
       check(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), name + ': no horizontal overflow');
-      check(await page.getByRole('button', {name: '论坛筹备中'}).isDisabled(), name + ': forum stays disabled');
+      check(await page.locator('a[href="https://pd.qq.com/s/a6q695iaf?b=9"]').count() === 3, name + ': all community entries point to the Tencent channel');
+      check(await page.locator('#community h2').textContent() === '剑侠茶馆', name + ': teahouse title is unchanged');
       check(await page.getByRole('link', {name: '开始游戏'}).getAttribute('href') === '#game', name + ': platform-neutral game selection');
       check(await page.locator('#game a[href="/go/webgame"]').count() === 1 && await page.locator('#game a[href="/go/android"]').count() === 1, name + ': Web and Android are choices in one game item');
       check(await page.locator('.hero-icon').evaluate(image => image.complete && image.naturalWidth === 256), name + ': reused icon decoded');

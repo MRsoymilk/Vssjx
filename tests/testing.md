@@ -9,8 +9,7 @@
 | 开源文档与链接 | [文档检查](documentation.md) |
 | 导航与游戏子路径 | [页面、浏览器与隔离 Nginx 验证](portal_navigation.md) |
 | 私有统计后台与 APK 管理 | [采集、文件管理、HTTP 安全与浏览器验证](portal_stats.md) |
-| 独立 Flarum 论坛 | [2026-10-20 安装、隔离、资源与公网浏览器验证](flarum_release_20261020.md) |
-| 论坛 SMTP 与注册 | [QQ 测试邮件确认、注册开放与敏感配置检查](flarum_registration_20261020.md) |
+| 茶馆社区调整与旧论坛清理 | [腾讯频道链接、专用组件移除及服务器核验](community_channel_20261023.md) |
 | EVA 初号机主题装备 | [六角色、60 件装备、实际离屏渲染及隔离联机验证](eva01_equipment.md) |
 | 任务、战斗与地图 | [线上 PVE](online_pve.md)、[第二张地图](online_maps.md)、[技能](../design/skills.md#验证) |
 | 雷霆一击眩晕 | [概率、行动跳过、持久化与原生状态图标](stun.md) |

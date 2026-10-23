@@ -47,12 +47,17 @@ var portal_marker: Node2D
 var move_target: WorldMoveTarget
 var quest_marker: NpcQuestMarker
 var soul_markers: SoulMarkers
+var day_night: WorldDayNight
 
 func _ready() -> void:
 	zone = int(Game.player.zone)
 	map_id = AIWorld.local_map_id()
 	cell = Vector2i(Game.player.cell[0], Game.player.cell[1])
 	_build_map()
+	day_night = WorldDayNight.new()
+	day_night.name = "DayNight"
+	day_night.set_map(map_data)
+	add_child(day_night)
 	move_target = preload("res://scenes/world_move_target.tscn").instantiate()
 	add_child(move_target)
 	actors = Node2D.new()

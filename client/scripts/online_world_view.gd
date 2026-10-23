@@ -88,6 +88,7 @@ var soul_markers: SoulMarkers
 @onready var soul_overlay: CanvasLayer = $SoulOverlay
 var _soul_transition_id := ""
 var _soul_snap_pending := false
+var day_night: WorldDayNight
 
 func _ready() -> void:
 	solo_model.attach(network.pve)
@@ -558,6 +559,12 @@ func _advance_map_transition() -> void:
 	map_transition.complete()
 
 func _build_map() -> void:
+	if not is_instance_valid(day_night):
+		day_night = WorldDayNight.new()
+		day_night.name = "DayNight"
+		day_night.time_source = network.world_time_seconds
+		scene.add_child(day_night)
+	day_night.set_map(map_data)
 	SharedWorldMap.build($Viewport/Scene/Terrain, _motion_grid, map_data)
 	soul_markers=preload("res://scenes/actors/soul_markers.tscn").instantiate()
 	actor_layer.add_child(soul_markers)

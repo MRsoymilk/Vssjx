@@ -16,6 +16,7 @@
 | 新数值候选内核 | [共享参数、Rust/Godot一致性与实际离屏预览](combat_balance.md) |
 | 社交与多人战斗 | [社交](social.md)、[组队](teams.md)、[决斗](player_duels.md) |
 | 平台与网页 | [平台基础](platform_interface.md)、[主游戏 Web](web_game.md)、[浏览器存储](web_storage.md) |
+| 一小时昼夜切换 | [场景时间、边界、洞穴固定光照与实际渲染](day_night.md) |
 | 素材与桌面工具 | [数据浏览](data_browser.md)、[游戏导出边界](game_export.md) |
 | 截图NPC地图应用 | [20种透明人物、两端地图绑定、点击判定及实际渲染](recovered_npc_maps.md) |
 | 截图地图与怪物分布 | [黄土门院、水岸、沙地和避开巡游区的通路](map_distribution.md) |

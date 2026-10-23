@@ -64,6 +64,11 @@ func _run() -> void:
 	if not view.network.world_ready: get_tree().quit(1); return
 	check(app.mode == "online_world" and app.world == null, "Online entry never runs the offline world simulation")
 	check(view.screen.scene_file_path == "res://scenes/ui/game_world_screen.tscn" and view.viewport.size == Vector2i(320, 375), "Multiplayer uses the original game HUD and viewport")
+	check(view.network.world_time_seconds() > 0.0 and absf(view.network.world_time_seconds() - Time.get_unix_time_from_system()) < 5.0, "Real authenticated connection synchronizes world time")
+	var light_id := view.day_night.get_instance_id()
+	view.day_night.refresh()
+	var expected_light := WorldDayNight.tint_at(view.network.world_time_seconds())
+	check(absf(view.day_night.color.r - expected_light.r) < 0.002 and view.day_night.get_viewport() == view.viewport, "Real shared-world lighting follows server time inside the map only")
 	check(view.chat_panel.visible and view.chat_panel.position.y == 403, "Public chat stays in the original bottom message area")
 	check(view.network.entities.has(other_id), "Peer appears with server identity")
 	var own_id := OnlineAccount.characters[0].id as String
@@ -131,6 +136,7 @@ func _run() -> void:
 		check(seen_remote_leave and view.actors.size() == 2, "Disconnect removed peer and reconnect restored exactly one actor")
 		check(view.chat_log.get_parsed_text().count("重连原消息") == 1, "Reconnect retry is not rebroadcast to other players")
 	await capture("reconnected")
+	check(view.day_night.get_instance_id() == light_id and absf(view.network.world_time_seconds() - Time.get_unix_time_from_system()) < 5.0, "Reconnect retains the same map light and resynchronizes time")
 	check(Game.player == before and FileAccess.get_file_as_string(Game.save_path) == "offline-sentinel", "Shared-world play never mutates offline assets")
 	mark("done")
 	check(await wait_until(func() -> bool: return FileAccess.file_exists(folder.path_join("finish"))), "Coordinator finishes both clients")

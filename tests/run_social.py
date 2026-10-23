@@ -45,6 +45,7 @@ def main():
                 return session, data['character']['id']
 
             a, b, c = create('social_a'), create('social_b'), create('social_c')
+            check(db.query("SELECT count(*) FROM information_schema.columns WHERE table_schema='public' AND table_name='guilds' AND column_name='deleted_at'") == '0', 'Guild creation uses the actual hard-delete guild schema, without a character-only deleted_at column')
 
             def send(who, action, expected='OK', request=None, **kw):
                 payload = request or dict(character_id=who[1], action=action, **kw)
@@ -135,6 +136,14 @@ def main():
             check(not send(b, 'snapshot')[0]['state']['friends'], 'Friend deletion visible on both sides')
             send(b, 'guild_disband')
             check(send(b, 'snapshot')[0]['state']['guild'] is None, 'Disband removes all membership and applications atomically')
+            recreated, _ = send(b, 'guild_create', name='青云同盟')
+            check(recreated['state']['guild']['id'] != guild and db.query("SELECT count(*) FROM guilds WHERE name_key='青云同盟'") == '1', 'Hard-deleted guild names can be reused without restoring the old guild')
+            send(b, 'guild_disband')
+            race_a, race_b = create('guild_race_a'), create('guild_race_b')
+            with concurrent.futures.ThreadPoolExecutor(2) as pool:
+                duplicate_creates = list(pool.map(lambda row: api(base, '/api/v1/social', dict(character_id=row[0][1], operation_id=str(uuid4()), action='guild_create', name=row[1]), row[0][0]['access_token']), [(race_a, 'CloudGuild'), (race_b, 'cloudguild')]))
+            check(all(status == 200 for status, _ in duplicate_creates) and sorted(value['code'] for _, value in duplicate_creates) == ['GUILD_NAME_TAKEN', 'OK'], 'Concurrent canonical-name guild creation returns a business rejection, not a database error')
+            check(db.query("SELECT count(*) FROM guilds WHERE name_key='cloudguild'") == '1', 'Concurrent canonical-name creation persists exactly one guild')
             check(int(db.query("SELECT count(*) FROM security_audit WHERE action LIKE 'social.%'")) > 20, 'Social mutations and rejections are audited without private request bodies')
             # Seed only this disposable fixture to exercise actual capacity boundaries.
             db.query("WITH owners AS (INSERT INTO accounts(id,username,password_hash) SELECT gen_random_uuid(),'cap_'||i,a.password_hash FROM accounts a CROSS JOIN generate_series(1,151) g(i) WHERE a.username='social_a' RETURNING id,username) INSERT INTO characters(id,account_id,display_name,name_key,name_rules_version,rules_version,job,gender,school,hp,mp) SELECT gen_random_uuid(),id,username,username,'nickname-v1','creation-v1',1,0,3,95,45 FROM owners;")

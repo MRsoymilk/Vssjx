@@ -309,7 +309,8 @@ async fn apply(db: &mut PgConnection, c: &Command) -> Result<&'static str, AuthE
         let Ok((name, key)) = crate::characters::canonical_name(&c.name) else {
             return Ok("INVALID_NAME");
         };
-        if sqlx::query_scalar::<_, bool>("SELECT EXISTS(SELECT 1 FROM guilds WHERE name_key=$1 AND deleted_at IS NULL)")
+        // Guild disbanding deletes the row; only characters use deleted_at.
+        if sqlx::query_scalar::<_, bool>("SELECT EXISTS(SELECT 1 FROM guilds WHERE name_key=$1)")
             .bind(&key)
             .fetch_one(&mut *db)
             .await

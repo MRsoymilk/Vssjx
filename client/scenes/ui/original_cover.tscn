@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" path="res://assets/ui/original_cover.png" id="Artwork"]
 [ext_resource type="Texture2D" path="res://assets/ui/select_3.png" id="Left"]
 [ext_resource type="Texture2D" path="res://assets/ui/select_2.png" id="Right"]
+[ext_resource type="SpriteFrames" path="res://assets/ui/cover_panda_frames.tres" id="Panda"]
 
 [sub_resource type="SystemFont" id="Font"]
 script = ExtResource("BundledCjk")
@@ -48,6 +49,24 @@ offset_right = 320.0
 offset_bottom = 480.0
 mouse_filter = 2
 texture = ExtResource("Artwork")
+
+[node name="Panda" type="Button" parent="."]
+layout_mode = 0
+offset_left = 12.0
+offset_top = 412.0
+offset_right = 68.0
+offset_bottom = 472.0
+focus_mode = 0
+mouse_default_cursor_shape = 2
+flat = true
+
+[node name="Sprite" type="AnimatedSprite2D" parent="Panda"]
+position = Vector2(28, 56)
+scale = Vector2(2, 2)
+sprite_frames = ExtResource("Panda")
+animation = &"idle"
+centered = false
+offset = Vector2(-12, -24)
 
 [node name="Rows0" type="Button" parent="."]
 layout_mode = 0

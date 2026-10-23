@@ -7,12 +7,19 @@ signal exit_requested
 
 const MENU_OPTIONS := ["登陆游戏", "退出游戏"]
 const MENU_RECT := Rect2(164, 400, 142, 30)
-var active := true
+var active := true:
+	set(value):
+		active = value
+		if is_node_ready():
+			panda_button.disabled = not active
+			_reset_panda()
 var selected_index := 0
 var original_text: Dictionary
 var rows: Array[Button] = []
 @onready var left_arrow: TextureRect = $LeftArrow
 @onready var right_arrow: TextureRect = $RightArrow
+@onready var panda_button: Button = $Panda
+@onready var panda: AnimatedSprite2D = $Panda/Sprite
 
 func _ready() -> void:
 	original_text = JSON.parse_string(FileAccess.get_file_as_string("res://assets/data/cover.json"))
@@ -21,7 +28,18 @@ func _ready() -> void:
 		row.pressed.connect(_activate_row.bind(index))
 		row.mouse_entered.connect(_hover_row.bind(index))
 		rows.append(row)
+	panda_button.pressed.connect(_look_back)
+	panda_button.disabled = not active
+	panda.animation_finished.connect(_reset_panda)
 	_refresh()
+
+func _look_back() -> void:
+	if not active or panda.is_playing(): return
+	panda.play(&"look_back")
+
+func _reset_panda() -> void:
+	panda.stop()
+	panda.animation = &"idle"
 
 func _refresh() -> void:
 	for i in rows.size():

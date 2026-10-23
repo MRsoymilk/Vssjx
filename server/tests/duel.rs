@@ -402,3 +402,154 @@ fn afk_rounds_are_bounded_and_no_new_round_opens_during_playback() {
     assert_eq!(a.battles[&id].reason, "round_limit");
     assert_eq!(a.battles[&id].winner, None);
 }
+
+fn revised_arena(jobs: [i16; 2], first: usize) -> (Arena, Uuid, Uuid, Uuid, Instant) {
+    let now = Instant::now();
+    let fighters = jobs.map(|job| {
+        let mut stats = vssjx_server::attributes::balanced_stats(job, 60, false, [0; 5]);
+        stats.hp = 10000;
+        stats.attack = 500;
+        let b = stats.balance.as_mut().unwrap();
+        b.physical_attack = 500;
+        b.magic_attack = 500;
+        Fighter::from_snapshot(&json!({"state":{"stats":stats,"attributes":{"allocated":[0,0,0,0,0]},
+            "character":{"id":Uuid::new_v4(),"display_name":"切磋回归","job":job,"gender":0,"school":3,"level":60}}}), [1,0,0]).unwrap()
+    });
+    let [x, y] = fighters.each_ref().map(|f| f.id);
+    let mut arena = Arena::default();
+    let offer = arena.invite(x, y, fighters[0].name.clone(), fighters[1].name.clone(), now).unwrap();
+    let id = arena.start(offer, y, fighters, now).unwrap();
+    arena.battles.get_mut(&id).unwrap().fighters[first].speed = 300;
+    (arena, x, y, id, now)
+}
+fn paired_actions(arena: &mut Arena, id: Uuid, now: Instant, choices: [(&str, Option<&str>); 2]) {
+    let ids = arena.battles[&id].fighters.each_ref().map(|f| f.id);
+    let revision = arena.battles[&id].decision_revision.to_string();
+    for (who, (action, skill)) in ids.into_iter().zip(choices) {
+        let mut c = command(action);
+        c.battle_id = Some(id);c.expected_revision = Some(revision.clone());c.skill = skill.map(str::to_owned);
+        arena.act(who, &c, now, [0, 0, 99]).unwrap();
+    }
+}
+#[test]
+fn revised_sleep_and_silence_each_block_one_action_for_fast_and_slow_casters() {
+    for effect in ["sleep", "silence"] {
+        let skill = skills::ITEMS.iter().find(|s| s.active && s.effect == effect).unwrap();
+        for first in [0, 1] {
+            let mut observed = false;
+            for _ in 0..40 {
+                let (mut arena, x, y, id, mut now) = revised_arena([skill.job, 2], first);
+                let initial_mp = arena.battles[&id].fighters[0].mp;
+                let cost = vssjx_server::skill_balance::cost(skill, arena.battles[&id].fighters[0].stats);
+                let expected_action = if effect == "sleep" { "sleep" } else { "fizzle" };
+                let mut blocked = 0;
+                for round in 0..3 {
+                    let before_mp = arena.battles[&id].fighters[1].mp;
+                    let target_skill = if round == 0 && first == 1 { "legacy_2" } else if round < 2 { "sheet_018" } else { "legacy_2" };
+                    paired_actions(&mut arena, id, now, [if round == 0 { ("skill", Some(&skill.id)) } else { ("guard", None) }, ("skill", Some(target_skill))]);
+                    let b = &arena.battles[&id];
+                    if round == 0 && b.events.iter().any(|e| e.actor == x && e.missed) { break; }
+                    let target_event = b.events.iter().find(|e| e.actor == y).unwrap();
+                    if round == usize::from(first == 1) {
+                        assert_eq!(target_event.action, expected_action);
+                        assert_eq!(b.fighters[1].mp, before_mp, "A cancelled spell consumes no mana");
+                        assert_eq!(b.fighters[1].effects.remaining(target_skill), 0, "A cancelled spell starts no cooldown");
+                        blocked += 1;
+                    } else { assert_eq!(target_event.action, "skill"); }
+                    if round == 0 {
+                        assert_eq!(b.fighters[0].mp, initial_mp - cost);
+                        assert_eq!(b.fighters[0].effects.remaining(&skill.id), 3);
+                        assert_eq!(b.fighters[0].effects.balance.as_ref().unwrap().control_protection, 2);
+                        let remaining = if effect == "sleep" { b.fighters[0].effects.enemy_sleep } else { b.fighters[0].effects.enemy_silence };
+                        assert_eq!(remaining, i32::from(first == 1));
+                    }
+                    now += Duration::from_secs(5);
+                    arena.tick(now, &std::collections::HashMap::from([(x, (true,true)), (y, (true,true))]));
+                    if round == 2 { observed = true; }
+                }
+                if observed { assert_eq!(blocked, 1);break; }
+            }
+            assert!(observed, "No landed {effect} sample for initiative {first}");
+        }
+    }
+}
+#[test]
+fn landed_damage_still_wakes_sleep_and_silence_expires_after_a_basic_or_guard_action() {
+    let mut woke = false;
+    for _ in 0..40 {
+        let (mut a, x, y, id, now) = revised_arena([1, 2], 0);
+        a.battles.get_mut(&id).unwrap().fighters[0].effects.enemy_sleep = 1;
+        paired_actions(&mut a, id, now, [("attack", None), ("skill", Some("legacy_2"))]);
+        if a.battles[&id].events.iter().any(|e| e.actor == x && e.missed) { continue; }
+        assert_eq!(a.battles[&id].events.iter().find(|e| e.actor == y).unwrap().action, "skill");
+        woke = true;break;
+    }
+    assert!(woke);
+    for action in ["attack", "guard"] {
+        let (mut a, _, y, id, now) = revised_arena([1, 2], 0);
+        a.battles.get_mut(&id).unwrap().fighters[0].effects.enemy_silence = 1;
+        paired_actions(&mut a, id, now, [("guard", None), (action, None)]);
+        assert_eq!(a.battles[&id].events.iter().find(|e| e.actor == y).unwrap().action, action);
+        assert_eq!(a.battles[&id].fighters[0].effects.enemy_silence, 0);
+    }
+}
+#[test]
+fn revised_reflection_uses_pvp_scale_matching_defense_reduction_and_no_reflect_loop() {
+    for (job, action, skill, magical) in [(0,"attack",None,false),(2,"attack",None,true),(2,"skill",Some("legacy_2"),true)] {
+        for active in [false, true] {
+            for mitigated in [false, true] {
+                let mut observed = false;
+                for _ in 0..40 {
+                    let (mut a, x, _, id, now) = revised_arena([job, 0], 0);
+                    let b = a.battles.get_mut(&id).unwrap();
+                    let attacker = &mut b.fighters[0];
+                    attacker.effects.passive_physical = 100;attacker.effects.passive_magic = 100;
+                    let stats = attacker.stats.balance.as_mut().unwrap();
+                    stats.physical_defense = if mitigated {780} else {0};
+                    stats.magic_defense = if mitigated {1560} else {0};
+                    stats.reduction_bp = if mitigated {2000} else {0};
+                    if mitigated { attacker.effects.defense = 2;attacker.effects.defense_percent = 25; }
+                    let defender = &mut b.fighters[1];
+                    defender.effects.passive_physical = if magical {0} else {20};
+                    defender.effects.passive_magic = if magical {20} else {0};
+                    if active {
+                        if magical { defender.effects.reflect_magic = 2;defender.effects.magic_percent = 60; }
+                        else { defender.effects.reflect_physical = 2;defender.effects.physical_percent = 60; }
+                    }
+                    let hp = b.fighters.each_ref().map(|f| f.hp);
+                    paired_actions(&mut a, id, now, [(action, skill), ("guard", None)]);
+                    let b = &a.battles[&id];let event = b.events.iter().find(|e| e.actor == x).unwrap();
+                    if event.missed { assert_eq!(event.reflected,0);continue; }
+                    // 500×20/60%; armor is 50% physical / capped 60% magical;
+                    // then 20% gear reduction, 35% PvP scale and 25% defense buff.
+                    let expected = match (active, mitigated, magical) {
+                        (false,false,_)=>35,(true,false,_)=>105,
+                        (false,true,false)=>10,(false,true,true)=>8,
+                        (true,true,false)=>31,(true,true,true)=>24,
+                    };
+                    assert_eq!(event.reflected,expected);
+                    assert_eq!(event.fighters[0].hp,hp[0]-expected);
+                    assert_eq!(event.fighters[1].hp,hp[1]-event.damage,"Reflection never reflects recursively");
+                    assert_eq!(event.fighters[0].effects.last_reflected,expected);
+                    observed = true;break;
+                }
+                assert!(observed,"No landed reflection sample");
+            }
+        }
+    }
+}
+#[test]
+fn revised_magical_basic_attacks_never_trigger_physical_only_reflection() {
+    let mut observed = false;
+    for _ in 0..40 {
+        let (mut a, x, _, id, now) = revised_arena([2, 0], 0);
+        let defender = &mut a.battles.get_mut(&id).unwrap().fighters[1];
+        defender.effects.passive_magic = 0;defender.effects.reflect_magic = 0;
+        defender.effects.passive_physical = 100;defender.effects.reflect_physical = 2;defender.effects.physical_percent = 100;
+        paired_actions(&mut a, id, now, [("attack", None), ("guard", None)]);
+        let event = a.battles[&id].events.iter().find(|e| e.actor == x).unwrap();
+        if event.missed { continue; }
+        assert!(event.damage>0);assert_eq!(event.reflected,0);observed=true;break;
+    }
+    assert!(observed);
+}

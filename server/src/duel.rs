@@ -337,6 +337,7 @@ impl Battle {
                 action="stun".into();
                 self.lines.push(format!("{}处于眩晕，跳过本次行动。",actor.name));
             } else if enemy.effects.enemy_sleep > 0 {
+                actor.guarding = false;
                 action = "sleep".into();
                 self.lines.push(format!("{}沉睡中，跳过行动。", actor.name));
             } else if choice.action == "skill"
@@ -347,15 +348,16 @@ impl Battle {
                     .push(format!("{}的施法因封印或灵力不足而失败。", actor.name));
             } else {
                 let roll = rolls[1 + me];
+                let magical = actor.job == 2 && (choice.action == "skill" || actor.stats.balance.is_some());
                 let raw = match choice.action.as_str() {
                     "attack" => {
                         actor.mp=(actor.mp+crate::skill_balance::recovery(actor.stats,"basic_restore_bp",0)).min(actor.stats.mp);
-                        if crate::attributes::lands(Some(actor.stats), Some(enemy.stats), actor.job==2&&actor.stats.balance.is_some()) {
+                        if crate::attributes::lands(Some(actor.stats), Some(enemy.stats), magical) {
                             actor.effects.enemy_sleep = 0;
-                            let power = crate::attributes::for_attack(actor.stats, actor.job, actor.job==2&&actor.stats.balance.is_some());
+                            let power = crate::attributes::for_attack(actor.stats, actor.job, magical);
                             crate::attributes::critical(
-                                actor.stats, actor.job==2&&actor.stats.balance.is_some(), &mut actor.effects,
-                                crate::attributes::direct_damage(power,crate::attributes::defense(enemy.stats,actor.job==2&&actor.stats.balance.is_some()),10000,0), roll,
+                                actor.stats, magical, &mut actor.effects,
+                                crate::attributes::direct_damage(power,crate::attributes::defense(enemy.stats,magical),10000,0), roll,
                             )
                         } else {
                             missed=true;
@@ -366,7 +368,6 @@ impl Battle {
                         let s = skill.unwrap();
                         used = s.id.clone();
                         actor.effects.enemy_mp = enemy.mp;
-                        let magical = actor.job == 2;
                         let directed = matches!(s.target.as_str(), "enemy" | "all_enemies");
                         if directed && !crate::attributes::lands(Some(actor.stats), Some(enemy.stats), magical) {
                             missed=true;
@@ -406,10 +407,17 @@ impl Battle {
                 (damage, reflected) = if incoming > 0 {
                     enemy
                         .effects
-                        .enemy_hit(incoming, enemy.stats.attack, choice.action == "skill" && actor.job == 2)
+                        .enemy_hit(incoming, enemy.stats.attack, magical)
                 } else {
                     (0, 0)
                 };
+                if reflected > 0 && crate::skill_balance::revised(enemy.stats) {
+                    reflected = crate::attributes::incoming(reflected,enemy.level,actor.stats,magical,0)
+                        * crate::skill_balance::n("pvp_damage_bp") / 10000;
+                    if actor.guarding { reflected /= 2; }
+                    // Apply defensive buffs once, without generating another reflection.
+                    reflected = actor.effects.enemy_hit(reflected,0,magical).0;
+                }
                 enemy.hp = (enemy.hp - damage).max(0);
                 actor.hp = (actor.hp - reflected).max(0);
                 enemy.effects.last_incoming = damage;
@@ -433,6 +441,10 @@ impl Battle {
                     self.lines.push(format!("反弹{}点伤害。", reflected));
                 }
             }
+            // These controls count the victim's action opportunities. A slow
+            // caster must not lose the control at the end of the casting round.
+            enemy.effects.enemy_sleep = (enemy.effects.enemy_sleep - 1).max(0);
+            enemy.effects.enemy_silence = (enemy.effects.enemy_silence - 1).max(0);
             self.events.push(Event {
                 missed,
                 critical: damage > 0 && self.fighters[me].effects.last_critical,
@@ -473,8 +485,6 @@ impl Battle {
                         *n = (*n - 1).max(0);
                     }
                 }
-                f.effects.enemy_sleep = (f.effects.enemy_sleep - 1).max(0);
-                f.effects.enemy_silence = (f.effects.enemy_silence - 1).max(0);
             }
             if let Some(e) = self.events.last_mut() {
                 e.fighters = self.fighters.clone();

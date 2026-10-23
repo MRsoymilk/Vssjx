@@ -36,6 +36,9 @@ var _closed:=""
 var _status_notice:=""
 var _status_notice_until:=0
 var _stun_actor:=""
+const PERIODIC_SECONDS:=0.8
+var _periodic_remaining:=0.0
+var _periodic_targets:Array=[]
 func _ready()->void:
 	z_index=15
 	var field:=OriginalBattleField.new();field.kind="arena";add_child(field)
@@ -89,6 +92,7 @@ func _dismiss()->void:
 	_closed=battle_id;_cancel();hide();dismissed.emit()
 func _cancel()->void:
 	_clear_stun_badge()
+	_finish_periodic()
 	_effect_wait=""
 	if is_instance_valid(item_picker):item_picker.hide()
 	if is_instance_valid(move_callout):move_callout.clear()
@@ -148,7 +152,7 @@ func present()->void:
 				var item:Dictionary=event.duplicate(true);item["packet"]=packet_events;queue.append(item)
 		events_revision=packet_events
 	revision=int(b.revision)
-	var updating:=motion==null and queue.is_empty()
+	var updating:=not _executing()
 	for f in b.fighters:
 		if updating:
 			_display(f.id,f.name+" Lv."+str(int(f.level)),int(f.hp),int(f.stats.hp))
@@ -167,7 +171,7 @@ func _display(id:String,text:String,hp:int,max_hp:int)->void:
 	a.hit.tooltip_text=a.hp.tooltip_text
 	a.dead=hp==0
 func _choose(action:String)->void:
-	if motion!=null or not queue.is_empty() or not _effect_wait.is_empty() or effects.has_reactions() or model.pending() or not model.active():return
+	if _executing() or model.pending() or not model.active():return
 	if action not in ["inspect","flee"] and not model.my_turn():return
 	menu.hide()
 	if action=="inspect":
@@ -189,15 +193,17 @@ func _choose(action:String)->void:
 		return
 	_send(action)
 func _send(action:String,skill:String="")->void:
+	if _executing():return
 	if action!="flee" and not model.my_turn():return
 	item_picker.hide()
 	model.submit(action,selected if action in ["attack","skill"] else "",skill)
 func _refresh_controls()->void:
 	var b:Dictionary=model.battle()
 	if b.is_empty():return
-	var executing:=motion!=null or not queue.is_empty() or not _effect_wait.is_empty() or effects.has_reactions()
+	var executing:=_executing()
 	caption.text="精英遭遇" if int(b.get("monster_revision",0))==2 else ""
 	if b.has("endless"):caption.text="无尽第%d层"%int(b.endless.stage)
+	if _periodic_remaining>0:caption.text="回合末 · 持续伤害"
 	caption.visible=not caption.text.is_empty()
 	var left:=maxi(0,ceili((int(b.deadline_ms)-model.server_time-(Time.get_ticks_msec()-model.received_at))/1000.0))
 	if b.get("solo",false):left=ceili(solo_countdown)
@@ -207,11 +213,11 @@ func _refresh_controls()->void:
 		for f in b.fighters:
 			if f.hp>0:alive+=1
 		message="已提交 %d/%d · %s"%[b.commands.size(),alive,"请选择指令" if model.my_turn() else ("已锁定，等待队友" if b.commands.has(model.character_id) else "等待指令窗口")]
-		if motion!=null or not queue.is_empty() or not _effect_wait.is_empty() or effects.has_reactions() or model.server_time+Time.get_ticks_msec()-model.received_at<int(b.selection_starts_ms):message="行动中";left=0
+		if executing or model.server_time+Time.get_ticks_msec()-model.received_at<int(b.selection_starts_ms):message="行动中";left=0
 	hint.text=message if left==0 and b.has("commands") else "%s · %d秒"%[message,left]
 	if b.get("solo",false):hint.text="逐个行动中" if executing else ("等待确认" if model.pending() else "")
 	if b.get("wounds",{}).has(model.character_id):hint.text+=" · 流血%d回合"%int(b.wounds[model.character_id][0])
-	for i in action_buttons.size():action_buttons[i].disabled=not model.active() or not model.can_submit() or motion!=null or not queue.is_empty() or not _effect_wait.is_empty() or effects.has_reactions() or (not model.my_turn() if i<4 else (not model.party().get("leader",false) if i==5 else false))
+	for i in action_buttons.size():action_buttons[i].disabled=not model.active() or not model.can_submit() or executing or (not model.my_turn() if i<4 else (not model.party().get("leader",false) if i==5 else false))
 	if Time.get_ticks_msec()<_status_notice_until:hint.text=_status_notice
 	hint.visible=not hint.text.is_empty() and not executing
 	var can_choose:bool=model.active() and model.can_submit() and model.my_turn() and not model.pending() and not executing
@@ -244,24 +250,26 @@ func _process(delta:float)->void:
 	if not visible:return
 	if model.has_method("connected") and not model.connected():_cancel();menu.hide();countdown.hide();hint.show();hint.text="连接中断，正在恢复战斗……";return
 	effects.advance_reactions(delta)
+	# Advance existing deaths only; a batch ending this frame starts fresh deaths.
+	for death in deaths:death.advance(delta)
 	move_callout.update_anchor()
 	_refresh_actor_anchors()
 	if not _effect_wait.is_empty():
 		if effects.has_skill_effects(_effect_wait):return
 		_effect_wait=""
 		_start_deaths()
-	if motion!=null:
+	if _periodic_remaining>0:
+		_periodic_remaining=maxf(0.0,_periodic_remaining-maxf(0.0,delta))
+		if _periodic_remaining<0.000001:
+			_finish_periodic();_start_deaths()
+	elif motion!=null:
 		motion.advance(delta)
 		if not motion.active:
 			if playing.get("action")=="skill" and effects.has_skill_effects(playing.get("skill","")):_effect_wait=playing.skill
 			motion=null
 			if _effect_wait.is_empty():_start_deaths()
 	elif not queue.is_empty() and not effects.has_reactions():
-		var waiting:=false
-		if queue[0].action=="revive":
-			for death in deaths:
-				if death.actor==actors[queue[0].actor].sprite and death.active:waiting=true
-		if not waiting:_play(queue.pop_front())
+		if deaths.all(func(d:BattleDeathPlayback)->bool:return not d.active):_play(queue.pop_front())
 	elif not effects.has_reactions():
 		_sync_final_resources()
 		_start_deaths()
@@ -275,12 +283,11 @@ func _process(delta:float)->void:
 				# The result auto-dismisses this battle after 1.6s. Loot must remain
 				# a sibling overlay instead of disappearing with its hidden parent.
 				TeamLootPanel.open_for(self,model)
-	for death in deaths:death.advance(delta)
-	if motion==null and queue.is_empty() and _effect_wait.is_empty() and not effects.has_reactions() and deaths.all(func(d:BattleDeathPlayback)->bool:return not d.active) and model.has_method("finish_playback"):
+	if not _executing() and model.has_method("finish_playback"):
 		model.finish_playback()
 	_refresh_actor_anchors()
 	_refresh_controls()
-	if model.battle().get("solo",false) and model.my_turn() and motion==null and queue.is_empty() and _effect_wait.is_empty() and not effects.has_reactions() and not picker.visible:
+	if model.battle().get("solo",false) and model.my_turn() and not _executing() and not picker.visible:
 		solo_countdown=maxf(0,solo_countdown-delta);auto_elapsed+=delta
 		if automatic and auto_elapsed>=1.4:
 			auto_elapsed=0
@@ -335,8 +342,48 @@ func _start_deaths()->void:
 	for a in actors.values():
 		if a.dead and a.sprite.visible:
 			var death:=BattleDeathPlayback.new();death.start(a.sprite);deaths.append(death)
+
+func _executing()->bool:
+	return motion!=null or _periodic_remaining>0 or not queue.is_empty() or not _effect_wait.is_empty() or effects.has_reactions() or deaths.any(func(d:BattleDeathPlayback)->bool:return d.active)
+
+static func _is_periodic(event:Dictionary)->bool:
+	# Older receipts used self-targeted DOT events for round-end damage;
+	# reflection has a different actor/target and must stay beside its attack.
+	return event.get("action")=="dot" and event.get("actor")==event.get("target") and event.get("periodic",true)
+
+func _finish_periodic()->void:
+	for id in _periodic_targets:
+		if actors.has(id):
+			var sprite:AnimatedSprite2D=actors[id].sprite
+			if is_instance_valid(sprite) and sprite.visible and sprite.animation==&"hurt":sprite.play("idle")
+	_periodic_targets=[];_periodic_remaining=0.0
+
+func _play_periodic(first:Dictionary)->void:
+	var group:Array=[first]
+	while not queue.is_empty() and _is_periodic(queue[0]) and queue[0].get("packet")==first.get("packet"):
+		group.append(queue.pop_front())
+	var totals:Dictionary={}
+	for event in group:
+		if actors.has(event.target) and actors[event.target].sprite.visible and int(event.damage)>0:
+			totals[event.target]=int(totals.get(event.target,0))+int(event.damage)
+	# Apply every authoritative total in this frame, then run one shared visual
+	# interval. No attacker animation, status-name list, or per-unit wait is used.
+	for id in totals:
+		var receiver:Dictionary=actors[id]
+		receiver.hp.value=maxf(0,receiver.hp.value-int(totals[id]));receiver.dead=receiver.hp.value<=0
+	for id in totals:
+		var receiver:Dictionary=actors[id]
+		effects.number(receiver.sprite,int(totals[id]))
+		if receiver.sprite.sprite_frames.has_animation("hurt"):
+			receiver.sprite.play("hurt");receiver.sprite.set_frame_and_progress(0,0.0)
+	_periodic_targets=totals.keys()
+	_periodic_remaining=PERIODIC_SECONDS if not totals.is_empty() else 0.0
+	playing=first
+	move_callout.clear()
+
 func _play(event:Dictionary)->void:
 	_clear_stun_badge()
+	if _is_periodic(event):_play_periodic(event);return
 	if not actors.has(event.actor) or not actors.has(event.target):return
 	var a:Dictionary=actors[event.actor];var target:Dictionary=actors[event.target]
 	if event.action=="revive":

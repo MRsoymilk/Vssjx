@@ -13,6 +13,7 @@
 | EVA 初号机主题装备 | [六角色、60 件装备、实际离屏渲染及隔离联机验证](eva01_equipment.md) |
 | 任务、战斗与地图 | [线上 PVE](online_pve.md)、[第二张地图](online_maps.md)、[技能](../design/skills.md#验证) |
 | 雷霆一击眩晕 | [概率、行动跳过、持久化与原生状态图标](stun.md) |
+| 回合末持续伤害同步 | [五人五怪、混合状态、死亡／复活顺序及跨端回执](periodic_damage.md) |
 | 新数值候选内核 | [共享参数、Rust/Godot一致性与实际离屏预览](combat_balance.md) |
 | 社交与多人战斗 | [社交](social.md)、[组队](teams.md)、[决斗](player_duels.md) |
 | 平台与网页 | [平台基础](platform_interface.md)、[主游戏 Web](web_game.md)、[浏览器存储](web_storage.md) |

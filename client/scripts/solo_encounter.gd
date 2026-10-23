@@ -78,8 +78,9 @@ func _copy_enemy(from:Dictionary,to:Dictionary)->void:
 	if int(from.get("enemy_stun",0))>0:to.enemy_stun=int(from.enemy_stun)
 	else:to.erase("enemy_stun")
 	if from.has("balance") and to.has("balance"):to.balance.control_protection=from.balance.control_protection
-func _event(actor:String,target:String,action:String,skill:String,damage:int=0,healed:int=0,critical:bool=false,missed:bool=false)->void:
+func _event(actor:String,target:String,action:String,skill:String,damage:int=0,healed:int=0,critical:bool=false,missed:bool=false,periodic:bool=false)->void:
 	state.events.append({"actor":actor,"target":target,"action":action,"skill":skill,"damage":damage,"healed":healed,"critical":critical,"missed":missed})
+	if periodic:state.events[-1].periodic=true
 func submit(action:String,target:String="",skill:String="")->bool:
 	if not my_turn():return false
 	if pve!=null:return pve.submit(action,skill,[],1,target if action in ["attack","skill"] else "")
@@ -148,12 +149,12 @@ func _enemy_round()->void:
 	if engine.hp>before:_event(character_id,character_id,"regen","",0,engine.hp-before)
 	if state.wounds.has(character_id) and engine.hp>0:
 		var wound:Array=state.wounds[character_id];var damage:=mini(engine.hp,int(wound[1]));engine.hp-=damage;wound[0]=int(wound[0])-1
-		_event(character_id,character_id,"dot","monster_bleed",damage)
+		_event(character_id,character_id,"dot","monster_bleed",damage,0,false,false,true)
 		if int(wound[0])==0:state.wounds.erase(character_id)
 	SkillRules.end_turn(engine.skills)
 	for e in state.enemies:
 		var tail:=SkillRules.end_balance_round(e.effects,0,0);var damage:=mini(int(e.hp),int(tail.damage));e.hp=int(e.hp)-damage
-		if damage>0:_event(e.slot,e.slot,"dot","",damage)
+		if damage>0:_event(e.slot,e.slot,"dot","",damage,0,false,false,true)
 		SkillRules.end_turn(e.effects)
 	_revive_fallen()
 	if engine.hp==0:state.outcome="defeat"

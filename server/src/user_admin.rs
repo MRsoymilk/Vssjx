@@ -43,12 +43,19 @@ pub(crate) async fn users(
         return Err(invalid());
     }
     // strpos treats '%' and '_' as ordinary text, not wildcard/SQL syntax.
+    // Count and page share one snapshot, including empty/out-of-range pages.
+    let mut tx = pool(&state)?.begin().await.map_err(database)?;
+    sqlx::query("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ, READ ONLY")
+        .execute(&mut *tx).await.map_err(database)?;
+    let counts = sqlx::query("SELECT count(*) AS total, count(*) FILTER (WHERE $1='' OR strpos(a.username,lower($1))>0 OR a.id::text=$1 OR EXISTS(SELECT 1 FROM characters c WHERE c.deleted_at IS NULL AND c.account_id=a.id AND (strpos(c.name_key,lower($1))>0 OR c.id::text=$1))) AS matched FROM accounts a")
+        .bind(search.q.trim()).fetch_one(&mut *tx).await.map_err(database)?;
     let rows = sqlx::query("SELECT a.id,a.username,a.disabled,a.created_at::text AS created_at, (SELECT count(*) FROM characters c WHERE c.deleted_at IS NULL AND c.account_id=a.id) AS characters, COALESCE((SELECT jsonb_agg(jsonb_build_object('id',c.id,'display_name',c.display_name,'level',c.level) ORDER BY c.slot) FROM characters c WHERE c.deleted_at IS NULL AND c.account_id=a.id),'[]'::jsonb) AS character_summaries, (SELECT count(*) FROM sessions s WHERE s.account_id=a.id AND s.revoked_at IS NULL AND s.access_expires_at>clock_timestamp() AND s.refresh_expires_at>clock_timestamp() AND NOT a.disabled) AS sessions FROM accounts a WHERE $1='' OR strpos(a.username,lower($1))>0 OR a.id::text=$1 OR EXISTS(SELECT 1 FROM characters c WHERE c.deleted_at IS NULL AND c.account_id=a.id AND (strpos(c.name_key,lower($1))>0 OR c.id::text=$1)) ORDER BY a.created_at DESC,a.id LIMIT 51 OFFSET $2")
-        .bind(search.q.trim()).bind(search.offset).fetch_all(pool(&state)?).await.map_err(database)?;
+        .bind(search.q.trim()).bind(search.offset).fetch_all(&mut *tx).await.map_err(database)?;
+    tx.commit().await.map_err(database)?;
     let more = rows.len() > 50;
     let users: Vec<_> = rows.iter().take(50).map(|r| json!({"id":r.get::<Uuid,_>("id"),"username":r.get::<String,_>("username"),"disabled":r.get::<bool,_>("disabled"),"created_at":r.get::<String,_>("created_at"),"characters":r.get::<i64,_>("characters"),"character_summaries":r.get::<DbJson<Value>,_>("character_summaries").0,"sessions":r.get::<i64,_>("sessions")})).collect();
     Ok(Json(
-        json!({"users":users,"more":more,"csrf_token":state.operator_token}),
+        json!({"users":users,"more":more,"total":counts.get::<i64,_>("total"),"matched":counts.get::<i64,_>("matched"),"csrf_token":state.operator_token}),
     ))
 }
 pub(crate) async fn detail(

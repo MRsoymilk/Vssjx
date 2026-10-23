@@ -30,8 +30,8 @@
                     link.href='/users/'+encodeURIComponent(u.id)+suffix;td.append(link);tr.append(td);el('users-list').append(tr);
                 }
                 el('users-prev').disabled=offset===0;el('users-next').disabled=!data.more;
-                el('users-page').textContent=`第 ${offset/50+1} 页`;
-                el('users-status').textContent=data.users.length?`本页 ${data.users.length} 个账号 · 有效会话数量不等于在线人数`:'没有匹配账号';
+                el('users-page').textContent=`第 ${Math.floor(offset/50)+1} / ${Math.max(1,Math.ceil(data.matched/50))} 页`;
+                el('users-status').textContent=`总用户 ${data.total.toLocaleString('zh-CN')} 个账号 · 匹配 ${data.matched.toLocaleString('zh-CN')} 个 · 本页 ${data.users.length} 个${data.users.length?'':' · 本页没有匹配账号'} · 有效会话数量不等于在线人数`;
             } catch(e) {if(current===version)el('users-status').textContent=`获取失败：${e.message}`;}
         }
         el('users-search').addEventListener('submit',e=>{e.preventDefault();q=el('users-q').value.trim();offset=0;users();});

@@ -97,6 +97,9 @@ def main():
             check(request(private,'/api/users',headers={'Sec-Fetch-Site':'cross-site'})[0]==403,'cross site fetch denied')
             code,users=request(private,'/api/users?q=audit_')
             check(code==200 and len(users['users'])==2,'bounded user search')
+            check(users['total']==2 and users['matched']==2,'user list reports total accounts and matched accounts')
+            empty=request(private,'/api/users?q=nonexistent')[1]
+            check(empty['total']==2 and empty['matched']==0 and empty['users']==[],'empty search preserves overall account total')
             csrf=users['csrf_token'];h={'X-Operator-Token':csrf,'Origin':private}
             check(request(private,'/api/users?offset=-1')[0]==400,'negative pagination denied')
             check(request(private,'/api/users?q=%27%20OR%201%3D1--')[1]['users']==[],'SQL injection stays plain text')
@@ -213,7 +216,10 @@ def main():
             db.query("INSERT INTO accounts(id,username,password_hash) SELECT md5('owned-account-'||n)::uuid,'owned_'||lpad(n::text,3,'0'),'not-a-real-password-hash' FROM generate_series(1,52)n;")
             code,data=request(private,'/api/users?q=owned_')
             check(code==200 and len(data['users'])==50 and data['more'],'user list bounded at 50')
+            check(data['total']==54 and data['matched']==52,'total is independent of search and page limit')
             check(len(request(private,'/api/users?q=owned_&offset=50')[1]['users'])==2,'second user page')
+            empty=request(private,'/api/users?q=owned_&offset=100')[1]
+            check(empty['total']==54 and empty['matched']==52 and not empty['users'] and not empty['more'],'out-of-range page retains accurate counts')
             db.query(f"INSERT INTO security_audit(account_id,action,outcome,code,details) SELECT '{aid}','fixture.event','observed','OK','{{}}'::jsonb FROM generate_series(1,105);")
             first=request(private,'/api/audit?account_id='+aid)[1]
             second=request(private,f"/api/audit?account_id={aid}&before={first['next_before']}")[1]

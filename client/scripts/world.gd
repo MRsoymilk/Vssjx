@@ -94,6 +94,7 @@ func _ready() -> void:
 		for definition in SharedWorldMap.population(map_id):
 			if definition.kind != "npc": continue
 			var npc := OriginalArt.actor(definition.art)
+			npc.z_index = 10
 			npc.position = cell_center(Vector2i(definition.cell[0], definition.cell[1]))
 			actors.add_child(npc)
 			_name_tag(npc, definition.name + " · AI", Color("ffe095"))
@@ -114,6 +115,7 @@ func _ready() -> void:
 	if zone == 0 and AIWorld.map_data(map_id).is_empty():
 		var definition: Dictionary = SharedWorldMap.population()[0]
 		var npc := OriginalArt.actor(definition.art)
+		npc.z_index = 10
 		npc.position = cell_center(Vector2i(definition.cell[0], definition.cell[1]))
 		actors.add_child(npc)
 		_name_tag(npc, String(definition.name), Color("ffe095"))

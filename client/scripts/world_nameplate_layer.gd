@@ -21,6 +21,7 @@ func _process(_delta: float) -> void:
 	if not is_instance_valid(source_viewport):return
 	var ratio:=size/Vector2(source_viewport.size)
 	var seen := {}
+	var raised: Array[Label] = []
 	for source in get_tree().get_nodes_in_group(STYLE.GROUP):
 		if not source is Label or source.is_queued_for_deletion() or source.get_viewport()!=source_viewport:continue
 		var id: int=source.get_instance_id()
@@ -34,6 +35,8 @@ func _process(_delta: float) -> void:
 			# Keep source layout/visibility for the actor's existing facing logic.
 			source.self_modulate=Color(1,1,1,0)
 		var proxy: Label=entries[id].proxy
+		var actor := source.get_parent() as CanvasItem
+		if actor!=null and actor.z_index>0:raised.append(proxy)
 		proxy.text=source.text
 		proxy.size=source.size
 		proxy.position=source.get_global_transform_with_canvas().origin*ratio
@@ -46,6 +49,10 @@ func _process(_delta: float) -> void:
 			var entry: Dictionary=entries[id]
 			if is_instance_valid(entry.source):entry.source.self_modulate=entry.modulate
 			entry.proxy.queue_free();entries.erase(id)
+	# Raise NPC names within this overlay, without raising them above the HUD.
+	for i in range(raised.size()-1,-1,-1):
+		var index:=get_child_count()-raised.size()+i
+		if raised[i].get_index()!=index:move_child(raised[i],index)
 
 func _exit_tree() -> void:
 	for entry in entries.values():

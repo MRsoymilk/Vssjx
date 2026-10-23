@@ -873,6 +873,13 @@ func _map_input(event: InputEvent) -> void:
 		if id == character_id: continue
 		var actor: Dictionary = actors[id]
 		if Rect2(actor.root.position - Vector2(20,60),Vector2(40,64)).has_point(world_point):
+			# Match the raised NPC artwork only when a player would steal its click.
+			if not network.team_following:
+				for resident_id in residents:
+					var resident: OnlineResident = residents[resident_id]
+					if resident.data.kind == "npc" and resident.hit(world_point):
+						resident_selected.emit(resident_id)
+						return
 			_select_player(id)
 			return
 	if network.team_following:

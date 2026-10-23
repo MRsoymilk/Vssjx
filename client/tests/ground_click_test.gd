@@ -18,9 +18,12 @@ func visible_point(sprite: AnimatedSprite2D) -> Vector2:
 func local_click(world: ShushanWorld, point: Vector2) -> void:
 	world.click(point-world.camera.get_screen_center_position()+Vector2(world.get_viewport().size)/2.0)
 
-func online_click(view: OnlineWorldView, point: Vector2) -> void:
-	var event := InputEventMouseButton.new()
-	event.button_index=MOUSE_BUTTON_LEFT;event.pressed=true
+func online_click(view: OnlineWorldView, point: Vector2, touch: bool = false) -> void:
+	var event: InputEvent
+	if touch:
+		event=InputEventScreenTouch.new();event.pressed=true
+	else:
+		event=InputEventMouseButton.new();event.button_index=MOUSE_BUTTON_LEFT;event.pressed=true
 	event.position=point-view.camera.get_screen_center_position()+Vector2(view.viewport.size)/2.0
 	view._map_input(event)
 
@@ -60,6 +63,8 @@ func _run() -> void:
 	check(world.target_at(Vector2i(10,14)).is_empty(),"NPC proximity no longer counts as an exact target")
 	var npc:=world.quest_marker.get_parent() as AnimatedSprite2D
 	check(world.target_at_pixel(world.to_local(visible_point(npc))).get("kind")=="npc","NPC body still starts interaction")
+	world.hero.position=npc.position+Vector2(0,16)
+	await capture("local_npc_overlap")
 	image.queue_free();viewport.queue_free();await get_tree().process_frame
 	var view:OnlineWorldView=load("res://scenes/ui/online_world_view.tscn").instantiate()
 	view.character_id=SELF;add_child(view);view.set_process(false);view.network.set_process(false)
@@ -84,11 +89,39 @@ func _run() -> void:
 	resident.sprite.scale.x=-1
 	point=view.scene.to_local(visible_point(resident.sprite))
 	check(resident.hit(point),"Mirrored patrol graphics preserve picking")
+	await check_npc_crowding(view,selected)
 	view.queue_free();await get_tree().process_frame
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(Game.save_path))
 	Game.player=old;Game.save_path=old_path
 	print("GROUND CLICK: %d checks, %d failures"%[checks,failures])
 	get_tree().quit(0 if failures==0 else 1)
+
+func check_npc_crowding(view: OnlineWorldView, selected: Array) -> void:
+	var npc: OnlineResident=view.residents.qingwei
+	var names: Control=view.image.get_node("WorldNameplates")
+	names._process(0.0)
+	# Players arrive after the NPC, with their feet farther down the Y-sorted map.
+	for i in 12:
+		var id:="10000000-0000-4000-8000-%012d"%[i+2]
+		view.network.entities[id]=entity(id,i+2,"围观%d"%[i+1],i%3,i%2,[10+i%3-1,14])
+	view._snapshot(view.network.entities)
+	var point:=view.scene.to_local(visible_point(npc.sprite))
+	for touch in [false,true]:
+		selected.clear();view.target.clear()
+		online_click(view,point,touch)
+		check(selected==["qingwei"] and view.target.selected.is_empty(),"Crowded NPC body wins over overlapping players: "+("touch" if touch else "mouse"))
+	selected.clear();view.target.clear()
+	var player_point:=npc.position+Vector2(0,16)
+	check(not npc.hit(player_point),"Exposed player feet are outside the NPC body")
+	online_click(view,player_point)
+	check(selected.is_empty() and not view.target.selected.is_empty(),"Exposed player area still selects a player")
+	view.target.clear();view.network.team_following=true
+	var input_before:=view.network._input_seq
+	online_click(view,point)
+	check(selected.is_empty() and not view.target.selected.is_empty() and view.network._input_seq==input_before,"Following still allows player selection without starting NPC movement")
+	view.network.team_following=false;view.target.clear()
+	names._process(0.0)
+	await capture("online_npc_crowd")
 
 func check_packed_sprite() -> void:
 	var pixels:=Image.create(20,20,false,Image.FORMAT_RGBA8)

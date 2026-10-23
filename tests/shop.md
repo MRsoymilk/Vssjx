@@ -1,5 +1,49 @@
 # 铜钱商店、装备与换装
 
+## 2026-10-23 原版装备可见性与全量核查
+
+核对原包资源索引、正式图标、商城目录和运行时列表：208件原版物品均已有商品定义，其中装备137件（56件武器、81件衣饰），没有发现缺失的原版图标商品。誓约礼装新增60件后的商城总数为459，详见[礼装验收](vow_equipment.md)。
+
+用户指定的9个头饰已逐项核对并实际购买／穿戴：
+
+| 图标 | 商城名称 | 价格（铜钱） |
+| --- | --- | --- |
+| if1 | 朱霞冠 | 27 |
+| if10 | 丹羽冠 | 39 |
+| if20 | 玄青冠 | 51 |
+| if29 | 紫霄冠 | 63 |
+| if39 | 皓月冠 | 75 |
+| if48 | 赤焰冠 | 87 |
+| if57 | 流光冠 | 99 |
+| if66 | 碧落冠 | 111 |
+| if75 | 星河冠 | 123 |
+
+本轮修正：
+
+- 新增商城分类“原版装备”，集中显示全部137件；“帽子”分类包含上述9件原版头饰。
+- 从仙丹／炼制选择不兼容的装备分类，自动转至热卖；切换页签时若原分类不适用，则恢复“全部”。兼容分类继续保留，避免两重筛选造成假性空列表。
+- 商品提示和悬浮说明显示 `ifN`／`iwN` 原包编号，便于从素材定位商品；礼装显示其像素绘制来源。
+- 素材浏览器的全部208条原包记录增加“商城接入”和“当前商城商品”，展示现行名称、分类、槽位、价格、页签与规则来源。原版未知字段仍为null，原包资源状态、原始记录及重建商品ID保持可追溯。
+
+验证（Godot 4.7.2、Xvfb、Mesa OpenGL ES）：
+
+- `full_shop_test.tscn`：**1900项通过**。实际点选分类／页签，137件原版装备列表图标全覆盖，9件指定头饰逐项通过UI购买、扣款、穿戴与持久化；保留208件物品玩法和十槽存档回归。
+- `tests/run_full_shop.py`：**983项通过**。临时PostgreSQL与真实Rust服务逐项购买全部208件原版物品，137件装备逐项穿戴；覆盖权威价格、数量、槽位约束、外观广播和背包容量。
+- `data_browser_test.tscn`：实际渲染 **23087项通过**。包含208件商品关联、137件装备槽位与预览、9件原包帽子组合筛选、未知字段保留及玩家存档字节不变。同步测试中陈旧的目录数量、六个可玩角色范围及装备对照预览断言。
+- `test_original_items.py`：6项通过，原包208张图标字节、索引、来源摘要和未知字段保持一致。
+
+截图与日志：`/tmp/opencode/vow-equipment/original-shop/`、`original-shop.log`、`original-server.log`、`data-browser-render.log` 和 `data-browser-original-hats.png`。截图已检查9帽列表、星河冠穿戴／试穿、原版装备分类及素材浏览器关联说明。
+
+```sh
+SSJX_SHOP_CAPTURE=/tmp/opencode/vow-equipment/original-shop \
+  python3 tests/run_offscreen.py --path client --rendering-driver opengl3_es res://tests/full_shop_test.tscn
+SSJX_TEST_SERVER_BIN="$PWD/server/target/debug/vssjx-server" python3 tests/run_full_shop.py
+python3 tests/run_offscreen.py --path client --rendering-driver opengl3_es res://tests/data_browser_test.tscn -- --capture-data-browser=/tmp/opencode/vow-equipment/data-browser.png
+python3 -B -m unittest discover -s tests -p test_original_items.py
+```
+
+便携Xvfb／PostgreSQL依赖参数见[礼装验收](vow_equipment.md#复现入口)。本轮修改及验证位于源码和隔离环境，未推送、打包或部署。
+
 ## 2026-10-23 可补充葫芦
 
 商城新增气血葫芦和灵力葫芦，只在战斗外按缺口自动补给；空瓶找清微道人／各地图巡山人免费补满。背包提供剩余储量、容量和开关，双端持久化并校验回执／状态版本。规则、真实联机、回滚及渲染记录见[葫芦专项](gourds.md)。

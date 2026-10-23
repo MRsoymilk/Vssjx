@@ -68,7 +68,7 @@ func _ready() -> void:
 	balance=_label("",Rect2(126,48,167,20))
 	for i in ShopRules.catalog.tabs.size():
 		var tab: Array=ShopRules.catalog.tabs[i]
-		var button:=_button(tab[1],Rect2(0,0,70,24),func() -> void:section=tab[0];notice="";_filter(),%Tabs)
+		var button:=_button(tab[1],Rect2(0,0,70,24),func() -> void:_select_section(tab[0]),%Tabs)
 		button.custom_minimum_size.x=70
 		button.size_flags_horizontal=Control.SIZE_EXPAND_FILL
 		tabs.append(button)
@@ -80,11 +80,11 @@ func _ready() -> void:
 	category_popup.wrap_controls=false
 	category_popup.max_size=Vector2i(286,230)
 	category_popup.about_to_popup.connect(_fit_category_popup,CONNECT_DEFERRED)
-	for label in ["全部","武器","帽子","衣服","手腕","腰带","裤子","鞋子","戒指","项链","腰佩","药品","药材","宝石","配方","材料","特殊"]:category_box.add_item(label)
+	for label in ["全部","武器","帽子","衣服","手腕","腰带","裤子","鞋子","戒指","项链","腰佩","药品","药材","宝石","配方","材料","特殊","原版装备"]:category_box.add_item(label)
 	for family in GeneratedEquipment.FAMILIES: category_box.add_item(family.name+" · 本角色")
 	# Keep the authored catalog above the dynamically added shop background.
 	move_child(%Catalog,get_child_count()-1)
-	category_box.item_selected.connect(func(index: int) -> void:category=category_box.get_item_text(index);notice="";_filter())
+	category_box.item_selected.connect(_select_category)
 	scroll=%GoodsScroll
 	grid=%Goods
 	summary=_label("",Rect2(21,338,277,37),11)
@@ -143,11 +143,33 @@ func _appearance() -> String:
 		if entry.slot in ["weapon","armor"]:gear[entry.slot]=selected
 	return ShopRules.actor_key(int(character.get("job",0)),int(character.get("gender",0)),LootRules.look(loot,ShopRules.appearance(gear)))
 
-func _filter() -> void:
+func _category_goods() -> Array:
 	var character := _character()
-	var stats:Dictionary=Game.stats() if online_model==null else online_model.state.get("stats",{})
 	var family := GeneratedEquipment.family_for_category(category)
-	goods=ShopRules.catalog.items.filter(func(item: Dictionary) -> bool:return item.sections.has(section) and (category=="全部" or item.category==category or (not family.is_empty() and item.get("set_id", "").begins_with(family+"/") and ShopRules.equipment_error(item,int(character.get("job",0)),int(character.get("gender",0))).is_empty())))
+	return ShopRules.catalog.items.filter(func(item: Dictionary) -> bool:
+		if category=="全部" or item.category==category:return true
+		if category=="原版装备":return String(item.id).begins_with("original/") and ShopRules.is_equipment(item)
+		return not family.is_empty() and item.get("set_id", "").begins_with(family+"/") and ShopRules.equipment_error(item,int(character.get("job",0)),int(character.get("gender",0))).is_empty()
+	)
+
+func _select_section(id: String) -> void:
+	section=id;notice=""
+	if not _category_goods().any(func(item: Dictionary) -> bool:return item.sections.has(section)):
+		category="全部";category_box.select(0)
+	_filter()
+
+func _select_category(index: int) -> void:
+	category=category_box.get_item_text(index);notice=""
+	var options:=_category_goods()
+	# The hot tab contains the complete catalog, including every original item.
+	if not options.is_empty() and not options.any(func(item: Dictionary) -> bool:return item.sections.has(section)):
+		section="hot"
+		notice="已切换至热卖，显示所选分类。"
+	_filter()
+
+func _filter() -> void:
+	var stats:Dictionary=Game.stats() if online_model==null else online_model.state.get("stats",{})
+	goods=_category_goods().filter(func(item: Dictionary) -> bool:return item.sections.has(section))
 	for child in grid.get_children():grid.remove_child(child);child.queue_free()
 	rows.clear();scroll.scroll_vertical=0
 	if not goods.any(func(item: Dictionary) -> bool:return item.id==selected):selected=goods[0].id if not goods.is_empty() else ""
@@ -162,6 +184,7 @@ func _filter() -> void:
 		_label(item.name,Rect2(36,2,93,16),10,button).name="ItemName"
 		_label("",Rect2(36,19,93,15),9,button).name="Price"
 		button.tooltip_text=item.name+" · "+item.category+"\n"+ShopRules.description(id,stats)
+		if id.begins_with("original/"):button.tooltip_text+="\n原包图标："+id.trim_prefix("original/")
 		rows.append(button)
 	if goods.is_empty():_label("此分类暂无商品",Rect2(0,0,260,35),12,grid)
 	refresh()
@@ -199,7 +222,12 @@ func refresh() -> void:
 	equip_button.disabled=locked or version_locked or not equipment or count==0 or incompatible
 	equip_button.text="卸下" if ShopRules.equipped_id(gear,entry.slot)==selected else "装备"
 	preview_button.disabled=not equipment or incompatible
-	hint.text=notice if not notice.is_empty() else ("此商品需要更新服务端" if version_locked else (entry.get("set_name", "套装")+" · AI新设计 · 数值为重建规则" if String(entry.get("art_source", "")).begins_with("AI") else "原包图标 · 名称、数值和部分换装映射为重建规则"))
+	var source_hint:="原包图标 · 名称、数值和部分换装映射为重建规则"
+	if String(entry.id).begins_with("original/"):source_hint="原包 %s · 名称、数值和换装映射为重建规则"%String(entry.id).trim_prefix("original/")
+	elif entry.has("set_id"):
+		var method:="AI新设计" if String(entry.get("art_source", "")).begins_with("AI") else "像素绘制"
+		source_hint=entry.get("set_name", "套装")+" · "+method+" · 数值为重建规则"
+	hint.text=notice if not notice.is_empty() else ("此商品需要更新服务端" if version_locked else source_hint)
 	if notice.is_empty() and not version_locked and entry.slot=="gourd":hint.text="清微道人／各地图巡山人免费补充；背包可开关自动补给。"
 	_refreshing=false
 

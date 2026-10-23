@@ -288,6 +288,17 @@ func _load_original_items() -> void:
 		}
 		var summary := "%d × %d 像素 · 原版名称 / 数值未恢复" % [int(item.width), int(item.height)]
 		var preview := {"kind": "icon", "path": item.icon}
+		var product := ShopRules.item(item.id)
+		data["商城接入"] = "未接入" if product.is_empty() else "已接入"
+		if not product.is_empty():
+			var sections: Array = ShopRules.catalog.tabs.filter(func(tab: Array) -> bool: return product.sections.has(tab[0])).map(func(tab: Array) -> String: return tab[1])
+			data["当前商城商品"] = {
+				"物品ID": product.id, "名称": product.name, "分类": product.category,
+				"槽位": product.slot, "售价（铜钱）": product.price, "页签": sections,
+				"属性说明": ShopRules.description(product.id), "规则来源": product.rules_basis,
+				"数据文件": "res://assets/data/shop-v2.json"
+			}
+			summary = "已接入商城 · %s · %s\n%s" % [product.name, product.category, summary]
 		_add("items", item.id, item.display_name, summary, "原包资源", ORIGINAL_ITEMS, data, preview)
 		if item.group in ["weapons", "equipment"]:
 			_add(item.group, item.id, item.display_name, summary, "原包资源", ORIGINAL_ITEMS, data, preview)

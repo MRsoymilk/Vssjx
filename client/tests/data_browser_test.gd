@@ -23,7 +23,7 @@ func _ready() -> void:
 	var catalog := CATALOG.new()
 	catalog.reload()
 	check(catalog.errors.is_empty(), "All JSON sources load")
-	var counts := {"weapons": 127, "equipment": 282, "items": 542, "characters": 6, "quests": 16, "maps": 217, "enemies": 123, "effects": 159, "art": 100, "archive": 1917}
+	var counts := {"weapons": 140, "equipment": 390, "items": 667, "characters": 1145, "quests": 658, "maps": 431, "enemies": 577, "effects": 159, "art": 235, "archive": 1917}
 	for category in counts:
 		check(catalog.find(category).size() == counts[category], "Expected current definitions for " + category)
 	var keys: Dictionary = {}
@@ -33,13 +33,23 @@ func _ready() -> void:
 		keys[key] = true
 		check(FileAccess.file_exists(entry.source), "Source exists: " + key)
 	check(catalog.find("equipment", "", "预留").is_empty(), "All ten equipment slots have actual definitions")
-	check(catalog.find("items", "", "重建商店").size()==212,"Full runtime rules remain separate from raw resource evidence")
+	check(catalog.find("items", "", "重建商店").size()==336,"Full runtime rules remain separate from raw resource evidence")
 	check(catalog.find("items", "", "原包资源").size() == 208, "Every decoded item is included, regardless of gameplay integration")
 	check(catalog.find("weapons", "", "原包资源").size() == 56, "All 56 original weapon icons")
 	check(catalog.find("equipment", "", "原包资源").size() == 81, "All 81 original equipment icons")
 	check(catalog.find("items", "iw56", "原包资源").size() == 1, "Original filename search")
 	for entry in catalog.find("items", "", "原包资源"):
 		check(entry.data["原版名称"] == null and entry.data["原版属性"] == null, "Unknown original names and stats remain unknown: " + entry.id)
+		var product:=ShopRules.item(entry.id)
+		var linked:Dictionary=entry.data.get("当前商城商品",{})
+		check(entry.data.get("商城接入")=="已接入" and linked.get("物品ID")==entry.id and linked.get("名称")==product.name and linked.get("售价（铜钱）")==product.price,"Every original resource links to its actual shop product: "+entry.id)
+		check(entry.summary.contains("已接入商城") and entry.summary.contains(product.name) and linked.get("规则来源")==product.rules_basis,"Shop availability and reconstructed rules are explicit: "+entry.id)
+		if ShopRules.is_equipment(product):
+			check(catalog.equipment_slot(entry)==product.slot and entry.preview.get("equipment_id")==entry.id,"Original equipment keeps slot filtering and actual appearance preview: "+entry.id)
+	var hats:=catalog.find("equipment","","原包资源","hat")
+	check(hats.size()==9,"All nine requested original hats are discoverable by slot")
+	for number in [1,10,20,29,39,48,57,66,75]:
+		check(hats.any(func(entry:Dictionary)->bool:return entry.id=="original/if%d"%number),"Requested hat has a linked original record: if%d"%number)
 	check(catalog.find("items", "", "已接入").size() == 2, "Original icons are distinct from authored runtime rules")
 	check(catalog.find("items", "青锋", "已接入").size() == 1 and catalog.find("items", "青锋", "重建商店").size()>=1, "Chinese search distinguishes legacy and reconstructed names")
 	check(catalog.find("enemies", "WOLF_A").size() == 1, "Case-insensitive ID search")
@@ -80,8 +90,9 @@ func _ready() -> void:
 	add_child(browser)
 	await get_tree().process_frame
 	await get_tree().process_frame
-	check(browser.catalog.errors.is_empty() and browser.visible_entries.size() == 115, "Standalone browser opens with all original weapons and runtime rules")
-	for entry in catalog.find("characters"):
+	check(browser.catalog.errors.is_empty() and browser.visible_entries.size() == counts.weapons, "Standalone browser opens with all original weapons and runtime rules")
+	check(catalog.find("characters", "", "已接入").size()==6,"All six playable character definitions remain available")
+	for entry in catalog.find("characters", "", "已接入"):
 		browser._show_entry(entry)
 		var chooser: OptionButton = browser.get_node("%Animations")
 		var preview: Control = browser.get_node("%Preview")
@@ -142,8 +153,16 @@ func _ready() -> void:
 	browser.get_node("%StatusFilter").select(2)
 	browser._fill_list()
 	check(browser.visible_entries.is_empty(), "No reserved equipment after connecting all ten slots")
+	browser.get_node("%StatusFilter").select(4)
+	browser.get_node("%EquipmentSlotFilter").select(10)
+	browser._fill_list()
+	check(browser.visible_entries.size()==9,"Original-resource and hat filters expose all nine requested hats in the UI")
+	for entry in hats:
+		browser._show_entry(entry)
+		check(browser.get_node("%Summary").text.contains("已接入商城") and browser.get_node("%Raw").text.contains(ShopRules.item(entry.id).name),"Original hat inspector shows current shop integration: "+entry.id)
+		check(browser.get_node("%AppearanceComparison").visible,"Original hat inspector offers actual equipment preview: "+entry.id)
 	browser.select_category("enemies")
-	check(browser.visible_entries.size() == 123 and browser.get_node("%Context").text.contains("117"), "Monster category explains definitions versus all original resources")
+	check(browser.visible_entries.size() == counts.enemies and browser.get_node("%Context").text.contains("117"), "Monster category explains definitions versus all original resources")
 	browser.get_node("%StatusFilter").select(4)
 	browser._fill_list()
 	check(browser.visible_entries.size() == 117 and browser.get_node("%AnimationBar").visible, "Original monster filter exposes playable previews")
@@ -198,7 +217,7 @@ func _ready() -> void:
 	browser.select_category("quests")
 	browser.get_node("%StatusFilter").select(6)
 	browser._fill_list()
-	check(browser.current.id == "original/mission.str" and browser.get_node("%Context").text.contains("原版任务总数未知"), "Quest UI evidence is visibly separate from a quest definition")
+	check(browser.current.id == "original/mission.str" and browser.current.data["原版任务总数"] == null and browser.get_node("%Summary").text.contains("原版任务总数未知"), "Quest UI evidence is visibly separate from a quest definition")
 	check(browser.get_node("%Texts").text.contains("任务目标") and not browser.get_node("%Texts").bbcode_enabled, "Original text is readable inert content")
 	check(browser.get_node("%Texts").get_parent().current_tab == 2, "Text evidence automatically opens the excerpt tab")
 	browser.select_category("maps")
@@ -223,7 +242,10 @@ func _ready() -> void:
 				if entry.data.has("动画检查"):
 					check(entry.data["动画检查"]["结构检查"] == "通过", "Monster archive passes structural checks: " + entry.id)
 			if entry.preview.get("kind") == "icon":
-				check(browser.get_node("%Preview").icon != null, "Decoded icon loads: " + entry.id)
+				if entry.preview.has("equipment_id"):
+					check(browser.get_node("%AppearanceComparison").visible and is_instance_valid(browser.get_node("%AppearanceComparison").after_preview.sprite), "Actual equipment preview loads: " + entry.id)
+				else:
+					check(browser.get_node("%Preview").icon != null, "Decoded icon loads: " + entry.id)
 			if entry.preview.get("kind") == "actor":
 				var preview: Control = browser.get_node("%Preview")
 				check(is_instance_valid(preview.sprite), "Actual actor preview: " + entry.id)
@@ -277,6 +299,12 @@ func _ready() -> void:
 			var output := argument.trim_prefix("--capture-data-browser=")
 			if DisplayServer.get_name() != "headless":
 				check(capture_image(output), "Rendered browser screenshot")
+				browser.select_category("equipment")
+				browser.get_node("%StatusFilter").select(4)
+				browser.get_node("%EquipmentSlotFilter").select(10)
+				browser._fill_list("original/if75")
+				await get_tree().process_frame
+				check(capture_image(output.get_basename() + "-original-hats.png"), "Rendered original hat records and linked shop details")
 				browser.select_category("enemies")
 				browser.get_node("%StatusFilter").select(4)
 				browser._fill_list()

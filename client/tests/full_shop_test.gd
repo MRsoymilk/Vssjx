@@ -11,6 +11,13 @@ func capture(name: String) -> void:
 	DirAccess.make_dir_recursive_absolute(path)
 	await RenderingServer.frame_post_draw
 	get_viewport().get_texture().get_image().save_png(path.path_join(name+".png"))
+func choose_category(page: ShopPanel, label: String) -> void:
+	for index in page.category_box.item_count:
+		if page.category_box.get_item_text(index)==label:
+			page.category_box.select(index)
+			page.category_box.item_selected.emit(index)
+			return
+	check(false,"Category exists: "+label)
 func _run() -> void:
 	await Platform.when_ready()
 	var old:=Game.player.duplicate(true)
@@ -49,11 +56,45 @@ func _run() -> void:
 	check(page.rows.size()==459 and page.grid.columns==2,"Complete two-column catalog including ceremonial outfits and supply gourds")
 	for row in page.rows:
 		check(row.get_node("Icon").texture!=null,"Actual product icon "+String(row.get_meta("item_id")))
-	page.category="帽子";page.category_box.select(2);page._filter()
+	for section_index in [3,2]:
+		page.tabs[section_index].pressed.emit()
+		check(not page.goods.is_empty() and page.category=="全部" and page.category_box.get_item_text(page.category_box.selected)=="全部","Tab changes clear an incompatible category")
+		choose_category(page,"帽子")
+		check(page.section=="hot" and page.category=="帽子" and page.category_box.get_item_text(page.category_box.selected)=="帽子","Hats remain accessible after medicine and crafting tabs")
 	check(page.goods.size()==33 and page.goods.all(func(i:Dictionary)->bool:return i.slot=="hat"),"Nine original and twenty-four generated hats in their own category")
-	page.selected=page.goods[4].id;page.refresh()
+	page.tabs[1].pressed.emit()
+	check(page.category=="帽子" and page.goods.size()==33,"A compatible tab retains the hat category")
 	await capture("shop_hats")
-	page.preview_window.show();await capture("shop_head_preview");page.preview_window.hide()
+	for number in [1,10,20,29,39,48,57,66,75]:
+		var id:="original/if%d"%number
+		var matches:Array=page.rows.filter(func(row:Button)->bool:return row.get_meta("item_id")==id)
+		check(matches.size()==1,"Requested original hat is an actual shop row: "+id)
+		if matches.is_empty():continue
+		var row:Button=matches[0]
+		check(row.get_node("Icon").texture.resource_path==ShopRules.item(id).icon and row.tooltip_text.contains("if%d"%number),"Original hat icon and source ID are discoverable: "+id)
+		row.pressed.emit()
+		check(page.selected==id and not page.buy_button.disabled and page.hint.text.contains("if%d"%number),"Original hat can be selected and bought: "+id)
+		var gold:=int(Game.player.gold)
+		await page._command("buy")
+		check(ShopRules.quantity(ShopRules.local_state(Game.player),id)==1 and int(Game.player.gold)==gold-int(ShopRules.item(id).price),"Hat UI purchase saves exact ownership and price: "+id)
+		await page._command("equip")
+		check(ShopRules.equipped_id(ShopRules.local_state(Game.player),"hat")==id and ShopRules.appearance(ShopRules.local_state(Game.player))[2]==int(ShopRules.item(id).head_visual),"Hat UI equip saves the correct head: "+id)
+		await capture("shop_if%d"%number)
+		if number==75:
+			page.preview_window.show();await capture("shop_head_preview");page.preview_window.hide()
+		check((await Game.shop_command("discard",id)).ok,"Release hat fixture after durable UI operations: "+id)
+	page.tabs[2].pressed.emit()
+	choose_category(page,"原版装备")
+	check(page.section=="hot" and page.goods.size()==137,"Original-equipment category exposes all 137 recovered weapons and equipment from crafting")
+	var originals:Array=ShopRules.catalog.items.filter(func(item:Dictionary)->bool:return String(item.id).begins_with("original/") and ShopRules.is_equipment(item))
+	for item in originals:
+		check(page.rows.any(func(row:Button)->bool:return row.get_meta("item_id")==item.id and row.get_node("Icon").texture.resource_path==item.icon),"Every original equipment icon appears in the actual list: "+item.id)
+	await capture("shop_original_equipment")
+	page.tabs[3].pressed.emit()
+	choose_category(page,"誓约礼装 · 本角色")
+	check(page.section=="hot" and page.goods.size()==10 and page.goods.all(func(item:Dictionary)->bool:return item.set_id=="vow/wck"),"Role-specific outfit category remains accessible from medicine")
+	page.notice="";page.refresh()
+	check(page.hint.text.contains("像素绘制") and not page.hint.text.contains("原包图标"),"Ceremonial art uses its actual source label")
 	for slot in ShopRules.SLOTS:
 		var options:Array=ShopRules.catalog.items.filter(func(i:Dictionary)->bool:return i.slot==slot and (int(i.job)<0 or int(i.job)==1))
 		var item:Dictionary=options[mini(4,options.size()-1)]

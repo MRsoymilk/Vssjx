@@ -19,13 +19,13 @@ MAP = json.loads((ROOT / 'shared/data/qingyun-v1.json').read_text())
 HASH = hashlib.sha256((ROOT / 'shared/data/qingyun-v1.json').read_bytes()).hexdigest()
 
 class Player:
-    def __init__(self, base, session, character):
+    def __init__(self, base, session, character, maps_version=0):
         self.base, self.session, self.id = base, session, character
         status, ticket = api(base, '/api/v1/world/ticket', dict(character_id=character,protocol_version=1,config_hash=HASH),session['access_token'])
         assert status == 200, ticket
         assert ticket['pve_version'] == ticket['population_version'] == 1
         self.ws = WebSocket(base.replace('http://','ws://')+'/api/v1/world/ws')
-        self.ws.send(dict(type='auth.exchange',ticket=ticket['ticket'],protocol_version=1,config_hash=HASH,world_sync_version=2,population_version=1,pve_version=1))
+        self.ws.send(dict(type='auth.exchange',ticket=ticket['ticket'],protocol_version=1,config_hash=HASH,world_sync_version=2,population_version=1,pve_version=1,maps_version=maps_version,**({'map_rules_version':1} if ticket.get('map_rules_version')==1 else {})))
         self.population, self.state, self.seq = {}, {}, 0
         self.ready = self.until('auth.ready')
         self.state = self.until('pve.state')['state']

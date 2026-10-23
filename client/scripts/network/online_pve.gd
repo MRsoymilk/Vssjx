@@ -96,7 +96,7 @@ func valid(value: Variant) -> bool:
 		if not integer(value.get("server_time_ms"), 1, 253402300799999): return false
 		if not progress.get("respawns") is Dictionary or progress.respawns.size() > 6: return false
 		for id in progress.respawns:
-			if not seen.has(id) or not integer(progress.respawns[id], 0, mini(253402300799999, int(value.server_time_ms) + 30000)): return false
+			if not seen.has(id) or not integer(progress.respawns[id], 0, mini(253402300799999, int(value.server_time_ms) + 86400000)): return false
 	if value.has("hunt_pressure") and not MonsterCombat.pressure_valid(value.hunt_pressure):return false
 	if value.has("endless"):
 		if not EndlessRules.valid_view(value.endless):return false
@@ -318,6 +318,7 @@ func quest_text() -> String:
 	return "古剑遗迹 · 已完成\n妖气已散，可返回青云山道恢复元气，或继续探索遗迹。"
 
 static func error_text(code: String) -> String:
+	if code=="MAP_CLOSED":return "目标地图暂时禁止进入，请选择其他目的地；传送道具未消耗。"
 	var gathering:={"INVALID_GATHER_COMMAND":"无效的采集请求。","GATHER_NOT_FOUND":"当前地图没有这个可采集资源。","GATHER_TOO_FAR":"请先走到资源旁并停稳。","GATHER_COOLDOWN":"该资源正在刷新，请稍候。","GATHER_BUSY":"正在采集，请先完成或取消。","GATHER_NOT_READY":"采集尚未完成，请等待进度结束。","GATHER_INTERRUPTED":"采集已中断，请重新确认。","STALE_GATHERING":"角色状态已变化，请重新采集。","MATERIAL_BAG_FULL":"该材料已接近999份上限，请先整理材料袋。","INVALID_GATHER_STATE":"采集记录异常，请重新同步。"}
 	if gathering.has(code):return gathering[code]
 	if code=="TRAVEL_SCROLL_REQUIRED":return "神行符不足，请先到商店购买。"

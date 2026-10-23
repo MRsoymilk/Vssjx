@@ -234,6 +234,9 @@ func _ready() -> void:
 		if network.pve.last_code.is_empty() and network.pve.last_action in ["accept", "claim", "restore","ai_accept","ai_claim","ai_restore","ai_interact","school_join"]: npc_dialog.hide()
 	)
 	network.map_changed.connect(_map_changed)
+	network.map_rules.changed.connect(func()->void:
+		if network.map_rules.map_id==String(map_data.map_id):_build_portals()
+	)
 	network.map_transfer_started.connect(_begin_map_transition)
 	network.connection_failed.connect(map_transition.cancel)
 	network.pve.send_requested.connect(_map_command_sent)
@@ -580,35 +583,18 @@ func _build_map() -> void:
 	actor_layer.add_child(soul_markers)
 	soul_markers.display(String(map_data.map_id))
 	SharedWorldMap.add_scenery(actor_layer, map_data)
-	var gate: Dictionary = SharedWorldMap.exits(String(map_data.map_id))[0]
-	portal_marker = Node2D.new()
-	portal_marker.set_script(preload("res://scripts/portal.gd"))
-	portal_marker.set("gate",gate)
-	portal_marker.position = Vector2(gate.cell[0] * 16 + 8, gate.cell[1] * 16 + 8)
-	actor_layer.add_child(portal_marker)
-	var label := Label.new()
-	label.text = gate.name
-	label.position = Vector2(-65, -24)
-	label.size = Vector2(130, 16)
-	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	label.add_theme_font_size_override("font_size", 10)
-	label.add_theme_color_override("font_color", Color("c2f7f4"))
-	label.add_theme_color_override("font_outline_color", Color("182821"))
-	label.add_theme_constant_override("outline_size", 1)
-	preload("res://scripts/world_nameplate.gd").apply(label,Color("c2f7f4"))
-	portal_marker.add_child(label)
-	if not AIWorld.map_data(String(map_data.map_id)).is_empty():
-		for exit in SharedWorldMap.exits(String(map_data.map_id)).slice(1):
-			var node := Node2D.new();node.set_script(preload("res://scripts/portal.gd"))
-			node.set("gate",exit)
-			node.position=Vector2(exit.cell[0]*16+8,exit.cell[1]*16+8);actor_layer.add_child(node)
-			var tag := label.duplicate();tag.text=exit.name;preload("res://scripts/world_nameplate.gd").apply(tag,Color("c2f7f4"));node.add_child(tag)
-	if AIWorld.map_data(String(map_data.map_id)).is_empty():
-		ai_station = Node2D.new(); ai_station.set_script(preload("res://scripts/portal.gd"))
-		ai_station.position = Vector2(AIWorld.station(String(map_data.map_id))*16)+Vector2(8,8)
-		actor_layer.add_child(ai_station)
-		var tag := label.duplicate()
-		tag.text = "灵空台 · AI生成";preload("res://scripts/world_nameplate.gd").apply(tag,Color("c2f7f4")); ai_station.add_child(tag)
+	_build_portals()
+
+func _build_portals()->void:
+	for child in actor_layer.get_children():
+		if child.has_meta("online_portal"):actor_layer.remove_child(child);child.queue_free()
+	portal_marker=null;ai_station=null;_portal_latch="";_portal_stop=""
+	for gate in network.map_rules.exits(String(map_data.map_id)):
+		var node:=Node2D.new();node.set_script(preload("res://scripts/portal.gd"));node.set("gate",gate);node.set_meta("online_portal",true)
+		node.position=Vector2(gate.cell[0]*16+8,gate.cell[1]*16+8);actor_layer.add_child(node)
+		if portal_marker==null:portal_marker=node
+		var label:=Label.new();label.text=gate.name;label.position=Vector2(-65,-24);label.size=Vector2(130,16);label.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
+		label.add_theme_font_size_override("font_size",10);preload("res://scripts/world_nameplate.gd").apply(label,Color("c2f7f4"));node.add_child(label)
 
 func _map_changed(id: String) -> void:
 	target.clear()
@@ -892,7 +878,7 @@ func _map_input(event: InputEvent) -> void:
 	if network.team_following:
 		chat_status.text="跟随中由队长控制移动，可在队伍界面暂离。"
 		return
-	for gate in SharedWorldMap.exits(String(map_data.map_id)):
+	for gate in network.map_rules.exits(String(map_data.map_id)):
 		var center:=Vector2(gate.cell[0]*16+8,gate.cell[1]*16+8)
 		if Rect2(center-Vector2(8,8),Vector2(16,16)).has_point(world_point):
 			_cancel_approach();network.move_to(Vector2i(gate.cell[0],gate.cell[1]));_mark_destination(Vector2i(gate.cell[0],gate.cell[1]));return
@@ -1076,9 +1062,9 @@ func _auto_transfer() -> bool:
 	if not network.pve.ready or not network.entities.has(character_id): return false
 	var own: Dictionary=network.entities[character_id]
 	if own.next_cell!=null:
-		return not SharedWorldMap.exit_at(String(map_data.map_id),Vector2i(own.next_cell[0],own.next_cell[1])).is_empty()
+		return not network.map_rules.exit_at(String(map_data.map_id),Vector2i(own.next_cell[0],own.next_cell[1])).is_empty()
 	var cell:=Vector2i(own.cell[0],own.cell[1])
-	var gate:=SharedWorldMap.exit_at(String(map_data.map_id),cell)
+	var gate:=network.map_rules.exit_at(String(map_data.map_id),cell)
 	if gate.is_empty():_portal_latch="";_portal_stop="";return false
 	var key: String=String(map_data.map_id)+":"+str(cell)
 	if _portal_latch==key:return false
@@ -1088,7 +1074,7 @@ func _auto_transfer() -> bool:
 	if actors.has(character_id) and actors[character_id].motion.has_motion():return true
 	_portal_latch=key
 	_cancel_approach();move_target.clear()
-	if gate.get("legacy",false):network.pve.submit("transfer",SharedWorldMap.portal(String(map_data.map_id)).id)
+	if gate.get("legacy",false):network.pve.submit("transfer",gate.get("id",SharedWorldMap.portal(String(map_data.map_id)).id))
 	else:network.pve.submit("ai_travel",gate.target_map)
 	return true
 
@@ -1183,7 +1169,9 @@ func _advance_approach() -> void:
 	if own.next_cell != null or not network._pending_motion.is_empty() or int(own.last_input_seq) < network._input_seq: return
 	var cell := Vector2i(own.cell[0], own.cell[1])
 	if recovering and (not network.pve.is_soul() or _approach.target!=network.pve.state.character.corpse.id):_cancel_approach();return
-	var resident: Dictionary = gathering_nodes[_approach.target].data if gathering else (network.pve.state.character.corpse if recovering else (SharedWorldMap.portal(String(map_data.map_id)) if transfer else ({"cell":[AIWorld.station(String(map_data.map_id)).x,AIWorld.station(String(map_data.map_id)).y]} if ai_travel else network.population.entities[resident_id])))
+	if transfer and network.map_rules.portal(String(map_data.map_id)).is_empty() or ai_travel and not network.map_rules.station_enabled(String(map_data.map_id)):_cancel_approach();return
+	var station:=network.map_rules.station(String(map_data.map_id))
+	var resident: Dictionary = gathering_nodes[_approach.target].data if gathering else (network.pve.state.character.corpse if recovering else (network.map_rules.portal(String(map_data.map_id)) if transfer else ({"cell":[station.x,station.y]} if ai_travel else network.population.entities[resident_id])))
 	var target := Vector2i(resident.cell[0], resident.cell[1])
 	# Moving wolves can cross a cell while the challenge is in flight.
 	var reach := 1 if gathering or resident.get("kind") == "wolf" else 2

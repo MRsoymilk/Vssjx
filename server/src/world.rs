@@ -128,6 +128,7 @@ impl StateData {
     }
 }
 pub struct WorldHub {
+    rules:crate::map_rules::Cache,
     pub(crate) moderation: AsyncMutex<()>,
     pub(crate) team_updates: AsyncMutex<()>,
     metrics: Arc<Observability>,
@@ -230,6 +231,9 @@ impl WorldHub {
         Self::with_metrics(config, Arc::new(Observability::default()))
     }
     pub fn with_metrics(config: WorldConfig, metrics: Arc<Observability>) -> Arc<Self> {
+        Self::with_rules(config,metrics,Arc::new(std::sync::RwLock::new(Arc::new(crate::map_rules::Snapshot::default()))))
+    }
+    pub fn with_rules(config: WorldConfig, metrics: Arc<Observability>, rules:crate::map_rules::Cache) -> Arc<Self> {
         let ai_maps:HashMap<String,WorldMap>=crate::ai_world::maps().iter().map(|m| {
             let id=m["map_id"].as_str().unwrap().to_owned();
             let map=WorldMap::load(&id).expect("AI map");(id,map)
@@ -237,6 +241,7 @@ impl WorldHub {
         let ai_populations=ai_maps.iter().map(|(id,map)|(id.clone(),crate::population::Population::new(map))).collect();
         let ai_publications=ai_maps.keys().map(|id|(id.clone(),Publisher::default())).collect();
         let hub = Arc::new(Self {
+            rules,
             moderation: AsyncMutex::new(()),
             team_updates: AsyncMutex::new(()),
             metrics,
@@ -293,6 +298,10 @@ impl WorldHub {
                         state.revision += 1;
                     }
                     state.chat.drain(now);
+                    let rules=hub.rules.read().expect("map rules").clone();
+                    state.population.configure(&hub.map,&rules);
+                    state.ruins_population.configure(&hub.ruins,&rules);
+                    for (id,p) in &mut state.ai_populations{p.configure(&hub.ai_maps[id],&rules);}
                     state.population.advance(&hub.map, dt);
                     state.ruins_population.advance(&hub.ruins, dt);
                     let mut ai_entities:HashMap<String,Vec<Entity>>=HashMap::new();
@@ -570,15 +579,15 @@ impl WorldHub {
         actor.last_command = Instant::now();
         actor.last_input = sequence;
         if let Some(goal) = target {
-            if !actor.motion.move_to(self.map_for(&actor.map_id), goal) {
-                return Err(error(422, "INVALID_TARGET"));
-            }
+            let rules=self.rules.read().expect("map rules").clone();
+            let route=self.map_for(&actor.map_id).route_using(actor.motion.next.unwrap_or(actor.motion.cell),goal,|p|rules.exit(&actor.map_id,p).map(|e|e.target_map.clone())).ok_or(error(422,"INVALID_TARGET"))?;
+            actor.motion.route=route;
             // Stop on a transfer cell even when a longer click route crosses it.
             // The client then submits the normal authenticated, durable travel
             // operation instead of walking past the trigger during a tick.
-            if actor.motion.next.is_some_and(|point|crate::ai_world::exit_target(&actor.map_id,point).is_some()){
+            if actor.motion.next.is_some_and(|point|rules.exit(&actor.map_id,point).is_some()){
                 actor.motion.route.clear();
-            }else if let Some(index)=actor.motion.route.iter().position(|point|crate::ai_world::exit_target(&actor.map_id,*point).is_some()){
+            }else if let Some(index)=actor.motion.route.iter().position(|point|rules.exit(&actor.map_id,*point).is_some()){
                 actor.motion.route.truncate(index+1);
             }
         } else {
@@ -611,7 +620,7 @@ impl WorldHub {
         let actor = state.actors.get(&owner.id).filter(|a|Self::owned(a,owner)).ok_or(error(401,"SESSION_REPLACED"))?;
         Ok(crate::pve::Context { character: owner.id,session:owner.session,owner:owner.owner,connection_epoch:actor.epoch,cell:actor.motion.cell,
             moving: actor.motion.next.is_some() || !actor.motion.route.is_empty(),
-            target_cell:target.and_then(|id|state.population_for(&actor.map_id).get(id).map(|r|r.motion.cell).or_else(||crate::ai_world::target_cell(&actor.map_id,id))),
+            target_cell:target.and_then(|id|{let actual=crate::ai_world::quest(id).and_then(|q|q["giver"].as_str()).unwrap_or(id);state.population_for(&actor.map_id).get(actual).map(|r|r.motion.cell)}),
             map_id: actor.map_id.clone(), position_revision: actor.motion.revision, duel_active:state.duels.active(owner.id) })
     }
     fn pve_applied(&self, owner: &Ownership, result: &Value) {
@@ -746,7 +755,7 @@ pub(crate) async fn ticket(
         .bind(auth::token_digest(&raw)?).bind(session).bind(request.character_id).execute(&mut *tx).await.map_err(db_error)?;
     tx.commit().await.map_err(db_error)?;
     Ok(Json(
-        json!({"ticket":raw,"expires_in":20,"character_id":request.character_id,"config_hash":config_hash(),"announcement_version":1,"population_version":1,"pve_version":1,"maps_version":1,"ai_world_version":1,"shop_version":2,"duel_version":2,"team_version":1}),
+        json!({"ticket":raw,"expires_in":20,"character_id":request.character_id,"config_hash":config_hash(),"announcement_version":1,"population_version":1,"pve_version":1,"maps_version":1,"map_rules_version":1,"ai_world_version":1,"shop_version":2,"duel_version":2,"team_version":1}),
     ))
 }
 #[derive(Deserialize)]
@@ -767,6 +776,8 @@ pub enum ClientMessage {
         pve_version: u32,
         #[serde(default)]
         maps_version: u32,
+        #[serde(default)]
+        map_rules_version: u32,
         #[serde(default)]
         shop_version: u32,
         #[serde(default)]
@@ -920,6 +931,7 @@ async fn connection(socket: WebSocket, auth: AuthService, hub: Arc<WorldHub>, an
         population_version,
         pve_version,
         maps_version,
+        map_rules_version,
         shop_version,
         duel_version,
         team_version,
@@ -990,7 +1002,11 @@ async fn connection(socket: WebSocket, auth: AuthService, hub: Arc<WorldHub>, an
         hub.disconnect(&auth, &owner, false).await;
         return;
     }
-    let ready = with_server_time(json!({"type":"auth.ready","character_id":owner.id,"game_session_id":owner.game,"connection_epoch":owner.epoch.to_string(),"world_epoch":owner.owner.to_string(),"stream_id":stream,"world_stream_id":baseline.epoch,"world_sync_version":SYNC_VERSION,"config_hash":config_hash(),"map_id":owner.map_id,"map_hash":hub.map_for(&owner.map_id).hash(),"instance_id":"main","tick_ms":100}));
+    let rules=auth.map_rules.read().expect("map rules").clone();
+    let mut rules_revision=rules.revision(&owner.map_id);
+    if map_rules_version!=1&&rules_revision>0{fail(&mut socket,"MAP_UPDATE_REQUIRED").await;hub.disconnect(&auth,&owner,false).await;return;}
+    let mut ready = with_server_time(json!({"type":"auth.ready","character_id":owner.id,"game_session_id":owner.game,"connection_epoch":owner.epoch.to_string(),"world_epoch":owner.owner.to_string(),"stream_id":stream,"world_stream_id":baseline.epoch,"world_sync_version":SYNC_VERSION,"config_hash":config_hash(),"map_id":owner.map_id,"map_hash":hub.map_for(&owner.map_id).hash(),"instance_id":"main","tick_ms":100}));
+    if map_rules_version==1{ready["map_rules"]=rules.packet(&owner.map_id);}
     if send(&mut socket, ready).await.is_err() {
         hub.disconnect(&auth, &owner, false).await;
         return;
@@ -1145,6 +1161,15 @@ async fn connection(socket: WebSocket, auth: AuthService, hub: Arc<WorldHub>, an
                     }
                 }
                 if !hub.current(&owner){fail(&mut socket,"SESSION_REPLACED").await;break;}
+                {
+                    let rules=auth.map_rules.read().expect("map rules").clone();
+                    if rules_revision!=rules.revision(&owner.map_id){
+                        if map_rules_version!=1{fail(&mut socket,"MAP_UPDATE_REQUIRED").await;break;}
+                        if send(&mut socket,rules.packet(&owner.map_id)).await.is_err(){break;}
+                        rules_revision=rules.revision(&owner.map_id);
+                        if pve_version==1 {let result={let _business=owner.business.lock().await;match hub.pve_context(&owner,None){Ok(c)=>crate::pve::snapshot(&auth,&c).await,Err(e)=>Err(e)}};if let Ok(value)=result{if send(&mut socket,crate::shop::client_packet(value,shop_version)).await.is_err(){break;}}}
+                    }
+                }
                 if population_version == 1 {
                     let packet = { let state = hub.data.lock().expect("world state");
                         state.population_for(&owner.map_id).packet_since(population_revision) };

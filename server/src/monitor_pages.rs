@@ -3,6 +3,7 @@ use axum::response::Html;
 
 pub(crate) fn render(page: &str) -> Html<String> {
     let (title, active, content, scripts, crumbs) = match page {
+        "maps" => ("地图管理", "/maps", include_str!("monitor_assets/maps.html"), "/admin.js,/maps.js", "<li><a href=\"/\">管理中心</a></li><li aria-current=\"page\">地图管理</li>"),
         "chat" => (
             "聊天管理", "/chat", include_str!("monitor_assets/chat.html"), "/admin.js,/chat.js",
             "<li><a href=\"/\">管理中心</a></li><li aria-current=\"page\">聊天管理</li>",
@@ -49,6 +50,7 @@ pub(crate) fn render(page: &str) -> Html<String> {
         ("/audit", "操作审计"),
         ("/announcements", "全局通知"),
         ("/chat", "聊天管理"),
+        ("/maps", "地图管理"),
     ]
     .into_iter()
     .map(|(href, label)| {

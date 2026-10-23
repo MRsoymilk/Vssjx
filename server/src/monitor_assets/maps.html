@@ -1,0 +1,12 @@
+<link rel="stylesheet" href="/maps.css">
+<section class="card"><h2>地图与点位管理</h2><p>地形、导航、美术与任务ID保持只读。配置流程：保存草稿 → 校验 → 发布。发布不迁移现有玩家，不改写进行中的战斗或已有冷却。</p><label>搜索地图 <input id="map-search" type="search" maxlength="64" placeholder="名称或地图ID"></label><label>地图 <select id="map-select"></select></label><button id="map-reload">重新载入</button></section>
+<p id="map-status" role="status" aria-live="polite">加载中…</p>
+<section id="map-editor" class="card" hidden>
+<h2 id="map-title"></h2><p id="map-version"></p><p id="map-activation"></p>
+<div class="map-layout"><div><h3>导航网格预览</h3><canvas id="map-grid" width="384" height="384" aria-label="地图导航网格"></canvas><p>灰色不可行走；绿：出生；蓝：NPC；红：怪物；紫：传送；金：采集。点击“定位”后点击网格填写坐标。</p><p id="map-coordinate"></p></div><fieldset><legend>地图入口</legend><label><input id="map-entry" type="checkbox">允许新进入</label><div id="map-spawn"></div><label><input id="map-station-enabled" type="checkbox">开放驿站目的地选择</label><div id="map-station"></div><p>禁入只阻止后续跨图旅行；已有玩家仍能登录、停留和离开。</p></fieldset></div>
+<h3>刷怪与NPC</h3><p>管理现有出生点、启用状态和个人怪物刷新间隔；名字、模型与战斗数值保持原资产定义。</p><div class="table-wrap"><table><thead><tr><th>角色／ID</th><th>类型</th><th>启用</th><th>出生坐标</th><th>刷新秒</th></tr></thead><tbody id="map-residents"></tbody></table></div>
+<h3>传送</h3><p>触发格支持多格，格式：x,y; x,y。留空到达坐标表示使用目标地图出生点。驿站与触发传送分别启用。</p><div id="map-portals"></div>
+<h3>采矿与采药</h3><div id="map-gathering"></div>
+<fieldset><legend>草稿与发布</legend><label>操作原因 <input id="map-reason" maxlength="240" placeholder="至少2个字，写入审计"></label><div class="map-actions"><button id="map-save">保存草稿</button><button id="map-validate">校验草稿</button><button id="map-publish">发布配置</button><button id="map-retry" hidden>重试未确认操作</button></div><ul id="map-errors"></ul></fieldset>
+<h3>发布历史</h3><p>恢复历史只生成草稿，需要再次校验并发布才生效。</p><label>版本 <select id="map-history"></select></label><button id="map-restore">恢复到草稿</button>
+</section>

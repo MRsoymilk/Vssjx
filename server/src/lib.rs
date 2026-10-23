@@ -31,6 +31,8 @@ pub mod ai_world;
 pub mod pve_rules;
 pub mod pve;
 mod gathering;
+pub mod map_rules;
+mod map_admin;
 pub mod duel;
 pub mod world;
 pub mod world_map;
@@ -106,7 +108,7 @@ pub fn apps(
     tracing::info!(boot_id=%metrics.boot_id, "process diagnostics initialized");
     let world = auth
         .as_ref()
-        .map(|_| world::WorldHub::with_metrics(config.world, metrics.clone()));
+        .map(|auth| world::WorldHub::with_rules(config.world, metrics.clone(), auth.map_rules.clone()));
     let state = Arc::new(AppState {
         config,
         auth,

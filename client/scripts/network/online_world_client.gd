@@ -23,6 +23,7 @@ var config_hash := ""
 var game_session := ""
 var connection_epoch := ""
 var world_epoch := ""
+var map_rules:=OnlineMapRules.new()
 var stream := ""
 var world_stream := ""
 var _world_seq := 0
@@ -36,6 +37,7 @@ var duel := OnlineDuel.new()
 var _duel_version := 0
 var _pve_version := 0
 var _maps_version := 0
+var _map_rules_version:=0
 var _shop_version := 0
 var appearances: Dictionary = {}
 var _ticket := ""
@@ -114,6 +116,8 @@ func _exit_tree() -> void:
 	leave()
 
 func _failed(code: String, retry: bool = false) -> void:
+	if code=="INVALID_MAP_RULES":code="CONFIG_MISMATCH"
+	if code=="MAP_UPDATE_REQUIRED":code="WORLD_PROTOCOL_MISMATCH"
 	duel.disconnect_channel()
 	connection_failed.emit()
 	_pending_motion.clear()
@@ -171,6 +175,7 @@ func _on_ticket(result: Dictionary) -> void:
 	_announcement_version = 1 if result.get("announcement_version") == 1 else 0
 	_pve_version = 1 if result.get("pve_version") == 1 else 0
 	_maps_version = int(result.get("maps_version", 0)) if result.get("maps_version") in [1, 2] else 0
+	_map_rules_version=1 if result.get("map_rules_version")==1 else 0
 	# Servers keep maps_version=1 for older clients and advertise the expansion separately.
 	if _maps_version >= 1 and result.get("ai_world_version") == 1: _maps_version = 2
 	_shop_version = int(result.get("shop_version")) if result.get("shop_version") in [1,2] else 0
@@ -285,6 +290,7 @@ func _exchange_packet() -> Dictionary:
 	if _population_version == 1: packet.population_version = 1
 	if _pve_version == 1: packet.pve_version = 1
 	if _maps_version in [1, 2]: packet.maps_version = _maps_version
+	if _map_rules_version==1:packet.map_rules_version=1
 	if _shop_version in [1,2]: packet.shop_version = _shop_version
 	if _duel_version == 2: packet.duel_version = 2
 	if _team_version == 1: packet.team_version = 1
@@ -374,6 +380,9 @@ func _receive(data: Dictionary, raw: PackedByteArray) -> void:
 	if kind == "population.state":
 		if stream.is_empty() or not population.receive(data): _failed("INVALID_POPULATION")
 		return
+	if kind == "map.rules":
+		if stream.is_empty() or not map_rules.receive(data,map_id):_failed("INVALID_MAP_RULES")
+		return
 	if kind == "announcement.state":
 		if stream.is_empty() or not announcements.receive(data): _failed("INVALID_ANNOUNCEMENT")
 		return
@@ -391,6 +400,9 @@ func _receive(data: Dictionary, raw: PackedByteArray) -> void:
 			_failed("CONFIG_MISMATCH"); return
 		if not _sync_world_clock(data):
 			_failed("INVALID_WORLD_CLOCK"); return
+		if data.has("map_rules"):
+			if not data.map_rules is Dictionary or not map_rules.receive(data.map_rules,data.map_id):_failed("INVALID_MAP_RULES");return
+		else:map_rules.clear()
 		map_id = data.map_id
 		map_changed.emit(map_id)
 		game_session = data.game_session_id

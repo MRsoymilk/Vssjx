@@ -25,6 +25,8 @@ use uuid::Uuid;
 
 #[derive(Clone)]
 pub struct AuthService {
+    pub(crate) map_rules: crate::map_rules::Cache,
+    pub(crate) map_publish: Arc<tokio::sync::Mutex<()>>,
     pool: PgPool,
     hash_slots: Arc<Semaphore>,
     dummy_hash: String,
@@ -223,7 +225,10 @@ impl AuthService {
         .await
         .map_err(|_| "password initialization failed")?
         .map_err(|_| "password initialization failed")?;
+        let rules=crate::map_rules::load(&pool).await.map_err(|_|"map configuration initialization failed")?;
         Ok(Self {
+            map_rules:Arc::new(std::sync::RwLock::new(rules)),
+            map_publish:Arc::new(tokio::sync::Mutex::new(())),
             pool,
             hash_slots: Arc::new(Semaphore::new(settings.hash_workers as usize)),
             dummy_hash,

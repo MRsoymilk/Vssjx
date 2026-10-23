@@ -38,6 +38,7 @@ pub struct Resident {
     wait: f64,
 }
 pub struct Population {
+    rules_revision:i64,
     pub residents: Vec<Resident>,
     epoch: Uuid,
     revision: u64,
@@ -64,6 +65,7 @@ impl Population {
             })
             .collect();
         let mut value = Self {
+            rules_revision:-1,
             residents,
             epoch: Uuid::new_v4(),
             revision: 0,
@@ -74,6 +76,17 @@ impl Population {
     }
     pub fn get(&self, id: &str) -> Option<&Resident> {
         self.residents.iter().find(|r| r.definition.id == id)
+    }
+    pub fn configure(&mut self,map:&WorldMap,rules:&crate::map_rules::Snapshot){
+        let revision=rules.revision(&map.map_id);if self.rules_revision==revision{return;}
+        let d=rules.document(&map.map_id);
+        let mut old=std::mem::take(&mut self.residents);
+        self.residents=definitions_for(&map.map_id).into_iter().filter_map(|mut definition|{
+            let p=d.residents.iter().find(|p|p.id==definition.id&&p.enabled)?;definition.cell=p.cell;
+            if let Some(i)=old.iter().position(|r|r.definition.id==definition.id&&r.definition.cell==p.cell){return Some(old.swap_remove(i));}
+            Some(Resident{motion:Motion::new(p.cell),definition,rng:StdRng::from_entropy(),wait:1.0})
+        }).collect();
+        self.rules_revision=revision;self.revision+=1;self.encode();
     }
     pub fn advance(&mut self, map: &WorldMap, seconds: f64) {
         let seconds = seconds.clamp(0.0, 0.1);
@@ -126,7 +139,9 @@ impl Population {
                 value["next_cell"] = json!(resident.motion.next);
                 value["segment_progress"] =
                     json!((resident.motion.progress * 1000.0).round() as u16);
-                value["world_epoch"] = json!("1");
+                // Operational relocation is a new pose baseline, not a walk
+                // from the old spawn through intervening scenery.
+                value["world_epoch"] = json!(self.rules_revision.max(0).saturating_add(1).to_string());
                 value["entity_revision"] = json!(resident.motion.revision.to_string());
                 value
             })
@@ -154,6 +169,17 @@ mod tests {
         ]
     }
 
+    #[test]
+    fn operational_relocation_starts_a_new_pose_baseline() {
+        let map=WorldMap::default();let mut p=Population::seeded(&map,1);
+        let mut d=crate::map_rules::DEFAULTS[&map.map_id].clone();
+        d.residents.iter_mut().find(|r|r.id=="qingwei").unwrap().cell=[11,13];
+        d.residents.iter_mut().find(|r|r.id=="wolf_b").unwrap().enabled=false;
+        let mut rules=crate::map_rules::Snapshot::default();rules.active.insert(map.map_id.clone(),(1,d));p.configure(&map,&rules);
+        assert_eq!(p.get("qingwei").unwrap().motion.cell,[11,13]);assert!(p.get("wolf_b").is_none());
+        let packet:serde_json::Value=serde_json::from_str(&p.packet).unwrap();
+        assert!(packet["entities"].as_array().unwrap().iter().all(|r|r["world_epoch"]=="2"));
+    }
     #[test]
     fn patrols_have_different_routes_and_independent_pause_times() {
         let map = WorldMap::default();

@@ -612,10 +612,12 @@ async fn apply(
             if unavailable.contains(&enemy.id) {
                 return Err(err("MONSTER_RESPAWNING"));
             }
+            let map_rules=crate::map_rules::load_tx(tx).await.map_err(db)?;
+            if !map_rules.enabled(&context.map_id,&enemy.id){return Err(err("INVALID_RESIDENT"));}
             let pool: Vec<_> = crate::population::definitions_for(&context.map_id)
                 .into_iter()
                 .filter(|e| {
-                    e.kind == enemy.kind && e.id != enemy.id
+                    map_rules.enabled(&context.map_id,&e.id) && e.kind == enemy.kind && e.id != enemy.id
                         && e.level <= enemy.level + 3
                         && !unavailable.contains(&e.id)
                 })

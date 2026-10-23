@@ -38,6 +38,7 @@ pub struct Context {
 }
 #[derive(Clone)]
 struct Loaded {
+    rules:std::sync::Arc<crate::map_rules::Snapshot>,
     gathering:Value,
     endless:crate::endless::Progress,
     hunt_pressure: crate::monster_combat::HuntPressure,
@@ -112,6 +113,7 @@ async fn load_character(tx:&mut Transaction<'_,Postgres>,character_id:Uuid,accou
     let ai:crate::ai_world::Progress=serde_json::from_value(row.get::<Json<Value>,_>("ai_progress").0).map_err(|_|unavailable())?;
     if !ai.valid(){return Err(unavailable());}
     let mut loaded = Loaded {
+        rules:crate::map_rules::load_tx(tx).await.map_err(database)?,
         gathering:crate::gathering::view(tx,character_id,&character.map_id).await.map_err(database)?,
         endless:serde_json::from_value(row.get::<Json<Value>,_>("endless_state").0).map_err(|_|unavailable())?,
         hunt_pressure:serde_json::from_value(row.get::<Json<Value>,_>("hunt_pressure").0).map_err(|_|unavailable())?,
@@ -304,12 +306,13 @@ impl Loaded {
             if destination==context.map_id{return Err("AI_SAME_MAP");}
             if destination=="ancient_ruins"&&self.character.quest_stage<3{return Err("QUEST_REQUIRED");}
             if !matches!(destination,"qingyun_trail"|"ancient_ruins")&&crate::ai_world::map(destination).is_none(){return Err("AI_INVALID_TARGET");}
-            let map=crate::world_map::WorldMap::load(destination).ok_or("AI_INVALID_TARGET")?;
+            crate::world_map::WorldMap::load(destination).ok_or("AI_INVALID_TARGET")?;
+            let spawn=self.rules.arrival(destination)?;
             let id="restored/shenxing_scroll";
             let count=self.quantities.get(id).copied().unwrap_or(0);
             if count<1{return Err("TRAVEL_SCROLL_REQUIRED");}
             if count==1{self.quantities.remove(id);self.gear.remove(id);}else{self.quantities.insert(id.into(),count-1);}
-            self.character.map_id=destination.into();self.character.cell_x=map.spawn[0];self.character.cell_y=map.spawn[1];
+            self.character.map_id=destination.into();self.character.cell_x=spawn[0];self.character.cell_y=spawn[1];
             return Ok(vec!["神行符化作一道灵光，你已抵达所选地图，消耗1张神行符。".into()]);
         }
         if command.action==Action::SchoolJoin {
@@ -321,9 +324,10 @@ impl Loaded {
             let npc=context.target_cell.ok_or("INVALID_SCHOOL_NPC")?;
             if (npc[0]-context.cell[0]).abs()+(npc[1]-context.cell[1]).abs()>2{return Err("RESIDENT_TOO_FAR");}
             let (school,destination)=match command.target.as_deref(){Some("emei")=>(0,"ai_004"),Some("huajian")=>(1,"ai_021"),Some("kunlun")=>(2,"ai_032"),_=>return Err("INVALID_SCHOOL")};
-            let map=crate::world_map::WorldMap::load(destination).ok_or("INVALID_SCHOOL")?;
+            crate::world_map::WorldMap::load(destination).ok_or("INVALID_SCHOOL")?;
+            let spawn=self.rules.arrival(destination)?;
             self.character.school=school;
-            self.character.map_id=destination.into();self.character.cell_x=map.spawn[0];self.character.cell_y=map.spawn[1];
+            self.character.map_id=destination.into();self.character.cell_x=spawn[0];self.character.cell_y=spawn[1];
             return Ok(vec![format!("经清微道人引荐，你已正式拜入{}，并抵达门派驻地。技能暂按职业和等级开放，不受门派限制。",["峨眉派","花涧派","昆仑派"][school as usize])]);
         }
         self.ai.respawns.retain(|_,deadline|*deadline>unix_ms());
@@ -333,15 +337,20 @@ impl Loaded {
             let id=command.target.as_deref().ok_or("AI_INVALID_TARGET")?;
             let near=|point:[i32;2]| (point[0]-context.cell[0]).abs()+(point[1]-context.cell[1]).abs()<=2;
             if command.action==Action::AiTravel {
-                let at_exit=crate::ai_world::map(&context.map_id).is_some()&&crate::ai_world::exit_target(&context.map_id,context.cell).as_deref()==Some(id);
-                if !at_exit&&!near(crate::ai_world::station(&context.map_id)){return Err("PORTAL_TOO_FAR");}
-                let map=crate::world_map::WorldMap::load(id).ok_or("AI_INVALID_TARGET")?;
-                if id!="qingyun_trail"&&crate::ai_world::map(id).is_none(){return Err("AI_INVALID_TARGET");}
+                crate::world_map::WorldMap::load(id).ok_or("AI_INVALID_TARGET")?;
+                let d=self.rules.document(&context.map_id);
+                let portal=self.rules.exit(&context.map_id,context.cell).filter(|p|!p.legacy&&p.target_map==id);
+                if portal.is_none()&&!(d.station_enabled&&near(d.station)){return Err("PORTAL_TOO_FAR");}
+                // Retain the original station destination catalog; explicit exits may target any bundled map.
+                if portal.is_none()&&id!="qingyun_trail"&&crate::ai_world::map(id).is_none(){return Err("AI_INVALID_TARGET");}
                 if id==context.map_id{return Err("AI_SAME_MAP");}
-                self.character.map_id=id.into();self.character.cell_x=map.spawn[0];self.character.cell_y=map.spawn[1];
+                if id=="ancient_ruins"&&self.character.quest_stage<3{return Err("PORTAL_LOCKED");}
+                let spawn=self.rules.arrival(id)?;let spawn=portal.and_then(|p|p.arrival).unwrap_or(spawn);
+                self.character.map_id=id.into();self.character.cell_x=spawn[0];self.character.cell_y=spawn[1];
                 return Ok(vec!["已沿蜀山驿路抵达。AI生成场景与任务，不是原版恢复内容。".into()]);
             }
-            let point=crate::ai_world::target_cell(&context.map_id,id).ok_or("AI_INVALID_TARGET")?;
+            let resident=crate::ai_world::quest(id).and_then(|q|q["giver"].as_str()).unwrap_or(id);
+            let point=self.rules.document(&context.map_id).residents.iter().find(|p|p.enabled&&p.id==resident).map(|p|p.cell).ok_or("AI_INVALID_TARGET")?;
             if !near(point){return Err("RESIDENT_TOO_FAR");}
             return match command.action {
                 Action::AiAccept=>{self.ai.accept(id,&context.map_id,self.character.level)?;Ok(vec!["已接取AI生成任务，请按目标顺序行动。".into()])},
@@ -417,11 +426,11 @@ impl Loaded {
             if command.battle_id.is_some() || command.expected_revision.is_some() || command.attributes.is_some() {
                 return Err("INVALID_PVE_COMMAND");
             }
-            let map = crate::world_map::WorldMap::load(&context.map_id).ok_or("INVALID_MAP")?;
-            let (gate, cell, destination, spawn) = map.portal();
-            if command.target.as_deref() != Some(gate) { return Err("INVALID_PORTAL"); }
-            if (cell[0] - context.cell[0]).abs() + (cell[1] - context.cell[1]).abs() > 2 { return Err("PORTAL_TOO_FAR"); }
+            let portal=self.rules.document(&context.map_id).portals.iter().find(|p|p.enabled&&p.legacy&&Some(p.id.as_str())==command.target.as_deref()).ok_or("INVALID_PORTAL")?;
+            let destination=portal.target_map.as_str();
+            if !portal.cells.iter().any(|cell|(cell[0]-context.cell[0]).abs()+(cell[1]-context.cell[1]).abs()<=2){return Err("PORTAL_TOO_FAR");}
             if destination == "ancient_ruins" && self.character.quest_stage < 3 { return Err("PORTAL_LOCKED"); }
+            let spawn=self.rules.arrival(destination)?;let spawn=portal.arrival.unwrap_or(spawn);
             self.character.map_id = destination.to_owned();
             self.character.cell_x = spawn[0];
             self.character.cell_y = spawn[1];
@@ -470,6 +479,7 @@ impl Loaded {
         match command.action {
             Action::GatherStart|Action::GatherFinish|Action::GatherCancel|Action::GatherDiscard=>Err("INVALID_GATHER_COMMAND"),
             Action::Accept | Action::Claim | Action::Restore | Action::Challenge => {
+                if !self.rules.enabled(&context.map_id,command.target.as_deref().unwrap_or("")){return Err("INVALID_RESIDENT");}
                 if self.battle.is_some() {
                     return Err("BATTLE_ACTIVE");
                 }
@@ -509,7 +519,7 @@ impl Loaded {
                         self.battle=Some(battle);
                         return Ok(vec![format!("与{name}的遭遇战开始。")]);
                     }
-                    let mut pool:Vec<_>=population::definitions_for(&context.map_id).into_iter().filter(|d|d.id!=definition.id&&d.kind!="npc"&&d.kind!="boss"&&(d.level-definition.level).abs()<=3&&!self.respawns.get(&d.id).is_some_and(|t|*t>unix_ms())&&!self.ai.respawns.get(&d.id).is_some_and(|t|*t>unix_ms())).collect();
+                    let mut pool:Vec<_>=population::definitions_for(&context.map_id).into_iter().filter(|d|self.rules.enabled(&context.map_id,&d.id)&&d.id!=definition.id&&d.kind!="npc"&&d.kind!="boss"&&(d.level-definition.level).abs()<=3&&!self.respawns.get(&d.id).is_some_and(|t|*t>unix_ms())&&!self.ai.respawns.get(&d.id).is_some_and(|t|*t>unix_ms())).collect();
                     use rand::seq::SliceRandom;
                     pool.shuffle(&mut rand::thread_rng());
                     let count=crate::monster_combat::solo_count(rand::thread_rng().gen_range(0..100));
@@ -605,8 +615,9 @@ impl Loaded {
                     let mut recorded=std::collections::HashSet::new();
                     for enemy in defeated.into_iter().filter(|_|endless_run.is_none()) {
                         if !recorded.insert(enemy.id.clone()){continue;}
-                        if crate::ai_world::resident(&enemy.id).is_some(){self.ai.event("kill",&enemy.id);self.ai.respawns.insert(enemy.id.clone(),unix_ms()+MONSTER_RESPAWN_MS);}
-                        else{self.defeated|=pve_rules::mask(&enemy.id).ok_or("INVALID_RESIDENT")?;self.respawns.insert(enemy.id,unix_ms()+MONSTER_RESPAWN_MS);}
+                        let deadline=unix_ms()+self.rules.respawn_ms(&context.map_id,&enemy.id);
+                        if crate::ai_world::resident(&enemy.id).is_some(){self.ai.event("kill",&enemy.id);self.ai.respawns.insert(enemy.id.clone(),deadline);}
+                        else{self.defeated|=pve_rules::mask(&enemy.id).ok_or("INVALID_RESIDENT")?;self.respawns.insert(enemy.id,deadline);}
                     }
                     if self.character.quest_stage == 1 && self.defeated & 7 == 7 {
                         self.character.quest_stage = 2;
@@ -806,8 +817,9 @@ pub(crate) async fn team_save(tx:&mut Transaction<'_,Postgres>,f:&crate::team_ru
         let mut ids=std::collections::HashSet::new();
         for e in &b.enemies{
             if !ids.insert(e.definition.id.clone()){continue;}
-            if crate::ai_world::resident(&e.definition.id).is_some(){a.ai.event("kill",&e.definition.id);a.ai.respawns.insert(e.definition.id.clone(),unix_ms()+MONSTER_RESPAWN_MS);}
-            else if let Some(mask)=pve_rules::mask(&e.definition.id){a.defeated|=mask;a.respawns.insert(e.definition.id.clone(),unix_ms()+MONSTER_RESPAWN_MS);}
+            let deadline=unix_ms()+a.rules.respawn_ms(&b.map_id,&e.definition.id);
+            if crate::ai_world::resident(&e.definition.id).is_some(){a.ai.event("kill",&e.definition.id);a.ai.respawns.insert(e.definition.id.clone(),deadline);}
+            else if let Some(mask)=pve_rules::mask(&e.definition.id){a.defeated|=mask;a.respawns.insert(e.definition.id.clone(),deadline);}
             if e.definition.id=="boss"&&a.character.quest_stage==3{a.character.quest_stage=4;}
         }
         if a.character.quest_stage==1&&a.defeated&7==7{a.character.quest_stage=2;}

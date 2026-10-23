@@ -12,7 +12,7 @@ const [base,output]=process.argv.slice(2);
         page.on('pageerror',e=>errors.push(e.message));page.on('request',r=>requests.push(new URL(r.url()).pathname));
         await page.goto(base);
         await page.waitForFunction(()=>document.getElementById('health').textContent==='运行中');
-        check(await page.locator('.section-nav a').count()===5);
+        check(await page.locator('.section-nav a').count()===6 && await page.locator('.section-nav a[href="/maps"]').count()===1);
         check(await page.locator('#breadcrumbs li').count()===1);
         check(await page.locator('#users-list,#announcement-form,#audit-list').count()===0);
         check(!requests.includes('/api/users') && !requests.includes('/api/audit'));

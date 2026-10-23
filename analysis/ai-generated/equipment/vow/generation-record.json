@@ -1,0 +1,107 @@
+{
+  "method": "Pillow原生像素网格绘制；沿用原始图层关节与握持坐标，不缩放整身参考图",
+  "generator": "tools/build_vow_equipment.py",
+  "generator_sha256": "bd718bb486c829afb63a16917f96dc81157a57df0cf532a4be57e3bc5319dbfd",
+  "style_module": "tools/vow_native_style.py",
+  "style_sha256": "fd612163f2b0f4272628420d1adee16ce307512a0a1b9dfdc621ebc2ce912a7d",
+  "native_inputs": {
+    "client/assets/hero_parts/mzst7.png": "2634d396283281aa7a140afbda64cf857f7a0141d80d6da30598becd3a337250",
+    "client/assets/hero_parts/mzs4.png": "a1996a81acf69f079d118dc110592daa4d0fca774509fea283e377de9dffd6a5",
+    "client/assets/hero_parts/mzs4q.png": "dfa02986fa5fa83df21e0b96f235bb81616f0197df9040055cf1b416c08be0ab",
+    "client/assets/hero_parts/mzs4x.png": "cc86784916c61a1d2f79fe14220701631f1547bae0ea18345a960dc3c21822b4",
+    "client/assets/hero_parts/ezs9.png": "6cb023bea2049a29a7957a05506c132d946500beb669a63a132fd3e67d62bccb",
+    "client/assets/hero_parts/wzst5.png": "049eb12ce3a750a9c1139bbdc8f2d25a2554455f7992729ab43cc824e680c05f",
+    "client/assets/hero_parts/wzs4.png": "2235064cd014209d21d24dce4083928f90af372ec4070cfbc6a111bdb46d9e21",
+    "client/assets/hero_parts/wzs4q.png": "b420d7acfe8e6db55535d57323a7fe89e151d6b9c3fdd5e3f0541e98c37fb680",
+    "client/assets/hero_parts/wzs4x.png": "a9129d30b30f34f5623325b503e22bb4f71637467070fb6ee27dee9754c6ff56",
+    "client/assets/hero_parts/mckt5.png": "774ccbb610df849cbfbbd515dda78dc56821031ce1cc8fce2144eb781bd8a136",
+    "client/assets/hero_parts/mck2.png": "b1a4ec6080f265be1ea24f3934425283fa2c90a355305442dc720191d8549478",
+    "client/assets/hero_parts/mck2q.png": "24e6c32e4f4cdd1aa59e7afb4447c119266efd547b2394d755555e8de881e375",
+    "client/assets/hero_parts/mck2x.png": "4eba97a43ada0b73f8fc3767b97cef9f5cf34f138c84c9955ae256d8b4cc7cee",
+    "client/assets/hero_parts/eck9.png": "2b7ecba99a08c8b78606008354d57066c5e10bf96683c8569b0aba07ff5baae2",
+    "client/assets/hero_parts/wckt1.png": "fc5b4eb0aa897d7a06ef8d1b8dc61df313e247fa7a1a1bb8226bc0d3215430be",
+    "client/assets/hero_parts/wck2.png": "9fed8e241aab5047254cc952256f2206547a6dd08350fefe2c9e7e1f59ad24fc",
+    "client/assets/hero_parts/wck2q.png": "0222337a904c1a2790c2402e91c25ef6cb466c25336ce40ea0e9286bdfab1150",
+    "client/assets/hero_parts/wck2x.png": "2ab943185c9287163be3fa71df83b67056fe3ade4fe1215a4b45772e155ceab3",
+    "client/assets/hero_parts/mfst2.png": "d73d297054bc51181585598fae893fea6638d868d046f0793d12b250e777cb1f",
+    "client/assets/hero_parts/mfs4.png": "11a27b28c5d9c2d53e665a8db52be2fb770279c1863ceca8baac612398610174",
+    "client/assets/hero_parts/mfs4q.png": "6b79f87cf8d710c8a0bd6ada81dc110e48468ecff0ef584bb6fd10573c42aae7",
+    "client/assets/hero_parts/mfs4x.png": "54c358e53b55cc85018d64c2f69b7c5398e13f293fe466a34d7aaebb9edf4e7e",
+    "client/assets/hero_parts/efs7.png": "c99bd5140a6597f3a1efdb54fe6b1f7cf7b0c1897a537c6ce6433b8be4d61074",
+    "client/assets/hero_parts/wfst2.png": "80561a1862a6896af3ef68dc56b57d0a5d84a8e7ae92c315b566ca890136401d",
+    "client/assets/hero_parts/wfs5.png": "7f75364a8b0485e101b733cf71510d933675f8ca339c88926074e9b4fd71d401",
+    "client/assets/hero_parts/wfs5q.png": "ff670ea0817d4357bf8a0dd3e063dbbf8ffb59c187f7108e6017e05ad4f96256",
+    "client/assets/hero_parts/wfs5x.png": "78b09384d7a4f28ed1261af7e701da40d1e6054201fc9dc28f4a2c7521d540a0"
+  },
+  "palette": {
+    "mzs": [
+      "#242433",
+      "#363440",
+      "#4c4651",
+      "#68616a",
+      "#8c8186",
+      "#b5a6a2"
+    ],
+    "wzs": [
+      "#766873",
+      "#a99b9e",
+      "#cbc1bb",
+      "#e7e0d3",
+      "#f8f0dc",
+      "#fffcf0"
+    ],
+    "mck": [
+      "#242735",
+      "#373d49",
+      "#525967",
+      "#747b87",
+      "#969eaa",
+      "#c4c7cb"
+    ],
+    "wck": [
+      "#806474",
+      "#ab8692",
+      "#d3afb5",
+      "#e8cbd0",
+      "#f8e4df",
+      "#fff8ed"
+    ],
+    "mfs": [
+      "#20283e",
+      "#28334d",
+      "#344461",
+      "#4b607e",
+      "#6c82a1",
+      "#9aaac1"
+    ],
+    "wfs": [
+      "#6f627f",
+      "#9b8da9",
+      "#c0b2cf",
+      "#dfcfe5",
+      "#f0e5f2",
+      "#fff8f6"
+    ]
+  },
+  "codes": {
+    "weapon": [
+      47,
+      52
+    ],
+    "clothing": [
+      30,
+      35
+    ],
+    "head": [
+      28,
+      33
+    ]
+  },
+  "features": [
+    "男士翻领西装、衬衣、领结、胸花",
+    "女士收腰礼裙、分层开衩裙摆、头纱或花冠",
+    "玫瑰护手宽刃大剑、白色缎带",
+    "每手三刃花藤爪、粉白丝带",
+    "花环水晶杖首、垂落丝绸"
+  ]
+}

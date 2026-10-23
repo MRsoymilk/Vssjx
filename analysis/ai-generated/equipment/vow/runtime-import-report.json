@@ -1,0 +1,1016 @@
+[
+  {
+    "path": "res://assets/generated/equipment/vow/mzs/parts/mzst7.png",
+    "sha256": "228a30ce308458e0e19e04014a5e6ad9f1485966c2cc2ccb82e50d5eb523e46d",
+    "native_frames": [
+      [
+        0,
+        0,
+        42,
+        43
+      ],
+      [
+        42,
+        0,
+        20,
+        16
+      ]
+    ]
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/mzs/parts/mzs4.png",
+    "sha256": "8abd5d71a7d800703f1e342e9586b52a63d9ed848e52120a59d6f7359b491dfc",
+    "native_frames": [
+      [
+        0,
+        0,
+        19,
+        13
+      ],
+      [
+        26,
+        0,
+        26,
+        13
+      ],
+      [
+        52,
+        0,
+        6,
+        7
+      ]
+    ]
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/mzs/parts/mzs4q.png",
+    "sha256": "58a7f12de4729da396d1465d2cc8c11ecce1273cec6734f6d4efdbd2a0a56815",
+    "native_frames": [
+      [
+        0,
+        0,
+        11,
+        14
+      ],
+      [
+        25,
+        0,
+        9,
+        10
+      ],
+      [
+        50,
+        0,
+        25,
+        23
+      ]
+    ]
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/mzs/parts/mzs4x.png",
+    "sha256": "3be60b69682324e5c162312dff757e9e19537122dee6f865b0f4309dccc82ce3",
+    "native_frames": [
+      [
+        0,
+        0,
+        25,
+        15
+      ],
+      [
+        26,
+        0,
+        26,
+        14
+      ],
+      [
+        52,
+        0,
+        22,
+        13
+      ],
+      [
+        78,
+        0,
+        20,
+        15
+      ],
+      [
+        104,
+        0,
+        19,
+        14
+      ],
+      [
+        130,
+        0,
+        22,
+        13
+      ]
+    ]
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/mzs/parts/ezs9.png",
+    "sha256": "ce9f4eee25a8fe0beee1090255b11552e92af8635297e82be314f3f714fb0906",
+    "native_frames": [
+      [
+        0,
+        0,
+        74,
+        38
+      ],
+      [
+        74,
+        0,
+        74,
+        47
+      ]
+    ]
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/mzs/icons/weapon.png",
+    "sha256": "2542e5ea9fd77d9a11b7aca41128610f2c8da400359f8bbd088eb97542828c28"
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/mzs/icons/pendant.png",
+    "sha256": "da0413275606a547fdf0b267c4ee1fe02e5e1c82395bcedd25a1163769235ccf"
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/mzs/icons/armor.png",
+    "sha256": "4567e41f10e5cb1b1c690d3b24456953f2c95d59d1f36047974c1e17129f157a"
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/mzs/icons/wrist.png",
+    "sha256": "3fac3b7218f73259e9d551ac9979213a13bc86586a325e0397e9b4794324189b"
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/mzs/icons/belt.png",
+    "sha256": "4aa4066c0036282f0654918cbb892d67bde3de9a722e7f68815f79f7ca7de1ce"
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/mzs/icons/pants.png",
+    "sha256": "b8d72d0b33d19fb2b548aa5f91acaee5a91dbfbc578400e9d34c81f5422adc0b"
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/mzs/icons/boots.png",
+    "sha256": "75db8934c132cd817e56ea80143094c2727097b60f60fa08ce90638d52e7d2b9"
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/mzs/icons/ring.png",
+    "sha256": "062b3b5a4df98d0c6ba9cea21875f9c1b217c25c69af0262f149bc902867998a"
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/mzs/icons/necklace.png",
+    "sha256": "bd1ebbe50fed9a6dc71a9844562acddf9d4238f872485a9e50847bb2a9276f6a"
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/mzs/icons/hat.png",
+    "sha256": "f655980322347189754cfdcc3c1e8335020e325d9c1ecb5ef98c40449638b22c"
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/wzs/parts/wzst5.png",
+    "sha256": "1c3ea07d62320c484e6361f992dfb136f615006a19e306fc90d916931723ee54",
+    "native_frames": [
+      [
+        0,
+        0,
+        42,
+        43
+      ],
+      [
+        42,
+        0,
+        20,
+        16
+      ]
+    ]
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/wzs/parts/wzs4.png",
+    "sha256": "12a3b35490ba11f59c8aa114b57fd1bcc875814f0bfea8c94d93c209c616c352",
+    "native_frames": [
+      [
+        0,
+        0,
+        13,
+        11
+      ],
+      [
+        24,
+        0,
+        24,
+        12
+      ],
+      [
+        48,
+        0,
+        7,
+        9
+      ]
+    ]
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/wzs/parts/wzs4q.png",
+    "sha256": "428f649381321c5d10e12b864dbfc6d186f9573da3f9f489972e4f43330a4b62",
+    "native_frames": [
+      [
+        0,
+        0,
+        10,
+        7
+      ],
+      [
+        25,
+        0,
+        8,
+        7
+      ],
+      [
+        50,
+        0,
+        25,
+        21
+      ]
+    ]
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/wzs/parts/wzs4x.png",
+    "sha256": "620a793351d47c173cd952d6279a4c27ef83c6ae1ebcf06dd6f4a758b2a5b49a",
+    "native_frames": [
+      [
+        0,
+        0,
+        24,
+        14
+      ],
+      [
+        24,
+        0,
+        13,
+        12
+      ],
+      [
+        48,
+        0,
+        19,
+        12
+      ],
+      [
+        72,
+        0,
+        22,
+        13
+      ],
+      [
+        96,
+        0,
+        16,
+        14
+      ],
+      [
+        120,
+        0,
+        17,
+        11
+      ]
+    ]
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/wzs/parts/ezs9.png",
+    "sha256": "ce9f4eee25a8fe0beee1090255b11552e92af8635297e82be314f3f714fb0906",
+    "native_frames": [
+      [
+        0,
+        0,
+        74,
+        38
+      ],
+      [
+        74,
+        0,
+        74,
+        47
+      ]
+    ]
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/wzs/icons/weapon.png",
+    "sha256": "84a09677d9915ee36f3482b45dbb4f6bdb55203c92e4cf8f25be51c561c0e4d3"
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/wzs/icons/pendant.png",
+    "sha256": "299073af2b7e526ddbb270cc2d4d8e7db561fdbec5b9c05d02c8581178e1d73e"
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/wzs/icons/armor.png",
+    "sha256": "4682eaf6bcd62e6002ca84688aaf4e2bf717c0a6983e605e0e706332fb746549"
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/wzs/icons/wrist.png",
+    "sha256": "74415293c731e59dba52f25b9378830a17b5a5f3927bfe0afcee41cbd97ccb50"
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/wzs/icons/belt.png",
+    "sha256": "cb5d2fae224140269ceb2c621eead86065e37fc0791222d978ec38ac3b68f591"
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/wzs/icons/pants.png",
+    "sha256": "78cf7903a304185474bb806758fd946e0566eab67393b225a3a55fe4b8132d0c"
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/wzs/icons/boots.png",
+    "sha256": "fc3d2cbe7e02a7b4b31a1f5b548f107af3f5d53c19921daa7b4d4e3a291da040"
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/wzs/icons/ring.png",
+    "sha256": "92a860d45c84068c1996b72a331f513f2974aa2b15a671255a1ec7f9462af5a3"
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/wzs/icons/necklace.png",
+    "sha256": "bd1ebbe50fed9a6dc71a9844562acddf9d4238f872485a9e50847bb2a9276f6a"
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/wzs/icons/hat.png",
+    "sha256": "04641a79f1da50c26d1e8ad59bce198a4ea0274f15f870908d9f2b4b2d87870c"
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/mck/parts/mckt5.png",
+    "sha256": "1c1825840972298ac66290cf9ddc0b2af14d6620f4b690a45b232d894add6e7e",
+    "native_frames": [
+      [
+        0,
+        0,
+        42,
+        43
+      ],
+      [
+        42,
+        0,
+        20,
+        16
+      ]
+    ]
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/mck/parts/mck2.png",
+    "sha256": "f66b63ec5928d374189ba864d4ec1a95c9d87109e0639894b0d1f2d88a2e38cc",
+    "native_frames": [
+      [
+        0,
+        0,
+        21,
+        19
+      ],
+      [
+        21,
+        0,
+        15,
+        13
+      ]
+    ]
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/mck/parts/mck2q.png",
+    "sha256": "88197a3eab751f323489ca156d366212f1c33af05d8dacce92d15b5f6f563b0a",
+    "native_frames": [
+      [
+        0,
+        0,
+        22,
+        20
+      ],
+      [
+        24,
+        0,
+        11,
+        8
+      ],
+      [
+        48,
+        0,
+        20,
+        8
+      ],
+      [
+        72,
+        0,
+        14,
+        5
+      ],
+      [
+        96,
+        0,
+        12,
+        5
+      ],
+      [
+        120,
+        0,
+        21,
+        17
+      ],
+      [
+        144,
+        0,
+        24,
+        16
+      ]
+    ]
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/mck/parts/mck2x.png",
+    "sha256": "162f184a5e5cca18e976e3412bc6b31641b6c92420e5638c86049890c81a4881",
+    "native_frames": [
+      [
+        0,
+        0,
+        15,
+        13
+      ],
+      [
+        16,
+        0,
+        16,
+        13
+      ],
+      [
+        32,
+        0,
+        14,
+        13
+      ],
+      [
+        48,
+        0,
+        13,
+        13
+      ],
+      [
+        64,
+        0,
+        13,
+        13
+      ],
+      [
+        80,
+        0,
+        14,
+        13
+      ]
+    ]
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/mck/parts/eck9.png",
+    "sha256": "8319795b97171b1fcaac3535d68e8f9755f4a9d942bc8f1be53117494914a34a",
+    "native_frames": [
+      [
+        0,
+        0,
+        41,
+        14
+      ],
+      [
+        41,
+        0,
+        30,
+        30
+      ]
+    ]
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/mck/icons/weapon.png",
+    "sha256": "9149c5f23a5105e046b08011befdbdaffc687945c9b9c64c42e2baa72cb33c88"
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/mck/icons/pendant.png",
+    "sha256": "e988417e00a26068b3e1aaf71509c2634f94cd2d2d488d1b02f8659dede8efa6"
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/mck/icons/armor.png",
+    "sha256": "ae6ec0f12225bbd6e9d94aad1b902d55b16286a47336dab376d0b89d16ead519"
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/mck/icons/wrist.png",
+    "sha256": "a86b6db3ae003cec021de87167c48c7c9e8ba9678e84853aee5c4bc5ee892f61"
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/mck/icons/belt.png",
+    "sha256": "79c509d9ef7d68d0094bc02513788edf8ec7f880ad82024072fda23fd411a9ab"
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/mck/icons/pants.png",
+    "sha256": "08eeeb99340679f44d3bc657bf28b28977f6f248bd486a1cbb6cb264fe058d5f"
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/mck/icons/boots.png",
+    "sha256": "6894d799f25f0bd0042227e1409877d42ee72b757361accd82b59cba33a435c2"
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/mck/icons/ring.png",
+    "sha256": "be863b2fe5ac9f4ba0e5a19731d518e0a8108130d7bb5124e7494174646be17a"
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/mck/icons/necklace.png",
+    "sha256": "693b035aabc6ed667cf95c5b79bbe1cf9b65fcac3e4d2dd069aee3222cb6ffc2"
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/mck/icons/hat.png",
+    "sha256": "ac90f1e26f0932a4bbadcec7786d5a5319a0ca28b430f79af119d45360ab1758"
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/wck/parts/wckt1.png",
+    "sha256": "d7e1e364860de50a175bc9d7556994dea808b57e14f6bb97e1c876c59e99657f",
+    "native_frames": [
+      [
+        0,
+        0,
+        42,
+        43
+      ],
+      [
+        42,
+        0,
+        20,
+        16
+      ]
+    ]
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/wck/parts/wck2.png",
+    "sha256": "5b0b6f05d35a3be3f90bed1004eb9dbe5e82ef0de908d246dd24a75463107d61",
+    "native_frames": [
+      [
+        0,
+        0,
+        15,
+        12
+      ],
+      [
+        15,
+        0,
+        11,
+        13
+      ]
+    ]
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/wck/parts/wck2q.png",
+    "sha256": "6dd13858f143a4b5c1ce5456fb3d6bf0b7da8951a31bf8e6431c4833614b8bb1",
+    "native_frames": [
+      [
+        0,
+        0,
+        17,
+        21
+      ],
+      [
+        27,
+        0,
+        25,
+        22
+      ],
+      [
+        54,
+        0,
+        27,
+        26
+      ]
+    ]
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/wck/parts/wck2x.png",
+    "sha256": "7a57b9378cb1315b807588af3f7335a3c27595bc7bb43337a69b6cb5dc1bfe83",
+    "native_frames": [
+      [
+        0,
+        0,
+        16,
+        12
+      ],
+      [
+        16,
+        0,
+        12,
+        13
+      ],
+      [
+        32,
+        0,
+        12,
+        13
+      ],
+      [
+        48,
+        0,
+        13,
+        11
+      ],
+      [
+        64,
+        0,
+        15,
+        13
+      ],
+      [
+        80,
+        0,
+        12,
+        13
+      ]
+    ]
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/wck/parts/eck9.png",
+    "sha256": "8319795b97171b1fcaac3535d68e8f9755f4a9d942bc8f1be53117494914a34a",
+    "native_frames": [
+      [
+        0,
+        0,
+        41,
+        14
+      ],
+      [
+        41,
+        0,
+        30,
+        30
+      ]
+    ]
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/wck/icons/weapon.png",
+    "sha256": "335f8966f64fc7f98a9bb0b4f79dd11222264cb23c4794f8b1ff7ef6a7ce20cb"
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/wck/icons/pendant.png",
+    "sha256": "c0cd10d02a951ec787bbd60c5d79fce71cf6e1842b68fb9e6c233449df720f42"
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/wck/icons/armor.png",
+    "sha256": "4b3134618f76e81018b437aac3aeea5ad7fdb976523140d823e1cb4e5f15d366"
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/wck/icons/wrist.png",
+    "sha256": "2076cd0e47a05972d4174703dbc4789c2bfbc0a7ebb7512a2dc8bc8bfb96bd9d"
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/wck/icons/belt.png",
+    "sha256": "f69d9eed4ca13f2f216ee600f1bdba12b858e0b107a03a9b889a273830242ebb"
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/wck/icons/pants.png",
+    "sha256": "114972ea09620aa6158a1fd42aab3d07b0a4ea21dc4b91532500119232cb9896"
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/wck/icons/boots.png",
+    "sha256": "01d089b7bf100839d3b4e112b5f7a5474b7cdc6f6bdb133dc11e07241659c0bc"
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/wck/icons/ring.png",
+    "sha256": "248e21736bb4f76e87aed1c4e3ed13df204a208f0eee4f41a9675b6b88e1fe66"
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/wck/icons/necklace.png",
+    "sha256": "693b035aabc6ed667cf95c5b79bbe1cf9b65fcac3e4d2dd069aee3222cb6ffc2"
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/wck/icons/hat.png",
+    "sha256": "df1af212c86b09a982c7ab34e5f04fb57d3ee6867d30597a7c907ba74b293a03"
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/mfs/parts/mfst2.png",
+    "sha256": "a85463a628ab00d44337ae4a3eca1f09c1fd5478157f3544fd7785c3a95f82b7",
+    "native_frames": [
+      [
+        0,
+        0,
+        42,
+        43
+      ],
+      [
+        42,
+        0,
+        20,
+        16
+      ]
+    ]
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/mfs/parts/mfs4.png",
+    "sha256": "9f32ef2124aa43636f90d3e85908a3a138cda2e719b91c00dc375a109e72e4db",
+    "native_frames": [
+      [
+        0,
+        0,
+        28,
+        17
+      ],
+      [
+        28,
+        0,
+        23,
+        10
+      ],
+      [
+        56,
+        0,
+        5,
+        9
+      ]
+    ]
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/mfs/parts/mfs4q.png",
+    "sha256": "1b156d1eeea00d078238718807ab080439645431c3cc466d2d81be62c71710a9",
+    "native_frames": [
+      [
+        0,
+        0,
+        11,
+        5
+      ],
+      [
+        31,
+        0,
+        3,
+        4
+      ],
+      [
+        62,
+        0,
+        31,
+        23
+      ]
+    ]
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/mfs/parts/mfs4x.png",
+    "sha256": "2ce43a7305f4fe951775c4c52cd0553ed3068cd0a500ee24f67fd3a6a1684378",
+    "native_frames": [
+      [
+        0,
+        0,
+        18,
+        14
+      ],
+      [
+        18,
+        0,
+        16,
+        13
+      ],
+      [
+        36,
+        0,
+        18,
+        12
+      ],
+      [
+        54,
+        0,
+        16,
+        12
+      ],
+      [
+        72,
+        0,
+        15,
+        12
+      ],
+      [
+        90,
+        0,
+        16,
+        14
+      ]
+    ]
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/mfs/parts/efs7.png",
+    "sha256": "deddf85731fa962ff2d6cc940acce2e2866550920f6fcabe8d224bcc6ea2fb8e",
+    "native_frames": [
+      [
+        0,
+        0,
+        40,
+        40
+      ],
+      [
+        49,
+        0,
+        49,
+        32
+      ]
+    ]
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/mfs/icons/weapon.png",
+    "sha256": "dd15ce248c306f1c96d9ecd0227f2ce61d886051f9e995953ce99ceace3b3ff0"
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/mfs/icons/pendant.png",
+    "sha256": "38469e3edf43b4935883af4b70129c63c36ce45ca1266890b861ca5af13b807b"
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/mfs/icons/armor.png",
+    "sha256": "64f4efc8cdfe61a10dd223baca22604e73c05535f5d43fddaee56378c455a8e2"
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/mfs/icons/wrist.png",
+    "sha256": "3004ec0527776a3a775e289be43eedb02634841c08e26059a02221c0eb078b6d"
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/mfs/icons/belt.png",
+    "sha256": "393cb41d011a1263d1a6917edb8b21d9465f066afbbe68931e9b47f14529001f"
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/mfs/icons/pants.png",
+    "sha256": "0d851220e9c82f9b9bad9061cd95ce79519bab410257bacbe6a811e0bf273835"
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/mfs/icons/boots.png",
+    "sha256": "8777209043f10065603219f2a9e546a2f359b9a7be4b8d70061c2f2786b8dce0"
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/mfs/icons/ring.png",
+    "sha256": "d2e607ee2ff20e722cad3d6179de98121583f336ffcab7b51df45d54c23ec5aa"
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/mfs/icons/necklace.png",
+    "sha256": "62cabd33f5c65fc7f0da54339e3af30b0356e4545174bceeb8b4f12657809663"
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/mfs/icons/hat.png",
+    "sha256": "ba0ea9346b32aa8ffe3ec5647a38dfb62225c8d2939f6c65528db219dd9f5fb7"
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/wfs/parts/wfst2.png",
+    "sha256": "8ff4384a24daa2b56795b7f278d9781e01d252dda59af6c68748935839ed17e3",
+    "native_frames": [
+      [
+        0,
+        0,
+        42,
+        43
+      ],
+      [
+        42,
+        0,
+        20,
+        16
+      ]
+    ]
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/wfs/parts/wfs5.png",
+    "sha256": "02c4610445ef94610b9bfac1242abe687e3eac82f34e24c70335231c98e2e0ce",
+    "native_frames": [
+      [
+        0,
+        0,
+        22,
+        14
+      ],
+      [
+        22,
+        0,
+        12,
+        13
+      ],
+      [
+        44,
+        0,
+        11,
+        15
+      ]
+    ]
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/wfs/parts/wfs5q.png",
+    "sha256": "ef9c4d59f2337e2a471f6cae9712447947d4e67cc6f2414c2651d4a857a8fbfd",
+    "native_frames": [
+      [
+        0,
+        0,
+        19,
+        22
+      ],
+      [
+        21,
+        0,
+        4,
+        6
+      ],
+      [
+        42,
+        0,
+        21,
+        21
+      ],
+      [
+        63,
+        0,
+        10,
+        8
+      ]
+    ]
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/wfs/parts/wfs5x.png",
+    "sha256": "01482f0e016c77fc3b9a1ba19abd0265bf8d73a84202af6b0bff13a29ac4580d",
+    "native_frames": [
+      [
+        0,
+        0,
+        13,
+        14
+      ],
+      [
+        15,
+        0,
+        15,
+        13
+      ],
+      [
+        30,
+        0,
+        12,
+        12
+      ],
+      [
+        45,
+        0,
+        12,
+        14
+      ],
+      [
+        60,
+        0,
+        13,
+        13
+      ],
+      [
+        75,
+        0,
+        12,
+        12
+      ]
+    ]
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/wfs/parts/efs7.png",
+    "sha256": "deddf85731fa962ff2d6cc940acce2e2866550920f6fcabe8d224bcc6ea2fb8e",
+    "native_frames": [
+      [
+        0,
+        0,
+        40,
+        40
+      ],
+      [
+        49,
+        0,
+        49,
+        32
+      ]
+    ]
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/wfs/icons/weapon.png",
+    "sha256": "4b8b7149f5824a1ff8abdaddeb700ff9c7ce60fc7baf9873d147646b3c7ec8d5"
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/wfs/icons/pendant.png",
+    "sha256": "9159994d306f47c9dd7694a55a08c51eb0e4a73fa1ce22749435bcd9d676b1c7"
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/wfs/icons/armor.png",
+    "sha256": "286a925cad647b746aff1eb27c2931dfc94019b6ae974d12674283f1740784e7"
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/wfs/icons/wrist.png",
+    "sha256": "955a6cbb1fc0d860afaa4fda27f5141a917b4171930ca648d7f31b864fb299b5"
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/wfs/icons/belt.png",
+    "sha256": "a4edce143448b767d9a57fa46b0ed9b557775c4a3f1cd5ebc93f87cc98a00355"
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/wfs/icons/pants.png",
+    "sha256": "941367717932272d22edf8fa2652ce43174e06acf79c8849d39aab1919e3adf9"
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/wfs/icons/boots.png",
+    "sha256": "14fd366d10979958622e598c7bcd29d5780cb3ed616990c26d8d15f9ec12b164"
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/wfs/icons/ring.png",
+    "sha256": "27e2ceae74014e7245ab8806d3714269956c80e6c60f72fb05c3e0e0d00a2eba"
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/wfs/icons/necklace.png",
+    "sha256": "62cabd33f5c65fc7f0da54339e3af30b0356e4545174bceeb8b4f12657809663"
+  },
+  {
+    "path": "res://assets/generated/equipment/vow/wfs/icons/hat.png",
+    "sha256": "c3ceea850a6199c2b40593d996d212bc8d94ead9435aa4b39daaf29e6252e94e"
+  }
+]

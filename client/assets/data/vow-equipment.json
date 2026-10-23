@@ -1,0 +1,860 @@
+{
+  "format_version": 1,
+  "source": "用户确认誓约礼装；原生网格手绘西装礼裙、花饰大剑双爪法杖",
+  "sets": [
+    {
+      "id": "vow/mzs",
+      "name": "誓约·夜玫",
+      "stem": "mzs",
+      "job": 0,
+      "gender": 0,
+      "weapon_code": 47,
+      "clothing_code": 30,
+      "head_code": 28,
+      "head": "vow/mzs/mzst7",
+      "body": [
+        "vow/mzs/mzs4",
+        "vow/mzs/mzs4q",
+        "vow/mzs/mzs4x"
+      ],
+      "weapon": "vow/mzs/ezs9",
+      "weapon_name": "夜玫誓约大剑"
+    },
+    {
+      "id": "vow/wzs",
+      "name": "誓约·白蔷",
+      "stem": "wzs",
+      "job": 0,
+      "gender": 1,
+      "weapon_code": 48,
+      "clothing_code": 31,
+      "head_code": 29,
+      "head": "vow/wzs/wzst5",
+      "body": [
+        "vow/wzs/wzs4",
+        "vow/wzs/wzs4q",
+        "vow/wzs/wzs4x"
+      ],
+      "weapon": "vow/wzs/ezs9",
+      "weapon_name": "白蔷誓约大剑"
+    },
+    {
+      "id": "vow/mck",
+      "name": "誓约·银蔷",
+      "stem": "mck",
+      "job": 1,
+      "gender": 0,
+      "weapon_code": 49,
+      "clothing_code": 32,
+      "head_code": 30,
+      "head": "vow/mck/mckt5",
+      "body": [
+        "vow/mck/mck2",
+        "vow/mck/mck2q",
+        "vow/mck/mck2x"
+      ],
+      "weapon": "vow/mck/eck9",
+      "weapon_name": "银蔷花藤双爪"
+    },
+    {
+      "id": "vow/wck",
+      "name": "誓约·绯绡",
+      "stem": "wck",
+      "job": 1,
+      "gender": 1,
+      "weapon_code": 50,
+      "clothing_code": 33,
+      "head_code": 31,
+      "head": "vow/wck/wckt1",
+      "body": [
+        "vow/wck/wck2",
+        "vow/wck/wck2q",
+        "vow/wck/wck2x"
+      ],
+      "weapon": "vow/wck/eck9",
+      "weapon_name": "绯绡花藤双爪"
+    },
+    {
+      "id": "vow/mfs",
+      "name": "誓约·星兰",
+      "stem": "mfs",
+      "job": 2,
+      "gender": 0,
+      "weapon_code": 51,
+      "clothing_code": 34,
+      "head_code": 32,
+      "head": "vow/mfs/mfst2",
+      "body": [
+        "vow/mfs/mfs4",
+        "vow/mfs/mfs4q",
+        "vow/mfs/mfs4x"
+      ],
+      "weapon": "vow/mfs/efs7",
+      "weapon_name": "星兰花誓法杖"
+    },
+    {
+      "id": "vow/wfs",
+      "name": "誓约·月藤",
+      "stem": "wfs",
+      "job": 2,
+      "gender": 1,
+      "weapon_code": 52,
+      "clothing_code": 35,
+      "head_code": 33,
+      "head": "vow/wfs/wfst2",
+      "body": [
+        "vow/wfs/wfs5",
+        "vow/wfs/wfs5q",
+        "vow/wfs/wfs5x"
+      ],
+      "weapon": "vow/wfs/efs7",
+      "weapon_name": "月藤花誓法杖"
+    }
+  ],
+  "parts": {
+    "vow/mzs/mzst7": {
+      "texture": "res://assets/generated/equipment/vow/mzs/parts/mzst7.png",
+      "frames": [
+        [
+          0,
+          0,
+          42,
+          43
+        ],
+        [
+          42,
+          0,
+          20,
+          16
+        ]
+      ]
+    },
+    "vow/mzs/mzs4": {
+      "texture": "res://assets/generated/equipment/vow/mzs/parts/mzs4.png",
+      "frames": [
+        [
+          0,
+          0,
+          19,
+          13
+        ],
+        [
+          26,
+          0,
+          26,
+          13
+        ],
+        [
+          52,
+          0,
+          6,
+          7
+        ]
+      ]
+    },
+    "vow/mzs/mzs4q": {
+      "texture": "res://assets/generated/equipment/vow/mzs/parts/mzs4q.png",
+      "frames": [
+        [
+          0,
+          0,
+          11,
+          14
+        ],
+        [
+          25,
+          0,
+          9,
+          10
+        ],
+        [
+          50,
+          0,
+          25,
+          23
+        ]
+      ]
+    },
+    "vow/mzs/mzs4x": {
+      "texture": "res://assets/generated/equipment/vow/mzs/parts/mzs4x.png",
+      "frames": [
+        [
+          0,
+          0,
+          25,
+          15
+        ],
+        [
+          26,
+          0,
+          26,
+          14
+        ],
+        [
+          52,
+          0,
+          22,
+          13
+        ],
+        [
+          78,
+          0,
+          20,
+          15
+        ],
+        [
+          104,
+          0,
+          19,
+          14
+        ],
+        [
+          130,
+          0,
+          22,
+          13
+        ]
+      ]
+    },
+    "vow/mzs/ezs9": {
+      "texture": "res://assets/generated/equipment/vow/mzs/parts/ezs9.png",
+      "frames": [
+        [
+          0,
+          0,
+          74,
+          38
+        ],
+        [
+          74,
+          0,
+          74,
+          47
+        ]
+      ]
+    },
+    "vow/wzs/wzst5": {
+      "texture": "res://assets/generated/equipment/vow/wzs/parts/wzst5.png",
+      "frames": [
+        [
+          0,
+          0,
+          42,
+          43
+        ],
+        [
+          42,
+          0,
+          20,
+          16
+        ]
+      ]
+    },
+    "vow/wzs/wzs4": {
+      "texture": "res://assets/generated/equipment/vow/wzs/parts/wzs4.png",
+      "frames": [
+        [
+          0,
+          0,
+          13,
+          11
+        ],
+        [
+          24,
+          0,
+          24,
+          12
+        ],
+        [
+          48,
+          0,
+          7,
+          9
+        ]
+      ]
+    },
+    "vow/wzs/wzs4q": {
+      "texture": "res://assets/generated/equipment/vow/wzs/parts/wzs4q.png",
+      "frames": [
+        [
+          0,
+          0,
+          10,
+          7
+        ],
+        [
+          25,
+          0,
+          8,
+          7
+        ],
+        [
+          50,
+          0,
+          25,
+          21
+        ]
+      ]
+    },
+    "vow/wzs/wzs4x": {
+      "texture": "res://assets/generated/equipment/vow/wzs/parts/wzs4x.png",
+      "frames": [
+        [
+          0,
+          0,
+          24,
+          14
+        ],
+        [
+          24,
+          0,
+          13,
+          12
+        ],
+        [
+          48,
+          0,
+          19,
+          12
+        ],
+        [
+          72,
+          0,
+          22,
+          13
+        ],
+        [
+          96,
+          0,
+          16,
+          14
+        ],
+        [
+          120,
+          0,
+          17,
+          11
+        ]
+      ]
+    },
+    "vow/wzs/ezs9": {
+      "texture": "res://assets/generated/equipment/vow/wzs/parts/ezs9.png",
+      "frames": [
+        [
+          0,
+          0,
+          74,
+          38
+        ],
+        [
+          74,
+          0,
+          74,
+          47
+        ]
+      ]
+    },
+    "vow/mck/mckt5": {
+      "texture": "res://assets/generated/equipment/vow/mck/parts/mckt5.png",
+      "frames": [
+        [
+          0,
+          0,
+          42,
+          43
+        ],
+        [
+          42,
+          0,
+          20,
+          16
+        ]
+      ]
+    },
+    "vow/mck/mck2": {
+      "texture": "res://assets/generated/equipment/vow/mck/parts/mck2.png",
+      "frames": [
+        [
+          0,
+          0,
+          21,
+          19
+        ],
+        [
+          21,
+          0,
+          15,
+          13
+        ]
+      ]
+    },
+    "vow/mck/mck2q": {
+      "texture": "res://assets/generated/equipment/vow/mck/parts/mck2q.png",
+      "frames": [
+        [
+          0,
+          0,
+          22,
+          20
+        ],
+        [
+          24,
+          0,
+          11,
+          8
+        ],
+        [
+          48,
+          0,
+          20,
+          8
+        ],
+        [
+          72,
+          0,
+          14,
+          5
+        ],
+        [
+          96,
+          0,
+          12,
+          5
+        ],
+        [
+          120,
+          0,
+          21,
+          17
+        ],
+        [
+          144,
+          0,
+          24,
+          16
+        ]
+      ]
+    },
+    "vow/mck/mck2x": {
+      "texture": "res://assets/generated/equipment/vow/mck/parts/mck2x.png",
+      "frames": [
+        [
+          0,
+          0,
+          15,
+          13
+        ],
+        [
+          16,
+          0,
+          16,
+          13
+        ],
+        [
+          32,
+          0,
+          14,
+          13
+        ],
+        [
+          48,
+          0,
+          13,
+          13
+        ],
+        [
+          64,
+          0,
+          13,
+          13
+        ],
+        [
+          80,
+          0,
+          14,
+          13
+        ]
+      ]
+    },
+    "vow/mck/eck9": {
+      "texture": "res://assets/generated/equipment/vow/mck/parts/eck9.png",
+      "frames": [
+        [
+          0,
+          0,
+          41,
+          14
+        ],
+        [
+          41,
+          0,
+          30,
+          30
+        ]
+      ]
+    },
+    "vow/wck/wckt1": {
+      "texture": "res://assets/generated/equipment/vow/wck/parts/wckt1.png",
+      "frames": [
+        [
+          0,
+          0,
+          42,
+          43
+        ],
+        [
+          42,
+          0,
+          20,
+          16
+        ]
+      ]
+    },
+    "vow/wck/wck2": {
+      "texture": "res://assets/generated/equipment/vow/wck/parts/wck2.png",
+      "frames": [
+        [
+          0,
+          0,
+          15,
+          12
+        ],
+        [
+          15,
+          0,
+          11,
+          13
+        ]
+      ]
+    },
+    "vow/wck/wck2q": {
+      "texture": "res://assets/generated/equipment/vow/wck/parts/wck2q.png",
+      "frames": [
+        [
+          0,
+          0,
+          17,
+          21
+        ],
+        [
+          27,
+          0,
+          25,
+          22
+        ],
+        [
+          54,
+          0,
+          27,
+          26
+        ]
+      ]
+    },
+    "vow/wck/wck2x": {
+      "texture": "res://assets/generated/equipment/vow/wck/parts/wck2x.png",
+      "frames": [
+        [
+          0,
+          0,
+          16,
+          12
+        ],
+        [
+          16,
+          0,
+          12,
+          13
+        ],
+        [
+          32,
+          0,
+          12,
+          13
+        ],
+        [
+          48,
+          0,
+          13,
+          11
+        ],
+        [
+          64,
+          0,
+          15,
+          13
+        ],
+        [
+          80,
+          0,
+          12,
+          13
+        ]
+      ]
+    },
+    "vow/wck/eck9": {
+      "texture": "res://assets/generated/equipment/vow/wck/parts/eck9.png",
+      "frames": [
+        [
+          0,
+          0,
+          41,
+          14
+        ],
+        [
+          41,
+          0,
+          30,
+          30
+        ]
+      ]
+    },
+    "vow/mfs/mfst2": {
+      "texture": "res://assets/generated/equipment/vow/mfs/parts/mfst2.png",
+      "frames": [
+        [
+          0,
+          0,
+          42,
+          43
+        ],
+        [
+          42,
+          0,
+          20,
+          16
+        ]
+      ]
+    },
+    "vow/mfs/mfs4": {
+      "texture": "res://assets/generated/equipment/vow/mfs/parts/mfs4.png",
+      "frames": [
+        [
+          0,
+          0,
+          28,
+          17
+        ],
+        [
+          28,
+          0,
+          23,
+          10
+        ],
+        [
+          56,
+          0,
+          5,
+          9
+        ]
+      ]
+    },
+    "vow/mfs/mfs4q": {
+      "texture": "res://assets/generated/equipment/vow/mfs/parts/mfs4q.png",
+      "frames": [
+        [
+          0,
+          0,
+          11,
+          5
+        ],
+        [
+          31,
+          0,
+          3,
+          4
+        ],
+        [
+          62,
+          0,
+          31,
+          23
+        ]
+      ]
+    },
+    "vow/mfs/mfs4x": {
+      "texture": "res://assets/generated/equipment/vow/mfs/parts/mfs4x.png",
+      "frames": [
+        [
+          0,
+          0,
+          18,
+          14
+        ],
+        [
+          18,
+          0,
+          16,
+          13
+        ],
+        [
+          36,
+          0,
+          18,
+          12
+        ],
+        [
+          54,
+          0,
+          16,
+          12
+        ],
+        [
+          72,
+          0,
+          15,
+          12
+        ],
+        [
+          90,
+          0,
+          16,
+          14
+        ]
+      ]
+    },
+    "vow/mfs/efs7": {
+      "texture": "res://assets/generated/equipment/vow/mfs/parts/efs7.png",
+      "frames": [
+        [
+          0,
+          0,
+          40,
+          40
+        ],
+        [
+          49,
+          0,
+          49,
+          32
+        ]
+      ]
+    },
+    "vow/wfs/wfst2": {
+      "texture": "res://assets/generated/equipment/vow/wfs/parts/wfst2.png",
+      "frames": [
+        [
+          0,
+          0,
+          42,
+          43
+        ],
+        [
+          42,
+          0,
+          20,
+          16
+        ]
+      ]
+    },
+    "vow/wfs/wfs5": {
+      "texture": "res://assets/generated/equipment/vow/wfs/parts/wfs5.png",
+      "frames": [
+        [
+          0,
+          0,
+          22,
+          14
+        ],
+        [
+          22,
+          0,
+          12,
+          13
+        ],
+        [
+          44,
+          0,
+          11,
+          15
+        ]
+      ]
+    },
+    "vow/wfs/wfs5q": {
+      "texture": "res://assets/generated/equipment/vow/wfs/parts/wfs5q.png",
+      "frames": [
+        [
+          0,
+          0,
+          19,
+          22
+        ],
+        [
+          21,
+          0,
+          4,
+          6
+        ],
+        [
+          42,
+          0,
+          21,
+          21
+        ],
+        [
+          63,
+          0,
+          10,
+          8
+        ]
+      ]
+    },
+    "vow/wfs/wfs5x": {
+      "texture": "res://assets/generated/equipment/vow/wfs/parts/wfs5x.png",
+      "frames": [
+        [
+          0,
+          0,
+          13,
+          14
+        ],
+        [
+          15,
+          0,
+          15,
+          13
+        ],
+        [
+          30,
+          0,
+          12,
+          12
+        ],
+        [
+          45,
+          0,
+          12,
+          14
+        ],
+        [
+          60,
+          0,
+          13,
+          13
+        ],
+        [
+          75,
+          0,
+          12,
+          12
+        ]
+      ]
+    },
+    "vow/wfs/efs7": {
+      "texture": "res://assets/generated/equipment/vow/wfs/parts/efs7.png",
+      "frames": [
+        [
+          0,
+          0,
+          40,
+          40
+        ],
+        [
+          49,
+          0,
+          49,
+          32
+        ]
+      ]
+    }
+  }
+}

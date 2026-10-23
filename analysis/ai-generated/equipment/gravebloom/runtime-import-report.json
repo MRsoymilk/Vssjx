@@ -15,7 +15,7 @@
       ]
     ],
     "path": "res://assets/generated/equipment/gravebloom/mzs/parts/mzst6.png",
-    "sha256": "bfd8c666b2d2f7075e90ee26ae6a57464022ee96e6eff9ea70d079fba2602ce7"
+    "sha256": "16530000fa4fb34d04edef6dbf01f19e60fef8b06cb57a6a7e87dfddce4326ca"
   },
   {
     "native_frames": [
@@ -39,7 +39,7 @@
       ]
     ],
     "path": "res://assets/generated/equipment/gravebloom/mzs/parts/mzs1.png",
-    "sha256": "1d246b811ddb86b63fc4553a9f030228fedb7d5cb2d6b3de3e601bcbd8af1ca8"
+    "sha256": "5c425cf9a4c6c0c379007b0b00d1321618359e54d3808823b0e9813e768f9f82"
   },
   {
     "native_frames": [
@@ -63,7 +63,7 @@
       ]
     ],
     "path": "res://assets/generated/equipment/gravebloom/mzs/parts/mzs1q.png",
-    "sha256": "36363ce3639a71873e8428b6f1d10be26cc0ae88e52a7aaa6507ab034f414c85"
+    "sha256": "43cf5042881df2e8a2027a9bf8deecbb522d994b65dade0d2bec8578e2c55966"
   },
   {
     "native_frames": [
@@ -105,7 +105,7 @@
       ]
     ],
     "path": "res://assets/generated/equipment/gravebloom/mzs/parts/mzs1x.png",
-    "sha256": "9408b01dc9c3813b74d251cc3ad2a86b803abc9f2360bbebd57867151867e4d3"
+    "sha256": "6838a8ff7aa98988cbe9adbcb8bc3a5baa484e7c6f0db373680a8e47bb7a0522"
   },
   {
     "native_frames": [
@@ -123,56 +123,56 @@
       ]
     ],
     "path": "res://assets/generated/equipment/gravebloom/mzs/parts/ezs11.png",
-    "sha256": "c6b12786864a29c10ae477610a6b9d87e894bd35996929af6d99b2f17cd4ff2b"
+    "sha256": "f35da13c355118d3e026c8d198bdf2b3f77b34f1a2b5164bd159d5d991f7a114"
   },
   {
     "path": "res://assets/generated/equipment/gravebloom/mzs/icons/weapon.png",
-    "sha256": "7dbd65e9f19870b3ada4a8ec1980fdccc4458fda22df8ee3cef5ebf47eec93bf",
+    "sha256": "b2aab98c9c5df1061e6c991f088de2e41ec2764707a1ae5aaaa610bc5a78327f",
     "source_cell": 20
   },
   {
     "path": "res://assets/generated/equipment/gravebloom/mzs/icons/hat.png",
-    "sha256": "4be5761035a2912859356fa982e07ac4d48164974eaf053d8d8811368ebe118f",
+    "sha256": "172bded4186804981d66a8f9a9e2d6b53cadb849c0bcc3125fab7b08b2bf4eff",
     "source_cell": 21
   },
   {
     "path": "res://assets/generated/equipment/gravebloom/mzs/icons/armor.png",
-    "sha256": "1638230ae495b0367e5e09e2ba68e30b26d87e870bc8ca9d12b65fe72b2ef295",
+    "sha256": "8b6ee88b09ca24166204fbc5f9b5eb035575b6245528c6bcedb28fb5cd6d6287",
     "source_cell": 22
   },
   {
     "path": "res://assets/generated/equipment/gravebloom/mzs/icons/wrist.png",
-    "sha256": "52d88c6f95bbc20a171671ba3308b4d306dfb0bfde57540cf39a53216e05ab60",
+    "sha256": "d11e4c37a81633b70dfe2497c41b8fb795e4f9c7ecc5468e85a73f79f61a27cb",
     "source_cell": 23
   },
   {
     "path": "res://assets/generated/equipment/gravebloom/mzs/icons/belt.png",
-    "sha256": "294a14eb5e2c1b5060ffa5bd68dff61413bab233f5aef8989ffb224400f6dd29",
+    "sha256": "309d71820a31db43ad98492c794fc138622ecfd9d351f3b32ff09d4491abdc20",
     "source_cell": 24
   },
   {
     "path": "res://assets/generated/equipment/gravebloom/mzs/icons/pants.png",
-    "sha256": "566245d9fe4dc7fc01fe50b76cab5948b68659ac8aae871a40be2beb34611df6",
+    "sha256": "75725bfe12a25a1076be72c4afc09e5f14bfd4fe309cbfe42cd39f441cb7e733",
     "source_cell": 25
   },
   {
     "path": "res://assets/generated/equipment/gravebloom/mzs/icons/boots.png",
-    "sha256": "e5b7bddf4b4122f2e889fe13c65308ce25bd4cf6576d1a7776c5d6aed28b1124",
+    "sha256": "4b084708a9fbd962098fef08973c3c38662720959fa168331e31e10151ef2c6c",
     "source_cell": 26
   },
   {
     "path": "res://assets/generated/equipment/gravebloom/mzs/icons/pendant.png",
-    "sha256": "dc9e5c503240735874319a76d88d5c34386f3e44835a264a31c69cb64740f6de",
+    "sha256": "6a93610d0e6b39275f671b400a3047402183afbb0dbdec8a27a2ecb45e6054f1",
     "source_cell": 27
   },
   {
     "path": "res://assets/generated/equipment/gravebloom/mzs/icons/ring.png",
-    "sha256": "44b152f9db3699f36bf32399f66f3e724477b049751492aecb718411b289a260",
+    "sha256": "e461178e68ffa5bb71facad1b1cde63cefe02090544f5e2e1c9d322e6b45ec70",
     "source_cell": 28
   },
   {
     "path": "res://assets/generated/equipment/gravebloom/mzs/icons/necklace.png",
-    "sha256": "3a78908d8cafb7a396ee51cbbacfb6a46ba43148db5344bca0ff9e8baaf4ef4b",
+    "sha256": "aca0190d28da87de6f3fff56b5d5218fef061089eb7070013a85791a88a98994",
     "source_cell": 29
   },
   {
@@ -191,7 +191,7 @@
       ]
     ],
     "path": "res://assets/generated/equipment/gravebloom/wzs/parts/wzst4.png",
-    "sha256": "595fd02123d584b758257c99405adba1080af75b5f0b09d3e69bfe972e6288e3"
+    "sha256": "40c2a01486f76db40ac973f1c3c9ee932ce20dbe44cdf49791e04e85242487f7"
   },
   {
     "native_frames": [
@@ -215,7 +215,7 @@
       ]
     ],
     "path": "res://assets/generated/equipment/gravebloom/wzs/parts/wzs1.png",
-    "sha256": "cb602c5da666aed5032d670100d04212d978bfdabc1ac0d45ba6bca720307b89"
+    "sha256": "68d908926df958aeafe63afca49e413ffffb4c41b65efcc7d08e4c69f8bd33d9"
   },
   {
     "native_frames": [
@@ -239,7 +239,7 @@
       ]
     ],
     "path": "res://assets/generated/equipment/gravebloom/wzs/parts/wzs1q.png",
-    "sha256": "1d5a20d9bbaaabe53f43f73df8b402ce91fc9d998994cf28b7590424959e2f48"
+    "sha256": "bdce27a5390b423abfe2f0bbe10799a4560f6e716298ff37c57e4537baed2c43"
   },
   {
     "native_frames": [
@@ -281,7 +281,7 @@
       ]
     ],
     "path": "res://assets/generated/equipment/gravebloom/wzs/parts/wzs1x.png",
-    "sha256": "a62862ff3ba3c921d4a53d556a8efd5e0d11c111c9117183668a8b69a99469b6"
+    "sha256": "da229f0d0b04d6e826c893fb34bf65be49cd9b026dff65f060a81107cdda905e"
   },
   {
     "native_frames": [
@@ -299,56 +299,56 @@
       ]
     ],
     "path": "res://assets/generated/equipment/gravebloom/wzs/parts/ezs14.png",
-    "sha256": "43fc1c706a7933df264fa50e01bb096c1d4fd1b692c8437608056f0e34ebf781"
+    "sha256": "797e5a6ada9f55189a1448d0c0cdc2992005a77b8adaad0bff1cba582feca295"
   },
   {
     "path": "res://assets/generated/equipment/gravebloom/wzs/icons/weapon.png",
-    "sha256": "848ad02f0cdd56b78111b5892ae828fd1d9fbe3659c67414e52f9966e236cb27",
+    "sha256": "4345bc8386daaea9dce03eb60968c1b8b96dd099bfd5dc93c2dde7a650cc9968",
     "source_cell": 20
   },
   {
     "path": "res://assets/generated/equipment/gravebloom/wzs/icons/hat.png",
-    "sha256": "0e3cbb3787532981df7231869dd2116dbdb84bb000844a916d9914775b4c16ea",
+    "sha256": "dfc3ed2e480ab670a5c6966a67cb6c0d6ca690834cf23f082d985809013a7a77",
     "source_cell": 21
   },
   {
     "path": "res://assets/generated/equipment/gravebloom/wzs/icons/armor.png",
-    "sha256": "253041bcf3f59c385aa2d38d2ae26cfb39e723626852338cd81267d05ede7550",
+    "sha256": "0687ad645e8623bee96ff7f044c7b12875e08d50da040305a9b098688019982f",
     "source_cell": 22
   },
   {
     "path": "res://assets/generated/equipment/gravebloom/wzs/icons/wrist.png",
-    "sha256": "1c08da7cfafcfc44a16bdf1fa02bb1661697b37a1eaf85f95e1db8fc6461812a",
+    "sha256": "8e1479fb085a0fbff4b853698ab73c9e356373b7563799f727603cd9ffe2be71",
     "source_cell": 23
   },
   {
     "path": "res://assets/generated/equipment/gravebloom/wzs/icons/belt.png",
-    "sha256": "a2b766da19bb2797a0a8cb5730c7797bae947dffa17e9f9a92bc5952e2fe4c7c",
+    "sha256": "947544695198a0b4f24ebaefa72dce3223190e4f2543be6d40a16983e2170817",
     "source_cell": 24
   },
   {
     "path": "res://assets/generated/equipment/gravebloom/wzs/icons/pants.png",
-    "sha256": "3cc5ac3e49c859e7cbd111eec01da95f2c7b55105766352b919330b90933b584",
+    "sha256": "2b53aff2ca61498a40fd7999545ffdc27af9e586b7189423965880adc77585e6",
     "source_cell": 25
   },
   {
     "path": "res://assets/generated/equipment/gravebloom/wzs/icons/boots.png",
-    "sha256": "73aabcb27c6c102be7c987947331411ff8d906bae3ed0aa6a3bbf9e9b69c59a5",
+    "sha256": "8b3b8e5177f21ab1c437461036101f7799e2e27e5199f03864dbeac6a58de130",
     "source_cell": 26
   },
   {
     "path": "res://assets/generated/equipment/gravebloom/wzs/icons/pendant.png",
-    "sha256": "088eea3f4afd6e2339bcbeae96351426fc8e1895d1ed7c1d8a562e608d407c0f",
+    "sha256": "998d81eb66d7a69b1e7adbdcfd13aec3d3e64cb3beb9daaf19bf5a9ebfe877d6",
     "source_cell": 27
   },
   {
     "path": "res://assets/generated/equipment/gravebloom/wzs/icons/ring.png",
-    "sha256": "c55b89c38380f09753e07862649152489fd8cf9fb5e380d8c0469578c64168d2",
+    "sha256": "87d91fd6b71e9af39e75c9b7cf60e5bb40fc6ed9fac8df017095bdd0ef6ca114",
     "source_cell": 28
   },
   {
     "path": "res://assets/generated/equipment/gravebloom/wzs/icons/necklace.png",
-    "sha256": "30f054b819aba45eb16bd7d96c7b19fc226c4eea8def7809d3a54e9b2526247c",
+    "sha256": "9d8023a7a7ed5b75dcaf05a691ee10a5a46442f474ac7e429cbe1f594ab4fbb6",
     "source_cell": 29
   },
   {
@@ -367,7 +367,7 @@
       ]
     ],
     "path": "res://assets/generated/equipment/gravebloom/mck/parts/mckt8.png",
-    "sha256": "2d22bf1e0cfd0733538f6e074018cee4592212f6c8b79d4b0a7e04b90248e672"
+    "sha256": "653f8b995feb36afc817ce2d29743ecc34fab3c65de1398c2d033969c256b76b"
   },
   {
     "native_frames": [
@@ -385,7 +385,7 @@
       ]
     ],
     "path": "res://assets/generated/equipment/gravebloom/mck/parts/mck1.png",
-    "sha256": "442f08726708dea170e2d6f326d1c8876470ae43a6a03f21eae7800b15d06a0c"
+    "sha256": "ad5400743500ebc2a6b8c5d157a9a8f2aefe82cae6d0f989cb04de1c288673a5"
   },
   {
     "native_frames": [
@@ -433,7 +433,7 @@
       ]
     ],
     "path": "res://assets/generated/equipment/gravebloom/mck/parts/mck1q.png",
-    "sha256": "5ca53bd24ad059e6adfc3a77341ceac7b1dc17b973d1453e160c9bd40955be67"
+    "sha256": "5ba0d226e228b11dd0d5e67475a9d6fe301c301a8c402f493b2393faf0e8b83d"
   },
   {
     "native_frames": [
@@ -475,7 +475,7 @@
       ]
     ],
     "path": "res://assets/generated/equipment/gravebloom/mck/parts/mck1x.png",
-    "sha256": "c1af57044e9255ba183f17ac39dc447e586c7fc7ef25a59dbf187932a09672e3"
+    "sha256": "1c628210306b86b262bd5abac1c992c44b56cffe00523e1d164fcaf425c62fdb"
   },
   {
     "native_frames": [
@@ -493,56 +493,56 @@
       ]
     ],
     "path": "res://assets/generated/equipment/gravebloom/mck/parts/eck9.png",
-    "sha256": "ca3b146ea6b315b4b9533951e44c6caeee929847c244cb51deadcd3cf31147c5"
+    "sha256": "9c1b820978698eb0cd7ee3cc7c34655efcc377cde905a69f930f9484ef2e2159"
   },
   {
     "path": "res://assets/generated/equipment/gravebloom/mck/icons/weapon.png",
-    "sha256": "1e5a2c255e49d80656a1c868450f067812ec139af33d1bf6af70b573f054b360",
+    "sha256": "ba5a805a5c20be3e70a4e864efa316f0c2517b442939b60c0608e436dcd3c08c",
     "source_cell": 20
   },
   {
     "path": "res://assets/generated/equipment/gravebloom/mck/icons/hat.png",
-    "sha256": "8f1c7af58fa9e1b522d2da2e534620caae8daf3b14869ab8b80e73b7ba294a91",
+    "sha256": "812feb63d86a7a598795a8f911c547d1216d6da52a4be546e6c88b131dceed81",
     "source_cell": 21
   },
   {
     "path": "res://assets/generated/equipment/gravebloom/mck/icons/armor.png",
-    "sha256": "c1fd17d9c2fcff7b2aa54fa9b4f13884ea31df9a5b6034ba254a5252444dda34",
+    "sha256": "330504a77f385976e716d7e1ebbe0e0ba98ab9c0e3fa660a9ebd4a7cc84ec164",
     "source_cell": 22
   },
   {
     "path": "res://assets/generated/equipment/gravebloom/mck/icons/wrist.png",
-    "sha256": "1e70e44e4aadb28c37f551c3b5da2e634f6d49eb06ad4e240dbb0562695cfb6d",
+    "sha256": "9e4f347d773cbf678769d6b847834e20262a57d9cf8f7be66844273b0b873ca0",
     "source_cell": 23
   },
   {
     "path": "res://assets/generated/equipment/gravebloom/mck/icons/belt.png",
-    "sha256": "a7651e2e3013f832b8aa4768f7190a64e4a6538190d86b5f18d603370ac4671c",
+    "sha256": "2a46bb8142ee41eae625808b8ea89a1eb71015f6c06bd852627792b07cbf3ffb",
     "source_cell": 24
   },
   {
     "path": "res://assets/generated/equipment/gravebloom/mck/icons/pants.png",
-    "sha256": "a8dff23cd52263c3ffbc420df270787cfa7580f24fafb0b557bd3809c0c50b6d",
+    "sha256": "8aa59f3ecd3a9b6cf0a22926f4e9811e29af5e8388274191c831db7cca925905",
     "source_cell": 25
   },
   {
     "path": "res://assets/generated/equipment/gravebloom/mck/icons/boots.png",
-    "sha256": "b45f7939d946b8fa40a4dfcd4e543640eef8e4a2e4bee7a43a716a8b023ca609",
+    "sha256": "129f1b514f897b705639f6fd67ba983b90f151d54b2808d1d889b0533da6048b",
     "source_cell": 26
   },
   {
     "path": "res://assets/generated/equipment/gravebloom/mck/icons/pendant.png",
-    "sha256": "a12e4fefdb2176b835514a0a30e967c2f12f72d2d42e95b1d71ca2a8ecdf7264",
+    "sha256": "0be328763563c4eb1e56351384ea05e9c8803f41312fffbe448f5f8303adebf0",
     "source_cell": 27
   },
   {
     "path": "res://assets/generated/equipment/gravebloom/mck/icons/ring.png",
-    "sha256": "0b5df114e8943a82054ea9419000b081854c3ca5cbdc910a1b94776080ee76eb",
+    "sha256": "793e6904bfd4059b47e81330d643df16bad4f267c8f218433d4298f06609663a",
     "source_cell": 28
   },
   {
     "path": "res://assets/generated/equipment/gravebloom/mck/icons/necklace.png",
-    "sha256": "5a3bcdecd61c61011ef6249f6eab91bbe39b89c63cc53815a4223717a13b0f97",
+    "sha256": "782710c2b47e82fe50ff6c5a4db55f536120f10c3f6dabb9cb2aaf5748495609",
     "source_cell": 29
   },
   {
@@ -561,7 +561,7 @@
       ]
     ],
     "path": "res://assets/generated/equipment/gravebloom/wck/parts/wckt5.png",
-    "sha256": "7131a97a891e1d05408fefa3a44b3d046532b3201cd49db291d1d8aac0c55be0"
+    "sha256": "40ee638a45037a671ad605ddcfe28d235b18c56bfaec072a7e39d80dc35aceea"
   },
   {
     "native_frames": [
@@ -579,7 +579,7 @@
       ]
     ],
     "path": "res://assets/generated/equipment/gravebloom/wck/parts/wck1.png",
-    "sha256": "e52d932e92c8fa475100bcda9f5d74f07a83ee98348efe453deb73b01609b97a"
+    "sha256": "b8061b6a71dff483705b005f5dc18950748a7ea7e5f6e56b1b32a3d06374a791"
   },
   {
     "native_frames": [
@@ -603,7 +603,7 @@
       ]
     ],
     "path": "res://assets/generated/equipment/gravebloom/wck/parts/wck1q.png",
-    "sha256": "523607d0278d747ee8f1a14561bc4c259c997beca332856b5d5eb28bfcf49462"
+    "sha256": "7a4c4e7bf72f9e53e655fd2c3333a5e5cd6f8da40211afdf0eeadca2cf0f975b"
   },
   {
     "native_frames": [
@@ -645,7 +645,7 @@
       ]
     ],
     "path": "res://assets/generated/equipment/gravebloom/wck/parts/wck1x.png",
-    "sha256": "93fa6bf8cd29fab416ec61c9e4244500593046b54d729a7c9dad6ff82a86b973"
+    "sha256": "9a2b9a624c3cbefbfd097d7a6e6d9f186cf8835049aec3986da99b13e4c17f16"
   },
   {
     "native_frames": [
@@ -663,56 +663,56 @@
       ]
     ],
     "path": "res://assets/generated/equipment/gravebloom/wck/parts/eck17.png",
-    "sha256": "025eb9774a11d2814574e70fbc86a50ae86295075fa81a39571b119470ed7ae5"
+    "sha256": "fa5dbd126908d761367ec921a6af757b8d807ceb4d8daa039bd046f173ea4130"
   },
   {
     "path": "res://assets/generated/equipment/gravebloom/wck/icons/weapon.png",
-    "sha256": "63645dadd6e36b0d6bc10d57193b85bbb2bbf0bde66b69d10aae658f4c47af97",
+    "sha256": "5e155bc87996306ed90d8cfbdc58111df514bf938defe1be607099fe6892f44e",
     "source_cell": 20
   },
   {
     "path": "res://assets/generated/equipment/gravebloom/wck/icons/hat.png",
-    "sha256": "10df6242a86a8f1fb981cfdda17ad6ebbbf43eb62b7e83d092c3692582d9eed3",
+    "sha256": "4c0a774ac1a67ff1f52e2fc4a489942c20ee96b014733f65a01ef625bb967f2e",
     "source_cell": 21
   },
   {
     "path": "res://assets/generated/equipment/gravebloom/wck/icons/armor.png",
-    "sha256": "ad1b8ba390c4234713373b590ff7a7968e6fd8cf943f967d212aea170b5852df",
+    "sha256": "7d0bfc10aaad23f0e871a9521feaf1d4aa5f6f3651567eadbabf7bf62b1d86f2",
     "source_cell": 22
   },
   {
     "path": "res://assets/generated/equipment/gravebloom/wck/icons/wrist.png",
-    "sha256": "ca4de33fbcabc020649a0d2fc687ca53743db3b265a8f6a40f7611e2d27c0c1e",
+    "sha256": "ba88065af0ba59faecf21ad4f7da74cdc4b74fc6f0d6b42a52088031c36b6879",
     "source_cell": 23
   },
   {
     "path": "res://assets/generated/equipment/gravebloom/wck/icons/belt.png",
-    "sha256": "14f067b02820263a51d9f89be93257f7bd9a2f8226205d2085d0b44b5ea4fd0f",
+    "sha256": "98774f06f0f10b03beb9963c196d99476bd4ab51f193ad6aee6e916d05cbc469",
     "source_cell": 24
   },
   {
     "path": "res://assets/generated/equipment/gravebloom/wck/icons/pants.png",
-    "sha256": "fb2170744e5827d151616ed190678c11317f42e9a40347d20ba7aa78e51b027a",
+    "sha256": "88c2448103708b18cc9c3eef3392a2fc8cc9c9ed1b8a2e3a3025c57d5d676677",
     "source_cell": 25
   },
   {
     "path": "res://assets/generated/equipment/gravebloom/wck/icons/boots.png",
-    "sha256": "6c2dc4395292a8bf29dabaf2b90d1999bb9fbf51adeb43e882ebc0fe8b81bd35",
+    "sha256": "9acc4ad35103cc32d4baefdf78bc34b5ba92663eefc76971f240c69d51950e6b",
     "source_cell": 26
   },
   {
     "path": "res://assets/generated/equipment/gravebloom/wck/icons/pendant.png",
-    "sha256": "8e81c244179ea698eee410c4d8a42157f9d9d75b071a897644c90cf968a93c18",
+    "sha256": "d8e41d430e59c2e904bdf8cd28440cbbb29eebc2312bd48b4ff6208168d90b6b",
     "source_cell": 27
   },
   {
     "path": "res://assets/generated/equipment/gravebloom/wck/icons/ring.png",
-    "sha256": "96827ba6e3a4b54ad497df123ee96b4f5f17380bbe9efcd0a27f56f009c01e5c",
+    "sha256": "0792f8ea8be38b885a4b9cbeef38844143f3bc2355b9790dc5343daa56612e7f",
     "source_cell": 28
   },
   {
     "path": "res://assets/generated/equipment/gravebloom/wck/icons/necklace.png",
-    "sha256": "3d1b88f27157a109dd67d0bdc1630b7ceff040126a025f668a751f00135b84ec",
+    "sha256": "3436ae559faf9efcac651a3d4a024beb9056d5b6b36d281a8b2dffd4e46d07a5",
     "source_cell": 29
   },
   {
@@ -731,7 +731,7 @@
       ]
     ],
     "path": "res://assets/generated/equipment/gravebloom/mfs/parts/mfst6.png",
-    "sha256": "893aef9121b496aeaae157cfbb9dd1a038d35a966b41955d5877420a1abe654e"
+    "sha256": "3f9ddacb7c54d32da907f98620dc037f95f244cc9579fdef4ca021fa6d36380d"
   },
   {
     "native_frames": [
@@ -755,7 +755,7 @@
       ]
     ],
     "path": "res://assets/generated/equipment/gravebloom/mfs/parts/mfs2.png",
-    "sha256": "d63f5b453cd599af31416c5dd81ad1263f3a881a0e4ba482baed8276484b0be2"
+    "sha256": "9bcfebd4256f7594b07a6f66e9cd8e8a82b7492bfacaaad0b9e7ec7a03ea3c9c"
   },
   {
     "native_frames": [
@@ -779,7 +779,7 @@
       ]
     ],
     "path": "res://assets/generated/equipment/gravebloom/mfs/parts/mfs2q.png",
-    "sha256": "1a82dfb672570efbffb7688849ba0424b6671afc3e75463d338b6c5d73b37e9a"
+    "sha256": "619e6db220ee860827af30f895696b243344841165fa1d231629bb082e184190"
   },
   {
     "native_frames": [
@@ -821,7 +821,7 @@
       ]
     ],
     "path": "res://assets/generated/equipment/gravebloom/mfs/parts/mfs2x.png",
-    "sha256": "c371739b1782086a6996232ee4477434a0ee7bc1effd834f64f2576ae436f745"
+    "sha256": "b72b94469a4729344f0933125e9295241bab0299302f7b0a86cbb88cc8eb6ba1"
   },
   {
     "native_frames": [
@@ -839,56 +839,56 @@
       ]
     ],
     "path": "res://assets/generated/equipment/gravebloom/mfs/parts/efs11.png",
-    "sha256": "84a5a40e88b7dc35b25c4a8286f4be85684fbd6a3f40f310d147ee890b896849"
+    "sha256": "f30253d02dfa17231c1f32dbfaa1588ac052ab2511fc8b78cd1f931e6f7373d5"
   },
   {
     "path": "res://assets/generated/equipment/gravebloom/mfs/icons/weapon.png",
-    "sha256": "f935a056624caba4b40c0411e8c71f8ab363a42fe4b52201b216dfb2de48d5e6",
+    "sha256": "8829375d6d6a4a0eb1f130686e13e3a15108cf8f163e6bbf3a6f61594299ebff",
     "source_cell": 20
   },
   {
     "path": "res://assets/generated/equipment/gravebloom/mfs/icons/hat.png",
-    "sha256": "6db45097625796a102157278cbc21d70573309a81129cea0ff05f030ac000eed",
+    "sha256": "120f511421c25bf70def77865543ca7edf4cad74531de4d0a66f1701707be150",
     "source_cell": 21
   },
   {
     "path": "res://assets/generated/equipment/gravebloom/mfs/icons/armor.png",
-    "sha256": "3f6b55a0889ac8f6da853e89e8dc1f1216b3256f804e7ed2b4d478cf0816deff",
+    "sha256": "5d5e7fd0c4821b8013e71243fdb79506d0243b1b174ef9a6e3a3880ad2ea22e0",
     "source_cell": 22
   },
   {
     "path": "res://assets/generated/equipment/gravebloom/mfs/icons/wrist.png",
-    "sha256": "0bddad15caee80a4eff5ff2448e23c4c8414a7ce050fdd771e26603a672d5933",
+    "sha256": "7fdb17d4d081273f4f17dbbe1823499150399cbdb27d2ec4b2acf0709ad11a39",
     "source_cell": 23
   },
   {
     "path": "res://assets/generated/equipment/gravebloom/mfs/icons/belt.png",
-    "sha256": "b01ddcde166e34b263dcf58dcc863170759303fb97b483a98bd6142c4022fa43",
+    "sha256": "42a02aac0b04b5639647f2a6ed800dcf3fbf88b323940394afdf5e64e01a4d77",
     "source_cell": 24
   },
   {
     "path": "res://assets/generated/equipment/gravebloom/mfs/icons/pants.png",
-    "sha256": "39e7ac66454b5c02c4c94930442063db5615910e41ed0d1e5ff32c0da7f3d548",
+    "sha256": "1b6ce89dd9eb36e884310ed3b3263c53c21289ed6e1ae27f1a8ffb2fa8a3916c",
     "source_cell": 25
   },
   {
     "path": "res://assets/generated/equipment/gravebloom/mfs/icons/boots.png",
-    "sha256": "606db04986518deae7e0ad58f2deae2deb9ed8384bb66829d85091accb7d95ac",
+    "sha256": "6b802a74336ee012b5a57f0c1d20db96c69bd08646c8eec89e780c546bdd231b",
     "source_cell": 26
   },
   {
     "path": "res://assets/generated/equipment/gravebloom/mfs/icons/pendant.png",
-    "sha256": "676b90e13a956370412313f1fed5bd472d1d341466edb45733b32b741eb7d50e",
+    "sha256": "a7a53f57ad22a531be890e8627a8148d47c5e731ebc029ccfa11058cd21cc411",
     "source_cell": 27
   },
   {
     "path": "res://assets/generated/equipment/gravebloom/mfs/icons/ring.png",
-    "sha256": "2d63c7b30842f8ad91b9a1cd312fcffec27bd0bd9726c5831e83f426d038f08b",
+    "sha256": "9fe62947829ff81c6fb681329ee7a027ae4d997273b5752bada608fe1fa0acd3",
     "source_cell": 28
   },
   {
     "path": "res://assets/generated/equipment/gravebloom/mfs/icons/necklace.png",
-    "sha256": "659f7c07a75839eca3f01306a1c38c134c8889ffcc7924d0c341eb23c0264e46",
+    "sha256": "c33389f977d6c2aa97fe5b1eaf205d83218a9c1889e5c4234e6c7ac81a3166fb",
     "source_cell": 29
   },
   {
@@ -907,7 +907,7 @@
       ]
     ],
     "path": "res://assets/generated/equipment/gravebloom/wfs/parts/wfst4.png",
-    "sha256": "5dabf4d698fb24a12c973292dc3a32e3734cc5db189d65273f5850ab22b8f012"
+    "sha256": "42fbc8567e53dd0ba495d5f495cbcfc69de0b472838e3102419b56642e4548b3"
   },
   {
     "native_frames": [
@@ -931,7 +931,7 @@
       ]
     ],
     "path": "res://assets/generated/equipment/gravebloom/wfs/parts/wfs2.png",
-    "sha256": "9531529beed5363ba8722866634615f3b8e881535efc339bca7adbbcad0b5f61"
+    "sha256": "18a3d5faf1d10a524c29e65a23cfe93942b73d7abfecb48d70f225622d992a3a"
   },
   {
     "native_frames": [
@@ -961,7 +961,7 @@
       ]
     ],
     "path": "res://assets/generated/equipment/gravebloom/wfs/parts/wfs2q.png",
-    "sha256": "ab67b0d6686e39e125e8ec3c3e69db67cd197bccf0856dcf617c5a5229c5826d"
+    "sha256": "03431809542807a499a07a34d796ed240a392c561bd7b6f4b8b842c764f34770"
   },
   {
     "native_frames": [
@@ -1003,7 +1003,7 @@
       ]
     ],
     "path": "res://assets/generated/equipment/gravebloom/wfs/parts/wfs2x.png",
-    "sha256": "e8c78caeb65ebdb01a234df96a0665c50a7e45ba6889e2a7c4010a99de8c553b"
+    "sha256": "18dc8c76c73b5af823affd99e5ecd7c49bfac8c174497618e02bbd614a28c767"
   },
   {
     "native_frames": [
@@ -1021,56 +1021,56 @@
       ]
     ],
     "path": "res://assets/generated/equipment/gravebloom/wfs/parts/efs7.png",
-    "sha256": "d72436cc4bca9eb0da18bd29be8393e907d68c5fa916dd71dde5cf3421bc696a"
+    "sha256": "a88392e1faba7a80d40729b4a56b7fb56cc56a3d4101d132da673967ed0b81d5"
   },
   {
     "path": "res://assets/generated/equipment/gravebloom/wfs/icons/weapon.png",
-    "sha256": "4a11ffeda0016bb3226475d254a8ab75b08808fb7fa0131394b34e1e9013e906",
+    "sha256": "ac89ed7a390723e39ef2c521e59383653bb503a41705b8d60a3858a3752d2b85",
     "source_cell": 20
   },
   {
     "path": "res://assets/generated/equipment/gravebloom/wfs/icons/hat.png",
-    "sha256": "849be56826bbffee4d80d22a5cfe41e342c4c748fd730b828343bdfcbc2a9d03",
+    "sha256": "20741dfb3c4ea0eec05aac832d26196c187b098e1711efc1d4d876d3c06101de",
     "source_cell": 21
   },
   {
     "path": "res://assets/generated/equipment/gravebloom/wfs/icons/armor.png",
-    "sha256": "962cfac02e3b7ce2d09dbd3f2903a6f8d09d4a4015b951f719fcacf83b449305",
+    "sha256": "df0047e4f6fab9886259723d388470a71b798c2f0de1b6dc791aaf14d929ae7c",
     "source_cell": 22
   },
   {
     "path": "res://assets/generated/equipment/gravebloom/wfs/icons/wrist.png",
-    "sha256": "5a2b1873e0745a0105b73d7d50bdb3d9f05772e88e1fd98baf52f417a4066425",
+    "sha256": "73d26d7db53709f24fd6da853f2e462a7aa03f7f9dfbb9ae29a5929faac73f55",
     "source_cell": 23
   },
   {
     "path": "res://assets/generated/equipment/gravebloom/wfs/icons/belt.png",
-    "sha256": "261180c0fb96b8d17a6e75eae78881dcc743e51abdd1a5d54f7777da4e297ee7",
+    "sha256": "3a8cbe51c2b993b699907e56e5ea366bccc4704a1a2512bcabcd9aada5d15adb",
     "source_cell": 24
   },
   {
     "path": "res://assets/generated/equipment/gravebloom/wfs/icons/pants.png",
-    "sha256": "ec6464899fb0286547b4cfc684c8f4ca1fdbf1242912045327cd2e62fce8455b",
+    "sha256": "5c47f974b5d6e814191605bb47dc395068e8b4613df74683ef1add6bf143a959",
     "source_cell": 25
   },
   {
     "path": "res://assets/generated/equipment/gravebloom/wfs/icons/boots.png",
-    "sha256": "b2c50f6ffa0b68dbcf0db5a096172f96b5f54c7f66ceb2147ae99b7748842990",
+    "sha256": "9ba3ee4b3043dc66cfa12280c2a0b8d3aa3cf3c625ad55304638e89b04a0bc04",
     "source_cell": 26
   },
   {
     "path": "res://assets/generated/equipment/gravebloom/wfs/icons/pendant.png",
-    "sha256": "408ef9f6bad6e08a044593b7c2b97ab82f7dc397967cf2ed450c3c3f583e9311",
+    "sha256": "78683a32065f959527af45678f69f6aeb00947f14a307b0f1cc9edf293291ad0",
     "source_cell": 27
   },
   {
     "path": "res://assets/generated/equipment/gravebloom/wfs/icons/ring.png",
-    "sha256": "c650b5f14ca2d6718de02040b04f572cd4c2d0cf59cc332e5f126edc7389c815",
+    "sha256": "905aebcfe007fe011c293d4d3a46e0531354489c996215480ec9694b7fc943db",
     "source_cell": 28
   },
   {
     "path": "res://assets/generated/equipment/gravebloom/wfs/icons/necklace.png",
-    "sha256": "1bd2e0be03538f48bde00914020c762e4607907c40267b932765b24c7da07b5b",
+    "sha256": "a6f19ba1c4dde11b8af6e84687c5d19e5e4826633c280e0220451c1113b18fd5",
     "source_cell": 29
   }
 ]

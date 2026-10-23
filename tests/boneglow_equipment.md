@@ -1,5 +1,9 @@
 # 骨甲幽光装备验证
 
+## 2026-10-23 全系列像素精修
+
+六套正式部件、图标与赤翎破军自定义头部已精修；实际渲染496项通过。最新范围、全动作几何比对及复现命令见[套装精修](equipment_refinement.md)。
+
 ## 2026-10-20 赤翎破军脸部修正
 
 用户指出女力士头部脸型、眼睛变形后，以内置 image_gen 编辑原生产稿的第 0 格，并参考原包 `wzst2` 头部；保留棕红长发、金色饰物和装备风格。新稿、修复前图集、生成记录与可复现配置保存在 `analysis/ai-generated/equipment/boneglow/face-correction-*` 及 `02_female_lishi-face-corrected.png`、`02_female_lishi-head-before.png`。

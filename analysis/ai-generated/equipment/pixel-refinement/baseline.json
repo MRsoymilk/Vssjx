@@ -59,6 +59,1026 @@
     "client/assets/generated/equipment/boneglow/wzs/icons/wrist.png": {
       "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/wzs/icons/wrist.png",
       "sha256": "ab71418ee9093fec3321b4b7f373f89e74eebfcc2c00c6f78727a1a09ed499e8"
+    },
+    "client/assets/generated/equipment/boneglow/mzs/parts/mzst2.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/mzs/parts/mzst2.png",
+      "sha256": "e2b425afc771e0574d086992b4f25cc41ff133f0defd445ab925ddd02d070770"
+    },
+    "client/assets/generated/equipment/boneglow/mzs/parts/mzs1.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/mzs/parts/mzs1.png",
+      "sha256": "73595becb3bde47f659bc6758280071d2be27bd39659767554572884050f7d99"
+    },
+    "client/assets/generated/equipment/boneglow/mzs/parts/mzs1q.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/mzs/parts/mzs1q.png",
+      "sha256": "e4ae38f24861bfc002b263033f5f730ce7420437fa191ea3ba9147abbb677dc4"
+    },
+    "client/assets/generated/equipment/boneglow/mzs/parts/mzs1x.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/mzs/parts/mzs1x.png",
+      "sha256": "697c7407b53c2153ac7f87bf94f22a39d6f707b602c0bf9b69e41676e47a6f76"
+    },
+    "client/assets/generated/equipment/boneglow/mzs/parts/ezs14.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/mzs/parts/ezs14.png",
+      "sha256": "93823c0f98a4e8009a05b9fca483818678ed324659d3066e4df5a2943eea33e2"
+    },
+    "client/assets/generated/equipment/boneglow/mzs/icons/armor.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/mzs/icons/armor.png",
+      "sha256": "6511bf20708a01b013daf4ea7e927662940741a54ee8f4184810bef48d3093d2"
+    },
+    "client/assets/generated/equipment/boneglow/mzs/icons/belt.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/mzs/icons/belt.png",
+      "sha256": "4d57b34eb2b54bad8ac4c0f364415cc59c21fb7ca6a9a59c9987c9586751edc2"
+    },
+    "client/assets/generated/equipment/boneglow/mzs/icons/boots.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/mzs/icons/boots.png",
+      "sha256": "82a0c3a77420cca01b869d17357b468369964d35342ae49f0d75367b882f782e"
+    },
+    "client/assets/generated/equipment/boneglow/mzs/icons/hat.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/mzs/icons/hat.png",
+      "sha256": "134b6830c8bd67e189909ba50a0c8ed51bbf4efe98be9153fc4e919df49b1787"
+    },
+    "client/assets/generated/equipment/boneglow/mzs/icons/necklace.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/mzs/icons/necklace.png",
+      "sha256": "c9df4d9114f2dc97c09263952245c58307b0aaeb6b1ea9fa434af03c2790a824"
+    },
+    "client/assets/generated/equipment/boneglow/mzs/icons/pants.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/mzs/icons/pants.png",
+      "sha256": "79b80addae7c5c135420d02051519af5ab1dc3769c9eb813317b1926e8cec84b"
+    },
+    "client/assets/generated/equipment/boneglow/mzs/icons/pendant.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/mzs/icons/pendant.png",
+      "sha256": "fcbbf608355bde309b58664e5c7eac0108cd081167d542206c9b6a7c10ff7e85"
+    },
+    "client/assets/generated/equipment/boneglow/mzs/icons/ring.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/mzs/icons/ring.png",
+      "sha256": "e3f81b7a802cc57b4df3f471a9a965703b06e26e96159f1a64db7859e41bdc62"
+    },
+    "client/assets/generated/equipment/boneglow/mzs/icons/weapon.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/mzs/icons/weapon.png",
+      "sha256": "d2e6161b32f0bc18b476517dfb4a66d613f30c51220278a523444e3f4591e066"
+    },
+    "client/assets/generated/equipment/boneglow/mzs/icons/wrist.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/mzs/icons/wrist.png",
+      "sha256": "4146f1196e53c653adf2420fdbf138ea90c5d8566c029560fee244da61126bdf"
+    },
+    "client/assets/generated/equipment/boneglow/mck/parts/mckt2.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/mck/parts/mckt2.png",
+      "sha256": "26b60021d28a3c4584e8ae5399f977511d21613ffd9933b269863ad85a54fdc4"
+    },
+    "client/assets/generated/equipment/boneglow/mck/parts/mck1.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/mck/parts/mck1.png",
+      "sha256": "f6f2513eb9392728d993ad51dea007854f63c4428a564af5bee8d2b221434f9e"
+    },
+    "client/assets/generated/equipment/boneglow/mck/parts/mck1q.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/mck/parts/mck1q.png",
+      "sha256": "293163ded75603fc43038b1c2cbd88f171e89f48b393a1673a53e8c2495ad678"
+    },
+    "client/assets/generated/equipment/boneglow/mck/parts/mck1x.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/mck/parts/mck1x.png",
+      "sha256": "2b024d5bb362edf4f0f5270c4ac25564480cf14c1fe1087265fceadc4aacbf75"
+    },
+    "client/assets/generated/equipment/boneglow/mck/parts/eck1.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/mck/parts/eck1.png",
+      "sha256": "cf53f0e5b43ca0644c86bc7ebe1c3a43a160eb0d7a2a7ff8f345adf27b0e1bfe"
+    },
+    "client/assets/generated/equipment/boneglow/mck/icons/armor.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/mck/icons/armor.png",
+      "sha256": "5982df0826d55478729617199c16834f914fdda00d2a1754234165f3602b31d0"
+    },
+    "client/assets/generated/equipment/boneglow/mck/icons/belt.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/mck/icons/belt.png",
+      "sha256": "2deaf76ea229168d30a6bd6e66007da649606c456e659abc7b5ce415c8a0af37"
+    },
+    "client/assets/generated/equipment/boneglow/mck/icons/boots.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/mck/icons/boots.png",
+      "sha256": "39a1ae5e88ddbc9e341169a9cf67b3664de9b0cef9f1fe918c09f303421cdf44"
+    },
+    "client/assets/generated/equipment/boneglow/mck/icons/hat.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/mck/icons/hat.png",
+      "sha256": "7ce7793a3a403a5e3ed6604d3375c2f7084cb11d44ea89552bdb2aa4c27c5531"
+    },
+    "client/assets/generated/equipment/boneglow/mck/icons/necklace.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/mck/icons/necklace.png",
+      "sha256": "2034941de6902346a35a15f03b76d9037e74062a37a5ef7e5f1d3674613db167"
+    },
+    "client/assets/generated/equipment/boneglow/mck/icons/pants.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/mck/icons/pants.png",
+      "sha256": "379295ce843201bed5e995b00fddc5e564ef3664871edb47db7d6a6928614520"
+    },
+    "client/assets/generated/equipment/boneglow/mck/icons/pendant.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/mck/icons/pendant.png",
+      "sha256": "2b4de48aa54e5babc08d5d4e4e35afd62dabfcd71641a7ebbca317c797e6727e"
+    },
+    "client/assets/generated/equipment/boneglow/mck/icons/ring.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/mck/icons/ring.png",
+      "sha256": "5058c28eab7dde1622f86020062515e2639cea6c1c3a9ab4ee307389a62d6de3"
+    },
+    "client/assets/generated/equipment/boneglow/mck/icons/weapon.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/mck/icons/weapon.png",
+      "sha256": "d823735489e1618a54a15f662ccb7d98657d02ba24d269fe69cbaaee454cab5a"
+    },
+    "client/assets/generated/equipment/boneglow/mck/icons/wrist.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/mck/icons/wrist.png",
+      "sha256": "e098317296855b9dd932b346bb777e7d7d2c60ab0776aab9739bc27cde4069b3"
+    },
+    "client/assets/generated/equipment/boneglow/wck/parts/wckt2.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/wck/parts/wckt2.png",
+      "sha256": "863d633bef4d4f9d54a339191b0763fef78d3e23364d385ebdc6f9705de6b8b3"
+    },
+    "client/assets/generated/equipment/boneglow/wck/parts/wck1.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/wck/parts/wck1.png",
+      "sha256": "d9f238143d6039f796108bc9a52f7fc8b505ab2c961305f2f44fcd230b9529ed"
+    },
+    "client/assets/generated/equipment/boneglow/wck/parts/wck1q.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/wck/parts/wck1q.png",
+      "sha256": "79dd5439e899e54e020da9230839d0ec67750bcf6597b8f4c3f5e701b80fbb94"
+    },
+    "client/assets/generated/equipment/boneglow/wck/parts/wck1x.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/wck/parts/wck1x.png",
+      "sha256": "0c07b2d8d405d5ebc41e84a1a8641c1a8167483f430ae58241492b9221659ff4"
+    },
+    "client/assets/generated/equipment/boneglow/wck/parts/eck1.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/wck/parts/eck1.png",
+      "sha256": "3e4b6d86f501d3cfd152a92e68a675685b9ef6c284b8e9eca7aba081f8ddb41f"
+    },
+    "client/assets/generated/equipment/boneglow/wck/icons/armor.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/wck/icons/armor.png",
+      "sha256": "d5cad6528e84ff41a092ff8dd7091a9e93b88570559c6b52df3867a777b6316a"
+    },
+    "client/assets/generated/equipment/boneglow/wck/icons/belt.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/wck/icons/belt.png",
+      "sha256": "0b564ef69560cbf046500704a87c50eeeed1257d1dc1790d3b5177be830a6346"
+    },
+    "client/assets/generated/equipment/boneglow/wck/icons/boots.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/wck/icons/boots.png",
+      "sha256": "2ca1864de5245e797a1346120403a070a7fe1b301aa19b990cfd6cfb42134bc8"
+    },
+    "client/assets/generated/equipment/boneglow/wck/icons/hat.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/wck/icons/hat.png",
+      "sha256": "2eac0a2b2d771b22024745a5f56bb2b893d618cc9d9f1e4057d030b254e0796a"
+    },
+    "client/assets/generated/equipment/boneglow/wck/icons/necklace.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/wck/icons/necklace.png",
+      "sha256": "0fa79489df248a81235a2e33342929d72f457b21bca0e9c179b3cb9b311c20f1"
+    },
+    "client/assets/generated/equipment/boneglow/wck/icons/pants.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/wck/icons/pants.png",
+      "sha256": "0f89c48f349a13e548e4b5c27aaeccd4f5b3f1e5d2840ad2e53429d6981ee83e"
+    },
+    "client/assets/generated/equipment/boneglow/wck/icons/pendant.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/wck/icons/pendant.png",
+      "sha256": "3faefb4c2f44b14bb42bd852452b170454cfa9f5fa8b95889ec9b0a977de321b"
+    },
+    "client/assets/generated/equipment/boneglow/wck/icons/ring.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/wck/icons/ring.png",
+      "sha256": "342c18c9729df9f59c718da3a13e4881f3de9f8f729548936ec32fe5b3707b9b"
+    },
+    "client/assets/generated/equipment/boneglow/wck/icons/weapon.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/wck/icons/weapon.png",
+      "sha256": "c2e967ad2146d93c9984726edbb19452246375ba77ea976b11cc78a76dfc484c"
+    },
+    "client/assets/generated/equipment/boneglow/wck/icons/wrist.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/wck/icons/wrist.png",
+      "sha256": "a1e86041c739b3ef8a9510bcfc115aa017ab46caf943d289cad934baed636ce8"
+    },
+    "client/assets/generated/equipment/boneglow/mfs/parts/mfst3.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/mfs/parts/mfst3.png",
+      "sha256": "0f2a2d9bff785ae22bd7fdb0735cb02fef87ded26b95a2f9407f85d8bf1dbf64"
+    },
+    "client/assets/generated/equipment/boneglow/mfs/parts/mfs2.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/mfs/parts/mfs2.png",
+      "sha256": "822ea3d1d9e894671e9c0a9dc5f916044cf5ccf27f64bdeb99fccc13a3b529d6"
+    },
+    "client/assets/generated/equipment/boneglow/mfs/parts/mfs2q.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/mfs/parts/mfs2q.png",
+      "sha256": "97036259be438ae52c818c9289d9fe91fa909c0963c51e17df2c6260adb19545"
+    },
+    "client/assets/generated/equipment/boneglow/mfs/parts/mfs2x.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/mfs/parts/mfs2x.png",
+      "sha256": "efdbfe9de4561b04b3e7c3996404c363bb500974f64904113a6e618239340fc8"
+    },
+    "client/assets/generated/equipment/boneglow/mfs/parts/efs2.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/mfs/parts/efs2.png",
+      "sha256": "bcd22357a73d9c0fb894d3654d1e1657201de351e59d0782322117561d53b207"
+    },
+    "client/assets/generated/equipment/boneglow/mfs/icons/armor.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/mfs/icons/armor.png",
+      "sha256": "f4cb5b9c651937c195dea68163c44eacd2964161f39494eeeada005de92f3ed2"
+    },
+    "client/assets/generated/equipment/boneglow/mfs/icons/belt.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/mfs/icons/belt.png",
+      "sha256": "37709c3f526ae04685773efa96e2a6c328a4e2524e37a42324964b5ceae02dc9"
+    },
+    "client/assets/generated/equipment/boneglow/mfs/icons/boots.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/mfs/icons/boots.png",
+      "sha256": "528250148a15da540e59e017eef2e86e9b6c67954c2a9488e301f5bb65d675c4"
+    },
+    "client/assets/generated/equipment/boneglow/mfs/icons/hat.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/mfs/icons/hat.png",
+      "sha256": "e229421cc19c7e55494eb52c307d83f719907a1b02d8761c98be6b2aaa0874e6"
+    },
+    "client/assets/generated/equipment/boneglow/mfs/icons/necklace.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/mfs/icons/necklace.png",
+      "sha256": "d3a86ea92fce1bdd6c6bbd45274e15ba6f6b94d63815e054f07b3b9041404fa7"
+    },
+    "client/assets/generated/equipment/boneglow/mfs/icons/pants.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/mfs/icons/pants.png",
+      "sha256": "a5482f0c5703aecf6816b38428481c5e72ab190f23e80081fc9f1605e2feb3c5"
+    },
+    "client/assets/generated/equipment/boneglow/mfs/icons/pendant.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/mfs/icons/pendant.png",
+      "sha256": "2f674d6509dd280b503edf1c3392b6e758a6162dad1d93f43be7316b6a7bfc54"
+    },
+    "client/assets/generated/equipment/boneglow/mfs/icons/ring.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/mfs/icons/ring.png",
+      "sha256": "b900bcdf84ef398f9f9ec820f5877a4859b756d6a44f39a1f2679440359f5ed2"
+    },
+    "client/assets/generated/equipment/boneglow/mfs/icons/weapon.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/mfs/icons/weapon.png",
+      "sha256": "df13e5116af84ae3ce204bbd722312c396ffcd11124f528ba7d84f756b680769"
+    },
+    "client/assets/generated/equipment/boneglow/mfs/icons/wrist.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/mfs/icons/wrist.png",
+      "sha256": "ceff225036e1156014d31255096e0f681260963966aa8cb9c43e7224871c5ca4"
+    },
+    "client/assets/generated/equipment/boneglow/wfs/parts/wfst3.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/wfs/parts/wfst3.png",
+      "sha256": "21c228ea668845c98686c13f7909ea23f7a9294ca5999766d779ce7cacdf4f7b"
+    },
+    "client/assets/generated/equipment/boneglow/wfs/parts/wfs2.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/wfs/parts/wfs2.png",
+      "sha256": "95f705e9eac96e54c37afa78bc9b80e50936594033c3f41d95c14e7eb856843d"
+    },
+    "client/assets/generated/equipment/boneglow/wfs/parts/wfs2q.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/wfs/parts/wfs2q.png",
+      "sha256": "29fe3b4e570c1cc44a4456f1809589f0a3a064a75f02703c1ef0c971f684f929"
+    },
+    "client/assets/generated/equipment/boneglow/wfs/parts/wfs2x.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/wfs/parts/wfs2x.png",
+      "sha256": "8dfbb371eb8df4fc51c02df1796e90fbf98a70c3326dee21a7f03c1a3b155a65"
+    },
+    "client/assets/generated/equipment/boneglow/wfs/parts/efs2.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/wfs/parts/efs2.png",
+      "sha256": "a75a6f0682e00f846b000d8794678223981f01c8a98a6445bd7b8aa376d66fee"
+    },
+    "client/assets/generated/equipment/boneglow/wfs/icons/armor.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/wfs/icons/armor.png",
+      "sha256": "f82e04fcc177738d8e2ffdf91eff018d4d333f94e2ff2351d2c975b320aa7302"
+    },
+    "client/assets/generated/equipment/boneglow/wfs/icons/belt.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/wfs/icons/belt.png",
+      "sha256": "ac7df32081ea236aae95cd4de295421dd48a4b7876bcf86929604d2a616da078"
+    },
+    "client/assets/generated/equipment/boneglow/wfs/icons/boots.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/wfs/icons/boots.png",
+      "sha256": "b990454ab47ec38c4c67a44fcc5e584e27d34c57785b00d24cdfbc9cf6f19a23"
+    },
+    "client/assets/generated/equipment/boneglow/wfs/icons/hat.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/wfs/icons/hat.png",
+      "sha256": "6b33c393830c04f28f15969128ca8c7fd8883e50f97055b1f4534bdf0aee6175"
+    },
+    "client/assets/generated/equipment/boneglow/wfs/icons/necklace.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/wfs/icons/necklace.png",
+      "sha256": "1be34e8ac6f307181541770bc09efa7afa05db41d7a2f34ed6a3c3a540235b76"
+    },
+    "client/assets/generated/equipment/boneglow/wfs/icons/pants.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/wfs/icons/pants.png",
+      "sha256": "36b708207976b477bb147f52bc71b5145c13157fae2f37e9d4172a19d69c340e"
+    },
+    "client/assets/generated/equipment/boneglow/wfs/icons/pendant.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/wfs/icons/pendant.png",
+      "sha256": "2ba2ccbb4e711f3a3175cb6f6978fd2af68ae9ba59eb34731b33e6605c8e341b"
+    },
+    "client/assets/generated/equipment/boneglow/wfs/icons/ring.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/wfs/icons/ring.png",
+      "sha256": "809230733acaf92e7662d80a059b91d77ad15c737ffab34d4f2e95e6f910ddf7"
+    },
+    "client/assets/generated/equipment/boneglow/wfs/icons/weapon.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/wfs/icons/weapon.png",
+      "sha256": "03ab636c1cc3cdd6d74ede09cdeaa43b80c472ff331100b421de0d6fd828c321"
+    },
+    "client/assets/generated/equipment/boneglow/wfs/icons/wrist.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/wfs/icons/wrist.png",
+      "sha256": "9f7a60c6a30889ecf11dd1f2b028338749b59d5ef58e0fe7e1c7e24a53df67eb"
+    },
+    "client/assets/generated/equipment/gravebloom/mzs/parts/mzst6.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/mzs/parts/mzst6.png",
+      "sha256": "bfd8c666b2d2f7075e90ee26ae6a57464022ee96e6eff9ea70d079fba2602ce7"
+    },
+    "client/assets/generated/equipment/gravebloom/mzs/parts/mzs1.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/mzs/parts/mzs1.png",
+      "sha256": "1d246b811ddb86b63fc4553a9f030228fedb7d5cb2d6b3de3e601bcbd8af1ca8"
+    },
+    "client/assets/generated/equipment/gravebloom/mzs/parts/mzs1q.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/mzs/parts/mzs1q.png",
+      "sha256": "36363ce3639a71873e8428b6f1d10be26cc0ae88e52a7aaa6507ab034f414c85"
+    },
+    "client/assets/generated/equipment/gravebloom/mzs/parts/mzs1x.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/mzs/parts/mzs1x.png",
+      "sha256": "9408b01dc9c3813b74d251cc3ad2a86b803abc9f2360bbebd57867151867e4d3"
+    },
+    "client/assets/generated/equipment/gravebloom/mzs/parts/ezs11.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/mzs/parts/ezs11.png",
+      "sha256": "c6b12786864a29c10ae477610a6b9d87e894bd35996929af6d99b2f17cd4ff2b"
+    },
+    "client/assets/generated/equipment/gravebloom/mzs/icons/armor.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/mzs/icons/armor.png",
+      "sha256": "1638230ae495b0367e5e09e2ba68e30b26d87e870bc8ca9d12b65fe72b2ef295"
+    },
+    "client/assets/generated/equipment/gravebloom/mzs/icons/belt.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/mzs/icons/belt.png",
+      "sha256": "294a14eb5e2c1b5060ffa5bd68dff61413bab233f5aef8989ffb224400f6dd29"
+    },
+    "client/assets/generated/equipment/gravebloom/mzs/icons/boots.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/mzs/icons/boots.png",
+      "sha256": "e5b7bddf4b4122f2e889fe13c65308ce25bd4cf6576d1a7776c5d6aed28b1124"
+    },
+    "client/assets/generated/equipment/gravebloom/mzs/icons/hat.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/mzs/icons/hat.png",
+      "sha256": "4be5761035a2912859356fa982e07ac4d48164974eaf053d8d8811368ebe118f"
+    },
+    "client/assets/generated/equipment/gravebloom/mzs/icons/necklace.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/mzs/icons/necklace.png",
+      "sha256": "3a78908d8cafb7a396ee51cbbacfb6a46ba43148db5344bca0ff9e8baaf4ef4b"
+    },
+    "client/assets/generated/equipment/gravebloom/mzs/icons/pants.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/mzs/icons/pants.png",
+      "sha256": "566245d9fe4dc7fc01fe50b76cab5948b68659ac8aae871a40be2beb34611df6"
+    },
+    "client/assets/generated/equipment/gravebloom/mzs/icons/pendant.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/mzs/icons/pendant.png",
+      "sha256": "dc9e5c503240735874319a76d88d5c34386f3e44835a264a31c69cb64740f6de"
+    },
+    "client/assets/generated/equipment/gravebloom/mzs/icons/ring.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/mzs/icons/ring.png",
+      "sha256": "44b152f9db3699f36bf32399f66f3e724477b049751492aecb718411b289a260"
+    },
+    "client/assets/generated/equipment/gravebloom/mzs/icons/weapon.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/mzs/icons/weapon.png",
+      "sha256": "7dbd65e9f19870b3ada4a8ec1980fdccc4458fda22df8ee3cef5ebf47eec93bf"
+    },
+    "client/assets/generated/equipment/gravebloom/mzs/icons/wrist.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/mzs/icons/wrist.png",
+      "sha256": "52d88c6f95bbc20a171671ba3308b4d306dfb0bfde57540cf39a53216e05ab60"
+    },
+    "client/assets/generated/equipment/gravebloom/wzs/parts/wzst4.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/wzs/parts/wzst4.png",
+      "sha256": "595fd02123d584b758257c99405adba1080af75b5f0b09d3e69bfe972e6288e3"
+    },
+    "client/assets/generated/equipment/gravebloom/wzs/parts/wzs1.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/wzs/parts/wzs1.png",
+      "sha256": "cb602c5da666aed5032d670100d04212d978bfdabc1ac0d45ba6bca720307b89"
+    },
+    "client/assets/generated/equipment/gravebloom/wzs/parts/wzs1q.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/wzs/parts/wzs1q.png",
+      "sha256": "1d5a20d9bbaaabe53f43f73df8b402ce91fc9d998994cf28b7590424959e2f48"
+    },
+    "client/assets/generated/equipment/gravebloom/wzs/parts/wzs1x.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/wzs/parts/wzs1x.png",
+      "sha256": "a62862ff3ba3c921d4a53d556a8efd5e0d11c111c9117183668a8b69a99469b6"
+    },
+    "client/assets/generated/equipment/gravebloom/wzs/parts/ezs14.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/wzs/parts/ezs14.png",
+      "sha256": "43fc1c706a7933df264fa50e01bb096c1d4fd1b692c8437608056f0e34ebf781"
+    },
+    "client/assets/generated/equipment/gravebloom/wzs/icons/armor.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/wzs/icons/armor.png",
+      "sha256": "253041bcf3f59c385aa2d38d2ae26cfb39e723626852338cd81267d05ede7550"
+    },
+    "client/assets/generated/equipment/gravebloom/wzs/icons/belt.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/wzs/icons/belt.png",
+      "sha256": "a2b766da19bb2797a0a8cb5730c7797bae947dffa17e9f9a92bc5952e2fe4c7c"
+    },
+    "client/assets/generated/equipment/gravebloom/wzs/icons/boots.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/wzs/icons/boots.png",
+      "sha256": "73aabcb27c6c102be7c987947331411ff8d906bae3ed0aa6a3bbf9e9b69c59a5"
+    },
+    "client/assets/generated/equipment/gravebloom/wzs/icons/hat.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/wzs/icons/hat.png",
+      "sha256": "0e3cbb3787532981df7231869dd2116dbdb84bb000844a916d9914775b4c16ea"
+    },
+    "client/assets/generated/equipment/gravebloom/wzs/icons/necklace.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/wzs/icons/necklace.png",
+      "sha256": "30f054b819aba45eb16bd7d96c7b19fc226c4eea8def7809d3a54e9b2526247c"
+    },
+    "client/assets/generated/equipment/gravebloom/wzs/icons/pants.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/wzs/icons/pants.png",
+      "sha256": "3cc5ac3e49c859e7cbd111eec01da95f2c7b55105766352b919330b90933b584"
+    },
+    "client/assets/generated/equipment/gravebloom/wzs/icons/pendant.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/wzs/icons/pendant.png",
+      "sha256": "088eea3f4afd6e2339bcbeae96351426fc8e1895d1ed7c1d8a562e608d407c0f"
+    },
+    "client/assets/generated/equipment/gravebloom/wzs/icons/ring.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/wzs/icons/ring.png",
+      "sha256": "c55b89c38380f09753e07862649152489fd8cf9fb5e380d8c0469578c64168d2"
+    },
+    "client/assets/generated/equipment/gravebloom/wzs/icons/weapon.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/wzs/icons/weapon.png",
+      "sha256": "848ad02f0cdd56b78111b5892ae828fd1d9fbe3659c67414e52f9966e236cb27"
+    },
+    "client/assets/generated/equipment/gravebloom/wzs/icons/wrist.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/wzs/icons/wrist.png",
+      "sha256": "1c08da7cfafcfc44a16bdf1fa02bb1661697b37a1eaf85f95e1db8fc6461812a"
+    },
+    "client/assets/generated/equipment/gravebloom/mck/parts/mckt8.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/mck/parts/mckt8.png",
+      "sha256": "2d22bf1e0cfd0733538f6e074018cee4592212f6c8b79d4b0a7e04b90248e672"
+    },
+    "client/assets/generated/equipment/gravebloom/mck/parts/mck1.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/mck/parts/mck1.png",
+      "sha256": "442f08726708dea170e2d6f326d1c8876470ae43a6a03f21eae7800b15d06a0c"
+    },
+    "client/assets/generated/equipment/gravebloom/mck/parts/mck1q.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/mck/parts/mck1q.png",
+      "sha256": "5ca53bd24ad059e6adfc3a77341ceac7b1dc17b973d1453e160c9bd40955be67"
+    },
+    "client/assets/generated/equipment/gravebloom/mck/parts/mck1x.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/mck/parts/mck1x.png",
+      "sha256": "c1af57044e9255ba183f17ac39dc447e586c7fc7ef25a59dbf187932a09672e3"
+    },
+    "client/assets/generated/equipment/gravebloom/mck/parts/eck9.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/mck/parts/eck9.png",
+      "sha256": "ca3b146ea6b315b4b9533951e44c6caeee929847c244cb51deadcd3cf31147c5"
+    },
+    "client/assets/generated/equipment/gravebloom/mck/icons/armor.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/mck/icons/armor.png",
+      "sha256": "c1fd17d9c2fcff7b2aa54fa9b4f13884ea31df9a5b6034ba254a5252444dda34"
+    },
+    "client/assets/generated/equipment/gravebloom/mck/icons/belt.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/mck/icons/belt.png",
+      "sha256": "a7651e2e3013f832b8aa4768f7190a64e4a6538190d86b5f18d603370ac4671c"
+    },
+    "client/assets/generated/equipment/gravebloom/mck/icons/boots.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/mck/icons/boots.png",
+      "sha256": "b45f7939d946b8fa40a4dfcd4e543640eef8e4a2e4bee7a43a716a8b023ca609"
+    },
+    "client/assets/generated/equipment/gravebloom/mck/icons/hat.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/mck/icons/hat.png",
+      "sha256": "8f1c7af58fa9e1b522d2da2e534620caae8daf3b14869ab8b80e73b7ba294a91"
+    },
+    "client/assets/generated/equipment/gravebloom/mck/icons/necklace.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/mck/icons/necklace.png",
+      "sha256": "5a3bcdecd61c61011ef6249f6eab91bbe39b89c63cc53815a4223717a13b0f97"
+    },
+    "client/assets/generated/equipment/gravebloom/mck/icons/pants.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/mck/icons/pants.png",
+      "sha256": "a8dff23cd52263c3ffbc420df270787cfa7580f24fafb0b557bd3809c0c50b6d"
+    },
+    "client/assets/generated/equipment/gravebloom/mck/icons/pendant.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/mck/icons/pendant.png",
+      "sha256": "a12e4fefdb2176b835514a0a30e967c2f12f72d2d42e95b1d71ca2a8ecdf7264"
+    },
+    "client/assets/generated/equipment/gravebloom/mck/icons/ring.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/mck/icons/ring.png",
+      "sha256": "0b5df114e8943a82054ea9419000b081854c3ca5cbdc910a1b94776080ee76eb"
+    },
+    "client/assets/generated/equipment/gravebloom/mck/icons/weapon.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/mck/icons/weapon.png",
+      "sha256": "1e5a2c255e49d80656a1c868450f067812ec139af33d1bf6af70b573f054b360"
+    },
+    "client/assets/generated/equipment/gravebloom/mck/icons/wrist.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/mck/icons/wrist.png",
+      "sha256": "1e70e44e4aadb28c37f551c3b5da2e634f6d49eb06ad4e240dbb0562695cfb6d"
+    },
+    "client/assets/generated/equipment/gravebloom/wck/parts/wckt5.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/wck/parts/wckt5.png",
+      "sha256": "7131a97a891e1d05408fefa3a44b3d046532b3201cd49db291d1d8aac0c55be0"
+    },
+    "client/assets/generated/equipment/gravebloom/wck/parts/wck1.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/wck/parts/wck1.png",
+      "sha256": "e52d932e92c8fa475100bcda9f5d74f07a83ee98348efe453deb73b01609b97a"
+    },
+    "client/assets/generated/equipment/gravebloom/wck/parts/wck1q.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/wck/parts/wck1q.png",
+      "sha256": "523607d0278d747ee8f1a14561bc4c259c997beca332856b5d5eb28bfcf49462"
+    },
+    "client/assets/generated/equipment/gravebloom/wck/parts/wck1x.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/wck/parts/wck1x.png",
+      "sha256": "93fa6bf8cd29fab416ec61c9e4244500593046b54d729a7c9dad6ff82a86b973"
+    },
+    "client/assets/generated/equipment/gravebloom/wck/parts/eck17.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/wck/parts/eck17.png",
+      "sha256": "025eb9774a11d2814574e70fbc86a50ae86295075fa81a39571b119470ed7ae5"
+    },
+    "client/assets/generated/equipment/gravebloom/wck/icons/armor.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/wck/icons/armor.png",
+      "sha256": "ad1b8ba390c4234713373b590ff7a7968e6fd8cf943f967d212aea170b5852df"
+    },
+    "client/assets/generated/equipment/gravebloom/wck/icons/belt.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/wck/icons/belt.png",
+      "sha256": "14f067b02820263a51d9f89be93257f7bd9a2f8226205d2085d0b44b5ea4fd0f"
+    },
+    "client/assets/generated/equipment/gravebloom/wck/icons/boots.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/wck/icons/boots.png",
+      "sha256": "6c2dc4395292a8bf29dabaf2b90d1999bb9fbf51adeb43e882ebc0fe8b81bd35"
+    },
+    "client/assets/generated/equipment/gravebloom/wck/icons/hat.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/wck/icons/hat.png",
+      "sha256": "10df6242a86a8f1fb981cfdda17ad6ebbbf43eb62b7e83d092c3692582d9eed3"
+    },
+    "client/assets/generated/equipment/gravebloom/wck/icons/necklace.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/wck/icons/necklace.png",
+      "sha256": "3d1b88f27157a109dd67d0bdc1630b7ceff040126a025f668a751f00135b84ec"
+    },
+    "client/assets/generated/equipment/gravebloom/wck/icons/pants.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/wck/icons/pants.png",
+      "sha256": "fb2170744e5827d151616ed190678c11317f42e9a40347d20ba7aa78e51b027a"
+    },
+    "client/assets/generated/equipment/gravebloom/wck/icons/pendant.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/wck/icons/pendant.png",
+      "sha256": "8e81c244179ea698eee410c4d8a42157f9d9d75b071a897644c90cf968a93c18"
+    },
+    "client/assets/generated/equipment/gravebloom/wck/icons/ring.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/wck/icons/ring.png",
+      "sha256": "96827ba6e3a4b54ad497df123ee96b4f5f17380bbe9efcd0a27f56f009c01e5c"
+    },
+    "client/assets/generated/equipment/gravebloom/wck/icons/weapon.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/wck/icons/weapon.png",
+      "sha256": "63645dadd6e36b0d6bc10d57193b85bbb2bbf0bde66b69d10aae658f4c47af97"
+    },
+    "client/assets/generated/equipment/gravebloom/wck/icons/wrist.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/wck/icons/wrist.png",
+      "sha256": "ca4de33fbcabc020649a0d2fc687ca53743db3b265a8f6a40f7611e2d27c0c1e"
+    },
+    "client/assets/generated/equipment/gravebloom/mfs/parts/mfst6.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/mfs/parts/mfst6.png",
+      "sha256": "893aef9121b496aeaae157cfbb9dd1a038d35a966b41955d5877420a1abe654e"
+    },
+    "client/assets/generated/equipment/gravebloom/mfs/parts/mfs2.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/mfs/parts/mfs2.png",
+      "sha256": "d63f5b453cd599af31416c5dd81ad1263f3a881a0e4ba482baed8276484b0be2"
+    },
+    "client/assets/generated/equipment/gravebloom/mfs/parts/mfs2q.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/mfs/parts/mfs2q.png",
+      "sha256": "1a82dfb672570efbffb7688849ba0424b6671afc3e75463d338b6c5d73b37e9a"
+    },
+    "client/assets/generated/equipment/gravebloom/mfs/parts/mfs2x.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/mfs/parts/mfs2x.png",
+      "sha256": "c371739b1782086a6996232ee4477434a0ee7bc1effd834f64f2576ae436f745"
+    },
+    "client/assets/generated/equipment/gravebloom/mfs/parts/efs11.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/mfs/parts/efs11.png",
+      "sha256": "84a5a40e88b7dc35b25c4a8286f4be85684fbd6a3f40f310d147ee890b896849"
+    },
+    "client/assets/generated/equipment/gravebloom/mfs/icons/armor.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/mfs/icons/armor.png",
+      "sha256": "3f6b55a0889ac8f6da853e89e8dc1f1216b3256f804e7ed2b4d478cf0816deff"
+    },
+    "client/assets/generated/equipment/gravebloom/mfs/icons/belt.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/mfs/icons/belt.png",
+      "sha256": "b01ddcde166e34b263dcf58dcc863170759303fb97b483a98bd6142c4022fa43"
+    },
+    "client/assets/generated/equipment/gravebloom/mfs/icons/boots.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/mfs/icons/boots.png",
+      "sha256": "606db04986518deae7e0ad58f2deae2deb9ed8384bb66829d85091accb7d95ac"
+    },
+    "client/assets/generated/equipment/gravebloom/mfs/icons/hat.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/mfs/icons/hat.png",
+      "sha256": "6db45097625796a102157278cbc21d70573309a81129cea0ff05f030ac000eed"
+    },
+    "client/assets/generated/equipment/gravebloom/mfs/icons/necklace.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/mfs/icons/necklace.png",
+      "sha256": "659f7c07a75839eca3f01306a1c38c134c8889ffcc7924d0c341eb23c0264e46"
+    },
+    "client/assets/generated/equipment/gravebloom/mfs/icons/pants.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/mfs/icons/pants.png",
+      "sha256": "39e7ac66454b5c02c4c94930442063db5615910e41ed0d1e5ff32c0da7f3d548"
+    },
+    "client/assets/generated/equipment/gravebloom/mfs/icons/pendant.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/mfs/icons/pendant.png",
+      "sha256": "676b90e13a956370412313f1fed5bd472d1d341466edb45733b32b741eb7d50e"
+    },
+    "client/assets/generated/equipment/gravebloom/mfs/icons/ring.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/mfs/icons/ring.png",
+      "sha256": "2d63c7b30842f8ad91b9a1cd312fcffec27bd0bd9726c5831e83f426d038f08b"
+    },
+    "client/assets/generated/equipment/gravebloom/mfs/icons/weapon.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/mfs/icons/weapon.png",
+      "sha256": "f935a056624caba4b40c0411e8c71f8ab363a42fe4b52201b216dfb2de48d5e6"
+    },
+    "client/assets/generated/equipment/gravebloom/mfs/icons/wrist.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/mfs/icons/wrist.png",
+      "sha256": "0bddad15caee80a4eff5ff2448e23c4c8414a7ce050fdd771e26603a672d5933"
+    },
+    "client/assets/generated/equipment/gravebloom/wfs/parts/wfst4.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/wfs/parts/wfst4.png",
+      "sha256": "5dabf4d698fb24a12c973292dc3a32e3734cc5db189d65273f5850ab22b8f012"
+    },
+    "client/assets/generated/equipment/gravebloom/wfs/parts/wfs2.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/wfs/parts/wfs2.png",
+      "sha256": "9531529beed5363ba8722866634615f3b8e881535efc339bca7adbbcad0b5f61"
+    },
+    "client/assets/generated/equipment/gravebloom/wfs/parts/wfs2q.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/wfs/parts/wfs2q.png",
+      "sha256": "ab67b0d6686e39e125e8ec3c3e69db67cd197bccf0856dcf617c5a5229c5826d"
+    },
+    "client/assets/generated/equipment/gravebloom/wfs/parts/wfs2x.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/wfs/parts/wfs2x.png",
+      "sha256": "e8c78caeb65ebdb01a234df96a0665c50a7e45ba6889e2a7c4010a99de8c553b"
+    },
+    "client/assets/generated/equipment/gravebloom/wfs/parts/efs7.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/wfs/parts/efs7.png",
+      "sha256": "d72436cc4bca9eb0da18bd29be8393e907d68c5fa916dd71dde5cf3421bc696a"
+    },
+    "client/assets/generated/equipment/gravebloom/wfs/icons/armor.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/wfs/icons/armor.png",
+      "sha256": "962cfac02e3b7ce2d09dbd3f2903a6f8d09d4a4015b951f719fcacf83b449305"
+    },
+    "client/assets/generated/equipment/gravebloom/wfs/icons/belt.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/wfs/icons/belt.png",
+      "sha256": "261180c0fb96b8d17a6e75eae78881dcc743e51abdd1a5d54f7777da4e297ee7"
+    },
+    "client/assets/generated/equipment/gravebloom/wfs/icons/boots.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/wfs/icons/boots.png",
+      "sha256": "b2c50f6ffa0b68dbcf0db5a096172f96b5f54c7f66ceb2147ae99b7748842990"
+    },
+    "client/assets/generated/equipment/gravebloom/wfs/icons/hat.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/wfs/icons/hat.png",
+      "sha256": "849be56826bbffee4d80d22a5cfe41e342c4c748fd730b828343bdfcbc2a9d03"
+    },
+    "client/assets/generated/equipment/gravebloom/wfs/icons/necklace.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/wfs/icons/necklace.png",
+      "sha256": "1bd2e0be03538f48bde00914020c762e4607907c40267b932765b24c7da07b5b"
+    },
+    "client/assets/generated/equipment/gravebloom/wfs/icons/pants.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/wfs/icons/pants.png",
+      "sha256": "ec6464899fb0286547b4cfc684c8f4ca1fdbf1242912045327cd2e62fce8455b"
+    },
+    "client/assets/generated/equipment/gravebloom/wfs/icons/pendant.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/wfs/icons/pendant.png",
+      "sha256": "408ef9f6bad6e08a044593b7c2b97ab82f7dc397967cf2ed450c3c3f583e9311"
+    },
+    "client/assets/generated/equipment/gravebloom/wfs/icons/ring.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/wfs/icons/ring.png",
+      "sha256": "c650b5f14ca2d6718de02040b04f572cd4c2d0cf59cc332e5f126edc7389c815"
+    },
+    "client/assets/generated/equipment/gravebloom/wfs/icons/weapon.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/wfs/icons/weapon.png",
+      "sha256": "4a11ffeda0016bb3226475d254a8ab75b08808fb7fa0131394b34e1e9013e906"
+    },
+    "client/assets/generated/equipment/gravebloom/wfs/icons/wrist.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/gravebloom/wfs/icons/wrist.png",
+      "sha256": "5a2b1873e0745a0105b73d7d50bdb3d9f05772e88e1fd98baf52f417a4066425"
+    },
+    "client/assets/generated/equipment/eva01/mzs/parts/mzst2.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/mzs/parts/mzst2.png",
+      "sha256": "6e1376b2b05aa818959d53a447182cac2e94277f2d19447c4717ea1959b895d5"
+    },
+    "client/assets/generated/equipment/eva01/mzs/parts/mzs7.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/mzs/parts/mzs7.png",
+      "sha256": "255cfc92e4625a79dcd1906fe78b2283794e3b377d3a43c490e7ddc6514a1655"
+    },
+    "client/assets/generated/equipment/eva01/mzs/parts/mzs7q.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/mzs/parts/mzs7q.png",
+      "sha256": "6dba99f3bedaa1a74fe0867e8b288de2fe82dfe7e3ddae05b78d1a1c25bdb25c"
+    },
+    "client/assets/generated/equipment/eva01/mzs/parts/mzs7x.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/mzs/parts/mzs7x.png",
+      "sha256": "1276b84cf79e661ca31f39b3993689fb4c84b242a17623d1aa754d2427e4fef7"
+    },
+    "client/assets/generated/equipment/eva01/mzs/parts/ezs9.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/mzs/parts/ezs9.png",
+      "sha256": "cf0a5a2d7c4d931d864fa1ea09ad0d2f71d9fc801e8927665565dd01051f65da"
+    },
+    "client/assets/generated/equipment/eva01/mzs/icons/armor.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/mzs/icons/armor.png",
+      "sha256": "8087a4097f33f2da549c0c353dfe9ba72b6448ccd0fcbd8f608a7179f1015523"
+    },
+    "client/assets/generated/equipment/eva01/mzs/icons/belt.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/mzs/icons/belt.png",
+      "sha256": "fe54202ae7bfce2afad14618fa264d8c0f0863a885b27f1f3da9b525f33c30f1"
+    },
+    "client/assets/generated/equipment/eva01/mzs/icons/boots.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/mzs/icons/boots.png",
+      "sha256": "8770a6cec391c167f5708f757e4bb3bd619e8c9c932ae36244fcf88ad6187ea7"
+    },
+    "client/assets/generated/equipment/eva01/mzs/icons/hat.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/mzs/icons/hat.png",
+      "sha256": "d0de9f21d2c0b9d54e307b090988c16d0f7a7df79f905ccab05520b0444bef14"
+    },
+    "client/assets/generated/equipment/eva01/mzs/icons/necklace.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/mzs/icons/necklace.png",
+      "sha256": "98df05909d78812f330e76f36b9baeeec71d662fd6f869a3dbc6fdb3154627f9"
+    },
+    "client/assets/generated/equipment/eva01/mzs/icons/pants.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/mzs/icons/pants.png",
+      "sha256": "75c0c61f3a24661fcaa9865185beee149045a613b130bfff7fcaee36a94ef9d9"
+    },
+    "client/assets/generated/equipment/eva01/mzs/icons/pendant.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/mzs/icons/pendant.png",
+      "sha256": "0b5edd109ba71dda8f4252dd06d1192a1cc070f828e5624abf8bfe8d76c9b53e"
+    },
+    "client/assets/generated/equipment/eva01/mzs/icons/ring.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/mzs/icons/ring.png",
+      "sha256": "fa874265cd0c9523e7226dd683689f5f8918a4db60732a33127cc15f63396360"
+    },
+    "client/assets/generated/equipment/eva01/mzs/icons/weapon.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/mzs/icons/weapon.png",
+      "sha256": "8de14a4e68fa9db07e808db3a79b0d62cf1b9cf275413f34eb2613819723d3e5"
+    },
+    "client/assets/generated/equipment/eva01/mzs/icons/wrist.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/mzs/icons/wrist.png",
+      "sha256": "3775fbae89acb4fcabd509526e530062290a0229074fa1d6bf270e5b28a22b3a"
+    },
+    "client/assets/generated/equipment/eva01/wzs/parts/wzst2.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/wzs/parts/wzst2.png",
+      "sha256": "b7af0df9fde146d906475adeca6075d3068dda233881044bd24af39c20883430"
+    },
+    "client/assets/generated/equipment/eva01/wzs/parts/wzs7.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/wzs/parts/wzs7.png",
+      "sha256": "12b0dd56f24dd21d04d233f87adc9c061af3117636741c78523dd188f7f2e6d0"
+    },
+    "client/assets/generated/equipment/eva01/wzs/parts/wzs7q.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/wzs/parts/wzs7q.png",
+      "sha256": "79f33da6bff400732bf3ba2bdadc628dea9706dc2c192078db55abf403fb33bf"
+    },
+    "client/assets/generated/equipment/eva01/wzs/parts/wzs7x.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/wzs/parts/wzs7x.png",
+      "sha256": "313c39c45292ff00bdab3f8a9f180c618626917c7b256389467791c5b6fbb5a0"
+    },
+    "client/assets/generated/equipment/eva01/wzs/parts/ezs9.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/wzs/parts/ezs9.png",
+      "sha256": "cf0a5a2d7c4d931d864fa1ea09ad0d2f71d9fc801e8927665565dd01051f65da"
+    },
+    "client/assets/generated/equipment/eva01/wzs/icons/armor.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/wzs/icons/armor.png",
+      "sha256": "8087a4097f33f2da549c0c353dfe9ba72b6448ccd0fcbd8f608a7179f1015523"
+    },
+    "client/assets/generated/equipment/eva01/wzs/icons/belt.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/wzs/icons/belt.png",
+      "sha256": "fe54202ae7bfce2afad14618fa264d8c0f0863a885b27f1f3da9b525f33c30f1"
+    },
+    "client/assets/generated/equipment/eva01/wzs/icons/boots.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/wzs/icons/boots.png",
+      "sha256": "8770a6cec391c167f5708f757e4bb3bd619e8c9c932ae36244fcf88ad6187ea7"
+    },
+    "client/assets/generated/equipment/eva01/wzs/icons/hat.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/wzs/icons/hat.png",
+      "sha256": "d0de9f21d2c0b9d54e307b090988c16d0f7a7df79f905ccab05520b0444bef14"
+    },
+    "client/assets/generated/equipment/eva01/wzs/icons/necklace.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/wzs/icons/necklace.png",
+      "sha256": "98df05909d78812f330e76f36b9baeeec71d662fd6f869a3dbc6fdb3154627f9"
+    },
+    "client/assets/generated/equipment/eva01/wzs/icons/pants.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/wzs/icons/pants.png",
+      "sha256": "75c0c61f3a24661fcaa9865185beee149045a613b130bfff7fcaee36a94ef9d9"
+    },
+    "client/assets/generated/equipment/eva01/wzs/icons/pendant.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/wzs/icons/pendant.png",
+      "sha256": "0b5edd109ba71dda8f4252dd06d1192a1cc070f828e5624abf8bfe8d76c9b53e"
+    },
+    "client/assets/generated/equipment/eva01/wzs/icons/ring.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/wzs/icons/ring.png",
+      "sha256": "fa874265cd0c9523e7226dd683689f5f8918a4db60732a33127cc15f63396360"
+    },
+    "client/assets/generated/equipment/eva01/wzs/icons/weapon.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/wzs/icons/weapon.png",
+      "sha256": "8de14a4e68fa9db07e808db3a79b0d62cf1b9cf275413f34eb2613819723d3e5"
+    },
+    "client/assets/generated/equipment/eva01/wzs/icons/wrist.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/wzs/icons/wrist.png",
+      "sha256": "3775fbae89acb4fcabd509526e530062290a0229074fa1d6bf270e5b28a22b3a"
+    },
+    "client/assets/generated/equipment/eva01/mck/parts/mckt2.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/mck/parts/mckt2.png",
+      "sha256": "c5f04dad0eae1d852bd357ac5cc13590d424198b1b0c52916fb618297e64defc"
+    },
+    "client/assets/generated/equipment/eva01/mck/parts/mck7.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/mck/parts/mck7.png",
+      "sha256": "4eea5157232845eaf1169dcb544eda0cb5106090df3e1d8d70c4af6fb0a6bbcb"
+    },
+    "client/assets/generated/equipment/eva01/mck/parts/mck7q.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/mck/parts/mck7q.png",
+      "sha256": "26f07f6218e8866aca887bf507f352771e7b92a3dbe08c183d3c24d14d2115ad"
+    },
+    "client/assets/generated/equipment/eva01/mck/parts/mck7x.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/mck/parts/mck7x.png",
+      "sha256": "eb959b42e4244a27b7aaacf3925d5b32c0341d82183f4628b5c2b399213d0514"
+    },
+    "client/assets/generated/equipment/eva01/mck/parts/eck9.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/mck/parts/eck9.png",
+      "sha256": "611bf8e9eabb27ae703b95368c94eba50ffe68fe581a4e6fc3b52d1bfbd1c479"
+    },
+    "client/assets/generated/equipment/eva01/mck/icons/armor.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/mck/icons/armor.png",
+      "sha256": "8087a4097f33f2da549c0c353dfe9ba72b6448ccd0fcbd8f608a7179f1015523"
+    },
+    "client/assets/generated/equipment/eva01/mck/icons/belt.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/mck/icons/belt.png",
+      "sha256": "fe54202ae7bfce2afad14618fa264d8c0f0863a885b27f1f3da9b525f33c30f1"
+    },
+    "client/assets/generated/equipment/eva01/mck/icons/boots.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/mck/icons/boots.png",
+      "sha256": "8770a6cec391c167f5708f757e4bb3bd619e8c9c932ae36244fcf88ad6187ea7"
+    },
+    "client/assets/generated/equipment/eva01/mck/icons/hat.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/mck/icons/hat.png",
+      "sha256": "d0de9f21d2c0b9d54e307b090988c16d0f7a7df79f905ccab05520b0444bef14"
+    },
+    "client/assets/generated/equipment/eva01/mck/icons/necklace.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/mck/icons/necklace.png",
+      "sha256": "98df05909d78812f330e76f36b9baeeec71d662fd6f869a3dbc6fdb3154627f9"
+    },
+    "client/assets/generated/equipment/eva01/mck/icons/pants.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/mck/icons/pants.png",
+      "sha256": "75c0c61f3a24661fcaa9865185beee149045a613b130bfff7fcaee36a94ef9d9"
+    },
+    "client/assets/generated/equipment/eva01/mck/icons/pendant.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/mck/icons/pendant.png",
+      "sha256": "0b5edd109ba71dda8f4252dd06d1192a1cc070f828e5624abf8bfe8d76c9b53e"
+    },
+    "client/assets/generated/equipment/eva01/mck/icons/ring.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/mck/icons/ring.png",
+      "sha256": "fa874265cd0c9523e7226dd683689f5f8918a4db60732a33127cc15f63396360"
+    },
+    "client/assets/generated/equipment/eva01/mck/icons/weapon.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/mck/icons/weapon.png",
+      "sha256": "babadf8fef16d8e6aef7f51922821474b8e729e7c5368391f4e56af5792c3a7e"
+    },
+    "client/assets/generated/equipment/eva01/mck/icons/wrist.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/mck/icons/wrist.png",
+      "sha256": "3775fbae89acb4fcabd509526e530062290a0229074fa1d6bf270e5b28a22b3a"
+    },
+    "client/assets/generated/equipment/eva01/wck/parts/wckt2.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/wck/parts/wckt2.png",
+      "sha256": "f5329c53f468c92a2a89377081a8717e7ae30a124b4461b4df673e0219251df5"
+    },
+    "client/assets/generated/equipment/eva01/wck/parts/wck7.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/wck/parts/wck7.png",
+      "sha256": "1d58df1609bff7a4fcd149bbc76b04ae19d6b06256a92ba15a7353d579e49dea"
+    },
+    "client/assets/generated/equipment/eva01/wck/parts/wck7q.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/wck/parts/wck7q.png",
+      "sha256": "cfd94e807e4e4262c3a066fc04db8d06eb60dd81b8f59d67154bd53c41577033"
+    },
+    "client/assets/generated/equipment/eva01/wck/parts/wck7x.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/wck/parts/wck7x.png",
+      "sha256": "a19a373ef73226ce13ada0241b5b02279530793cfdf3c504b6e1948656f251a5"
+    },
+    "client/assets/generated/equipment/eva01/wck/parts/eck17.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/wck/parts/eck17.png",
+      "sha256": "e04eed022284b25c556665296124bf43b7f902bfda4e0616129f2bb76f5a68f4"
+    },
+    "client/assets/generated/equipment/eva01/wck/icons/armor.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/wck/icons/armor.png",
+      "sha256": "8087a4097f33f2da549c0c353dfe9ba72b6448ccd0fcbd8f608a7179f1015523"
+    },
+    "client/assets/generated/equipment/eva01/wck/icons/belt.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/wck/icons/belt.png",
+      "sha256": "fe54202ae7bfce2afad14618fa264d8c0f0863a885b27f1f3da9b525f33c30f1"
+    },
+    "client/assets/generated/equipment/eva01/wck/icons/boots.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/wck/icons/boots.png",
+      "sha256": "8770a6cec391c167f5708f757e4bb3bd619e8c9c932ae36244fcf88ad6187ea7"
+    },
+    "client/assets/generated/equipment/eva01/wck/icons/hat.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/wck/icons/hat.png",
+      "sha256": "d0de9f21d2c0b9d54e307b090988c16d0f7a7df79f905ccab05520b0444bef14"
+    },
+    "client/assets/generated/equipment/eva01/wck/icons/necklace.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/wck/icons/necklace.png",
+      "sha256": "98df05909d78812f330e76f36b9baeeec71d662fd6f869a3dbc6fdb3154627f9"
+    },
+    "client/assets/generated/equipment/eva01/wck/icons/pants.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/wck/icons/pants.png",
+      "sha256": "75c0c61f3a24661fcaa9865185beee149045a613b130bfff7fcaee36a94ef9d9"
+    },
+    "client/assets/generated/equipment/eva01/wck/icons/pendant.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/wck/icons/pendant.png",
+      "sha256": "0b5edd109ba71dda8f4252dd06d1192a1cc070f828e5624abf8bfe8d76c9b53e"
+    },
+    "client/assets/generated/equipment/eva01/wck/icons/ring.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/wck/icons/ring.png",
+      "sha256": "fa874265cd0c9523e7226dd683689f5f8918a4db60732a33127cc15f63396360"
+    },
+    "client/assets/generated/equipment/eva01/wck/icons/weapon.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/wck/icons/weapon.png",
+      "sha256": "8d61d582a6063d06b90d0dcce6ee5950d7e3ec305f12db9ef14746f5a1da210f"
+    },
+    "client/assets/generated/equipment/eva01/wck/icons/wrist.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/wck/icons/wrist.png",
+      "sha256": "3775fbae89acb4fcabd509526e530062290a0229074fa1d6bf270e5b28a22b3a"
+    },
+    "client/assets/generated/equipment/eva01/mfs/parts/mfst2.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/mfs/parts/mfst2.png",
+      "sha256": "1b2f41ee179f991d64a4da7aeea9941c2db21761e9aa2c285d9ea0998afbd92b"
+    },
+    "client/assets/generated/equipment/eva01/mfs/parts/mfs7.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/mfs/parts/mfs7.png",
+      "sha256": "209ead1b4239d6fb03de72dd8b611108a9e99872c1deae89e51520917a11e5aa"
+    },
+    "client/assets/generated/equipment/eva01/mfs/parts/mfs7q.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/mfs/parts/mfs7q.png",
+      "sha256": "6f28f9813d733f5d9d1abbffe9262238389727f07bd2fa58c1ef407316bcd170"
+    },
+    "client/assets/generated/equipment/eva01/mfs/parts/mfs7x.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/mfs/parts/mfs7x.png",
+      "sha256": "0b46f82d835ea8c03d27da9aafe69741d751fc169701eeed3089ecfa26bc8ef9"
+    },
+    "client/assets/generated/equipment/eva01/mfs/parts/efs2.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/mfs/parts/efs2.png",
+      "sha256": "6396e1ceee04475076a009a01c4a7bd255282ecd7e17659d1fa6765d3bba273c"
+    },
+    "client/assets/generated/equipment/eva01/mfs/icons/armor.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/mfs/icons/armor.png",
+      "sha256": "8087a4097f33f2da549c0c353dfe9ba72b6448ccd0fcbd8f608a7179f1015523"
+    },
+    "client/assets/generated/equipment/eva01/mfs/icons/belt.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/mfs/icons/belt.png",
+      "sha256": "fe54202ae7bfce2afad14618fa264d8c0f0863a885b27f1f3da9b525f33c30f1"
+    },
+    "client/assets/generated/equipment/eva01/mfs/icons/boots.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/mfs/icons/boots.png",
+      "sha256": "8770a6cec391c167f5708f757e4bb3bd619e8c9c932ae36244fcf88ad6187ea7"
+    },
+    "client/assets/generated/equipment/eva01/mfs/icons/hat.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/mfs/icons/hat.png",
+      "sha256": "d0de9f21d2c0b9d54e307b090988c16d0f7a7df79f905ccab05520b0444bef14"
+    },
+    "client/assets/generated/equipment/eva01/mfs/icons/necklace.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/mfs/icons/necklace.png",
+      "sha256": "98df05909d78812f330e76f36b9baeeec71d662fd6f869a3dbc6fdb3154627f9"
+    },
+    "client/assets/generated/equipment/eva01/mfs/icons/pants.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/mfs/icons/pants.png",
+      "sha256": "75c0c61f3a24661fcaa9865185beee149045a613b130bfff7fcaee36a94ef9d9"
+    },
+    "client/assets/generated/equipment/eva01/mfs/icons/pendant.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/mfs/icons/pendant.png",
+      "sha256": "0b5edd109ba71dda8f4252dd06d1192a1cc070f828e5624abf8bfe8d76c9b53e"
+    },
+    "client/assets/generated/equipment/eva01/mfs/icons/ring.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/mfs/icons/ring.png",
+      "sha256": "fa874265cd0c9523e7226dd683689f5f8918a4db60732a33127cc15f63396360"
+    },
+    "client/assets/generated/equipment/eva01/mfs/icons/weapon.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/mfs/icons/weapon.png",
+      "sha256": "f01b1f6b26a95d8b9921588317be255eb02a1d4801b0bc474ceedf21a9e255b3"
+    },
+    "client/assets/generated/equipment/eva01/mfs/icons/wrist.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/mfs/icons/wrist.png",
+      "sha256": "3775fbae89acb4fcabd509526e530062290a0229074fa1d6bf270e5b28a22b3a"
+    },
+    "client/assets/generated/equipment/eva01/wfs/parts/wfst2.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/wfs/parts/wfst2.png",
+      "sha256": "7d76793134fa3871e686d4357764c4a9e66908fdfed17eb8d7e5872c6c98b3f5"
+    },
+    "client/assets/generated/equipment/eva01/wfs/parts/wfs7.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/wfs/parts/wfs7.png",
+      "sha256": "8793a8ecf4873420aee757ee89321b68420692778b07ba573f79f4f8f1d1307d"
+    },
+    "client/assets/generated/equipment/eva01/wfs/parts/wfs7q.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/wfs/parts/wfs7q.png",
+      "sha256": "afd559b9eedcbc91222edfcc47b1d890ba80f9e8f70fdce3049936247554e6ed"
+    },
+    "client/assets/generated/equipment/eva01/wfs/parts/wfs7x.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/wfs/parts/wfs7x.png",
+      "sha256": "ad10afcf072a3692207e2d5b4d5c0df92de49812d811fe2407e07c2709bd1b8f"
+    },
+    "client/assets/generated/equipment/eva01/wfs/parts/efs7.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/wfs/parts/efs7.png",
+      "sha256": "a9649fa308c0e1743eef82c13a0077e792fe8db6e4c772f2a67108b5ad7b41db"
+    },
+    "client/assets/generated/equipment/eva01/wfs/icons/armor.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/wfs/icons/armor.png",
+      "sha256": "8087a4097f33f2da549c0c353dfe9ba72b6448ccd0fcbd8f608a7179f1015523"
+    },
+    "client/assets/generated/equipment/eva01/wfs/icons/belt.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/wfs/icons/belt.png",
+      "sha256": "fe54202ae7bfce2afad14618fa264d8c0f0863a885b27f1f3da9b525f33c30f1"
+    },
+    "client/assets/generated/equipment/eva01/wfs/icons/boots.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/wfs/icons/boots.png",
+      "sha256": "8770a6cec391c167f5708f757e4bb3bd619e8c9c932ae36244fcf88ad6187ea7"
+    },
+    "client/assets/generated/equipment/eva01/wfs/icons/hat.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/wfs/icons/hat.png",
+      "sha256": "d0de9f21d2c0b9d54e307b090988c16d0f7a7df79f905ccab05520b0444bef14"
+    },
+    "client/assets/generated/equipment/eva01/wfs/icons/necklace.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/wfs/icons/necklace.png",
+      "sha256": "98df05909d78812f330e76f36b9baeeec71d662fd6f869a3dbc6fdb3154627f9"
+    },
+    "client/assets/generated/equipment/eva01/wfs/icons/pants.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/wfs/icons/pants.png",
+      "sha256": "75c0c61f3a24661fcaa9865185beee149045a613b130bfff7fcaee36a94ef9d9"
+    },
+    "client/assets/generated/equipment/eva01/wfs/icons/pendant.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/wfs/icons/pendant.png",
+      "sha256": "0b5edd109ba71dda8f4252dd06d1192a1cc070f828e5624abf8bfe8d76c9b53e"
+    },
+    "client/assets/generated/equipment/eva01/wfs/icons/ring.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/wfs/icons/ring.png",
+      "sha256": "fa874265cd0c9523e7226dd683689f5f8918a4db60732a33127cc15f63396360"
+    },
+    "client/assets/generated/equipment/eva01/wfs/icons/weapon.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/wfs/icons/weapon.png",
+      "sha256": "09a41489f033e11242c08e10c4f5aca7be13e148f6c6f69ddcb8497dca18b648"
+    },
+    "client/assets/generated/equipment/eva01/wfs/icons/wrist.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/eva01/wfs/icons/wrist.png",
+      "sha256": "3775fbae89acb4fcabd509526e530062290a0229074fa1d6bf270e5b28a22b3a"
     }
   },
   "overrides": {

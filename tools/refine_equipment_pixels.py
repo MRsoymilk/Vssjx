@@ -11,7 +11,7 @@ import io
 import json
 from pathlib import Path
 
-from PIL import Image
+from PIL import Image, ImageDraw
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / 'analysis/ai-generated/equipment/pixel-refinement'
@@ -45,6 +45,18 @@ EVA = {
     'a75c70': 'b66c83',
 }
 EVA = {colors(key)[0]: colors(value)[0] for key, value in EVA.items()}
+EVA_ROLES = {
+    'ck': {'302336':'211f30', '44324f':'353046', '584267':'534663',
+           '775790':'806493', 'ad8fc1':'b6a0c9', 'd3bddc':'e2d9ec',
+           '90c65a':'76c0a0', 'd4eca0':'c7f1d1', '4c713e':'365c51',
+           'd8a254':'b8c7c4'},
+    'fs': {'302336':'282238', '44324f':'493657', '584267':'6d4f7d',
+           '775790':'986cad', 'ad8fc1':'c79bd9', 'd3bddc':'efd8f1',
+           '90c65a':'91cbb2', 'd4eca0':'d8f4ce', '4c713e':'416956',
+           'd8a254':'dfba7f'},
+}
+EVA_ROLES = {role: {colors(key)[0]: colors(value)[0] for key, value in entries.items()}
+             for role, entries in EVA_ROLES.items()}
 
 
 def digest(path):
@@ -128,7 +140,7 @@ def refine_tile(tile, family, stem, kind, native=None):
                 if native is not None and pixel == native.getpixel((x, y)):
                     continue
             if family == 'eva01':
-                color = EVA.get(pixel, pixel)
+                color = EVA_ROLES.get(stem[1:], {}).get(pixel, EVA.get(pixel, pixel))
             else:
                 ramp = material(pixel, family, stem, kind == 'head')
                 light = luma(pixel)
@@ -161,6 +173,134 @@ def refine_part(image, row, part, source, native_parts):
     return result
 
 
+def eva_icon(stem, slot):
+    """Authored 32px silhouettes: plate, light leather and long ritual robes.
+
+    Palette and jade motifs match the worn outfit. Draw directly on the icon
+    grid so shoulders, clasps and gems remain readable at backpack scale.
+    """
+    image = Image.new('RGBA', (32, 32))
+    draw = ImageDraw.Draw(image)
+    role = stem[1:]; female = stem.startswith('w')
+    def shade(key):
+        pixel = colors(key)[0]
+        return EVA_ROLES.get(role, {}).get(pixel, EVA.get(pixel, pixel))
+    ink, dark, mid, light, pearl = [shade(key) for key in ('302336','44324f','775790','ad8fc1','d3bddc')]
+    jade, green, gleam, gold = [shade(key) for key in ('4c713e','90c65a','d4eca0','d8a254')]
+    def shape(points, fill):draw.polygon(points, fill=fill, outline=ink)
+    def line(points, fill, width=1):draw.line(points, fill=fill, width=width)
+    def gem(x, y, radius=3):
+        shape([(x,y-radius-1),(x+radius,y),(x,y+radius+1),(x-radius,y)], gold)
+        draw.polygon([(x,y-radius),(x+radius-1,y),(x,y+radius),(x-radius+1,y)],fill=jade)
+        line([(x,y-radius+1),(x-radius+1,y),(x,y)],green)
+        draw.point((x,y-radius+1),fill=gleam)
+
+    if slot == 'armor':
+        if role == 'zs':
+            shape([(10,4),(14,7),(18,7),(22,4),(28,9),(26,16),(23,15),
+                   (22 if female else 24,27),(18,29),(16,25),(14,29),(8 if female else 7,27),
+                   (9,15),(5,16),(3,9)],dark)
+            shape([(5,9),(10,5),(13,9),(11,14),(5,13)],mid)
+            shape([(19,9),(22,5),(26,9),(25,13),(21,14)],mid)
+            line([(5,9),(10,6),(12,9)],pearl);line([(21,8),(23,7),(26,10)],light)
+            shape([(11,11),(16,13),(21,11),(20,19),(16,21),(12,19)],mid)
+            line([(12,12),(15,14),(15,18)],light);line([(17,14),(20,12)],pearl)
+            shape([(11,21),(15,21),(14,27),(9,26)],mid)
+            shape([(17,21),(21,21),(23,26),(18,27)],mid)
+            line([(10,25),(13,23)],green);line([(19,23),(21,25)],green)
+        elif role == 'ck':
+            shape([(11,4),(15,7),(20,4),(25,9),(23,14),(21,13),(21,19),
+                   (25,28),(18,26),(16,22),(13,28),(6,28),(10,18),(10,13),(7,14),(6,9)],dark)
+            shape([(10,7),(14,9),(14,18),(11,20),(8,11)],mid)
+            shape([(17,8),(20,6),(23,10),(20,15),(19,19),(16,18)],mid)
+            line([(10,7),(13,10),(13,17)],pearl);line([(19,7),(17,11),(17,17)],green)
+            shape([(11,21),(15,21),(12,26),(8,26)],mid)
+            line([(18,21),(21,25)],light)
+            if female:line([(22,10),(24,11)],green)
+        else:
+            shape([(11,4),(15,6),(19,4),(23,8),(29,15),(24,18),(21,14),
+                   (24,29),(8,29),(11,14),(7,18),(2,15),(8,8)],dark)
+            shape([(9,8),(12,10),(9,14),(6,16),(4,14)],mid)
+            shape([(20,9),(23,9),(27,14),(24,16),(21,12)],mid)
+            shape([(13,9),(18,8),(20,19),(17,27),(10,27)],mid)
+            line([(12,6),(16,10),(19,6)],gold)
+            line([(13,10),(16,13),(18,11)],pearl)
+            line([(12,21),(10,27),(15,27)],green)
+            line([(20,20),(22,27)],light)
+            line([(5,14),(7,16),(10,12)],green)
+        line([(11,20),(21,20)],gold);gem(16,20,2)
+    elif slot == 'hat':
+        # Small jade hair ornaments, matching the visible crest rather than a helmet.
+        if role == 'zs':
+            shape([(5,17),(7,10),(11,14),(15,6),(20,14),(25,10),(26,17),(22,22),(9,22)],dark)
+            line([(7,16),(11,18),(21,18),(25,15)],gold,2)
+            line([(9,20),(22,20)],light);gem(16,14,4 if not female else 3)
+            line([(8,12),(10,15)],green);line([(23,12),(22,15)],green)
+        elif role == 'ck':
+            shape([(7,21),(8,12),(13,16),(17,5),(20,7),(20,15),(25,10),(27,13),(23,21)],dark)
+            line([(10,18),(16,8),(17,13),(22,10)],pearl)
+            line([(9,22),(24,22)],gold);gem(16 if not female else 18,18,3)
+            line([(11,23),(10,27)],jade);draw.point((10,26),fill=gleam)
+        else:
+            shape([(6,19),(9,11),(15,7),(21,10),(25,18),(21,22),(10,22)],dark)
+            line([(8,17),(11,12),(16,10),(21,13),(23,18)],gold)
+            gem(16,15,4)
+            for x in (10,22):
+                line([(x,22),(x,27)],gold);draw.rectangle((x-1,25,x+1,27),fill=green)
+            if female:line([(7,20),(5,24)],light)
+    elif slot == 'wrist':
+        for x,y in ((4,6),(18,12)):
+            shape([(x,y),(x+8,y-2),(x+10,y+3),(x+8,y+12),(x+3,y+14),(x-1,y+9)],dark)
+            shape([(x+1,y+2),(x+7,y),(x+7,y+9),(x+3,y+11)],mid)
+            line([(x+1,y+2),(x+6,y)],pearl)
+            line([(x+1,y+5),(x+8,y+3)],green,2)
+            line([(x+3,y+10),(x+6,y+9)],gold)
+    elif slot == 'belt':
+        shape([(3,10),(9,8),(23,8),(29,10),(27,19),(20,21),(11,20),(4,18)],dark)
+        line([(5,11),(11,10),(22,10),(27,12)],light)
+        line([(5,17),(12,18),(23,18),(27,16)],gold)
+        shape([(12,19),(17,20),(15,29),(11,27)],mid)
+        line([(13,22),(13,27)],green);gem(17,15,4)
+    elif slot == 'pants':
+        shape([(8,4),(24,4),(25,14),(27,27),(18,29),(16,17),(14,28),(5,27),(7,14)],dark)
+        shape([(9,8),(14,8),(14,16),(11,26),(7,25)],mid)
+        shape([(18,8),(22,8),(23,15),(25,26),(20,27)],mid)
+        line([(9,10),(9,16),(8,24)],light);line([(21,10),(21,16),(23,24)],green)
+        line([(9,6),(23,6)],gold);draw.point((16,6),fill=gleam)
+    elif slot == 'boots':
+        for x,y in ((4,4),(17,9)):
+            shape([(x+2,y),(x+10,y),(x+9,y+11),(x+12,y+15),(x+10,y+18),(x-1,y+18),(x-2,y+14),(x+2,y+10)],dark)
+            shape([(x+3,y+3),(x+8,y+3),(x+7,y+12),(x+1,y+14)],mid)
+            line([(x+3,y+4),(x+3,y+10)],light)
+            line([(x+2,y+2),(x+9,y+2)],green,2)
+            line([(x,y+15),(x+8,y+15),(x+10,y+16)],gold)
+            line([(x,y+17),(x+8,y+17)],pearl)
+    elif slot == 'ring':
+        draw.ellipse((5,8,26,29),fill=ink)
+        draw.ellipse((6,9,25,28),fill=gold)
+        draw.ellipse((9,12,22,25),fill=dark)
+        draw.ellipse((11,13,21,24),fill=(0,0,0,0))
+        draw.arc((6,9,25,28),75,210,fill=pearl,width=2)
+        shape([(14,4),(23,4),(27,9),(23,15),(15,14),(11,9)],mid)
+        gem(19,9,4);draw.point((7,17),fill=gleam)
+    elif slot == 'pendant':
+        line([(13,3),(16,6),(19,3)],gold,2)
+        draw.ellipse((13,6,19,11),outline=light)
+        shape([(16,10),(24,17),(16,25),(8,17)],mid)
+        gem(16,17,5);line([(16,25),(16,29)],gold)
+        line([(14,26),(13,29)],jade);line([(18,26),(19,29)],green)
+    elif slot == 'necklace':
+        line([(5,6),(4,12),(7,19),(12,23),(20,23),(25,19),(28,12),(27,6)],ink,3)
+        line([(5,6),(5,12),(8,18),(13,22),(19,22),(24,18),(27,12),(27,6)],gold)
+        for x,y in ((5,9),(6,14),(9,19),(23,19),(26,14),(27,9)):
+            draw.rectangle((x-1,y-1,x+1,y+1),fill=mid)
+            draw.point((x-1,y-1),fill=pearl)
+        gem(16,23,4)
+    else:
+        raise ValueError(slot)
+    return image
+
+
 def snapshot(selected, all_sets):
     path = DATA/'baseline.json'
     data = json.loads(path.read_text('utf8')) if path.exists() else {'textures': {}, 'overrides': {}}
@@ -189,7 +329,8 @@ def build(selected, all_sets, check=False):
     baseline = json.loads((DATA/'baseline.json').read_text('utf8'))
     report_path = DATA/'refinement.json'
     report = json.loads(report_path.read_text('utf8')) if report_path.exists() else {'sets': [], 'textures': {}, 'overrides': {}}
-    native_parts = json.loads((ROOT/'client/assets/data/hero-parts.json').read_text('utf8'))['parts']
+    native = json.loads((ROOT/'client/assets/data/hero-parts.json').read_text('utf8'))
+    native_parts = native['parts']
     overrides = saved_overrides()
     override_text = OVERRIDES.read_text('utf8')
     family_reports = {}
@@ -220,7 +361,9 @@ def build(selected, all_sets, check=False):
             key = path.relative_to(ROOT).as_posix(); record = baseline['textures'][key]
             assert digest(ROOT/record['input']) == record['sha256']
             image = Image.open(ROOT/record['input']).convert('RGBA')
-            pending[key] = refine_tile(image, family, stem, 'icon')
+            pending[key] = (eva_icon(stem, path.stem)
+                            if family == 'eva01' and path.stem != 'weapon'
+                            else refine_tile(image, family, stem, 'icon'))
         if set_id not in report['sets']:
             report['sets'].append(set_id)
         family_reports[family] = json.loads((ROOT/f'analysis/ai-generated/equipment/{family}/runtime-import-report.json').read_text('utf8'))

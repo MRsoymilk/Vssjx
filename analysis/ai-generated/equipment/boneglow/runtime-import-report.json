@@ -15,7 +15,7 @@
       ]
     ],
     "path": "res://assets/generated/equipment/boneglow/mzs/parts/mzst2.png",
-    "sha256": "e2b425afc771e0574d086992b4f25cc41ff133f0defd445ab925ddd02d070770"
+    "sha256": "50f645a06beef77bf95f90d8b12992162ae43ad72d0780da0bc0e2cb0359587c"
   },
   {
     "native_frames": [
@@ -39,7 +39,7 @@
       ]
     ],
     "path": "res://assets/generated/equipment/boneglow/mzs/parts/mzs1.png",
-    "sha256": "73595becb3bde47f659bc6758280071d2be27bd39659767554572884050f7d99"
+    "sha256": "c97873563942586608e3dd174cdeba1368204323687a4432d53ec7a534bde75c"
   },
   {
     "native_frames": [
@@ -63,7 +63,7 @@
       ]
     ],
     "path": "res://assets/generated/equipment/boneglow/mzs/parts/mzs1q.png",
-    "sha256": "e4ae38f24861bfc002b263033f5f730ce7420437fa191ea3ba9147abbb677dc4"
+    "sha256": "037890fc9dafc0cfb404c0d7c8e342112f23856014cd05e355e2fb02ec349b15"
   },
   {
     "native_frames": [
@@ -105,7 +105,7 @@
       ]
     ],
     "path": "res://assets/generated/equipment/boneglow/mzs/parts/mzs1x.png",
-    "sha256": "697c7407b53c2153ac7f87bf94f22a39d6f707b602c0bf9b69e41676e47a6f76"
+    "sha256": "b2c8b61a273d400cc0cf90af8f5584905b8088ea90b012538044d95fd6493c79"
   },
   {
     "native_frames": [
@@ -123,56 +123,56 @@
       ]
     ],
     "path": "res://assets/generated/equipment/boneglow/mzs/parts/ezs14.png",
-    "sha256": "93823c0f98a4e8009a05b9fca483818678ed324659d3066e4df5a2943eea33e2"
+    "sha256": "bf319b93ee5e73e8d8947951c12f88a21deff386201e969d53e9d917f1f53586"
   },
   {
     "path": "res://assets/generated/equipment/boneglow/mzs/icons/weapon.png",
-    "sha256": "d2e6161b32f0bc18b476517dfb4a66d613f30c51220278a523444e3f4591e066",
+    "sha256": "575df1025567b86d5e8910b45cb57b4e40a4e4e3c53dad862bbb319b9a1cda99",
     "source_cell": 4
   },
   {
     "path": "res://assets/generated/equipment/boneglow/mzs/icons/hat.png",
-    "sha256": "134b6830c8bd67e189909ba50a0c8ed51bbf4efe98be9153fc4e919df49b1787",
+    "sha256": "8dd2948408b41c0c4a0e4cf49805ef976b4b76382111bf91dd3c7e2aaefe7750",
     "source_cell": 5
   },
   {
     "path": "res://assets/generated/equipment/boneglow/mzs/icons/armor.png",
-    "sha256": "6511bf20708a01b013daf4ea7e927662940741a54ee8f4184810bef48d3093d2",
+    "sha256": "9244c4e453eb9f3a01d3625d7e002200e7a0fad10ab16b971ffca6802e3d0bb5",
     "source_cell": 6
   },
   {
     "path": "res://assets/generated/equipment/boneglow/mzs/icons/wrist.png",
-    "sha256": "4146f1196e53c653adf2420fdbf138ea90c5d8566c029560fee244da61126bdf",
+    "sha256": "df65967fd1156e9dbfa5769ec72dfb2671182dfabeb380193ddbf4e9905ae4bb",
     "source_cell": 7
   },
   {
     "path": "res://assets/generated/equipment/boneglow/mzs/icons/belt.png",
-    "sha256": "4d57b34eb2b54bad8ac4c0f364415cc59c21fb7ca6a9a59c9987c9586751edc2",
+    "sha256": "92411cb7afd027f2684529a6ea5486635c42523987ff159f6848f24ae271ae52",
     "source_cell": 8
   },
   {
     "path": "res://assets/generated/equipment/boneglow/mzs/icons/pants.png",
-    "sha256": "79b80addae7c5c135420d02051519af5ab1dc3769c9eb813317b1926e8cec84b",
+    "sha256": "c96e16f8632431422d4410130cdd30bdb9e9483e3b602e165616f77bf650d4a7",
     "source_cell": 9
   },
   {
     "path": "res://assets/generated/equipment/boneglow/mzs/icons/boots.png",
-    "sha256": "82a0c3a77420cca01b869d17357b468369964d35342ae49f0d75367b882f782e",
+    "sha256": "fc6b7b654db684f3d407ccdbf6f80da046d084a776cd4ac583ea8be8fa7ca494",
     "source_cell": 10
   },
   {
     "path": "res://assets/generated/equipment/boneglow/mzs/icons/pendant.png",
-    "sha256": "fcbbf608355bde309b58664e5c7eac0108cd081167d542206c9b6a7c10ff7e85",
+    "sha256": "754499cb4fc6e586d21f13f100d3597124a2a3a226cb28cd5795b6aba95c18e2",
     "source_cell": 11
   },
   {
     "path": "res://assets/generated/equipment/boneglow/mzs/icons/ring.png",
-    "sha256": "e3f81b7a802cc57b4df3f471a9a965703b06e26e96159f1a64db7859e41bdc62",
+    "sha256": "aa58e7b7e7cef4fdfc407be0e8f6f28b24f4b8a6a99575337449df0cc88d4e18",
     "source_cell": 12
   },
   {
     "path": "res://assets/generated/equipment/boneglow/mzs/icons/necklace.png",
-    "sha256": "c9df4d9114f2dc97c09263952245c58307b0aaeb6b1ea9fa434af03c2790a824",
+    "sha256": "e6b1d9348c5e59887595274a7ff393e8cdb84fda55a48d68fd95ef51af1e8e11",
     "source_cell": 13
   },
   {
@@ -367,7 +367,7 @@
       ]
     ],
     "path": "res://assets/generated/equipment/boneglow/mck/parts/mckt2.png",
-    "sha256": "26b60021d28a3c4584e8ae5399f977511d21613ffd9933b269863ad85a54fdc4"
+    "sha256": "9edc583b9efddb1d1421c6adbc4385cb4b5871a558b4c4e5bc1e39fb4dc7014b"
   },
   {
     "native_frames": [
@@ -385,7 +385,7 @@
       ]
     ],
     "path": "res://assets/generated/equipment/boneglow/mck/parts/mck1.png",
-    "sha256": "f6f2513eb9392728d993ad51dea007854f63c4428a564af5bee8d2b221434f9e"
+    "sha256": "79eae2c955227e081c8453673867ad43c4a038d749851e222661de31fa6ce9b8"
   },
   {
     "native_frames": [
@@ -433,7 +433,7 @@
       ]
     ],
     "path": "res://assets/generated/equipment/boneglow/mck/parts/mck1q.png",
-    "sha256": "293163ded75603fc43038b1c2cbd88f171e89f48b393a1673a53e8c2495ad678"
+    "sha256": "e12e22400f0088722c5db74b5f73d083bf0467e2e38be649510c4f72b56d830f"
   },
   {
     "native_frames": [
@@ -475,7 +475,7 @@
       ]
     ],
     "path": "res://assets/generated/equipment/boneglow/mck/parts/mck1x.png",
-    "sha256": "2b024d5bb362edf4f0f5270c4ac25564480cf14c1fe1087265fceadc4aacbf75"
+    "sha256": "b064ffcdb8c684c73d6a3a57735cc2ec8f89bf6c7d998c0a34d7118690611584"
   },
   {
     "native_frames": [
@@ -493,56 +493,56 @@
       ]
     ],
     "path": "res://assets/generated/equipment/boneglow/mck/parts/eck1.png",
-    "sha256": "cf53f0e5b43ca0644c86bc7ebe1c3a43a160eb0d7a2a7ff8f345adf27b0e1bfe"
+    "sha256": "61c2d7e6738adcf25c5a8facdc4d3683d504a7c79ad713016a5c8c2f0c0f38d5"
   },
   {
     "path": "res://assets/generated/equipment/boneglow/mck/icons/weapon.png",
-    "sha256": "d823735489e1618a54a15f662ccb7d98657d02ba24d269fe69cbaaee454cab5a",
+    "sha256": "7cbfb310bfbd05ba8b7499ee1338a4c20d1a15c1a9b3ec96103c31a72814ec66",
     "source_cell": 4
   },
   {
     "path": "res://assets/generated/equipment/boneglow/mck/icons/hat.png",
-    "sha256": "7ce7793a3a403a5e3ed6604d3375c2f7084cb11d44ea89552bdb2aa4c27c5531",
+    "sha256": "52c9340bbbb43f403a4810bca759fe6812970ce8af6af36ef2329ce9e38368af",
     "source_cell": 5
   },
   {
     "path": "res://assets/generated/equipment/boneglow/mck/icons/armor.png",
-    "sha256": "5982df0826d55478729617199c16834f914fdda00d2a1754234165f3602b31d0",
+    "sha256": "6a95ad0e4a26f90f47655676cb1cda90bbc281a020296707ef33e34289d2ced7",
     "source_cell": 6
   },
   {
     "path": "res://assets/generated/equipment/boneglow/mck/icons/wrist.png",
-    "sha256": "e098317296855b9dd932b346bb777e7d7d2c60ab0776aab9739bc27cde4069b3",
+    "sha256": "225759b200e750eec30ded882b96e4ab9e7b7177ebb82ba430c3642c965dc4cb",
     "source_cell": 7
   },
   {
     "path": "res://assets/generated/equipment/boneglow/mck/icons/belt.png",
-    "sha256": "2deaf76ea229168d30a6bd6e66007da649606c456e659abc7b5ce415c8a0af37",
+    "sha256": "13e0d60c5c899f0fe81ca7587fdf155d0c89968fd4e69d35775390a76958897f",
     "source_cell": 8
   },
   {
     "path": "res://assets/generated/equipment/boneglow/mck/icons/pants.png",
-    "sha256": "379295ce843201bed5e995b00fddc5e564ef3664871edb47db7d6a6928614520",
+    "sha256": "8b78f5a70c06f465f04dffe5abeb9c68cd4940553c2646ff4cd86be0d88c2273",
     "source_cell": 9
   },
   {
     "path": "res://assets/generated/equipment/boneglow/mck/icons/boots.png",
-    "sha256": "39a1ae5e88ddbc9e341169a9cf67b3664de9b0cef9f1fe918c09f303421cdf44",
+    "sha256": "790ee70abc6777cbdb90ada0e23b3232d552e11979b57eb9d4084d3663f3e91d",
     "source_cell": 10
   },
   {
     "path": "res://assets/generated/equipment/boneglow/mck/icons/pendant.png",
-    "sha256": "2b4de48aa54e5babc08d5d4e4e35afd62dabfcd71641a7ebbca317c797e6727e",
+    "sha256": "7dba5268b61e8f955534d94fb9ac33dc6cc88095813042fdc3556abe0467f364",
     "source_cell": 11
   },
   {
     "path": "res://assets/generated/equipment/boneglow/mck/icons/ring.png",
-    "sha256": "5058c28eab7dde1622f86020062515e2639cea6c1c3a9ab4ee307389a62d6de3",
+    "sha256": "71b46d2c8b1ba1b9bbac32f0384d9b7284a40b7bbfd9e8efba579b451c13a98a",
     "source_cell": 12
   },
   {
     "path": "res://assets/generated/equipment/boneglow/mck/icons/necklace.png",
-    "sha256": "2034941de6902346a35a15f03b76d9037e74062a37a5ef7e5f1d3674613db167",
+    "sha256": "81ff94d8f3bd3445a9b09b9eb131e6ee65e72bab4e389af7e3c19c7bae7318db",
     "source_cell": 13
   },
   {
@@ -561,7 +561,7 @@
       ]
     ],
     "path": "res://assets/generated/equipment/boneglow/wck/parts/wckt2.png",
-    "sha256": "863d633bef4d4f9d54a339191b0763fef78d3e23364d385ebdc6f9705de6b8b3"
+    "sha256": "ce24d212d720761f5f63846dbda1665a43f660140e8b5b39ca66421a208625c9"
   },
   {
     "native_frames": [
@@ -579,7 +579,7 @@
       ]
     ],
     "path": "res://assets/generated/equipment/boneglow/wck/parts/wck1.png",
-    "sha256": "d9f238143d6039f796108bc9a52f7fc8b505ab2c961305f2f44fcd230b9529ed"
+    "sha256": "749a1930feb68f8bc354d0b507e518911845b52a72a50ba2b591c57f9cdba201"
   },
   {
     "native_frames": [
@@ -603,7 +603,7 @@
       ]
     ],
     "path": "res://assets/generated/equipment/boneglow/wck/parts/wck1q.png",
-    "sha256": "79dd5439e899e54e020da9230839d0ec67750bcf6597b8f4c3f5e701b80fbb94"
+    "sha256": "c967b7be0fb66387bb92e7db61958addfde8452aeb4fd0374e8916397ece0634"
   },
   {
     "native_frames": [
@@ -645,7 +645,7 @@
       ]
     ],
     "path": "res://assets/generated/equipment/boneglow/wck/parts/wck1x.png",
-    "sha256": "0c07b2d8d405d5ebc41e84a1a8641c1a8167483f430ae58241492b9221659ff4"
+    "sha256": "b4b19848d0b1d759d79194af5200ec0e6b0a2c1bf7ac3c493a71d5310a980dc3"
   },
   {
     "native_frames": [
@@ -663,60 +663,60 @@
       ]
     ],
     "path": "res://assets/generated/equipment/boneglow/wck/parts/eck1.png",
-    "sha256": "3e4b6d86f501d3cfd152a92e68a675685b9ef6c284b8e9eca7aba081f8ddb41f"
+    "sha256": "674d950d3193e21e07a2fe5b068f95f8428f72adf5447c4336f4dc56c0f3af16"
   },
   {
     "path": "res://assets/generated/equipment/boneglow/wck/icons/weapon.png",
     "removed_border_pixels": 407,
-    "sha256": "c2e967ad2146d93c9984726edbb19452246375ba77ea976b11cc78a76dfc484c",
+    "sha256": "525bd691db2acc23e748ec007214d726ff7e8b827136276ec9aaaf2d476d56b3",
     "source_cell": 4
   },
   {
     "path": "res://assets/generated/equipment/boneglow/wck/icons/hat.png",
     "removed_border_pixels": 421,
-    "sha256": "2eac0a2b2d771b22024745a5f56bb2b893d618cc9d9f1e4057d030b254e0796a",
+    "sha256": "597ca42d9387ea39b53cc65410dfde7cbe970967918d4e28159317c0a1eb2f96",
     "source_cell": 5
   },
   {
     "path": "res://assets/generated/equipment/boneglow/wck/icons/armor.png",
     "removed_border_pixels": 761,
-    "sha256": "d5cad6528e84ff41a092ff8dd7091a9e93b88570559c6b52df3867a777b6316a",
+    "sha256": "1e70339eee04ce62bee7d4566e7e5007f71fa819bf249d52db92795c2ec298d5",
     "source_cell": 6
   },
   {
     "path": "res://assets/generated/equipment/boneglow/wck/icons/wrist.png",
     "removed_border_pixels": 211,
-    "sha256": "a1e86041c739b3ef8a9510bcfc115aa017ab46caf943d289cad934baed636ce8",
+    "sha256": "d89160e42be65ed2326db5db5c96a4a791d98f6231e28a87a8cd27d3ba7d80b8",
     "source_cell": 7
   },
   {
     "path": "res://assets/generated/equipment/boneglow/wck/icons/belt.png",
-    "sha256": "0b564ef69560cbf046500704a87c50eeeed1257d1dc1790d3b5177be830a6346",
+    "sha256": "b407455762bed647ee37d6bbae116995278491ca3bc5b533c079bd382c14950e",
     "source_cell": 8
   },
   {
     "path": "res://assets/generated/equipment/boneglow/wck/icons/pants.png",
-    "sha256": "0f89c48f349a13e548e4b5c27aaeccd4f5b3f1e5d2840ad2e53429d6981ee83e",
+    "sha256": "9b4606bc4a670535127eeb6e097fa5aab3d2b72cf61a1d95a908eb65b0300c3e",
     "source_cell": 9
   },
   {
     "path": "res://assets/generated/equipment/boneglow/wck/icons/boots.png",
-    "sha256": "2ca1864de5245e797a1346120403a070a7fe1b301aa19b990cfd6cfb42134bc8",
+    "sha256": "1f819f41476d3b38686cf887a31c0e28d3f914616b2e6fdfc2c66990785abaf4",
     "source_cell": 10
   },
   {
     "path": "res://assets/generated/equipment/boneglow/wck/icons/pendant.png",
-    "sha256": "3faefb4c2f44b14bb42bd852452b170454cfa9f5fa8b95889ec9b0a977de321b",
+    "sha256": "f2fd405be6a28bae433df359a77aed966a69f023bd58d5d19f443e678538c2a0",
     "source_cell": 11
   },
   {
     "path": "res://assets/generated/equipment/boneglow/wck/icons/ring.png",
-    "sha256": "342c18c9729df9f59c718da3a13e4881f3de9f8f729548936ec32fe5b3707b9b",
+    "sha256": "a7528a14a7d67551a88f49916a5778c1d89d7be181d059c43b4f6281d5c89327",
     "source_cell": 12
   },
   {
     "path": "res://assets/generated/equipment/boneglow/wck/icons/necklace.png",
-    "sha256": "0fa79489df248a81235a2e33342929d72f457b21bca0e9c179b3cb9b311c20f1",
+    "sha256": "939983f24f68c8c3689aae113ddd486e8510bf19763d52d4ba43381af5c33d4f",
     "source_cell": 13
   },
   {
@@ -735,7 +735,7 @@
       ]
     ],
     "path": "res://assets/generated/equipment/boneglow/mfs/parts/mfst3.png",
-    "sha256": "0f2a2d9bff785ae22bd7fdb0735cb02fef87ded26b95a2f9407f85d8bf1dbf64"
+    "sha256": "a7f6706a05cd7d64b8a3420c28f10eeeb0997ff6e3e3dbad37a5a362b72beda5"
   },
   {
     "native_frames": [
@@ -759,7 +759,7 @@
       ]
     ],
     "path": "res://assets/generated/equipment/boneglow/mfs/parts/mfs2.png",
-    "sha256": "822ea3d1d9e894671e9c0a9dc5f916044cf5ccf27f64bdeb99fccc13a3b529d6"
+    "sha256": "409ab4fbc5b6c181f2719dda36594b128c232debe2a096a02fec363df8983727"
   },
   {
     "native_frames": [
@@ -783,7 +783,7 @@
       ]
     ],
     "path": "res://assets/generated/equipment/boneglow/mfs/parts/mfs2q.png",
-    "sha256": "97036259be438ae52c818c9289d9fe91fa909c0963c51e17df2c6260adb19545"
+    "sha256": "b854f4116976b87a48fe5dccc64808be7d553cf8676b49190e432470220b363d"
   },
   {
     "native_frames": [
@@ -825,7 +825,7 @@
       ]
     ],
     "path": "res://assets/generated/equipment/boneglow/mfs/parts/mfs2x.png",
-    "sha256": "efdbfe9de4561b04b3e7c3996404c363bb500974f64904113a6e618239340fc8"
+    "sha256": "62d1a34a97fdcfded1f2b6dfd7fe3e8c42c03fdda7aae8944c4fa2ba42da8f1f"
   },
   {
     "native_frames": [
@@ -843,56 +843,56 @@
       ]
     ],
     "path": "res://assets/generated/equipment/boneglow/mfs/parts/efs2.png",
-    "sha256": "bcd22357a73d9c0fb894d3654d1e1657201de351e59d0782322117561d53b207"
+    "sha256": "89a1adeda8f5bdb443ea3fecc07a9b5719a9d85ee82cb01af67a5f9218c04c36"
   },
   {
     "path": "res://assets/generated/equipment/boneglow/mfs/icons/weapon.png",
-    "sha256": "df13e5116af84ae3ce204bbd722312c396ffcd11124f528ba7d84f756b680769",
+    "sha256": "4a20d03a6de6d1a7774e0a81b3070730ebcd61049c6397c68943ca0c6e0f4774",
     "source_cell": 4
   },
   {
     "path": "res://assets/generated/equipment/boneglow/mfs/icons/hat.png",
-    "sha256": "e229421cc19c7e55494eb52c307d83f719907a1b02d8761c98be6b2aaa0874e6",
+    "sha256": "b68b6b117c2ecf3ae14a8757ed05f0dd9cf9f7ba4385d9c64ec5e34ccd55f966",
     "source_cell": 5
   },
   {
     "path": "res://assets/generated/equipment/boneglow/mfs/icons/armor.png",
-    "sha256": "f4cb5b9c651937c195dea68163c44eacd2964161f39494eeeada005de92f3ed2",
+    "sha256": "1700da770400fbfa6b199a54113082fa22c21d08919f091e1ba63fbcd1062cf4",
     "source_cell": 6
   },
   {
     "path": "res://assets/generated/equipment/boneglow/mfs/icons/wrist.png",
-    "sha256": "ceff225036e1156014d31255096e0f681260963966aa8cb9c43e7224871c5ca4",
+    "sha256": "1c90e70173e7031702a4048b74912d97a38039c0f60bbd5e0bff77d13e318323",
     "source_cell": 7
   },
   {
     "path": "res://assets/generated/equipment/boneglow/mfs/icons/belt.png",
-    "sha256": "37709c3f526ae04685773efa96e2a6c328a4e2524e37a42324964b5ceae02dc9",
+    "sha256": "3ce61c5c01d0ca744479422b69e897c86fcb224cae80bf1c202fca272b02b18d",
     "source_cell": 8
   },
   {
     "path": "res://assets/generated/equipment/boneglow/mfs/icons/pants.png",
-    "sha256": "a5482f0c5703aecf6816b38428481c5e72ab190f23e80081fc9f1605e2feb3c5",
+    "sha256": "7dec4476726b363bd6db653424e3d563d6c6314e288f864a234203bdeee713d4",
     "source_cell": 9
   },
   {
     "path": "res://assets/generated/equipment/boneglow/mfs/icons/boots.png",
-    "sha256": "528250148a15da540e59e017eef2e86e9b6c67954c2a9488e301f5bb65d675c4",
+    "sha256": "d7a96eb2d23c488557accc827145cedaf3abf5463cf600fa73396935a2e2d360",
     "source_cell": 10
   },
   {
     "path": "res://assets/generated/equipment/boneglow/mfs/icons/pendant.png",
-    "sha256": "2f674d6509dd280b503edf1c3392b6e758a6162dad1d93f43be7316b6a7bfc54",
+    "sha256": "5d55ff277f58729bca5ce62197eadf60249dc2988bb29e7b4297283114a45b59",
     "source_cell": 11
   },
   {
     "path": "res://assets/generated/equipment/boneglow/mfs/icons/ring.png",
-    "sha256": "b900bcdf84ef398f9f9ec820f5877a4859b756d6a44f39a1f2679440359f5ed2",
+    "sha256": "dd8cdaaa0d6435b28dbbc9053f4c7af7de8c3da44fe117b91e06d162b1c2c4d9",
     "source_cell": 12
   },
   {
     "path": "res://assets/generated/equipment/boneglow/mfs/icons/necklace.png",
-    "sha256": "d3a86ea92fce1bdd6c6bbd45274e15ba6f6b94d63815e054f07b3b9041404fa7",
+    "sha256": "57072c50a34fe7c24c9005dc8451662e7da1822173e6a75cd57d6f1f7e0bcc97",
     "source_cell": 13
   },
   {
@@ -911,7 +911,7 @@
       ]
     ],
     "path": "res://assets/generated/equipment/boneglow/wfs/parts/wfst3.png",
-    "sha256": "21c228ea668845c98686c13f7909ea23f7a9294ca5999766d779ce7cacdf4f7b"
+    "sha256": "d163a50054251216b82c0bcfaef8381c660988c5c977fd5c6041aa2ef2438ae5"
   },
   {
     "native_frames": [
@@ -935,7 +935,7 @@
       ]
     ],
     "path": "res://assets/generated/equipment/boneglow/wfs/parts/wfs2.png",
-    "sha256": "95f705e9eac96e54c37afa78bc9b80e50936594033c3f41d95c14e7eb856843d"
+    "sha256": "ae970b7ecc6b2003b4038dfa663d03bbc9e260555d2d71a8b45811eaf8a9ce07"
   },
   {
     "native_frames": [
@@ -965,7 +965,7 @@
       ]
     ],
     "path": "res://assets/generated/equipment/boneglow/wfs/parts/wfs2q.png",
-    "sha256": "29fe3b4e570c1cc44a4456f1809589f0a3a064a75f02703c1ef0c971f684f929"
+    "sha256": "d8d404cabb3de96b257ae94c528a811c17f2f4064d677d4e692be62e2fc2d912"
   },
   {
     "native_frames": [
@@ -1007,7 +1007,7 @@
       ]
     ],
     "path": "res://assets/generated/equipment/boneglow/wfs/parts/wfs2x.png",
-    "sha256": "8dfbb371eb8df4fc51c02df1796e90fbf98a70c3326dee21a7f03c1a3b155a65"
+    "sha256": "8b754c5eedfe9291a2921c93d4a64313ac525581b8bb6eaa66c13125fdf103c5"
   },
   {
     "native_frames": [
@@ -1025,56 +1025,56 @@
       ]
     ],
     "path": "res://assets/generated/equipment/boneglow/wfs/parts/efs2.png",
-    "sha256": "a75a6f0682e00f846b000d8794678223981f01c8a98a6445bd7b8aa376d66fee"
+    "sha256": "7741c9f268087530c37393877ddca1a9b54f3edea4e9b2cb8b29421bec8fc425"
   },
   {
     "path": "res://assets/generated/equipment/boneglow/wfs/icons/weapon.png",
-    "sha256": "03ab636c1cc3cdd6d74ede09cdeaa43b80c472ff331100b421de0d6fd828c321",
+    "sha256": "b25dfdbc3b453738704a3c351036578f0bb8e01ebd025de5f05c0f27ff9968db",
     "source_cell": 4
   },
   {
     "path": "res://assets/generated/equipment/boneglow/wfs/icons/hat.png",
-    "sha256": "6b33c393830c04f28f15969128ca8c7fd8883e50f97055b1f4534bdf0aee6175",
+    "sha256": "497e10aed2d68f0c052f04bd52d3d9dfc921879d5dd39be5ba7cf05d6ce85324",
     "source_cell": 5
   },
   {
     "path": "res://assets/generated/equipment/boneglow/wfs/icons/armor.png",
-    "sha256": "f82e04fcc177738d8e2ffdf91eff018d4d333f94e2ff2351d2c975b320aa7302",
+    "sha256": "e93bd26067c3f6cb39f10a3b896db1785dc75a7230c409b34aa0321d74b7927f",
     "source_cell": 6
   },
   {
     "path": "res://assets/generated/equipment/boneglow/wfs/icons/wrist.png",
-    "sha256": "9f7a60c6a30889ecf11dd1f2b028338749b59d5ef58e0fe7e1c7e24a53df67eb",
+    "sha256": "7ff00f9fd46f79fc36b3be9baacbcff647e95fc525fa3b02fae54bc4a0becd72",
     "source_cell": 7
   },
   {
     "path": "res://assets/generated/equipment/boneglow/wfs/icons/belt.png",
-    "sha256": "ac7df32081ea236aae95cd4de295421dd48a4b7876bcf86929604d2a616da078",
+    "sha256": "97f66b7c325e6b9ffe438836cb770b6a15a3d931acdca2cf789d1d86e61b3c21",
     "source_cell": 8
   },
   {
     "path": "res://assets/generated/equipment/boneglow/wfs/icons/pants.png",
-    "sha256": "36b708207976b477bb147f52bc71b5145c13157fae2f37e9d4172a19d69c340e",
+    "sha256": "10fb928196f12ab7e824fd8351e0e8c488cb4126d43738ae8463fa6f95bd5aef",
     "source_cell": 9
   },
   {
     "path": "res://assets/generated/equipment/boneglow/wfs/icons/boots.png",
-    "sha256": "b990454ab47ec38c4c67a44fcc5e584e27d34c57785b00d24cdfbc9cf6f19a23",
+    "sha256": "e05d0b7d447e402ef8ee8101c9d274fedee7b16362c89f1fd0c861c5e3555af0",
     "source_cell": 10
   },
   {
     "path": "res://assets/generated/equipment/boneglow/wfs/icons/pendant.png",
-    "sha256": "2ba2ccbb4e711f3a3175cb6f6978fd2af68ae9ba59eb34731b33e6605c8e341b",
+    "sha256": "d436df6fd258a5e69182d961be827139b6d6a543f024ff9276acabf38dc85194",
     "source_cell": 11
   },
   {
     "path": "res://assets/generated/equipment/boneglow/wfs/icons/ring.png",
-    "sha256": "809230733acaf92e7662d80a059b91d77ad15c737ffab34d4f2e95e6f910ddf7",
+    "sha256": "73baa4c907f578d0b3a245262a1c6110d6378974160f469c68850afbb4fa0214",
     "source_cell": 12
   },
   {
     "path": "res://assets/generated/equipment/boneglow/wfs/icons/necklace.png",
-    "sha256": "1be34e8ac6f307181541770bc09efa7afa05db41d7a2f34ed6a3c3a540235b76",
+    "sha256": "b1b09c3f653f48745ebccfa81b882b0c57ed05724558a26d3df8fd773ad39d20",
     "source_cell": 13
   }
 ]

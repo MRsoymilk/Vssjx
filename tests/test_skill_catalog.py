@@ -42,5 +42,12 @@ class SkillCatalogTests(unittest.TestCase):
         self.assertTrue(all(s['mp_cost']==0 and s['damage_percent']==0 for s in passive))
         self.assertTrue(all(s['unlock_level']<=60 and s['mp_cost']>=0 for s in items))
 
+    def test_active_reflection_is_sixty_percent_for_two_turns(self):
+        reflection=[s for s in build()['items'] if s['effect'] in ('reflect_physical','reflect_magic')]
+        self.assertEqual({s['id'] for s in reflection},{'sheet_011','sheet_014','sheet_033','sheet_036'})
+        for skill in reflection:
+            self.assertEqual(skill['value'],60 if skill['active'] else 20)
+            self.assertEqual(skill['duration'],2 if skill['active'] else 0)
+
 
 if __name__=='__main__':unittest.main()

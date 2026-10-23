@@ -112,15 +112,49 @@ fn reflection_scales_with_own_attack_not_received_damage_or_mitigation() {
             assert_eq!(state.enemy_hit(incoming,240,magical),(incoming,48));
         }
     }
-    state.reflect_physical=2;state.physical_percent=30;
-    state.reflect_magic=2;state.magic_percent=30;
+    state.reflect_physical=2;state.physical_percent=60;
+    state.reflect_magic=2;state.magic_percent=60;
     state.defense=2;state.defense_percent=50;
     for magical in [false,true] {
-        assert_eq!(state.enemy_hit(50,120,magical),(25,36));
-        assert_eq!(state.enemy_hit(5000,120,magical),(2500,36));
-        assert_eq!(state.enemy_hit(50,119,magical),(25,35));
+        assert_eq!(state.enemy_hit(50,120,magical),(25,72));
+        assert_eq!(state.enemy_hit(5000,120,magical),(2500,72));
+        assert_eq!(state.enemy_hit(50,119,magical),(25,71));
         assert_eq!(state.enemy_hit(0,120,magical),(0,0));
         assert_eq!(state.enemy_hit(50,0,magical),(25,0));
+    }
+}
+
+#[test]
+fn active_reflection_casts_last_two_turns_without_stacking_with_passives() {
+    for (id,magical) in [("sheet_011",false),("sheet_033",true)] {
+        let skill=skills::item(id).unwrap();assert_eq!(skill.value,60);assert_eq!(skill.duration,2);
+        let mut state=State::new(0,3,60,1);let mut hp=100;let mut mp=200;
+        let mut own=stats();own.attack=120;
+        assert_eq!(state.cast(skill,own,&mut hp,&mut mp,0,99),0);
+        assert_eq!(state.enemy_hit(500,own.attack,magical),(500,72));
+        assert_eq!(state.enemy_hit(500,own.attack,!magical),(500,24));
+        state.end_turn();
+        let mut state:State=serde_json::from_value(serde_json::to_value(state).unwrap()).unwrap();
+        assert_eq!(state.enemy_hit(500,own.attack,magical),(500,72));
+        state.end_turn();
+        assert_eq!(state.enemy_hit(500,own.attack,magical),(500,24));
+        assert_eq!(state.passive_physical,20);assert_eq!(state.passive_magic,20);
+    }
+}
+
+#[test]
+fn active_reflection_applies_once_per_hit_in_multi_enemy_rounds_then_expires() {
+    use vssjx_server::{population,team_rules};
+    let mut own=stats();own.attack=120;own.hp=10000;
+    let id=uuid::Uuid::new_v4();
+    let f=team_rules::Fighter{id,name:"多怪反弹".into(),job:0,gender:0,school:3,level:60,appearance:[0;3],stats:own,hp:own.hp,mp:own.mp,potions:6,effects:State::new(0,3,60,1),guarding:false};
+    let mut enemy=population::definitions().into_iter().find(|e|e.id=="wolf_a").unwrap();enemy.attack=50;enemy.hp=10000;
+    let mut b=team_rules::Battle::new("qingyun_trail".into(),vec![f],vec![enemy.clone(),enemy.clone(),enemy],1000);
+    for (action,skill,expected,timer) in [("skill",Some("sheet_011"),72,1),("guard",None,78,0),("guard",None,30,0)] {
+        b.act(id,action,None,skill,b.selection_starts_ms+1,99).unwrap();
+        let reflected:Vec<_>=b.events.iter().filter(|e|e.actor==id.to_string()&&e.action=="dot").collect();
+        assert_eq!(reflected.len(),3);assert!(reflected.iter().all(|e|e.damage==expected));
+        assert_eq!(b.fighters[0].effects.reflect_physical,timer);
     }
 }
 

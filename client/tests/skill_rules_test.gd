@@ -31,13 +31,24 @@ func _ready()->void:
 		for incoming in [1,50,5000]:
 			check(RULES.enemy_hit(reflection,incoming,120,magical)==Vector2i(incoming,24),"Reflection uses own attack rather than incoming damage")
 			check(RULES.enemy_hit(reflection,incoming,240,magical)==Vector2i(incoming,48),"Increasing own attack increases reflection")
-	reflection.reflect_physical=2;reflection.physical_percent=30;reflection.reflect_magic=2;reflection.magic_percent=30
+	reflection.reflect_physical=2;reflection.physical_percent=60;reflection.reflect_magic=2;reflection.magic_percent=60
 	reflection.defense=2;reflection.defense_percent=50
 	for magical in [false,true]:
-		check(RULES.enemy_hit(reflection,50,120,magical)==Vector2i(25,36),"Defense does not weaken own-attack reflection")
-		check(RULES.enemy_hit(reflection,5000,120,magical)==Vector2i(2500,36),"Stronger enemy cannot inflate reflection")
-		check(RULES.enemy_hit(reflection,50,119,magical)==Vector2i(25,35),"Reflection uses matching integer rounding")
+		check(RULES.enemy_hit(reflection,50,120,magical)==Vector2i(25,72),"Defense does not weaken own-attack reflection")
+		check(RULES.enemy_hit(reflection,5000,120,magical)==Vector2i(2500,72),"Stronger enemy cannot inflate reflection")
+		check(RULES.enemy_hit(reflection,50,119,magical)==Vector2i(25,71),"Reflection uses matching integer rounding")
 		check(RULES.enemy_hit(reflection,0,120,magical)==Vector2i.ZERO,"No reflection on a miss or zero incoming hit")
 		check(RULES.enemy_hit(reflection,50,0,magical)==Vector2i(25,0),"Zero attack cannot gain damage from the attacker")
+	for id in ["sheet_011","sheet_033"]:
+		var skill:Dictionary=RULES.item(id);var magical:bool=skill.effect=="reflect_magic"
+		var state:Dictionary=RULES.new_state(0,3,60)
+		check(skill.value==60 and skill.duration==2,"Active reflection catalog uses 60% for two turns")
+		RULES.cast(skill,state,{"hp":1000,"mp":400,"attack":120,"defense":20},100,200,0,99)
+		check(RULES.enemy_hit(state,500,120,magical)==Vector2i(500,72),"Actual cast uses 60%, not 60% plus passive 20%")
+		check(RULES.enemy_hit(state,500,120,not magical)==Vector2i(500,24),"Other incoming type retains passive reflection")
+		RULES.end_turn(state)
+		check(RULES.enemy_hit(state,500,120,magical)==Vector2i(500,72),"Active reflection remains for the second turn")
+		RULES.end_turn(state)
+		check(RULES.enemy_hit(state,500,120,magical)==Vector2i(500,24),"Expired active reflection returns to passive 20%")
 	print("SKILLS: %d checks, %d failures"%[checks,failures])
 	get_tree().quit(1 if failures else 0)

@@ -228,7 +228,7 @@ fn skills_use_server_eligibility_mana_and_reflection() {
 }
 #[test]
 fn physical_and_magical_reflection_use_defenders_attack_in_duels() {
-    for magical in [false,true] {
+    for (magical,active) in [(false,false),(true,false),(false,true),(true,true)] {
         for attack in [50,200] {
             let (mut a,x,y,id,now)=arena();
             let b=a.battles.get_mut(&id).unwrap();
@@ -236,12 +236,13 @@ fn physical_and_magical_reflection_use_defenders_attack_in_duels() {
             b.fighters[1].stats.attack=attack;
             if magical{b.fighters[1].job=2;b.fighters[1].effects=skills::State::new(2,3,50,50);}
             let mut guard=command("guard");guard.battle_id=Some(id);guard.expected_revision=Some("0".into());
+            if active{guard.action="skill".into();guard.skill=Some(if magical{"sheet_033"}else{"sheet_011"}.into());}
             a.act(x,&guard,now,[99;3]).unwrap();
             let mut hit=command(if magical{"skill"}else{"attack"});hit.battle_id=Some(id);hit.expected_revision=Some("0".into());
             if magical{hit.skill=Some("legacy_2".into());}
             a.act(y,&hit,now,[99;3]).unwrap();
             let event=a.battles[&id].events.iter().find(|e|e.actor==y).unwrap();
-            assert_eq!(event.reflected,24,"defender 120 × 20%, independent of attacker {attack}");
+            assert_eq!(event.reflected,if active{72}else{24},"defender 120 × own reflection ratio, independent of attacker {attack}");
         }
     }
 }

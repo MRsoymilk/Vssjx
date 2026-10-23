@@ -29,7 +29,7 @@ def build():
         description=' '.join([row['description_raw'] or '']+row['notes_raw']).strip()
         effect='damage';value=0;duration=0;chance=100
         if '自动反弹' in description:effect='reflect_magic' if '法术' in description else 'reflect_physical';value=20
-        elif '反伤' in description:effect='reflect_magic' if '法术' in description else 'reflect_physical';value=30;duration=2
+        elif '反伤' in description:effect='reflect_magic' if '法术' in description else 'reflect_physical';value=60;duration=2
         elif '防御加成' in description:effect='defense';value=25;duration=2
         elif '暴击加成' in description:effect='crit';value=25;duration=2
         elif '回复生命' in description or '生命值回复' in description:effect='regen';value=15;duration=2

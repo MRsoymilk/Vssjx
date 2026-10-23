@@ -16,8 +16,8 @@ func run()->void:
 				var stats:={"hp":10000,"mp":400,"attack":own_attack,"defense":20}
 				var effects:Dictionary=SkillRules.new_state(0,3,60)
 				effects.defense=2;effects.defense_percent=50
-				if active:effects.reflect_physical=2;effects.physical_percent=30
-				var expected:int=own_attack*(30 if active else 20)/100+(0 if active else 6)
+				if active:effects.reflect_physical=2;effects.physical_percent=int(SkillRules.item("sheet_011").value)
+				var expected:int=own_attack*(60 if active else 20)/100+(0 if active else 6)
 				var legacy:=ShushanBattle.new(source);legacy.enemy=source.duplicate(true);legacy.enemy_hp=10000;legacy.frozen_stats=stats;legacy.skills=effects.duplicate(true);legacy.guarding=not active;legacy.phase="enemy"
 				var result:=legacy.resolve_enemy()
 				check(result.reflected==expected and legacy.enemy_hp==10000-expected,"Legacy offline battle uses own attack %d, not enemy attack %d"%[own_attack,enemy_attack])

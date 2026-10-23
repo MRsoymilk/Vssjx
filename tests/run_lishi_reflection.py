@@ -29,12 +29,18 @@ def main():
                 request=dict(operation_id=str(uuid4()),action=action,battle_id=bid,expected_revision=p.state['battle']['revision'])
                 if action=='skill':request['target']='sheet_011'
                 result,_=p.command('',request=request);battle=result['state']['battle']
-                expected=own_attack*(30 if action=='skill' else 20)//100+(6 if action=='guard' else 0)
+                expected=own_attack*(60 if action=='skill' else 20)//100+(6 if action=='guard' else 0)
                 check(battle['skills']['last_reflected']==expected,f'own {own_attack}, enemy {enemy_attack}, action {action}, defense {defense}')
                 check(battle['enemy_hp']==10000-expected,'authoritative enemy HP matches own-attack reflection')
                 replay,_=p.command('',request=request)
                 check(replay['replayed'] and replay['state']==result['state'],'reflection action retry cannot apply damage twice')
                 p.close();p=f.connect(identity)
                 check(p.state['battle']['enemy_hp']==10000-expected,'reconnect preserves already settled reflection')
+                if action=='skill':
+                    check(p.state['battle']['skills']['physical_percent']==60 and p.state['battle']['skills']['reflect_physical']==1,'active cast saves 60% and one remaining turn')
+                    second,_=p.command('guard');status=second['state']['battle']['skills']
+                    check(status['last_reflected']==own_attack*60//100+6 and status['reflect_physical']==0,'second turn keeps 60% then expires')
+                    third,_=p.command('guard')
+                    check(third['state']['battle']['skills']['last_reflected']==own_attack*20//100+6,'third turn falls back to unchanged passive 20%')
         print(f'LISHI REFLECTION SERVER: {checks} checks, 0 failures')
 if __name__=='__main__':main()

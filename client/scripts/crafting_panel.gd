@@ -3,6 +3,7 @@ extends Control
 signal back_requested
 signal changed
 var online_model:OnlinePve
+var from_details:=false
 var selected_id:=""
 var status:Label
 var materials:Label
@@ -55,12 +56,16 @@ func _fit_popup(box:OptionButton)->void:
 func _ready()->void:
 	z_index=2;size=Vector2(320,480);mouse_filter=Control.MOUSE_FILTER_STOP
 	palette=OriginalUITheme.palette("forge")
+	if from_details:palette={"main":Color("faf4b5"),"deep":Color("79acd0"),"body":Color("fff4bf"),"edge":Color("d3bc73")}
 	theme=preload("res://scenes/ui/shop_category_theme.tres").duplicate(true)
 	var disabled:=StyleBoxFlat.new();disabled.bg_color=Color("ead5a0");disabled.border_color=Color("b89959");disabled.set_border_width_all(1);disabled.content_margin_left=8;disabled.content_margin_top=3;disabled.content_margin_right=8;disabled.content_margin_bottom=3
 	theme.set_stylebox("disabled","OptionButton",disabled);theme.set_color("font_disabled_color","OptionButton",Color("978255"))
-	paper=_frame(Rect2(12,57,296,372),palette.main,Color("ffe883"),2);paper.name="ForgeFrame"
-	_frame(Rect2(17,62,286,27),palette.deep,palette.edge)
-	var title:=OriginalSceneChrome.label(self,"装 备 养 成",Rect2(32,63,256,24),15,Color("fff0a8"));title.name="Title";title.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
+	if from_details:paper=preload("res://scripts/equipment_paper.gd").frame(self,Rect2(12,57,296,372),"装 备 养 成")
+	else:
+		paper=_frame(Rect2(12,57,296,372),palette.main,Color("ffe883"),2)
+		_frame(Rect2(17,62,286,27),palette.deep,palette.edge)
+		var title:=OriginalSceneChrome.label(self,"装 备 养 成",Rect2(32,63,256,24),15,Color("fff0a8"));title.name="Title";title.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
+	paper.name="ForgeFrame"
 	materials=OriginalSceneChrome.label(self,"",Rect2(22,95,276,19),10,INK);materials.name="Materials"
 	# 炼材使用加工后的金属锭造型，避免误用商城首项的矿石图标。
 	var resource_icons:Array=["res://assets/ui/attribute_coin.png","res://assets/items/original/ix39.png","res://assets/ui/attribute_essence.png"]
@@ -88,9 +93,11 @@ func _ready()->void:
 	focus.item_selected.connect(_focus_selected)
 	status=OriginalSceneChrome.label(self,"强化不损毁装备，洗炼仅更改所选词条。",Rect2(22,379,276,23),10,INK);status.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
 	OriginalSceneChrome.label(self,"养成操作需再次确认",Rect2(22,405,190,16),9,INK)
-	back=OriginalSceneChrome.button(self,"返回装备",Rect2(222,402,76,21),11);back.name="Back";back.pressed.connect(func()->void:back_requested.emit())
+	back=OriginalSceneChrome.button(self,"返回详情" if from_details else "返回装备",Rect2(222,402,76,21),11);back.name="Back";back.pressed.connect(func()->void:back_requested.emit())
 	for button in [reroll,upgrade,back]:_skin_button(button)
 	_skin_button(salvage,true)
+	if from_details:
+		for button in [reroll,upgrade,salvage,back]:preload("res://scripts/equipment_paper.gd").skin_button(button)
 	for point in [Vector2(12,57),Vector2(300,57),Vector2(12,421),Vector2(300,421)]:
 		var corner:=TextureRect.new();corner.texture=preload("res://assets/ui/bag_corner.png");corner.position=point;corner.size=Vector2(8,8);corner.expand_mode=TextureRect.EXPAND_IGNORE_SIZE;corner.flip_h=point.x>160;corner.flip_v=point.y>240;corner.mouse_filter=Control.MOUSE_FILTER_IGNORE;add_child(corner)
 	if online_model!=null:online_model.changed.connect(_online_changed)
@@ -177,4 +184,5 @@ func _submit(action:String,target:String,count:int)->void:
 	if not is_inside_tree():return
 	busy=false;refresh();status.text="已保存，材料与装备同步生效。" if result.ok else result.message;changed.emit()
 func _unhandled_key_input(event:InputEvent)->void:
-	if event is InputEventKey and event.pressed and event.keycode==KEY_ESCAPE:back_requested.emit();get_viewport().set_input_as_handled()
+	if is_visible_in_tree() and event is InputEventKey and event.pressed and event.keycode==KEY_ESCAPE:
+		var input_viewport:=get_viewport();back_requested.emit();input_viewport.set_input_as_handled()

@@ -26,6 +26,7 @@ var slot_levels: Dictionary = {}
 var items: Array[Dictionary] = []
 var loot_panel:Control
 var equipment_details:Control
+var _pending_detail_target:Dictionary={}
 var material_bag:GatheringMaterialBag
 var travel_picker:AIWorldPanel
 @onready var description: Label = $Description
@@ -56,6 +57,7 @@ func _ready() -> void:
 	$Menu.pressed.connect(open_menu)
 	$Back.pressed.connect(func() -> void: back_requested.emit())
 	if online_model != null: online_model.changed.connect(_online_changed)
+	else:Game.storage_changed.connect(_equipment_storage_changed)
 	for i in range(1,10):
 		var button: Button = get_node("Equipment%d"%i)
 		var icon := TextureRect.new()
@@ -314,6 +316,7 @@ func show_item() -> void:
 		equipment_details.online_model=online_model;equipment_details.select(item)
 		add_child(equipment_details);set_process_unhandled_key_input(false)
 		equipment_details.back_requested.connect(_close_equipment_details)
+		equipment_details.changed.connect(func()->void:refresh();changed.emit())
 		return
 	tooltip.position = Vector2(61, 284)
 	tooltip_label.text=LootRules.describe(item.instance) if item.has("instance_id") else "%s  等级：1\n%s" % [item.name, ShopRules.description(item.id,_display_stats())]
@@ -323,8 +326,30 @@ func show_item() -> void:
 
 func _close_equipment_details() -> void:
 	var item:Dictionary=equipment_details.item
+	if online_model==null and Game.storage_busy:
+		_pending_detail_target={"template_id":equipment_details.template_id,"instance_id":equipment_details.instance_id}
 	remove_child(equipment_details);equipment_details.queue_free();equipment_details=null
 	set_process_unhandled_key_input(true);refresh()
+	_restore_detail_selection(item)
+
+func _equipment_storage_changed(active: bool) -> void:
+	if not active and (is_instance_valid(equipment_details) or not _pending_detail_target.is_empty()):
+		# A failed command restores its snapshot after the storage signal returns.
+		_finish_equipment_storage.call_deferred()
+
+func _finish_equipment_storage() -> void:
+	refresh()
+	if is_instance_valid(equipment_details):equipment_details.refresh()
+	if not _pending_detail_target.is_empty():
+		var latest:Dictionary={}
+		if not String(_pending_detail_target.instance_id).is_empty():
+			for instance in _loot().get("items",[]):
+				if instance.id==_pending_detail_target.instance_id:latest=LootRules.bag_item(instance);break
+		elif _gear().get("owned",[]).has(_pending_detail_target.template_id):latest=ShopRules.bag_item(_pending_detail_target.template_id,int(_display_player().job))
+		_pending_detail_target={};_restore_detail_selection(latest)
+	changed.emit()
+
+func _restore_detail_selection(item: Dictionary) -> void:
 	if item.is_empty():return
 	var worn:bool=item.instance.equipped if item.has("instance_id") else ShopRules.equipped_id(_gear(),item.slot)==item.id
 	if worn:

@@ -9,6 +9,11 @@ func _run()->void:
 	check(not input.is_empty(),"Economy regression requires actual Rust-generated draws and transactions")
 	if input.is_empty():get_tree().quit(1);return
 	var rows:Dictionary=JSON.parse_string(FileAccess.get_file_as_string(input))
+	for row in rows.dice:
+		var dice:=[int(row.seed)]
+		for i in row.limits.size():check(LootRules._draw(dice,int(row.limits[i]))==row.draws[i],"32-bit mixed draws agree at zero, signed boundary and maximum seeds")
+	for row in rows.upgrades:
+		check(same(LootRules.base(row.item),row.base),"All slot base gains match Rust across low levels, rounding boundaries and saved upgrade ranks")
 	for row in rows.rewards:
 		var player:Dictionary={"job":int(row.job),"gender":int(row.gender),"potions":5940,"weapon_owned":false,"shop_owned":[],"loot_state":row.before.duplicate(true)}
 		ProgressionRules.reward(player,int(row.level),row.boss,int(row.seed))

@@ -14,5 +14,19 @@ fn main(){
         }
         crafts.push(json!({"job":job,"before":initial,"steps":steps}));
     }
-    println!("{}",json!({"rewards":rewards,"crafts":crafts}));
+    let mut upgrades=vec![];
+    for slot in vssjx_server::shop::SLOTS{
+        let template=vssjx_server::shop::ITEMS.iter().find(|d|d.slot==slot&&d.equip_error(0,0).is_none()).unwrap();
+        for level in [1,8,15,49,50,60]{
+            let mut item=loot::roll(&template.id,level,"yellow",17,Uuid::new_v4()).unwrap();
+            for rank in 0..=6{item.upgrade=rank;upgrades.push(json!({"item":item,"base":item.base()}));}
+        }
+    }
+    let mut dice=vec![];
+    for seed in [0,1,17,0x7fffffff,0x80000000,u32::MAX]{
+        let mut rng=loot::Dice(seed);let limits=[10,100,2,1,7,u32::MAX as usize,2,10];
+        let draws:Vec<_>=limits.iter().map(|limit|rng.next(*limit)).collect();
+        dice.push(json!({"seed":seed,"limits":limits,"draws":draws}));
+    }
+    println!("{}",json!({"rewards":rewards,"crafts":crafts,"upgrades":upgrades,"dice":dice}));
 }

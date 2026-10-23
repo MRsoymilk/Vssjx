@@ -7,6 +7,6 @@
   "salvage_essence":{"white":0,"blue":0,"yellow":0,"orange":1,"green":1},
   "victory_scrap":1,"boss_scrap":4,"boss_essence":1,
   "upgrade_gold_per_level":2,"upgrade_scrap":10,"upgrade_essence_from":4,
-  "max_upgrade":6,"upgrade_step_percent":2,
+  "max_upgrade":6,"upgrade_step_percent":2,"upgrade_min_per_step":1,
   "reroll_gold_per_level":1,"reroll_scrap_base":3,"max_rerolls":20
 }

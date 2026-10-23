@@ -5,7 +5,7 @@ fn drops_obey_class_focus_item_level_and_both_pity_guarantees(){
     let mut seen=std::collections::BTreeSet::new();
     for job in 0..3{for gender in 0..2{for slot in shop::SLOTS{
         let mut s=loot::State::default();s.focus=slot.into();let mut focused=0;let mut drops=0;let mut drought=0;
-        for seed in 0..160{
+        for seed in 0..512{
             s.reward(job,gender,60,false,0,seed*7919);
             assert!(s.valid(job,gender));
             if s.items.is_empty(){drought+=1;assert!(drought<8);}else{drought=0;}
@@ -43,4 +43,43 @@ fn salvage_requires_owned_unequipped_nonlegacy_and_retains_unlocked_appearance()
 fn old_battles_do_not_silently_gain_new_reward_rules(){
     let mut b=vssjx_server::pve_rules::Battle::new(vssjx_server::population::definitions().remove(0),100,40,3);assert_eq!(b.loot_revision,1);
     let mut value=serde_json::to_value(&b).unwrap();value.as_object_mut().unwrap().remove("loot_revision");b=serde_json::from_value(value).unwrap();assert_eq!(b.loot_revision,0);
+}
+#[test]
+fn unfocused_nonpity_first_drops_cover_every_set_slot_for_every_build(){
+    for job in 0..3{
+        let mut counts=std::collections::BTreeMap::new();
+        for seed in 0..4096{
+            let mut state=loot::State::default();
+            state.reward(job,0,60,true,0,seed);
+            let item=&state.items[0];
+            if let Some(build)=&item.set_id{*counts.entry((build.clone(),item.slot().to_owned())).or_insert(0)+=1;}
+        }
+        for build in vssjx_server::builds::DATA["items"].as_array().unwrap().iter().filter(|b|b["job"]==job){
+            for slot in vssjx_server::builds::DATA["set_slots"].as_array().unwrap(){
+                let key=(build["id"].as_str().unwrap().to_owned(),slot.as_str().unwrap().to_owned());
+                assert!(counts.get(&key).copied().unwrap_or(0)>=10,"Natural first drops must cover {key:?}, without focus or pity");
+            }
+        }
+    }
+}
+#[test]
+fn every_upgrade_improves_nonzero_base_stats_even_on_low_level_accessories(){
+    for slot in shop::SLOTS{
+        let template=shop::ITEMS.iter().find(|d|d.slot==slot&&d.equip_error(0,0).is_none()).unwrap();
+        for level in 1..=60{
+            let mut item=loot::roll(&template.id,level,"yellow",17,Uuid::new_v4()).unwrap();
+            let original=item.clone();let mut previous=item.base();
+            for rank in 1..=6{
+                item.upgrade=rank;let next=item.base();
+                for (before,after) in [previous.0,previous.1,previous.2,previous.3].into_iter().zip([next.0,next.1,next.2,next.3]){
+                    assert!(if before==0{after==0}else{after>before},"{slot} level {level} +{rank}: {before} -> {after}");
+                }
+                previous=next;
+            }
+            let restored:loot::Item=serde_json::from_value(serde_json::to_value(&item).unwrap()).unwrap();
+            assert_eq!(restored.base(),previous);assert_eq!(restored.id,original.id);assert_eq!(restored.affixes,original.affixes);
+            if slot=="wrist"&&level==15{assert_eq!(restored.base().1,14);}
+            if slot=="ring"&&level==8{assert_eq!(restored.base().3,14);}
+        }
+    }
 }

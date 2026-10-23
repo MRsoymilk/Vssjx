@@ -14,7 +14,9 @@ static func bounds(kind:String,level:int)->Vector2i:
 	var v:Array=rules.affixes[kind];return Vector2i(maxi(1,int(v[0])*level/60),maxi(1,int(v[1])*level/60))
 static func _draw(dice:Array,limit:int)->int:
 	dice[0]=(int(dice[0])*1664525+1013904223)&0xffffffff
-	return int(dice[0])%limit
+	# Same 32-bit RXS-M-XS output permutation as the server; products fit in int64.
+	var word:=(((int(dice[0])>>((int(dice[0])>>28)+4))^int(dice[0]))*277803737)&0xffffffff
+	return ((word>>22)^word)%limit
 static func roll(template:String,level:int,quality:String,seed:int,id:String="")->Dictionary:
 	var d:=ShopRules.item(template)
 	if not ShopRules.is_equipment(d) or level<1 or level>60 or quality not in ["white","blue","yellow"] or seed<0 or seed>0xffffffff:return {}
@@ -94,8 +96,12 @@ static func sync_legacy(player:Dictionary)->void:
 static func extra_bag(s:Dictionary)->int:return s.get("items",[]).filter(func(i:Dictionary)->bool:return not i.legacy and not i.equipped).size()
 static func base(i:Dictionary)->Array:
 	if i.legacy:return [int(i.legacy_attack),int(i.legacy_defense),0,0]
-	var d:Dictionary=rules.base[ShopRules.item(i.template).slot];var l:=int(i.level);var scale:=100+int(ProgressionRules.rules.upgrade_step_percent)*int(i.upgrade)
-	return [(int(d.power_base)+l*int(d.power_step))*scale/100,(int(d.defense_base)+l*int(d.defense_step_bp)/10000)*scale/100,l*int(d.hp_step)*scale/100,l*int(d.mp_step)*scale/100]
+	var d:Dictionary=rules.base[ShopRules.item(i.template).slot];var l:=int(i.level)
+	var values:Array=[int(d.power_base)+l*int(d.power_step),int(d.defense_base)+l*int(d.defense_step_bp)/10000,l*int(d.hp_step),l*int(d.mp_step)]
+	for index in values.size():
+		var value:=int(values[index])
+		if value>0:values[index]=value+maxi(value*int(ProgressionRules.rules.upgrade_step_percent)*int(i.upgrade)/100,int(ProgressionRules.rules.upgrade_min_per_step)*int(i.upgrade))
+	return values
 static func look(s:Dictionary,original:Array)->Array:
 	var result:=original.duplicate()
 	for i in s.get("items",[]):

@@ -34,7 +34,15 @@ fn is_zero(n:&i32)->bool{*n==0}
 impl Default for State{fn default()->Self{Self{version:1,items:vec![],pending:vec![],scrap:0,essence:0,kills:0,bosses:0,difficulty:1,skins:BTreeSet::new(),focus:String::new()}}}
 #[derive(Clone)]
 pub struct Dice(pub u32);
-impl Dice{pub fn next(&mut self,limit:usize)->usize{self.0=self.0.wrapping_mul(1664525).wrapping_add(1013904223);self.0 as usize%limit}}
+impl Dice{
+    pub fn next(&mut self,limit:usize)->usize{
+        self.0=self.0.wrapping_mul(1664525).wrapping_add(1013904223);
+        // RXS-M-XS permutes all 32 bits before bounded draws. Raw LCG low bits
+        // otherwise correlate even-sized slot, quality and build selections.
+        let word=((self.0>>((self.0>>28)+4))^self.0).wrapping_mul(277803737);
+        ((word>>22)^word) as usize%limit
+    }
+}
 pub fn range(kind:&str,level:i32)->Option<(i32,i32)>{let v=DATA["affixes"].get(kind)?;Some(((v[0].as_i64()? as i32*level/60).max(1),(v[1].as_i64()? as i32*level/60).max(1)))}
 impl Item{
     pub fn definition(&self)->&'static shop::Item{shop::item(&self.template).expect("validated equipment template")}
@@ -58,8 +66,11 @@ impl Item{
     }
     pub fn base(&self)->(i32,i32,i32,i32){
         if self.legacy{return (self.legacy_attack,self.legacy_defense,0,0);}
-        let d=&DATA["base"][self.slot()];let v=|key:&str|d[key].as_i64().unwrap() as i32;let scale=100+crate::progression::n("upgrade_step_percent")*self.upgrade;
-        ((v("power_base")+self.level*v("power_step"))*scale/100,(v("defense_base")+self.level*v("defense_step_bp")/10000)*scale/100,self.level*v("hp_step")*scale/100,self.level*v("mp_step")*scale/100)
+        let d=&DATA["base"][self.slot()];let v=|key:&str|d[key].as_i64().unwrap() as i32;
+        // Recompute from the saved upgrade rank; existing items receive the same
+        // minimum gain without changing their identity or persisted affixes.
+        let upgraded=|base:i32|if base==0{0}else{base+(base*crate::progression::n("upgrade_step_percent")*self.upgrade/100).max(crate::progression::n("upgrade_min_per_step")*self.upgrade)};
+        (upgraded(v("power_base")+self.level*v("power_step")),upgraded(v("defense_base")+self.level*v("defense_step_bp")/10000),upgraded(self.level*v("hp_step")),upgraded(self.level*v("mp_step")))
     }
 }
 pub fn roll(template:&str,level:i32,quality:&str,seed:u32,id:Uuid)->Result<Item,&'static str>{

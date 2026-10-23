@@ -113,6 +113,7 @@ func refresh()->void:
 	focus.select(ShopRules.SLOTS.find(state.get("focus",""))+1);focus.disabled=locked or state.is_empty()
 	affix.clear();affix.disabled=true;upgrade.disabled=true;reroll.disabled=true;salvage.disabled=true
 	upgrade.text="强化+1";reroll.text="洗炼";reroll_cost.text="—";upgrade_cost.text="—"
+	upgrade.tooltip_text="每级增加原始基础属性的2%，每项非零属性每级至少+1；词条不变。"
 	if item.is_empty():
 		item_icon.texture=null;item_name.text="未选择装备";item_meta.text="请先从装备列表中选择";affix.add_item("暂无可洗炼词条")
 		details.text="请在装备列表选中一件，再打开养成。\n暂存装备需领取后才能养成。\n定向掉落：80%优先选定部位。";refreshing=false;return

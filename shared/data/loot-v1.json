@@ -1,5 +1,6 @@
 {
   "version":"loot-v1",
+  "roll_algorithm":"lcg32-rxs-m-xs-v1",
   "bag_limit":60,"pending_limit":20,"max_items":90,"max_level":60,"max_upgrade":6,
   "normal_drop_percent":25,"boss_drops":2,
   "quality_affixes":{"legacy":0,"white":0,"blue":2,"yellow":4,"orange":3,"green":3},

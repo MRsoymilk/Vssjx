@@ -138,6 +138,7 @@ func _ready() -> void:
 	)
 	target.changed.connect(_refresh_target)
 	gathering_panel=GatheringPanel.new();add_child(gathering_panel)
+	gathering_panel.hero_point=_hero_screen_point
 	gathering_panel.start_requested.connect(_gather_confirm)
 	gathering_panel.cancel_requested.connect(_cancel_gathering)
 	duel_invitation = DuelInvitation.new()
@@ -817,7 +818,7 @@ func _process(delta: float) -> void:
 	if OS.has_feature("web") and (not Platform.context.lifecycle.focused or Platform.context.lifecycle.suspended): return
 	if _follow_transfer():return
 	_advance_approach()
-	if gathering_panel.visible and (Input.is_physical_key_pressed(KEY_W) or Input.is_physical_key_pressed(KEY_A) or Input.is_physical_key_pressed(KEY_S) or Input.is_physical_key_pressed(KEY_D)):_cancel_gathering()
+	if gathering_panel.visible and GatheringPanel.movement_pressed():_cancel_gathering()
 	if gathering_panel.visible or target_view.actions.visible or is_instance_valid(help_panel) or team_panel.visible or social_panel.visible or bag_overlay != null or chat_input.has_focus() or menu.visible or details.visible or npc_dialog.visible or emote_picker.visible or encounter.visible or (battle_view.visible or solo_battle.visible) or expanded_chat.visible or attributes.visible or world_map.visible or network.pve.pending() or network.pve.active():
 		_was_keyboard = false
 		return
@@ -1111,9 +1112,10 @@ func _gathering_changed()->void:
 		if gathering_panel.node.get("id")==value.id:gathering_panel.node=value.duplicate(true)
 	for id in gathering_nodes.keys():
 		if not present.has(id):gathering_nodes[id].queue_free();gathering_nodes.erase(id)
-	if network.pve.last_action in ["gather_finish","gather_cancel"] and not network.pve.pending():
-		if network.pve.last_code.is_empty():gathering_panel.hide()
-		elif gathering_panel.visible:gathering_panel.description.text=OnlinePve.error_text(network.pve.last_code)
+	if network.pve.last_action in ["gather_start","gather_finish","gather_cancel"] and not network.pve.pending():
+		if not network.pve.last_code.is_empty():
+			gathering_panel.hide();chat_status.text=OnlinePve.error_text(network.pve.last_code)
+		elif network.pve.last_action!="gather_start":gathering_panel.hide()
 	_gather_tick()
 
 func _gather_compatible(active:Dictionary)->bool:
@@ -1191,7 +1193,7 @@ func _advance_approach() -> void:
 		_approach = {}
 		var action: String = request.action
 		if action=="gather":
-			_gather_cancel_requested=false;_gather_auto_token="";gathering_panel.present(resident);gathering_panel.display(network.pve);return
+			_gather_cancel_requested=false;_gather_auto_token="";gathering_panel.present(resident);_gather_confirm();return
 		if action == "npc":
 			npc_dialog.present(request.target, resident, network.pve)
 			return

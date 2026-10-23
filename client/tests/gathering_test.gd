@@ -37,8 +37,9 @@ func run()->void:
 	var scrap:=int(Game.player.loot_state.scrap)
 	bag.batches.value=2;bag.craft.pressed.emit()
 	check(int(Game.player.loot_state.scrap)==scrap+2 and bag.stock.text.contains("炼材"),"Material bag processes selected batches and refreshes real resource balances")
-	var panel:=GatheringPanel.new();panel.local_mode=true;add_child(panel);panel.present(node)
-	check(panel.visible and panel.frame.size.x<=320,"Mining/herbalism panel fits existing portrait viewport")
+	var panel:=GatheringPanel.new();add_child(panel);panel.present(node);panel.hero_point=func()->Vector2:return Vector2(160,216)
+	panel._process(0)
+	check(panel.visible and panel.progress.size==Vector2(48,6) and panel.get_child_count()==1 and panel.position==Vector2(136,130),"Gathering uses only a compact overhead bar, without a frame, explanation or confirmation buttons")
 	var output:=OS.get_environment("SSJX_GATHERING_CAPTURE")
 	if not output.is_empty() and DisplayServer.get_name()!="headless":
 		DirAccess.make_dir_recursive_absolute(output);await RenderingServer.frame_post_draw

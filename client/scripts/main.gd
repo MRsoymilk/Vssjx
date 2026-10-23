@@ -542,9 +542,11 @@ func _enter_world() -> void:
 	world_view.gui_input.connect(func(event: InputEvent) -> void:
 		if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 			_release_local_chat_input()
+			if modal is GatheringPanel:_close_modal()
 			world.click(event.position)
 		elif event is InputEventScreenTouch and event.pressed:
 			_release_local_chat_input()
+			if modal is GatheringPanel:_close_modal()
 			world.click(event.position)
 	)
 	add_child(world_view)
@@ -673,18 +675,18 @@ func _world_interaction(kind: String, data: Dictionary) -> void:
 		"hint": _message("交互", String(data.text))
 
 func _open_local_gathering(data:Dictionary)->void:
-	_close_modal();world.pause_moving();world.enabled=false
+	_close_modal();world.pause_moving()
+	var code:=Game.begin_gathering(String(data.id),world.cell,world.map_id)
+	if not code.is_empty():quest_label.text="[系统] "+OnlinePve.error_text(code);return
+	world.enabled=false
 	var panel:=GatheringPanel.new();panel.local_mode=true;ui.add_child(panel);modal=panel;panel.present(data)
+	panel.hero_point=func()->Vector2:return world.hero.get_global_transform_with_canvas().origin+world_view.position
 	panel.cancel_requested.connect(func()->void:Game.local_gather={};_close_modal())
 	panel.start_requested.connect(func()->void:
-		if Game.local_gather.is_empty():
-			var code:=Game.begin_gathering(String(data.id),world.cell,world.map_id)
-			if not code.is_empty():panel.description.text=OnlinePve.error_text(code)
-		else:
-			var result:=await Game.finish_gathering(world.cell,world.map_id)
-			if not is_instance_valid(panel):return
-			if result.ok:_close_modal()
-			else:panel.description.text=result.message
+		var result:=await Game.finish_gathering(world.cell,world.map_id)
+		if not is_instance_valid(panel):return
+		_close_modal()
+		if not result.ok:quest_label.text="[系统] "+result.message
 	)
 
 func _travel_local(kind: String, target: String = "") -> void:

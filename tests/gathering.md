@@ -41,9 +41,17 @@ SSJX_TEST_SERVER_BIN=/path/to/vssjx-server python tests/run_gathering.py
 
 ## 客户端与离线
 
-- 点击矿点／药点自动靠近，明确确认开始，显示进度并到时提交领取；移动、战斗、切图、断线中断。背包保留原装备界面，另有材料袋入口。
+- 点击矿点／药点自动靠近，抵达后直接开始，只在人物姓名上方显示48×6进度条，无说明面板、开始／领取／返回按钮；到时自动提交领取。移动（WASD及方向键）、地图点击、战斗、切图、断线中断。背包保留原装备界面，另有材料袋入口。
 - 离线使用同一份418点目录，计时使用单调时钟；完成后材料和个人刷新写入存档，写入失败回滚。旧存档不要求新增字段，联机不修改离线人物。
 - JSON坐标与二进制世界坐标在采集兼容检查中统一为整数坐标，避免浮点数组比较导致误取消。在线状态沿用可选字段兼容旧回执。
 - 离线测试：`godot --headless --path client res://tests/gathering_test.tscn`。渲染截图位于`work/gathering/materials-and-gathering.png`。
 
 未推送、打包、部署或迁移现有玩家数据库；联机功能需更新服务端并应用0035，以及配套客户端。
+
+## 头顶进度条调整（2026-10-23）
+
+- 本地与联机共用精简进度组件，跟随人物及相机位置，保留服务端／本地真实计时、自动完成和原有材料结算。失败与冷却使用现有底部状态文字，不再弹出大说明窗口。
+- `godot --headless --path client res://tests/gathering_test.tscn`：447项通过。
+- `godot --headless --path client res://tests/gathering_overhead_test.tscn`：9项通过；实际OpenGL渲染10项通过，截图 `/tmp/opencode/vssjx-gathering-overhead-captures/gathering-overhead.png` 已查看。覆盖自动开始、头顶坐标、半程填充、方向键／地图点击取消、自动完成入袋和冷却无弹窗。
+- `gathering_live_test.gd` 已更新为自动开始及真实人物头顶坐标断言；本轮尝试 `GODOT_BIN=godot python tests/run_gathering.py` 因环境无Docker socket、无法创建隔离PostgreSQL而未执行到联机测试，不将历史通过结果当作本轮联机通过。
+- 仅修改客户端与验证记录，不推送、打包、部署或修改线上数据库。

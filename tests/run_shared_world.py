@@ -74,7 +74,10 @@ def main():
             ws = WebSocket(base.replace('http://', 'ws://') + '/api/v1/world/ws')
             sockets.append(ws)
             ws.send({'type': 'auth.exchange', 'ticket': raw, 'protocol_version': 1, 'config_hash': HASH, 'world_sync_version': 2})
-            return ws, ws.recv()[0]
+            ready = ws.recv()[0]
+            if ready.get('type') == 'auth.ready':
+                assert abs(ready['server_time_ms'] - time.time() * 1000) < 5000, ready
+            return ws, ready
         def motion(ready, seq, target):
             data = {key: ready[key] for key in ('game_session_id', 'connection_epoch', 'world_epoch')}
             data.update(type='world.move_to', input_seq=str(seq), target=target)
@@ -113,6 +116,15 @@ def main():
             assert ready_b['type'] == 'auth.ready'
             entities = a.snapshot(lambda values: len(values) == 2)
             assert {first_id, second_id} == set(entities)
+            a.send({'type': 'ping'})
+            for _ in range(80):
+                heartbeat, _raw = a.recv()
+                if heartbeat['type'] == 'pong':
+                    assert abs(heartbeat['server_time_ms'] - time.time() * 1000) < 5000, heartbeat
+                    assert heartbeat['server_time_ms'] >= ready_a['server_time_ms']
+                    break
+            else:
+                raise AssertionError('Expected heartbeat with fresh server time')
             assert all(not {'account_id', 'gold', 'hp', 'potions', 'session_id'} & entity.keys() for entity in entities.values())
             chat_id, chat_text, chat_message = exercise_chat(a, b, first_id, second_id, db)
             # A newly admitted character cannot read messages from before entry.

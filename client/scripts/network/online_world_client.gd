@@ -58,6 +58,8 @@ var _records: Dictionary = {}
 var _digest: HashingContext
 var _chunk_index := 0
 var _snapshot_bytes := 0
+var _world_clock_ms := 0
+var _world_clock_tick := 0
 
 func _ready() -> void:
 	config_hash = FileAccess.get_sha256(MAP_PATH)
@@ -76,6 +78,7 @@ func _ready() -> void:
 	)
 
 func start(id: String) -> void:
+	_world_clock_ms = 0
 	character_id = id
 	server = OnlineAccount.server_address
 	login_session = OnlineAccount.login_session_id
@@ -93,6 +96,7 @@ func leave() -> void:
 		socket.close()
 	socket = null
 	_state = "idle"
+	_world_clock_ms = 0
 	_ticket = ""
 	world_ready = false
 	team_following=false;team_marks={};team_travel={}
@@ -328,7 +332,9 @@ func _receive(data: Dictionary, raw: PackedByteArray) -> void:
 			status_changed.emit("跟随中由队长控制移动，可在队伍界面暂离。" if code=="TEAM_FOLLOWING" else "战斗中暂不能移动。" if code in ["BATTLE_ACTIVE","TEAM_BATTLE_ACTIVE"] else "目标不可达或操作过快，请重试。")
 		else: _failed(code, code in ["DATABASE_UNAVAILABLE", "SERVER_BUSY", "WORLD_STREAM_LAGGED"])
 		return
-	if kind == "pong": return
+	if kind == "pong":
+		if stream.is_empty() or not _sync_world_clock(data): _failed("INVALID_WORLD_CLOCK")
+		return
 	if kind == "world.team":
 		if not world_ready or _team_version!=1 or not valid_team_packet(data,map_id):
 			_failed("INVALID_TEAM_STATE");return
@@ -383,6 +389,8 @@ func _receive(data: Dictionary, raw: PackedByteArray) -> void:
 			_failed("CONFIG_MISMATCH"); return
 		if data.map_id != "qingyun_trail" and not data.has("map_hash"):
 			_failed("CONFIG_MISMATCH"); return
+		if not _sync_world_clock(data):
+			_failed("INVALID_WORLD_CLOCK"); return
 		map_id = data.map_id
 		map_changed.emit(map_id)
 		game_session = data.game_session_id
@@ -437,6 +445,20 @@ func _receive(data: Dictionary, raw: PackedByteArray) -> void:
 		_state = "ready"
 		changed.emit(entities)
 	else: _failed("INVALID_MESSAGE")
+
+func _sync_world_clock(data: Dictionary) -> bool:
+	# Optional addition: older servers remain compatible, but cannot drive lighting.
+	if not data.has("server_time_ms"): return true
+	if not _integer(data.server_time_ms, 1, 253402300799999): return false
+	_world_clock_ms = int(data.server_time_ms)
+	_world_clock_tick = Time.get_ticks_msec()
+	return true
+
+func world_time_seconds() -> float:
+	# Keep advancing across reconnect/map transfer; local wall-clock changes cannot
+	# change online daylight. A fresh handshake/pong corrects the estimate.
+	if _world_clock_ms == 0: return -1.0
+	return float(_world_clock_ms + maxi(0, Time.get_ticks_msec() - _world_clock_tick)) / 1000.0
 
 func _receive_delta(raw: PackedByteArray) -> bool:
 	if not world_ready or not _snapshot.is_empty() or raw.size() < 70 or raw.size() > 1048576: return false

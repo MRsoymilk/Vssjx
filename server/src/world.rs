@@ -30,7 +30,7 @@ use std::sync::atomic::Ordering;
 use std::{
     collections::HashMap,
     sync::{Arc, Mutex},
-    time::{Duration, Instant},
+    time::{Duration, Instant, SystemTime, UNIX_EPOCH},
 };
 use tokio::sync::{Mutex as AsyncMutex, Semaphore};
 use tracing::Instrument;
@@ -990,7 +990,7 @@ async fn connection(socket: WebSocket, auth: AuthService, hub: Arc<WorldHub>, an
         hub.disconnect(&auth, &owner, false).await;
         return;
     }
-    let ready = json!({"type":"auth.ready","character_id":owner.id,"game_session_id":owner.game,"connection_epoch":owner.epoch.to_string(),"world_epoch":owner.owner.to_string(),"stream_id":stream,"world_stream_id":baseline.epoch,"world_sync_version":SYNC_VERSION,"config_hash":config_hash(),"map_id":owner.map_id,"map_hash":hub.map_for(&owner.map_id).hash(),"instance_id":"main","tick_ms":100});
+    let ready = with_server_time(json!({"type":"auth.ready","character_id":owner.id,"game_session_id":owner.game,"connection_epoch":owner.epoch.to_string(),"world_epoch":owner.owner.to_string(),"stream_id":stream,"world_stream_id":baseline.epoch,"world_sync_version":SYNC_VERSION,"config_hash":config_hash(),"map_id":owner.map_id,"map_hash":hub.map_for(&owner.map_id).hash(),"instance_id":"main","tick_ms":100}));
     if send(&mut socket, ready).await.is_err() {
         hub.disconnect(&auth, &owner, false).await;
         return;
@@ -1058,7 +1058,7 @@ async fn connection(socket: WebSocket, auth: AuthService, hub: Arc<WorldHub>, an
                 if !hub.current(&owner){fail(&mut socket,"SESSION_REPLACED").await;break;}
                 if matches!(input,ClientMessage::Leave {}){leave=true;break;}
                 match auth.live_session(owner.session).await {Ok(true)=>{},Ok(false)=>{fail(&mut socket,"SESSION_REVOKED").await;leave=true;break},Err(_)=>{fail(&mut socket,"DATABASE_UNAVAILABLE").await;break}}
-                if matches!(input,ClientMessage::Ping {}){if send(&mut socket,json!({"type":"pong"})).await.is_err(){break;}}
+                if matches!(input,ClientMessage::Ping {}){if send(&mut socket,with_server_time(json!({"type":"pong"}))).await.is_err(){break;}}
                 else if let ClientMessage::Duel{command}=&input {
                     if duel_version!=2 {fail(&mut socket,"DUEL_UNSUPPORTED").await;continue;}
                     let result=hub.duel_command(&auth,&owner,command).await;
@@ -1198,6 +1198,12 @@ async fn connection(socket: WebSocket, auth: AuthService, hub: Arc<WorldHub>, an
     hub.disconnect(&auth, &owner, leave).await;
     let _ = tokio::time::timeout(Duration::from_secs(1), socket.send(Message::Close(None))).await;
 }
+// Presentation time is sampled at send time, never from a historical PVE receipt.
+fn with_server_time(mut packet: Value) -> Value {
+    packet["server_time_ms"] = json!(SystemTime::now().duration_since(UNIX_EPOCH).unwrap_or_default().as_millis() as u64);
+    packet
+}
+
 async fn send_snapshot(
     socket: &mut ObservedSocket,
     stream: Uuid,

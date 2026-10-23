@@ -18,9 +18,15 @@
 
 - `POST /api/v1/world/ticket`：Bearer认证，提交character_id、protocol_version=1、config_hash。返回20秒有效单次票据；数据库只存摘要，每登录会话最多一张，重新申请使旧票据失效。
 - `/api/v1/world/ws`：升级后5秒内提交 `auth.exchange`，包含票据、protocol_version=1、world_sync_version=2和地图摘要。旧世界同步版本明确拒绝，不让旧客户端误读二进制增量。票据不放URL或日志。客户端对HTTPS地址使用WSS；服务本体监听HTTP，由公网TLS反向代理提供HTTPS/WSS。回环测试使用WS。浏览器Origin默认拒绝，P2a可通过正式HTTPS/本机开发两组精确白名单显式开放；来源通过不替代认证，也不代表Godot Web客户端可用，见[来源安全前置](../tests/web_origins.md)。
-- `auth.ready`：返回character_id、game_session_id、connection_epoch、world_epoch、stream_id、world_stream_id、world_sync_version和地图标识。
+- `auth.ready`：返回character_id、game_session_id、connection_epoch、world_epoch、stream_id、world_stream_id、world_sync_version和地图标识；附带发送时采样的 `server_time_ms`（Unix 毫秒整数）。
 - `world.move_to`：上述会话/代次及递增input_seq，target为两个整数；`world.stop`结构相同但无target。修订、代次与序号都是十进制字符串。停步完成正在经过的一格，不额外前进；断线立即冻结至最后确认格。
 - `ping`/`pong` 保活，`world.leave` 显式退出。持续校验登录会话，撤销、过期、封禁关闭游戏连接。
+
+### 场景时间
+
+`auth.ready` 和每次 `pong` 都携带发送时采样的 `server_time_ms`。客户端校验其为 `1..253402300799999` 的整数，用接收时的单调时钟推进场景时间；后续心跳重新校时。不使用历史 PVE 回执的时间，也不依据玩家设备的本地时区或修改后的系统时间决定联机光照。时间估计未补偿单程网络延迟，不承诺毫秒级同步。
+
+断连重试和切图继续推进已有时间，退出或开始新的角色连接时清空。字段是向后兼容的增量：旧客户端忽略它，新客户端连接未提供时间的旧服务器时保持默认光照，不能伪装已经同步。异常时间字段拒绝安装。验证见 [昼夜与场景时钟](../tests/day_night.md)。
 
 ## 快照与恢复
 

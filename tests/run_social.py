@@ -5,6 +5,7 @@ import os
 from pathlib import Path
 import subprocess
 import threading
+import time
 from uuid import uuid4
 from pg_fixture import PostgresFixture
 from run_account_auth import stop
@@ -63,7 +64,13 @@ def main():
             view, _ = send(b, 'find', name='SOCIAL_A')
             card = view['profile']
             check(card['id'] == a[1] and card['online'] and card['display_name'] == 'social_a', 'Exact canonical-name lookup and online status')
-            check(set(card) == {'id', 'display_name', 'job', 'gender', 'school', 'level', 'online', 'appearance', 'combat', 'equipment', 'guild'}, 'Profile public-field allowlist')
+            check(set(card) == {'id', 'display_name', 'job', 'gender', 'school', 'level', 'online', 'appearance', 'combat', 'vitals', 'equipment', 'guild'}, 'Profile public-field allowlist')
+            before=card['vitals']
+            db.query(f"UPDATE characters SET hp=37,mp=11 WHERE id='{a[1]}'")
+            observed=send(b,'profile',target=a[1])[0]['profile']
+            check(observed['vitals']==dict(hp=37,mp=11) and observed['combat']['hp']>37,'Profile current health/mana are distinct from maximum combat attributes')
+            check(api(base,'/api/v1/social',dict(character_id=b[1],action='profile',target=a[1],vitals=dict(hp=99999)),b[0]['access_token'])[0]==400,'Read-only profile cannot accept client-supplied vitals')
+            db.query(f"UPDATE characters SET hp={before['hp']},mp={before['mp']} WHERE id='{a[1]}'")
             check(not any(k in json.dumps(card) for k in ['account_id', 'access_token', 'gold', 'xp', 'potions', 'quantities', 'allocated_attributes']), 'No private account, wallet or inventory state')
             send(a, 'find', 'PLAYER_NOT_FOUND', name='missing')
             send(a, 'friend_request', 'SELF_TARGET', target=a[1])
@@ -155,6 +162,14 @@ def main():
             send(b, 'guild_apply', 'GUILD_FULL', target=full)
             if os.environ.get('GODOT_BIN'):
                 ua, ub = create('social_ui_a'), create('social_ui_b')
+                db.query(f"UPDATE characters SET hp=53,mp=17 WHERE id='{ub[1]}'")
+                peer=Player(base,ub[0],ub[1]);clients.append(peer)
+                def keep_peer_online():
+                    try:
+                        while True:
+                            peer.ws.send(dict(type='ping'));peer.until('pong');time.sleep(1)
+                    except (OSError,EOFError,TimeoutError):pass
+                threading.Thread(target=keep_peer_online,daemon=True).start()
                 send(ub, 'friend_request', target=ua[1])
                 godot_env = dict(os.environ, SSJX_SOCIAL_TEST=json.dumps(dict(base=base, username='social_ui_a', character=ua[1], other=ub[1])))
                 client = subprocess.run([os.environ['GODOT_BIN'], '--headless', '--path', str(ROOT / 'client'), '--quit-after', '18000', 'res://tests/social_live_test.tscn'], env=godot_env, capture_output=True, text=True, encoding='utf8', timeout=90)

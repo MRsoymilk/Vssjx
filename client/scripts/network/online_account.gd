@@ -92,6 +92,10 @@ func delete_character(character_id: String, character_name: String) -> void:
 func social_request(payload: Dictionary) -> void:
 	_send("social", server_address, payload, true)
 
+func target_profile_request(payload: Dictionary) -> void:
+	# Separate read completion: target polling must never acknowledge social writes.
+	_send("target_profile", server_address, {"character_id":payload.get("character_id",""),"action":"profile","target":payload.get("target","")}, true)
+
 func team_request(payload: Dictionary) -> void:
 	_send("teams", server_address, payload, true)
 
@@ -173,7 +177,7 @@ func _send(action: String, address: String, payload: Dictionary, bearer: bool = 
 	busy = true
 	_request = HTTPRequest.new()
 	_request.timeout = REQUEST_TIMEOUT
-	_request.body_size_limit = 262144 if action in ["social","teams"] else 32768
+	_request.body_size_limit = 262144 if action in ["social","teams","target_profile"] else 32768
 	_request.max_redirects = 0
 	add_child(_request)
 	_request.request_completed.connect(_on_response.bind(_generation))
@@ -183,7 +187,7 @@ func _send(action: String, address: String, payload: Dictionary, bearer: bool = 
 	if action in ["characters", "character_create"]: route = "/api/v1/characters"
 	if action == "character_delete": route = "/api/v1/characters/delete"
 	if action == "world_ticket": route = "/api/v1/world/ticket"
-	if action == "social": route = "/api/v1/social"
+	if action in ["social","target_profile"]: route = "/api/v1/social"
 	if action == "teams": route = "/api/v1/teams"
 	var error := _request.request(_target + route, headers, method, body)
 	if error != OK: _finish({"ok": false, "code": "NETWORK_ERROR", "request_error": int(error)})
@@ -237,7 +241,7 @@ func _on_response(result: int, code: int, _headers: PackedStringArray, body: Pac
 		pending_deletion = {}
 		_finish({"ok": true})
 		return
-	if _action in ["social","teams"]:
+	if _action in ["social","teams","target_profile"]:
 		_finish(data)
 		return
 	if _action in ["characters", "character_create"]:

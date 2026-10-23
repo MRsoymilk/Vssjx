@@ -70,6 +70,8 @@ var _closed_duel := ""
 var _duel_lines := ""
 var social: RefCounted = preload("res://scripts/network/online_social.gd").new()
 var social_panel: Control
+var target:=OnlineTarget.new()
+var target_view:PlayerTarget
 var _social_incoming: Array = []
 var team:RefCounted=preload("res://scripts/network/online_team.gd").new()
 var team_panel:Control
@@ -122,6 +124,14 @@ func _ready() -> void:
 		if not team.submit("invite",id):chat_status.text="正在同步队伍，请稍后再邀请。"
 	)
 	social.changed.connect(_social_changed)
+	target.character_id=character_id
+	target.send_requested.connect(OnlineAccount.target_profile_request)
+	target_view=preload("res://scenes/ui/player_target.tscn").instantiate();add_child(target_view)
+	target_view.action_requested.connect(_target_action)
+	target_view.actions_opened.connect(func()->void:
+		_cancel_approach();network.stop_moving();move_target.clear();_was_keyboard=false
+	)
+	target.changed.connect(_refresh_target)
 	duel_invitation = DuelInvitation.new()
 	duel_invitation.channel = network.duel
 	add_child(duel_invitation)
@@ -319,6 +329,7 @@ func _status_changed(text_value: String) -> void:
 	_system_text = text_value
 	expanded_chat.add_system(text_value)
 	if not network.world_ready:
+		target.clear()
 		move_target.clear()
 		for actor in actors.values(): actor.sprite.play("idle")
 	_chat_changed()
@@ -328,10 +339,34 @@ func _map_command_sent(packet: Dictionary) -> void:
 		_begin_map_transition()
 
 func _select_player(id: String) -> void:
-	if id == character_id or not network.entities.has(id) or network.pve.active() or network.pve.pending(): return
-	_cancel_approach()
-	network.stop_moving();move_target.clear();_was_keyboard=false
-	_open_social("profile",id)
+	if id == character_id or not network.entities.has(id) or not network.world_ready or network.pve.active() or network.pve.pending() or team.active() or network.duel.active() or map_transition.blocking:return
+	_cancel_approach();target.select(id);target_view.close_actions();_refresh_target()
+
+func _refresh_target()->void:
+	if not is_instance_valid(target_view):return
+	if target.selected.is_empty():target_view.display("",{},{});return
+	if not network.world_ready or not network.entities.has(target.selected) or map_transition.blocking or network.pve.active() or team.active() or network.duel.active():
+		target.clear();return
+	target_view.display(target.selected,network.entities[target.selected],target.profile,target.last_code)
+	target_view.visible=not (is_instance_valid(help_panel) or team_panel.visible or social_panel.visible or bag_overlay!=null or menu.visible or details.visible or npc_dialog.visible or encounter.visible or battle_view.visible or solo_battle.visible or duel_battle.visible or team_battle.visible or expanded_chat.visible or attributes.visible or world_map.visible)
+	if not target_view.visible:target_view.close_actions()
+	target_view.buttons.duel.disabled=not network.duel.enabled or network.duel.pending()
+	var friends:bool=social.state.get("friends",[]).any(func(p:Dictionary)->bool:return p.id==target.selected)
+	target_view.buttons.friend.text="已是好友" if friends else "加为好友"
+	target_view.buttons.friend.disabled=friends or social.pending() or social.inflight or not social.request.is_empty()
+	target_view.buttons.team.disabled=not team.can_submit()
+
+func _target_action(action:String)->void:
+	var id:=target.selected
+	if action=="clear":target.clear();return
+	if id.is_empty() or not network.world_ready or not network.entities.has(id) or not target_view.is_visible_in_tree() or network.pve.pending() or network.pve.active() or team.active() or network.duel.active() or map_transition.blocking:return
+	match action:
+		"profile":_open_social("profile",id)
+		"friend":
+			if not social.submit("friend_request",id):chat_status.text="正在同步社交信息，请稍后再试。"
+		"team":
+			if not team.submit("invite",id):chat_status.text="正在同步队伍，请稍后再邀请。"
+		"duel":_invite_player(id)
 
 func _open_social(section: String, target: String="") -> void:
 	if team_panel.visible:team_panel.dismiss()
@@ -347,6 +382,7 @@ func _open_social(section: String, target: String="") -> void:
 func _social_completed(action: String, result: Dictionary) -> void:
 	if action=="social":social.receive(result)
 	elif action=="teams":team.receive(result)
+	elif action=="target_profile":target.receive(result)
 
 func _open_team()->void:
 	if social_panel.visible:social_panel.dismiss()
@@ -491,6 +527,7 @@ func _duel_changed() -> void:
 
 func _begin_map_transition() -> void:
 	if map_transition.blocking: return
+	target.clear()
 	_transfer_origin = String(map_data.map_id)
 	_cancel_approach()
 	_close_inventory()
@@ -557,6 +594,7 @@ func _build_map() -> void:
 		tag.text = "灵空台 · AI生成";preload("res://scripts/world_nameplate.gd").apply(tag,Color("c2f7f4")); ai_station.add_child(tag)
 
 func _map_changed(id: String) -> void:
+	target.clear()
 	if social_panel.visible:social_panel.dismiss()
 	duel_invitation.selected = ""
 	_portal_latch=""
@@ -638,6 +676,7 @@ func _snapshot(values: Dictionary) -> void:
 		actors[id].motion.receive(entity, _motion_grid)
 		actors[id].root.position = actors[id].motion.position
 	if not duel_invitation.selected.is_empty() and not values.has(duel_invitation.selected): duel_invitation.selected = ""
+	if not target.selected.is_empty() and not values.has(target.selected):target.clear()
 	count_label.text = "同图%d人" % actors.size()
 	screen.hud.get_node("Minimap").set_shared_world(map_data, values, character_id)
 	if values.has(character_id):
@@ -739,6 +778,8 @@ func _process(delta: float) -> void:
 	_update_chat_controls()
 	_update_allocation_controls()
 	_advance_map_transition()
+	_refresh_target()
+	target.tick(social_available and not OnlineAccount.busy and target_view.visible)
 	if network == null or not network.world_ready: return
 	if network.pve.ready and network.pve.unavailable_monsters() != _hidden_residents:
 		_population(network.population.entities)
@@ -771,7 +812,7 @@ func _process(delta: float) -> void:
 	if OS.has_feature("web") and (not Platform.context.lifecycle.focused or Platform.context.lifecycle.suspended): return
 	if _follow_transfer():return
 	_advance_approach()
-	if is_instance_valid(help_panel) or team_panel.visible or social_panel.visible or bag_overlay != null or chat_input.has_focus() or menu.visible or details.visible or npc_dialog.visible or emote_picker.visible or encounter.visible or (battle_view.visible or solo_battle.visible) or expanded_chat.visible or attributes.visible or world_map.visible or network.pve.pending() or network.pve.active():
+	if target_view.actions.visible or is_instance_valid(help_panel) or team_panel.visible or social_panel.visible or bag_overlay != null or chat_input.has_focus() or menu.visible or details.visible or npc_dialog.visible or emote_picker.visible or encounter.visible or (battle_view.visible or solo_battle.visible) or expanded_chat.visible or attributes.visible or world_map.visible or network.pve.pending() or network.pve.active():
 		_was_keyboard = false
 		return
 	if network.team_following: return
@@ -804,6 +845,9 @@ func _map_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed: point = event.position
 	elif event is InputEventScreenTouch and event.pressed: point = event.position
 	else: return
+	if target_view.actions.visible:
+		target_view.close_actions()
+		return # Dismissal consumes the click; never also move or select a different player.
 	if emote_picker.visible:
 		emote_picker.hide()
 		return
@@ -852,6 +896,10 @@ func _unhandled_key_input(event: InputEvent) -> void:
 	if map_transition.blocking: return
 	if network.duel.active() or duel_battle.visible or team.active() or team_battle.visible: return
 	if not event is InputEventKey or not event.pressed: return
+	if event.keycode==KEY_ESCAPE and not target.selected.is_empty() and target_view.visible:
+		if target_view.actions.visible:target_view.close_actions()
+		else:target.clear()
+		get_viewport().set_input_as_handled();return
 	if team_panel.visible:
 		if event.keycode==KEY_ESCAPE:team_panel.dismiss();get_viewport().set_input_as_handled()
 		return

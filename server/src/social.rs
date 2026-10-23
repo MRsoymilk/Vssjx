@@ -576,7 +576,7 @@ async fn public_profile(
     online: &HashSet<Uuid>,
 ) -> Result<Value, AuthError> {
     // Allowlist only: never serialize Character or an account/session/inventory row.
-    let row=sqlx::query("SELECT c.id,c.display_name,c.job,c.gender,c.school,c.level,c.balance_revision,c.loot_state,c.allocated_attributes,COALESCE((SELECT jsonb_object_agg(i.definition_id,true) FROM inventory_items i WHERE i.character_id=c.id AND i.equipped),'{}'::jsonb) AS gear,(SELECT jsonb_build_object('id',g.id,'name',g.name,'role',m.role) FROM guild_members m JOIN guilds g ON g.id=m.guild_id WHERE m.character_id=c.id) AS guild FROM characters c JOIN accounts a ON a.id=c.account_id WHERE c.id=$1 AND c.deleted_at IS NULL AND NOT a.disabled")
+    let row=sqlx::query("SELECT c.id,c.display_name,c.job,c.gender,c.school,c.level,c.hp,c.mp,c.balance_revision,c.loot_state,c.allocated_attributes,COALESCE((SELECT jsonb_object_agg(i.definition_id,true) FROM inventory_items i WHERE i.character_id=c.id AND i.equipped),'{}'::jsonb) AS gear,(SELECT jsonb_build_object('id',g.id,'name',g.name,'role',m.role) FROM guild_members m JOIN guilds g ON g.id=m.guild_id WHERE m.character_id=c.id) AS guild FROM characters c JOIN accounts a ON a.id=c.account_id WHERE c.id=$1 AND c.deleted_at IS NULL AND NOT a.disabled")
         .bind(id).fetch_optional(db).await.map_err(database)?;
     let Some(r) = row else { return Ok(Value::Null) };
     let gear: BTreeMap<String, bool> = r.get::<DbJson<BTreeMap<String, bool>>, _>("gear").0;
@@ -606,7 +606,8 @@ async fn public_profile(
         .map(|s| (s.into(), crate::shop::equipped(&gear, s).map(str::to_owned)))
         .collect();
     for i in loot.items.iter().filter(|i|i.equipped&&!i.legacy){equipped.insert(i.slot().into(),Some(i.template.clone()));}
+    let vitals=json!({"hp":r.get::<i32,_>("hp").clamp(0,stats["hp"].as_i64().unwrap() as i32),"mp":r.get::<i32,_>("mp").clamp(0,stats["mp"].as_i64().unwrap() as i32)});
     Ok(
-        json!({"id":id,"display_name":r.get::<String,_>("display_name"),"job":job,"gender":r.get::<i16,_>("gender"),"school":r.get::<i16,_>("school"),"level":level,"online":online.contains(&id),"appearance":loot.look(crate::shop::appearance(&gear)),"combat":stats,"equipment":equipped,"guild":r.get::<Option<DbJson<Value>>,_>("guild").map(|v|v.0)}),
+        json!({"id":id,"display_name":r.get::<String,_>("display_name"),"job":job,"gender":r.get::<i16,_>("gender"),"school":r.get::<i16,_>("school"),"level":level,"online":online.contains(&id),"appearance":loot.look(crate::shop::appearance(&gear)),"combat":stats,"vitals":vitals,"equipment":equipped,"guild":r.get::<Option<DbJson<Value>>,_>("guild").map(|v|v.0)}),
     )
 }

@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/player_target.gd" id="1"]
+[node name="PlayerTarget" type="Control"]
+mouse_filter = 2
+offset_right = 320.0
+offset_bottom = 480.0
+script = ExtResource("1")

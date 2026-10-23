@@ -122,8 +122,13 @@ func _run() -> void:
 	var view: OnlineWorldView=load("res://scenes/ui/online_world_view.tscn").instantiate()
 	view.character_id=SELF;add_child(view);view.set_process(false);view.network.set_process(false)
 	view.network.entities={OTHER:{"display_name":"昆仑客"}}
+	view.network.world_ready=true
 	view._select_player(OTHER)
-	check(view.social_panel.visible and view.social_panel.section=="profile" and view.social.request.target==OTHER,"Clicking a map player opens the public profile independently of PK capability")
+	check(view.target_view.visible and not view.target_view.actions.visible and not view.social_panel.visible and view.target.selected==OTHER,"Clicking a map player only selects the upper-right target, independently of PK capability")
+	view.target_view.card.pressed.emit()
+	check(view.target_view.actions.visible and not view.social_panel.visible,"A second deliberate HUD click opens the action menu")
+	view.target_view.buttons.profile.pressed.emit()
+	check(view.social_panel.visible and view.social_panel.section=="profile" and view.social.request.target==OTHER,"Only the explicit view-info action opens the public profile")
 	view.social_panel.dismiss();view._scene_action("friends")
 	check(view.social_panel.visible and view.social_panel.section=="friends","Menu social opens friend management")
 	view._scene_action("guild")

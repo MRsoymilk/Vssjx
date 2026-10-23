@@ -120,6 +120,10 @@ func valid(v: Dictionary) -> bool:
 			if not OnlinePve.integer(p.appearance[i],0,ShopRules.APPEARANCE_LIMITS[i]): return false
 		for key in ["hp","mp","physical_attack","magic_attack","physical_defense","magic_defense","physical_crit","magic_crit","physical_hit","magic_hit","physical_evasion","magic_evasion","damage_reduction"]:
 			if not OnlinePve.integer(p.combat.get(key),0,100000): return false
+		if p.has("vitals"):
+			if not p.vitals is Dictionary:return false
+			for key in ["hp","mp"]:
+				if not OnlinePve.integer(p.vitals.get(key),0,int(p.combat[key])):return false
 		for slot in ShopRules.SLOTS:
 			if not p.equipment.has(slot): return false
 			var item: Variant=p.equipment[slot]

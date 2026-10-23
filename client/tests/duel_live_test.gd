@@ -18,6 +18,7 @@ func capture(name_value: String) -> void:
 	check(get_viewport().get_texture().get_image().save_png(path.path_join(name_value + ".png")) == OK,"Capture " + name_value)
 
 func _run() -> void:
+	await Platform.when_ready()
 	var old := Game.player.duplicate(true)
 	var role := OS.get_environment("SSJX_DUEL_ROLE")
 	OnlineAccount.login(OS.get_environment("SSJX_DUEL_BASE"),"duel_ui_"+role,OS.get_environment("SSJX_DUEL_PASSWORD"))
@@ -38,6 +39,8 @@ func _run() -> void:
 		check(not peer.is_empty(),"Same-map opponent is selectable")
 		if peer.is_empty():get_tree().quit(1);return
 		view._select_player(peer)
+		check(view.target_view.visible and not view.social_panel.visible,"Selecting a player only shows the upper-right target card")
+		view.target_view.card.pressed.emit();view.target_view.buttons.profile.pressed.emit()
 		check(await wait_until(func()->bool:return view.social_panel.visible and view.social.profile.get("id")==peer),"Player selection loads the public character card")
 		var invite:Button
 		for row in view.social_panel.rows.get_children():

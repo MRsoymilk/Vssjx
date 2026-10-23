@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="NativeHeroEquipment" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/hero_equipment.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/resources/appearance_part.gd" id="PartType"]
+[ext_resource type="Resource" path="res://assets/appearance_resources/parts/vow/wfs/wfst2.tres" id="Part_0"]
+
+[resource]
+script = ExtResource("1")
+stem = "wfs"
+slot = "head"
+visual_code = 33
+parts = Array[ExtResource("PartType")]([ExtResource("Part_0")])

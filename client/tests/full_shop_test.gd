@@ -46,11 +46,11 @@ func _run() -> void:
 	check(source_count==208,"All recovered items are functional")
 	var page:ShopPanel=load("res://scenes/ui/shop_panel.tscn").instantiate()
 	add_child(page)
-	check(page.rows.size()==399 and page.grid.columns==2,"Complete two-column catalog including reusable supply gourds")
+	check(page.rows.size()==459 and page.grid.columns==2,"Complete two-column catalog including ceremonial outfits and supply gourds")
 	for row in page.rows:
 		check(row.get_node("Icon").texture!=null,"Actual product icon "+String(row.get_meta("item_id")))
 	page.category="帽子";page.category_box.select(2);page._filter()
-	check(page.goods.size()==27 and page.goods.all(func(i:Dictionary)->bool:return i.slot=="hat"),"Nine original and eighteen generated hats in their own category")
+	check(page.goods.size()==33 and page.goods.all(func(i:Dictionary)->bool:return i.slot=="hat"),"Nine original and twenty-four generated hats in their own category")
 	page.selected=page.goods[4].id;page.refresh()
 	await capture("shop_hats")
 	page.preview_window.show();await capture("shop_head_preview");page.preview_window.hide()

@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="NativeAppearancePart" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/appearance_part.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+source_id = "vow/wzs/wzs4q"
+texture_path = "res://assets/generated/equipment/vow/wzs/parts/wzs4q.png"
+regions = Array[Rect2i]([Rect2i(0, 0, 10, 7), Rect2i(25, 0, 8, 7), Rect2i(50, 0, 25, 21)])

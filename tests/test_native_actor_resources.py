@@ -74,7 +74,7 @@ class NativeActorResources(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix='native-appearance-',dir='/tmp/opencode') as scratch:
             client=Path(scratch)
             (client/'assets/data').mkdir(parents=True)
-            for name in ['hero-parts.json','appearance-edits.json',*[family+'-equipment.json' for family in ['boneglow','gravebloom','eva01','legendary']]]:
+            for name in ['hero-parts.json','appearance-edits.json',*[family+'-equipment.json' for family in ['boneglow','gravebloom','eva01','legendary','vow']]]:
                 shutil.copyfile(ROOT/'client/assets/data'/name,client/'assets/data'/name)
             target=client/'assets/appearance_resources/overrides.tres'
             target.parent.mkdir(parents=True)

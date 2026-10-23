@@ -100,7 +100,7 @@ class Eva01Assets(unittest.TestCase):
 
     def test_catalog_and_migration_preserve_existing_items_and_slot_constraints(self):
         catalog=json.loads((ROOT/'client/assets/data/shop-v2.json').read_text('utf8'))['items']
-        self.assertEqual(len(catalog),399)
+        self.assertEqual(len(catalog),459)
         self.assertEqual([i for i in catalog if i['id'].startswith('ai/eva01/')],builder.equipment_items())
         sql=(ROOT/'server/migrations/0023_eva01_equipment.sql').read_text('utf8')
         whitelist=re.search(r'definition_id IN \((.*?)\)\)',sql)[1]

@@ -5,7 +5,8 @@ const FAMILIES := [
 	{"id":"boneglow","name":"骨甲幽光","path":"res://assets/appearance_resources/families/boneglow.tres"},
 	{"id":"gravebloom","name":"冥林异装","path":"res://assets/appearance_resources/families/gravebloom.tres"},
 	{"id":"eva01","name":"初号机","path":"res://assets/appearance_resources/families/eva01.tres"},
-	{"id":"legendary","name":"传世兵器","path":"res://assets/appearance_resources/families/legendary.tres"}
+	{"id":"legendary","name":"传世兵器","path":"res://assets/appearance_resources/families/legendary.tres"},
+	{"id":"vow","name":"誓约礼装","path":"res://assets/appearance_resources/families/vow.tres"}
 ]
 const NATIVE_LIMITS := [27,11,9]
 static var _data: Dictionary = {}

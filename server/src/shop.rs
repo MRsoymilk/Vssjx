@@ -117,7 +117,7 @@ mod tests {
             gear.insert(format!("ai/boneglow/{stem}/hat"),true);
             assert_eq!(appearance(&gear),[34+index as i32,18+index as i32,10+index as i32]);
         }
-        assert_eq!(ITEMS.len(),399);
+        assert_eq!(ITEMS.len(),459);
     }
     #[test]
     fn eva01_sets_preserve_role_restrictions_and_mix_with_previous_families(){
@@ -139,6 +139,31 @@ mod tests {
             assert_eq!(appearance(&gear),[40+index as i32,24+index as i32,16+index as i32]);
         }
         assert!(item("ai/eva01/unknown/weapon").is_none());
+    }
+    #[test]
+    fn vow_sets_preserve_roles_and_mix_all_three_visual_slots(){
+        for (index,stem) in ["mzs","wzs","mck","wck","mfs","wfs"].iter().enumerate(){
+            let mut gear=BTreeMap::new();
+            for slot in SLOTS {
+                let id=format!("ai/vow/{stem}/{slot}");
+                let entry=item(&id).expect("every ceremonial slot is catalogued");
+                assert_eq!(entry.slot,slot);
+                assert_eq!(entry.price,if slot=="weapon" {140} else {70});
+                assert_eq!(entry.equip_error((index/2) as i16,(index%2) as i16),None);
+                assert_eq!(entry.equip_error((index/2) as i16,1-(index%2) as i16),Some("WRONG_GENDER"));
+                assert_eq!(entry.equip_error(((index/2+1)%3) as i16,(index%2) as i16),Some("WRONG_JOB"));
+                gear.insert(id,true);
+            }
+            let n=index as i32;
+            assert_eq!(appearance(&gear),[47+n,30+n,28+n]);
+            assert_eq!(bonus(&gear),(14,27));
+            for (slot,expected) in [("hat",[47+n,30+n,22+n]),("armor",[47+n,24+n,22+n]),("weapon",[40+n,24+n,22+n])] {
+                gear.insert(format!("ai/vow/{stem}/{slot}"),false);
+                gear.insert(format!("ai/eva01/{stem}/{slot}"),true);
+                assert_eq!(appearance(&gear),expected);
+            }
+        }
+        assert!(item("ai/vow/unknown/weapon").is_none());
     }
     #[test]
     fn potian_axe_is_one_authoritative_weapon_for_both_lishi_genders(){

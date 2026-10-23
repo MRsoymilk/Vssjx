@@ -36,12 +36,12 @@ func _verify() -> void:
 	var skill_rules = load("res://scripts/skill_rules.gd")
 	check(skill_rules.list_for(1, 0, 50).size() == 8 and skill_rules.list_for(1, 3, 50) == skill_rules.list_for(1, 0, 50), "Packed skills unlock by job and level for all schools")
 	var shop_rules = load("res://scripts/shop_rules.gd")
-	check(shop_rules.catalog.items.size()==397,"All original goods, approved collections and travel talisman are in the packed catalog")
+	check(shop_rules.catalog.items.size()==459,"All original goods, approved collections, ceremonial outfits and supply gourds are in the packed catalog")
 	check(shop_rules.item("restored/shenxing_scroll").get("effect")=="teleport","Packed travel talisman retains destination selection semantics")
 	for item in shop_rules.catalog.items:
 		check(ResourceLoader.exists(item.icon),"Packed product icon: "+item.id)
 	var art=load("res://scripts/art.gd")
-	for collection in ["boneglow","gravebloom","eva01"]:
+	for collection in ["boneglow","gravebloom","eva01","vow"]:
 		for stem in ["mzs","wzs","mck","wck","mfs","wfs"]:
 			var prefix:String="ai/%s/%s/"%[collection,stem]
 			for slot in shop_rules.SLOTS:

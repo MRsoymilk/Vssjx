@@ -11,6 +11,7 @@
 | 私有统计后台与 APK 管理 | [采集、文件管理、HTTP 安全与浏览器验证](portal_stats.md) |
 | 茶馆社区调整与旧论坛清理 | [腾讯频道链接、专用组件移除及服务器核验](community_channel_20261023.md) |
 | EVA 初号机主题装备 | [六角色、60 件装备、实际离屏渲染及隔离联机验证](eva01_equipment.md) |
+| 誓约礼装 | [六套婚纱西装、全动作、商城及旧数据升级验证](vow_equipment.md) |
 | 任务、战斗与地图 | [线上 PVE](online_pve.md)、[第二张地图](online_maps.md)、[技能](../design/skills.md#验证) |
 | 雷霆一击眩晕 | [概率、行动跳过、持久化与原生状态图标](stun.md) |
 | 回合末持续伤害同步 | [五人五怪、混合状态、死亡／复活顺序及跨端回执](periodic_damage.md) |

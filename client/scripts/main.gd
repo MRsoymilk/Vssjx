@@ -653,7 +653,7 @@ func _world_interaction(kind: String, data: Dictionary) -> void:
 		"map_exit":
 			if data.get("legacy",false):_world_interaction("portal",data)
 			else:_world_interaction("ai_travel",{"target":data.target_map})
-		"ai_gate": _open_ai("maps")
+		"ai_gate": _open_world_map()
 		"ai_npc": _open_ai_npc(String(data.id))
 		"ai_travel":
 			_travel_local("ai_travel", data.target)
@@ -891,18 +891,18 @@ func _bag() -> void:
 	modal.add_child(backpack)
 	backpack.back_requested.connect(_close_modal)
 	backpack.changed.connect(_refresh_hud)
-	backpack.travel_requested.connect(_local_scroll_travel)
 
 func _local_scroll_travel(destination:String)->void:
-	if _closing:return
+	if _closing or not modal is OriginalWorldMap:return
+	var page:OriginalWorldMap=modal
 	if Game.storage_busy:
-		if is_instance_valid(backpack):backpack.finish_scroll_travel("正在处理存档，请稍后再试。")
+		page.finish_travel("正在处理存档，请稍后再试。")
 		return
 	var epoch:=_ui_epoch
 	var result:=await Game.shop_command("scroll_travel",destination)
 	if epoch!=_ui_epoch or _closing:return
 	if result.ok:_enter_world()
-	elif is_instance_valid(backpack):backpack.finish_scroll_travel(result.message)
+	elif is_instance_valid(page):page.finish_travel(result.message)
 
 func _open_world_map() -> void:
 	if modal is OriginalWorldMap:
@@ -916,19 +916,17 @@ func _open_world_map() -> void:
 	modal = page
 	ui.add_child(page)
 	page.back_requested.connect(_close_modal)
-	page.ai_requested.connect(func(id: String) -> void:
-		_open_ai("maps")
-		if modal is AIWorldPanel: modal.selected_map=id; modal.refresh()
-	)
+	page.travel_requested.connect(_local_scroll_travel)
 	page.present(world.map_id,world.cell)
 
-func _open_ai(section: String = "maps", npc: String = "") -> void:
+func _open_ai(section: String = "quests", npc: String = "") -> void:
+	if section=="maps":_open_world_map();return
 	if section=="quests" and not npc.is_empty():_open_ai_npc(npc);return
 	_close_modal()
 	world.pause_moving(); world.enabled = false
 	var panel := AIWorldPanel.new()
 	modal = panel
-	panel.present(AIWorld.local_map_id(), AIWorld.progress(), int(Game.player.level), section, npc)
+	panel.present(AIWorld.local_map_id(), AIWorld.progress(), int(Game.player.level), npc)
 	ui.add_child(panel)
 	panel.back_requested.connect(_close_modal)
 	panel.requested.connect(_ai_requested)

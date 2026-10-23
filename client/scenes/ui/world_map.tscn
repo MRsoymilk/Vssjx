@@ -40,6 +40,17 @@ border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
 [sub_resource type="StyleBoxEmpty" id="Empty"]
+[sub_resource type="Theme" id="ConfirmationTheme"]
+Button/colors/font_color = Color(0.29, 0.18, 0.07, 1)
+Button/colors/font_hover_color = Color(0.29, 0.18, 0.07, 1)
+Button/colors/font_pressed_color = Color(0.29, 0.18, 0.07, 1)
+Button/colors/font_focus_color = Color(0.29, 0.18, 0.07, 1)
+Button/colors/font_disabled_color = Color(0.54, 0.47, 0.32, 1)
+Button/styles/normal = SubResource("Orange")
+Button/styles/hover = SubResource("Hover")
+Button/styles/pressed = SubResource("Hover")
+Button/styles/disabled = SubResource("Empty")
+Label/colors/font_color = Color(0.29, 0.18, 0.07, 1)
 [sub_resource type="Theme" id="Theme"]
 default_font = SubResource("Font")
 default_font_size = 15
@@ -199,7 +210,7 @@ offset_right = 167.0
 offset_bottom = 31.0
 focus_mode = 0
 disabled = true
-tooltip_text = "神行符数量暂未同步，传送暂未开放"
+tooltip_text = "点击地图上的目的地，确认使用1张神行符。"
 theme_override_colors/font_disabled_color = Color(1, 0.95, 0.2, 1)
 text = "神行符"
 
@@ -271,3 +282,67 @@ offset_right = 117.0
 offset_bottom = 93.0
 focus_mode = 0
 text = "关闭地图"
+
+[node name="TravelConfirmation" type="Control" parent="."]
+visible = false
+offset_right = 320.0
+offset_bottom = 480.0
+theme = SubResource("ConfirmationTheme")
+
+[node name="Shade" type="ColorRect" parent="TravelConfirmation"]
+offset_right = 320.0
+offset_bottom = 480.0
+mouse_filter = 2
+color = Color(0.02, 0.06, 0.05, 0.65)
+
+[node name="Panel" type="Panel" parent="TravelConfirmation"]
+offset_left = 30.0
+offset_top = 142.0
+offset_right = 290.0
+offset_bottom = 350.0
+theme_override_styles/panel = SubResource("Tip")
+
+[node name="Title" type="Label" parent="TravelConfirmation/Panel"]
+offset_left = 12.0
+offset_top = 10.0
+offset_right = 248.0
+offset_bottom = 36.0
+text = "使用神行符"
+horizontal_alignment = 1
+
+[node name="Question" type="Label" parent="TravelConfirmation/Panel"]
+offset_left = 12.0
+offset_top = 42.0
+offset_right = 248.0
+offset_bottom = 112.0
+theme_override_font_sizes/font_size = 14
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="Status" type="Label" parent="TravelConfirmation/Panel"]
+offset_left = 12.0
+offset_top = 116.0
+offset_right = 248.0
+offset_bottom = 160.0
+theme_override_font_sizes/font_size = 12
+text = ""
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="Confirm" type="Button" parent="TravelConfirmation/Panel"]
+offset_left = 18.0
+offset_top = 166.0
+offset_right = 120.0
+offset_bottom = 196.0
+focus_mode = 0
+text = "确定使用"
+
+[node name="Cancel" type="Button" parent="TravelConfirmation/Panel"]
+offset_left = 140.0
+offset_top = 166.0
+offset_right = 242.0
+offset_bottom = 196.0
+focus_mode = 0
+text = "取消"

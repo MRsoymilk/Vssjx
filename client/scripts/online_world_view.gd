@@ -176,10 +176,7 @@ func _ready() -> void:
 	menu.chosen.connect(func(action: String)->void:_scene_action("friends" if action=="social" else action))
 	attributes.back_requested.connect(_close_attributes)
 	world_map.back_requested.connect(_close_world_map)
-	world_map.ai_requested.connect(func(id: String) -> void:
-		_open_ai("maps")
-		if ai_panel != null: ai_panel.selected_map=id; ai_panel.refresh()
-	)
+	world_map.travel_requested.connect(_scroll_travel)
 	attributes.allocation_requested.connect(_allocate_attributes)
 	attributes.respec_requested.connect(func()->void:
 		if attributes.allocation_enabled:network.pve.submit("respec")
@@ -945,9 +942,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 			get_viewport().set_input_as_handled()
 		return
 	if world_map.visible:
-		if event.keycode in [KEY_ESCAPE, KEY_3]:
-			_close_world_map()
-			get_viewport().set_input_as_handled()
+		world_map._unhandled_key_input(event)
 		return
 	if attributes.visible:
 		if event.keycode == KEY_ESCAPE:
@@ -1423,8 +1418,12 @@ func _open_world_map() -> void:
 	Platform.context.text_input.release_focus(chat_input)
 	var own:Dictionary=network.entities.get(character_id,{})
 	var cell:=Vector2i(own.cell[0],own.cell[1]) if own.has("cell") else Vector2i(-1,-1)
-	world_map.present(String(map_data.map_id),cell)
+	world_map.present(String(map_data.map_id),cell,network.pve)
 	battle_view.set_process_unhandled_key_input(false)
+
+func _scroll_travel(destination: String) -> void:
+	if not network.world_ready or not network.pve.submit("scroll_travel",destination):
+		world_map.finish_travel("暂时无法传送，请确认连接、神行符数量和角色状态。")
 
 func _open_shop() -> void:
 	if network.pve.state.get("shop",{}).get("version") not in ["shop-v1","shop-v2"] or network.pve.active():
@@ -1466,7 +1465,8 @@ func _close_inventory() -> void:
 	shop = null
 	ai_panel = null
 
-func _open_ai(section: String = "maps", npc: String = "") -> void:
+func _open_ai(section: String = "quests", npc: String = "") -> void:
+	if section=="maps":_open_world_map();return
 	if section=="quests" and not npc.is_empty():
 		_close_inventory();_resident_action("ai_npc",npc);return
 	_close_inventory(); _close_world_map()
@@ -1477,7 +1477,7 @@ func _open_ai(section: String = "maps", npc: String = "") -> void:
 	network.stop_moving(); _was_keyboard=false
 	details.hide(); menu.hide(); npc_dialog.hide()
 	ai_panel = AIWorldPanel.new(); bag_overlay = ai_panel
-	ai_panel.present(String(map_data.map_id),network.pve.state.ai_world,int(_character.get("level",1)),section,npc,network.map_rules.exits(String(map_data.map_id)))
+	ai_panel.present(String(map_data.map_id),network.pve.state.ai_world,int(_character.get("level",1)),npc)
 	add_child(ai_panel)
 	ai_panel.back_requested.connect(_close_inventory)
 	ai_panel.requested.connect(_ai_requested)
@@ -1499,7 +1499,7 @@ func _ai_requested(action: String, target: String) -> void:
 
 func _close_world_map() -> void:
 	if not world_map.visible: return
-	world_map.hide()
+	world_map.dismiss()
 	battle_view.set_process_unhandled_key_input(true)
 
 func _can_allocate() -> bool:

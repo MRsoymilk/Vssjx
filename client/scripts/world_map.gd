@@ -1,8 +1,8 @@
 class_name OriginalWorldMap
 extends Control
-## Recovered overview coordinates are browsing data, not teleport destinations.
+## Recovered overview locations with confirmed, inventory-backed talisman travel.
 signal back_requested
-signal ai_requested(map_id: String)
+signal travel_requested(map_id: String)
 const STEP := Vector2(46, 56)
 const PADDING := Vector2(24, 24)
 const GRAPH_SIZE := Vector2(1060, 1448)
@@ -10,7 +10,10 @@ var locations: Dictionary = {}
 var selected_id := 14
 var current_map_id := ""
 var current_cell := Vector2i(-1,-1)
-var ai_button: Button
+var online_model: OnlinePve
+var travel_destination := ""
+var travel_busy := false
+var travel_notice := ""
 var _dragging := false
 var _drag_distance := 0.0
 var _touch_index := -1
@@ -19,6 +22,8 @@ var _touch_index := -1
 @onready var selection: TextureRect = $MapArea/Selection
 @onready var tooltip: Panel = $MapArea/LocationTip
 @onready var popup: Panel = $MapMenu
+@onready var travel_confirmation: Control = $TravelConfirmation
+@onready var travel_confirm: Button = $TravelConfirmation/Panel/Confirm
 
 func _ready() -> void:
 	var source: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://assets/data/original_world.json"))
@@ -28,21 +33,25 @@ func _ready() -> void:
 	$Header/City.pressed.connect(cycle_kind.bind(1))
 	$Header/School.pressed.connect(cycle_kind.bind(2))
 	$MainCity.pressed.connect(cycle_kind.bind(1))
-	$Footer/Back.pressed.connect(func() -> void: back_requested.emit())
+	$Footer/Back.pressed.connect(_request_back)
+	$Footer/Travel.pressed.connect(func() -> void: request_travel(selected_destination()))
 	$Footer/Menu.pressed.connect(func() -> void: popup.visible = not popup.visible)
 	$MapMenu/Details.pressed.connect(func() -> void: popup.hide(); _place_selection())
 	$MapMenu/City.pressed.connect(func() -> void: popup.hide(); cycle_kind(1))
-	$MapMenu/Close.pressed.connect(func() -> void: back_requested.emit())
+	$MapMenu/Close.pressed.connect(_request_back)
 	$CurrentLocation.pressed.connect(_locate_current)
-	ai_button = Button.new()
-	ai_button.text = "AI生成 · 驿路目录"
-	ai_button.position = Vector2(130, 404); ai_button.size = Vector2(180, 30)
-	ai_button.add_theme_font_size_override("font_size", 12)
-	add_child(ai_button)
-	ai_button.pressed.connect(func() -> void: ai_requested.emit("ai_%03d" % selected_id))
+	travel_confirm.pressed.connect(_confirm_travel)
+	$TravelConfirmation/Panel/Cancel.pressed.connect(cancel_travel)
+	Game.storage_changed.connect(func(_busy: bool) -> void: _refresh_travel())
 	select_location(selected_id, true)
 
-func present(map_id: String = "", cell: Vector2i = Vector2i(-1,-1)) -> void:
+func present(map_id: String = "", cell: Vector2i = Vector2i(-1,-1), model: OnlinePve = null) -> void:
+	if online_model != model:
+		if online_model != null and online_model.changed.is_connected(_refresh_travel): online_model.changed.disconnect(_refresh_travel)
+		online_model = model
+		if online_model != null: online_model.changed.connect(_refresh_travel)
+	travel_busy = false
+	cancel_travel()
 	popup.hide()
 	_dragging = false
 	_drag_distance = 0.0
@@ -52,6 +61,79 @@ func present(map_id: String = "", cell: Vector2i = Vector2i(-1,-1)) -> void:
 	$CurrentLocation.visible=not map_id.is_empty()
 	if map_id.is_empty():_place_selection()
 	else:_locate_current()
+	_refresh_travel()
+
+func selected_destination() -> String:
+	return "ai_%03d" % selected_id if locations.has(selected_id) else ""
+
+func scroll_count() -> int:
+	if online_model == null: return ShopRules.quantity(ShopRules.local_state(Game.player), ShopRules.TRAVEL_SCROLL)
+	if not online_model.ready or online_model.state.get("shop", {}).get("version") != "shop-v2": return -1
+	return ShopRules.quantity(online_model.state.shop, ShopRules.TRAVEL_SCROLL)
+
+func _travel_error(destination: String) -> String:
+	if travel_busy: return "正在确认传送，请稍候……"
+	if online_model != null:
+		if not online_model.ready or scroll_count() < 0: return "神行符数量正在同步，请稍候。"
+		if online_model.pending(): return "上一项操作尚未确认，请稍候。"
+		if online_model.active(): return OnlinePve.error_text("BATTLE_ACTIVE")
+		if online_model.is_soul(): return OnlinePve.error_text("SOUL_STATE")
+	else:
+		if Game.storage_busy: return "正在保存，请稍候。"
+		if Game.local_battle_active(): return OnlinePve.error_text("BATTLE_ACTIVE")
+		if Game.is_soul(): return OnlinePve.error_text("SOUL_STATE")
+	var stage := int(Game.player.get("quest", 0) if online_model == null else online_model.state.character.quest_stage)
+	var error := ShopRules.travel_error(destination, current_map_id, stage)
+	if not error.is_empty(): return OnlinePve.error_text(error)
+	if scroll_count() < 1: return OnlinePve.error_text("TRAVEL_SCROLL_REQUIRED")
+	return ""
+
+func _refresh_travel() -> void:
+	if not is_node_ready(): return
+	var count := scroll_count()
+	$Footer/TravelCount.text = str(count) if count >= 0 else "—"
+	$Footer/Travel.disabled = travel_busy or selected_destination().is_empty()
+	$Footer/Travel.tooltip_text = "点击地图上的目的地，确认使用1张神行符。"
+	if not travel_confirmation.visible: return
+	$TravelConfirmation/Panel/Question.text = "是否使用1张神行符前往\n%s？\n持有：%s张" % [SharedWorldMap.title(travel_destination), str(count) if count >= 0 else "—"]
+	var error := _travel_error(travel_destination)
+	$TravelConfirmation/Panel/Status.text = error if not error.is_empty() else travel_notice
+	travel_confirm.disabled = not error.is_empty()
+	$TravelConfirmation/Panel/Cancel.disabled = travel_busy
+
+func request_travel(destination: String) -> void:
+	if travel_busy or destination.is_empty() or not SharedWorldMap.exists(destination): return
+	popup.hide()
+	travel_destination = destination
+	travel_notice = ""
+	travel_confirmation.show()
+	_refresh_travel()
+
+func _confirm_travel() -> void:
+	if not travel_confirmation.visible or travel_busy: return
+	if not _travel_error(travel_destination).is_empty(): _refresh_travel(); return
+	travel_busy = true
+	_refresh_travel()
+	travel_requested.emit(travel_destination)
+
+func finish_travel(message: String) -> void:
+	travel_busy = false
+	travel_notice = message
+	_refresh_travel()
+
+func cancel_travel() -> void:
+	if travel_busy: return
+	travel_confirmation.hide()
+	travel_destination = ""
+	travel_notice = ""
+
+func dismiss() -> void:
+	travel_busy = false
+	cancel_travel()
+	hide()
+
+func _request_back() -> void:
+	if not travel_busy: back_requested.emit()
 
 func _locate_current() -> void:
 	var data:=AIWorld.map_data(current_map_id)
@@ -99,7 +181,7 @@ func _clamp_pan() -> void:
 	graph.position.y = roundf(clampf(graph.position.y, map_area.size.y - GRAPH_SIZE.y, 0))
 
 func _place_selection() -> void:
-	ai_button.disabled=not locations.has(selected_id)
+	_refresh_travel()
 	if not locations.has(selected_id):
 		selection.hide();tooltip.hide()
 		return
@@ -118,9 +200,12 @@ func _select_at(point: Vector2) -> void:
 		if candidate < distance:
 			distance = candidate
 			nearest = id
-	if nearest >= 0: select_location(nearest)
+	if nearest >= 0:
+		select_location(nearest)
+		request_travel(selected_destination())
 
 func _map_input(event: InputEvent) -> void:
+	if travel_confirmation.visible or travel_busy: return
 	popup.hide()
 	if event is InputEventMouse and _touch_index >= 0:
 		map_area.accept_event()
@@ -153,15 +238,20 @@ func _map_input(event: InputEvent) -> void:
 	map_area.accept_event()
 
 func _unhandled_key_input(event: InputEvent) -> void:
-	if not visible or not event is InputEventKey or not event.pressed: return
+	if not visible or not event is InputEventKey or not event.pressed or event.echo: return
 	var input_viewport := get_viewport()
+	if travel_confirmation.visible:
+		if event.keycode in [KEY_ESCAPE, KEY_3]: cancel_travel()
+		elif event.keycode == KEY_ENTER: _confirm_travel()
+		input_viewport.set_input_as_handled()
+		return
 	match event.keycode:
-		KEY_ESCAPE, KEY_3: back_requested.emit()
+		KEY_ESCAPE, KEY_3: _request_back()
 		KEY_0: cycle_kind(1)
 		KEY_LEFT, KEY_A: pan_by(Vector2(STEP.x, 0))
 		KEY_RIGHT, KEY_D: pan_by(Vector2(-STEP.x, 0))
 		KEY_UP, KEY_W: pan_by(Vector2(0, STEP.y))
 		KEY_DOWN, KEY_S: pan_by(Vector2(0, -STEP.y))
-		KEY_ENTER: _place_selection()
+		KEY_ENTER: request_travel(selected_destination())
 		_: return
 	input_viewport.set_input_as_handled()

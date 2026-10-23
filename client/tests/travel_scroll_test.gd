@@ -5,6 +5,17 @@ class RejectWrites extends "res://scripts/interface/adapters/native/native_stora
 class ActiveBattle extends RefCounted:
 	func active()->bool:return true
 
+func click_location(page:OriginalWorldMap,id:int,touch:bool=false)->void:
+	page.select_location(id,true)
+	var point:=page.graph.position+page.location_point(id)
+	for down in [true,false]:
+		if touch:
+			var event:=InputEventScreenTouch.new();event.index=0;event.position=point;event.pressed=down
+			page.map_area.gui_input.emit(event)
+		else:
+			var event:=InputEventMouseButton.new();event.button_index=MOUSE_BUTTON_LEFT;event.position=point;event.pressed=down
+			page.map_area.gui_input.emit(event)
+
 func _run()->void:
 	await Game.when_ready()
 	var old:=Game.player.duplicate(true);var path:=Game.save_path;var storage:=Platform.context.storage
@@ -23,14 +34,29 @@ func _run()->void:
 	var app:Control=load("res://scenes/main.tscn").instantiate();add_child(app);app.set_process(false);app._enter_world();app._scene_action("bag")
 	var bag:OriginalInventory=app.backpack
 	bag.select_item(bag.items.find(bag.items.filter(func(i:Dictionary)->bool:return i.id==item.id)[0]))
+	bag.open_menu()
+	check(not bag.item_menu.get_children().any(func(n:Node)->bool:return n is Button and n.text=="使用"),"Talisman backpack menu no longer offers the removed directory use action")
 	bag.use_item()
-	check(is_instance_valid(bag.travel_picker) and not bag.travel_picker.allow_ruins and Game.player==purchased,"Use opens destination selection at full HP without consuming or unlocking ruins")
-	bag.travel_picker.back_requested.emit()
-	check(Game.player==purchased and not is_instance_valid(bag.travel_picker),"Cancel consumes nothing and closes picker")
-	bag.use_item();bag.travel_picker.selected_map="ai_004";bag.travel_picker.refresh()
+	check(not bag.has_node("TravelPicker") and bag.description.text.contains("地图") and Game.player==purchased,"Direct backpack use only explains map entry and cannot open a directory or spend")
+	app._close_modal()
+	app._scene_action("map")
+	var page:OriginalWorldMap=app.modal
+	check(page.get_node("Footer/TravelCount").text=="3" and not app.world.enabled,"Map shows purchased talisman stock and pauses local movement")
+	click_location(page,4)
+	check(page.travel_confirmation.visible and page.travel_destination=="ai_004" and not page.travel_confirm.disabled and Game.player==purchased,"Map click opens destination confirmation without consuming")
 	output=OS.get_environment("SSJX_SCROLL_CAPTURE") if DisplayServer.get_name()!="headless" else ""
-	await capture("scroll-destination")
-	bag.travel_picker.requested.emit("scroll_travel","ai_004")
+	await capture("scroll-map-confirmation")
+	page.get_node("TravelConfirmation/Panel/Cancel").pressed.emit()
+	check(Game.player==purchased and not page.travel_confirmation.visible and app.modal==page,"Cancel keeps the map open and consumes nothing")
+	click_location(page,4,true)
+	check(page.travel_confirmation.visible and page.travel_destination=="ai_004","Touching a destination uses the same confirmation")
+	Platform.context._storage=RejectWrites.new()
+	page.travel_confirm.pressed.emit()
+	await Game.wait_for_storage()
+	check(Game.player==purchased and app.modal==page and not page.travel_busy and not page.travel_confirm.disabled and not page.travel_notice.is_empty(),"Failed map confirmation restores stock and allows retry on the same dialog")
+	Platform.context._storage=storage
+	page.travel_confirm.pressed.emit()
+	await Game.wait_for_storage()
 	check(app.world.map_id=="ai_004" and Game.player.cell==SharedWorldMap.load_data("ai_004").spawn and ShopRules.quantity(ShopRules.local_state(Game.player),item.id)==2,"Confirmation directly reaches chosen map and consumes exactly one")
 	check(Game.player.hp==purchased.hp and Game.player.mp==purchased.mp and Game.player.gold==210,"Travel does not heal or charge extra copper")
 	await capture("scroll-arrival")
@@ -52,6 +78,14 @@ func _run()->void:
 	check((await Game.shop_command("scroll_travel","qingyun_trail")).ok and Game.player.ai_map.is_empty() and ShopRules.quantity(ShopRules.local_state(Game.player),item.id)==1,"Return to original map consumes one and clears AI map marker")
 	check((await Game.shop_command("scroll_travel","ai_032")).ok and not ShopRules.local_state(Game.player).owned.has(item.id),"Last talisman is removed without a zero-count stack")
 	check((await Game.shop_command("scroll_travel","ai_021")).code=="TRAVEL_SCROLL_REQUIRED","No stock cannot teleport")
+	app._enter_world();app._scene_action("map");page=app.modal
+	click_location(page,21)
+	check(page.travel_confirmation.visible and page.travel_confirm.disabled and page.get_node("Footer/TravelCount").text=="0","Map confirmation explains empty stock and disables consumption")
+	page.travel_confirm.pressed.emit()
+	check(AIWorld.local_map_id()=="ai_032","Even an emitted disabled confirmation cannot teleport without stock")
+	page.cancel_travel();click_location(page,32)
+	check(page.travel_confirm.disabled and page.get_node("TravelConfirmation/Panel/Status").text==OnlinePve.error_text("AI_SAME_MAP"),"Clicking current map cannot consume a talisman")
+	app._close_modal()
 	Game.player=purchased.duplicate(true);Game.player.quest=3
 	check((await Game.shop_command("scroll_travel","ancient_ruins")).ok and Game.player.zone==1 and Game.player.ai_map.is_empty(),"Unlocked original ruins are valid destinations")
 	app.free()

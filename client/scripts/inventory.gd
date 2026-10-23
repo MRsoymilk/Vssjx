@@ -4,7 +4,6 @@ extends Control
 
 signal back_requested
 signal changed
-signal travel_requested(map_id: String)
 const CELL_SCENE := preload("res://scenes/ui/inventory_cell.tscn")
 const EQUIPMENT := ["武器", "腰佩", "衣服", "手腕", "腰带", "裤子", "鞋子", "戒指", "项链", "帽子"]
 const WINDOW := Rect2(36, 63, 248, 353)
@@ -28,7 +27,6 @@ var loot_panel:Control
 var equipment_details:Control
 var _pending_detail_target:Dictionary={}
 var material_bag:GatheringMaterialBag
-var travel_picker:AIWorldPanel
 @onready var description: Label = $Description
 @onready var tooltip: Panel = $Tooltip
 @onready var tooltip_label: Label = $Tooltip/TooltipLabel
@@ -250,6 +248,7 @@ func _selected() -> Dictionary:
 func _description() -> void:
 	var item := _selected()
 	description.text = "" if item.is_empty() else "%s  ×%d" % [item.name, int(item.count)]
+	if item.get("effect")=="teleport":description.text="神行符 ×%d · 请在地图中使用"%int(item.count)
 	if item.get("slot")=="gourd":description.text=item.name+" · "+GourdRules.status(item.id,_gourds())
 
 func _gourds()->Dictionary:
@@ -277,7 +276,7 @@ func open_menu() -> void:
 	if not item.is_empty():
 		actions.append({"name": "查看", "call": show_item})
 		if item.slot=="consumable":
-			if online_model==null or online_model.state.get("shop",{}).get("version")=="shop-v2": actions.append({"name":"使用","call":use_item})
+			if item.get("effect")!="teleport" and (online_model==null or online_model.state.get("shop",{}).get("version")=="shop-v2"): actions.append({"name":"使用","call":use_item})
 		elif ShopRules.is_equipment(item): actions.append({"name":"卸下" if selected_equipment else "装备","call":equip_item})
 		elif item.slot=="gourd":actions.append({"name":"关闭自动补给" if _gourds().get(item.id,{}).get("enabled",false) else "开启自动补给","call":toggle_gourd})
 		if not item.has("instance_id") and (online_model==null or online_model.state.get("shop",{}).get("version")=="shop-v2"): actions.append({"name":"丢弃","call":confirm_discard})
@@ -384,7 +383,8 @@ func use_item() -> void:
 	var code:=ShopRules.use_error(item,_display_player(),_display_stats(),_allocated_points())
 	if not code.is_empty(): description.text=OnlinePve.error_text(code);return
 	if item.get("effect")=="teleport":
-		_open_travel_picker()
+		close_menu()
+		description.text="请打开地图，点击目的地使用神行符。"
 		return
 	if item.get("effect")=="reset_attributes":
 		close_menu()
@@ -397,26 +397,6 @@ func use_item() -> void:
 		_button("取消",Rect2(121,86,64,24),true,item_menu).pressed.connect(close_menu)
 		return
 	await _use_item_id(item.id)
-
-func _open_travel_picker()->void:
-	if is_instance_valid(travel_picker):return
-	close_menu();tooltip.hide();set_process_unhandled_key_input(false)
-	travel_picker=AIWorldPanel.new();travel_picker.name="TravelPicker";travel_picker.travel_action="scroll_travel"
-	travel_picker.allow_ruins=int(Game.player.get("quest",0) if online_model==null else online_model.state.character.quest_stage)>=3
-	var current:String=AIWorld.local_map_id() if online_model==null else online_model.state.character.map_id
-	travel_picker.present(current,{},int(_display_player().level));add_child(travel_picker)
-	travel_picker.back_requested.connect(func()->void:
-		travel_picker.queue_free();travel_picker=null;set_process_unhandled_key_input(true))
-	travel_picker.requested.connect(func(_action:String,destination:String)->void:
-		if travel_picker.busy:return
-		travel_picker.busy=true;travel_picker.notice="正在确认传送……";travel_picker.refresh()
-		if online_model!=null:
-			if not online_model.submit("scroll_travel",destination):finish_scroll_travel("暂时无法传送，请确认神行符数量和角色状态。")
-		else:travel_requested.emit(destination))
-
-func finish_scroll_travel(message:String)->void:
-	if not is_instance_valid(travel_picker):return
-	travel_picker.busy=false;travel_picker.notice=message;travel_picker.refresh()
 
 func _allocated_points() -> Array:
 	return Game.allocated_attributes() if online_model==null else online_model.state.get("attributes",{}).get("allocated",[0,0,0,0,0])

@@ -120,7 +120,7 @@ impl Fighter {
             number("level")? as i32,
         );
         if crate::skill_balance::revised(stats){stats.hp=stats.hp*crate::skill_balance::n("pvp_hp_bp")/10000;}
-        let mut effects=skills::State::new(job,school,level,level);effects.activate(stats);
+        let mut effects=skills::State::new(job,school,level,level);effects.enable_stun(stats);
         Ok(Self {
             id: serde_json::from_value(c["id"].clone()).map_err(|_| "DUEL_PROFILE_UNAVAILABLE")?,
             name: c["display_name"]
@@ -193,6 +193,7 @@ impl Battle {
         self.winner = winner;
         self.reason = reason.into();
         self.ended = Some(now);
+        for f in &mut self.fighters{f.effects.enemy_stun=0;}
         self.resume_at = None;
         self.revision += 1;
         self.lines.push(match winner {
@@ -290,7 +291,8 @@ impl Battle {
             self.fighters[i].effects.reset_turn();
             // Guard is a round-wide defensive commitment, independent of initiative.
             self.fighters[i].guarding = self.choices[i].as_ref().unwrap().action == "guard"
-                && self.fighters[1 - i].effects.enemy_sleep == 0;
+                && self.fighters[1 - i].effects.enemy_sleep == 0
+                && self.fighters[1 - i].effects.enemy_stun == 0;
         }
         let first = match self.fighters[0].speed.cmp(&self.fighters[1].speed) {
             std::cmp::Ordering::Greater => 0,
@@ -330,6 +332,10 @@ impl Battle {
             }
             if actor.hp == 0 {
                 action = "dot".into();
+            } else if enemy.effects.consume_stun() {
+                actor.guarding=false;
+                action="stun".into();
+                self.lines.push(format!("{}处于眩晕，跳过本次行动。",actor.name));
             } else if enemy.effects.enemy_sleep > 0 {
                 action = "sleep".into();
                 self.lines.push(format!("{}沉睡中，跳过行动。", actor.name));

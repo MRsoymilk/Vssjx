@@ -169,13 +169,18 @@
       "chance": 100,
       "legacy_heal": 0,
       "target": "enemy",
-      "description": "单体攻击",
+      "description": "单体攻击；命中后35%概率眩晕，跳过目标下一次行动，受击不解除。",
       "source_row": 10,
       "source_role": "力士",
       "source_level": "5",
       "original_skill_id": null,
       "source": "analysis/references/player-sheet/source.csv",
-      "rules_basis": "名称、归属与效果文字来自用户资料；等级暂按角色解锁等级；消耗、公式、部分持续时间及武功/心法划分为重建规则"
+      "rules_basis": "名称、归属与效果文字来自用户资料；等级暂按角色解锁等级；消耗、公式、部分持续时间及武功/心法划分为重建规则；眩晕为2026-10-23新增玩法，非原版恢复；原伤害与灵力消耗保留",
+      "stun": {
+        "chance": 35,
+        "actions": 1,
+        "cooldown": 3
+      }
     },
     {
       "id": "sheet_011",

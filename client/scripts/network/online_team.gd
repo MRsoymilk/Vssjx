@@ -178,12 +178,14 @@ static func valid_battle(b:Variant,character_id:String,ids:Dictionary)->bool:
 		for k in ["hp","attack","defense","level"]:
 			if not OnlinePve.integer(d.get(k),0,100000):return false
 		if not OnlinePve.integer(e.get("hp"),0,int(d.hp)):return false
+		if not SkillRules.valid_state(e.get("effects")):return false
 		enemies[e.slot]=true
 	if int(b.get("monster_revision",0))==2 and not b.enemies[0].has("elite"):return false
 	for event in b.events:
 		if event is Dictionary and event.has("missed") and (not event.missed is bool or (event.missed and (event.get("damage")!=0 or event.get("critical",false) or event.get("action") not in ["attack","skill"]))):return false
 		if event is Dictionary and event.has("critical") and not event.critical is bool:return false
-		if not event is Dictionary or not (fighters.has(event.get("actor")) or enemies.has(event.get("actor"))) or not (fighters.has(event.get("target")) or enemies.has(event.get("target"))) or event.get("action") not in ["attack","skill","potion","guard","dot","regen","revive"] or not event.get("skill") is String or not OnlinePve.integer(event.get("damage"),0,100000) or not OnlinePve.integer(event.get("healed"),0,100000):return false
+		if not event is Dictionary or not (fighters.has(event.get("actor")) or enemies.has(event.get("actor"))) or not (fighters.has(event.get("target")) or enemies.has(event.get("target"))) or event.get("action") not in ["attack","skill","potion","guard","dot","regen","revive","stun"] or not event.get("skill") is String or not OnlinePve.integer(event.get("damage"),0,100000) or not OnlinePve.integer(event.get("healed"),0,100000):return false
+		if event.action=="stun" and (event.actor!=event.target or not enemies.has(event.actor) or event.skill!="" or int(event.damage)!=0 or int(event.healed)!=0 or event.get("critical",false) or event.get("missed",false)):return false
 		if event.action=="revive" and (event.actor!=event.target or not enemies.has(event.actor) or event.skill!="monster_rebirth" or int(event.damage)!=0 or int(event.healed)<1 or not b.enemies.any(func(e:Dictionary)->bool:return e.slot==event.actor and e.has("elite"))):return false
 	if b.has("loot_pool") and (b.outcome!="victory" or not TeamLootRules.valid(b.loot_pool,b.fighters)):return false
 	return true

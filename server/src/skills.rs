@@ -8,14 +8,21 @@ use std::collections::BTreeMap;
 #[derive(Clone,Debug,Default,Serialize,Deserialize)]
 #[serde(default)]
 pub struct BalanceState{
+    #[serde(default,skip_serializing_if="is_zero")]
+    pub stun_revision:u8,
     pub cooldowns:BTreeMap<String,i32>,
     pub targets:i32,
     pub control_protection:i32,
     pub last_enemy_magical:bool,
 }
 const DATA: &str = include_str!("../../client/assets/data/skills-v1.json");
+fn is_zero(value:&u8)->bool{*value==0}
+#[derive(Deserialize)]
+pub struct Stun {pub chance:i32,pub actions:i32,pub cooldown:i32}
 #[derive(Deserialize)]
 pub struct Skill {
+    #[serde(default)]
+    pub stun:Option<Stun>,
     pub id: String,
     pub name: String,
     pub job: i16,
@@ -69,6 +76,8 @@ pub fn view(job: i16, school: i16, level: i32) -> Value {
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 #[serde(default)]
 pub struct State {
+    #[serde(default,skip_serializing_if="stun_is_zero")]
+    pub enemy_stun:i32,
     #[serde(default,skip_serializing_if="Option::is_none")]
     pub builds:Option<crate::builds::Progress>,
     #[serde(skip_serializing_if="not_critical")]
@@ -108,11 +117,17 @@ pub struct State {
 fn not_critical(value: &bool) -> bool {
     !*value
 }
+fn stun_is_zero(value:&i32)->bool{*value==0}
 impl State {
+    // Enable only at encounter creation. Deserializing an in-flight battle must
+    // not opt it into new mechanics or a new cooldown halfway through combat.
+    pub fn enable_stun(&mut self,stats:Stats){self.activate(stats);if let Some(b)=self.balance.as_mut(){b.stun_revision=1;}}
+    pub fn stun_enabled(&self)->bool{self.balance.as_ref().is_some_and(|b|b.stun_revision==1)}
+    pub fn consume_stun(&mut self)->bool{if self.enemy_stun<=0{return false;}self.enemy_stun-=1;true}
     pub fn miss(&mut self,s:&Skill,stats:Stats,mp:&mut i32){self.activate(stats);self.last_skill=s.id.clone();self.last_missed=true;*mp-=crate::skill_balance::cost(s,stats);self.mark(s);self.last_critical=false;}
     pub fn activate(&mut self,stats:Stats){if crate::skill_balance::revised(stats)&&self.balance.is_none(){self.balance=Some(BalanceState{targets:1,..Default::default()});}}
     pub fn remaining(&self,id:&str)->i32{self.balance.as_ref().and_then(|b|b.cooldowns.get(id)).copied().unwrap_or(0)}
-    pub fn mark(&mut self,s:&Skill){if let Some(b)=self.balance.as_mut(){b.cooldowns.insert(s.id.clone(),crate::skill_balance::cooldown(s)+1);}}
+    pub fn mark(&mut self,s:&Skill){let cooldown=crate::skill_balance::cooldown_for(s,self.stun_enabled());if let Some(b)=self.balance.as_mut(){b.cooldowns.insert(s.id.clone(),cooldown+1);}}
     pub fn tick_balance(&mut self){if let Some(b)=self.balance.as_mut(){for v in b.cooldowns.values_mut(){*v=(*v-1).max(0);}b.cooldowns.retain(|_,v|*v>0);b.control_protection=(b.control_protection-1).max(0);}}
     pub fn end_balance_round(&mut self,hp:&mut i32,max_hp:i32)->i32{
         if self.balance.is_none(){return 0;}
@@ -236,6 +251,11 @@ impl State {
                 *mp = (*mp + stolen).min(stats.mp);
             }
             _ => {}
+        }
+        if self.stun_enabled() && let Some(stun)=s.stun.as_ref()
+            && roll<stun.chance && self.balance.as_ref().is_some_and(|b|b.control_protection==0) {
+            self.enemy_stun=stun.actions;
+            self.balance.as_mut().unwrap().control_protection=crate::skill_balance::n("control_protection");
         }
         crate::builds::cast(s,stats,self,hp,mp,damage,stolen_amount,control_applied)
     }

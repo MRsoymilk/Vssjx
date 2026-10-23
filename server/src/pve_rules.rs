@@ -311,7 +311,9 @@ impl Battle {
             self.skills.end_turn();
             return Ok(lines);
         }
-        if self.skills.enemy_sleep > 0 {
+        if self.skills.consume_stun() {
+            lines.push(format!("{}处于眩晕，跳过本次行动。",self.enemy.name));
+        } else if self.skills.enemy_sleep > 0 {
             lines.push(format!("{}处于睡眠，无法行动。", self.enemy.name));
         } else {
             let magical=crate::skill_balance::revised(stats)&&crate::skill_balance::monster_magical(&self.enemy,self.round as i32,self.skills.enemy_mp,self.skills.enemy_silence>0);

@@ -53,6 +53,10 @@ def build():
             mp_cost=9,damage_percent=180,effect='damage',value=0,duration=0,chance=100,
             legacy_heal=16 if job==2 else 0,target='enemy',description='旧版入门技能，保留兼容。',
             source_row=None,original_skill_id=None,source='client/scripts/battle.gd',rules_basis='沿用旧版重建规则，并非原版技能'))
+    thunder=next(s for s in items if s['id']=='sheet_010')
+    thunder['stun']={'chance':35,'actions':1,'cooldown':3}
+    thunder['description']='单体攻击；命中后35%概率眩晕，跳过目标下一次行动，受击不解除。'
+    thunder['rules_basis']+='；眩晕为2026-10-23新增玩法，非原版恢复；原伤害与灵力消耗保留'
     assert len(items)==33
     return {'version':'skills-v1','named_reference_count':30,'unnamed_rows_excluded':18,
         'rules_basis':'表中具名技能及效果文字接入；未知消耗与战斗参数使用显式重建规则',

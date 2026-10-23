@@ -9,6 +9,13 @@ from build_skill_catalog import build, build_coverage
 
 
 class SkillCatalogTests(unittest.TestCase):
+    def test_thunder_stun_is_authored_and_keeps_its_original_damage_budget(self):
+        skills=build()['items']
+        thunder=next(s for s in skills if s['id']=='sheet_010')
+        self.assertEqual(thunder['stun'],{'chance':35,'actions':1,'cooldown':3})
+        self.assertEqual((thunder['effect'],thunder['damage_percent'],thunder['mp_cost'],thunder['unlock_level']),('damage',180,9,5))
+        self.assertIn('非原版恢复',thunder['rules_basis'])
+        self.assertEqual([s['id'] for s in skills if 'stun' in s],['sheet_010'])
     def test_reference_gaps_are_ui_metadata_not_playable_definitions(self):
         coverage=build_coverage()
         self.assertEqual(coverage,json.loads((ROOT/'client/assets/data/skill-reference-coverage.json').read_text('utf8')))

@@ -75,6 +75,8 @@ func _sync()->void:
 	server_time=int(Time.get_unix_time_from_system()*1000);received_at=Time.get_ticks_msec();state.deadline_ms=server_time+30000
 func _copy_enemy(from:Dictionary,to:Dictionary)->void:
 	for key in ENEMY_FIELDS:to[key]=from[key]
+	if int(from.get("enemy_stun",0))>0:to.enemy_stun=int(from.enemy_stun)
+	else:to.erase("enemy_stun")
 	if from.has("balance") and to.has("balance"):to.balance.control_protection=from.balance.control_protection
 func _event(actor:String,target:String,action:String,skill:String,damage:int=0,healed:int=0,critical:bool=false,missed:bool=false)->void:
 	state.events.append({"actor":actor,"target":target,"action":action,"skill":skill,"damage":damage,"healed":healed,"critical":critical,"missed":missed})
@@ -119,6 +121,10 @@ func submit(action:String,target:String="",skill:String="")->bool:
 func _enemy_round()->void:
 	for e in state.enemies:
 		if int(e.hp)<=0 or engine.hp<=0:continue
+		if SkillRules.consume_stun(e.effects):
+			state.lines.append("%s处于眩晕，跳过本次行动。"%e.definition.name)
+			_event(e.slot,e.slot,"stun","")
+			continue
 		if int(e.effects.enemy_sleep)>0:state.lines.append("%s处于睡眠，无法行动。"%e.definition.name);continue
 		var magical:=SkillBalance.monster_magical(e.definition,int(state.round),int(e.effects.enemy_mp),int(e.effects.enemy_silence)>0)
 		var plan:=MonsterCombat.elite_plan(e,rng.randi_range(0,99),magical,int(e.effects.enemy_silence)>0)
@@ -155,6 +161,7 @@ func _enemy_round()->void:
 func _revive_fallen()->void:
 	if engine.hp<=0:return
 	for e in state.enemies:
+		if int(e.hp)==0:e.effects.erase("enemy_stun")
 		if int(e.hp)==0 and e.has("elite") and int(e.elite.revives_left)>0:
 			e.elite.revives_left=int(e.elite.revives_left)-1
 			e.hp=maxi(1,int(e.definition.hp)*MonsterCombat.elite_n(int(e.elite.party_size),"revive_bp")/10000)

@@ -45,6 +45,7 @@ static func valid_view(view:Variant,character:Dictionary)->bool:
 static func valid_state(state:Variant)->bool:
 	if state is Dictionary and state.has("builds") and not BuildRules.valid_progress(state.builds):return false
 	if not state is Dictionary or not state.get("last_skill") is String or not state.get("last_enemy_acted") is bool:return false
+	if state.has("enemy_stun") and not OnlinePve.integer(state.enemy_stun,0,1):return false
 	for key in ["last_missed","last_enemy_missed"]:
 		if state.has(key) and not state[key] is bool:return false
 	if state.has("last_critical") and not state.last_critical is bool:return false
@@ -57,6 +58,7 @@ static func valid_state(state:Variant)->bool:
 	if state.has("balance"):
 		var b:Variant=state.balance
 		if not b is Dictionary or not b.get("cooldowns") is Dictionary or b.cooldowns.size()>33 or not OnlinePve.integer(b.get("targets"),0,5) or not OnlinePve.integer(b.get("control_protection"),0,3) or not b.get("last_enemy_magical") is bool:return false
+		if b.has("stun_revision") and not OnlinePve.integer(b.stun_revision,0,1):return false
 		for id in b.cooldowns:
 			if not id is String or item(id).is_empty() or not OnlinePve.integer(b.cooldowns[id],0,4):return false
 	for key in TIMERS+["enemy_bleed","enemy_poison","regen"]:
@@ -81,9 +83,17 @@ static func reset_turn(state:Dictionary)->void:
 
 static func activate(state:Dictionary,stats:Dictionary)->void:
 	if SkillBalance.revised(stats) and not state.has("balance"):state.balance={"cooldowns":{},"targets":1,"control_protection":0,"last_enemy_magical":false}
+static func enable_stun(state:Dictionary,stats:Dictionary)->void:
+	activate(state,stats)
+	if state.has("balance"):state.balance.stun_revision=1
+static func stun_enabled(state:Dictionary)->bool:return int(state.get("balance",{}).get("stun_revision",0))==1
+static func consume_stun(state:Dictionary)->bool:
+	if int(state.get("enemy_stun",0))<=0:return false
+	state.erase("enemy_stun")
+	return true
 static func remaining(state:Dictionary,id:String)->int:return int(state.get("balance",{}).get("cooldowns",{}).get(id,0))
 static func miss(skill:Dictionary,state:Dictionary,stats:Dictionary,mp:int)->int:
-	activate(state,stats);state.erase("last_critical");state.last_missed=true;state.last_skill=skill.id;state.balance.cooldowns[skill.id]=SkillBalance.cooldown(skill)+1
+	activate(state,stats);state.erase("last_critical");state.last_missed=true;state.last_skill=skill.id;state.balance.cooldowns[skill.id]=SkillBalance.cooldown(skill,stun_enabled(state))+1
 	return mp-SkillBalance.cost(skill,stats)
 static func end_balance_round(state:Dictionary,hp:int,max_hp:int)->Dictionary:
 	if not state.has("balance"):return {"damage":0,"hp":hp}
@@ -103,7 +113,7 @@ static func cast(skill:Dictionary,state:Dictionary,stats:Dictionary,hp:int,mp:in
 	var revised:=SkillBalance.revised(stats)
 	activate(state,stats)
 	mp-=SkillBalance.cost(skill,stats)
-	if revised:state.balance.cooldowns[skill.id]=SkillBalance.cooldown(skill)+1
+	if revised:state.balance.cooldowns[skill.id]=SkillBalance.cooldown(skill,stun_enabled(state))+1
 	var coefficient:=SkillBalance.coefficient(skill,int(state.balance.targets)) if revised else int(skill.damage_percent)*100
 	var damage:=CharacterAttributeRules.direct_damage(stats,enemy_defense,coefficient) if int(skill.damage_percent)>0 else 0
 	var healed:=mini(int(skill.legacy_heal),int(stats.hp)-hp)
@@ -131,6 +141,9 @@ static func cast(skill:Dictionary,state:Dictionary,stats:Dictionary,hp:int,mp:in
 			var stolen:=mini(value,int(state.enemy_mp));state.enemy_mp=int(state.enemy_mp)-stolen
 			stolen_amount=stolen
 			mp=mini(int(stats.mp),mp+stolen)
+	if stun_enabled(state) and skill.has("stun") and roll<int(skill.stun.chance) and int(state.balance.control_protection)==0:
+		state.enemy_stun=int(skill.stun.actions)
+		state.balance.control_protection=int(SkillBalance.rules.control_protection)
 	state.last_healed=int(state.last_healed)+healed
 	return BuildRules.cast(skill,stats,state,hp,mp,damage,stolen_amount,control_applied)
 
@@ -163,7 +176,7 @@ static func end_turn(state:Dictionary)->void:
 
 static func status_text(state:Dictionary)->String:
 	var parts:Array[String]=[]
-	for row in [["enemy_bleed","流血"],["enemy_poison","中毒"],["enemy_sleep","睡眠"],["enemy_silence","沉默"],["regen","回春"],["defense","护体"],["crit","暴击"],["reflect_physical","物反"],["reflect_magic","法反"]]:
+	for row in [["enemy_bleed","流血"],["enemy_poison","中毒"],["enemy_sleep","睡眠"],["enemy_silence","沉默"],["enemy_stun","眩晕"],["regen","回春"],["defense","护体"],["crit","暴击"],["reflect_physical","物反"],["reflect_magic","法反"]]:
 		if int(state.get(row[0],0))>0:parts.append("%s%d"%[row[1],int(state[row[0]])])
 	if state.has("builds"):
 		for i in [0,2,4,5]:

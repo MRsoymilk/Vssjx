@@ -39,6 +39,7 @@ func _init(opponent: Dictionary) -> void:
 	frozen_stats=Game.stats().duplicate(true)
 	skills=SkillRules.new_state(int(Game.player.job),int(Game.player.school),int(Game.player.level),int(enemy.get("level",1)))
 	SkillRules.activate(skills,frozen_stats)
+	SkillRules.enable_stun(skills,frozen_stats)
 	selected_skill=SkillRules.default_id(int(Game.player.job),int(Game.player.school),int(Game.player.level))
 	rng.randomize()
 
@@ -117,6 +118,7 @@ func resolve_player() -> Dictionary:
 	skills.last_damage=mini(enemy_hp,damage)
 	enemy_hp = maxi(0, enemy_hp - damage)
 	if enemy_hp == 0:
+		skills.erase("enemy_stun")
 		finished = true
 		victory = true
 		lines.append("%s被击败了！" % enemy.name)
@@ -127,6 +129,9 @@ func resolve_enemy() -> Dictionary:
 	if phase != "enemy": return {"ok": false, "lines": []}
 	var values := frozen_stats
 	var lines: Array[String] = []
+	if SkillRules.consume_stun(skills):
+		phase="settlement"
+		return {"ok":true,"lines":["%s处于眩晕，跳过本次行动。"%enemy.name],"incoming":0,"reflected":0}
 	if int(skills.enemy_sleep)>0:
 		phase="settlement"
 		return {"ok":true,"lines":["%s处于睡眠，无法行动。"%enemy.name],"incoming":0,"reflected":0}

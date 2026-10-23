@@ -1313,7 +1313,7 @@ func _battle_turn(command: String, skill_id:String="") -> void:
 		if epoch!=_ui_epoch or mode!="battle" or battle!=active_battle:return
 	battle_playback = null
 	battle_move_callout.clear()
-	if battle.phase=="enemy" and int(battle.skills.enemy_sleep)>0:
+	if battle.phase=="enemy" and (int(battle.skills.enemy_sleep)>0 or int(battle.skills.get("enemy_stun",0))>0):
 		_battle_lines(battle.resolve_enemy().lines)
 	elif battle.phase == "enemy":
 		battle_stage = "enemy"

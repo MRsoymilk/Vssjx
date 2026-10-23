@@ -94,7 +94,7 @@ impl Battle {
         assert!((1..=MAX_MEMBERS).contains(&fighters.len()) && !source.is_empty());
         let extra = fighters.len() as i32 - 1;
         let balanced=fighters.iter().all(|f|f.stats.balance.is_some());
-        for f in &mut fighters{f.effects.activate(f.stats);}
+        for f in &mut fighters{f.effects.activate(f.stats);f.effects.enable_stun(f.stats);}
         let mut enemies:Vec<Enemy> = source
             .into_iter()
             .take(5)
@@ -162,6 +162,7 @@ impl Battle {
     fn revive_fallen(&mut self) {
         if self.fighters.iter().all(|f|f.hp==0) {return;}
         for e in &mut self.enemies {
+            if e.hp==0{e.effects.enemy_stun=0;}
             if let Some(elite)=e.elite.as_mut() {
                 if e.hp==0 && elite.revives_left>0 {
                     elite.revives_left-=1;
@@ -554,6 +555,7 @@ impl Battle {
         to.enemy_poison = from.enemy_poison;
         to.poison_damage = from.poison_damage;
         to.enemy_sleep = from.enemy_sleep;
+        to.enemy_stun = from.enemy_stun;
         to.enemy_silence = from.enemy_silence;
     }
     fn enemy_round(&mut self, roll: i32) {
@@ -575,6 +577,11 @@ impl Battle {
             e.effects.enemy_bleed = (e.effects.enemy_bleed - 1).max(0);
             e.effects.enemy_poison = (e.effects.enemy_poison - 1).max(0);
             if e.hp == 0 {
+                continue;
+            }
+            if e.effects.consume_stun() {
+                self.lines.push(format!("{}处于眩晕，跳过本次行动。",e.definition.name));
+                self.events.push(Event{missed:false,critical:false,actor:e.slot.clone(),target:e.slot.clone(),action:"stun".into(),skill:String::new(),damage:0,healed:0});
                 continue;
             }
             if e.effects.enemy_sleep > 0 {

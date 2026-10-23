@@ -21,7 +21,8 @@ pub fn cost(s:&Skill,stats:Stats)->i32{
     let bp=DATA["cost_bp"][kind(s)].as_i64().unwrap() as i32;
     ((i64::from(stats.mp)*i64::from(bp)+9999)/10000).max(1) as i32
 }
-pub fn cooldown(s:&Skill)->i32{DATA["cooldowns"][kind(s)].as_i64().unwrap() as i32}
+pub fn cooldown_for(s:&Skill,stun_enabled:bool)->i32{if stun_enabled && let Some(stun)=s.stun.as_ref(){return stun.cooldown;}DATA["cooldowns"][kind(s)].as_i64().unwrap() as i32}
+pub fn cooldown(s:&Skill)->i32{cooldown_for(s,true)}
 pub fn recovery(stats:Stats,key:&str,legacy:i32)->i32{if revised(stats){(stats.mp*n(key)/10000).max(1)}else{legacy}}
 pub fn potion(stats:Stats)->i32{if revised(stats){(stats.hp*n("potion_restore_bp")/10000).max(45)}else{45}}
 pub fn monster(mut d:ResidentDefinition)->ResidentDefinition{

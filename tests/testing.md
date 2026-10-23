@@ -13,6 +13,7 @@
 | 论坛 SMTP 与注册 | [QQ 测试邮件确认、注册开放与敏感配置检查](flarum_registration_20261020.md) |
 | EVA 初号机主题装备 | [六角色、60 件装备、实际离屏渲染及隔离联机验证](eva01_equipment.md) |
 | 任务、战斗与地图 | [线上 PVE](online_pve.md)、[第二张地图](online_maps.md)、[技能](../design/skills.md#验证) |
+| 雷霆一击眩晕 | [概率、行动跳过、持久化与原生状态图标](stun.md) |
 | 新数值候选内核 | [共享参数、Rust/Godot一致性与实际离屏预览](combat_balance.md) |
 | 社交与多人战斗 | [社交](social.md)、[组队](teams.md)、[决斗](player_duels.md) |
 | 平台与网页 | [平台基础](platform_interface.md)、[主游戏 Web](web_game.md)、[浏览器存储](web_storage.md) |

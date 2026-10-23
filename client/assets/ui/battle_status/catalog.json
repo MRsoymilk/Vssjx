@@ -43,6 +43,16 @@
       "reference_animation": "t00",
       "visual": "红色嘴形"
     },
+    "stun": {
+      "name": "眩晕",
+      "texture": "res://assets/ui/battle_status/stun.png",
+      "source_frame": "analysis/decoded_png/ssjx/effect/tx41_frame001.png",
+      "source_member": "ssjx/effect.mrp/tx41.imgs",
+      "source_sha256": "31f313a3ccf7deaa12d85db1bf7030cce0927c79b6387e1942e486c62261aa2e",
+      "decoded_sha256": "61af81ded587aa055287a1d71330d618168faf2bbff92473a58ffb8f4b0b4fea",
+      "reference_animation": "t14",
+      "visual": "环状金色星芒；眩晕为新增语义适配，非原版状态绑定"
+    },
     "regen": {
       "name": "回春",
       "texture": "res://assets/ui/battle_status/regen.png",

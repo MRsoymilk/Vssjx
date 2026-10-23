@@ -28,3 +28,20 @@ python tests/run_stun.py
 - `run_stun.py` 在自行创建的临时 PostgreSQL、Rust 服务和真实 WebSocket 下通过：实际概率触发、整次怪物行动跳过、冷却拒绝、原编号回放、断连／进程重启保持结果、回执写入故障整笔回滚、原编号重试及旧版本存档不升级。仅在临时数据库将测试目标气血加大以避免提前击杀，不修改生产地图定义。
 
 本轮未打包、部署或推送，不访问生产数据库或玩家存档。
+
+## 状态图标与实际播放
+
+```sh
+godot --headless --path client res://tests/stun_ui_test.tscn
+godot --headless --path client res://tests/battle_status_test.tscn
+mkdir -p /tmp/opencode/vssjx-stun-captures
+SSJX_STUN_CAPTURE_PATH=/tmp/opencode/vssjx-stun-captures \
+  LIBGL_ALWAYS_SOFTWARE=1 python tests/run_offscreen.py \
+  --path client --rendering-driver opengl3_es res://tests/stun_ui_test.tscn
+```
+
+- 新状态图标逐字节复制原包 `tx41_frame001.png`（`t14` 环状金色星芒），生成器及目录均记录来源和 SHA256。眩晕对应关系为本次语义适配，不冒充已恢复的原版绑定。
+- 待消费状态从权威快照恢复；实际跳过行动的 `stun` 事件只显示待机、状态图标和“眩晕 · 无法行动”，不播放攻击、不移动、不产生伤害数字。阵列在该事件播放后按最终状态清除临时图标，取消时立即清理；切磋保留双方事件顺序，按相对施加者解析状态归属，不把受控者画到施加者身上。
+- 图标说明使用“剩余1次行动”，不把它误写成回合末自动递减。切磋提示气泡上移，避免遮住眩晕图标。战斗技能选择使用短说明保证可见，完整规则保留在悬浮提示；武功页同时显示35%眩晕、原160%威力／9%最大灵力消耗和3回合冷却。旧在途战斗显示原说明与原冷却，不许诺未启用的眩晕。
+- Godot逻辑UI专项28项、Xvfb＋Mesa OpenGL实际渲染32项通过，已检查技能选择、武功页、阵列眩晕和切磋眩晕4张截图。状态条28项、技能战斗120项、技能固定向量408项、单人阵列55项、技能预算3项、本地技能时机26项、队伍70项、切磋46项回归通过。
+- Rust全套测试零失败，保留原有数据库审计专项1项忽略。最终数据目录更新后再次运行真实隔离 `run_stun.py` 通过。未声称完成手机或浏览器真机验收。

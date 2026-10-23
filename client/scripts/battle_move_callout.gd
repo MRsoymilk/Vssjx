@@ -6,6 +6,7 @@ var remaining := 0.0
 var tail_x := 0.0
 var _subject: WeakRef
 const HEAD_OFFSET := Vector2(0, -88)
+var _head_offset := HEAD_OFFSET
 
 func present(text_value: String, anchor: Vector2, seconds: float) -> void:
 	_subject = null
@@ -18,11 +19,12 @@ func present(text_value: String, anchor: Vector2, seconds: float) -> void:
 	_place(anchor)
 	show()
 
-func present_for(text_value: String, subject: Node2D, seconds: float) -> void:
+func present_for(text_value: String, subject: Node2D, seconds: float, head_offset: Vector2 = HEAD_OFFSET) -> void:
 	if not is_instance_valid(subject) or not subject.is_inside_tree():
 		clear()
 		return
 	present(text_value, Vector2.ZERO, seconds)
+	_head_offset = head_offset
 	_subject = weakref(subject)
 	update_anchor()
 
@@ -36,7 +38,7 @@ func update_anchor() -> void:
 	# the actor faces the other way or lives in a scaled/translated station.
 	var parent_canvas := get_parent() as CanvasItem
 	var anchor := parent_canvas.get_global_transform_with_canvas().affine_inverse() * subject.get_global_transform_with_canvas().origin
-	_place(anchor + HEAD_OFFSET)
+	_place(anchor + _head_offset)
 
 func _place(anchor: Vector2) -> void:
 	position = Vector2(clampf(roundf(anchor.x - size.x / 2), 4, 316 - size.x), clampf(roundf(anchor.y - size.y), 30, 370))

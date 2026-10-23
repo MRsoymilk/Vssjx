@@ -61,13 +61,18 @@ func present(job: int, school: int, level: int, mp: int, available: Array = [], 
 	choices = usable_choices(job,school,level,available,legacy_only).duplicate(true)
 	for skill in choices:
 		skill.mp_cost=SkillBalance.cost(skill,stats)
-		if SkillBalance.revised(stats):skill.description+=" · 冷却%d轮"%SkillBalance.cooldown(skill)
+		skill.description=SkillRules.description(skill,SkillRules.stun_enabled(effects))
+		skill.full_description=skill.description
+		if skill.has("stun") and SkillRules.stun_enabled(effects):skill.description="%d%%眩晕：跳过下次行动，受击不解除"%int(skill.stun.chance)
+		if SkillBalance.revised(stats):
+			var cooldown_text:=" · 冷却%d轮"%SkillBalance.cooldown(skill,SkillRules.stun_enabled(effects))
+			skill.description+=cooldown_text;skill.full_description+=cooldown_text
 	for child in rows.get_children(): rows.remove_child(child); child.queue_free()
 	for skill in choices:
 		var button := Button.new()
 		button.custom_minimum_size = Vector2(0, ROW_HEIGHT)
 		button.focus_mode = Control.FOCUS_NONE
-		button.tooltip_text = skill.description
+		button.tooltip_text = skill.full_description
 		_style_button(button); rows.add_child(button)
 		var name_label := _caption(String(skill.name),Vector2(3,1),Vector2(92,17),INK,button)
 		name_label.name = "Name"; name_label.clip_text = true
@@ -85,7 +90,7 @@ func _select(id: String) -> void:
 	var skill:Dictionary=choices[choices.find_custom(func(s:Dictionary)->bool:return s.id==id)]
 	var remaining:=SkillRules.remaining(combat_effects,id)
 	description.text = String(skill.description) + ("（尚余%d轮）"%remaining if remaining>0 else ("（灵力不足）" if current_mp < int(skill.mp_cost) else ""))
-	description.tooltip_text = description.text
+	description.tooltip_text = String(skill.get("full_description",skill.description)) + ("（尚余%d轮）"%remaining if remaining>0 else "")
 	for index in rows.get_child_count():
 		var row: Button = rows.get_child(index)
 		var selected: bool = choices[index].id == id

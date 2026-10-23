@@ -35,6 +35,7 @@ var target_marker:Node2D
 var _closed:=""
 var _status_notice:=""
 var _status_notice_until:=0
+var _stun_actor:=""
 func _ready()->void:
 	z_index=15
 	var field:=OriginalBattleField.new();field.kind="arena";add_child(field)
@@ -87,6 +88,7 @@ func _station(index:int,count:int,enemy:bool)->Vector2:
 func _dismiss()->void:
 	_closed=battle_id;_cancel();hide();dismissed.emit()
 func _cancel()->void:
+	_clear_stun_badge()
 	_effect_wait=""
 	if is_instance_valid(item_picker):item_picker.hide()
 	if is_instance_valid(move_callout):move_callout.clear()
@@ -322,11 +324,19 @@ func _sync_final_resources()->void:
 		for e in b.enemies:
 			if int(e.hp)>0:selected=e.slot;break
 	_sync_statuses()
+	_stun_actor=""
+
+func _clear_stun_badge()->void:
+	if actors.has(_stun_actor):
+		var strip:BattleStatusStrip=actors[_stun_actor].status
+		strip.set_statuses(strip.entries.filter(func(row:Dictionary)->bool:return row.id!="stun"))
+	_stun_actor=""
 func _start_deaths()->void:
 	for a in actors.values():
 		if a.dead and a.sprite.visible:
 			var death:=BattleDeathPlayback.new();death.start(a.sprite);deaths.append(death)
 func _play(event:Dictionary)->void:
+	_clear_stun_badge()
 	if not actors.has(event.actor) or not actors.has(event.target):return
 	var a:Dictionary=actors[event.actor];var target:Dictionary=actors[event.target]
 	if event.action=="revive":
@@ -338,6 +348,15 @@ func _play(event:Dictionary)->void:
 		playing=event;move_callout.present_for("妖躯复生",a.sprite,motion.duration)
 		return
 	if not a.sprite.visible:return
+	if event.action=="stun":
+		playing=event
+		_stun_actor=event.actor
+		var statuses:Array=a.status.entries.filter(func(row:Dictionary)->bool:return row.id!="stun")
+		statuses.append({"id":"stun","turns":1});a.status.set_statuses(statuses)
+		motion=BattleActionPlayback.new()
+		motion.start(a.sprite,OriginalArt.actor_info(a.key),a.sprite.global_position,&"idle",a.sprite)
+		move_callout.present_for("眩晕 · 无法行动",a.sprite,motion.duration)
+		return
 	if event.action not in ["attack","skill","guard","potion","dot","regen"]:return
 	playing=event
 	var group:Array=[event]

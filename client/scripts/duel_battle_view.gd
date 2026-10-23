@@ -69,6 +69,12 @@ func _display(b:Dictionary,fighters:Array,action:String,actor:Variant,used:Strin
 	super.present(adapter)
 	_hero_key=ShopRules.actor_key(int(me.job),int(me.gender),me.appearance)
 	OriginalArt.apply_appearance(hero,_hero_key)
+	if action=="stun":
+		animation_time=0.8
+		var stunned:AnimatedSprite2D=hero if mine else enemy
+		stunned.play("idle")
+		move_callout.present_for("眩晕 · 无法行动",stunned,animation_time,Vector2(0,-130))
+		refresh()
 
 func _next_event()->void:
 	if _queue.is_empty():
@@ -136,6 +142,9 @@ func _status_sources()->Array:
 	var theirs:Dictionary=opponent.get("effects",{})
 	var hero_rows:=BattleStatusStrip.harmful(theirs);hero_rows.append_array(BattleStatusStrip.beneficial(mine))
 	var enemy_rows:=BattleStatusStrip.harmful(mine);enemy_rows.append_array(BattleStatusStrip.beneficial(theirs))
+	if _playing.get("action")=="stun" and channel!=null:
+		var rows:Array=hero_rows if _playing.actor==channel.character_id else enemy_rows
+		if not rows.any(func(row:Dictionary)->bool:return row.id=="stun"):rows.append({"id":"stun","turns":1})
 	return [hero_rows,enemy_rows]
 func toggle_auto()->void:pass
 

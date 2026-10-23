@@ -55,6 +55,7 @@ def build():
             source_row=None,original_skill_id=None,source='client/scripts/battle.gd',rules_basis='沿用旧版重建规则，并非原版技能'))
     thunder=next(s for s in items if s['id']=='sheet_010')
     thunder['stun']={'chance':35,'actions':1,'cooldown':3}
+    thunder['legacy_description']=thunder['description']
     thunder['description']='单体攻击；命中后35%概率眩晕，跳过目标下一次行动，受击不解除。'
     thunder['rules_basis']+='；眩晕为2026-10-23新增玩法，非原版恢复；原伤害与灵力消耗保留'
     assert len(items)==33

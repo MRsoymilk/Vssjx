@@ -11,6 +11,9 @@ static func item(id:String)->Dictionary:
 		for skill in catalog.items:_items[skill.id]=skill
 	return _items.get(id,{}).duplicate(true)
 
+static func description(skill:Dictionary,stun_enabled:bool=true)->String:
+	return String(skill.get("legacy_description",skill.description)) if skill.has("stun") and not stun_enabled else String(skill.description)
+
 static func eligible(skill:Dictionary,job:int,_school:int,level:int)->bool:
 	# School remains source metadata; current gameplay unlocks by job and level only.
 	return not skill.is_empty() and int(skill.job)==job and level>=int(skill.unlock_level)

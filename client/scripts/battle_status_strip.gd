@@ -13,7 +13,7 @@ func _init()->void:
 	theme=preload("res://scenes/ui/online_pve_theme.tres")
 static func harmful(state:Dictionary,dots:Variant=null)->Array:
 	var rows:Array=[]
-	for id in ["bleed","poison","sleep","silence"]:
+	for id in ["bleed","poison","sleep","silence","stun"]:
 		var turns:=int(state.get("enemy_"+id,0))
 		# Revised server PVE stores each source independently. Empty dots means expired,
 		# even when legacy enemy_bleed/enemy_poison counters still have stale values.
@@ -37,6 +37,7 @@ func set_statuses(rows:Array)->void:
 	if rows==entries:return
 	entries=rows.duplicate(true);page=0;_rebuild()
 func description(row:Dictionary)->String:
+	if row.id=="stun":return "眩晕 · 跳过下一次行动（剩余%d次），受击不解除"%int(row.turns)
 	return "%s · 剩余%d回合"%[catalog[row.id].name,int(row.turns)]
 func _rebuild()->void:
 	for child in get_children():remove_child(child);child.queue_free()

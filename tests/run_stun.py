@@ -63,6 +63,12 @@ def main():
 
             proc = None
             for _ in range(30):
+                # A rare run of failed rolls must not hit the solo 30-round cap.
+                # Reset only our owned fixture between sample batches.
+                if a.state['battle']['round'] >= 24:
+                    a.close()
+                    db.query(f"UPDATE pve_battles SET state=$owned${json.dumps(template)}$owned$::jsonb WHERE id='{battle_id}'")
+                    a = Player(base, session, char); clients.append(a)
                 while a.state['battle']['formation']['fighters'][0]['effects']['balance']['cooldowns'].get('sheet_010', 0):
                     a.command('guard')
                     time.sleep(.06)

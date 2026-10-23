@@ -34,7 +34,7 @@ func select_skill(index:int)->void:
 	selected_index=clampi(index,0,items.size()-1)
 	var skill:Dictionary=items[selected_index]
 	$SkillName.text=skill.name
-	detail.text=String(skill.description)
+	detail.text=SkillRules.description(skill,balanced)
 	if balanced and skill.active:
 		if SkillBalance.kind(skill)=="dot":detail.text+=" · 首击80%＋每轮30%，共3次"
 		elif skill.target=="all_enemies":detail.text+=" · 群攻总倍率最多240%"

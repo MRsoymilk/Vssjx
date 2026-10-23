@@ -85,13 +85,13 @@ func receive(result:Dictionary)->bool:
 	var playback_response:bool=request.get("action")=="playback_done"
 	if result.get("version")!="team-v1" or not valid(result):
 		var code:String=result.get("code","INVALID_RESPONSE")
-		if wrote and code not in ["INVALID_REQUEST","INVALID_TEAM_TARGET","FORBIDDEN","UNAUTHORIZED","IDEMPOTENCY_CONFLICT","NOT_FOUND"]:message.emit("操作结果未确认，将按原编号重试。")
+		if wrote and code not in ["INVALID_REQUEST","INVALID_TEAM_TARGET","FORBIDDEN","UNAUTHORIZED","IDEMPOTENCY_CONFLICT","NOT_FOUND"] and not LOOT_ERRORS.has(code):message.emit("操作结果未确认，将按原编号重试。")
 		else:
 			if code=="NOT_FOUND":supported=false
 			request={}
 			if code in ["FORBIDDEN","UNAUTHORIZED","NOT_FOUND"]:queued_command={}
 			if queued_command.is_empty():OnlineAccount.pending_team={}
-			message.emit(ERRORS.get(code,"组队请求失败，请刷新后重试。"))
+			message.emit(LOOT_ERRORS.get(code,ERRORS.get(code,"组队请求失败，请刷新后重试。")))
 		_promote_queued()
 		next_poll=0 if pending() and not wrote else Time.get_ticks_msec()+5000
 		changed.emit();return false

@@ -135,7 +135,7 @@ def main():
             # These absent-member conditions must never enter fighter loading.
             db.query(f"UPDATE characters SET quest_stage=0,hp=31,mp=12,defeated_mask=63,monster_respawns='{{\"spirit\":253402300799000}}' WHERE id='{b[1]}'")
             absent = resources(b)
-            send(a, 'challenge', 'TEAM_NOT_READY', target='spirit')
+            check(next(m for m in party(a)['members'] if m['id']==c[1])['ready'], 'New members default to prepared without blocking every encounter')
             send(c, 'ready', ready=True)
             initial, _ = send(a, 'challenge', target='spirit')
             battle = initial['state']['team']['battle']
@@ -165,7 +165,7 @@ def main():
             cb.close()
             wait(lambda: not next(m for m in party(a)['members'] if m['id'] == b[1])['online'], 'Offline again')
             send(c, 'follow', ready=False)
-            send(c, 'ready', ready=True)  # Readiness cannot override temporary leave.
+            check(not next(m for m in party(a)['members'] if m['id']==c[1])['ready'], 'Temporary leave clears the one participation state')
             send(c, 'challenge', 'TEAM_LEADER_REQUIRED', target='spirit')
             db.query(f"UPDATE characters SET quest_stage=0,hp=29,mp=11 WHERE id='{c[1]}'")
             away = resources(c)

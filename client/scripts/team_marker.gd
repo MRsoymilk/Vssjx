@@ -3,12 +3,12 @@ extends Sprite2D
 const LEADER=preload("res://assets/ui/team_leader.png")
 const MEMBER=preload("res://assets/ui/team_member.png")
 const AWAY=preload("res://assets/ui/team_away.png")
-const WAITING=preload("res://assets/ui/team_waiting.tres")
+static func prepared(state:Dictionary)->bool:
+	return state.get("leader",false) or (state.get("following",true) and state.get("ready",true))
 static func texture_for(state:Dictionary)->Texture2D:
-	return LEADER if state.get("leader",false) else MEMBER if state.get("following",true) else AWAY
+	return LEADER if state.get("leader",false) else MEMBER if prepared(state) else AWAY
 static func material_for(state:Dictionary)->Material:
-	# An older server omits readiness; retain its blue follow marker.
-	return WAITING if not state.get("leader",false) and state.get("following",true) and state.has("ready") and not state.ready else null
+	return null
 func _init()->void:
 	texture_filter=CanvasItem.TEXTURE_FILTER_NEAREST
 	position=Vector2(-20,-67)

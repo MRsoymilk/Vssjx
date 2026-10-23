@@ -398,7 +398,7 @@ async fn apply(
             .execute(&mut **tx)
             .await
             .map_err(db)?;
-        sqlx::query("INSERT INTO team_members(character_id,team_id,leader) VALUES($1,$2,TRUE)")
+        sqlx::query("INSERT INTO team_members(character_id,team_id,leader,ready,following) VALUES($1,$2,TRUE,TRUE,TRUE)")
             .bind(me)
             .bind(id)
             .execute(&mut **tx)
@@ -426,7 +426,7 @@ async fn apply(
         if members(tx, team).await?.len() >= MAX_MEMBERS {
             return Err(err("TEAM_FULL"));
         }
-        sqlx::query("INSERT INTO team_members(character_id,team_id) VALUES($1,$2)")
+        sqlx::query("INSERT INTO team_members(character_id,team_id,ready,following) VALUES($1,$2,TRUE,TRUE)")
             .bind(me)
             .bind(team)
             .execute(&mut **tx)
@@ -440,19 +440,14 @@ async fn apply(
         return Ok(false);
     }
     let (team, leader) = own_membership.ok_or(err("NOT_IN_TEAM"))?;
-    if c.action == "follow" {
-        if leader {return Err(err("TEAM_MEMBER_REQUIRED"));}
-        sqlx::query("UPDATE team_members SET following=$2,ready=FALSE WHERE character_id=$1")
-            .bind(me).bind(c.ready.ok_or(err("INVALID_TEAM_COMMAND"))?).execute(&mut **tx).await.map_err(db)?;
-        return Ok(false);
-    }
-    if c.action == "ready" {
-        if context.moving {
-            return Err(err("TEAM_NOT_READY"));
-        }
-        sqlx::query("UPDATE team_members SET ready=$2 WHERE character_id=$1")
+    if matches!(c.action.as_str(), "ready" | "follow") {
+        let prepared=c.ready.ok_or(err("INVALID_TEAM_COMMAND"))?;
+        if leader && !prepared {return Err(err("TEAM_MEMBER_REQUIRED"));}
+        // A standing preference, not an extra confirmation per encounter. Keep
+        // the old follow command as a wire-compatible alias of this same toggle.
+        sqlx::query("UPDATE team_members SET ready=$2,following=$2 WHERE character_id=$1")
             .bind(me)
-            .bind(c.ready.ok_or(err("INVALID_TEAM_COMMAND"))?)
+            .bind(prepared)
             .execute(&mut **tx)
             .await
             .map_err(db)?;
@@ -562,7 +557,7 @@ async fn apply(
                     .execute(&mut **tx)
                     .await
                     .map_err(db)?;
-                sqlx::query("UPDATE team_members SET leader=TRUE WHERE character_id=$1")
+                sqlx::query("UPDATE team_members SET leader=TRUE,ready=TRUE,following=TRUE WHERE character_id=$1")
                     .bind(other)
                     .execute(&mut **tx)
                     .await

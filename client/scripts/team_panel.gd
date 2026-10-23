@@ -45,11 +45,10 @@ func _member(m:Dictionary)->void:
 	var flag:=TextureRect.new();flag.name="Flag";flag.texture=TeamMarker.texture_for(m);flag.material=TeamMarker.material_for(m);flag.texture_filter=TEXTURE_FILTER_NEAREST;flag.position=Vector2(55,5);flag.size=Vector2(15,18);flag.mouse_filter=MOUSE_FILTER_IGNORE;content.add_child(flag)
 	var title:=OriginalSceneChrome.label(content,m.display_name+("（你）" if m.id==model.character_id else ""),Rect2(74,3,180,22),13,INK);title.text_overrun_behavior=TextServer.OVERRUN_TRIM_ELLIPSIS;title.tooltip_text=m.display_name
 	OriginalSceneChrome.label(content,"Lv.%d　%s"%[int(m.level),["力士","侠客","隐者"][clampi(int(m.job),0,2)]],Rect2(55,24,122,16),11,INK)
-	OriginalSceneChrome.label(content,"离线" if not m.online else "队长" if m.leader else "跟随中" if m.get("following",true) else "暂离",Rect2(55,40,122,16),11,INK)
-	var participating:bool=m.online and (m.leader or m.get("following",true))
-	var prepared:bool=participating and (m.leader or m.ready)
+	OriginalSceneChrome.label(content,"离线" if not m.online else "队长" if m.leader else "队员",Rect2(55,40,122,16),11,INK)
+	var prepared:bool=TeamMarker.prepared(m)
 	var ready:=OriginalSceneChrome.panel(content,Rect2(180,29,73,22),Color("d8e0a1") if prepared else Color("ead6a0"),Color("9c8442"))
-	var status:=OriginalSceneChrome.label(ready,"不参战" if not participating else "带队迎战" if m.leader else "已准备" if m.ready else "未准备",Rect2(0,0,73,22),11,Color("36562a") if prepared else INK);status.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;status.vertical_alignment=VERTICAL_ALIGNMENT_CENTER
+	var status:=OriginalSceneChrome.label(ready,"准备" if prepared else "暂离",Rect2(0,0,73,22),11,Color("36562a") if prepared else INK);status.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER;status.vertical_alignment=VERTICAL_ALIGNMENT_CENTER
 func _actions(actions:Array,parent:Node=null)->void:
 	var h:=HBoxContainer.new();(rows if parent==null else parent).add_child(h)
 	h.size_flags_horizontal=SIZE_EXPAND_FILL
@@ -58,8 +57,7 @@ func _actions(actions:Array,parent:Node=null)->void:
 func open()->void:show();model.refresh();refresh()
 func dismiss()->void:confirmation={};hide();dismissed.emit()
 func open_loot()->void:
-	if has_node("TeamLoot"):return
-	var panel:=TeamLootPanel.new();panel.name="TeamLoot";panel.model=model;add_child(panel)
+	TeamLootPanel.open_for(self,model)
 func confirm(action:String,id:String,text:String)->void:confirmation={"action":action,"id":id,"text":text};refresh()
 func refresh()->void:
 	if not is_node_ready():return
@@ -73,7 +71,7 @@ func refresh()->void:
 	for m in p.get("members",[]):
 		if m.online and (m.leader or (m.get("following",true) and m.ready)):ready_count+=1
 	summary.text="尚未组队 · 最多五人同行" if p.is_empty() else "%d / 5 人　·　%d 人已准备"%[p.members.size(),ready_count]
-	tip.text="准备一次持续参战；取消或暂离可退出后续战斗。"
+	tip.text="准备后持续跟随参战；暂离不参战，无需每场重复准备。"
 	if model.has_method("loot_pending") and model.loot_pending():tip.text="战利品待ROLL／放弃，60秒超时自动放弃。"
 	if p.get("battle_active",false) and not model.active():tip.text="队友正在战斗；本轮未参战，结束后可重新集合。"
 	if not confirmation.is_empty():
@@ -92,8 +90,7 @@ func refresh()->void:
 		var actions:Array=[["资料",func()->void:profile_requested.emit(m.id)]]
 		if m.id==model.character_id:
 			if not m.leader:
-				if m.get("following",true):actions.append(["取消准备" if m.ready else "准备",func()->void:model.submit("ready","","",not m.ready)])
-				actions.append(["暂离" if m.get("following",true) else "跟随队长",func()->void:model.submit("follow","","",not m.get("following",true))])
+				actions.append(["暂离" if TeamMarker.prepared(m) else "准备",func()->void:model.submit("ready","","",not TeamMarker.prepared(m))])
 		elif p.leader:
 			actions.append(["移交",func()->void:confirm("transfer",m.id,"将队长移交给%s？"%m.display_name)])
 			actions.append(["移出",func()->void:confirm("kick",m.id,"将%s移出队伍？"%m.display_name)])

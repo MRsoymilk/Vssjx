@@ -10,7 +10,15 @@ var roll:Button
 var pass_button:Button
 var hint:Label
 var selected_id:=""
+var _source:WeakRef
 const INK:=Color("654518")
+static func open_for(owner:Node,team:OnlineTeamModel)->TeamLootPanel:
+	var host:=owner.get_parent()
+	for child in host.get_children():
+		if child is TeamLootPanel and child.model==team and not child.is_queued_for_deletion():
+			child.show();child.refresh();return child
+	var panel:=TeamLootPanel.new();panel.name="TeamLoot";panel.model=team;panel._source=weakref(owner)
+	host.add_child(panel);return panel
 func _ready()->void:
 	z_index=90;size=Vector2(320,480);mouse_filter=MOUSE_FILTER_STOP
 	var shade:=ColorRect.new();shade.size=size;shade.color=Color(0,0,0,.65);add_child(shade)
@@ -45,8 +53,9 @@ func refresh()->void:
 	if list.item_count>0 and list.get_selected_items().is_empty():list.select(0);selected_id=pool.drops[0].item.id
 	_describe()
 func _process(_delta:float)->void:
+	if _source!=null and _source.get_ref()==null:queue_free();return
 	var pool:=model.loot_pool();var now:=model.server_time+Time.get_ticks_msec()-model.received_at
-	clock.text="全部战利品已分配" if not model.loot_pending() else "剩余%d秒 · 超时自动放弃（独立于战斗回合）"%maxi(0,(int(pool.get("deadline_ms",now))-now+999)/1000)
+	clock.text="全部战利品已分配" if not model.loot_pending() else "时间已到，正在确认分配……" if now>=int(pool.get("deadline_ms",0)) else "剩余%d秒 · 超时自动放弃（独立于战斗回合）"%maxi(0,(int(pool.get("deadline_ms",now))-now+999)/1000)
 	if now>=int(pool.get("deadline_ms",0)):roll.disabled=true;pass_button.disabled=true
 func _drop()->Dictionary:
 	for d in model.loot_pool().get("drops",[]):

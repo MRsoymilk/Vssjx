@@ -40,8 +40,14 @@ func _run()->void:
 				if child is Button and child.text=="战利品":entry=child
 		check(entry!=null,"Returning to the world keeps a visible team-window loot entry")
 		if entry!=null:entry.pressed.emit()
-		check(page.has_node("TeamLoot"),"The native team-window entry reopens the same authoritative loot pool")
+		var reopened:TeamLootPanel
+		for child in get_children():
+			if child is TeamLootPanel and child.model==model:reopened=child
+		check(reopened!=null,"The native team-window entry reopens the same authoritative loot pool")
+		page.hide()
+		check(reopened!=null and reopened.is_visible_in_tree(),"Closing the team window cannot hide its independent loot overlay")
 		page.queue_free();await get_tree().process_frame
+	await _result_overlay_regression(fixtures[0])
 	var five:Dictionary=fixtures[0].duplicate(true)
 	for name in ["天涯明月清风剑客","山河故人醉卧云端"]:
 		var id:=LootRules.uuid();var f:Dictionary=five.state.team.battle.fighters[-1].duplicate(true);f.id=id;f.name=name;five.state.team.battle.fighters.append(f)
@@ -58,3 +64,28 @@ func _run()->void:
 	expanded.queue_free();await get_tree().process_frame
 	OnlineAccount.pending_team=previous
 	print("TEAM LOOT: %d checks, %d failures"%[checks,failures]);get_tree().quit(1 if failures else 0)
+func _result_overlay_regression(packet:Dictionary)->void:
+	var model:=OnlineTeamModel.new();model.bind_character(packet.character_id)
+	model.state=packet.state.duplicate(true);model.server_time=int(packet.server_time_ms);model.received_at=Time.get_ticks_msec()
+	var ended:Dictionary=model.state.team.battle.duplicate(true)
+	model.state.team.battle.outcome="active";model.state.team.battle.erase("loot_pool")
+	for e in model.state.team.battle.enemies:e.hp=e.definition.hp
+	var view:Control=load("res://scenes/ui/team_battle_view.tscn").instantiate();view.model=model;add_child(view)
+	view.present();model.state.team.battle=ended;model.changed.emit();view._process(0)
+	for death in view.deaths:death.advance(death.remaining())
+	view._process(0)
+	var overlay:TeamLootPanel
+	for child in get_children():
+		if child is TeamLootPanel and child.model==model:overlay=child
+	check(overlay!=null and overlay.get_parent()==self,"Battle victory opens loot outside the battle's own visibility subtree")
+	view.result.advance(2)
+	check(not view.visible and overlay!=null and overlay.is_visible_in_tree(),"Actual 1.6-second result auto-return cannot strand ROLL behind a hidden battlefield")
+	if overlay!=null:
+		TeamLootPanel.open_for(view,model)
+		check(get_children().filter(func(n:Node)->bool:return n is TeamLootPanel and n.model==model).size()==1,"Battle and team entry share one loot overlay, not duplicate modal blockers")
+		model.request={};model.inflight=false;overlay.pass_button.pressed.emit()
+		check(model.request.get("action")=="loot_pass","The visible post-result overlay still submits the original authoritative item choice")
+		model.inflight=true;model.receive({"code":"LOOT_STORAGE_FULL"})
+		check(not model.pending() and OnlineAccount.pending_team.is_empty(),"Definitive storage rejection cannot trap the durable outbox in endless ambiguous retries")
+		overlay.queue_free()
+	view.queue_free();await get_tree().process_frame

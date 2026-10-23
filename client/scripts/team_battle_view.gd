@@ -270,7 +270,9 @@ func _process(delta:float)->void:
 			result.present(model.battle().outcome,details,saved)
 			if model is OnlineTeamModel and model.loot_pending() and _loot_opened!=model.battle().id:
 				_loot_opened=model.battle().id
-				var loot:=TeamLootPanel.new();loot.model=model;add_child(loot)
+				# The result auto-dismisses this battle after 1.6s. Loot must remain
+				# a sibling overlay instead of disappearing with its hidden parent.
+				TeamLootPanel.open_for(self,model)
 	for death in deaths:death.advance(delta)
 	if motion==null and queue.is_empty() and _effect_wait.is_empty() and not effects.has_reactions() and deaths.all(func(d:BattleDeathPlayback)->bool:return not d.active) and model.has_method("finish_playback"):
 		model.finish_playback()

@@ -172,10 +172,10 @@ func _run()->void:
 	check(world.actors[OTHER].flag.material==null,"Ready member keeps the original blue flag")
 	packet.members[OTHER].ready=false
 	world.network._receive(packet,PackedByteArray())
-	check(world.actors[OTHER].flag.material==preload("res://assets/ui/team_waiting.tres"),"Unready member switches to yellow from a live world packet")
+	check(world.actors[OTHER].flag.texture==preload("res://assets/ui/team_away.png") and world.actors[OTHER].flag.material==null,"An old unready-following packet maps to away, never a third yellow state")
 	world.team.state.team.members[1].ready=false;world.team_panel.refresh()
 	var cards=world.team_panel.rows.get_children().filter(func(row:Node)->bool:return row is PanelContainer)
-	check(cards[1].find_child("Flag",true,false).material==world.actors[OTHER].flag.material,"Team card and world marker share the same readiness color")
+	check(cards[1].find_child("Flag",true,false).texture==world.actors[OTHER].flag.texture,"Team card and world marker share the same two-state readiness")
 	world.team_panel.hide();world._set_battle_layout(false);world.screen.hud.show();world.camera.position=Vector2(392,232)
 	await capture("team_flags_waiting")
 	packet.members[OTHER].ready=true
@@ -195,7 +195,8 @@ func _run()->void:
 	check(follow_button!=null,"Own party row exposes temporary leave")
 	if follow_button!=null:
 		world.team.request={};world.team.inflight=false;follow_button.pressed.emit()
-		check(world.team.request.get("action")=="follow" and world.team.request.ready==false,"Temporary leave submits a server-owned follow command")
+		check(world.team.request.get("action")=="ready" and world.team.request.ready==false,"Temporary leave submits the single server-owned participation toggle")
+	check(world.team_panel.find_children("*","Button",true,false).filter(func(b:Button)->bool:return b.text in ["取消准备","跟随队长"]).is_empty(),"No separate follow/unready controls create a third state")
 	world.team_panel.hide();world._set_battle_layout(false);world.screen.hud.show();world.camera.position=Vector2(392,232)
 	await capture("team_flags")
 	world.queue_free();await get_tree().process_frame

@@ -258,7 +258,8 @@ impl State {
         }
         damage
     }
-    pub fn enemy_hit(&self, mut incoming: i32, magical: bool) -> (i32, i32) {
+    pub fn enemy_hit(&self, mut incoming: i32, own_attack: i32, magical: bool) -> (i32, i32) {
+        if incoming <= 0 { return (0, 0); }
         if self.defense > 0 {
             incoming = (incoming * (100 - self.defense_percent) / 100).max(1);
         }
@@ -278,7 +279,8 @@ impl State {
                 self.physical_percent
             });
         }
-        (incoming, incoming * percent / 100)
+        // Reflection uses the defender's own attack, not the attacker's damage.
+        (incoming, own_attack.max(0) * percent / 100)
     }
     pub fn end_turn(&mut self) {
         self.tick_balance();

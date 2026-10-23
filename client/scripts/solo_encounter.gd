@@ -129,7 +129,7 @@ func _enemy_round()->void:
 			var raw:=CharacterAttributeRules.incoming(int(e.definition.attack),int(e.definition.level),engine.frozen_stats,plan.magical,0)*int(plan.coefficient)/10000 if landed else 0
 			var crit:=MonsterCombat.elite_critical(e,raw,rng.randi_range(0,99));var damage:=int(crit.damage)
 			if engine.guarding and landed:damage=maxi(1,damage/2)
-			var taken:=SkillRules.enemy_hit(engine.skills,maxi(1,damage),plan.magical) if landed else Vector2i.ZERO
+			var taken:=SkillRules.enemy_hit(engine.skills,maxi(1,damage),int(engine.frozen_stats.attack),plan.magical) if landed else Vector2i.ZERO
 			var reflected:=mini(int(e.hp),taken.y+(6 if landed and int(Game.player.job)==0 and engine.guarding else 0))
 			damage=mini(engine.hp,taken.x);engine.hp-=damage;e.hp=int(e.hp)-reflected
 			_event(e.slot,character_id,"skill" if not plan.skill.is_empty() else "attack",plan.skill,damage,0,crit.critical,not landed)

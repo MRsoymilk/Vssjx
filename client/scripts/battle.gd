@@ -138,7 +138,7 @@ func resolve_enemy() -> Dictionary:
 	var landed:=rng.randi_range(0,9999)<CharacterAttributeRules.hit_chance({},values,magical)
 	skills.last_enemy_missed=not landed
 	if guarding: incoming = maxi(1, incoming / 2)
-	var hit:=SkillRules.enemy_hit(skills,incoming,magical) if landed else Vector2i.ZERO
+	var hit:=SkillRules.enemy_hit(skills,incoming,int(values.attack),magical) if landed else Vector2i.ZERO
 	incoming=hit.x;skills.last_enemy_acted=true
 	hp = maxi(0, hp - incoming)
 	lines.append("%s行动，你受到 %d 点伤害。" % [enemy.name, incoming])

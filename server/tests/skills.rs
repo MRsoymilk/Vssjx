@@ -69,8 +69,8 @@ fn catalog_restrictions_and_typed_effects() {
     }
     let mut state = State::new(0, 2, 45, 1);
     assert_eq!(state.passive_physical, 20);
-    assert_eq!(state.enemy_hit(50, false), (50, 10));
-    assert_eq!(state.enemy_hit(50, true), (50, 10));
+    assert_eq!(state.enemy_hit(50, 100, false), (50, 20));
+    assert_eq!(state.enemy_hit(50, 100, true), (50, 20));
     let mut hp = 10;
     let mut mp = 100;
     let heal = skills::ITEMS.iter().find(|s| s.name == "起死回生").unwrap();
@@ -104,13 +104,52 @@ fn catalog_restrictions_and_typed_effects() {
     assert_eq!(mp, 20 - mana.mp_cost + 7);
 }
 #[test]
+fn reflection_scales_with_own_attack_not_received_damage_or_mitigation() {
+    let mut state=State::new(0,3,60,1);
+    for magical in [false,true] {
+        for incoming in [1,50,5000] {
+            assert_eq!(state.enemy_hit(incoming,120,magical),(incoming,24));
+            assert_eq!(state.enemy_hit(incoming,240,magical),(incoming,48));
+        }
+    }
+    state.reflect_physical=2;state.physical_percent=30;
+    state.reflect_magic=2;state.magic_percent=30;
+    state.defense=2;state.defense_percent=50;
+    for magical in [false,true] {
+        assert_eq!(state.enemy_hit(50,120,magical),(25,36));
+        assert_eq!(state.enemy_hit(5000,120,magical),(2500,36));
+        assert_eq!(state.enemy_hit(50,119,magical),(25,35));
+        assert_eq!(state.enemy_hit(0,120,magical),(0,0));
+        assert_eq!(state.enemy_hit(50,0,magical),(25,0));
+    }
+}
+
+#[test]
+fn solo_and_formation_use_the_reflecting_fighters_stats() {
+    use vssjx_server::{population,pve_rules::{Action,Battle},team_rules};
+    let mut own=stats();own.attack=120;own.hp=10000;
+    for attack in [50,500] {
+        let mut enemy=population::definitions().into_iter().find(|e|e.id=="wolf_a").unwrap();enemy.attack=attack;enemy.hp=10000;
+        let mut solo=Battle::new(enemy.clone(),own.hp,own.mp,6);
+        solo.turn_selected(Action::Guard,0,3,60,own,0,0,None,99).unwrap();
+        assert_eq!(solo.skills.last_reflected,30,"own 120 × 20% plus unchanged guard bonus 6");
+        let id=uuid::Uuid::new_v4();
+        let f=team_rules::Fighter{id,name:"反弹验证".into(),job:0,gender:0,school:3,level:60,appearance:[0;3],stats:own,hp:own.hp,mp:own.mp,potions:6,effects:State::new(0,3,60,1),guarding:false};
+        let mut formation=team_rules::Battle::new("qingyun_trail".into(),vec![f],vec![enemy],1000);
+        formation.act(id,"guard",None,None,formation.selection_starts_ms+1,99).unwrap();
+        let reflection=formation.events.iter().find(|e|e.actor==id.to_string()&&e.action=="dot").unwrap();
+        assert_eq!(reflection.damage,30,"formation must use its defender's own attack");
+    }
+}
+
+#[test]
 fn shared_vectors_are_stable() {
     let vectors:Vec<_>=skills::ITEMS.iter().map(|s|{
         let mut state=State::new(s.job,s.school.max(0),60,10);
         state.reset_turn();let mut hp=100;let mut mp=200;
         let damage=state.cast(s,stats(),&mut hp,&mut mp,5,0);
         let dot=state.after_player(&mut hp,1000);
-        let hit=state.enemy_hit(100,false);state.end_turn();
+        let hit=state.enemy_hit(100,stats().attack,false);state.end_turn();
         json!({"id":s.id,"hp":hp,"mp":mp,"damage":damage,"dot":dot,"incoming":hit.0,"reflected":hit.1,"state":state})
     }).collect();
     let value = json!(vectors);

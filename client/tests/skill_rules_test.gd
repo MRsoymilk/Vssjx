@@ -14,7 +14,7 @@ func _ready()->void:
 		RULES.reset_turn(state)
 		var cast:Dictionary=RULES.cast(skill,state,{"hp":1000,"mp":400,"attack":100,"defense":20},100,200,5,0)
 		var after:Dictionary=RULES.after_player(state,int(cast.hp),1000)
-		var hit:Vector2i=RULES.enemy_hit(state,100,false)
+		var hit:Vector2i=RULES.enemy_hit(state,100,100,false)
 		RULES.end_turn(state)
 		check(after.hp==vector.hp and cast.mp==vector.mp and cast.damage==vector.damage and after.damage==vector.dot,"Cross-language player effect "+skill.id)
 		check(hit.x==int(vector.incoming) and hit.y==int(vector.reflected),"Cross-language defense/reflection "+skill.id)
@@ -26,5 +26,18 @@ func _ready()->void:
 		for level in [1,5,15,25,35,45,50,55,60]:
 			for school in 3:
 				check(RULES.list_for(job,school,level)==RULES.list_for(job,SchoolRules.UNJOINED,level),"Every school and unjoined identity share the same job/level skill pool")
+	var reflection:Dictionary=RULES.new_state(0,3,60)
+	for magical in [false,true]:
+		for incoming in [1,50,5000]:
+			check(RULES.enemy_hit(reflection,incoming,120,magical)==Vector2i(incoming,24),"Reflection uses own attack rather than incoming damage")
+			check(RULES.enemy_hit(reflection,incoming,240,magical)==Vector2i(incoming,48),"Increasing own attack increases reflection")
+	reflection.reflect_physical=2;reflection.physical_percent=30;reflection.reflect_magic=2;reflection.magic_percent=30
+	reflection.defense=2;reflection.defense_percent=50
+	for magical in [false,true]:
+		check(RULES.enemy_hit(reflection,50,120,magical)==Vector2i(25,36),"Defense does not weaken own-attack reflection")
+		check(RULES.enemy_hit(reflection,5000,120,magical)==Vector2i(2500,36),"Stronger enemy cannot inflate reflection")
+		check(RULES.enemy_hit(reflection,50,119,magical)==Vector2i(25,35),"Reflection uses matching integer rounding")
+		check(RULES.enemy_hit(reflection,0,120,magical)==Vector2i.ZERO,"No reflection on a miss or zero incoming hit")
+		check(RULES.enemy_hit(reflection,50,0,magical)==Vector2i(25,0),"Zero attack cannot gain damage from the attacker")
 	print("SKILLS: %d checks, %d failures"%[checks,failures])
 	get_tree().quit(1 if failures else 0)

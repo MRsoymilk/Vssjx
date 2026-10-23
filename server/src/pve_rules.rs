@@ -325,7 +325,7 @@ impl Battle {
             if action == Action::Guard {
                 incoming = if landed { (incoming / 2).max(1) } else { 0 };
             }
-            let (incoming, mut reflected) = if landed { self.skills.enemy_hit(incoming, magical) } else { (0, 0) };
+            let (incoming, mut reflected) = if landed { self.skills.enemy_hit(incoming, stats.attack, magical) } else { (0, 0) };
             self.skills.last_enemy_acted = true;
             self.skills.last_incoming = incoming;
             self.hp = (self.hp - incoming).max(0);

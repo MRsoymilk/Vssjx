@@ -400,7 +400,7 @@ impl Battle {
                 (damage, reflected) = if incoming > 0 {
                     enemy
                         .effects
-                        .enemy_hit(incoming, choice.action == "skill" && actor.job == 2)
+                        .enemy_hit(incoming, enemy.stats.attack, choice.action == "skill" && actor.job == 2)
                 } else {
                     (0, 0)
                 };

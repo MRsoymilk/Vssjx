@@ -145,11 +145,13 @@ static func after_player(state:Dictionary,hp:int,max_hp:int)->Dictionary:
 		hp+=healed;state.last_healed=int(state.last_healed)+healed;state.regen=int(state.regen)-1
 	return {"damage":damage,"hp":hp}
 
-static func enemy_hit(state:Dictionary,incoming:int,magical:bool=false)->Vector2i:
+static func enemy_hit(state:Dictionary,incoming:int,own_attack:int,magical:bool=false)->Vector2i:
+	if incoming<=0:return Vector2i.ZERO
 	if int(state.defense)>0:incoming=maxi(1,incoming*(100-int(state.defense_percent))/100)
 	var percent:=int(state.passive_magic if magical else state.passive_physical)
 	if int(state.reflect_magic if magical else state.reflect_physical)>0:percent=maxi(percent,int(state.magic_percent if magical else state.physical_percent))
-	return Vector2i(incoming,incoming*percent/100)
+	# Both physical and magical reflection use the defender's own attack.
+	return Vector2i(incoming,maxi(0,own_attack)*percent/100)
 
 static func end_turn(state:Dictionary)->void:
 	if state.has("balance"):

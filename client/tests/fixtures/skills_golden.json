@@ -294,7 +294,7 @@
     "id": "sheet_012",
     "incoming": 75,
     "mp": 185,
-    "reflected": 15,
+    "reflected": 20,
     "state": {
       "bleed_damage": 0,
       "crit": 0,
@@ -690,7 +690,7 @@
     "id": "sheet_034",
     "incoming": 75,
     "mp": 185,
-    "reflected": 15,
+    "reflected": 20,
     "state": {
       "bleed_damage": 0,
       "crit": 0,

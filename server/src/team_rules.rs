@@ -607,7 +607,7 @@ impl Battle {
                     let raw=if landed{crate::attributes::incoming(e.definition.attack,e.definition.level,a.stats,plan.magical,0)*plan.coefficient/10000}else{0};
                     let (incoming,critical)=if self.monster_revision>0{crate::monster_combat::elite_critical(e.elite.as_ref(),&e.definition,raw,(roll*37+n as i32*19+hit as i32*43+i as i32*11).rem_euclid(100))}else{(raw,false)};
                     let incoming=if landed&&a.guarding{(incoming/2).max(1)}else{incoming};
-                    let (incoming,reflected)=if landed{a.effects.enemy_hit(incoming.max(1),plan.magical)}else{(0,0)};
+                    let (incoming,reflected)=if landed{a.effects.enemy_hit(incoming.max(1),a.stats.attack,plan.magical)}else{(0,0)};
                     let reflected=(reflected+if landed&&a.job==0&&a.guarding{6}else{0}).min(e.hp);
                     let damage=incoming.min(a.hp);
                     a.hp=(a.hp-incoming).max(0);e.hp-=reflected;

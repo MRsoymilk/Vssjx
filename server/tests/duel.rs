@@ -120,7 +120,7 @@ fn concurrent_choices_are_hidden_and_settle_only_after_both_commit() {
     a.act(x, &c, now, [99; 3]).unwrap();
     assert_eq!(a.battles[&id].events.len(), 2);
     assert_eq!(a.battles[&id].fighters[0].hp, 205);
-    assert_eq!(a.battles[&id].fighters[1].hp, 186);
+    assert_eq!(a.battles[&id].fighters[1].hp, 185); // 95 direct + defender's 100 × 20% reflection
     assert_eq!(a.act(x, &c, now, [99; 3]), Err("DUEL_RESOLVING"));
     a.tick(
         now + Duration::from_secs(4),
@@ -227,6 +227,26 @@ fn skills_use_server_eligibility_mana_and_reflection() {
     assert!(a.battles[&id].fighters[1].hp < old);
 }
 #[test]
+fn physical_and_magical_reflection_use_defenders_attack_in_duels() {
+    for magical in [false,true] {
+        for attack in [50,200] {
+            let (mut a,x,y,id,now)=arena();
+            let b=a.battles.get_mut(&id).unwrap();
+            b.fighters[0].stats.attack=120;b.fighters[0].speed=200;
+            b.fighters[1].stats.attack=attack;
+            if magical{b.fighters[1].job=2;b.fighters[1].effects=skills::State::new(2,3,50,50);}
+            let mut guard=command("guard");guard.battle_id=Some(id);guard.expected_revision=Some("0".into());
+            a.act(x,&guard,now,[99;3]).unwrap();
+            let mut hit=command(if magical{"skill"}else{"attack"});hit.battle_id=Some(id);hit.expected_revision=Some("0".into());
+            if magical{hit.skill=Some("legacy_2".into());}
+            a.act(y,&hit,now,[99;3]).unwrap();
+            let event=a.battles[&id].events.iter().find(|e|e.actor==y).unwrap();
+            assert_eq!(event.reflected,24,"defender 120 × 20%, independent of attacker {attack}");
+        }
+    }
+}
+
+#[test]
 fn command_schema_rejects_damage_injection() {
     assert!(
         serde_json::from_value::<Command>(
@@ -276,7 +296,7 @@ fn agility_determines_initiative_instead_of_arrival_order_and_ko_cancels_the_slo
         assert_eq!(b.events[0].actor, y);
         assert_eq!(b.winner, Some(y));
         assert_eq!(
-            b.fighters[1].hp, 281,
+            b.fighters[1].hp, 280,
             "Passive reflection still applies to the faster attacker"
         );
     }

@@ -7,6 +7,6 @@ script = ExtResource("1_v3co8")
 parts = {
 "boneglow/wzs/wzst2": {
 "offsets": [[0, 2], [0, 2]],
-"texture": "res://assets/edited/equipment/c6ba9124cc62-7ef55d98f17d69f6c660.png"
+"texture": "res://assets/edited/equipment/c6ba9124cc62-2ef36b1303954d95e02b.png"
 }
 }

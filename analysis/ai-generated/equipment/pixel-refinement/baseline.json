@@ -1,0 +1,80 @@
+{
+  "textures": {
+    "client/assets/generated/equipment/boneglow/wzs/parts/wzst2.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/wzs/parts/wzst2.png",
+      "sha256": "992b5bc2789d39b8756280bea398565bf162130e3ab38c2b9e6c5ad932561fe4"
+    },
+    "client/assets/generated/equipment/boneglow/wzs/parts/wzs1.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/wzs/parts/wzs1.png",
+      "sha256": "399611f6efb37f884a6fddf60e8cf2c3762a9dfa2d211e3ae81f372f60cb913d"
+    },
+    "client/assets/generated/equipment/boneglow/wzs/parts/wzs1q.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/wzs/parts/wzs1q.png",
+      "sha256": "a91f655a018d8257b78afd26d7a08b4586adaa9b4ac5203621b9f20cf0c8e622"
+    },
+    "client/assets/generated/equipment/boneglow/wzs/parts/wzs1x.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/wzs/parts/wzs1x.png",
+      "sha256": "f335b95b764f423037befd8e9857abf6af635f42a9d2395a7c5ebe45e3cf772d"
+    },
+    "client/assets/generated/equipment/boneglow/wzs/parts/ezs14.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/wzs/parts/ezs14.png",
+      "sha256": "4e942fa1c864bdba6e900261c9c4f01b25279273b77129c5a0c7b0c03d4eebe0"
+    },
+    "client/assets/generated/equipment/boneglow/wzs/icons/armor.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/wzs/icons/armor.png",
+      "sha256": "6b0a604945ee353c24bef17c45c039fe350378bfc1dd9e70ce24c444d44d2581"
+    },
+    "client/assets/generated/equipment/boneglow/wzs/icons/belt.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/wzs/icons/belt.png",
+      "sha256": "95eeecc2b739f80bdbf89ee9ca23dd14ce224e226c2757fdbbc4e5750c94a497"
+    },
+    "client/assets/generated/equipment/boneglow/wzs/icons/boots.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/wzs/icons/boots.png",
+      "sha256": "8414bf2db8e0e8428d615f4bc84e8ef563e3a09ca8f514a39c863bf84a6a2f4c"
+    },
+    "client/assets/generated/equipment/boneglow/wzs/icons/hat.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/wzs/icons/hat.png",
+      "sha256": "6ac7c6ff61341796207387926a07312cb84b3f74f2385c91a520c662ae3ab99e"
+    },
+    "client/assets/generated/equipment/boneglow/wzs/icons/necklace.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/wzs/icons/necklace.png",
+      "sha256": "7e1a6d5a079c49c44611a8007c9073fe4c5bf21133b6da7e9688de876bbe5211"
+    },
+    "client/assets/generated/equipment/boneglow/wzs/icons/pants.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/wzs/icons/pants.png",
+      "sha256": "d21da52bab2c73f1e96feb8e80a903fdc657191781692e814fa5db26aa316717"
+    },
+    "client/assets/generated/equipment/boneglow/wzs/icons/pendant.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/wzs/icons/pendant.png",
+      "sha256": "50539dfbe21397d66ed2376726d689357cb074c92b2962ebf92ea227a2758830"
+    },
+    "client/assets/generated/equipment/boneglow/wzs/icons/ring.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/wzs/icons/ring.png",
+      "sha256": "cbda6de2b2934d1dbc37b0e49ff477c3c2ab05da3474dd679db4349969a0d171"
+    },
+    "client/assets/generated/equipment/boneglow/wzs/icons/weapon.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/wzs/icons/weapon.png",
+      "sha256": "9ec46ce99e41d17df0d0aa2e4140acfa400b27d2c893c5d4cce0b977c6904335"
+    },
+    "client/assets/generated/equipment/boneglow/wzs/icons/wrist.png": {
+      "input": "analysis/ai-generated/equipment/pixel-refinement/inputs/boneglow/wzs/icons/wrist.png",
+      "sha256": "ab71418ee9093fec3321b4b7f373f89e74eebfcc2c00c6f78727a1a09ed499e8"
+    }
+  },
+  "overrides": {
+    "boneglow/wzs/wzst2": {
+      "offsets": [
+        [
+          0,
+          2
+        ],
+        [
+          0,
+          2
+        ]
+      ],
+      "texture": "res://assets/edited/equipment/c6ba9124cc62-7ef55d98f17d69f6c660.png",
+      "sha256": "7ef55d98f17d69f6c660602e49d4fb86ed1095b380f42d95530dcef406ecbf0c"
+    }
+  }
+}

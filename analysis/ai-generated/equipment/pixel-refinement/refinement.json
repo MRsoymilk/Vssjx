@@ -1,0 +1,40 @@
+{
+  "sets": [
+    "boneglow/wzs"
+  ],
+  "textures": {
+    "client/assets/generated/equipment/boneglow/wzs/parts/wzst2.png": "aa60d598f95627d5d504304c24b09457953790835b082f72af195e8c2deadf4f",
+    "client/assets/generated/equipment/boneglow/wzs/parts/wzs1.png": "cf7bbb6265175cb0a4534fcbfd3e7273dc57376d807ae6be3d4adc870dbbf583",
+    "client/assets/generated/equipment/boneglow/wzs/parts/wzs1q.png": "623d7681d0b8043121b78d5b9bc9e3312184ef778271b1bb4545bcd04e2a2c57",
+    "client/assets/generated/equipment/boneglow/wzs/parts/wzs1x.png": "af7dcb9d299f2658b1c19ed8f37fc3c4e5032138e6810e0cb860ad3c4a316943",
+    "client/assets/generated/equipment/boneglow/wzs/parts/ezs14.png": "36f4ef6418b3a808d779cf6de49e852a268ca31addd0c6c99832b6ac1386efb9",
+    "client/assets/generated/equipment/boneglow/wzs/icons/armor.png": "0d587f09ca3838eafdd550bb478e62bb2ba1cadd6a9b4b2aeabd310f9b029407",
+    "client/assets/generated/equipment/boneglow/wzs/icons/belt.png": "2d1262daac0f4f1c04aabbb561102014511210294aacf7f30714cf0f97079ad8",
+    "client/assets/generated/equipment/boneglow/wzs/icons/boots.png": "2e23cddb9e0bcc098baacb871f4bceb631c139ea79f18c5793b2ef35e2c01e84",
+    "client/assets/generated/equipment/boneglow/wzs/icons/hat.png": "ad27d3b01ff5bd9b39591480d752bdf09fa0680b05af7b47831b6882c543835c",
+    "client/assets/generated/equipment/boneglow/wzs/icons/necklace.png": "0173b83960fc3c2890b3cfdeef82956a6f46aefccdc0d0764f8a445e6f32f5b3",
+    "client/assets/generated/equipment/boneglow/wzs/icons/pants.png": "473f4001fdda5ff1c6f2fbd0533b9d5d77f7cf07062b583449616d5d88c0fb28",
+    "client/assets/generated/equipment/boneglow/wzs/icons/pendant.png": "4d377c76c9b3f7d5cbcf9696e2a66b614e27415554052c9e6a15d193fecd5387",
+    "client/assets/generated/equipment/boneglow/wzs/icons/ring.png": "ef86286ae1f2fcd8598b194380ec2959c7b9c4945526e97b2c8d7bea5808d2e8",
+    "client/assets/generated/equipment/boneglow/wzs/icons/weapon.png": "667cd8e5c18161ee34fd88eab0c6ad1572d80aa7ffcd8db7a2fadc958f000f8d",
+    "client/assets/generated/equipment/boneglow/wzs/icons/wrist.png": "69710546dffa0b2bdd41b744649a4c9b023ff5ad6e7062210900895a7e85b339"
+  },
+  "overrides": {
+    "boneglow/wzs/wzst2": {
+      "texture": "res://assets/edited/equipment/c6ba9124cc62-2ef36b1303954d95e02b.png",
+      "offsets": [
+        [
+          0,
+          2
+        ],
+        [
+          0,
+          2
+        ]
+      ],
+      "sha256": "2ef36b1303954d95e02b16f42a86298a87073af2edc7ad49653ea3aee2577391"
+    }
+  },
+  "generator": "tools/refine_equipment_pixels.py",
+  "generator_sha256": "e6ee7b758522bc0a77fdb7cadaf6b32cf93b58c1b9c5bedd40bca86b47dc8697"
+}

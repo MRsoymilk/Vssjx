@@ -285,9 +285,17 @@ func open_menu() -> void:
 	if online_model==null or online_model.state.has("gathering"):actions.append({"name":"采集材料袋","call":open_material_bag})
 	actions.append({"name": "整理背包", "call": sort_items})
 	if online_model == null: actions.append({"name": "购药 · 8 铜钱", "call": buy_potion})
+	var hover_style := _style(Color("ffd77a"), Color("b47d2b"), 1)
+	var pressed_style := _style(Color("edb74f"), Color("8a5a20"), 1)
 	for i in actions.size():
 		var button := _button(String(actions[i].name), Rect2(3, 3 + i * 26, 144, 25), false, item_menu)
 		button.add_theme_color_override("font_color", Color("705321"))
+		for state in ["hover", "pressed", "hover_pressed", "focus"]:
+			button.add_theme_color_override("font_%s_color" % state, Color("4a2d12"))
+		button.add_theme_color_override("font_disabled_color", Color("897851"))
+		button.add_theme_stylebox_override("hover", hover_style)
+		button.add_theme_stylebox_override("pressed", pressed_style)
+		button.add_theme_stylebox_override("hover_pressed", pressed_style)
 		button.pressed.connect(actions[i].call)
 		if online_model != null and (button.text in ["装备", "卸下", "使用", "丢弃"] or button.text.ends_with("自动补给")): button.disabled = not online_model.ready or online_model.pending() or online_model.active() or online_model.is_soul()
 		if button.text=="使用":

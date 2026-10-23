@@ -48,3 +48,9 @@ python tests/run_offscreen.py --path client --rendering-method gl_compatibility 
 装备管理沿用 `OriginalUITheme.palette("bag")` 的青绿底、金色边框与像素边角。列表增加原物品图标、穿戴/暂存状态及品质色；长名称省略显示，悬停可见完整名称、品质、等级和编号。下方独立属性区域保留滚动和当前穿戴对比，底部操作区固定。流派说明使用完整内容区域，再点“装备”可回到列表；空列表显示获取提示并禁用装备、领取。
 
 `loot_instances_test.tscn` 无头 20 项、实际 OpenGL 渲染 21 项通过；使用进程独立存档路径实机检查普通装备、暂存领取、流派说明、58 件长列表和空列表五种视图，未更改玩家存档。只调整界面，不修改装备属性、掉落、实例 UUID 或线上提交协议。
+
+## 2026-10-23 背包菜单高亮可读性
+
+- 背包弹出菜单此前只覆盖普通文字颜色，悬停／按下时继承浅色文字，导致浅黄纸底上难以辨认。所有菜单项补齐深棕色悬停、按下、悬停按下和焦点文字；悬停增加浅金底和棕色细边，按下时加深金色，禁用项使用灰棕文字。
+- `godot --headless --path client res://tests/loot_instances_test.tscn`：20项、0失败。
+- 实际OpenGL鼠标交互截图确认普通、悬停、按下及禁用状态，并点击“装备实例”成功打开装备管理。截图目录 `/tmp/opencode/inventory-menu-highlight/`，日志 `/tmp/opencode/inventory-menu-highlight.log` 和 `/tmp/opencode/inventory-menu-loot.log`。

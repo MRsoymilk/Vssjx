@@ -25,6 +25,7 @@ var slot_icons: Dictionary = {}
 var slot_levels: Dictionary = {}
 var items: Array[Dictionary] = []
 var loot_panel:Control
+var material_bag:GatheringMaterialBag
 var travel_picker:AIWorldPanel
 @onready var description: Label = $Description
 @onready var tooltip: Panel = $Tooltip
@@ -104,6 +105,11 @@ func open_loot()->void:
 	add_child(loot_panel);set_process_unhandled_key_input(false)
 	loot_panel.changed.connect(func()->void:refresh();changed.emit())
 	loot_panel.back_requested.connect(func()->void:loot_panel.queue_free();loot_panel=null;set_process_unhandled_key_input(true);refresh())
+
+func open_material_bag()->void:
+	if is_instance_valid(material_bag):return
+	close_menu();tooltip.hide();material_bag=GatheringMaterialBag.new();material_bag.online_model=online_model;add_child(material_bag);set_process_unhandled_key_input(false)
+	material_bag.dismissed.connect(func()->void:material_bag.queue_free();material_bag=null;set_process_unhandled_key_input(true))
 
 func _display_items() -> Array[Dictionary]:
 	if online_model == null: return Game.bag_items()
@@ -253,6 +259,7 @@ func open_menu() -> void:
 		elif ShopRules.is_equipment(item): actions.append({"name":"卸下" if selected_equipment else "装备","call":equip_item})
 		if not item.has("instance_id") and (online_model==null or online_model.state.get("shop",{}).get("version")=="shop-v2"): actions.append({"name":"丢弃","call":confirm_discard})
 	actions.append({"name":"装备实例","call":open_loot})
+	if online_model==null or online_model.state.has("gathering"):actions.append({"name":"采集材料袋","call":open_material_bag})
 	actions.append({"name": "整理背包", "call": sort_items})
 	if online_model == null: actions.append({"name": "购药 · 8 铜钱", "call": buy_potion})
 	for i in actions.size():
@@ -267,6 +274,7 @@ func open_menu() -> void:
 		if button.text=="装备" and int(item.get("job",-1))>=0 and int(item.job)!=int(_display_player().job): button.disabled=true
 		if button.text.begins_with("购药"): button.disabled = int(Game.player.gold) < 8
 	item_menu.size.y = 6 + actions.size() * 26
+	item_menu.position.y=minf(item_menu.position.y,416-item_menu.size.y)
 
 func close_menu() -> void:
 	if item_menu != null and is_instance_valid(item_menu):

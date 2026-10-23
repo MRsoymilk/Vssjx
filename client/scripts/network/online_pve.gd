@@ -102,6 +102,7 @@ func valid(value: Variant) -> bool:
 		if not EndlessRules.valid_view(value.endless):return false
 		var running:bool=value.get("battle") is Dictionary and value.battle.has("endless") and value.battle.get("outcome")=="active"
 		if value.endless.progress.in_progress!=running:return false
+	if value.has("gathering") and not GatheringRules.valid(value.gathering):return false
 	if not value.has("battle"): return false
 	var battle: Variant = value.battle
 	if battle == null: return true
@@ -164,6 +165,8 @@ func receive(packet: Dictionary) -> bool:
 		var previous_ai: Dictionary = state.get("ai_world", {})
 		var previous_loot:Dictionary=state.get("loot",{})
 		var previous_endless:Dictionary=state.get("endless",{})
+		var previous_gathering:Dictionary=state.get("gathering",{})
+		var keep_gathering:bool=state.has("gathering") and not packet.state.has("gathering") and packet.state.character.state_revision==state.character.state_revision
 		var keep_endless:bool=state.has("endless") and not packet.state.has("endless") and packet.state.character.state_revision==state.character.state_revision
 		var keep_loot:bool=state.has("loot") and not packet.state.has("loot") and packet.state.character.state_revision==state.character.state_revision
 		var keep_ai: bool = state.has("ai_world") and not packet.state.has("ai_world") and packet.state.character.state_revision==state.character.state_revision
@@ -174,6 +177,7 @@ func receive(packet: Dictionary) -> bool:
 		var keep_respawns: bool = state.has("server_time_ms") and not packet.state.has("server_time_ms") and packet.state.character.state_revision == state.character.state_revision
 		var previous_time: int = int(state.get("server_time_ms", 0))
 		state = packet.state.duplicate(true)
+		if keep_gathering:state.gathering=previous_gathering.duplicate(true)
 		if keep_ai: state.ai_world = previous_ai.duplicate(true)
 		if keep_loot:state.loot=previous_loot.duplicate(true)
 		if keep_endless:state.endless=previous_endless.duplicate(true)
@@ -227,6 +231,12 @@ func unavailable_monsters() -> Array:
 
 func submit(action: String, target: String = "", points: Array = [], count: int=1, enemy_slot:String="") -> bool:
 	if not ready or pending(): return false
+	if action in ["gather_start","gather_finish","gather_cancel","gather_discard"]:
+		if not state.has("gathering") or (count!=1 and action!="gather_discard") or not points.is_empty():return false
+		if action!="gather_cancel" and (active() or is_soul()):return false
+		if action=="gather_start" and not state.gathering.nodes.any(func(n:Dictionary)->bool:return n.id==target and int(n.available_at_ms)<=server_time_ms()):return false
+		if action in ["gather_finish","gather_cancel"] and not uuid(target):return false
+		if action=="gather_discard" and (not GatheringRules.MATERIALS.has(target) or count<1 or count>int(state.gathering.materials.get(target,0))):return false
 	if not enemy_slot.is_empty() and (not active() or not state.battle.has("formation") or action not in ["attack","skill"] or not state.battle.formation.enemies.any(func(e:Dictionary)->bool:return e.slot==enemy_slot and int(e.hp)>0)):return false
 	if is_soul() and action!="revive":return false
 	if action=="revive" and (not is_soul() or target!=state.character.corpse.id):return false
@@ -273,7 +283,7 @@ func submit(action: String, target: String = "", points: Array = [], count: int=
 	elif action=="respec":
 		if active() or not state.character.get("balance_respec_available",false):return false
 		command.expected_revision=state.character.state_revision
-	elif action in ["buy", "equip", "unequip", "use", "discard","school_join","scroll_travel","revive","endless","gear_equip","gear_unequip","gear_claim","gear_salvage","gear_reroll","gear_upgrade","gear_focus"]:
+	elif action in ["gather_start","gather_finish","gather_cancel","gather_discard","buy", "equip", "unequip", "use", "discard","school_join","scroll_travel","revive","endless","gear_equip","gear_unequip","gear_claim","gear_salvage","gear_reroll","gear_upgrade","gear_focus"]:
 		command.target = target
 		if count!=1 or action=="gear_reroll": command.quantity=count
 		command.expected_revision = state.character.state_revision
@@ -308,6 +318,8 @@ func quest_text() -> String:
 	return "古剑遗迹 · 已完成\n妖气已散，可返回青云山道恢复元气，或继续探索遗迹。"
 
 static func error_text(code: String) -> String:
+	var gathering:={"INVALID_GATHER_COMMAND":"无效的采集请求。","GATHER_NOT_FOUND":"当前地图没有这个可采集资源。","GATHER_TOO_FAR":"请先走到资源旁并停稳。","GATHER_COOLDOWN":"该资源正在刷新，请稍候。","GATHER_BUSY":"正在采集，请先完成或取消。","GATHER_NOT_READY":"采集尚未完成，请等待进度结束。","GATHER_INTERRUPTED":"采集已中断，请重新确认。","STALE_GATHERING":"角色状态已变化，请重新采集。","MATERIAL_BAG_FULL":"该材料已接近999份上限，请先整理材料袋。","INVALID_GATHER_STATE":"采集记录异常，请重新同步。"}
+	if gathering.has(code):return gathering[code]
 	if code=="TRAVEL_SCROLL_REQUIRED":return "神行符不足，请先到商店购买。"
 	if code=="TRAVEL_DESTINATION_REQUIRED":return "请先选择神行符的传送目的地。"
 	var endless:={"ENDLESS_NPC_REQUIRED":"请到主城灵空台，与守境人交谈开启无尽试炼。","ENDLESS_NOT_READY":"请先停稳，再进入试炼。","ENDLESS_SOLO_ONLY":"无尽试炼为单人模式，请先退出队伍。","ENDLESS_LIMIT":"已到达当前数值安全极限，最高纪录已保留。","INVALID_ENDLESS_STATE":"试炼记录异常，请重新同步后重试。","STALE_ENDLESS":"试炼记录已更新，请重新确认挑战。"}

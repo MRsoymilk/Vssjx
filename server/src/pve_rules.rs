@@ -11,6 +11,7 @@ pub enum Action {
     GatherStart,
     GatherFinish,
     GatherCancel,
+    GatherDiscard,
     GearEquip,
     GearUnequip,
     GearClaim,

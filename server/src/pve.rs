@@ -468,7 +468,7 @@ impl Loaded {
             return Err("INVALID_PVE_COMMAND");
         }
         match command.action {
-            Action::GatherStart|Action::GatherFinish|Action::GatherCancel=>Err("INVALID_GATHER_COMMAND"),
+            Action::GatherStart|Action::GatherFinish|Action::GatherCancel|Action::GatherDiscard=>Err("INVALID_GATHER_COMMAND"),
             Action::Accept | Action::Claim | Action::Restore | Action::Challenge => {
                 if self.battle.is_some() {
                     return Err("BATTLE_ACTIVE");

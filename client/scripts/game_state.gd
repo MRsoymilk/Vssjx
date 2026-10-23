@@ -20,6 +20,47 @@ var _load_epoch := 0
 var _operation_path := ""
 var _storage_announced := false
 var _local_roster_busy := false
+var local_gather:Dictionary={}
+
+func begin_gathering(id:String,cell:Vector2i,map_id:String)->String:
+	if storage_busy or not local_gather.is_empty():return "GATHER_BUSY"
+	if is_soul():return "SOUL_STATE"
+	if local_combat!=null:return "BATTLE_ACTIVE"
+	var node:=GatheringRules.definition(id)
+	if node.is_empty() or node.map_id!=map_id or AIWorld.local_map_id()!=map_id:return "GATHER_NOT_FOUND"
+	if absi(cell.x-int(node.cell[0]))+absi(cell.y-int(node.cell[1]))>1:return "GATHER_TOO_FAR"
+	var data:Dictionary=player.get("gathering",{"materials":{},"respawns":{}})
+	if int(data.respawns.get(id,0))>int(Time.get_unix_time_from_system()*1000):return "GATHER_COOLDOWN"
+	if int(data.materials.get(node.material,0))+int(node.max_quantity)>999:return "MATERIAL_BAG_FULL"
+	local_gather={"node":node.duplicate(true),"cell":cell,"map":map_id,"started":Time.get_ticks_msec(),"generation":_player_generation,"path":save_path,"quantity":randi_range(int(node.min_quantity),int(node.max_quantity))}
+	return ""
+
+func finish_gathering(cell:Vector2i,map_id:String)->PlatformResult:
+	if storage_busy:return PlatformResult.new(PlatformResult.Status.TEMPORARY_FAILURE,"STORAGE_BUSY","正在保存，请稍候。")
+	var pending:=local_gather.duplicate(true)
+	if pending.is_empty() or pending.cell!=cell or pending.map!=map_id or AIWorld.local_map_id()!=map_id or pending.generation!=_player_generation or pending.path!=save_path or is_soul() or local_combat!=null:return PlatformResult.new(PlatformResult.Status.INVALID_DATA,"GATHER_INTERRUPTED",OnlinePve.error_text("GATHER_INTERRUPTED"))
+	if Time.get_ticks_msec()-int(pending.started)<int(pending.node.duration_ms):return PlatformResult.new(PlatformResult.Status.INVALID_DATA,"GATHER_NOT_READY",OnlinePve.error_text("GATHER_NOT_READY"))
+	var before:=player.duplicate(true)
+	var data:Dictionary=player.get("gathering",{"materials":{},"respawns":{}}).duplicate(true)
+	var material:String=pending.node.material
+	if int(data.materials.get(material,0))+int(pending.quantity)>999:return PlatformResult.new(PlatformResult.Status.INVALID_DATA,"MATERIAL_BAG_FULL",OnlinePve.error_text("MATERIAL_BAG_FULL"))
+	data.materials[material]=int(data.materials.get(material,0))+int(pending.quantity)
+	data.respawns[pending.node.id]=int(Time.get_unix_time_from_system()*1000)+int(pending.node.respawn_ms)
+	player.gathering=data
+	var result:=await save_game()
+	if not result.ok:
+		if pending.generation==_player_generation and pending.path==save_path:player=before
+		return result
+	local_gather={};return PlatformResult.success({"material":material,"quantity":pending.quantity})
+
+func discard_gathering(material:String,quantity:int)->PlatformResult:
+	if storage_busy or not GatheringRules.MATERIALS.has(material) or quantity<1 or quantity>int(player.get("gathering",{}).get("materials",{}).get(material,0)):return PlatformResult.new(PlatformResult.Status.INVALID_DATA,"MATERIALS_INSUFFICIENT","材料数量不足或正在保存。")
+	var before:=player.duplicate(true);var generation:=_player_generation;var path:=save_path
+	player.gathering.materials[material]=int(player.gathering.materials[material])-quantity
+	if int(player.gathering.materials[material])==0:player.gathering.materials.erase(material)
+	var result:=await save_game()
+	if not result.ok and generation==_player_generation and path==save_path:player=before
+	return result
 
 func _local_snapshot() -> Dictionary:
 	var snapshot := player.duplicate(true)
@@ -173,6 +214,7 @@ func when_ready() -> PlatformResult:
 	return path
 
 func new_player(nickname: String, job: int, school: int, gender: int = 0) -> void:
+	local_gather={}
 	_player_generation += 1
 	last_save_receipt = {}
 	player = {
@@ -658,6 +700,7 @@ func valid_save(data: Variant) -> bool:
 		return false
 	if not ShopRules._integer(data.get("balance_revision",0),0,1) or not data.get("balance_respec_available",true) is bool:return false
 	if data.has("endless_state") and not EndlessRules.valid(data.endless_state):return false
+	if data.has("gathering") and not GatheringRules.valid_local(data.gathering):return false
 	if data.has("ai_map") and (not data.ai_map is String or (not data.ai_map.is_empty() and AIWorld.map_data(data.ai_map).is_empty())): return false
 	if data.has("ai_progress") and not AIWorld.valid_progress(data.ai_progress): return false
 	if data.get("corpse")!=null:

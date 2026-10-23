@@ -1,0 +1,5462 @@
+{
+  "version": "gathering-v1",
+  "stack_limit": 999,
+  "materials": [
+    {
+      "id": "iron",
+      "name": "铁矿",
+      "kind": "ore"
+    },
+    {
+      "id": "copper",
+      "name": "铜矿",
+      "kind": "ore"
+    },
+    {
+      "id": "gancao",
+      "name": "甘草",
+      "kind": "herb"
+    },
+    {
+      "id": "danggui",
+      "name": "当归",
+      "kind": "herb"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "qingyun_trail_ore",
+      "map_id": "qingyun_trail",
+      "cell": [
+        15,
+        19
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "qingyun_trail_herb",
+      "map_id": "qingyun_trail",
+      "cell": [
+        7,
+        20
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ancient_ruins_ore",
+      "map_id": "ancient_ruins",
+      "cell": [
+        10,
+        19
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ancient_ruins_herb",
+      "map_id": "ancient_ruins",
+      "cell": [
+        1,
+        20
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_001_ore",
+      "map_id": "ai_001",
+      "cell": [
+        10,
+        19
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_001_herb",
+      "map_id": "ai_001",
+      "cell": [
+        1,
+        20
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_002_ore",
+      "map_id": "ai_002",
+      "cell": [
+        10,
+        29
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_002_herb",
+      "map_id": "ai_002",
+      "cell": [
+        1,
+        30
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_003_ore",
+      "map_id": "ai_003",
+      "cell": [
+        10,
+        21
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_003_herb",
+      "map_id": "ai_003",
+      "cell": [
+        2,
+        21
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_004_ore",
+      "map_id": "ai_004",
+      "cell": [
+        23,
+        30
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_004_herb",
+      "map_id": "ai_004",
+      "cell": [
+        14,
+        30
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_005_ore",
+      "map_id": "ai_005",
+      "cell": [
+        10,
+        22
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_005_herb",
+      "map_id": "ai_005",
+      "cell": [
+        2,
+        21
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_006_ore",
+      "map_id": "ai_006",
+      "cell": [
+        9,
+        19
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_006_herb",
+      "map_id": "ai_006",
+      "cell": [
+        1,
+        20
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_007_ore",
+      "map_id": "ai_007",
+      "cell": [
+        9,
+        21
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_007_herb",
+      "map_id": "ai_007",
+      "cell": [
+        1,
+        22
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_008_ore",
+      "map_id": "ai_008",
+      "cell": [
+        9,
+        17
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_008_herb",
+      "map_id": "ai_008",
+      "cell": [
+        3,
+        18
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_009_ore",
+      "map_id": "ai_009",
+      "cell": [
+        10,
+        22
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_009_herb",
+      "map_id": "ai_009",
+      "cell": [
+        1,
+        23
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_010_ore",
+      "map_id": "ai_010",
+      "cell": [
+        25,
+        21
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_010_herb",
+      "map_id": "ai_010",
+      "cell": [
+        21,
+        22
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_011_ore",
+      "map_id": "ai_011",
+      "cell": [
+        9,
+        19
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_011_herb",
+      "map_id": "ai_011",
+      "cell": [
+        1,
+        20
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_012_ore",
+      "map_id": "ai_012",
+      "cell": [
+        7,
+        21
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_012_herb",
+      "map_id": "ai_012",
+      "cell": [
+        1,
+        22
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_013_ore",
+      "map_id": "ai_013",
+      "cell": [
+        9,
+        21
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_013_herb",
+      "map_id": "ai_013",
+      "cell": [
+        1,
+        22
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_014_ore",
+      "map_id": "ai_014",
+      "cell": [
+        8,
+        18
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_014_herb",
+      "map_id": "ai_014",
+      "cell": [
+        1,
+        21
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_015_ore",
+      "map_id": "ai_015",
+      "cell": [
+        9,
+        22
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_015_herb",
+      "map_id": "ai_015",
+      "cell": [
+        1,
+        23
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_016_ore",
+      "map_id": "ai_016",
+      "cell": [
+        9,
+        20
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_016_herb",
+      "map_id": "ai_016",
+      "cell": [
+        1,
+        21
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_017_ore",
+      "map_id": "ai_017",
+      "cell": [
+        10,
+        22
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_017_herb",
+      "map_id": "ai_017",
+      "cell": [
+        1,
+        23
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_018_ore",
+      "map_id": "ai_018",
+      "cell": [
+        9,
+        22
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_018_herb",
+      "map_id": "ai_018",
+      "cell": [
+        1,
+        23
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_019_ore",
+      "map_id": "ai_019",
+      "cell": [
+        10,
+        22
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_019_herb",
+      "map_id": "ai_019",
+      "cell": [
+        2,
+        21
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_020_ore",
+      "map_id": "ai_020",
+      "cell": [
+        9,
+        21
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_020_herb",
+      "map_id": "ai_020",
+      "cell": [
+        3,
+        22
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_021_ore",
+      "map_id": "ai_021",
+      "cell": [
+        21,
+        29
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_021_herb",
+      "map_id": "ai_021",
+      "cell": [
+        12,
+        30
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_022_ore",
+      "map_id": "ai_022",
+      "cell": [
+        21,
+        26
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_022_herb",
+      "map_id": "ai_022",
+      "cell": [
+        12,
+        26
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_023_ore",
+      "map_id": "ai_023",
+      "cell": [
+        20,
+        25
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_023_herb",
+      "map_id": "ai_023",
+      "cell": [
+        12,
+        24
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_024_ore",
+      "map_id": "ai_024",
+      "cell": [
+        8,
+        19
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_024_herb",
+      "map_id": "ai_024",
+      "cell": [
+        1,
+        20
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_025_ore",
+      "map_id": "ai_025",
+      "cell": [
+        9,
+        22
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_025_herb",
+      "map_id": "ai_025",
+      "cell": [
+        1,
+        23
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_026_ore",
+      "map_id": "ai_026",
+      "cell": [
+        7,
+        17
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_026_herb",
+      "map_id": "ai_026",
+      "cell": [
+        1,
+        18
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_027_ore",
+      "map_id": "ai_027",
+      "cell": [
+        11,
+        22
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_027_herb",
+      "map_id": "ai_027",
+      "cell": [
+        2,
+        21
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_028_ore",
+      "map_id": "ai_028",
+      "cell": [
+        9,
+        21
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_028_herb",
+      "map_id": "ai_028",
+      "cell": [
+        1,
+        22
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_029_ore",
+      "map_id": "ai_029",
+      "cell": [
+        9,
+        21
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_029_herb",
+      "map_id": "ai_029",
+      "cell": [
+        1,
+        22
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_030_ore",
+      "map_id": "ai_030",
+      "cell": [
+        9,
+        21
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_030_herb",
+      "map_id": "ai_030",
+      "cell": [
+        1,
+        22
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_031_ore",
+      "map_id": "ai_031",
+      "cell": [
+        22,
+        30
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_031_herb",
+      "map_id": "ai_031",
+      "cell": [
+        13,
+        30
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_032_ore",
+      "map_id": "ai_032",
+      "cell": [
+        8,
+        21
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_032_herb",
+      "map_id": "ai_032",
+      "cell": [
+        1,
+        22
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_033_ore",
+      "map_id": "ai_033",
+      "cell": [
+        10,
+        22
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_033_herb",
+      "map_id": "ai_033",
+      "cell": [
+        3,
+        23
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_034_ore",
+      "map_id": "ai_034",
+      "cell": [
+        9,
+        19
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_034_herb",
+      "map_id": "ai_034",
+      "cell": [
+        1,
+        23
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_035_ore",
+      "map_id": "ai_035",
+      "cell": [
+        8,
+        18
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_035_herb",
+      "map_id": "ai_035",
+      "cell": [
+        1,
+        21
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_036_ore",
+      "map_id": "ai_036",
+      "cell": [
+        9,
+        17
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_036_herb",
+      "map_id": "ai_036",
+      "cell": [
+        1,
+        18
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_037_ore",
+      "map_id": "ai_037",
+      "cell": [
+        19,
+        30
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_037_herb",
+      "map_id": "ai_037",
+      "cell": [
+        10,
+        30
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_038_ore",
+      "map_id": "ai_038",
+      "cell": [
+        10,
+        22
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_038_herb",
+      "map_id": "ai_038",
+      "cell": [
+        1,
+        23
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_039_ore",
+      "map_id": "ai_039",
+      "cell": [
+        9,
+        20
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_039_herb",
+      "map_id": "ai_039",
+      "cell": [
+        1,
+        22
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_040_ore",
+      "map_id": "ai_040",
+      "cell": [
+        9,
+        22
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_040_herb",
+      "map_id": "ai_040",
+      "cell": [
+        1,
+        23
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_041_ore",
+      "map_id": "ai_041",
+      "cell": [
+        9,
+        21
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_041_herb",
+      "map_id": "ai_041",
+      "cell": [
+        1,
+        22
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_042_ore",
+      "map_id": "ai_042",
+      "cell": [
+        8,
+        22
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_042_herb",
+      "map_id": "ai_042",
+      "cell": [
+        1,
+        23
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_043_ore",
+      "map_id": "ai_043",
+      "cell": [
+        9,
+        21
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_043_herb",
+      "map_id": "ai_043",
+      "cell": [
+        1,
+        22
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_044_ore",
+      "map_id": "ai_044",
+      "cell": [
+        9,
+        21
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_044_herb",
+      "map_id": "ai_044",
+      "cell": [
+        1,
+        23
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_045_ore",
+      "map_id": "ai_045",
+      "cell": [
+        9,
+        21
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_045_herb",
+      "map_id": "ai_045",
+      "cell": [
+        1,
+        22
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_046_ore",
+      "map_id": "ai_046",
+      "cell": [
+        9,
+        21
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_046_herb",
+      "map_id": "ai_046",
+      "cell": [
+        1,
+        22
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_047_ore",
+      "map_id": "ai_047",
+      "cell": [
+        10,
+        22
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_047_herb",
+      "map_id": "ai_047",
+      "cell": [
+        1,
+        21
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_048_ore",
+      "map_id": "ai_048",
+      "cell": [
+        10,
+        22
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_048_herb",
+      "map_id": "ai_048",
+      "cell": [
+        1,
+        23
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_049_ore",
+      "map_id": "ai_049",
+      "cell": [
+        8,
+        17
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_049_herb",
+      "map_id": "ai_049",
+      "cell": [
+        1,
+        18
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_050_ore",
+      "map_id": "ai_050",
+      "cell": [
+        9,
+        22
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_050_herb",
+      "map_id": "ai_050",
+      "cell": [
+        1,
+        23
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_051_ore",
+      "map_id": "ai_051",
+      "cell": [
+        10,
+        22
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_051_herb",
+      "map_id": "ai_051",
+      "cell": [
+        2,
+        21
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_052_ore",
+      "map_id": "ai_052",
+      "cell": [
+        9,
+        18
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_052_herb",
+      "map_id": "ai_052",
+      "cell": [
+        1,
+        19
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_053_ore",
+      "map_id": "ai_053",
+      "cell": [
+        20,
+        7
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_053_herb",
+      "map_id": "ai_053",
+      "cell": [
+        11,
+        8
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_054_ore",
+      "map_id": "ai_054",
+      "cell": [
+        9,
+        18
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_054_herb",
+      "map_id": "ai_054",
+      "cell": [
+        1,
+        19
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_055_ore",
+      "map_id": "ai_055",
+      "cell": [
+        9,
+        19
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_055_herb",
+      "map_id": "ai_055",
+      "cell": [
+        1,
+        20
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_056_ore",
+      "map_id": "ai_056",
+      "cell": [
+        9,
+        18
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_056_herb",
+      "map_id": "ai_056",
+      "cell": [
+        1,
+        21
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_057_ore",
+      "map_id": "ai_057",
+      "cell": [
+        20,
+        30
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_057_herb",
+      "map_id": "ai_057",
+      "cell": [
+        11,
+        30
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_058_ore",
+      "map_id": "ai_058",
+      "cell": [
+        9,
+        17
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_058_herb",
+      "map_id": "ai_058",
+      "cell": [
+        1,
+        18
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_059_ore",
+      "map_id": "ai_059",
+      "cell": [
+        8,
+        19
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_059_herb",
+      "map_id": "ai_059",
+      "cell": [
+        1,
+        20
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_060_ore",
+      "map_id": "ai_060",
+      "cell": [
+        9,
+        21
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_060_herb",
+      "map_id": "ai_060",
+      "cell": [
+        1,
+        23
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_061_ore",
+      "map_id": "ai_061",
+      "cell": [
+        9,
+        20
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_061_herb",
+      "map_id": "ai_061",
+      "cell": [
+        1,
+        22
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_062_ore",
+      "map_id": "ai_062",
+      "cell": [
+        19,
+        30
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_062_herb",
+      "map_id": "ai_062",
+      "cell": [
+        10,
+        30
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_063_ore",
+      "map_id": "ai_063",
+      "cell": [
+        9,
+        18
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_063_herb",
+      "map_id": "ai_063",
+      "cell": [
+        1,
+        19
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_064_ore",
+      "map_id": "ai_064",
+      "cell": [
+        9,
+        21
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_064_herb",
+      "map_id": "ai_064",
+      "cell": [
+        1,
+        22
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_065_ore",
+      "map_id": "ai_065",
+      "cell": [
+        9,
+        18
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_065_herb",
+      "map_id": "ai_065",
+      "cell": [
+        1,
+        19
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_066_ore",
+      "map_id": "ai_066",
+      "cell": [
+        9,
+        18
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_066_herb",
+      "map_id": "ai_066",
+      "cell": [
+        1,
+        19
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_067_ore",
+      "map_id": "ai_067",
+      "cell": [
+        9,
+        20
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_067_herb",
+      "map_id": "ai_067",
+      "cell": [
+        1,
+        21
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_068_ore",
+      "map_id": "ai_068",
+      "cell": [
+        9,
+        18
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_068_herb",
+      "map_id": "ai_068",
+      "cell": [
+        1,
+        19
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_069_ore",
+      "map_id": "ai_069",
+      "cell": [
+        10,
+        22
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_069_herb",
+      "map_id": "ai_069",
+      "cell": [
+        2,
+        21
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_070_ore",
+      "map_id": "ai_070",
+      "cell": [
+        9,
+        19
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_070_herb",
+      "map_id": "ai_070",
+      "cell": [
+        1,
+        20
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_071_ore",
+      "map_id": "ai_071",
+      "cell": [
+        9,
+        21
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_071_herb",
+      "map_id": "ai_071",
+      "cell": [
+        1,
+        23
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_072_ore",
+      "map_id": "ai_072",
+      "cell": [
+        9,
+        20
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_072_herb",
+      "map_id": "ai_072",
+      "cell": [
+        1,
+        23
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_073_ore",
+      "map_id": "ai_073",
+      "cell": [
+        9,
+        17
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_073_herb",
+      "map_id": "ai_073",
+      "cell": [
+        1,
+        18
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_074_ore",
+      "map_id": "ai_074",
+      "cell": [
+        26,
+        20
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_074_herb",
+      "map_id": "ai_074",
+      "cell": [
+        23,
+        22
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_075_ore",
+      "map_id": "ai_075",
+      "cell": [
+        9,
+        18
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_075_herb",
+      "map_id": "ai_075",
+      "cell": [
+        1,
+        19
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_076_ore",
+      "map_id": "ai_076",
+      "cell": [
+        20,
+        30
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_076_herb",
+      "map_id": "ai_076",
+      "cell": [
+        11,
+        30
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_077_ore",
+      "map_id": "ai_077",
+      "cell": [
+        19,
+        7
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_077_herb",
+      "map_id": "ai_077",
+      "cell": [
+        10,
+        6
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_078_ore",
+      "map_id": "ai_078",
+      "cell": [
+        9,
+        19
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_078_herb",
+      "map_id": "ai_078",
+      "cell": [
+        1,
+        20
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_079_ore",
+      "map_id": "ai_079",
+      "cell": [
+        11,
+        22
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_079_herb",
+      "map_id": "ai_079",
+      "cell": [
+        1,
+        22
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_080_ore",
+      "map_id": "ai_080",
+      "cell": [
+        10,
+        22
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_080_herb",
+      "map_id": "ai_080",
+      "cell": [
+        3,
+        23
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_081_ore",
+      "map_id": "ai_081",
+      "cell": [
+        21,
+        7
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_081_herb",
+      "map_id": "ai_081",
+      "cell": [
+        12,
+        8
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_082_ore",
+      "map_id": "ai_082",
+      "cell": [
+        8,
+        18
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_082_herb",
+      "map_id": "ai_082",
+      "cell": [
+        1,
+        19
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_083_ore",
+      "map_id": "ai_083",
+      "cell": [
+        9,
+        19
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_083_herb",
+      "map_id": "ai_083",
+      "cell": [
+        1,
+        20
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_084_ore",
+      "map_id": "ai_084",
+      "cell": [
+        10,
+        22
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_084_herb",
+      "map_id": "ai_084",
+      "cell": [
+        2,
+        21
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_085_ore",
+      "map_id": "ai_085",
+      "cell": [
+        9,
+        21
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_085_herb",
+      "map_id": "ai_085",
+      "cell": [
+        1,
+        23
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_086_ore",
+      "map_id": "ai_086",
+      "cell": [
+        8,
+        17
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_086_herb",
+      "map_id": "ai_086",
+      "cell": [
+        1,
+        18
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_087_ore",
+      "map_id": "ai_087",
+      "cell": [
+        20,
+        28
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_087_herb",
+      "map_id": "ai_087",
+      "cell": [
+        11,
+        24
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_088_ore",
+      "map_id": "ai_088",
+      "cell": [
+        9,
+        21
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_088_herb",
+      "map_id": "ai_088",
+      "cell": [
+        2,
+        20
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_089_ore",
+      "map_id": "ai_089",
+      "cell": [
+        23,
+        6
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_089_herb",
+      "map_id": "ai_089",
+      "cell": [
+        14,
+        8
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_090_ore",
+      "map_id": "ai_090",
+      "cell": [
+        27,
+        20
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_090_herb",
+      "map_id": "ai_090",
+      "cell": [
+        23,
+        19
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_091_ore",
+      "map_id": "ai_091",
+      "cell": [
+        10,
+        22
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_091_herb",
+      "map_id": "ai_091",
+      "cell": [
+        2,
+        23
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_092_ore",
+      "map_id": "ai_092",
+      "cell": [
+        9,
+        18
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_092_herb",
+      "map_id": "ai_092",
+      "cell": [
+        4,
+        21
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_093_ore",
+      "map_id": "ai_093",
+      "cell": [
+        10,
+        21
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_093_herb",
+      "map_id": "ai_093",
+      "cell": [
+        1,
+        19
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_094_ore",
+      "map_id": "ai_094",
+      "cell": [
+        9,
+        21
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_094_herb",
+      "map_id": "ai_094",
+      "cell": [
+        5,
+        22
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_095_ore",
+      "map_id": "ai_095",
+      "cell": [
+        9,
+        18
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_095_herb",
+      "map_id": "ai_095",
+      "cell": [
+        1,
+        19
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_096_ore",
+      "map_id": "ai_096",
+      "cell": [
+        9,
+        20
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_096_herb",
+      "map_id": "ai_096",
+      "cell": [
+        1,
+        21
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_097_ore",
+      "map_id": "ai_097",
+      "cell": [
+        9,
+        18
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_097_herb",
+      "map_id": "ai_097",
+      "cell": [
+        1,
+        19
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_098_ore",
+      "map_id": "ai_098",
+      "cell": [
+        11,
+        22
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_098_herb",
+      "map_id": "ai_098",
+      "cell": [
+        3,
+        23
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_099_ore",
+      "map_id": "ai_099",
+      "cell": [
+        9,
+        22
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_099_herb",
+      "map_id": "ai_099",
+      "cell": [
+        1,
+        23
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_100_ore",
+      "map_id": "ai_100",
+      "cell": [
+        9,
+        21
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_100_herb",
+      "map_id": "ai_100",
+      "cell": [
+        1,
+        22
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_101_ore",
+      "map_id": "ai_101",
+      "cell": [
+        19,
+        7
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_101_herb",
+      "map_id": "ai_101",
+      "cell": [
+        11,
+        9
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_102_ore",
+      "map_id": "ai_102",
+      "cell": [
+        9,
+        20
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_102_herb",
+      "map_id": "ai_102",
+      "cell": [
+        1,
+        20
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_103_ore",
+      "map_id": "ai_103",
+      "cell": [
+        21,
+        29
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_103_herb",
+      "map_id": "ai_103",
+      "cell": [
+        12,
+        24
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_104_ore",
+      "map_id": "ai_104",
+      "cell": [
+        9,
+        21
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_104_herb",
+      "map_id": "ai_104",
+      "cell": [
+        3,
+        22
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_105_ore",
+      "map_id": "ai_105",
+      "cell": [
+        9,
+        17
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_105_herb",
+      "map_id": "ai_105",
+      "cell": [
+        1,
+        18
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_106_ore",
+      "map_id": "ai_106",
+      "cell": [
+        10,
+        22
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_106_herb",
+      "map_id": "ai_106",
+      "cell": [
+        2,
+        21
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_107_ore",
+      "map_id": "ai_107",
+      "cell": [
+        9,
+        21
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_107_herb",
+      "map_id": "ai_107",
+      "cell": [
+        1,
+        23
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_108_ore",
+      "map_id": "ai_108",
+      "cell": [
+        9,
+        21
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_108_herb",
+      "map_id": "ai_108",
+      "cell": [
+        1,
+        22
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_109_ore",
+      "map_id": "ai_109",
+      "cell": [
+        20,
+        5
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_109_herb",
+      "map_id": "ai_109",
+      "cell": [
+        13,
+        8
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_110_ore",
+      "map_id": "ai_110",
+      "cell": [
+        9,
+        21
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_110_herb",
+      "map_id": "ai_110",
+      "cell": [
+        2,
+        21
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_111_ore",
+      "map_id": "ai_111",
+      "cell": [
+        19,
+        29
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_111_herb",
+      "map_id": "ai_111",
+      "cell": [
+        10,
+        24
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_112_ore",
+      "map_id": "ai_112",
+      "cell": [
+        9,
+        19
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_112_herb",
+      "map_id": "ai_112",
+      "cell": [
+        3,
+        21
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_113_ore",
+      "map_id": "ai_113",
+      "cell": [
+        9,
+        19
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_113_herb",
+      "map_id": "ai_113",
+      "cell": [
+        1,
+        22
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_114_ore",
+      "map_id": "ai_114",
+      "cell": [
+        10,
+        22
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_114_herb",
+      "map_id": "ai_114",
+      "cell": [
+        2,
+        23
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_115_ore",
+      "map_id": "ai_115",
+      "cell": [
+        9,
+        20
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_115_herb",
+      "map_id": "ai_115",
+      "cell": [
+        1,
+        23
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_116_ore",
+      "map_id": "ai_116",
+      "cell": [
+        9,
+        18
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_116_herb",
+      "map_id": "ai_116",
+      "cell": [
+        1,
+        19
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_117_ore",
+      "map_id": "ai_117",
+      "cell": [
+        10,
+        22
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_117_herb",
+      "map_id": "ai_117",
+      "cell": [
+        1,
+        23
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_118_ore",
+      "map_id": "ai_118",
+      "cell": [
+        25,
+        18
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_118_herb",
+      "map_id": "ai_118",
+      "cell": [
+        22,
+        20
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_119_ore",
+      "map_id": "ai_119",
+      "cell": [
+        9,
+        21
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_119_herb",
+      "map_id": "ai_119",
+      "cell": [
+        5,
+        15
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_120_ore",
+      "map_id": "ai_120",
+      "cell": [
+        9,
+        21
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_120_herb",
+      "map_id": "ai_120",
+      "cell": [
+        1,
+        17
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_121_ore",
+      "map_id": "ai_121",
+      "cell": [
+        9,
+        18
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_121_herb",
+      "map_id": "ai_121",
+      "cell": [
+        1,
+        19
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_122_ore",
+      "map_id": "ai_122",
+      "cell": [
+        9,
+        20
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_122_herb",
+      "map_id": "ai_122",
+      "cell": [
+        1,
+        22
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_123_ore",
+      "map_id": "ai_123",
+      "cell": [
+        10,
+        22
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_123_herb",
+      "map_id": "ai_123",
+      "cell": [
+        2,
+        22
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_124_ore",
+      "map_id": "ai_124",
+      "cell": [
+        9,
+        18
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_124_herb",
+      "map_id": "ai_124",
+      "cell": [
+        1,
+        20
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_125_ore",
+      "map_id": "ai_125",
+      "cell": [
+        9,
+        21
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_125_herb",
+      "map_id": "ai_125",
+      "cell": [
+        1,
+        22
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_126_ore",
+      "map_id": "ai_126",
+      "cell": [
+        9,
+        21
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_126_herb",
+      "map_id": "ai_126",
+      "cell": [
+        1,
+        22
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_127_ore",
+      "map_id": "ai_127",
+      "cell": [
+        8,
+        17
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_127_herb",
+      "map_id": "ai_127",
+      "cell": [
+        1,
+        18
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_128_ore",
+      "map_id": "ai_128",
+      "cell": [
+        9,
+        19
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_128_herb",
+      "map_id": "ai_128",
+      "cell": [
+        1,
+        20
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_129_ore",
+      "map_id": "ai_129",
+      "cell": [
+        10,
+        29
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_129_herb",
+      "map_id": "ai_129",
+      "cell": [
+        1,
+        30
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_130_ore",
+      "map_id": "ai_130",
+      "cell": [
+        25,
+        21
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_130_herb",
+      "map_id": "ai_130",
+      "cell": [
+        21,
+        22
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_131_ore",
+      "map_id": "ai_131",
+      "cell": [
+        21,
+        27
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_131_herb",
+      "map_id": "ai_131",
+      "cell": [
+        12,
+        24
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_132_ore",
+      "map_id": "ai_132",
+      "cell": [
+        9,
+        21
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_132_herb",
+      "map_id": "ai_132",
+      "cell": [
+        3,
+        22
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_133_ore",
+      "map_id": "ai_133",
+      "cell": [
+        22,
+        7
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_133_herb",
+      "map_id": "ai_133",
+      "cell": [
+        13,
+        8
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_134_ore",
+      "map_id": "ai_134",
+      "cell": [
+        25,
+        19
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_134_herb",
+      "map_id": "ai_134",
+      "cell": [
+        21,
+        20
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_135_ore",
+      "map_id": "ai_135",
+      "cell": [
+        21,
+        27
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_135_herb",
+      "map_id": "ai_135",
+      "cell": [
+        11,
+        24
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_136_ore",
+      "map_id": "ai_136",
+      "cell": [
+        9,
+        17
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_136_herb",
+      "map_id": "ai_136",
+      "cell": [
+        3,
+        18
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_137_ore",
+      "map_id": "ai_137",
+      "cell": [
+        20,
+        7
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_137_herb",
+      "map_id": "ai_137",
+      "cell": [
+        11,
+        8
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_138_ore",
+      "map_id": "ai_138",
+      "cell": [
+        25,
+        17
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_138_herb",
+      "map_id": "ai_138",
+      "cell": [
+        23,
+        20
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_139_ore",
+      "map_id": "ai_139",
+      "cell": [
+        21,
+        28
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_139_herb",
+      "map_id": "ai_139",
+      "cell": [
+        12,
+        24
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_140_ore",
+      "map_id": "ai_140",
+      "cell": [
+        9,
+        17
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_140_herb",
+      "map_id": "ai_140",
+      "cell": [
+        3,
+        18
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_141_ore",
+      "map_id": "ai_141",
+      "cell": [
+        22,
+        7
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_141_herb",
+      "map_id": "ai_141",
+      "cell": [
+        13,
+        7
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_142_ore",
+      "map_id": "ai_142",
+      "cell": [
+        8,
+        21
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_142_herb",
+      "map_id": "ai_142",
+      "cell": [
+        1,
+        22
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_143_ore",
+      "map_id": "ai_143",
+      "cell": [
+        8,
+        20
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_143_herb",
+      "map_id": "ai_143",
+      "cell": [
+        1,
+        24
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_144_ore",
+      "map_id": "ai_144",
+      "cell": [
+        8,
+        20
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_144_herb",
+      "map_id": "ai_144",
+      "cell": [
+        1,
+        21
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_145_ore",
+      "map_id": "ai_145",
+      "cell": [
+        8,
+        20
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_145_herb",
+      "map_id": "ai_145",
+      "cell": [
+        1,
+        23
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_146_ore",
+      "map_id": "ai_146",
+      "cell": [
+        20,
+        30
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_146_herb",
+      "map_id": "ai_146",
+      "cell": [
+        11,
+        30
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_147_ore",
+      "map_id": "ai_147",
+      "cell": [
+        23,
+        30
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_147_herb",
+      "map_id": "ai_147",
+      "cell": [
+        14,
+        30
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_148_ore",
+      "map_id": "ai_148",
+      "cell": [
+        8,
+        17
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_148_herb",
+      "map_id": "ai_148",
+      "cell": [
+        1,
+        18
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_149_ore",
+      "map_id": "ai_149",
+      "cell": [
+        19,
+        30
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_149_herb",
+      "map_id": "ai_149",
+      "cell": [
+        10,
+        30
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_150_ore",
+      "map_id": "ai_150",
+      "cell": [
+        30,
+        20
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_150_herb",
+      "map_id": "ai_150",
+      "cell": [
+        23,
+        21
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_151_ore",
+      "map_id": "ai_151",
+      "cell": [
+        22,
+        30
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_151_herb",
+      "map_id": "ai_151",
+      "cell": [
+        13,
+        30
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_152_ore",
+      "map_id": "ai_152",
+      "cell": [
+        9,
+        18
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_152_herb",
+      "map_id": "ai_152",
+      "cell": [
+        1,
+        21
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_153_ore",
+      "map_id": "ai_153",
+      "cell": [
+        10,
+        22
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_153_herb",
+      "map_id": "ai_153",
+      "cell": [
+        2,
+        21
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_154_ore",
+      "map_id": "ai_154",
+      "cell": [
+        9,
+        21
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_154_herb",
+      "map_id": "ai_154",
+      "cell": [
+        1,
+        22
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_155_ore",
+      "map_id": "ai_155",
+      "cell": [
+        9,
+        21
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_155_herb",
+      "map_id": "ai_155",
+      "cell": [
+        1,
+        23
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_156_ore",
+      "map_id": "ai_156",
+      "cell": [
+        9,
+        17
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_156_herb",
+      "map_id": "ai_156",
+      "cell": [
+        1,
+        18
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_157_ore",
+      "map_id": "ai_157",
+      "cell": [
+        9,
+        23
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_157_herb",
+      "map_id": "ai_157",
+      "cell": [
+        1,
+        24
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_158_ore",
+      "map_id": "ai_158",
+      "cell": [
+        9,
+        18
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_158_herb",
+      "map_id": "ai_158",
+      "cell": [
+        1,
+        19
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_159_ore",
+      "map_id": "ai_159",
+      "cell": [
+        7,
+        17
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_159_herb",
+      "map_id": "ai_159",
+      "cell": [
+        1,
+        18
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_160_ore",
+      "map_id": "ai_160",
+      "cell": [
+        8,
+        17
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_160_herb",
+      "map_id": "ai_160",
+      "cell": [
+        1,
+        18
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_161_ore",
+      "map_id": "ai_161",
+      "cell": [
+        10,
+        19
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_161_herb",
+      "map_id": "ai_161",
+      "cell": [
+        1,
+        21
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_162_ore",
+      "map_id": "ai_162",
+      "cell": [
+        9,
+        19
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_162_herb",
+      "map_id": "ai_162",
+      "cell": [
+        1,
+        20
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_163_ore",
+      "map_id": "ai_163",
+      "cell": [
+        8,
+        18
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_163_herb",
+      "map_id": "ai_163",
+      "cell": [
+        1,
+        19
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_164_ore",
+      "map_id": "ai_164",
+      "cell": [
+        9,
+        18
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_164_herb",
+      "map_id": "ai_164",
+      "cell": [
+        1,
+        20
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_165_ore",
+      "map_id": "ai_165",
+      "cell": [
+        7,
+        17
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_165_herb",
+      "map_id": "ai_165",
+      "cell": [
+        1,
+        18
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_166_ore",
+      "map_id": "ai_166",
+      "cell": [
+        9,
+        18
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_166_herb",
+      "map_id": "ai_166",
+      "cell": [
+        1,
+        22
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_167_ore",
+      "map_id": "ai_167",
+      "cell": [
+        9,
+        19
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_167_herb",
+      "map_id": "ai_167",
+      "cell": [
+        1,
+        20
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_168_ore",
+      "map_id": "ai_168",
+      "cell": [
+        9,
+        18
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_168_herb",
+      "map_id": "ai_168",
+      "cell": [
+        1,
+        19
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_169_ore",
+      "map_id": "ai_169",
+      "cell": [
+        9,
+        18
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_169_herb",
+      "map_id": "ai_169",
+      "cell": [
+        1,
+        19
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_170_ore",
+      "map_id": "ai_170",
+      "cell": [
+        9,
+        20
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_170_herb",
+      "map_id": "ai_170",
+      "cell": [
+        1,
+        21
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_171_ore",
+      "map_id": "ai_171",
+      "cell": [
+        8,
+        18
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_171_herb",
+      "map_id": "ai_171",
+      "cell": [
+        1,
+        19
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_172_ore",
+      "map_id": "ai_172",
+      "cell": [
+        9,
+        18
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_172_herb",
+      "map_id": "ai_172",
+      "cell": [
+        1,
+        19
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_173_ore",
+      "map_id": "ai_173",
+      "cell": [
+        9,
+        20
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_173_herb",
+      "map_id": "ai_173",
+      "cell": [
+        1,
+        22
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_174_ore",
+      "map_id": "ai_174",
+      "cell": [
+        9,
+        18
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_174_herb",
+      "map_id": "ai_174",
+      "cell": [
+        1,
+        19
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_175_ore",
+      "map_id": "ai_175",
+      "cell": [
+        9,
+        19
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_175_herb",
+      "map_id": "ai_175",
+      "cell": [
+        1,
+        20
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_176_ore",
+      "map_id": "ai_176",
+      "cell": [
+        9,
+        18
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_176_herb",
+      "map_id": "ai_176",
+      "cell": [
+        1,
+        20
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_177_ore",
+      "map_id": "ai_177",
+      "cell": [
+        20,
+        7
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_177_herb",
+      "map_id": "ai_177",
+      "cell": [
+        11,
+        8
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_178_ore",
+      "map_id": "ai_178",
+      "cell": [
+        30,
+        20
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_178_herb",
+      "map_id": "ai_178",
+      "cell": [
+        23,
+        21
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_179_ore",
+      "map_id": "ai_179",
+      "cell": [
+        21,
+        30
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_179_herb",
+      "map_id": "ai_179",
+      "cell": [
+        12,
+        30
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_181_ore",
+      "map_id": "ai_181",
+      "cell": [
+        19,
+        7
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_181_herb",
+      "map_id": "ai_181",
+      "cell": [
+        10,
+        6
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_182_ore",
+      "map_id": "ai_182",
+      "cell": [
+        30,
+        19
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_182_herb",
+      "map_id": "ai_182",
+      "cell": [
+        23,
+        20
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_183_ore",
+      "map_id": "ai_183",
+      "cell": [
+        20,
+        30
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_183_herb",
+      "map_id": "ai_183",
+      "cell": [
+        11,
+        30
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_185_ore",
+      "map_id": "ai_185",
+      "cell": [
+        19,
+        7
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_185_herb",
+      "map_id": "ai_185",
+      "cell": [
+        10,
+        7
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_186_ore",
+      "map_id": "ai_186",
+      "cell": [
+        30,
+        17
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_186_herb",
+      "map_id": "ai_186",
+      "cell": [
+        23,
+        18
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_187_ore",
+      "map_id": "ai_187",
+      "cell": [
+        21,
+        30
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_187_herb",
+      "map_id": "ai_187",
+      "cell": [
+        12,
+        30
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_189_ore",
+      "map_id": "ai_189",
+      "cell": [
+        20,
+        7
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_189_herb",
+      "map_id": "ai_189",
+      "cell": [
+        11,
+        8
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_190_ore",
+      "map_id": "ai_190",
+      "cell": [
+        30,
+        20
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_190_herb",
+      "map_id": "ai_190",
+      "cell": [
+        23,
+        21
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_191_ore",
+      "map_id": "ai_191",
+      "cell": [
+        22,
+        30
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_191_herb",
+      "map_id": "ai_191",
+      "cell": [
+        13,
+        30
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_193_ore",
+      "map_id": "ai_193",
+      "cell": [
+        19,
+        30
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_193_herb",
+      "map_id": "ai_193",
+      "cell": [
+        10,
+        30
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_194_ore",
+      "map_id": "ai_194",
+      "cell": [
+        23,
+        30
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_194_herb",
+      "map_id": "ai_194",
+      "cell": [
+        14,
+        30
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_195_ore",
+      "map_id": "ai_195",
+      "cell": [
+        19,
+        30
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_195_herb",
+      "map_id": "ai_195",
+      "cell": [
+        10,
+        30
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_196_ore",
+      "map_id": "ai_196",
+      "cell": [
+        23,
+        30
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_196_herb",
+      "map_id": "ai_196",
+      "cell": [
+        14,
+        30
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_197_ore",
+      "map_id": "ai_197",
+      "cell": [
+        23,
+        6
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_197_herb",
+      "map_id": "ai_197",
+      "cell": [
+        14,
+        8
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_198_ore",
+      "map_id": "ai_198",
+      "cell": [
+        30,
+        20
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_198_herb",
+      "map_id": "ai_198",
+      "cell": [
+        23,
+        19
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_199_ore",
+      "map_id": "ai_199",
+      "cell": [
+        22,
+        30
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_199_herb",
+      "map_id": "ai_199",
+      "cell": [
+        13,
+        30
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_200_ore",
+      "map_id": "ai_200",
+      "cell": [
+        9,
+        19
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_200_herb",
+      "map_id": "ai_200",
+      "cell": [
+        1,
+        22
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_201_ore",
+      "map_id": "ai_201",
+      "cell": [
+        20,
+        7
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_201_herb",
+      "map_id": "ai_201",
+      "cell": [
+        11,
+        6
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_202_ore",
+      "map_id": "ai_202",
+      "cell": [
+        30,
+        17
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_202_herb",
+      "map_id": "ai_202",
+      "cell": [
+        23,
+        18
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_203_ore",
+      "map_id": "ai_203",
+      "cell": [
+        20,
+        30
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_203_herb",
+      "map_id": "ai_203",
+      "cell": [
+        12,
+        30
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_205_ore",
+      "map_id": "ai_205",
+      "cell": [
+        23,
+        7
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_205_herb",
+      "map_id": "ai_205",
+      "cell": [
+        14,
+        8
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_206_ore",
+      "map_id": "ai_206",
+      "cell": [
+        30,
+        19
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_206_herb",
+      "map_id": "ai_206",
+      "cell": [
+        23,
+        20
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_207_ore",
+      "map_id": "ai_207",
+      "cell": [
+        23,
+        30
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_207_herb",
+      "map_id": "ai_207",
+      "cell": [
+        14,
+        30
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_209_ore",
+      "map_id": "ai_209",
+      "cell": [
+        20,
+        7
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_209_herb",
+      "map_id": "ai_209",
+      "cell": [
+        11,
+        7
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_210_ore",
+      "map_id": "ai_210",
+      "cell": [
+        30,
+        20
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_210_herb",
+      "map_id": "ai_210",
+      "cell": [
+        23,
+        20
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_211_ore",
+      "map_id": "ai_211",
+      "cell": [
+        19,
+        30
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_211_herb",
+      "map_id": "ai_211",
+      "cell": [
+        10,
+        30
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_213_ore",
+      "map_id": "ai_213",
+      "cell": [
+        20,
+        29
+      ],
+      "material": "iron",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_213_herb",
+      "map_id": "ai_213",
+      "cell": [
+        11,
+        30
+      ],
+      "material": "gancao",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_214_ore",
+      "map_id": "ai_214",
+      "cell": [
+        9,
+        24
+      ],
+      "material": "copper",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    },
+    {
+      "id": "ai_214_herb",
+      "map_id": "ai_214",
+      "cell": [
+        1,
+        25
+      ],
+      "material": "danggui",
+      "duration_ms": 3000,
+      "respawn_ms": 60000,
+      "min_quantity": 1,
+      "max_quantity": 3
+    }
+  ]
+}

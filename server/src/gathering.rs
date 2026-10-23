@@ -7,7 +7,7 @@ use uuid::Uuid;
 #[derive(serde::Deserialize)]
 struct Frozen { map_id:String,material:String,quantity:i32,respawn_ms:i64,duration_ms:i64 }
 
-pub fn is_action(action:Action)->bool{matches!(action,Action::GatherStart|Action::GatherFinish|Action::GatherCancel)}
+pub fn is_action(action:Action)->bool{matches!(action,Action::GatherStart|Action::GatherFinish|Action::GatherCancel|Action::GatherDiscard)}
 pub fn material_name(id:&str)->&str{match id{"iron"=>"铁矿","copper"=>"铜矿","gancao"=>"甘草","danggui"=>"当归",_=>"未知材料"}}
 pub async fn view(tx:&mut Transaction<'_,Postgres>,character:Uuid,map:&str)->Result<Value,sqlx::Error>{
     let value:Json<Value>=sqlx::query_scalar(r#"SELECT jsonb_build_object(
@@ -23,7 +23,7 @@ pub async fn cancel(tx:&mut Transaction<'_,Postgres>,character:Uuid)->Result<(),
 }
 pub async fn apply(tx:&mut Transaction<'_,Postgres>,c:&Character,ctx:&Context,command:&Command,busy:bool)->Result<Result<Vec<String>,&'static str>,sqlx::Error>{
     let now:i64=sqlx::query_scalar("SELECT (extract(epoch FROM clock_timestamp())*1000)::bigint").fetch_one(&mut **tx).await?;
-    if command.quantity.is_some()||command.attributes.is_some()||command.battle_id.is_some()||command.enemy_slot.is_some()||command.encounter_version.is_some(){return Ok(Err("INVALID_GATHER_COMMAND"));}
+    if (command.quantity.is_some()&&command.action!=Action::GatherDiscard)||command.attributes.is_some()||command.battle_id.is_some()||command.enemy_slot.is_some()||command.encounter_version.is_some(){return Ok(Err("INVALID_GATHER_COMMAND"));}
     if command.action==Action::GatherCancel {
         let target=command.target.as_deref().and_then(|s|Uuid::parse_str(s).ok());
         if target.is_none(){return Ok(Err("INVALID_GATHER_COMMAND"));}
@@ -34,6 +34,15 @@ pub async fn apply(tx:&mut Transaction<'_,Postgres>,c:&Character,ctx:&Context,co
     if busy||ctx.duel_active{return Ok(Err("BATTLE_ACTIVE"));}
     if ctx.map_id!=c.map_id||ctx.moving{return Ok(Err("GATHER_INTERRUPTED"));}
     if command.expected_revision.as_deref()!=Some(&c.state_revision){return Ok(Err("STALE_GATHERING"));}
+    if command.action==Action::GatherDiscard {
+        let material=command.target.as_deref().unwrap_or("");let quantity=command.quantity.unwrap_or(1);
+        if !["iron","copper","gancao","danggui"].contains(&material)||!(1..=999).contains(&quantity){return Ok(Err("INVALID_GATHER_COMMAND"));}
+        let current:Option<i32>=sqlx::query_scalar("SELECT quantity FROM gathering_materials WHERE character_id=$1 AND material=$2 FOR UPDATE").bind(c.id).bind(material).fetch_optional(&mut **tx).await?;
+        if current.is_none_or(|v|v<quantity){return Ok(Err("MATERIALS_INSUFFICIENT"));}
+        if current==Some(quantity){sqlx::query("DELETE FROM gathering_materials WHERE character_id=$1 AND material=$2").bind(c.id).bind(material).execute(&mut **tx).await?;}
+        else {sqlx::query("UPDATE gathering_materials SET quantity=quantity-$3 WHERE character_id=$1 AND material=$2").bind(c.id).bind(material).bind(quantity).execute(&mut **tx).await?;}
+        cancel(tx,c.id).await?;return Ok(Ok(vec![format!("已丢弃{} ×{}。",material_name(material),quantity)]));
+    }
     if command.action==Action::GatherStart {
         let active:bool=sqlx::query_scalar("SELECT EXISTS(SELECT 1 FROM gathering_active WHERE character_id=$1 AND owner_epoch=$2 AND connection_epoch=$3 AND position_revision=$4 AND character_revision=$5 AND expires_at_ms>$6)")
             .bind(c.id).bind(ctx.owner).bind(ctx.connection_epoch as i64).bind(ctx.position_revision as i64).bind(c.state_revision.parse::<i64>().unwrap()).bind(now).fetch_one(&mut **tx).await?;

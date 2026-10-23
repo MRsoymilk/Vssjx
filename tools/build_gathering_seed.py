@@ -91,5 +91,6 @@ CREATE TABLE gathering_active (
 if __name__=='__main__':
     data=catalog()
     (ROOT/'shared/data/gathering-v1.json').write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n')
+    (ROOT/'client/assets/data/gathering-v1.json').write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n')
     (ROOT/'server/migrations/0035_gathering.sql').write_text(migration(data))
     print(f"GATHERING: {len(data['nodes'])} reachable points on {len(data['nodes'])//2} maps")

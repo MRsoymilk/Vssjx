@@ -93,6 +93,8 @@ def main():
         fixture.restart();p=fixture.connect(a)
         check(before==fixture.db.query('SELECT character_id,material,quantity FROM gathering_materials ORDER BY character_id,material'),'material stacks and personal cooldowns survive server restart')
         check(p.state['gathering']['materials']['gancao']==999,'reconnect exposes authoritative persisted material bag')
+        command(p,'gather_discard','gancao',request=dict(operation_id=str(uuid4()),action='gather_discard',target='gancao',quantity=998,expected_revision=p.state['character']['state_revision']))
+        check(p.state['gathering']['materials']['gancao']==1,'explicit material discard frees capacity without changing equipment')
         check('pve.gather_finish' in fixture.db.query("SELECT action FROM security_audit WHERE outcome='accepted'"),'harvest settlements are durably audited')
         if os.environ.get('GODOT_BIN'):
             live=fixture.create('gather_ui')

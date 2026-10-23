@@ -48,6 +48,7 @@ var move_target: WorldMoveTarget
 var quest_marker: NpcQuestMarker
 var soul_markers: SoulMarkers
 var day_night: WorldDayNight
+var gathering_nodes:Dictionary={}
 
 func _ready() -> void:
 	zone = int(Game.player.zone)
@@ -120,6 +121,8 @@ func _ready() -> void:
 		npc.add_child(quest_marker)
 		refresh_quest_marker()
 	_sync_enemies()
+	for data in GatheringRules.nodes_for(map_id):
+		var resource:=GatheringNode.new();resource.local_mode=true;actors.add_child(resource);resource.display(data,int(Time.get_unix_time_from_system()*1000));gathering_nodes[data.id]=resource
 	camera = Camera2D.new()
 	camera.position = hero.position
 	camera.limit_left = 0
@@ -289,6 +292,8 @@ func target_at_pixel(point: Vector2) -> Dictionary:
 		var sprite: AnimatedSprite2D = enemy_nodes.get(enemy.id)
 		if WorldSpriteHit.hit(sprite, to_global(point)):
 			return {"kind": "enemy", "cell": _enemy_cell(sprite), "data": enemy}
+	for resource in gathering_nodes.values():
+		if resource.hit(point):return {"kind":"gather","cell":Vector2i(resource.data.cell[0],resource.data.cell[1]),"data":resource.data}
 	return {}
 
 func target_at(target: Vector2i) -> Dictionary:
@@ -309,6 +314,8 @@ func target_at(target: Vector2i) -> Dictionary:
 		var spot := _enemy_cell(enemy_nodes[enemy.id]) if enemy_nodes.has(enemy.id) else Vector2i(enemy.cell[0], enemy.cell[1])
 		if target == spot:
 			return {"kind": "enemy", "cell": spot, "data": enemy}
+	for resource in gathering_nodes.values():
+		if target==Vector2i(resource.data.cell[0],resource.data.cell[1]):return {"kind":"gather","cell":target,"data":resource.data}
 	return {}
 
 func _walk_to(target: Dictionary) -> void:
@@ -324,7 +331,7 @@ func _walk_to(target: Dictionary) -> void:
 	pending = target
 	if target.kind == "enemy" and enemy_nodes.has(target.data.id):
 		enemy_nodes[target.data.id].play("idle")
-	if cell.distance_to(target.cell) <= 2.0 and next_cell.x < 0:
+	if cell.distance_to(target.cell) <= (1.0 if target.kind=="gather" else 2.0) and next_cell.x < 0:
 		_interact_pending()
 		return
 	var origin := next_cell if next_cell.x >= 0 else cell

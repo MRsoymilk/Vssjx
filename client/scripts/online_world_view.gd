@@ -72,6 +72,10 @@ var social: RefCounted = preload("res://scripts/network/online_social.gd").new()
 var social_panel: Control
 var target:=OnlineTarget.new()
 var target_view:PlayerTarget
+var gathering_nodes:Dictionary={}
+var gathering_panel:GatheringPanel
+var _gather_cancel_requested:=false
+var _gather_auto_token:=""
 var _social_incoming: Array = []
 var team:RefCounted=preload("res://scripts/network/online_team.gd").new()
 var team_panel:Control
@@ -133,6 +137,9 @@ func _ready() -> void:
 		_cancel_approach();network.stop_moving();move_target.clear();_was_keyboard=false
 	)
 	target.changed.connect(_refresh_target)
+	gathering_panel=GatheringPanel.new();add_child(gathering_panel)
+	gathering_panel.start_requested.connect(_gather_confirm)
+	gathering_panel.cancel_requested.connect(_cancel_gathering)
 	duel_invitation = DuelInvitation.new()
 	duel_invitation.channel = network.duel
 	add_child(duel_invitation)
@@ -216,6 +223,7 @@ func _ready() -> void:
 		_set_battle_layout(false)
 	)
 	network.pve.changed.connect(_pve_changed)
+	network.pve.changed.connect(_gathering_changed)
 	network.pve.message.connect(func(text: String) -> void:
 		if network.pve.last_action in ["transfer", "ai_travel", "school_join", "scroll_travel"] and not network.pve.last_code.is_empty(): map_transition.cancel()
 		_pve_log = text
@@ -252,6 +260,7 @@ func _leave_world() -> void:
 func _scene_action(action: String) -> void:
 	if map_transition.blocking: return
 	if network.duel.active() or duel_battle.visible or team.active() or team_battle.visible: return
+	if gathering_panel.visible:_cancel_gathering()
 	_close_help()
 	if team_panel.visible:team_panel.dismiss()
 	if social_panel.visible: social_panel.dismiss()
@@ -349,7 +358,7 @@ func _refresh_target()->void:
 	if not network.world_ready or not network.entities.has(target.selected) or map_transition.blocking or network.pve.active() or team.active() or network.duel.active():
 		target.clear();return
 	target_view.display(target.selected,network.entities[target.selected],target.profile,target.last_code)
-	target_view.visible=not (is_instance_valid(help_panel) or team_panel.visible or social_panel.visible or bag_overlay!=null or menu.visible or details.visible or npc_dialog.visible or encounter.visible or battle_view.visible or solo_battle.visible or duel_battle.visible or team_battle.visible or expanded_chat.visible or attributes.visible or world_map.visible)
+	target_view.visible=not (gathering_panel.visible or is_instance_valid(help_panel) or team_panel.visible or social_panel.visible or bag_overlay!=null or menu.visible or details.visible or npc_dialog.visible or encounter.visible or battle_view.visible or solo_battle.visible or duel_battle.visible or team_battle.visible or expanded_chat.visible or attributes.visible or world_map.visible)
 	if not target_view.visible:target_view.close_actions()
 	target_view.buttons.duel.disabled=not network.duel.enabled or network.duel.pending()
 	var friends:bool=social.state.get("friends",[]).any(func(p:Dictionary)->bool:return p.id==target.selected)
@@ -529,6 +538,7 @@ func _duel_changed() -> void:
 func _begin_map_transition() -> void:
 	if map_transition.blocking: return
 	target.clear()
+	_cancel_gathering()
 	_transfer_origin = String(map_data.map_id)
 	_cancel_approach()
 	_close_inventory()
@@ -602,6 +612,7 @@ func _build_map() -> void:
 
 func _map_changed(id: String) -> void:
 	target.clear()
+	gathering_panel.hide();gathering_nodes.clear();_gather_auto_token=""
 	if social_panel.visible:social_panel.dismiss()
 	duel_invitation.selected = ""
 	_portal_latch=""
@@ -785,6 +796,7 @@ func _process(delta: float) -> void:
 	_update_chat_controls()
 	_update_allocation_controls()
 	_advance_map_transition()
+	_gather_tick()
 	_refresh_target()
 	target.tick(social_available and not OnlineAccount.busy and target_view.visible)
 	if network == null or not network.world_ready: return
@@ -819,7 +831,8 @@ func _process(delta: float) -> void:
 	if OS.has_feature("web") and (not Platform.context.lifecycle.focused or Platform.context.lifecycle.suspended): return
 	if _follow_transfer():return
 	_advance_approach()
-	if target_view.actions.visible or is_instance_valid(help_panel) or team_panel.visible or social_panel.visible or bag_overlay != null or chat_input.has_focus() or menu.visible or details.visible or npc_dialog.visible or emote_picker.visible or encounter.visible or (battle_view.visible or solo_battle.visible) or expanded_chat.visible or attributes.visible or world_map.visible or network.pve.pending() or network.pve.active():
+	if gathering_panel.visible and (Input.is_physical_key_pressed(KEY_W) or Input.is_physical_key_pressed(KEY_A) or Input.is_physical_key_pressed(KEY_S) or Input.is_physical_key_pressed(KEY_D)):_cancel_gathering()
+	if gathering_panel.visible or target_view.actions.visible or is_instance_valid(help_panel) or team_panel.visible or social_panel.visible or bag_overlay != null or chat_input.has_focus() or menu.visible or details.visible or npc_dialog.visible or emote_picker.visible or encounter.visible or (battle_view.visible or solo_battle.visible) or expanded_chat.visible or attributes.visible or world_map.visible or network.pve.pending() or network.pve.active():
 		_was_keyboard = false
 		return
 	if network.team_following: return
@@ -855,6 +868,7 @@ func _map_input(event: InputEvent) -> void:
 	if target_view.actions.visible:
 		target_view.close_actions()
 		return # Dismissal consumes the click; never also move or select a different player.
+	if gathering_panel.visible:_cancel_gathering();return
 	if emote_picker.visible:
 		emote_picker.hide()
 		return
@@ -886,6 +900,8 @@ func _map_input(event: InputEvent) -> void:
 		if residents[id].hit(world_point):
 			resident_selected.emit(id)
 			return
+	for id in gathering_nodes:
+		if gathering_nodes[id].hit(world_point):_resident_action("gather",id);return
 	duel_invitation.selected = ""
 	_cancel_approach()
 	var destination := Vector2i(floori(world_point.x / 16.0), floori(world_point.y / 16.0))
@@ -903,6 +919,8 @@ func _unhandled_key_input(event: InputEvent) -> void:
 	if map_transition.blocking: return
 	if network.duel.active() or duel_battle.visible or team.active() or team_battle.visible: return
 	if not event is InputEventKey or not event.pressed: return
+	if gathering_panel.visible and event.keycode==KEY_ESCAPE:
+		_cancel_gathering();get_viewport().set_input_as_handled();return
 	if event.keycode==KEY_ESCAPE and not target.selected.is_empty() and target_view.visible:
 		if target_view.actions.visible:target_view.close_actions()
 		else:target.clear()
@@ -1088,6 +1106,62 @@ func _resident_action(action: String, target: String) -> void:
 	_approach = {"action": action, "target": target, "deadline": Time.get_unix_time_from_system() + 30.0, "stopped": true}
 	network.stop_moving()
 
+func _gathering_changed()->void:
+	var values:Array=network.pve.state.get("gathering",{}).get("nodes",[])
+	var present:={}
+	for value in values:
+		if value.map_id!=String(map_data.map_id):continue
+		present[value.id]=true
+		if not gathering_nodes.has(value.id):
+			var resource:=GatheringNode.new();actor_layer.add_child(resource);gathering_nodes[value.id]=resource
+		gathering_nodes[value.id].display(value,network.pve.server_time_ms())
+		if gathering_panel.node.get("id")==value.id:gathering_panel.node=value.duplicate(true)
+	for id in gathering_nodes.keys():
+		if not present.has(id):gathering_nodes[id].queue_free();gathering_nodes.erase(id)
+	if network.pve.last_action in ["gather_finish","gather_cancel"] and not network.pve.pending():
+		if network.pve.last_code.is_empty():gathering_panel.hide()
+		elif gathering_panel.visible:gathering_panel.description.text=OnlinePve.error_text(network.pve.last_code)
+	_gather_tick()
+
+func _gather_compatible(active:Dictionary)->bool:
+	if active.is_empty() or not network.world_ready or not network.pve.ready or network.pve.active() or team.active() or network.duel.active() or network.pve.is_soul() or map_transition.blocking:return false
+	var own:Dictionary=network.entities.get(character_id,{})
+	return not own.is_empty() and active.map_id==network.map_id and active.owner_epoch==network.world_epoch and active.connection_epoch==network.connection_epoch and active.position_revision==own.entity_revision and Vector2i(int(active.cell[0]),int(active.cell[1]))==Vector2i(int(own.cell[0]),int(own.cell[1])) and own.next_cell==null and active.revision==network.pve.state.character.state_revision and network.pve.server_time_ms()<=int(active.expires_at_ms)
+
+func _gather_confirm()->void:
+	if not gathering_panel.visible or network.pve.pending():return
+	var active:=GatheringRules.active(network.pve)
+	if not active.is_empty():
+		if _gather_compatible(active):network.pve.submit("gather_finish",active.token)
+		return
+	if not gathering_nodes.has(gathering_panel.node.get("id","")):return
+	_gather_cancel_requested=false;_gather_auto_token=""
+	network.pve.submit("gather_start",gathering_panel.node.id)
+
+func _cancel_gathering()->void:
+	if not is_instance_valid(gathering_panel):return
+	gathering_panel.hide();_gather_cancel_requested=true
+	var active:=GatheringRules.active(network.pve)
+	if not active.is_empty() and network.world_ready and network.pve.ready and not network.pve.pending():
+		_gather_cancel_requested=false;network.pve.submit("gather_cancel",active.token)
+
+func _gather_tick()->void:
+	if not is_instance_valid(gathering_panel):return
+	for resource in gathering_nodes.values():resource.display(resource.data,network.pve.server_time_ms())
+	var active:=GatheringRules.active(network.pve)
+	if not network.world_ready or network.pve.active() or team.active() or network.duel.active() or map_transition.blocking:
+		gathering_panel.hide();return
+	if _gather_cancel_requested:
+		if not active.is_empty() and network.pve.ready and not network.pve.pending():
+			_gather_cancel_requested=false;network.pve.submit("gather_cancel",active.token)
+		return
+	if not active.is_empty() and not _gather_compatible(active):
+		_cancel_gathering();return
+	if gathering_panel.visible:
+		gathering_panel.display(network.pve)
+		if not active.is_empty() and not network.pve.pending() and network.pve.server_time_ms()>=int(active.ready_at_ms)+150 and _gather_auto_token!=active.token:
+			_gather_auto_token=active.token;network.pve.submit("gather_finish",active.token)
+
 func _advance_approach() -> void:
 	if _approach.is_empty(): return
 	if network.pve.active() or network.pve.pending():
@@ -1100,18 +1174,19 @@ func _advance_approach() -> void:
 	var transfer: bool = _approach.action == "transfer"
 	var ai_travel: bool = _approach.action == "ai_travel"
 	var recovering:bool=_approach.action=="revive"
+	var gathering:bool=_approach.action=="gather"
 	var resident_id: String = "qingwei" if _approach.action=="school_join" else String(AIWorld.quest(_approach.target).get("giver",_approach.target))
-	if (not recovering and not transfer and not ai_travel and not network.population.entities.has(resident_id)) or not network.entities.has(character_id):
+	if (gathering and not gathering_nodes.has(_approach.target)) or (not gathering and not recovering and not transfer and not ai_travel and not network.population.entities.has(resident_id)) or not network.entities.has(character_id):
 		_cancel_approach()
 		return
 	var own: Dictionary = network.entities[character_id]
 	if own.next_cell != null or not network._pending_motion.is_empty() or int(own.last_input_seq) < network._input_seq: return
 	var cell := Vector2i(own.cell[0], own.cell[1])
 	if recovering and (not network.pve.is_soul() or _approach.target!=network.pve.state.character.corpse.id):_cancel_approach();return
-	var resident: Dictionary = network.pve.state.character.corpse if recovering else (SharedWorldMap.portal(String(map_data.map_id)) if transfer else ({"cell":[AIWorld.station(String(map_data.map_id)).x,AIWorld.station(String(map_data.map_id)).y]} if ai_travel else network.population.entities[resident_id]))
+	var resident: Dictionary = gathering_nodes[_approach.target].data if gathering else (network.pve.state.character.corpse if recovering else (SharedWorldMap.portal(String(map_data.map_id)) if transfer else ({"cell":[AIWorld.station(String(map_data.map_id)).x,AIWorld.station(String(map_data.map_id)).y]} if ai_travel else network.population.entities[resident_id])))
 	var target := Vector2i(resident.cell[0], resident.cell[1])
 	# Moving wolves can cross a cell while the challenge is in flight.
-	var reach := 1 if resident.get("kind") == "wolf" else 2
+	var reach := 1 if gathering or resident.get("kind") == "wolf" else 2
 	if absi(cell.x - target.x) + absi(cell.y - target.y) <= reach:
 		if not _approach.stopped:
 			_approach.stopped = true
@@ -1120,6 +1195,8 @@ func _advance_approach() -> void:
 		var request := _approach
 		_approach = {}
 		var action: String = request.action
+		if action=="gather":
+			_gather_cancel_requested=false;_gather_auto_token="";gathering_panel.present(resident);gathering_panel.display(network.pve);return
 		if action == "npc":
 			npc_dialog.present(request.target, resident, network.pve)
 			return

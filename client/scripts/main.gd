@@ -647,6 +647,7 @@ func _world_interaction(kind: String, data: Dictionary) -> void:
 		return
 	if Game.is_soul() and kind!="hint":_message("灵魂状态",OnlinePve.error_text("SOUL_STATE"));return
 	match kind:
+		"gather":_open_local_gathering(data)
 		"map_exit":
 			if data.get("legacy",false):_world_interaction("portal",data)
 			else:_world_interaction("ai_travel",{"target":data.target_map})
@@ -671,8 +672,24 @@ func _world_interaction(kind: String, data: Dictionary) -> void:
 				_travel_local("portal")
 		"hint": _message("交互", String(data.text))
 
+func _open_local_gathering(data:Dictionary)->void:
+	_close_modal();world.pause_moving();world.enabled=false
+	var panel:=GatheringPanel.new();panel.local_mode=true;ui.add_child(panel);modal=panel;panel.present(data)
+	panel.cancel_requested.connect(func()->void:Game.local_gather={};_close_modal())
+	panel.start_requested.connect(func()->void:
+		if Game.local_gather.is_empty():
+			var code:=Game.begin_gathering(String(data.id),world.cell,world.map_id)
+			if not code.is_empty():panel.description.text=OnlinePve.error_text(code)
+		else:
+			var result:=await Game.finish_gathering(world.cell,world.map_id)
+			if not is_instance_valid(panel):return
+			if result.ok:_close_modal()
+			else:panel.description.text=result.message
+	)
+
 func _travel_local(kind: String, target: String = "") -> void:
 	if Game.is_soul():return
+	Game.local_gather={}
 	_release_local_chat_input()
 	world.pause_moving()
 	var before := Game.player.duplicate(true)
@@ -800,6 +817,7 @@ func _modal_panel(title: String, height: int = 246, page: String = "scene") -> P
 
 func _close_modal() -> void:
 	if Game.storage_busy or _closing: return
+	if modal is GatheringPanel:Game.local_gather={}
 	if modal != null and is_instance_valid(modal):
 		ui.remove_child(modal)
 		modal.queue_free()

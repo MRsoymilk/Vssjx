@@ -121,7 +121,7 @@ static func description(id: String, stats: Dictionary={}) -> String:
 		var parts: Array[String] = []
 		if int(entry.restore_hp)>0: parts.append("恢复%d点气血"%int(entry.restore_hp))
 		if int(entry.restore_mp)>0: parts.append("恢复%d点灵力"%int(entry.restore_mp))
-		return " / ".join(parts)
+		return " / ".join(parts)+("（%s）"%entry.usage_note if entry.has("usage_note") else "")
 	return "%s，可购买并存入背包"%entry.category
 
 static func use_error(entry: Dictionary, player: Dictionary, limits: Dictionary, points: Array=[]) -> String:

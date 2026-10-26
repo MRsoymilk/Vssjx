@@ -39,7 +39,10 @@ func _ready() -> void:
 	check(catalog.find("equipment", "", "原包资源").size() == 81, "All 81 original equipment icons")
 	check(catalog.find("items", "iw56", "原包资源").size() == 1, "Original filename search")
 	for entry in catalog.find("items", "", "原包资源"):
-		check(entry.data["原版名称"] == null and entry.data["原版属性"] == null, "Unknown original names and stats remain unknown: " + entry.id)
+		if entry.id=="original/ix10":
+			check(entry.data["原版名称"]=="生骨融血草" and entry.data["原版属性"]=={"恢复气血":8000},"User-confirmed herb name and recovery are explicit")
+		else:
+			check(entry.data["原版名称"] == null and entry.data["原版属性"] == null, "Unknown original names and stats remain unknown: " + entry.id)
 		var product:=ShopRules.item(entry.id)
 		var linked:Dictionary=entry.data.get("当前商城商品",{})
 		check(entry.data.get("商城接入")=="已接入" and linked.get("物品ID")==entry.id and linked.get("名称")==product.name and linked.get("售价（铜钱）")==product.price,"Every original resource links to its actual shop product: "+entry.id)

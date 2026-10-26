@@ -8,6 +8,15 @@ ROOT=Path(__file__).resolve().parents[1]
 
 
 class FullShopTests(unittest.TestCase):
+    def test_confirmed_herb_reuses_original_id_icon_and_fixed_healing(self):
+        catalog=json.loads((ROOT/'client/assets/data/shop-v2.json').read_text('utf8'))
+        herb=next(i for i in catalog['items'] if i['id']=='original/ix10')
+        self.assertEqual((herb['name'],herb['slot'],herb['category']),('生骨融血草','consumable','药品'))
+        self.assertEqual((herb['restore_hp'],herb['restore_mp'],herb['price']),(8000,0,10))
+        self.assertEqual(herb['icon'],'res://assets/items/original/ix10.png')
+        self.assertEqual(herb['sections'],['hot','elixir'])
+        self.assertEqual(herb['original_confirmation']['restore_hp'],8000)
+
     def test_generated_families_coexist_without_replacing_original_items(self):
         catalog=json.loads((ROOT/'client/assets/data/shop-v2.json').read_text('utf8'))
         self.assertEqual(len(catalog['items']),459)

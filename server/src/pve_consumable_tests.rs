@@ -19,6 +19,25 @@ fn use_item(id:&str)->Command{
 }
 
 #[test]
+fn confirmed_boneblood_herb_restores_fixed_8000_without_waste_or_changing_mana(){
+    const ID:&str="original/ix10";
+    let item=crate::shop::item(ID).unwrap();
+    assert_eq!((item.name.as_str(),item.slot.as_str(),item.restore_hp,item.restore_mp,item.price),("生骨融血草","consumable",8000,0,10));
+    for revision in [0,1]{for job in 0..3{
+        let (mut loaded,context)=player(job,60,revision);
+        loaded.gear.insert(ID.into(),false);loaded.quantities.insert(ID.into(),3);
+        let hp=loaded.stats().hp;
+        loaded.character.mp=7;
+        loaded.apply(&use_item(ID),&context).unwrap();
+        assert_eq!(loaded.character.hp,(1+8000).min(hp));assert_eq!(loaded.character.mp,7);
+        assert_eq!(loaded.quantities[ID],2);
+        assert_eq!(loaded.apply(&use_item(ID),&context),Err("HP_FULL"));assert_eq!(loaded.quantities[ID],2);
+        let mut command=use_item(ID);command.quantity=Some(2);
+        assert_eq!(loaded.apply(&command,&context),Err("INVALID_QUANTITY"));assert_eq!(loaded.quantities[ID],2);
+    }}
+}
+
+#[test]
 fn world_potion_matches_battle_healing_for_all_jobs_and_both_rule_revisions(){
     for revision in [0,1]{for job in 0..3{for level in [1,5,30,60]{
         let (mut loaded,context)=player(job,level,revision);let stats=loaded.stats();

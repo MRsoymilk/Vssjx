@@ -3610,8 +3610,8 @@
     },
     {
       "id": "original/ix10",
-      "name": "灵草·10",
-      "slot": "material",
+      "name": "生骨融血草",
+      "slot": "consumable",
       "price": 10,
       "attack": 0,
       "defense": 0,
@@ -3620,16 +3620,22 @@
       "level": 1,
       "job": -1,
       "icon": "res://assets/items/original/ix10.png",
-      "restore_hp": 0,
+      "restore_hp": 8000,
       "restore_mp": 0,
       "source_member": "ssjx/item/ix10.img",
       "source_sha256": "cf75bd43743f18dffefde8b45a105e83a7527c7d75c3da179a8b652975db2fa0",
-      "rules_basis": "图形特征命名、分类、售价和属性为重建规则；并非原服务器物品表",
-      "category": "药材",
+      "rules_basis": "原包图标；名称及固定恢复8000气血由用户确认；售价沿用10铜钱，分类与战斗外使用沿用当前重建规则",
+      "category": "药品",
       "sections": [
         "hot",
-        "craft"
-      ]
+        "elixir"
+      ],
+      "usage_note": "战斗外使用，不超过气血上限",
+      "original_confirmation": {
+        "name": "生骨融血草",
+        "restore_hp": 8000,
+        "source": "用户于2026-10-26提供ix10截图并确认原版名称与恢复量"
+      }
     },
     {
       "id": "original/ix11",

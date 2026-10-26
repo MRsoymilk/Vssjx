@@ -224,6 +224,7 @@ func refresh() -> void:
 	preview_button.disabled=not equipment or incompatible
 	var source_hint:="原包图标 · 名称、数值和部分换装映射为重建规则"
 	if String(entry.id).begins_with("original/"):source_hint="原包 %s · 名称、数值和换装映射为重建规则"%String(entry.id).trim_prefix("original/")
+	if entry.has("original_confirmation"):source_hint="仅战斗外使用；气血已满时不消耗。"
 	elif entry.has("set_id"):
 		var method:="AI新设计" if String(entry.get("art_source", "")).begins_with("AI") else "像素绘制"
 		source_hint=entry.get("set_name", "套装")+" · "+method+" · 数值为重建规则"

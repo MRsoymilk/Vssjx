@@ -323,6 +323,13 @@ func _load_original_items() -> void:
 		var summary := "%d × %d 像素 · 原版名称 / 数值未恢复" % [int(item.width), int(item.height)]
 		var preview := {"kind": "icon", "path": item.icon}
 		var product := ShopRules.item(item.id)
+		var confirmation: Dictionary = product.get("original_confirmation", {})
+		if not confirmation.is_empty():
+			data["原版名称"] = confirmation.name
+			data["原版属性"] = {"恢复气血": confirmation.restore_hp}
+			data["确认依据"] = confirmation.source
+			data["说明"] = "名称与恢复量由用户确认；原版等级、业务物品ID及其余属性未知"
+			summary = "%d × %d 像素 · 用户确认原版名称与恢复%d点气血" % [int(item.width), int(item.height), int(confirmation.restore_hp)]
 		data["商城接入"] = "未接入" if product.is_empty() else "已接入"
 		if not product.is_empty():
 			var sections: Array = ShopRules.catalog.tabs.filter(func(tab: Array) -> bool: return product.sections.has(tab[0])).map(func(tab: Array) -> String: return tab[1])
@@ -333,7 +340,7 @@ func _load_original_items() -> void:
 				"数据文件": "res://assets/data/shop-v2.json"
 			}
 			summary = "已接入商城 · %s · %s\n%s" % [product.name, product.category, summary]
-		_add("items", item.id, item.display_name, summary, "原包资源", ORIGINAL_ITEMS, data, preview)
+		_add("items", item.id, item.display_name if confirmation.is_empty() else String(confirmation.name)+" · "+String(item.resource_id), summary, "原包资源", ORIGINAL_ITEMS, data, preview)
 		if item.group in ["weapons", "equipment"]:
 			_add(item.group, item.id, item.display_name, summary, "原包资源", ORIGINAL_ITEMS, data, preview)
 

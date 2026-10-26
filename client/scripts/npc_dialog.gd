@@ -16,6 +16,7 @@ var extra_buttons: Array[Button] = []
 @onready var quest_button: Button = $Paper/Quest
 @onready var restore_button: Button = $Paper/Restore
 @onready var hint: Label = $Paper/Hint
+@onready var restore_caption:String=$Paper/Restore.text
 
 func _ready() -> void:
 	$Dismiss.pressed.connect(dismiss)
@@ -26,6 +27,10 @@ func _ready() -> void:
 		else:action_requested.emit("accept" if _legacy_stage()==0 else "claim",target)
 	)
 	restore_button.pressed.connect(func() -> void:
+		if target==EndlessRules.rules.npc.id:
+			if not has_node("EndlessLeaderboard"):
+				var board:=EndlessLeaderboard.new();board.name="EndlessLeaderboard";add_child(board);board.present("" if local_mode else model.character_id)
+			return
 		if not restore_button.disabled: action_requested.emit("ai_restore" if ai_mode else "restore", target)
 	)
 
@@ -58,6 +63,7 @@ func _clear_extras() -> void:
 
 func _reset_paper() -> void:
 	_clear_extras()
+	restore_button.text=restore_caption
 	$Paper.position=Vector2(6,125);$Paper.size=Vector2(308,157)
 	$Paper/Greeting.autowrap_mode=TextServer.AUTOWRAP_OFF
 	$Paper/Greeting.position.y=34;$Paper/Greeting.size.y=20
@@ -119,13 +125,13 @@ func refresh() -> void:
 	if model.last_action=="school_join" and not model.last_code.is_empty():hint.text=OnlinePve.error_text(model.last_code)
 
 func _refresh_endless()->void:
-	_reset_paper();restore_button.hide()
+	_reset_paper();restore_button.text="无尽之路排行榜";restore_button.position.y=126;restore_button.disabled=false
 	$Paper/Name.text=String(EndlessRules.rules.npc.name)+" · 无尽试炼"
 	$Paper/Greeting.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
 	$Paper/Greeting.text="一层更比一层强。胜利后继续，失败或撤退结束本轮，最高纪录保留。"
 	$Paper/Greeting.size=Vector2(284,48);$Paper/Rule.position.y=86;quest_button.position.y=94
-	$Paper.size.y=207;$Paper.position.y=95;hint.position.y=129;hint.size=Vector2(284,63);hint.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
-	$Paper/BL.position.y=193;$Paper/BR.position.y=193
+	$Paper.size.y=237;$Paper.position.y=75;hint.position.y=159;hint.size=Vector2(284,63);hint.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
+	$Paper/BL.position.y=223;$Paper/BR.position.y=223
 	var supported:bool=local_mode or (model!=null and model.state.has("endless"))
 	var progress:Dictionary=EndlessRules.progress(Game.player) if local_mode else (model.state.get("endless",{}).get("progress",EndlessRules.empty()) if model!=null else EndlessRules.empty())
 	quest_button.text="挑战第%d层 · 最高已过%d层"%[int(progress.stage),int(progress.best)]
@@ -231,5 +237,6 @@ func _refresh_gourds()->void:
 
 func dismiss() -> void:
 	if local_mode and Game.storage_busy:return
+	if has_node("EndlessLeaderboard"):get_node("EndlessLeaderboard").queue_free()
 	hide()
 	dismissed.emit()

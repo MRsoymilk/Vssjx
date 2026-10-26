@@ -9,6 +9,7 @@ pub mod progression;
 mod economy;
 pub mod team_loot;
 pub mod endless;
+mod endless_board;
 pub mod soul;
 pub mod social;
 pub mod team_rules;
@@ -122,6 +123,7 @@ pub fn apps(
     });
     monitor::sample_database(&state);
     economy::start(&state);
+    endless_board::start(&state);
     let router = Router::new()
         .route("/healthz", get(health))
         .route("/readyz", get(ready))
@@ -136,6 +138,7 @@ pub fn apps(
         .route("/api/v1/social", post(social::command))
         .route("/api/v1/teams", post(teams::command))
         .route("/api/v1/economy", post(economy::command))
+        .route("/api/v1/endless/leaderboard", post(endless_board::leaderboard))
         .route(
             "/api/v1/characters",
             get(characters::list).post(characters::create),

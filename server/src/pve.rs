@@ -762,6 +762,7 @@ pub async fn execute(
     let previous_gear = loaded.gear.clone();
     let previous_quantities=loaded.quantities.clone();
     let original = loaded.clone();
+    let previous_endless_best=original.endless.best;
     let was_soul=original.character.corpse.is_some();
     let before = crate::security::state_summary(&original.state());
     let team_active:bool=sqlx::query_scalar("SELECT EXISTS(SELECT 1 FROM team_members m JOIN team_battles b ON b.team_id=m.team_id AND b.active WHERE m.character_id=$1)").bind(context.character).fetch_one(&mut *tx).await.map_err(database)?;
@@ -819,6 +820,7 @@ pub async fn execute(
             .bind(c.id).bind(c.level).bind(c.xp).bind(c.gold).bind(c.hp).bind(c.mp).bind(c.quest_stage).bind(loaded.defeated).bind(active).bind(loaded.allocated.to_vec()).bind(Json(&loaded.respawns))
             .bind(Json(&loaded.ai)).bind(c.school).bind(&c.corpse).bind(c.balance_respec_available).bind(Json(&loaded.hunt_pressure)).bind(Json(&loaded.endless)).fetch_one(&mut *tx).await.map_err(database)?;
         loaded.character.state_revision = revision.to_string();
+        crate::endless_board::record(&mut tx,loaded.character.id,&loaded.character.display_name,previous_endless_best,loaded.endless.best).await?;
         if loaded.potions == 0 {
             sqlx::query(
                 "DELETE FROM inventory_items WHERE character_id=$1 AND definition_id='potion'",

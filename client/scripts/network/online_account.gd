@@ -102,6 +102,8 @@ func team_request(payload: Dictionary) -> void:
 	_send("teams", server_address, payload, true)
 func economy_request(payload:Dictionary)->void:
 	_send("economy",server_address,payload,true)
+func endless_board_request(character_id:String)->void:
+	_send("endless_board",server_address,{"character_id":character_id},true)
 
 func request_world_ticket(character_id: String, config_hash: String) -> void:
 	_send("world_ticket", server_address, {"character_id": character_id, "protocol_version": 1, "config_hash": config_hash}, true)
@@ -194,6 +196,7 @@ func _send(action: String, address: String, payload: Dictionary, bearer: bool = 
 	if action in ["social","target_profile"]: route = "/api/v1/social"
 	if action == "teams": route = "/api/v1/teams"
 	if action == "economy":route="/api/v1/economy"
+	if action == "endless_board":route="/api/v1/endless/leaderboard"
 	var error := _request.request(_target + route, headers, method, body)
 	if error != OK: _finish({"ok": false, "code": "NETWORK_ERROR", "request_error": int(error)})
 
@@ -246,7 +249,7 @@ func _on_response(result: int, code: int, _headers: PackedStringArray, body: Pac
 		pending_deletion = {}
 		_finish({"ok": true})
 		return
-	if _action in ["social","teams","target_profile","economy"]:
+	if _action in ["social","teams","target_profile","economy","endless_board"]:
 		_finish(data)
 		return
 	if _action in ["characters", "character_create"]:

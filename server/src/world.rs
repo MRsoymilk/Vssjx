@@ -219,6 +219,7 @@ impl WorldHub {
         let state = self.data.lock().expect("world state");
         (state.chat.epoch, state.chat.recent())
     }
+    pub(crate) fn public_notice(&self,notice:String){self.data.lock().expect("world state").chat.system_notice(notice);}
     pub(crate) fn moderate_chat(&self, removed: Option<Uuid>, characters: &[Uuid], mute: Option<u64>, notice: String) {
         let now = Instant::now();
         let mut state = self.data.lock().expect("world state");

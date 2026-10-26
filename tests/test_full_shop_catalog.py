@@ -8,6 +8,25 @@ ROOT=Path(__file__).resolve().parents[1]
 
 
 class FullShopTests(unittest.TestCase):
+    def test_confirmed_medicines_and_stones_reuse_ids_and_preserve_other_items(self):
+        catalog=json.loads((ROOT/'client/assets/data/shop-v2.json').read_text('utf8'))
+        indexed={i['id']:i for i in catalog['items']}
+        for n,name,hp,price in [(15,'金疮药',500,5),(16,'小金疮药',800,10),(17,'中金疮药',1000,8),(18,'大金疮药',1500,14)]:
+            item=indexed[f'original/ix{n}']
+            self.assertEqual((item['name'],item['slot'],item['restore_hp'],item['restore_mp'],item['price']),(name,'consumable',hp,0,price))
+            self.assertEqual(item['original_confirmation']['restore_hp'],hp)
+            self.assertEqual(item['sections'],['hot','elixir'])
+        for n,attribute in [(31,'敏捷'),(32,'力量'),(33,'体质'),(34,'灵性'),(35,'定力')]:
+            item=indexed[f'original/ix{n}']
+            self.assertEqual((item['name'],item['slot'],item['category'],item['attribute']),(attribute+'石','material','宝石',attribute))
+            self.assertEqual((item['price'],item['restore_hp'],item['restore_mp']),(35,0,0))
+            self.assertEqual(item['sections'],['hot','craft'])
+            self.assertEqual(item['original_confirmation']['attribute'],attribute)
+        import sys
+        sys.path.insert(0,str(ROOT/'tools'))
+        from build_full_shop_catalog import build
+        self.assertEqual(build(),catalog)
+
     def test_chicken_preserves_icon_and_level_while_restoring_health(self):
         catalog=json.loads((ROOT/'client/assets/data/shop-v2.json').read_text('utf8'))
         item=next(i for i in catalog['items'] if i['id']=='original/ix26')

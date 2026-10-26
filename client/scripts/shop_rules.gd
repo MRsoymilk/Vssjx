@@ -115,6 +115,7 @@ static func description(id: String, stats: Dictionary={}) -> String:
 	if entry.get("effect")=="teleport":return "自选已开放地图；成功耗1张，取消不消耗。"
 	if entry.get("effect")=="reset_attributes": return "返还全部属性点；耗1颗，保留气血灵力比例。"
 	if is_equipment(entry): return ("攻击 +%d"%int(entry.attack)) if entry.slot=="weapon" else ("防御 +%d"%int(entry.defense))
+	if entry.has("attribute"):return "%s类宝石材料，可购买并存入背包"%entry.attribute
 	if id=="potion" and (stats.is_empty() or SkillBalance.revised(stats)):
 		return "恢复最大气血的%d%%（至少%d点）"%[int(SkillBalance.rules.potion_restore_bp)/100,int(entry.restore_hp)]
 	if entry.slot=="consumable":

@@ -19,6 +19,42 @@ fn use_item(id:&str)->Command{
 }
 
 #[test]
+fn confirmed_wound_medicines_restore_fixed_hp_and_preserve_existing_inventory(){
+    for (id,name,healing,price) in [
+        ("original/ix15","金疮药",500,5),("original/ix16","小金疮药",800,10),
+        ("original/ix17","中金疮药",1000,8),("original/ix18","大金疮药",1500,14),
+    ]{
+        let item=crate::shop::item(id).unwrap();
+        assert_eq!((item.name.as_str(),item.slot.as_str(),item.restore_hp,item.restore_mp,item.price),(name,"consumable",healing,0,price));
+        for revision in [0,1]{for job in 0..3{
+            let (mut loaded,context)=player(job,60,revision);loaded.allocated=[300,0,0,0,0];
+            loaded.gear.insert(id.into(),false);loaded.quantities.insert(id.into(),2);loaded.character.mp=7;
+            assert!(loaded.stats().hp>healing+1);
+            loaded.apply(&use_item(id),&context).unwrap();
+            assert_eq!((loaded.character.hp,loaded.character.mp),(1+healing,7));
+            assert_eq!(loaded.quantities[id],1);
+            loaded.character.hp=loaded.stats().hp-1;
+            loaded.apply(&use_item(id),&context).unwrap();assert_eq!(loaded.character.hp,loaded.stats().hp);
+            loaded.gear.insert(id.into(),false);loaded.quantities.insert(id.into(),1);
+            assert_eq!(loaded.apply(&use_item(id),&context),Err("HP_FULL"));assert_eq!(loaded.quantities[id],1);
+        }}
+    }
+}
+
+#[test]
+fn named_attribute_stones_keep_material_behavior_without_inventing_permanent_points(){
+    for (id,name) in [("original/ix31","敏捷石"),("original/ix32","力量石"),("original/ix33","体质石"),("original/ix34","灵性石"),("original/ix35","定力石")]{
+        let item=crate::shop::item(id).unwrap();
+        assert_eq!((item.name.as_str(),item.slot.as_str(),item.price),(name,"material",35));
+        let (mut loaded,context)=player(0,60,1);
+        loaded.gear.insert(id.into(),false);loaded.quantities.insert(id.into(),2);
+        assert_eq!(loaded.apply(&use_item(id),&context),Err("ITEM_NOT_USABLE"));
+        assert_eq!((loaded.character.hp,loaded.character.mp,loaded.allocated),(1,0,[0;5]));
+        assert_eq!(loaded.quantities[id],2);
+    }
+}
+
+#[test]
 fn lotus_leaf_chicken_restores_6000_hp_without_retaining_old_mana_effect(){
     const ID:&str="original/ix26";
     let item=crate::shop::item(ID).unwrap();

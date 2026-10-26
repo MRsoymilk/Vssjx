@@ -336,6 +336,10 @@ func _load_original_items() -> void:
 			data["原版属性"] = recovery
 			data["确认依据"] = confirmation.source
 			data["说明"] = "名称与恢复量由用户确认；原版等级、业务物品ID及其余属性未知"
+			if confirmation.has("attribute"):
+				data["原版属性"]={"对应属性":confirmation.attribute,"属性增量":null}
+				data["说明"]="名称与属性归属由用户确认；属性增量、强化效果、原版等级及业务物品ID未知"
+				parts.append("对应"+String(confirmation.attribute))
 			if confirmation.has("level"):
 				data["原版等级"] = int(confirmation.level)
 				data["说明"] = "名称、等级与恢复量由用户截图确认；原版业务物品ID及其余属性未知"

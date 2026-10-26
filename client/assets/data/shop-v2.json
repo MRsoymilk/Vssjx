@@ -3737,7 +3737,7 @@
     },
     {
       "id": "original/ix15",
-      "name": "小玉药瓶",
+      "name": "金疮药",
       "slot": "consumable",
       "price": 5,
       "attack": 0,
@@ -3747,20 +3747,26 @@
       "level": 1,
       "job": -1,
       "icon": "res://assets/items/original/ix15.png",
-      "restore_hp": 30,
+      "restore_hp": 500,
       "restore_mp": 0,
       "source_member": "ssjx/item/ix15.img",
       "source_sha256": "c9f96c2512c313f8117a26a40f1f09feb85d3677fb199dae1ec57613de5643f1",
-      "rules_basis": "图形特征命名、分类、售价和属性为重建规则；并非原服务器物品表",
+      "rules_basis": "原包图标；名称及固定恢复500气血由用户确认；售价沿用5铜钱，分类与战斗外使用沿用当前重建规则",
       "category": "药品",
       "sections": [
         "hot",
         "elixir"
-      ]
+      ],
+      "usage_note": "战斗外使用，不超过气血上限",
+      "original_confirmation": {
+        "name": "金疮药",
+        "restore_hp": 500,
+        "source": "用户于2026-10-26提供ix15对照并确认原版名称与恢复量"
+      }
     },
     {
       "id": "original/ix16",
-      "name": "白瓷药瓶",
+      "name": "小金疮药",
       "slot": "consumable",
       "price": 10,
       "attack": 0,
@@ -3770,20 +3776,26 @@
       "level": 1,
       "job": -1,
       "icon": "res://assets/items/original/ix16.png",
-      "restore_hp": 60,
+      "restore_hp": 800,
       "restore_mp": 0,
       "source_member": "ssjx/item/ix16.img",
       "source_sha256": "d0a6acefc599fd6c9deed3616ba3012a18df4c9110211983f74327521a6ed294",
-      "rules_basis": "图形特征命名、分类、售价和属性为重建规则；并非原服务器物品表",
+      "rules_basis": "原包图标；名称及固定恢复800气血由用户确认；售价沿用10铜钱，分类与战斗外使用沿用当前重建规则",
       "category": "药品",
       "sections": [
         "hot",
         "elixir"
-      ]
+      ],
+      "usage_note": "战斗外使用，不超过气血上限",
+      "original_confirmation": {
+        "name": "小金疮药",
+        "restore_hp": 800,
+        "source": "用户于2026-10-26提供ix16对照并确认原版名称与恢复量"
+      }
     },
     {
       "id": "original/ix17",
-      "name": "方口药瓶",
+      "name": "中金疮药",
       "slot": "consumable",
       "price": 8,
       "attack": 0,
@@ -3793,20 +3805,26 @@
       "level": 1,
       "job": -1,
       "icon": "res://assets/items/original/ix17.png",
-      "restore_hp": 0,
-      "restore_mp": 25,
+      "restore_hp": 1000,
+      "restore_mp": 0,
       "source_member": "ssjx/item/ix17.img",
       "source_sha256": "b91fb687229cdb0a1d1101f97f9b6a9abc7e3cbd8381a707b040eeddc97b4a77",
-      "rules_basis": "图形特征命名、分类、售价和属性为重建规则；并非原服务器物品表",
+      "rules_basis": "原包图标；名称及固定恢复1000气血由用户确认；售价沿用8铜钱，分类与战斗外使用沿用当前重建规则",
       "category": "药品",
       "sections": [
         "hot",
         "elixir"
-      ]
+      ],
+      "usage_note": "战斗外使用，不超过气血上限",
+      "original_confirmation": {
+        "name": "中金疮药",
+        "restore_hp": 1000,
+        "source": "用户于2026-10-26提供ix17对照并确认原版名称与恢复量"
+      }
     },
     {
       "id": "original/ix18",
-      "name": "竹筒药液",
+      "name": "大金疮药",
       "slot": "consumable",
       "price": 14,
       "attack": 0,
@@ -3816,16 +3834,22 @@
       "level": 1,
       "job": -1,
       "icon": "res://assets/items/original/ix18.png",
-      "restore_hp": 45,
-      "restore_mp": 20,
+      "restore_hp": 1500,
+      "restore_mp": 0,
       "source_member": "ssjx/item/ix18.img",
       "source_sha256": "3e2da75ca70d838a61e21a9b7ad91b71742311f06ad0b6e27841750958962435",
-      "rules_basis": "图形特征命名、分类、售价和属性为重建规则；并非原服务器物品表",
+      "rules_basis": "原包图标；名称及固定恢复1500气血由用户确认；售价沿用14铜钱，分类与战斗外使用沿用当前重建规则",
       "category": "药品",
       "sections": [
         "hot",
         "elixir"
-      ]
+      ],
+      "usage_note": "战斗外使用，不超过气血上限",
+      "original_confirmation": {
+        "name": "大金疮药",
+        "restore_hp": 1500,
+        "source": "用户于2026-10-26提供ix18对照并确认原版名称与恢复量"
+      }
     },
     {
       "id": "original/ix19",
@@ -4112,7 +4136,7 @@
     },
     {
       "id": "original/ix31",
-      "name": "灵石·31",
+      "name": "敏捷石",
       "slot": "material",
       "price": 35,
       "attack": 0,
@@ -4126,16 +4150,22 @@
       "restore_mp": 0,
       "source_member": "ssjx/item/ix31.img",
       "source_sha256": "d2978d3790608438fc9a3a5f9a9fc4d8f92fabb0659677c79108322b05e50245",
-      "rules_basis": "图形特征命名、分类、售价和属性为重建规则；并非原服务器物品表",
+      "rules_basis": "原包图标；名称及对应属性由用户确认；售价35铜钱和宝石材料分类沿用当前重建规则；未指定属性增量与强化效果",
       "category": "宝石",
       "sections": [
         "hot",
         "craft"
-      ]
+      ],
+      "attribute": "敏捷",
+      "original_confirmation": {
+        "name": "敏捷石",
+        "attribute": "敏捷",
+        "source": "用户于2026-10-26提供ix31对照并确认名称与属性归属"
+      }
     },
     {
       "id": "original/ix32",
-      "name": "灵石·32",
+      "name": "力量石",
       "slot": "material",
       "price": 35,
       "attack": 0,
@@ -4149,16 +4179,22 @@
       "restore_mp": 0,
       "source_member": "ssjx/item/ix32.img",
       "source_sha256": "cf58e1a2e49fbcab19f3adf0c41a440419f316a94f98791706b3be3b953233de",
-      "rules_basis": "图形特征命名、分类、售价和属性为重建规则；并非原服务器物品表",
+      "rules_basis": "原包图标；名称及对应属性由用户确认；售价35铜钱和宝石材料分类沿用当前重建规则；未指定属性增量与强化效果",
       "category": "宝石",
       "sections": [
         "hot",
         "craft"
-      ]
+      ],
+      "attribute": "力量",
+      "original_confirmation": {
+        "name": "力量石",
+        "attribute": "力量",
+        "source": "用户于2026-10-26提供ix32对照并确认名称与属性归属"
+      }
     },
     {
       "id": "original/ix33",
-      "name": "灵石·33",
+      "name": "体质石",
       "slot": "material",
       "price": 35,
       "attack": 0,
@@ -4172,16 +4208,22 @@
       "restore_mp": 0,
       "source_member": "ssjx/item/ix33.img",
       "source_sha256": "06449f1505d44e7403eb7a5978c30ba2f1160bd9a79eb997e58b3c66591cc13a",
-      "rules_basis": "图形特征命名、分类、售价和属性为重建规则；并非原服务器物品表",
+      "rules_basis": "原包图标；名称及对应属性由用户确认；售价35铜钱和宝石材料分类沿用当前重建规则；未指定属性增量与强化效果",
       "category": "宝石",
       "sections": [
         "hot",
         "craft"
-      ]
+      ],
+      "attribute": "体质",
+      "original_confirmation": {
+        "name": "体质石",
+        "attribute": "体质",
+        "source": "用户于2026-10-26提供ix33对照并确认名称与属性归属"
+      }
     },
     {
       "id": "original/ix34",
-      "name": "灵石·34",
+      "name": "灵性石",
       "slot": "material",
       "price": 35,
       "attack": 0,
@@ -4195,16 +4237,22 @@
       "restore_mp": 0,
       "source_member": "ssjx/item/ix34.img",
       "source_sha256": "d6ea6c3090078cd1624c8e3c1f47f63602c0419cc3212d3df5e8003d5e863463",
-      "rules_basis": "图形特征命名、分类、售价和属性为重建规则；并非原服务器物品表",
+      "rules_basis": "原包图标；名称及对应属性由用户确认；售价35铜钱和宝石材料分类沿用当前重建规则；未指定属性增量与强化效果",
       "category": "宝石",
       "sections": [
         "hot",
         "craft"
-      ]
+      ],
+      "attribute": "灵性",
+      "original_confirmation": {
+        "name": "灵性石",
+        "attribute": "灵性",
+        "source": "用户于2026-10-26提供ix34对照并确认名称与属性归属"
+      }
     },
     {
       "id": "original/ix35",
-      "name": "灵石·35",
+      "name": "定力石",
       "slot": "material",
       "price": 35,
       "attack": 0,
@@ -4218,12 +4266,18 @@
       "restore_mp": 0,
       "source_member": "ssjx/item/ix35.img",
       "source_sha256": "97fbf9508f4e7398c055a41d3481a73b5e010207107379cca88a17d529561b47",
-      "rules_basis": "图形特征命名、分类、售价和属性为重建规则；并非原服务器物品表",
+      "rules_basis": "原包图标；名称及对应属性由用户确认；售价35铜钱和宝石材料分类沿用当前重建规则；未指定属性增量与强化效果",
       "category": "宝石",
       "sections": [
         "hot",
         "craft"
-      ]
+      ],
+      "attribute": "定力",
+      "original_confirmation": {
+        "name": "定力石",
+        "attribute": "定力",
+        "source": "用户于2026-10-26提供ix35对照并确认名称与属性归属"
+      }
     },
     {
       "id": "original/ix36",

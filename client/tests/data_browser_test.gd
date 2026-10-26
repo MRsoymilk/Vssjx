@@ -45,6 +45,12 @@ func _ready() -> void:
 			check(entry.data["原版名称"]=="极品人参" and entry.data["原版属性"]=={"恢复灵力":4000},"User-confirmed ginseng name and mana recovery are explicit")
 		elif entry.id=="original/ix26":
 			check(entry.data["原版名称"]=="荷叶烧鸡" and entry.data["原版等级"]==1 and entry.data["原版属性"]=={"恢复气血":6000},"Screenshot-confirmed chicken name, level and healing are explicit")
+		elif ShopRules.item(entry.id).has("original_confirmation"):
+			var confirmation:Dictionary=ShopRules.item(entry.id).original_confirmation
+			check(entry.data["原版名称"]==confirmation.name,"Confirmed item names appear on original resources")
+			if confirmation.has("attribute"):
+				check(entry.data["原版属性"]=={"对应属性":confirmation.attribute,"属性增量":null},"Stone attribute type is confirmed, amount remains unknown")
+			else:check(entry.data["原版属性"]=={"恢复气血":confirmation.restore_hp},"Confirmed wound medicine recovery is explicit")
 		else:
 			check(entry.data["原版名称"] == null and entry.data["原版属性"] == null, "Unknown original names and stats remain unknown: " + entry.id)
 		var product:=ShopRules.item(entry.id)

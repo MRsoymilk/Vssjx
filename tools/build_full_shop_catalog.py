@@ -40,13 +40,16 @@ MEDICINES = {
     14:('极品人参',0,4000),
     0:('青露药剂',30,0),1:('白玉药剂',45,0),2:('青瓷灵液',0,20),
     3:('赤玉药剂',60,0),4:('碧水灵液',0,30),5:('琥珀药剂',40,15),
-    15:('小玉药瓶',30,0),16:('白瓷药瓶',60,0),17:('方口药瓶',0,25),18:('竹筒药液',45,20),
+    15:('金疮药',500,0),16:('小金疮药',800,0),17:('中金疮药',1000,0),18:('大金疮药',1500,0),
     19:('紫晶灵液',0,35),20:('四方灵液',0,45),21:('圆肚灵液',0,55),
     22:('赤玉葫芦',70,0),23:('铜口葫芦',100,25),24:('烧饼',20,0),25:('灵果',25,10),
     26:('荷叶烧鸡',6000,0),27:('朱果',35,15),28:('回春药罐',45,0),70:('白玉药囊',75,0),71:('赤陶药罐',100,0),72:('青纹药罐',60,40),
 }
 # Material resource names confirmed by the user; keep recovered evidence intact.
 MATERIAL_NAMES = {42: '当归', 43: '茯苓'}
+ATTRIBUTE_STONES = {31:'敏捷',32:'力量',33:'体质',34:'灵性',35:'定力'}
+# Preserve current shop prices; the user confirmed names/recovery, not prices.
+PRESERVED_MEDICINE_PRICES = {10:10,14:10,15:5,16:10,17:8,18:14,26:6}
 
 
 def build():
@@ -81,14 +84,20 @@ def build():
         elif n in MEDICINES:
             name,hp,mp=MEDICINES[n]
             row.update(name=name,slot='consumable',category='药品',price=max(4,(hp+mp*2)//6),restore_hp=hp,restore_mp=mp,sections=['hot','elixir'])
-            if n in (10,14,26):
+            if n in PRESERVED_MEDICINE_PRICES:
                 resource,amount,field=('气血',hp,'restore_hp') if hp else ('灵力',mp,'restore_mp')
-                price=6 if n==26 else 10
+                price=PRESERVED_MEDICINE_PRICES[n]
+                source=f'用户于2026-10-26提供ix{n}截图并确认原版名称与恢复量' if n in (10,14,26) else f'用户于2026-10-26提供ix{n}对照并确认原版名称与恢复量'
                 row.update(price=price,usage_note=f'战斗外使用，不超过{resource}上限',
-                    original_confirmation={'name':name,field:amount,'source':f'用户于2026-10-26提供ix{n}截图并确认原版名称与恢复量'},
+                    original_confirmation={'name':name,field:amount,'source':source},
                     rules_basis=f'原包图标；名称及固定恢复{amount}{resource}由用户确认；售价沿用{price}铜钱，分类与战斗外使用沿用当前重建规则')
                 if n==26:
                     row['original_confirmation']['level']=1
+        elif n in ATTRIBUTE_STONES:
+            attribute=ATTRIBUTE_STONES[n];name=attribute+'石'
+            row.update(name=name,category='宝石',price=35,sections=['hot','craft'],attribute=attribute,
+                original_confirmation={'name':name,'attribute':attribute,'source':f'用户于2026-10-26提供ix{n}对照并确认名称与属性归属'},
+                rules_basis='原包图标；名称及对应属性由用户确认；售价35铜钱和宝石材料分类沿用当前重建规则；未指定属性增量与强化效果')
         else:
             if n in [29,31,32,33,34,35,67]: category='宝石';name='灵石';row['price']=35
             elif n in [6,51,52,53,54,68]: category='配方';name='纹印卷轴';row['price']=24

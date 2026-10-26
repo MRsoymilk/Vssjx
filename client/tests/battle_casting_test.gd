@@ -40,6 +40,7 @@ func _run() -> void:
 		for command in ["skill", "attack"]:
 			var round_before: int = app.battle.round_number
 			var mp_before: int = app.battle.mp
+			var expected_mp:int=mp_before-SkillBalance.cost(SkillRules.item(app.battle.selected_skill),app.battle.frozen_stats) if command=="skill" else mini(int(app.battle.frozen_stats.mp),mp_before+SkillBalance.recovery(app.battle.frozen_stats,"basic_restore_bp"))
 			app._battle_turn(command)
 			check(app.battle_move_callout.visible and app.battle_move_callout.caption.text == ShushanBattle.action_name(command, 2), "Move name matches the action and combat log")
 			check(app.battle_move_callout.mouse_filter == Control.MOUSE_FILTER_IGNORE, "Move bubble cannot consume battle input")
@@ -64,7 +65,7 @@ func _run() -> void:
 			while app.battle.phase != "select" and Time.get_ticks_msec() < deadline: await get_tree().process_frame
 			check(app.battle.phase == "select" and app.battle_hero.animation == "idle", "Completed action returns to a stable ready pose")
 			check(seen_frames.size() >= 4, "Actual engine advances through distinct staff poses")
-			check(not app.battle_move_callout.visible and app.battle.mp == mp_before - (9 if command == "skill" else 0), "Bubble clears without extra resource consumption")
+			check(not app.battle_move_callout.visible and app.battle.mp == expected_mp, "Bubble clears without changing the configured skill cost or basic-attack mana recovery")
 			check(app.battle_log.text.contains("摄灵诀") if command == "skill" else app.battle_log.text.contains("挥杖"), "Mage combat text describes the actual move")
 		app._home()
 		await get_tree().process_frame

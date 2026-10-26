@@ -1279,9 +1279,7 @@ func _battle_turn(command: String, skill_id:String="") -> void:
 		return
 	if action_menu != null: action_menu.hide()
 	battle_stage = "player"
-	var animation: StringName = &"cast" if command == "skill" and battle_hero.sprite_frames.has_animation("cast") else &"attack"
-	var support:=command=="skill" and int(SkillRules.item(skill_id).damage_percent)==0
-	if support:animation=&"cast" if battle_hero.sprite_frames.has_animation("cast") else &"idle"
+	var animation:=BattleEffects.animation_for(command,int(Game.player.job),skill_id,battle_hero)
 	battle_move_callout.present_for(ShushanBattle.action_name(command, int(Game.player.job),skill_id), battle_hero, _battle_action_duration(battle_hero, animation) + 0.15 if command in ["attack", "skill"] else 0.75)
 	_refresh_battle()
 	await get_tree().create_timer(0.15).timeout
@@ -1290,7 +1288,9 @@ func _battle_turn(command: String, skill_id:String="") -> void:
 	if command in ["attack", "skill"]:
 		player_motion = BattleActionPlayback.new()
 		battle_playback = player_motion
-		player_motion.start(battle_hero, OriginalArt.actor_info(Game.appearance_key()), battle_hero.global_position if support else battle_enemy.global_position, animation, battle_hero if support else battle_enemy)
+		var preview_progress:Dictionary=Game.player.get("skill_proficiency",{}).duplicate()
+		var cast_level:=SkillProficiency.record(preview_progress,skill_id) if command=="skill" else 1
+		battle_effects.start_motion(player_motion,command,int(Game.player.job),skill_id,battle_hero,OriginalArt.actor_info(Game.appearance_key()),battle_enemy,cast_level)
 		_refresh_battle()
 		await player_motion.impact
 		if epoch != _ui_epoch or player_motion.cancelled or mode != "battle" or battle != active_battle: return
@@ -1300,7 +1300,7 @@ func _battle_turn(command: String, skill_id:String="") -> void:
 		if int(result.damage) > 0 and not battle.skills.get("last_missed",false) and battle_enemy.sprite_frames.has_animation("hurt"):
 			battle_enemy.play("hurt")
 		if battle.skills.get("last_missed",false):battle_effects.dodge(battle_enemy,battle_hero)
-		if command=="skill" or not battle.skills.get("last_missed",false):battle_effects.play_action(command,int(Game.player.job),skill_id,battle_hero,battle_enemy,int(battle.skills.get("last_skill_level",1)))
+		if (command=="skill" or not battle.skills.get("last_missed",false)) and (command!="skill" or BattleEffects.projectile_seconds(skill_id)<=0):battle_effects.play_action(command,int(Game.player.job),skill_id,battle_hero,battle_enemy,int(battle.skills.get("last_skill_level",1)))
 		battle_effects.number(battle_enemy,int(battle.skills.last_damage),battle.skills.get("last_critical",false))
 		battle_effects.number(battle_hero,int(battle.skills.last_healed),false,true)
 	_refresh_battle()

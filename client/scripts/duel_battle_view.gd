@@ -159,7 +159,7 @@ func _hero_impact()->void:
 	if _playing.get("missed",false):effects.dodge(enemy,hero)
 	effects.number(enemy,int(_playing.get("damage",0)),_playing.get("critical",false))
 	effects.number(hero,int(_playing.get("reflected",0)))
-	if model.last_action=="skill" or not _playing.get("missed",false):effects.play_action(model.last_action,int(model.state.character.job),_playing.get("skill",""),hero,enemy,int(model.state.battle.skills.get("last_skill_level",1)))
+	if (model.last_action=="skill" or not _playing.get("missed",false)) and (model.last_action!="skill" or BattleEffects.projectile_seconds(_playing.get("skill",""))<=0):effects.play_action(model.last_action,int(model.state.character.job),_playing.get("skill",""),hero,enemy,int(model.state.battle.skills.get("last_skill_level",1)))
 	if _enemy_took_damage and not _playing.get("missed",false) and enemy.sprite_frames.has_animation("hurt"):enemy.play("hurt")
 	_shown_hero_hp=int(model.state.battle.hp);_shown_enemy_hp=int(model.state.battle.enemy_hp)
 	effects.play_reflection(int(opponent.job),int(opponent.school),int(opponent.level),opponent.effects,model.last_action=="skill" and int(model.state.character.job)==2,enemy,hero)
@@ -168,23 +168,19 @@ func _start_enemy_motion()->void:
 	_enemy_attack_delay=0
 	if not _should_enemy_act():_start_death();return
 	var event:Dictionary=_playing.duplicate(true)
-	var used:=SkillRules.item(event.get("skill",""))
-	var support:bool=event.action=="skill" and not used.is_empty() and int(used.damage_percent)==0
-	var animation:StringName=&"cast" if event.action=="skill" and enemy.sprite_frames.has_animation("cast") else &"attack"
-	if support and not enemy.sprite_frames.has_animation("cast"):animation=&"idle"
 	_enemy_motion=BattleActionPlayback.new()
 	_enemy_motion.impact.connect(func()->void:
 		if _enemy_motion.cancelled:return
 		if event.get("missed",false):effects.dodge(hero,enemy)
 		effects.number(hero,int(event.get("damage",0)),event.get("critical",false))
 		effects.number(enemy,int(event.get("reflected",0)))
-		if event.action=="skill" or not event.get("missed",false):effects.play_action(event.action,int(opponent.job),event.skill,enemy,hero,int(opponent.effects.get("last_skill_level",1)))
+		if (event.action=="skill" or not event.get("missed",false)) and (event.action!="skill" or BattleEffects.projectile_seconds(event.skill)<=0):effects.play_action(event.action,int(opponent.job),event.skill,enemy,hero,int(opponent.effects.get("last_skill_level",1)))
 		if int(model.state.battle.hp)<_shown_hero_hp and not event.get("missed",false) and hero.sprite_frames.has_animation("hurt"):hero.play("hurt")
 		_shown_hero_hp=int(model.state.battle.hp);_shown_enemy_hp=int(model.state.battle.enemy_hp)
 		var me:Dictionary=event.fighters[0] if event.fighters[0].id==channel.character_id else event.fighters[1]
 		effects.play_reflection(int(me.job),int(me.school),int(me.level),me.effects,event.action=="skill" and int(opponent.job)==2,hero,enemy)
 	)
 	_enemy_motion.completed.connect(func()->void:if not _enemy_motion.cancelled:_after_reactions(_start_death))
-	_enemy_motion.start(enemy,OriginalArt.actor_info(model.state.battle.enemy.art),enemy.global_position if support else hero.global_position,animation,enemy if support else hero)
+	effects.start_motion(_enemy_motion,event.action,int(opponent.job),event.skill,enemy,OriginalArt.actor_info(model.state.battle.enemy.art),hero,int(opponent.effects.get("last_skill_level",1)))
 	move_callout.present_for(ShushanBattle.action_name(event.action,int(opponent.job),event.skill),enemy,_enemy_motion.duration)
 	animation_time=_enemy_motion.duration

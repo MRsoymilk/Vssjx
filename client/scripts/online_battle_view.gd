@@ -120,16 +120,12 @@ func present(pve: OnlinePve) -> void:
 			if int(b.get("skill_rules_version",0))==1:_enemy_took_damage=int(b.skills.last_damage)>0
 			if model.last_action in ["attack", "skill"]:
 				var used_id:String=b.get("skills",{}).get("last_skill","")
-				var used:=SkillRules.item(used_id)
-				var support:=not used.is_empty() and int(used.damage_percent)==0
-				var animation:StringName=&"cast" if model.last_action=="skill" and hero.sprite_frames.has_animation("cast") else &"attack"
-				if support:animation=&"cast" if hero.sprite_frames.has_animation("cast") else &"idle"
 				_hero_motion = BattleActionPlayback.new()
 				_hero_motion.impact.connect(_hero_impact)
 				_hero_motion.completed.connect(func() -> void:
 					if not _hero_motion.cancelled: _after_reactions(_start_enemy_motion)
 				)
-				_hero_motion.start(hero, OriginalArt.actor_info(_hero_key), hero.global_position if support else enemy.global_position, animation, hero if support else enemy)
+				effects.start_motion(_hero_motion,model.last_action,int(c.job),used_id,hero,OriginalArt.actor_info(_hero_key),enemy,int(b.get("skills",{}).get("last_skill_level",1)))
 				move_callout.present_for(ShushanBattle.action_name(model.last_action,int(c.job),used_id),hero,_hero_motion.duration)
 				_enemy_attack_delay = _hero_motion.duration if _should_enemy_act() else 0.0
 				animation_time = _hero_motion.duration + (_action_duration(enemy, &"attack") if _should_enemy_act() else 0.0)
@@ -176,7 +172,7 @@ func _hero_impact() -> void:
 	if _hero_motion == null or _hero_motion.cancelled: return
 	var status:Dictionary=model.state.battle.get("skills",{})
 	if status.get("last_missed",false):effects.dodge(enemy,hero)
-	if model.last_action=="skill" or not status.get("last_missed",false):effects.play_action(model.last_action,int(model.state.character.job),String(status.get("last_skill","")),hero,enemy,int(status.get("last_skill_level",1)))
+	if (model.last_action=="skill" or not status.get("last_missed",false)) and (model.last_action!="skill" or BattleEffects.projectile_seconds(String(status.get("last_skill","")))<=0):effects.play_action(model.last_action,int(model.state.character.job),String(status.get("last_skill","")),hero,enemy,int(status.get("last_skill_level",1)))
 	var next_hp:=int(model.state.battle.enemy_hp)+int(status.get("last_reflected",0))
 	effects.number(enemy,int(status.get("last_damage",maxi(0,_shown_enemy_hp-next_hp))),status.get("last_critical",false))
 	effects.number(hero,int(status.get("last_healed",0)),false,true)

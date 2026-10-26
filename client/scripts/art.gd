@@ -165,6 +165,17 @@ static func actor(key: String) -> AnimatedSprite2D:
 		while _dynamic_order.size()>6:cached.erase(_dynamic_order.pop_front())
 	sprite.set_meta("appearance_edit_revision",AppearanceEdits.revision)
 	if key.begins_with("hero/"):sprite.set_meta("ground_pose_x",info.get("native_battle",{}).get("pose_x",{}))
+	if key.begins_with("hero/") and not sprite.sprite_frames.has_animation("cast"):
+		# All six original heroes have native sequence 8. Keep source artwork and
+		# step durations, and expose the reviewed raised-weapon/raised-hands pose.
+		var source:=StringName("source_%d"%(info.sequences.size()-1-8))
+		if sprite.sprite_frames.has_animation(source):
+			sprite.sprite_frames=sprite.sprite_frames.duplicate()
+			sprite.sprite_frames.add_animation("cast")
+			sprite.sprite_frames.set_animation_speed("cast",8)
+			sprite.sprite_frames.set_animation_loop("cast",false)
+			for step in sprite.sprite_frames.get_frame_count(source):
+				sprite.sprite_frames.add_frame("cast",sprite.sprite_frames.get_frame_texture(source,step),sprite.sprite_frames.get_frame_duration(source,step))
 	if sprite is NativeHeroSprite:sprite.configure(HeroAppearance.outfit_for_key(key),sprite.sprite_frames,info,key)
 	sprite.play("idle")
 	return sprite

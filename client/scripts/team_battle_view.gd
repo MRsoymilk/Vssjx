@@ -409,11 +409,9 @@ func _play(event:Dictionary)->void:
 	var group:Array=[event]
 	while event.action=="skill" and not queue.is_empty() and queue[0].actor==event.actor and queue[0].target!=event.target and queue[0].skill==event.skill and queue[0].get("packet")==event.get("packet"):
 		group.append(queue.pop_front())
-	var mode:StringName=&"cast" if event.action=="skill" and a.sprite.sprite_frames.has_animation("cast") else &"attack"
-	if event.action in ["guard","potion","dot","regen"]:mode=&"idle"
-	if event.action=="skill" and not SkillRules.item(event.skill).is_empty() and SkillRules.item(event.skill).get("damage_percent",0)==0:mode=&"cast" if a.sprite.sprite_frames.has_animation("cast") else &"idle"
 	motion=BattleActionPlayback.new()
 	motion.impact.connect(func()->void:
+		if motion==null or motion.cancelled:return
 		for hit in group:
 			var receiver:Dictionary=actors[hit.target]
 			receiver.hp.value=maxf(0,receiver.hp.value-int(hit.damage));receiver.dead=receiver.hp.value<=0
@@ -422,11 +420,14 @@ func _play(event:Dictionary)->void:
 			if hit.get("missed",false):effects.dodge(receiver.sprite,a.sprite)
 			effects.number(receiver.sprite,int(hit.damage),hit.get("critical",false))
 			effects.number(a.sprite if hit.actor!=hit.target and SkillRules.item(hit.get("skill","")).get("target")!="all_allies" else receiver.sprite,int(hit.healed),false,true)
-			if hit.action=="skill":effects.play_binding(hit.skill,"cast_impact",receiver.sprite if SkillRules.item(hit.skill).get("target")=="all_allies" else a.sprite,receiver.sprite,hit==group[0],int(hit.get("skill_level",1)))
+			if hit.action=="skill" and BattleEffects.projectile_seconds(hit.skill)<=0:effects.play_binding(hit.skill,"cast_impact",receiver.sprite if SkillRules.item(hit.skill).get("target")=="all_allies" else a.sprite,receiver.sprite,hit==group[0],int(hit.get("skill_level",1)))
 			elif hit.action=="attack" and not hit.get("missed",false):effects.attach("effect/flash",receiver.sprite)
 			if int(hit.damage)>0 and receiver.sprite.sprite_frames.has_animation("hurt"):receiver.sprite.play("hurt")
 	)
-	motion.start(a.sprite,OriginalArt.actor_info(a.key),target.sprite.global_position,mode,target.sprite)
+	var recipients:Array=[]
+	for hit in group:recipients.append(actors[hit.target].sprite)
+	var skill_job:=int(SkillRules.item(event.get("skill","")).get("job",-1))
+	effects.start_motion(motion,event.action,skill_job,event.get("skill",""),a.sprite,OriginalArt.actor_info(a.key),target.sprite,int(event.get("skill_level",1)),true,recipients)
 	if String(event.skill).begins_with("monster_"):move_callout.present_for("流血" if event.skill=="monster_bleed" else MonsterCombat.action_name(event.skill),a.sprite,motion.duration)
 	elif event.action=="skill":move_callout.present_for(SkillRules.item(event.skill).get("name",""),a.sprite,motion.duration)
 

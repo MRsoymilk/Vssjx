@@ -3,6 +3,7 @@ extends Node2D
 ## One-shot original ANI effects, attached by canvas position without inheriting facing.
 ## Bindings are authored from each skill's meaning, using original ANI artwork.
 static var catalog:Dictionary=JSON.parse_string(FileAccess.get_file_as_string("res://assets/data/skill-effects-v1.json"))
+static var _projectile_centers:Dictionary={}
 var _attachments:Array[Dictionary]=[]
 var _sounds:Array[AudioStreamPlayer]=[]
 var _numbers:Array[Node2D]=[]
@@ -27,6 +28,28 @@ static func binding(id:String,skill_level:int=1)->Dictionary:
 		if clampi(skill_level,1,15)>=int(stage.level):selected.layers=stage.layers
 	return selected
 
+static func animation_for(command:String,job:int,id:String,subject:AnimatedSprite2D)->StringName:
+	if command not in ["attack","skill"]:return &"idle"
+	if command=="attack":return &"attack"
+	var used:=SkillRules.item(id)
+	var stationary:bool=job==2 or binding(id).get("actor_motion")=="stationary_cast" or (not used.is_empty() and int(used.damage_percent)==0)
+	if stationary:return &"cast" if subject.sprite_frames.has_animation("cast") else &"idle"
+	return &"attack"
+
+static func projectile_seconds(id:String)->float:
+	var selected:=binding(id)
+	return float(selected.get("travel_seconds",0)) if selected.get("delivery")=="projectile" else 0.0
+
+func start_motion(motion:BattleActionPlayback,command:String,job:int,id:String,subject:AnimatedSprite2D,info:Dictionary,receiver:AnimatedSprite2D,skill_level:int=1,with_audio:bool=true,receivers:Array=[])->void:
+	var flight:=projectile_seconds(id) if command=="skill" else 0.0
+	if flight>0:
+		var token:WeakRef=weakref(motion)
+		motion.released.connect(func()->void:
+			if token.get_ref()==null or token.get_ref().cancelled:return
+			var targets:Array=receivers if not receivers.is_empty() else [receiver]
+			for index in targets.size():play_binding(id,"cast_impact",subject,targets[index],with_audio and index==0,skill_level),CONNECT_ONE_SHOT)
+	motion.start(subject,info,receiver.global_position,animation_for(command,job,id,subject),receiver,flight,binding(id).get("release_pose")=="raised")
+
 static func preload_keys(job:int,school:int,level:int,legacy_only:bool=false)->Array[String]:
 	var keys:Array[String]=[]
 	for skill in SkillRules.list_for(job,school,level):
@@ -45,6 +68,21 @@ func play_binding(id:String,trigger:String,hero:AnimatedSprite2D,enemy:AnimatedS
 	for layer in selected.layers:
 		var sprite:=attach(layer.art,hero if layer.anchor=="hero" else enemy,int(layer.sequence),Vector2(layer.canvas_offset[0],layer.canvas_offset[1]))
 		if sprite!=null:
+			if selected.get("delivery")=="projectile" and layer.anchor=="enemy" and hero!=enemy:
+				var entry:Dictionary=_attachments.back()
+				entry.flight_seconds=float(selected.travel_seconds);entry.flight_elapsed=0.0
+				entry.flight_from=get_global_transform_with_canvas().affine_inverse()*hero.get_global_transform_with_canvas().origin
+				entry.native_offset=sprite.offset
+				var frame_key:String=layer.art+":"+str(layer.sequence)
+				if not _projectile_centers.has(frame_key):
+					var image:=sprite.sprite_frames.get_frame_texture(sprite.animation,0).get_image()
+					if image.is_compressed():image.decompress()
+					_projectile_centers[frame_key]=Vector2(image.get_used_rect().get_center())
+				# Source ANI effects can start hundreds of pixels from their origin.
+				# Center the flying frame on the hand-to-target path; restore the
+				# native origin when the original sequence begins at the receiver.
+				sprite.offset=Vector2(0,-32)-_projectile_centers[frame_key]
+				sprite.pause();_follow(sprite,enemy,entry.offset,entry.flight_from,0.0)
 			sprite.set_meta("skill_id",id);sprite.set_meta("trigger",trigger);sprite.set_meta("skill_level",clampi(skill_level,1,15))
 			if primary==null:primary=sprite
 	if primary!=null and with_audio and selected.has("audio_id"):
@@ -122,12 +160,13 @@ func attach(key:String,subject:Node2D,sequence:int=0,anchor_offset:Vector2=Vecto
 	_follow(sprite,subject,anchor_offset)
 	return sprite
 
-func _follow(sprite:AnimatedSprite2D,subject:Node2D,anchor_offset:Vector2=Vector2.ZERO)->void:
+func _follow(sprite:AnimatedSprite2D,subject:Node2D,anchor_offset:Vector2=Vector2.ZERO,flight_from:Vector2=Vector2.ZERO,progress:float=1.0)->void:
 	# Both views can have translated/scaled HUD and actor station parents.
 	# Preserve the ANI origin and upright pixels; reflected actors must not flip FX.
-	sprite.position=get_global_transform_with_canvas().affine_inverse()*subject.get_global_transform_with_canvas().origin+anchor_offset
+	var destination:Vector2=get_global_transform_with_canvas().affine_inverse()*subject.get_global_transform_with_canvas().origin+anchor_offset
+	sprite.position=flight_from.lerp(destination,clampf(progress,0.0,1.0)) if progress<1.0 else destination
 
-func _process(_delta:float)->void:
+func _process(delta:float)->void:
 	for index in range(_attachments.size()-1,-1,-1):
 		var entry:Dictionary=_attachments[index]
 		var sprite:AnimatedSprite2D=entry.sprite
@@ -136,7 +175,14 @@ func _process(_delta:float)->void:
 			_attachments.remove_at(index)
 		elif not is_instance_valid(subject) or subject.is_queued_for_deletion() or not subject.is_inside_tree() or not subject.visible:
 			sprite.hide();sprite.queue_free();_attachments.remove_at(index)
-		else:_follow(sprite,subject,entry.offset)
+		else:
+			var progress:=1.0
+			if entry.has("flight_seconds"):
+				entry.flight_elapsed=minf(float(entry.flight_seconds),float(entry.flight_elapsed)+maxf(0,delta))
+				progress=float(entry.flight_elapsed)/float(entry.flight_seconds)
+				if progress>=1.0:
+					entry.erase("flight_seconds");sprite.offset=entry.native_offset;sprite.play()
+			_follow(sprite,subject,entry.offset,entry.get("flight_from",Vector2.ZERO),progress)
 
 func clear()->void:
 	for reaction in _dodges:reaction.cancel()

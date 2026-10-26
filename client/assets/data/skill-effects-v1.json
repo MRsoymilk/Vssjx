@@ -21,6 +21,10 @@
           "source_sha256": "b839b2e02c7617dce95ef599e844a4f12e2fca5b2ec9a03a6b21a3e1ecc9d8f2"
         }
       ],
+      "actor_motion": "stationary_cast",
+      "release_pose": "raised",
+      "delivery": "projectile",
+      "travel_seconds": 0.28,
       "stages": [
         {
           "level": 6,
@@ -91,6 +95,10 @@
           "source_sha256": "dc58697ef1edef07ea95c75b96f4386bc61895888768bbd108dcac87e2bf36fc"
         }
       ],
+      "actor_motion": "stationary_cast",
+      "release_pose": "raised",
+      "delivery": "projectile",
+      "travel_seconds": 0.28,
       "stages": [
         {
           "level": 6,
@@ -161,6 +169,10 @@
           "source_sha256": "de03f437e5c8fa05054cd7b3a516c74d91ed055d02f6907d66a45995c64b5181"
         }
       ],
+      "actor_motion": "stationary_cast",
+      "release_pose": "raised",
+      "delivery": "projectile",
+      "travel_seconds": 0.28,
       "stages": [
         {
           "level": 6,
@@ -331,6 +343,10 @@
           "source_sha256": "9e81bfa84a354a696b44125d9b073723526ad5a61d3bfd9abf3bd6559722a7e1"
         }
       ],
+      "actor_motion": "stationary_cast",
+      "release_pose": "raised",
+      "delivery": "projectile",
+      "travel_seconds": 0.28,
       "stages": [
         {
           "level": 6,
@@ -401,6 +417,8 @@
           "source_sha256": "cbf5113f72f436b29fe7f26de03b621ad7066082d26db93886749a29e7f9fbd8"
         }
       ],
+      "actor_motion": "stationary_cast",
+      "release_pose": "raised",
       "audio_id": "thunder",
       "stages": [
         {
@@ -650,6 +668,8 @@
           "source_sha256": "2ce4c1dd0d481aa39d4af91efcefcc484e3da70745721cd57e11dd09275ee0ef"
         }
       ],
+      "actor_motion": "stationary_cast",
+      "release_pose": "raised",
       "stages": [
         {
           "level": 6,
@@ -720,6 +740,7 @@
           "source_sha256": "f9cca222298d47f5c47dcfc5b572c35c0ba33d645cc00d96dac44d38348ad0fa"
         }
       ],
+      "actor_motion": "stationary_cast",
       "stages": [
         {
           "level": 6,
@@ -790,6 +811,7 @@
           "source_sha256": "73ff3e4739cefebc34c52bc9dc468c3d0fa417d108579713b22e080b1ceae87c"
         }
       ],
+      "actor_motion": "stationary_cast",
       "audio_id": "fire"
     },
     "sheet_019": {
@@ -810,6 +832,7 @@
           "source_sha256": "9572b466d5fc80629c67bf1f5a6e464d35f723360d3d432d4e99a0570335ad88"
         }
       ],
+      "actor_motion": "stationary_cast",
       "stages": [
         {
           "level": 6,
@@ -880,6 +903,7 @@
           "source_sha256": "135ed680424daefbcb51b3bc61ace8cb433f122f93ba2eb2bc0db7b962b5568e"
         }
       ],
+      "actor_motion": "stationary_cast",
       "stages": [
         {
           "level": 6,
@@ -1246,7 +1270,8 @@
           "source_member": "ssjx/effect.mrp/t18.ani",
           "source_sha256": "32d84a88186470bf5ae998b3e31d41cc60b6623684d1213e0d54387a27de922f"
         }
-      ]
+      ],
+      "actor_motion": "stationary_cast"
     },
     "sheet_041": {
       "name": "救死扶伤",
@@ -1265,7 +1290,8 @@
           "source_member": "ssjx/effect.mrp/t96.ani",
           "source_sha256": "51570ed6e148be7090dc90277520de316e28d89c9f11747cf8fb43d1e2f215f9"
         }
-      ]
+      ],
+      "actor_motion": "stationary_cast"
     },
     "sheet_042": {
       "name": "冰雪封天",
@@ -1284,7 +1310,8 @@
           "source_member": "ssjx/effect.mrp/t145.ani",
           "source_sha256": "c9f00011bdead2fc8a25b78b8807d40ed6feea827030a74217114e47dd78efa1"
         }
-      ]
+      ],
+      "actor_motion": "stationary_cast"
     },
     "sheet_045": {
       "name": "排山倒海",
@@ -1304,6 +1331,7 @@
           "source_sha256": "c4236a934e0905da70b9f08f2b75c7bbf82892e7af7bb52e8d7b42ac5dae6897"
         }
       ],
+      "actor_motion": "stationary_cast",
       "stages": [
         {
           "level": 6,
@@ -1385,6 +1413,7 @@
           "source_sha256": "30a2e1aaa797760395cfabbbd23acdd5e189aa3a8a26709613cfe331d7293522"
         }
       ],
+      "actor_motion": "stationary_cast",
       "stages": [
         {
           "level": 6,
@@ -1643,7 +1672,8 @@
           "source_member": "ssjx/effect.mrp/t01.ani",
           "source_sha256": "fcf085a85349bbd091ff71f752c263cdf2b7aa9140563e36d35b999a3af527b6"
         }
-      ]
+      ],
+      "actor_motion": "stationary_cast"
     },
     "user_shipo_tianjing": {
       "name": "石破天惊",
@@ -1803,6 +1833,7 @@
           "source_sha256": "32d84a88186470bf5ae998b3e31d41cc60b6623684d1213e0d54387a27de922f"
         }
       ],
+      "actor_motion": "stationary_cast",
       "stages": [
         {
           "level": 6,
@@ -1873,6 +1904,7 @@
           "source_sha256": "c4236a934e0905da70b9f08f2b75c7bbf82892e7af7bb52e8d7b42ac5dae6897"
         }
       ],
+      "actor_motion": "stationary_cast",
       "stages": [
         {
           "level": 6,

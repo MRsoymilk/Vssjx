@@ -43,3 +43,16 @@ Windows / Godot 4.7.1：`battle_casting_test.tscn` 61 项、`native_battle_flow_
 ```sh
 godot --path client res://tests/native_battle_flow_test.tscn -- --capture-native-flow=/absolute/path/follow-callout
 ```
+
+## 原地施法与飞行特效（2026-10-27）
+
+- 力士雷霆一击、斗转星移：使用原包 native sequence 8 的转武器、举武器姿势，在原站位施放；举起后在敌方播放对应技能特效。
+- 侠客仙人指路、沧海明月、剑飞惊天、万剑归宗：同样使用已核对的原包抬手动作；抬手后从自身向每个目标发出特效，0.28秒后到达目标才显示命中、伤害和受击动作。群攻每目标一条轨迹，同次施法只播放一次音效。
+- 隐者全部主动技能保持原地施法；普通攻击及未指定的其他近战攻击沿用原移动规则。未改变伤害、消耗、熟练度或冷却规则。
+- 原包所有男女角色已有 source sequence 8，运行时为缺少 `cast` 的力士、侠客建立动作别名，保留完整原始帧、纹理和相对帧时长；兼容换武器、衣服、头饰和双方朝向。原地动作不套普通攻击的目标位移。
+- 飞行期间用原图第一帧的可见中心对齐人物手部至目标的路径，避免原ANI首帧偏移数百像素；到达后恢复原ANI偏移并完整播放。场景离开、断线或取消动作会清除轨迹，不产生延迟特效或伤害回调。
+- 本地单人阵型、旧单怪本地路径、联机单怪／组队、决斗自己和对手使用同一动作选择与发射流程；原有1～5级基础特效及6/10/15级阶段资源不变。
+
+验证：`stationary_skill_test.tscn` 实际OpenGL渲染2417项通过，覆盖男女、默认及换装、双方朝向、所有隐者主动技能、全部阶段、动作取消、实际组队群攻逐目标伤害及决斗对手施法。相关动作／资源／特效／技能／HUD／飘字／组队／决斗回归25840项通过，Python资源映射7项通过。实际截图已核对：`work/stationary-skill-captures/knight-raised-projectiles.png`、`knight-target-impact.png`、`lishi-raised-target-lightning.png`；原包姿势接触表为 `work/stationary-cast-source.png`。
+
+旧 `battle_casting_test` 的“普通攻击不恢复灵力”断言在HEAD基线同样失败2处（日志 `work/stationary-battle-casting-baseline.log`），本次按现行技能费用与普攻回灵配置更新预期后61项全过，没有为测试改变战斗规则。未打包、推送或部署。

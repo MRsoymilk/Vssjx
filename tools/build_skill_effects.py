@@ -66,6 +66,9 @@ STAGES = {
 MAPPINGS['user_shuanglong_xizhu']=('用户指定复用排山倒海全部阶段特效',MAPPINGS['sheet_045'][1])
 STAGES['user_shuanglong_xizhu']=STAGES['sheet_045']
 
+STATIONARY = {'sheet_010', 'sheet_015', 'sheet_003', 'sheet_004', 'sheet_005', 'sheet_008'}
+PROJECTILES = {'sheet_003', 'sheet_004', 'sheet_005', 'sheet_008'}
+
 def all_layers(binding):
     return binding['layers']+[layer for stage in binding.get('stages',[]) for layer in stage['layers']]
 
@@ -107,6 +110,13 @@ def build():
             'trigger':'cast_impact' if skill['active'] else ('magic_reflect' if skill['effect']=='reflect_magic' else 'physical_reflect'),
             'reason':reason,'layers':[]}
         binding=bindings[skill['id']]
+        if skill['active'] and (skill['job']==2 or skill['id'] in STATIONARY):
+            binding['actor_motion']='stationary_cast'
+        if skill['id'] in STATIONARY:
+            binding['release_pose']='raised'
+        if skill['id'] in PROJECTILES:
+            binding['delivery']='projectile'
+            binding['travel_seconds']=0.28
         binding['layers']=[layer(key,anchor,True) for key,anchor in layers]
         if skill['id'] in audio:binding['audio_id']=audio[skill['id']]
         if skill['id'] in STAGES:

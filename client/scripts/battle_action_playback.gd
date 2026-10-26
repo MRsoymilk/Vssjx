@@ -2,6 +2,7 @@ class_name BattleActionPlayback
 extends RefCounted
 ## Native ANI state-5 target origin, per-step motion and event-mask timing.
 signal impact
+signal released
 signal completed
 var actor: AnimatedSprite2D
 var action: StringName
@@ -11,6 +12,8 @@ var cancelled := false
 var elapsed := 0.0
 var duration := 0.0
 var impact_time := 0.0
+var release_time := 0.0
+var _released := false
 var home := Vector2.ZERO
 var target := Vector2.ZERO
 var _durations: Array[float] = []
@@ -19,7 +22,7 @@ var _front_root: Node
 var _front_parent: Node
 var _front_index := -1
 
-func start(subject: AnimatedSprite2D, info: Dictionary, target_position: Vector2, mode: StringName = &"attack", receiver: AnimatedSprite2D = null) -> void:
+func start(subject: AnimatedSprite2D, info: Dictionary, target_position: Vector2, mode: StringName = &"attack", receiver: AnimatedSprite2D = null, flight_seconds: float = 0.0, raised_release: bool = false) -> void:
 	if active: cancel()
 	actor = subject
 	action = mode
@@ -31,6 +34,7 @@ func start(subject: AnimatedSprite2D, info: Dictionary, target_position: Vector2
 	elapsed = 0.0
 	duration = 0.0
 	impact_time = 0.0
+	_released = false
 	_durations.clear()
 	_x = []
 	var frames := actor.sprite_frames
@@ -49,6 +53,10 @@ func start(subject: AnimatedSprite2D, info: Dictionary, target_position: Vector2
 	if not hits.is_empty():
 		impact_time = 0.0
 		for index in mini(int(hits[0]),_durations.size()): impact_time += _durations[index]
+	if raised_release and action==&"cast":impact_time=duration-_durations.back()
+	release_time=impact_time
+	impact_time+=maxf(0.0,flight_seconds)
+	duration=maxf(duration,impact_time)
 	actor.play(action)
 	actor.pause()
 	_layer_attacker(receiver)
@@ -83,6 +91,11 @@ func advance(delta: float) -> void:
 	elapsed = minf(duration, elapsed + maxf(0.0, delta))
 	# Some engine/platform scalar paths round the clamped sum below duration.
 	if elapsed>=duration-0.000001:elapsed=duration
+	if not _released and elapsed>=release_time:
+		_sample(release_time)
+		_released=true
+		released.emit()
+	if not active:return
 	if not impacted and elapsed >= impact_time:
 		_sample(impact_time)
 		impacted = true

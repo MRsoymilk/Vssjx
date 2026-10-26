@@ -48,6 +48,7 @@ func _run()->void:
 			var subject:AnimatedSprite2D=app.battle_enemy if job==1 else app.battle_hero
 			check(fx.get_meta("subject_id")==subject.get_instance_id() and fx.get_meta("art_key")==BattleEffects.binding(id).layers[0].art,"Damage targets enemy; support follows caster with the individually mapped art")
 			var previous:Vector2=subject.position;subject.position+=Vector2(16,3);app.battle_effects._process(0)
+			if BattleEffects.projectile_seconds(id)>0:app.battle_effects._process(BattleEffects.projectile_seconds(id))
 			check(aligned(fx,subject),"Local effect stays attached when target moves")
 			subject.position=previous;app.battle_effects._process(0)
 			if job==2:await capture("local-support-effect")
@@ -69,6 +70,7 @@ func _run()->void:
 		view._hero_motion.advance(view._hero_motion.impact_time)
 		check(view.effects.get_child_count()==1,"Online skill impact now displays a one-shot effect")
 		fx=view.effects.get_child(0)
+		if not support:view.effects._process(BattleEffects.projectile_seconds("sheet_003"))
 		var subject:AnimatedSprite2D=view.hero if support else view.enemy
 		check(fx.get_meta("subject_id")==subject.get_instance_id(),"Online support and offensive effects use the same attachment rule")
 		view.present(model);check(view.effects.get_child_count()==1,"Same revision refresh cannot duplicate an effect")

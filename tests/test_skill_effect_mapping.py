@@ -13,6 +13,16 @@ from unittest.mock import patch
 
 
 class SkillEffectMappingTests(unittest.TestCase):
+    def test_stationary_casts_and_projectile_delivery_match_user_actions(self):
+        catalog=build()['bindings']
+        skills=json.loads((ROOT/'client/assets/data/skills-v1.json').read_text('utf8'))['items']
+        chosen={'sheet_010','sheet_015','sheet_003','sheet_004','sheet_005','sheet_008'}
+        flying={'sheet_003','sheet_004','sheet_005','sheet_008'}
+        for skill in skills:
+            binding=catalog[skill['id']]
+            self.assertEqual(binding.get('actor_motion')=='stationary_cast',skill['active'] and (skill['job']==2 or skill['id'] in chosen))
+            self.assertEqual(binding.get('delivery')=='projectile',skill['id'] in flying)
+            if skill['id'] in flying:self.assertEqual(binding['travel_seconds'],0.28)
     def test_every_skill_has_an_explicit_individual_design(self):
         catalog=build()
         self.assertEqual(catalog,json.loads((ROOT/'client/assets/data/skill-effects-v1.json').read_text('utf8')))

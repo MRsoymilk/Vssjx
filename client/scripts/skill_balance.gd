@@ -8,9 +8,8 @@ static func kind(skill:Dictionary)->String:
 	if skill.effect in ["bleed","poison"]:return "dot"
 	if int(skill.damage_percent)==0:return "support"
 	return "aoe" if skill.target=="all_enemies" else "single"
-static func cost(skill:Dictionary,stats:Dictionary)->int:
-	if not revised(stats):return int(skill.mp_cost)
-	return maxi(1,(int(stats.mp)*int(rules.cost_bp[kind(skill)])+9999)/10000)
+static func cost(skill:Dictionary,_stats:Dictionary)->int:
+	return int(skill.mp_cost)
 static func cooldown(skill:Dictionary,stun_enabled:bool=true)->int:
 	return int(skill.stun.cooldown) if stun_enabled and skill.has("stun") else int(rules.cooldowns[kind(skill)])
 static func coefficient(skill:Dictionary,targets:int=1)->int:

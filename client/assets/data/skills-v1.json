@@ -223,13 +223,14 @@
       "chance": 100,
       "legacy_heal": 0,
       "target": "self",
-      "description": "防御加成",
+      "description": "护体2回合，每次受到物理或法术攻击固定抵挡25点伤害，最低降至0点。",
       "source_row": 12,
       "source_role": "昆仑派力士",
       "source_level": "25",
       "original_skill_id": null,
       "source": "analysis/references/player-sheet/source.csv",
-      "rules_basis": "名称、归属与效果文字来自用户资料；等级暂按角色解锁等级；消耗、公式、部分持续时间及武功/心法划分为重建规则"
+      "rules_basis": "名称、归属与效果文字来自用户资料；等级暂按角色解锁等级；消耗、公式、部分持续时间及武功/心法划分为重建规则；按用户要求改为固定25点护体减伤，不按百分比处理",
+      "flat_reduction": 25
     },
     {
       "id": "sheet_013",

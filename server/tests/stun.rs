@@ -15,7 +15,7 @@ fn thunder_keeps_damage_cost_and_exact_chance_with_three_turn_cooldown(){
     assert_eq!(s.stun.as_ref().unwrap().actions,1);
     assert_eq!(skill_balance::kind(s),"single");
     assert_eq!(skill_balance::coefficient(s,1),16000);
-    assert_eq!(skill_balance::cost(s,stats),(stats.mp*900+9999)/10000);
+    assert_eq!(skill_balance::cost(s,stats),9);
     let mut successes=0;
     for roll in 0..100{
         let mut state=skills::State::new(0,3,60,1);state.enable_stun(stats);

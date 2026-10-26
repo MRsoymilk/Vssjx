@@ -19,8 +19,8 @@ def main():
         def cast(ok=True):
             return p.command('',request=dict(operation_id=str(uuid4()),action='skill',target=area['id'],battle_id=p.state['battle']['id'],expected_revision=p.state['battle']['revision']),ok=ok)
         value,request=cast();s=value['state'];fixtures.append(s)
-        cost=(s['stats']['mp']*1600+9999)//10000
-        check(s['battle']['mp']==500-cost,'Actual action spends the same percentage-based MP shown by the picker')
+        cost=area['mp_cost']
+        check(s['battle']['mp']==500-cost,'Actual action spends the same fixed MP shown by the picker')
         check(s['battle']['skills']['balance']['cooldowns'][area['id']]==2,'Fresh area cast starts two full intervening cooldown rounds')
         before=dict(round=s['battle']['round'],mp=s['battle']['mp'],enemy_hp=s['battle']['enemy_hp'])
         failed,_=cast(False);fixtures.append(failed['state'])

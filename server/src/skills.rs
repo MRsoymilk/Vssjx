@@ -31,6 +31,8 @@ pub struct Skill {
     pub active: bool,
     pub mp_cost: i32,
     pub damage_percent: i32,
+    #[serde(default)]
+    pub flat_reduction: i32,
     pub effect: String,
     pub value: i32,
     pub duration: i32,
@@ -105,6 +107,8 @@ pub struct State {
     pub regen_amount: i32,
     pub defense: i32,
     pub defense_percent: i32,
+    #[serde(default,skip_serializing_if="stun_is_zero")]
+    pub defense_flat: i32,
     pub crit: i32,
     pub crit_chance: i32,
     pub reflect_physical: i32,
@@ -237,7 +241,8 @@ impl State {
             }
             "defense" => {
                 self.defense = s.duration;
-                self.defense_percent = s.value;
+                self.defense_flat = s.flat_reduction;
+                self.defense_percent = if s.flat_reduction>0{0}else{s.value};
             }
             "crit" => {
                 self.crit = s.duration;
@@ -288,7 +293,8 @@ impl State {
     pub fn enemy_hit(&self, mut incoming: i32, own_attack: i32, magical: bool) -> (i32, i32) {
         if incoming <= 0 { return (0, 0); }
         if self.defense > 0 {
-            incoming = (incoming * (100 - self.defense_percent) / 100).max(1);
+            incoming = if self.defense_flat>0{incoming.saturating_sub(self.defense_flat).max(0)}
+                else{(i64::from(incoming)*i64::from(100-self.defense_percent.clamp(0,100))/100).max(1) as i32};
         }
         let mut percent = if magical {
             self.passive_magic

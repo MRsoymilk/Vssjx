@@ -48,7 +48,7 @@ fn poison_sleep_synergy_respects_control_protection_and_keeps_dot_clock(){
 #[test]
 fn mage_setup_and_mana_steal_change_the_followup_not_turn_count(){
     let s=stats(4,true,4);let mut fx=skills::State::default();let baseline=cast(s,&mut fx,"sheet_017").0;
-    cast(s,&mut fx,"sheet_039");let (hit,_,mp)=cast(s,&mut fx,"sheet_017");assert_eq!(hit,baseline*14500/10000);assert_eq!(mp,s.mp-vssjx_server::skill_balance::cost(skills::item("sheet_017").unwrap(),s)+s.mp*500/10000);
+    cast(s,&mut fx,"sheet_039");let (hit,_,mp)=cast(s,&mut fx,"sheet_017");assert_eq!(hit,baseline*14500/10000);assert_eq!(mp,(s.mp-vssjx_server::skill_balance::cost(skills::item("sheet_017").unwrap(),s)+s.mp*500/10000).min(s.mp));
     let s=stats(5,true,4);let mut fx=skills::State::default();fx.enemy_mp=40;let (_,hp,_)=cast(s,&mut fx,"sheet_047");assert!(hp>s.hp/2);assert_eq!(fx.enemy_mp,20);
     cast(s,&mut fx,"sheet_018");assert_eq!(fx.bleed_damage,attributes::dot_damage(s,100,3000)*16000/10000);assert_eq!(fx.builds.as_ref().unwrap().charges[5],0);
     let mut old=s;old.balance.as_mut().unwrap().builds=Default::default();let mut fx=skills::State::default();cast(old,&mut fx,"sheet_039");assert!(fx.builds.is_none(),"Frozen old snapshot never reads newly equipped artifacts");

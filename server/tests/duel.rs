@@ -432,6 +432,31 @@ fn paired_actions(arena: &mut Arena, id: Uuid, now: Instant, choices: [(&str, Op
     }
 }
 #[test]
+fn solid_guard_in_duels_spends_fixed_mana_and_blocks_the_opponents_hit(){
+    for magical in [false,true]{
+        let (mut arena,x,y,id,now)=arena();
+        let battle=arena.battles.get_mut(&id).unwrap();
+        for f in &mut battle.fighters{f.stats.hp=3000;f.hp=3000;}
+        battle.fighters[0].speed=300;
+        battle.fighters[1].job=if magical{2}else{1};
+        let cost=skills::item("sheet_012").unwrap().mp_cost;
+        paired_actions(&mut arena,id,now,[("skill",Some("sheet_012")),if magical{("skill",Some("legacy_2"))}else{("attack",None)}]);
+        let battle=&arena.battles[&id];
+        let hit=battle.events.iter().find(|e|e.actor==y).unwrap();
+        let raw=if magical{180-5}else{100-5};
+        assert_eq!(hit.damage,raw-25);
+        assert_eq!(battle.fighters[0].hp,3000-(raw-25));
+        assert_eq!(battle.fighters[0].mp,300-cost);
+        assert_eq!((battle.fighters[0].effects.defense,battle.fighters[0].effects.defense_flat),(1,25));
+        assert!(battle.events.iter().any(|e|e.actor==x&&e.skill=="sheet_012"));
+        let next=now+Duration::from_secs(5);
+        arena.tick(next,&std::collections::HashMap::from([(x,(true,true)),(y,(true,true))]));
+        paired_actions(&mut arena,id,next,[("guard",None),if magical{("skill",Some("legacy_2"))}else{("attack",None)}]);
+        assert_eq!(arena.battles[&id].events.iter().find(|e|e.actor==y).unwrap().damage,(raw/2-25).max(0));
+        assert_eq!(arena.battles[&id].fighters[0].effects.defense,0,"Fixed shield lasts exactly two duel rounds including the cast");
+    }
+}
+#[test]
 fn revised_sleep_and_silence_each_block_one_action_for_fast_and_slow_casters() {
     for effect in ["sleep", "silence"] {
         let skill = skills::ITEMS.iter().find(|s| s.active && s.effect == effect).unwrap();

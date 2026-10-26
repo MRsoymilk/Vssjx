@@ -476,13 +476,14 @@ impl Battle {
                 let refreshed = skills::item(&f.effects.last_skill)
                     .map(|s| s.effect.as_str())
                     .unwrap_or("");
+                let fixed_defense=f.effects.defense_flat>0;
                 for (name, n) in [
                     ("defense", &mut f.effects.defense),
                     ("crit", &mut f.effects.crit),
                     ("reflect_physical", &mut f.effects.reflect_physical),
                     ("reflect_magic", &mut f.effects.reflect_magic),
                 ] {
-                    if name != refreshed {
+                    if name != refreshed || (name=="defense" && fixed_defense) {
                         *n = (*n - 1).max(0);
                     }
                 }

@@ -58,6 +58,10 @@ def build():
     thunder['legacy_description']=thunder['description']
     thunder['description']='单体攻击；命中后35%概率眩晕，跳过目标下一次行动，受击不解除。'
     thunder['rules_basis']+='；眩晕为2026-10-23新增玩法，非原版恢复；原伤害与灵力消耗保留'
+    solid=next(s for s in items if s['id']=='sheet_012')
+    solid['flat_reduction']=25
+    solid['description']='护体2回合，每次受到物理或法术攻击固定抵挡25点伤害，最低降至0点。'
+    solid['rules_basis']+='；按用户要求改为固定25点护体减伤，不按百分比处理'
     for id,name,job,effect,target in [
         ('user_shipo_tianjing','石破天惊',1,'damage','all_enemies'),
         ('user_hengsao_qianjun','横扫千军',0,'damage','all_enemies'),

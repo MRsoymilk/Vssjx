@@ -6,7 +6,7 @@
   "dot_tick_bp":3000,
   "dot_ticks":3,
   "control_direct_bp":6000,
-  "cost_bp":{"single":900,"aoe":1600,"dot":1000,"control":1200,"support":1000},
+  "cost_basis":"fixed_skill_mp_cost",
   "cooldowns":{"single":0,"aoe":2,"dot":1,"control":3,"support":2},
   "basic_restore_bp":300,
   "guard_restore_bp":500,

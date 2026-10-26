@@ -16,11 +16,7 @@ pub fn coefficient(s:&Skill,targets:i32)->i32{
     let raw=match kind(s){"dot"=>n("dot_direct_bp"),"aoe"=>n("aoe_bp"),"control"=>n("control_direct_bp"),_=>n("single_bp")};
     if s.target=="all_enemies"{crate::combat_balance::aoe_coefficient(raw as i64,targets.clamp(1,5) as i64).unwrap() as i32}else{raw}
 }
-pub fn cost(s:&Skill,stats:Stats)->i32{
-    if !revised(stats){return s.mp_cost;}
-    let bp=DATA["cost_bp"][kind(s)].as_i64().unwrap() as i32;
-    ((i64::from(stats.mp)*i64::from(bp)+9999)/10000).max(1) as i32
-}
+pub fn cost(s:&Skill,_stats:Stats)->i32{s.mp_cost}
 pub fn cooldown_for(s:&Skill,stun_enabled:bool)->i32{if stun_enabled && let Some(stun)=s.stun.as_ref(){return stun.cooldown;}DATA["cooldowns"][kind(s)].as_i64().unwrap() as i32}
 pub fn cooldown(s:&Skill)->i32{cooldown_for(s,true)}
 pub fn recovery(stats:Stats,key:&str,legacy:i32)->i32{if revised(stats){(stats.mp*n(key)/10000).max(1)}else{legacy}}

@@ -8,7 +8,7 @@ fn fighter(job:i16)->team_rules::Fighter{
 fn mana_and_cooldowns_cover_all_named_skills_without_touching_legacy(){
     for s in skills::ITEMS.iter(){
         let stats=attributes::balanced_stats(s.job,60,false,[0;5]);
-        assert!(b::cost(s,stats)>0&&b::cost(s,stats)<=stats.mp/5+1);
+        assert_eq!(b::cost(s,stats),s.mp_cost);
         assert!(b::coefficient(s,5)*5<=24000||s.target!="all_enemies");
         let legacy=vssjx_server::pve_rules::stats(s.job,60,false);
         assert_eq!(b::cost(s,legacy),s.mp_cost);
@@ -23,6 +23,65 @@ fn mana_and_cooldowns_cover_all_named_skills_without_touching_legacy(){
     assert_eq!(state.remaining(&s.id),3);state.end_turn();assert_eq!(state.remaining(&s.id),2);
     let encoded=serde_json::to_value(&state).unwrap();let mut state:skills::State=serde_json::from_value(encoded).unwrap();
     state.end_turn();assert_eq!(state.remaining(&s.id),1);state.end_turn();assert_eq!(state.remaining(&s.id),0);
+}
+
+#[test]
+fn more_max_mana_buys_more_casts_without_increasing_any_skill_cost(){
+    for s in skills::ITEMS.iter(){
+        let mut stats=attributes::balanced_stats(s.job,60,false,[0;5]);
+        for max_mp in [1,35,400,800,1000000]{
+            stats.mp=max_mp;
+            assert_eq!(b::cost(s,stats),s.mp_cost,"{} at max MP {max_mp}",s.id);
+        }
+        if s.active{
+            assert!(800/b::cost(s,stats)>400/b::cost(s,stats));
+            let mut state=skills::State::default();let mut hp=stats.hp;let mut mp=400;
+            state.cast(s,stats,&mut hp,&mut mp,0,99);
+            assert_eq!(mp,400-s.mp_cost,"No hidden max-MP charge on {}",s.id);
+        }
+    }
+}
+
+#[test]
+fn solid_guard_blocks_fixed_damage_for_two_rounds_without_increasing_or_overflowing(){
+    let s=skills::item("sheet_012").unwrap();
+    for stats in [vssjx_server::pve_rules::stats(0,60,false),attributes::balanced_stats(0,60,false,[0;5])]{
+        let mut state=skills::State::new(0,3,60,1);let mut hp=stats.hp;let mut mp=stats.mp;
+        state.cast(s,stats,&mut hp,&mut mp,0,99);
+        assert_eq!((hp,mp),(stats.hp,stats.mp-15));
+        assert_eq!((state.defense,state.defense_percent,state.defense_flat),(2,0,25));
+        state=serde_json::from_value(serde_json::to_value(&state).unwrap()).unwrap();
+        for _ in 0..2{
+            for magical in [false,true]{for raw in [0,1,24,25,26,100,10000,i32::MAX]{
+                let damage=state.enemy_hit(raw,stats.attack,magical).0;
+                assert_eq!(damage,(raw-25).max(0));assert!(damage<=raw);
+            }}
+            state.end_turn();
+        }
+        assert_eq!(state.enemy_hit(100,stats.attack,false).0,100);
+        // Another defense skill must replace the old fixed shield rather than stack it.
+        let other=skills::ITEMS.iter().find(|s|s.effect=="defense"&&s.id!="sheet_012").unwrap();
+        state.cast(other,stats,&mut hp,&mut mp,0,99);
+        assert_eq!(state.defense_flat,0);assert_eq!(state.defense_percent,other.value);
+        assert_eq!(state.enemy_hit(100,stats.attack,false).0,100-other.value);
+    }
+}
+
+#[test]
+fn actual_solo_and_formation_solid_guard_reduces_the_same_monster_hit(){
+    let mut stats=vssjx_server::pve_rules::stats(0,25,false);stats.hp=10000;stats.mp=400;
+    let mut enemy=population::definitions().into_iter().find(|r|r.id=="wolf_a").unwrap();enemy.hp=100000;enemy.attack=1000;
+    let mut solo=Battle::new(enemy.clone(),stats.hp,stats.mp,6);
+    let raw=attributes::incoming(enemy.attack,enemy.level,stats,false,0);
+    solo.turn_selected(Action::Skill,0,3,25,stats,0,0,Some("sheet_012"),99).unwrap();
+    assert_eq!(solo.hp,stats.hp-(raw-25).max(0));assert_eq!(solo.mp,385);
+    assert_eq!((solo.skills.defense,solo.skills.defense_flat),(1,25));
+    let mut f=fighter(0);f.level=25;f.stats=stats;f.hp=stats.hp;f.mp=stats.mp;f.effects=skills::State::new(0,3,25,1);let id=f.id;
+    let mut team=team_rules::Battle::new("qingyun_trail".into(),vec![f],vec![enemy.clone(),enemy],1000);
+    team.act(id,"skill",None,Some("sheet_012"),team.selection_starts_ms+1,99).unwrap();
+    let hits:Vec<_>=team.events.iter().filter(|e|e.target==id.to_string()&&e.actor!=id.to_string()).collect();
+    assert_eq!(hits.len(),2);assert!(hits.iter().all(|e|e.damage==(raw-25).max(0)));
+    assert_eq!(team.fighters[0].mp,385);assert_eq!((team.fighters[0].effects.defense,team.fighters[0].effects.defense_flat),(1,25));
 }
 #[test]
 fn cast_validation_rejects_cooling_skill_without_spending_or_advancing(){

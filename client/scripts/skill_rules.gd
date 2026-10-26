@@ -46,6 +46,7 @@ static func valid_view(view:Variant,character:Dictionary)->bool:
 	return true
 
 static func valid_state(state:Variant)->bool:
+	if state is Dictionary and state.has("defense_flat") and not OnlinePve.integer(state.defense_flat,0,1000000):return false
 	if state is Dictionary and state.has("proficiency") and not SkillProficiency.valid(state.proficiency):return false
 	if state is Dictionary and state.has("last_skill_level") and not OnlinePve.integer(state.last_skill_level,0,15):return false
 	if state is Dictionary and state.has("builds") and not BuildRules.valid_progress(state.builds):return false
@@ -139,7 +140,12 @@ static func cast(skill:Dictionary,state:Dictionary,stats:Dictionary,hp:int,mp:in
 				control_applied=true
 				if state.has("balance"):state.balance.control_protection=int(SkillBalance.rules.control_protection)
 		"regen":state.regen=duration;state.regen_amount=maxi(1,int(stats.hp)*value/100)
-		"defense":state.defense=duration;state.defense_percent=value
+		"defense":
+			state.defense=duration
+			if int(skill.get("flat_reduction",0))>0:
+				state.defense_flat=int(skill.flat_reduction);state.defense_percent=0
+			else:
+				state.erase("defense_flat");state.defense_percent=value
 		"crit":state.crit=duration;state.crit_chance=value
 		"reflect_physical":state.reflect_physical=duration;state.physical_percent=value
 		"reflect_magic":state.reflect_magic=duration;state.magic_percent=value
@@ -166,7 +172,9 @@ static func after_player(state:Dictionary,hp:int,max_hp:int)->Dictionary:
 
 static func enemy_hit(state:Dictionary,incoming:int,own_attack:int,magical:bool=false)->Vector2i:
 	if incoming<=0:return Vector2i.ZERO
-	if int(state.defense)>0:incoming=maxi(1,incoming*(100-int(state.defense_percent))/100)
+	if int(state.defense)>0:
+		if int(state.get("defense_flat",0))>0:incoming=maxi(0,incoming-int(state.defense_flat))
+		else:incoming=maxi(1,incoming*(100-clampi(int(state.defense_percent),0,100))/100)
 	var percent:=int(state.passive_magic if magical else state.passive_physical)
 	if int(state.reflect_magic if magical else state.reflect_physical)>0:percent=maxi(percent,int(state.magic_percent if magical else state.physical_percent))
 	# Both physical and magical reflection use the defender's own attack.

@@ -46,7 +46,7 @@ func select_skill(index:int)->void:
 		elif skill.target=="all_enemies":detail.text+=" · 群攻总倍率最多240%"
 		elif SkillBalance.kind(skill)=="control":detail.text+=" · 65%概率控制1轮，之后保护2轮"
 		elif int(skill.damage_percent)>0:detail.text+=" · 威力160%"
-	if balanced and skill.active:detail.text+="\n消耗最大灵力%d%% · 冷却%d轮"%[int(SkillBalance.rules.cost_bp[SkillBalance.kind(skill)])/100,SkillBalance.cooldown(skill)]
+	if balanced and skill.active:detail.text+="\n消耗灵力%d点 · 冷却%d轮"%[SkillBalance.cost(skill,{}),SkillBalance.cooldown(skill)]
 	elif int(skill.mp_cost)>0:detail.text+="\n（消耗灵力%d）"%int(skill.mp_cost)
 	detail.text+="\n%d级解锁"%int(skill.unlock_level) if level<int(skill.unlock_level) else ("\n已生效" if not skill.active else "\n已解锁 · %d级可用"%int(skill.unlock_level))
 	for i in rows.get_child_count():

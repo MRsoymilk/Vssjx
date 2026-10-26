@@ -23,7 +23,7 @@ func _ready() -> void:
 	var catalog := CATALOG.new()
 	catalog.reload()
 	check(catalog.errors.is_empty(), "All JSON sources load")
-	var counts := {"weapons": 140, "equipment": 390, "items": 667, "characters": 1145, "quests": 658, "maps": 431, "enemies": 577, "effects": 159, "art": 235, "archive": 1917}
+	var counts := {"weapons": 140, "equipment": 390, "items": 667, "characters": 1145, "quests": 658, "maps": 431, "enemies": 577, "skills":102, "effects": 159, "art": 277, "archive": 1917}
 	for category in counts:
 		check(catalog.find(category).size() == counts[category], "Expected current definitions for " + category)
 	var keys: Dictionary = {}
@@ -58,7 +58,12 @@ func _ready() -> void:
 	check(catalog.find("enemies", "zbjl2", "原包资源").size() == 1, "Original monster resource IDs are searchable")
 	check(catalog.find("effects", "", "原包资源").size() == 159, "Every original effect animation is indexed")
 	for entry in catalog.find("effects"):
-		check(entry.data["原版名称"] == null and entry.data["原版特效ID"] == null and entry.data["技能对应关系"] == null, "No invented effect names or skill rules: " + entry.id)
+		check(entry.data["原版名称"] == null and entry.data["原版特效ID"] == null and entry.data["原服技能对应关系"] == null, "Original evidence remains distinct from project skill mappings: " + entry.id)
+	check(catalog.find("skills","雷霆一击").size()==4,"Base and all three upgrade stages are independently indexed")
+	check(catalog.find("skills","石破天惊").size()==4,"Added skill includes all stages in resource manager")
+	check(catalog.find("effects","雷霆一击").size()==4,"Effect resources link back to their actual skill stages")
+	var stage_record:Dictionary=catalog.find("skills","雷霆一击 阶段3")[0]
+	check(stage_record.preview.art=="effect/t174" and stage_record.data["阶段起始技能等级"]==15,"Manager preview uses corrected final-stage resource")
 	check(catalog.find("archive", "", "未解析").size() == 9 and catalog.find("archive", "", "部分解析").size() == 321, "Unsupported and partially parsed members remain archived")
 	check(catalog.find("archive", "archive/ssjx.mrp/sfc.bin").size() == 1, "Unsupported binary is searchable by original archive path")
 	for entry in catalog.find("enemies", "", "原包资源"):

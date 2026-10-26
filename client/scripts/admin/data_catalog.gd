@@ -16,7 +16,7 @@ const RESOURCE_ARCHIVE := "res://assets/admin/archive/catalog.json"
 const CATEGORIES := [
 	["weapons", "武器"], ["equipment", "人物装备"], ["appearance", "装备外观"], ["items", "物品"],
 	["characters", "人物"], ["quests", "任务 / 线索"], ["maps", "地图"],
-	["enemies", "怪物"], ["effects", "特效"], ["audio", "音频"], ["art", "素材 / 动画"], ["archive", "原包归档"]
+	["enemies", "怪物"], ["skills", "技能 / 升级阶段"], ["effects", "特效"], ["audio", "音频"], ["art", "素材 / 动画"], ["archive", "原包归档"]
 ]
 var entries: Array[Dictionary] = []
 var errors: Array[String] = []
@@ -95,6 +95,7 @@ func reload() -> void:
 		_add("enemies", enemy.id, enemy.name, "气血 %s / 攻击 %s / %s" % [enemy.hp, enemy.attack, data["区域"]], "已接入", "res://scripts/world.gd", data, {"kind": "actor", "art": enemy.art})
 	_load_original_monsters()
 	_load_original_effects()
+	_load_skills()
 	_load_audio()
 	_load_resource_archive()
 	_load_maps()
@@ -104,6 +105,37 @@ func reload() -> void:
 		var info := ART.actor_info(key)
 		if info.is_empty(): continue
 		_add("art", key, key, "Godot场景 · %s 帧 · %s × %s" % [info.get("count", 0), info.get("width", 0), info.get("height", 0)], "资源", ART.scene_path(key), info, {"kind": "actor", "art": key})
+
+func _skill_usages() -> Dictionary:
+	var usages:Dictionary={}
+	for skill in SkillRules.catalog.items:
+		var binding:=BattleEffects.binding(skill.id)
+		var groups:Array=[{"level":1,"layers":binding.get("layers",[])}]+binding.get("stages",[])
+		for group in groups:
+			var rank:=int(group.level)
+			for layer in group.layers:
+				var key:String=layer.art
+				if not usages.has(key):usages[key]=[]
+				usages[key].append({"技能":skill.name,"技能ID":skill.id,"职业":STATE.JOBS[int(skill.job)],"阶段":SkillProficiency.stage(rank),"技能等级":rank,"附着":layer.anchor})
+	return usages
+
+func _load_skills() -> void:
+	for skill in SkillRules.catalog.items:
+		var binding:=BattleEffects.binding(skill.id)
+		var groups:Array=[{"level":1,"layers":binding.get("layers",[])}]+binding.get("stages",[])
+		for group in groups:
+			var rank:=int(group.level)
+			var stage:=SkillProficiency.stage(rank)
+			var label:String="基础 · 1～5级" if stage==0 and groups.size()>1 else "基础 · 沿用" if stage==0 else "阶段%d · %d%s"%[stage,rank,"级" if rank==15 else "～9级" if rank==6 else "～14级"]
+			var resources:Array=[]
+			for layer in group.layers:resources.append(String(layer.art).trim_prefix("effect/"))
+			var data:Dictionary=skill.duplicate(true)
+			data["阶段"]=stage;data["阶段起始技能等级"]=rank
+			data["最大技能等级"]=15;data["每级熟练度"]=int(SkillProficiency.rules.casts_per_level)
+			data["原包资源"]=resources;data["特效图层"]=group.layers.duplicate(true)
+			data["对应依据"]=binding.get("stage_basis",binding.get("basis",""))
+			var preview:Dictionary={"kind":"actor","art":group.layers[0].art} if not group.layers.is_empty() else {}
+			_add("skills",String(skill.id)+"/stage_"+str(stage),skill.name+" · "+label,"%s · 角色%d级解锁 · %s"%[STATE.JOBS[int(skill.job)],int(skill.unlock_level)," → ".join(PackedStringArray(resources))],"已接入","res://assets/data/skill-effects-v1.json",data,preview)
 
 func _load_audio() -> void:
 	for entry in GameAudio.catalog.items:
@@ -200,6 +232,7 @@ func _load_resource_archive() -> void:
 		_add("archive", record.id, record.resource_path, "%s · %s 字节 · %s" % [record.status, bytes_text, record.reason], record.status, RESOURCE_ARCHIVE, data, preview)
 
 func _load_original_effects() -> void:
+	var usages:=_skill_usages()
 	var manifest := _read_json(ORIGINAL_EFFECTS)
 	if manifest.get("format_version") != 1 or manifest.get("source_package") != "ssjx/effect.mrp" or not manifest.get("effects") is Array:
 		errors.append("原包特效目录身份或格式不正确")
@@ -209,17 +242,18 @@ func _load_original_effects() -> void:
 		return
 	for record in manifest.effects:
 		var info: Dictionary = record.animation
-		if not FileAccess.file_exists(info.texture):
+		if not ResourceLoader.exists(info.texture,"Texture2D"):
 			errors.append("原包特效图集缺失：" + record.resource_id)
 			continue
 		var data := {
-			"资源编号": record.resource_id, "原版名称": null, "原版特效ID": null, "技能对应关系": null,
+			"资源编号": record.resource_id, "原版名称": null, "原版特效ID": null, "原服技能对应关系": null,
+			"当前项目技能对应关系":usages.get("effect/"+String(record.resource_id),[]),
 			"恢复范围": "原包特效动画素材；名称、技能对应关系与业务规则尚未恢复",
 			"动画说明": "source_N 对应原始序列编号；原始帧索引与时长完整保留",
 			"来源资源": record.duplicate(true), "原包SHA256": manifest.source_sha256
 		}
 		_add("effects", record.id, record.display_name,
-			"%d 帧 · %d 组原始序列 · 名称 / 技能对应关系未恢复" % [int(info.count), info.sequences.size()],
+			"%d 帧 · %d 组原始序列 · 项目技能对应%d处" % [int(info.count), info.sequences.size(),usages.get("effect/"+String(record.resource_id),[]).size()],
 			"原包资源", ORIGINAL_EFFECTS, data, {"kind": "original_animation", "animation": info})
 
 func _load_original_world() -> void:

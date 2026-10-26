@@ -449,6 +449,69 @@ fn poison_is_unreflectable_and_ticks_full_caster_attack_even_against_guard_and_r
     panic!("Expected an ordinary landed poison cast");
 }
 #[test]
+fn poison_never_reflects_across_active_buffs_initiative_and_later_rounds() {
+    for modern in [false, true] {
+        for first in [0, 1] {
+            for passive in [false, true] {
+                let mut observed = false;
+                for _ in 0..40 {
+                    let (mut arena, x, y, id, mut now) = revised_arena([1, 0], first);
+                    let b = arena.battles.get_mut(&id).unwrap();
+                    if !modern {
+                        for f in &mut b.fighters {
+                            f.stats.balance = None;
+                            f.effects = skills::State::new(f.job, f.school, f.level, 60);
+                        }
+                    }
+                    if !passive {
+                        b.fighters[1].effects.passive_physical = 0;
+                        b.fighters[1].effects.passive_magic = 0;
+                    }
+                    let initial = [b.fighters[0].hp, b.fighters[1].hp];
+                    let attack = b.fighters[0].stats.attack;
+                    let online = std::collections::HashMap::from([(x, (true, true)), (y, (true, true))]);
+                    // Cast the real reflection skill before poisoning; an active-only
+                    // defender must also reject reflection, without relying on a passive.
+                    paired_actions(&mut arena, id, now, [("guard", None), ("skill", Some("sheet_011"))]);
+                    let target = &arena.battles[&id].fighters[1];
+                    assert!(target.effects.enemy_hit(1, target.stats.attack, false).1 > 0);
+                    now += Duration::from_secs(5);
+                    arena.tick(now, &online);
+                    paired_actions(&mut arena, id, now, [("skill", Some("sheet_052")), ("guard", None)]);
+                    let b = &arena.battles[&id];
+                    let event = b.events.iter().find(|e| e.actor == x).unwrap();
+                    if event.missed { continue; }
+                    let ticks = if modern { 3 } else { 2 };
+                    let first_tick = i32::from(modern || first == 0);
+                    assert_eq!(event.reflected, 0, "Poison's initial hit cannot reflect");
+                    assert_eq!(b.fighters[0].hp, initial[0]);
+                    assert_eq!(b.fighters[1].hp, initial[1] - event.damage - first_tick * attack);
+                    assert_eq!(b.fighters[0].effects.enemy_poison, ticks - first_tick);
+                    for _ in 0..ticks {
+                        let before = arena.battles[&id].fighters[1].hp;
+                        let remaining = arena.battles[&id].fighters[0].effects.enemy_poison;
+                        now += Duration::from_secs(5);
+                        arena.tick(now, &online);
+                        // Refresh reflection while poison is ticking. Neither the
+                        // active buff nor its combination with passives may reflect DOT.
+                        paired_actions(&mut arena, id, now, [("guard", None), ("skill", Some("sheet_011"))]);
+                        let b = &arena.battles[&id];
+                        assert_eq!(b.fighters[0].hp, initial[0], "Poison cannot hurt its caster");
+                        assert_eq!(b.fighters[1].hp, before - if remaining > 0 { attack } else { 0 });
+                        assert!(b.events.iter().all(|e| e.reflected == 0));
+                        assert!(b.fighters.iter().all(|f| f.effects.last_reflected == 0));
+                        assert!(!b.lines.iter().any(|line| line.contains("反弹")));
+                    }
+                    assert_eq!(arena.battles[&id].fighters[0].effects.enemy_poison, 0);
+                    observed = true;
+                    break;
+                }
+                assert!(observed, "No landed poison sample: modern={modern}, first={first}, passive={passive}");
+            }
+        }
+    }
+}
+#[test]
 fn attack_based_heals_keep_the_full_attack_amount_in_duels(){
     for skill in ["sheet_039","sheet_041"]{
         let(mut arena,_,_,id,now)=revised_arena([2,1],0);

@@ -24,6 +24,13 @@ func page_text(detail: EquipmentDetails) -> String:
 
 func _run() -> void:
 	await Game.when_ready()
+	var vectors:=OS.get_environment("SSJX_SCORE_VECTORS")
+	if not vectors.is_empty():
+		for row in JSON.parse_string(FileAccess.get_file_as_string(vectors)):
+			check(LootRules.score(row.item)==int(row.score),"Rust/Godot equipment score parity across all slots and roll units")
+			check(LootRules.entry_score(LootRules.bag_item(row.item))==int(row.score),"Backpack instance scores use the same authoritative item values")
+	check(LootRules.entry_score({})==0 and LootRules.entry_score(ShopRules.bag_item("potion"))==0,"Empty slots and non-equipment have no score")
+	check(LootRules.entry_score(ShopRules.bag_item("sword"))==3,"Fixed shop equipment receives a score from its true base stats")
 	var old:=Game.player.duplicate(true);var old_path:=Game.save_path;var outbox:=OnlineAccount.pending_pve.duplicate(true)
 	OnlineAccount.pending_pve={};Game.save_path="user://equipment_details_%d.json"%OS.get_process_id()
 	Game.new_player("装备详情",0,3);Game.player.level=60;Game.player.gold=50000;Game.restore()
@@ -39,12 +46,18 @@ func _run() -> void:
 	var detail:=open_details(bag,rolled.id)
 	check(is_instance_valid(detail) and not bag.tooltip.visible and bag.item_menu==null,"Backpack View opens its own equipment paper instead of the tiny tooltip")
 	check(detail.item.instance_id==rolled.id and detail.title.text==LootRules.bag_item(rolled).name,"Same-template items are identified by their owned UUID")
+	check(detail.score_label.text==str(LootRules.score(rolled)) and detail.score_change.text=="空槽","The first detail page prominently shows the selected instance score and empty-slot comparison")
+	check(detail.meta.text.contains("未绑") and not detail.title.text.contains("绑"),"The binding state comes from the actual instance")
+	await get_tree().process_frame
+	check(detail.content.get_combined_minimum_size().y<=detail.scroll.size.y,"Seven property rows fit the enlarged detail page without hidden affixes")
+	check(detail.scroll.get_rect().end.y<=detail.requirements.position.y and detail.requirements.get_rect().end.y<=detail.previous.position.y and detail.previous.get_rect().end.y<=detail.back.position.y,"Properties, requirements, paging and actions never overlap")
 	var all_text:=page_text(detail)
 	check(all_text.contains("4 / 6") and all_text.contains("双防 +75") and all_text.contains("气血 +194"),"Details show the actual upgraded base attributes")
 	for affix in rolled.affixes:check(all_text.contains(LootRules.affix_text(affix)),"Every rolled affix is readable across pages")
 	check(detail.pages.size()>=2 and detail.previous.disabled and not detail.next.disabled,"Long equipment data has real pagination")
 	await capture("01-details")
 	detail.next.pressed.emit();check(detail.page==1 and not detail.previous.disabled,"Next page exposes the remaining properties")
+	check(detail.score_label.visible and detail.score_label.text==str(LootRules.score(rolled)),"Score stays visible when paging attributes")
 	await capture("02-details-page2")
 	var index:=bag.selected_index;bag.select_item(0);check(bag.selected_index==index,"Modal inspection does not retarget the backpack behind it")
 	check(Game.player==before and OnlineAccount.pending_pve.is_empty(),"Reading and paging never mutate equipment or send commands")
@@ -56,6 +69,7 @@ func _run() -> void:
 	detail=open_details(bag,"sword")
 	check(not detail.item.has("instance_id") and detail.meta.text.contains("固定") and page_text(detail).contains("无随机词条"),"Fixed shop equipment uses its catalog properties without fabricated affixes")
 	check(not detail.title.text.contains("绑"),"A binding flag is not invented for equipment without binding data")
+	check(detail.score_label.text=="3","Fixed equipment details use the same score as its legacy instance")
 	await capture("04-fixed")
 	await get_tree().process_frame
 	var escape:=InputEventKey.new();escape.keycode=KEY_ESCAPE;escape.pressed=true
@@ -73,9 +87,12 @@ func _run() -> void:
 	for value in model.state.loot.state.items:
 		if value.id==other.id:value.upgrade=2
 	model.changed.emit();check(page_text(detail).contains("2 / 6"),"An authoritative update refreshes the currently inspected item")
+	var updated:Dictionary=model.state.loot.state.items.filter(func(value:Dictionary)->bool:return value.id==other.id)[0]
+	check(detail.score_label.text==str(LootRules.score(updated)),"Server refresh immediately recomputes the selected UUID's score")
 	model.ready=false;model.changed.emit();check(detail.meta.text.contains("离线快照"),"Disconnected inspection labels its last known snapshot")
 	model.state.loot.state.items=model.state.loot.state.items.filter(func(value:Dictionary)->bool:return value.id!=other.id)
 	model.changed.emit();check(detail.item.is_empty() and detail.meta.text.contains("已不在"),"Removed equipment does not fall back to another copy of its template")
+	check(detail.score_label.text=="—" and detail.score_change.text.is_empty(),"Removing equipment clears its score instead of showing another copy")
 	await capture("05-removed")
 	check(Game.player==before and OnlineAccount.pending_pve.is_empty(),"Online viewing preserves offline progress and the command outbox")
 	bag.queue_free();fixture.free();await get_tree().process_frame

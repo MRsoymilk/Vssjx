@@ -6,6 +6,7 @@ use std::{collections::{BTreeMap,BTreeSet},sync::LazyLock};
 use uuid::Uuid;
 use sha2::{Digest,Sha256};
 pub static DATA:LazyLock<Value>=LazyLock::new(||serde_json::from_str(include_str!("../../shared/data/loot-v1.json")).unwrap());
+static SCORE_DATA:LazyLock<Value>=LazyLock::new(||serde_json::from_str(include_str!("../../shared/data/equipment-score-v1.json")).unwrap());
 static HASH:LazyLock<String>=LazyLock::new(||format!("{:x}",Sha256::digest(include_str!("../../shared/data/loot-v1.json").replace("\r\n","\n").as_bytes())));
 fn n(key:&str)->i32{DATA[key].as_i64().unwrap() as i32}
 #[derive(Clone,Debug,Serialize,Deserialize,PartialEq)]
@@ -47,6 +48,18 @@ impl Dice{
 }
 pub fn range(kind:&str,level:i32)->Option<(i32,i32)>{let v=DATA["affixes"].get(kind)?;Some(((v[0].as_i64()? as i32*level/60).max(1),(v[1].as_i64()? as i32*level/60).max(1)))}
 impl Item{
+    /// Attribute score for comparing equipment; special build effects are separate.
+    /// Derived from authoritative values, never persisted or accepted from clients.
+    pub fn score(&self)->i32{
+        let (power,defense,hp,mana)=self.base();
+        let mut total=0i64;
+        for (kind,value) in [("power",power),("defense",defense),("hp",hp),("mana",mana)]
+            .into_iter().chain(self.affixes.iter().map(|a|(a.kind.as_str(),a.value))) {
+            total+=i64::from(value.max(0))*SCORE_DATA["weights"][kind].as_i64().unwrap_or(0);
+        }
+        let scale=SCORE_DATA["scale"].as_i64().unwrap();
+        if total>0{((total+scale/2)/scale).max(1).min(i64::from(i32::MAX)) as i32}else{0}
+    }
     pub fn definition(&self)->&'static shop::Item{shop::item(&self.template).expect("validated equipment template")}
     pub fn slot(&self)->&str{&self.definition().slot}
     pub fn valid(&self,job:i16,gender:i16)->bool{

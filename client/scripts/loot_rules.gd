@@ -3,6 +3,8 @@ extends RefCounted
 ## Offline and wire validation for character-owned equipment; never invents online loot.
 static var rules:Dictionary=JSON.parse_string(FileAccess.get_file_as_string("res://assets/data/loot-v1.json"))
 static var catalog_hash:String=FileAccess.get_file_as_string("res://assets/data/loot-v1.json").replace("\r\n","\n").sha256_text()
+static var score_rules:Dictionary=JSON.parse_string(FileAccess.get_file_as_string("res://assets/data/equipment-score-v1.json"))
+const SCORE_HINT := "按基础属性和追加词条评分，强化计入基础值。传奇、套装特效另看说明；适合同部位比较。"
 static var _uuid_pattern:RegEx=RegEx.create_from_string("^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\\z")
 static func uuid()->String:
 	var bytes:=Crypto.new().generate_random_bytes(16)
@@ -222,10 +224,27 @@ static func bag_item(i:Dictionary)->Dictionary:
 	entry.instance_id=i.id;entry.instance=i;entry.level=int(i.level);entry.count=1
 	return entry
 
+static func _score(values:Array,affixes:Array)->int:
+	var total:=0
+	var kinds:=["power","defense","hp","mana"]
+	for index in 4:total+=maxi(0,int(values[index]))*int(score_rules.weights[kinds[index]])
+	for affix in affixes:total+=maxi(0,int(affix.value))*int(score_rules.weights.get(affix.kind,0))
+	var scale:=int(score_rules.scale)
+	return maxi(1,(total+scale/2)/scale) if total>0 else 0
+
+static func score(i:Dictionary)->int:
+	return _score(base(i),i.get("affixes",[]))
+
+static func entry_score(entry:Dictionary)->int:
+	if entry.is_empty() or not ShopRules.is_equipment(entry):return 0
+	if entry.has("instance_id"):return score(entry.instance)
+	return _score([int(entry.get("attack",0)),int(entry.get("defense",0)),0,0],[])
+
 static func describe(i:Dictionary)->String:
 	var d:=ShopRules.item(i.template);var v:=base(i)
 	var parts:Array[String]=["%s · %s · 物等%d"%[d.name,{"legacy":"原有固定装备","white":"普通","blue":"魔法","yellow":"稀有","orange":"传奇","green":"套装"}.get(i.quality,i.quality),int(i.level)]]
 	parts.append("主攻+%d  双防+%d  气血+%d  灵力+%d"%v)
+	parts.append("装备评分：%d"%score(i))
 	parts.append("已绑定 · 不可交易" if i.get("bound",true) else "未绑定 · 可交易 · 穿戴后绑定")
 	var job:=int(d.job)
 	var build_id:Variant=i.get("legendary") if i.get("legendary")!=null else i.get("set_id")

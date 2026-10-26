@@ -8,6 +8,7 @@ PAIRS = (
     ('shared/data/builds-v1.json', 'client/assets/data/builds-v1.json'),
     ('shared/data/monster-combat-v1.json', 'client/assets/data/monster-combat-v1.json'),
     ('shared/data/loot-v1.json', 'client/assets/data/loot-v1.json'),
+    ('shared/data/equipment-score-v1.json', 'client/assets/data/equipment-score-v1.json'),
     ('shared/data/skill-balance-v1.json', 'client/assets/data/skill-balance-v1.json'),
     ('shared/data/balance-v1.json', 'client/assets/data/balance-v1.json'),
     ('shared/data/balance-v1-vectors.json', 'client/tests/fixtures/balance-v1-vectors.json'),

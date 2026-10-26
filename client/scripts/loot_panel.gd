@@ -109,7 +109,7 @@ func refresh()->void:
 		var place:="待领取" if pending.has(i) else ("已穿戴" if i.equipped else "未穿戴")
 		var quality:String={"legacy":"固定","white":"普通","blue":"魔法","yellow":"稀有","orange":"传奇","green":"套装"}.get(i.quality,"")
 		list.add_item("[%s] %s"%[place,entry.name],load(entry.icon))
-		list.set_item_tooltip(list.item_count-1,"%s · %s · %d级\n编号 %s"%[entry.name,quality,int(i.level),String(i.id).right(8)])
+		list.set_item_tooltip(list.item_count-1,"%s · %s · %d级\n装备评分：%d\n编号 %s"%[entry.name,quality,int(i.level),LootRules.score(i),String(i.id).right(8)])
 		list.set_item_custom_fg_color(list.item_count-1,{"blue":Color("9de4ff"),"yellow":GOLD,"orange":Color("ffb65a"),"green":Color("8df0b0")}.get(i.quality,INK))
 		if i.id==selected_id:list.select(list.item_count-1)
 	if not rows.is_empty() and list.get_selected_items().is_empty():list.select(0);selected_id=rows[0].id

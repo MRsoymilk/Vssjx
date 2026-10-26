@@ -16,6 +16,8 @@ var page := 0
 var paper: Panel
 var title: Label
 var meta: Label
+var score_label: Label
+var score_change: Label
 var requirements: Label
 var scroll: ScrollContainer
 var content: VBoxContainer
@@ -53,25 +55,30 @@ func _ready() -> void:
 	theme=preload("res://scenes/ui/shop_category_theme.tres")
 	var shade:=ColorRect.new();shade.color=Color(0,0,0,0.35);shade.size=size;shade.mouse_filter=Control.MOUSE_FILTER_IGNORE;add_child(shade)
 	detail_view=Control.new();detail_view.size=size;detail_view.mouse_filter=Control.MOUSE_FILTER_IGNORE;add_child(detail_view)
-	paper=Paper.frame(detail_view,Rect2(27,119,266,261),"装备详情");title=paper.get_node("Title")
-	meta=OriginalSceneChrome.label(detail_view,"",Rect2(41,151,238,16),11,Paper.INK)
-	OriginalSceneChrome.panel(detail_view,Rect2(41,168,238,1),Color("d3bc73"),Color("d3bc73"))
-	scroll=ScrollContainer.new();scroll.position=Vector2(41,175);scroll.size=Vector2(238,122)
+	paper=Paper.frame(detail_view,Rect2(27,99,266,308),"装备信息");title=paper.get_node("Title")
+	meta=OriginalSceneChrome.label(detail_view,"",Rect2(41,131,238,16),11,Paper.INK)
+	OriginalSceneChrome.panel(detail_view,Rect2(41,151,238,26),Color("f3e3a0"),Color("d3bc73"))
+	OriginalSceneChrome.label(detail_view,"装备评分：",Rect2(49,154,76,20),12,Paper.INK)
+	score_label=OriginalSceneChrome.label(detail_view,"—",Rect2(126,152,72,24),16,Paper.RED);score_label.name="EquipmentScore"
+	score_label.tooltip_text=LootRules.SCORE_HINT;score_label.mouse_filter=Control.MOUSE_FILTER_PASS
+	score_change=OriginalSceneChrome.label(detail_view,"",Rect2(198,155,73,18),10,Paper.INK);score_change.name="ScoreChange"
+	score_change.horizontal_alignment=HORIZONTAL_ALIGNMENT_RIGHT;score_change.mouse_filter=Control.MOUSE_FILTER_PASS
+	scroll=ScrollContainer.new();scroll.position=Vector2(41,185);scroll.size=Vector2(238,144)
 	scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED;detail_view.add_child(scroll)
 	content=VBoxContainer.new();content.size_flags_horizontal=Control.SIZE_EXPAND_FILL
 	content.add_theme_constant_override("separation",5);scroll.add_child(content)
-	requirements=OriginalSceneChrome.label(detail_view,"",Rect2(41,304,238,24),10,Paper.INK)
+	requirements=OriginalSceneChrome.label(detail_view,"",Rect2(41,331,238,24),10,Paper.INK)
 	requirements.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
-	previous=OriginalSceneChrome.button(detail_view,"◀",Rect2(113,328,27,20),12)
-	next=OriginalSceneChrome.button(detail_view,"▶",Rect2(181,328,27,20),12)
+	previous=OriginalSceneChrome.button(detail_view,"◀",Rect2(113,359,27,20),12)
+	next=OriginalSceneChrome.button(detail_view,"▶",Rect2(181,359,27,20),12)
 	for button in [previous,next]:
 		button.add_theme_color_override("font_color",Paper.INK);button.add_theme_color_override("font_disabled_color",Color("b9a66b"))
 		button.add_theme_stylebox_override("disabled",StyleBoxEmpty.new())
 	previous.pressed.connect(_turn_page.bind(-1));next.pressed.connect(_turn_page.bind(1))
-	page_label=OriginalSceneChrome.label(detail_view,"",Rect2(140,328,41,20),11,Paper.INK);page_label.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
-	compare_button=Paper.button(detail_view,"装备对比",Rect2(39,349,77,23));compare_button.name="Compare";compare_button.pressed.connect(show_comparison)
-	craft_button=Paper.button(detail_view,"前往洗练",Rect2(122,349,77,23));craft_button.name="Crafting";craft_button.pressed.connect(open_crafting)
-	back=Paper.button(detail_view,"返回",Rect2(205,349,75,23));back.name="Back";back.pressed.connect(func()->void:back_requested.emit())
+	page_label=OriginalSceneChrome.label(detail_view,"",Rect2(140,359,41,20),11,Paper.INK);page_label.horizontal_alignment=HORIZONTAL_ALIGNMENT_CENTER
+	compare_button=Paper.button(detail_view,"装备对比",Rect2(39,382,77,23));compare_button.name="Compare";compare_button.pressed.connect(show_comparison)
+	craft_button=Paper.button(detail_view,"前往洗练",Rect2(122,382,77,23));craft_button.name="Crafting";craft_button.pressed.connect(open_crafting)
+	back=Paper.button(detail_view,"返回",Rect2(205,382,75,23));back.name="Back";back.pressed.connect(func()->void:back_requested.emit())
 	_build_comparison()
 	if online_model!=null:
 		_bound_character=online_model.character_id
@@ -112,11 +119,11 @@ func _make_pages(entry: Dictionary) -> Array:
 	if not instance.is_empty() and not instance.legacy:rows.append({"label":"强化：","text":"%d / 6"%int(instance.upgrade)})
 	var base:=_base(entry);var names:=[_attack_name(),"双防","气血","灵力"]
 	for i in base.size():
-		if int(base[i])>0:rows.append({"label":"基础：","text":"%s +%d"%[names[i],int(base[i])]})
-	for i in instance.get("affixes",[]).size():rows.append({"label":"附加%d："%[i+1],"text":LootRules.affix_text(instance.affixes[i])})
+		if int(base[i])>0:rows.append({"label":"基础属性：","text":"%s +%d"%[names[i],int(base[i])]})
+	for i in instance.get("affixes",[]).size():rows.append({"label":"追加%d："%[i+1],"text":LootRules.affix_text(instance.affixes[i])})
 	if instance.get("affixes",[]).is_empty():rows.append({"label":"","text":"固定属性，无随机词条。" if instance.get("legacy",true) else "普通装备，无随机词条。","note":true})
 	var result: Array=[]
-	for i in range(0,rows.size(),6):result.append(rows.slice(i,i+6))
+	for i in range(0,rows.size(),7):result.append(rows.slice(i,i+7))
 	if not instance.is_empty() and not instance.legacy:
 		var extra: Array=[]
 		if instance.get("legendary")!=null or instance.get("set_id")!=null:
@@ -133,6 +140,7 @@ func _make_pages(entry: Dictionary) -> Array:
 func refresh() -> void:
 	if not is_node_ready():return
 	item=_resolve();pages=[]
+	score_label.text="—";score_change.text="";score_change.tooltip_text=""
 	if item.is_empty():
 		title.text="装备详情";meta.text="该装备已不在背包中";requirements.text="返回背包选择其他装备。"
 		pages=[[{"label":"","text":"装备可能已分解、丢弃或转移。","note":true}]]
@@ -140,7 +148,13 @@ func refresh() -> void:
 		title.text=item.name;title.tooltip_text=item.name
 		var quality:String=item.get("instance",{}).get("quality","legacy")
 		meta.text="%s · %s · %s"%[SLOTS[item.slot],QUALITIES[quality],"已穿戴" if _worn(item) else "未装备"]
+		if item.has("instance_id"):meta.text+=" · 已绑" if item.instance.get("bound",true) else " · 未绑"
 		if online_model!=null and not online_model.ready:meta.text+=" · 离线快照"
+		var rating:=LootRules.entry_score(item);score_label.text=str(rating)
+		var current:=_current_item();var delta:=rating-LootRules.entry_score(current)
+		score_change.text="已穿戴" if _worn(item) else "空槽" if current.is_empty() else ("↑ +%d"%delta if delta>0 else "↓ %d"%delta if delta<0 else "持平")
+		score_change.add_theme_color_override("font_color",Paper.GREEN if delta>0 else Paper.RED if delta<0 else Paper.INK)
+		score_change.tooltip_text="与当前同部位装备比较。\n"+LootRules.SCORE_HINT
 		var limits:Array[String]=["等级%d"%int(item.get("level",1))]
 		if int(item.get("job",-1))>=0:limits.append(Game.JOBS[int(item.job)])
 		if int(item.get("gender",-1))>=0:limits.append("男" if int(item.gender)==0 else "女")
@@ -228,7 +242,7 @@ func _refresh_comparison() -> void:
 	var error:=_equip_error()
 	equip_button.disabled=not error.is_empty();equip_button.tooltip_text=error
 	equip_button.text="已穿戴" if _worn(item) else "装备此件"
-	comparison_hint.text=operation_message if not operation_message.is_empty() else ("装备已移除，请返回背包。" if item.is_empty() else "基础＋词条，绿升红降。特殊效果见下方。" if specials.any(func(value:String)->bool:return not value.is_empty()) else "基础＋词条，绿升红降。")
+	comparison_hint.text=operation_message if not operation_message.is_empty() else ("装备已移除，请返回背包。" if item.is_empty() else "评分供同部位参考，绿升红降。特效另列。")
 
 func show_comparison() -> void:
 	if _resolve().is_empty():refresh();return

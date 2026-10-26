@@ -1,0 +1,19 @@
+{
+  "version": "equipment-score-v1",
+  "scale": 100,
+  "weights": {
+    "power": 50,
+    "defense": 50,
+    "hp": 10,
+    "mana": 10,
+    "crit": 50,
+    "hit": 50,
+    "evasion": 50,
+    "hp_percent": 5,
+    "crit_damage": 2,
+    "penetration": 5,
+    "damage": 3,
+    "dot": 2,
+    "reduction": 10
+  }
+}

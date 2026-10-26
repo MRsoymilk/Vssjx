@@ -17,6 +17,9 @@ static func format_value(kind: String, value: int) -> String:
 
 static func rows(current: Dictionary, selected: Dictionary, job: int) -> Array:
 	var left:=values(current);var right:=values(selected);var result:Array=[]
+	var before_score:=LootRules.entry_score(current);var after_score:=LootRules.entry_score(selected)
+	var score_delta:=after_score-before_score
+	result.append({"kind":"score","label":"装备评分","current":before_score,"selected":after_score,"delta":score_delta,"change":"无变化" if score_delta==0 else ("增加" if score_delta>0 else "减少")+str(absi(score_delta))})
 	for kind in ORDER:
 		var before:=int(left.get(kind,0));var after:=int(right.get(kind,0))
 		if before==0 and after==0:continue

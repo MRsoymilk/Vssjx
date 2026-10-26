@@ -7,6 +7,14 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class BalanceContract(unittest.TestCase):
+    def test_equipment_score_mirror_and_all_attribute_units(self):
+        source=(ROOT/'shared/data/equipment-score-v1.json').read_bytes()
+        self.assertEqual(source,(ROOT/'client/assets/data/equipment-score-v1.json').read_bytes())
+        score=json.loads(source)
+        loot=json.loads((ROOT/'shared/data/loot-v1.json').read_bytes())
+        self.assertEqual(set(score['weights']),set(loot['affixes']))
+        self.assertGreater(score['scale'],0)
+        self.assertTrue(all(isinstance(value,int) and value>0 for value in score['weights'].values()))
     def test_endless_mirror_and_growth_contract(self):
         source=(ROOT/'shared/data/endless-v1.json').read_bytes()
         self.assertEqual(source,(ROOT/'client/assets/data/endless-v1.json').read_bytes())

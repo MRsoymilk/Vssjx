@@ -53,7 +53,8 @@ func _run() -> void:
 	check(rows.any(func(row:Dictionary)->bool:return row.kind=="hit" and row.selected==0 and row.delta==-20),"Lost affixes remain visible as zero and a decrease")
 	check(rows.any(func(row:Dictionary)->bool:return row.kind=="penetration" and row.current==0 and row.delta==300),"New affixes compare against zero")
 	check(rows.any(func(row:Dictionary)->bool:return row.kind=="damage" and row.change=="增加4.00个百分点"),"Percentage affixes compare in percentage points")
-	check(Comparison.rows({},LootRules.bag_item(candidate),2)[0].label=="法术攻击","Caster main attack is labelled correctly")
+	check(Comparison.rows({},LootRules.bag_item(candidate),2).any(func(row:Dictionary)->bool:return row.kind=="power" and row.label=="法术攻击"),"Caster main attack is labelled correctly")
+	check(rows[0].kind=="score" and rows[0].current==116 and rows[0].selected==141 and rows[0].delta==25,"Comparison leads with actual equipment scores and their difference")
 	check(Comparison.values(ShopRules.bag_item("sword")).power==5,"Fixed shop equipment has the actual catalog contribution")
 	await capture("06-comparison")
 	var before:=Game.player.duplicate(true)
@@ -72,6 +73,7 @@ func _run() -> void:
 	await detail.equip_selected()
 	check(LootRules.equipped(Game.player.loot_state,"weapon").id==candidate.id and detail.equip_button.disabled,"Compare equips the selected UUID rather than the other identical template")
 	check(detail.comparison_rows.all(func(row:Dictionary)->bool:return row.delta==0),"After equipping, comparison refreshes against the new current item")
+	check(detail.score_change.text=="已穿戴" and detail.score_label.text=="141","Equipping refreshes both the detail score and its worn-state caption")
 	detail.show_details();detail._turn_page(1);var original_page:=detail.page
 	var gold:=int(Game.player.gold);await click(detail.craft_button)
 	var crafting:=detail.crafting
@@ -91,6 +93,7 @@ func _run() -> void:
 	Input.parse_input_event(escape);Input.flush_buffered_events();await get_tree().process_frame
 	check(detail.crafting==null and bag.equipment_details==detail and detail.detail_view.visible and detail.page==original_page,"Escape from crafting returns one level and retains the detail page")
 	check(page_text(detail).contains(LootRules.affix_text(washed.affixes[1])) and page_text(detail).contains("已锁定第2条"),"Returning refreshes actual washed attributes and lock information")
+	check(detail.score_label.text==str(LootRules.score(washed)),"Confirmed paid washing refreshes the score from the actual saved attributes")
 	detail.open_crafting();check(detail.crafting.affix.selected==1 and detail.crafting.affix.disabled,"Reopening retains the persisted locked affix")
 	detail.crafting.back.pressed.emit();detail.back.pressed.emit()
 	check(bag.selected_equipment and bag.selected_slot=="weapon" and bag._selected().instance_id==candidate.id,"Returning to the backpack selects the item now in the equipment slot")
@@ -135,6 +138,8 @@ func _run() -> void:
 	check(ProgressionRules.craft(remote,current.id,"gear_reroll",1,77).is_empty(),"Prepare the authoritative reroll response")
 	check(model.receive(receipt(model,state_for(fixture,remote,3))),"Authoritative washed equipment passes the normal protocol validator")
 	crafting.back.pressed.emit();check(page_text(detail).contains("已锁定第2条") and detail.item.instance_id==current.id,"Online return reads the server's changed affix on the same equipment")
+	var server_item:Dictionary=remote.loot_state.items.filter(func(value:Dictionary)->bool:return value.id==current.id)[0]
+	check(detail.score_label.text==str(LootRules.score(server_item)),"Online score follows the authoritative reroll response without changing offline progress")
 	model.ready=false;model.changed.emit();detail.show_comparison()
 	check(detail.equip_button.disabled and detail.compare_craft.disabled,"Disconnected snapshots remain readable with mutation controls locked")
 	model.ready=true;model.state.character.corpse={"id":"test"};model.changed.emit()

@@ -66,6 +66,7 @@ def build():
         ('user_shipo_tianjing','石破天惊',1,'damage','all_enemies'),
         ('user_hengsao_qianjun','横扫千军',0,'damage','all_enemies'),
         ('user_qingfeng_rongxin','清风荣新',2,'regen','self'),
+        ('user_shuanglong_xizhu','双龙戏珠',2,'damage','all_enemies'),
     ]:
         items.append(dict(id=id,name=name,job=job,school=-1,unlock_level=25,category='武功',active=True,
             mp_cost=15,damage_percent=0 if effect=='regen' else 200,effect=effect,
@@ -74,13 +75,16 @@ def build():
             source_row=None,source_role=['力士','侠客','隐者'][job],source_level=None,
             original_skill_id=None,source='user_skill_resource_corrections_20261026',
             rules_basis='用户明确新增；25级解锁，伤害、消耗及持续回复沿用当前重建规则；三级资源按用户编号'))
-    assert len(items)==36
+    dragons=next(s for s in items if s['id']=='user_shuanglong_xizhu')
+    dragons.update(max_targets=2,description='群体攻击，优先攻击选中目标，最多命中2个敌人。',
+        rules_basis='用户新增隐者技能；最多攻击两个敌人；25级解锁，固定消耗15点灵力，伤害与冷却沿用当前群攻规则；复用排山倒海全部阶段特效')
+    assert len(items)==37
     for id,alias in [('sheet_019','焚天极火'),('sheet_035','狂风巨电'),('sheet_017','连天绝避')]:
         next(s for s in items if s['id']==id)['aliases']=[alias]
     return {'version':'skills-v1','named_reference_count':30,'unnamed_rows_excluded':18,
         'rules_basis':'表中具名技能及效果文字接入；未知消耗与战斗参数使用显式重建规则',
         'school_aliases':{'花间':'花涧'},'unlock_basis':'按角色等级自动解锁；技能熟练度另按每20次有效施放升1级，最高15级',
-        'group_target_basis':'当前遭遇战为单人单怪，群体技能作用于现有唯一目标，不虚构额外队友或敌人',
+        'group_target_basis':'群攻作用于现有存活敌人；双龙戏珠优先选中目标、最多两个，其余全体群攻覆盖全部存活敌人',
         'items':items}
 
 
@@ -88,4 +92,4 @@ if __name__=='__main__':
     path=ROOT/'client/assets/data/skills-v1.json'
     path.write_text(json.dumps(build(),ensure_ascii=False,indent=2)+'\n','utf8')
     (path.parent/'skill-reference-coverage.json').write_text(json.dumps(build_coverage(),ensure_ascii=False,indent=2)+'\n','utf8')
-    print('Published 30 reference, 3 user-added and 3 legacy skills; 18 unnamed reference rows remain analysis-only.')
+    print('Published 30 reference, 4 user-added and 3 legacy skills; 18 unnamed reference rows remain analysis-only.')

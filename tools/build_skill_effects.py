@@ -63,6 +63,9 @@ STAGES = {
     'sheet_047': (138,136,137),
 }
 
+MAPPINGS['user_shuanglong_xizhu']=('用户指定复用排山倒海全部阶段特效',MAPPINGS['sheet_045'][1])
+STAGES['user_shuanglong_xizhu']=STAGES['sheet_045']
+
 def all_layers(binding):
     return binding['layers']+[layer for stage in binding.get('stages',[]) for layer in stage['layers']]
 

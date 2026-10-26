@@ -26,6 +26,16 @@ static func default_id(job:int,school:int,level:int)->String:
 		if skill.active and int(skill.school)<0:return skill.id
 	return "legacy_%d"%job
 
+static func enemy_targets(skill:Dictionary,enemies:Array,primary:Dictionary)->Array:
+	var targets:Array=enemies.filter(func(e:Dictionary)->bool:return int(e.hp)>0)
+	var limit:=int(skill.get("max_targets",0))
+	if limit>0:
+		var index:=targets.find_custom(func(e:Dictionary)->bool:return e.slot==primary.get("slot"))
+		if index>=0:
+			var selected:Dictionary=targets.pop_at(index);targets.push_front(selected)
+		targets=targets.slice(0,limit)
+	return targets
+
 static func check(id:String,job:int,_school:int,level:int)->String:
 	var skill:=item(id)
 	if skill.is_empty():return "INVALID_SKILL"

@@ -112,8 +112,8 @@ def main():
             command=dict(operation_id=str(uuid4()),action='allocate',attributes=[300,0,0,0,0],expected_revision=a.state['character']['state_revision'])
             value,_=a.command('',request=command)
             assert value['state']['attributes']['available']==0 and value['state']['attributes']['allocated']==[300,0,0,0,0]
-            assert count==33
-            print('ONLINE SKILLS: PASS (30 reference and 3 user-added skills; job/level/MP/passive guards, training, atomic rollback, replay, stale turns, restart, DOT expiry, allocation)')
+            assert count==34
+            print('ONLINE SKILLS: PASS (30 reference and 4 user-added skills; job/level/MP/passive guards, training, atomic rollback, replay, stale turns, restart, DOT expiry, allocation)')
         finally:
             for c in clients:
                 try:c.close()

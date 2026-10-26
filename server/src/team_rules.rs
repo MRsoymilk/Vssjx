@@ -413,7 +413,7 @@ impl Battle {
         if let Some(s) = selected {
             self.fighters[i].effects.practice(&s.id);
             let cast_level=self.fighters[i].effects.last_skill_level;
-            let targets: Vec<usize> = if mode == "all_enemies" {
+            let mut targets: Vec<usize> = if mode == "all_enemies" {
                 self.enemies
                     .iter()
                     .enumerate()
@@ -423,6 +423,15 @@ impl Battle {
             } else {
                 vec![target_index.unwrap_or(0)]
             };
+            if mode=="all_enemies" {
+                if s.max_targets>0 {
+                    if let Some(primary)=target_index {
+                        targets.retain(|t|*t!=primary);targets.insert(0,primary);
+                    }
+                    targets.truncate(s.max_targets);
+                }
+                if let Some(b)=self.fighters[i].effects.balance.as_mut(){b.targets=targets.len() as i32;}
+            }
             if mode == "all_allies" {
                 self.fighters[i].mp -= cost;
                 for ally in self.fighters.iter_mut().filter(|a| a.hp > 0) {

@@ -39,6 +39,9 @@ pub struct Skill {
     pub chance: i32,
     pub legacy_heal: i32,
     pub target: String,
+    /// Zero means all living enemies; positive values cap group recipients.
+    #[serde(default)]
+    pub max_targets: usize,
 }
 pub static ITEMS: LazyLock<Vec<Skill>> = LazyLock::new(|| {
     serde_json::from_value(

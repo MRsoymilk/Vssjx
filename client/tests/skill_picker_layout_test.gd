@@ -24,7 +24,7 @@ func _ready()->void:
 		var stats:=CharacterAttributeRules.balanced_stats(job,60,false,[0,0,0,0,0])
 		picker.present(job,3,60,1000,[],false,stats,{})
 		await settle()
-		check(picker.choices.size()==[13,10,11][job],"Every unlocked active skill is listed")
+		check(picker.choices.size()==[13,10,12][job],"Every unlocked active skill is listed")
 		check(not picker.scroll.get_v_scroll_bar().visible and picker.scroll.scroll_vertical==0,"Current skill pool fits without scrolling")
 		for row in picker.rows.get_children():
 			check(picker.scroll.get_global_rect().grow(0.5).encloses(row.get_global_rect()),"Every row is fully visible before selection")

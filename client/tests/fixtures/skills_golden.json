@@ -1295,5 +1295,41 @@
       "regen": 1,
       "regen_amount": 150
     }
+  },
+  {
+    "damage": 195,
+    "dot": 0,
+    "hp": 100,
+    "id": "user_shuanglong_xizhu",
+    "incoming": 100,
+    "mp": 185,
+    "reflected": 0,
+    "state": {
+      "bleed_damage": 0,
+      "crit": 0,
+      "crit_chance": 0,
+      "defense": 0,
+      "defense_percent": 0,
+      "enemy_bleed": 0,
+      "enemy_mp": 50,
+      "enemy_poison": 0,
+      "enemy_silence": 0,
+      "enemy_sleep": 0,
+      "last_damage": 0,
+      "last_enemy_acted": false,
+      "last_healed": 0,
+      "last_incoming": 0,
+      "last_reflected": 0,
+      "last_skill": "user_shuanglong_xizhu",
+      "magic_percent": 0,
+      "passive_magic": 0,
+      "passive_physical": 0,
+      "physical_percent": 0,
+      "poison_damage": 0,
+      "reflect_magic": 0,
+      "reflect_physical": 0,
+      "regen": 0,
+      "regen_amount": 0
+    }
   }
 ]

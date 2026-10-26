@@ -52,7 +52,7 @@ fn saved_encounter_refreshes_cross_school_passives_without_clearing_active_effec
 }
 #[test]
 fn catalog_restrictions_and_typed_effects() {
-    assert_eq!(skills::ITEMS.len(), 36);
+    assert_eq!(skills::ITEMS.len(), 37);
     for s in skills::ITEMS.iter() {
         assert!(skills::check(&s.id, (s.job + 1) % 3, s.school.max(0), 60).is_err());
         for school in 0..=3 {

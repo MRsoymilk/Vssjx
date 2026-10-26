@@ -7,7 +7,7 @@
     "花间": "花涧"
   },
   "unlock_basis": "按角色等级自动解锁；技能熟练度另按每20次有效施放升1级，最高15级",
-  "group_target_basis": "当前遭遇战为单人单怪，群体技能作用于现有唯一目标，不虚构额外队友或敌人",
+  "group_target_basis": "群攻作用于现有存活敌人；双龙戏珠优先选中目标、最多两个，其余全体群攻覆盖全部存活敌人",
   "items": [
     {
       "id": "sheet_003",
@@ -882,6 +882,31 @@
       "original_skill_id": null,
       "source": "user_skill_resource_corrections_20261026",
       "rules_basis": "用户明确新增；25级解锁，伤害、消耗及持续回复沿用当前重建规则；三级资源按用户编号"
+    },
+    {
+      "id": "user_shuanglong_xizhu",
+      "name": "双龙戏珠",
+      "job": 2,
+      "school": -1,
+      "unlock_level": 25,
+      "category": "武功",
+      "active": true,
+      "mp_cost": 15,
+      "damage_percent": 200,
+      "effect": "damage",
+      "value": 0,
+      "duration": 0,
+      "chance": 100,
+      "legacy_heal": 0,
+      "target": "all_enemies",
+      "description": "群体攻击，优先攻击选中目标，最多命中2个敌人。",
+      "source_row": null,
+      "source_role": "隐者",
+      "source_level": null,
+      "original_skill_id": null,
+      "source": "user_skill_resource_corrections_20261026",
+      "rules_basis": "用户新增隐者技能；最多攻击两个敌人；25级解锁，固定消耗15点灵力，伤害与冷却沿用当前群攻规则；复用排山倒海全部阶段特效",
+      "max_targets": 2
     }
   ]
 }

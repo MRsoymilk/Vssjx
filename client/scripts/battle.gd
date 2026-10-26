@@ -72,7 +72,7 @@ func begin_action(command: String, skill_id:String="") -> Dictionary:
 	phase = "player"
 	return {"ok": true, "lines": ["第 %d 回合开始。" % round_number]}
 
-func resolve_player() -> Dictionary:
+func resolve_player(train_skill:bool=true) -> Dictionary:
 	if phase != "player": return {"ok": false, "lines": []}
 	var values := frozen_stats
 	skills.erase("last_missed")
@@ -89,8 +89,9 @@ func resolve_player() -> Dictionary:
 			lines.append("你%s出击，造成 %d 点伤害。" % [["挥锤", "挥剑", "挥杖"][int(Game.player.job)], damage])
 		"skill":
 			var skill:=SkillRules.item(pending_skill)
-			skills.last_skill_level=SkillProficiency.record(skills.proficiency,pending_skill)
-			Game.player.skill_proficiency=skills.proficiency.duplicate(true)
+			if train_skill:
+				skills.last_skill_level=SkillProficiency.record(skills.proficiency,pending_skill)
+				Game.player.skill_proficiency=skills.proficiency.duplicate(true)
 			if SkillBalance.revised(values) and int(skill.damage_percent)>0 and skill.target in ["enemy","all_enemies"] and rng.randi_range(0,9999)>=CharacterAttributeRules.hit_chance(values,{},int(Game.player.job)==2):
 				mp=SkillRules.miss(skill,skills,values,mp);lines.append("法招未能命中，未施加目标状态。")
 			else:

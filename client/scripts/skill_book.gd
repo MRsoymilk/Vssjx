@@ -52,7 +52,9 @@ func select_skill(index:int)->void:
 		detail.text="%s反伤：自动反弹自身攻击力的%d%%伤害。"%["物理" if skill.effect=="reflect_physical" else "法术",int(skill.value)]
 	if balanced and skill.active:
 		if SkillBalance.kind(skill)=="dot":detail.text+=" · 首击80%＋每轮30%，共3次"
-		elif skill.target=="all_enemies":detail.text+=" · 群攻总倍率最多240%"
+		elif skill.target=="all_enemies":
+			var limit:=int(skill.get("max_targets",0))
+			detail.text+=" · 群攻总倍率最多240%" if limit==0 else " · 每个目标威力%d%%"%(SkillBalance.coefficient(skill,limit)/100)
 		elif SkillBalance.kind(skill)=="control":detail.text+=" · 65%概率控制1轮，之后保护2轮"
 		elif int(skill.damage_percent)>0:detail.text+=" · 威力160%"
 	$CombatMeta.text=("消耗灵力%d点 · 冷却%d轮"%[SkillBalance.cost(skill,{}),SkillBalance.cooldown(skill)] if balanced else "消耗灵力%d点"%SkillBalance.cost(skill,{})) if skill.active else "自动生效 · 不消耗灵力"

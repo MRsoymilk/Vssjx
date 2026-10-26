@@ -1854,6 +1854,76 @@
         }
       ],
       "stage_basis": "user_supplied_resource_order"
+    },
+    "user_shuanglong_xizhu": {
+      "name": "双龙戏珠",
+      "basis": "authored_semantic_mapping",
+      "trigger": "cast_impact",
+      "reason": "用户指定复用排山倒海全部阶段特效",
+      "layers": [
+        {
+          "art": "effect/t140",
+          "anchor": "enemy",
+          "sequence": 0,
+          "canvas_offset": [
+            0,
+            0
+          ],
+          "source_member": "ssjx/effect.mrp/t140.ani",
+          "source_sha256": "c4236a934e0905da70b9f08f2b75c7bbf82892e7af7bb52e8d7b42ac5dae6897"
+        }
+      ],
+      "stages": [
+        {
+          "level": 6,
+          "layers": [
+            {
+              "art": "effect/t29",
+              "anchor": "enemy",
+              "sequence": 0,
+              "canvas_offset": [
+                0,
+                0
+              ],
+              "source_member": "ssjx/effect.mrp/t29.ani",
+              "source_sha256": "90e1b37e0e19a17351ca106c1c39b625db16d1bf6ba4c344994461ba41f903a0"
+            }
+          ]
+        },
+        {
+          "level": 10,
+          "layers": [
+            {
+              "art": "effect/t144",
+              "anchor": "enemy",
+              "sequence": 0,
+              "canvas_offset": [
+                0,
+                0
+              ],
+              "source_member": "ssjx/effect.mrp/t144.ani",
+              "source_sha256": "488bc9f2099222e72068f562b6ab0ec3e031aa59aedc05f1b9b7735ce5824881"
+            }
+          ]
+        },
+        {
+          "level": 15,
+          "layers": [
+            {
+              "art": "effect/t145",
+              "anchor": "enemy",
+              "sequence": 0,
+              "canvas_offset": [
+                0,
+                0
+              ],
+              "source_member": "ssjx/effect.mrp/t145.ani",
+              "source_sha256": "c9f00011bdead2fc8a25b78b8807d40ed6feea827030a74217114e47dd78efa1"
+            }
+          ]
+        }
+      ],
+      "stage_basis": "user_supplied_resource_order"
     }
   }
 }

@@ -17,7 +17,7 @@ class SkillEffectMappingTests(unittest.TestCase):
         catalog=build()
         self.assertEqual(catalog,json.loads((ROOT/'client/assets/data/skill-effects-v1.json').read_text('utf8')))
         skills=json.loads((ROOT/'client/assets/data/skills-v1.json').read_text('utf8'))['items']
-        self.assertEqual(len(catalog['bindings']),36)
+        self.assertEqual(len(catalog['bindings']),37)
         self.assertFalse(catalog['original_binding_recovered'])
         signatures=set()
         for skill in skills:
@@ -55,6 +55,14 @@ class SkillEffectMappingTests(unittest.TestCase):
             stages=catalog['bindings'][skill]['stages']
             self.assertEqual([s['level'] for s in stages],[6,10,15])
             self.assertEqual([s['layers'][0]['art'] for s in stages],['effect/t'+str(n) for n in resources])
+
+    def test_dragons_reuses_paishan_base_and_all_three_stages(self):
+        bindings=build()['bindings']
+        dragons=bindings['user_shuanglong_xizhu']
+        original=bindings['sheet_045']
+        self.assertEqual(dragons['layers'],original['layers'])
+        self.assertEqual(dragons['stages'],original['stages'])
+        self.assertEqual(STAGES['user_shuanglong_xizhu'],STAGES['sheet_045'])
 
     def test_full_metadata_import_retains_mapped_effects(self):
         import import_assets

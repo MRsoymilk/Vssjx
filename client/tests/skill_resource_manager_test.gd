@@ -39,5 +39,14 @@ func _ready() -> void:
 	browser.get_node("%Search").text = "清风荣新"
 	browser._fill_list()
 	check(browser.visible_entries.size() == 4, "New skill exposes base and three stages")
+	browser.get_node("%Search").text = "双龙戏珠"
+	browser._fill_list()
+	check(browser.visible_entries.size() == 4, "Dragons exposes base and three stages")
+	for entry in browser.visible_entries:
+		check(entry.data.max_targets == 2, "Admin includes the two-enemy target limit")
+	browser.select_category("effects")
+	browser.get_node("%Search").text = "双龙戏珠"
+	browser._fill_list()
+	check(browser.visible_entries.size() == 4, "Effect search includes all four reused native resources")
 	print("SKILL RESOURCE MANAGER: %d checks, %d failures" % [checks, failures])
 	get_tree().quit(0 if failures == 0 else 1)

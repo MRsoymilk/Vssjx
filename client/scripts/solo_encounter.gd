@@ -80,6 +80,7 @@ func _copy_enemy(from:Dictionary,to:Dictionary)->void:
 	if from.has("balance") and to.has("balance"):to.balance.control_protection=from.balance.control_protection
 func _event(actor:String,target:String,action:String,skill:String,damage:int=0,healed:int=0,critical:bool=false,missed:bool=false,periodic:bool=false)->void:
 	state.events.append({"actor":actor,"target":target,"action":action,"skill":skill,"damage":damage,"healed":healed,"critical":critical,"missed":missed})
+	if action=="skill" and actor==character_id:state.events[-1].skill_level=int(engine.skills.get("last_skill_level",1))
 	if periodic:state.events[-1].periodic=true
 func submit(action:String,target:String="",skill:String="")->bool:
 	if not my_turn():return false
@@ -98,14 +99,15 @@ func submit(action:String,target:String="",skill:String="")->bool:
 	if not begun.ok:message.emit("\n".join(PackedStringArray(begun.lines)));return false
 	state.events=[];state.lines=begun.lines.duplicate()
 	var used:=SkillRules.item(skill)
-	var targets:Array=state.enemies.filter(func(e:Dictionary)->bool:return int(e.hp)>0) if action=="skill" and used.get("target")=="all_enemies" else [selected]
-	if engine.skills.has("balance"):engine.skills.balance.targets=state.enemies.filter(func(e:Dictionary)->bool:return int(e.hp)>0).size()
+	var group:bool=action=="skill" and used.get("target")=="all_enemies"
+	var targets:Array=SkillRules.enemy_targets(used,state.enemies,selected) if group else [selected]
+	if engine.skills.has("balance"):engine.skills.balance.targets=targets.size() if group else state.enemies.filter(func(e:Dictionary)->bool:return int(e.hp)>0).size()
 	for i in targets.size():
 		var e:Dictionary=targets[i];engine.enemy=e.definition;engine.enemy_hp=int(e.hp);engine.phase="player";engine.finished=false
 		_copy_enemy(e.effects,engine.skills)
 		if i>0:engine.mp+=SkillBalance.cost(used,engine.frozen_stats)
 		var old_hp:=engine.hp
-		var resolved:=engine.resolve_player();state.lines.append_array(resolved.lines);e.hp=engine.enemy_hp;_copy_enemy(engine.skills,e.effects)
+		var resolved:=engine.resolve_player(i==0);state.lines.append_array(resolved.lines);e.hp=engine.enemy_hp;_copy_enemy(engine.skills,e.effects)
 		var receiver:String=character_id if action in ["guard","potion"] or used.get("target") in ["self","all_allies"] else e.slot
 		_event(character_id,receiver,action,skill,int(resolved.get("direct_damage",engine.skills.last_damage)),maxi(0,engine.hp-old_hp),engine.skills.get("last_critical",false),engine.skills.get("last_missed",false))
 		var dot:=maxi(0,int(engine.skills.last_damage)-int(resolved.get("direct_damage",engine.skills.last_damage)))

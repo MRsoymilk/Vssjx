@@ -31,9 +31,9 @@ class SkillCatalogTests(unittest.TestCase):
         items=build()['items']
         indexed={s['source_row']:s for s in items if s['source_row']}
         self.assertEqual(len(indexed),30)
-        self.assertEqual(len(items),36)
+        self.assertEqual(len(items),37)
         added=[s for s in items if s['id'].startswith('user_')]
-        self.assertEqual({s['name'] for s in added},{'石破天惊','横扫千军','清风荣新'})
+        self.assertEqual({s['name'] for s in added},{'石破天惊','横扫千军','清风荣新','双龙戏珠'})
         self.assertTrue(all(s['unlock_level']==25 and s['active'] for s in added))
         for row in original:
             if not row['name']:
@@ -44,6 +44,15 @@ class SkillCatalogTests(unittest.TestCase):
                 self.assertIsNone(skill['original_skill_id'])
                 self.assertEqual(skill['source_role'],row['role_raw'])
                 self.assertIn('重建',skill['rules_basis'])
+
+    def test_requested_group_attacks_have_distinct_target_limits(self):
+        items=build()['items']
+        for name,job,limit in [('横扫千军',0,0),('沧海明月',1,0),('双龙戏珠',2,2)]:
+            found=[s for s in items if s['name']==name]
+            self.assertEqual(len(found),1)
+            skill=found[0]
+            self.assertEqual((skill['job'],skill['target'],skill.get('max_targets',0)),(job,'all_enemies',limit))
+        self.assertEqual((skill['unlock_level'],skill['mp_cost']),(25,15))
 
     def test_passive_skills_are_not_paid_attacks(self):
         items=build()['items']

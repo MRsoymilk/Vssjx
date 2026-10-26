@@ -28,7 +28,7 @@ func _run()->void:
 	picker.queue_free();await get_tree().process_frame
 	var book:SkillBook=load("res://scenes/ui/skill_book.tscn").instantiate();add_child(book);book.present({"job":0,"school":3,"level":60,"balance_revision":1},true)
 	book.select_skill(book.items.find_custom(func(s:Dictionary)->bool:return s.id=="sheet_010"))
-	check(book.detail.text.contains("35%") and book.detail.text.contains("威力160%") and book.detail.text.contains("灵力9点") and book.detail.text.contains("冷却3轮"),"Skill book keeps damage and explains fixed mana and authored control")
+	check(book.detail.text.contains("35%") and book.detail.text.contains("威力160%") and book.get_node("CombatMeta").text.contains("灵力9点") and book.get_node("CombatMeta").text.contains("冷却3轮"),"Skill book keeps damage and separates fixed mana and authored control")
 	await capture("stun-skill-book")
 	book.queue_free();await get_tree().process_frame
 	var fixture=load("res://tests/team_test.gd").new()

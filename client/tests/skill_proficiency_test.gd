@@ -35,6 +35,6 @@ func _run()->void:
 	var book:SkillBook=load("res://scenes/ui/skill_book.tscn").instantiate();add_child(book);book.present(Game.player,true)
 	var row_index:=book.items.find_custom(func(s:Dictionary)->bool:return s.id=="sheet_010")
 	book.select_skill(row_index)
-	check(book.rows.get_child(row_index).get_node("Rank").text=="6/15" and book.detail.text.contains("1阶段特效"),"Skill book shows persistent rank and resource stage")
+	check(book.rows.get_child(row_index).get_node("Rank").text=="6/15" and book.get_node("Availability").text.contains("1阶段特效"),"Skill book shows persistent rank and resource stage")
 	book.queue_free();Game.player=old;Game.save_path=path
 	print("SKILL PROFICIENCY: %d checks, %d failures"%[checks,failures]);get_tree().quit(0 if failures==0 else 1)

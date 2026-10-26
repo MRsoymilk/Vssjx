@@ -40,7 +40,7 @@ func _ready() -> void:
 	var book: SkillBook=load("res://scenes/ui/skill_book.tscn").instantiate();add_child(book)
 	book.present({"job":0,"school":3,"level":60,"balance_revision":1},true)
 	book.select_skill(book.items.find_custom(func(s:Dictionary)->bool:return s.id=="sheet_012"))
-	check(book.detail.text.contains("抵挡25点") and book.detail.text.contains("消耗灵力15点") and not book.detail.text.contains("最大灵力"),"Skill book explains actual fixed cost and protection")
+	check(book.detail.text.contains("抵挡25点") and book.get_node("CombatMeta").text.contains("消耗灵力15点") and not book.get_node("CombatMeta").text.contains("最大灵力"),"Skill book explains actual fixed cost and protection in separate fields")
 	var picker:=SkillPicker.new();add_child(picker);picker.present(0,3,60,14,[],false,stats,state)
 	var index:=picker.choices.find_custom(func(s:Dictionary)->bool:return s.id=="sheet_012")
 	check(picker.rows.get_child(index).get_node("Cost").text=="15","Picker shows the fixed cost")

@@ -21,29 +21,36 @@ border_width_left = 1
 border_width_right = 1
 border_width_top = 1
 border_width_bottom = 1
+[sub_resource type="StyleBoxFlat" id="ProgressBackground"]
+bg_color = Color(0.84, 0.73, 0.43, 1)
+[sub_resource type="StyleBoxFlat" id="ProgressFill"]
+bg_color = Color(0.64, 0.24, 0.18, 1)
 [node name="SkillBook" type="Control"]
+offset_right = 320.0
+offset_bottom = 480.0
+mouse_filter = 2
 script = ExtResource("Script")
 [node name="ListPaper" type="Panel" parent="."]
 offset_left = 12.0
-offset_top = 89.0
+offset_top = 108.0
 offset_right = 308.0
-offset_bottom = 291.0
+offset_bottom = 282.0
 mouse_filter = 2
 theme_override_styles/panel = SubResource("List")
 [node name="SkillCatalog" type="ScrollContainer" parent="."]
 offset_left = 17.0
-offset_top = 92.0
+offset_top = 111.0
 offset_right = 303.0
-offset_bottom = 288.0
+offset_bottom = 279.0
 horizontal_scroll_mode = 0
 [node name="Rows" type="VBoxContainer" parent="SkillCatalog"]
 size_flags_horizontal = 3
 theme_override_constants/separation = 0
 [node name="DetailPaper" type="Panel" parent="."]
 offset_left = 12.0
-offset_top = 302.0
+offset_top = 294.0
 offset_right = 308.0
-offset_bottom = 407.0
+offset_bottom = 438.0
 mouse_filter = 2
 theme_override_styles/panel = SubResource("Description")
 [node name="Coverage" type="Label" parent="."]
@@ -57,16 +64,77 @@ theme_override_colors/font_color = Color(0.396, 0.271, 0.094, 1)
 theme_override_font_sizes/font_size = 11
 autowrap_mode = 3
 clip_text = true
-[node name="Description" type="Label" parent="."]
+[node name="DescriptionScroll" type="ScrollContainer" parent="."]
 offset_left = 22.0
-offset_top = 311.0
+offset_top = 343.0
 offset_right = 296.0
-offset_bottom = 398.0
+offset_bottom = 393.0
+horizontal_scroll_mode = 0
+[node name="Description" type="Label" parent="DescriptionScroll"]
+size_flags_horizontal = 3
+mouse_filter = 2
 theme_override_colors/font_color = Color(0.251, 0.153, 0.094, 1)
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 12
 autowrap_mode = 3
 [node name="SkillName" type="Label" parent="."]
-visible = false
+offset_left = 22.0
+offset_top = 299.0
+offset_right = 204.0
+offset_bottom = 322.0
+mouse_filter = 2
+theme_override_font_sizes/font_size = 15
+theme_override_colors/font_color = Color(0.251, 0.153, 0.094, 1)
+[node name="SkillRank" type="Label" parent="."]
+offset_left = 208.0
+offset_top = 301.0
+offset_right = 296.0
+offset_bottom = 320.0
+mouse_filter = 2
+theme_override_font_sizes/font_size = 11
+theme_override_colors/font_color = Color(0.396, 0.271, 0.094, 1)
+horizontal_alignment = 2
+[node name="Availability" type="Label" parent="."]
+offset_left = 22.0
+offset_top = 323.0
+offset_right = 296.0
+offset_bottom = 339.0
+mouse_filter = 2
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_color = Color(0.396, 0.271, 0.094, 1)
+[node name="CombatMeta" type="Label" parent="."]
+offset_left = 22.0
+offset_top = 397.0
+offset_right = 296.0
+offset_bottom = 413.0
+mouse_filter = 2
+theme_override_font_sizes/font_size = 11
+theme_override_colors/font_color = Color(0.251, 0.153, 0.094, 1)
+[node name="Training" type="Label" parent="."]
+offset_left = 22.0
+offset_top = 416.0
+offset_right = 296.0
+offset_bottom = 432.0
+mouse_filter = 2
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_color = Color(0.396, 0.271, 0.094, 1)
+[node name="TrainingProgress" type="ProgressBar" parent="."]
+offset_left = 22.0
+offset_top = 433.0
+offset_right = 296.0
+offset_bottom = 437.0
+mouse_filter = 2
+max_value = 20.0
+show_percentage = false
+theme_override_styles/background = SubResource("ProgressBackground")
+theme_override_styles/fill = SubResource("ProgressFill")
+[node name="GrowthHint" type="Label" parent="."]
+offset_left = 12.0
+offset_top = 449.0
+offset_right = 260.0
+offset_bottom = 474.0
+mouse_filter = 2
+theme_override_font_sizes/font_size = 11
+theme_override_colors/font_color = Color(0.396, 0.271, 0.094, 1)
 [node name="Label0" type="Label" parent="."]
 offset_left = 22.0
 offset_top = 123.0
@@ -77,6 +145,7 @@ theme_override_font_sizes/font_size = 13
 text = "暂无此职业的具名心法资料"
 horizontal_alignment = 1
 [node name="Points" type="Label" parent="."]
+visible = false
 offset_left = 20.0
 offset_top = 414.0
 offset_right = 121.0
@@ -85,13 +154,14 @@ theme_override_colors/font_color = Color(0.251, 0.153, 0.094, 1)
 theme_override_font_sizes/font_size = 14
 text = "技能点：—"
 [node name="Provenance" type="Label" parent="."]
-offset_left = 126.0
-offset_top = 416.0
-offset_right = 302.0
-offset_bottom = 436.0
+offset_left = 16.0
+offset_top = 85.0
+offset_right = 304.0
+offset_bottom = 103.0
 theme_override_colors/font_color = Color(0.396, 0.271, 0.094, 1)
 theme_override_font_sizes/font_size = 10
 [node name="Upgrade" type="Button" parent="."]
+visible = false
 offset_left = 12.0
 offset_top = 446.0
 offset_right = 116.0
@@ -103,6 +173,7 @@ theme_override_font_sizes/font_size = 14
 theme_override_colors/font_disabled_color = Color(0.45, 0.34, 0.19, 1)
 theme_override_styles/disabled = SubResource("Disabled")
 [node name="NextInfo" type="Button" parent="."]
+visible = false
 offset_left = 128.0
 offset_top = 446.0
 offset_right = 232.0

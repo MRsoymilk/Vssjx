@@ -54,3 +54,10 @@ python tests/run_offscreen.py --path client --rendering-method gl_compatibility 
 - 背包弹出菜单此前只覆盖普通文字颜色，悬停／按下时继承浅色文字，导致浅黄纸底上难以辨认。所有菜单项补齐深棕色悬停、按下、悬停按下和焦点文字；悬停增加浅金底和棕色细边，按下时加深金色，禁用项使用灰棕文字。
 - `godot --headless --path client res://tests/loot_instances_test.tscn`：20项、0失败。
 - 实际OpenGL鼠标交互截图确认普通、悬停、按下及禁用状态，并点击“装备实例”成功打开装备管理。截图目录 `/tmp/opencode/inventory-menu-highlight/`，日志 `/tmp/opencode/inventory-menu-highlight.log` 和 `/tmp/opencode/inventory-menu-loot.log`。
+
+## 2026-10-26 手机装备滚动条加宽
+
+- 装备一览的列表和下方详情共用24个逻辑像素宽的滚动条（此前样式最小宽度6），可见条和实际命中区域一起加宽约4倍；滑块最小高度28。普通、焦点、悬停、按下样式保持相同宽度，不只增大视觉绘制。
+- 属性文本为新宽度留出空间并自动换行，不增加横向滚动、不遮挡属性。流派说明展开时同样使用宽条，底部装备／卸下、领取暂存、返回背包位置不变。
+- `loot_scrollbar_test.tscn` 无头47项、实际OpenGL48项通过，分别验证本地和联机装备界面、长列表／多词缀详情、条宽与滑块最小高度、从左／右边缘实际拖动、文本不遮挡、流派切换，以及不改变装备、玩家存档或联机发件箱。
+- 装备实例20项、独立装备详情21项回归通过。实际截图：`/tmp/opencode/loot-scrollbar.png`；验证使用独立虚拟显示器，没有打包、部署或修改运行中的客户端。

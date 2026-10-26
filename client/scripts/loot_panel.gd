@@ -22,6 +22,8 @@ var selected_id:=""
 var busy:=false
 const INK:=Color("fff8c5")
 const GOLD:=Color("f8e14b")
+const SCROLLBAR_WIDTH:=24.0
+const SCROLLBAR_GRAB_MIN_HEIGHT:=28.0
 
 func _frame(rect:Rect2,fill:Color,edge:Color,width:int=1)->Panel:
 	var panel:=OriginalSceneChrome.panel(self,rect,fill,edge)
@@ -39,11 +41,15 @@ func _skin_button(button:Button)->void:
 	button.add_theme_color_override("font_disabled_color",Color("83b6a0"))
 
 func _skin_scrollbar(bar:VScrollBar)->void:
+	bar.custom_minimum_size.x=SCROLLBAR_WIDTH
+	bar.mouse_filter=Control.MOUSE_FILTER_STOP
 	for state in ["scroll","scroll_focus","grabber","grabber_highlight","grabber_pressed"]:
 		var style:=StyleBoxFlat.new()
 		style.bg_color=palette.deep if state.begins_with("scroll") else palette.body
 		style.border_color=GOLD if state=="grabber_pressed" else palette.edge
-		style.set_border_width_all(1);style.content_margin_left=3;style.content_margin_right=3
+		style.set_border_width_all(1);style.content_margin_left=SCROLLBAR_WIDTH/2;style.content_margin_right=SCROLLBAR_WIDTH/2
+		if state.begins_with("grabber"):
+			style.content_margin_top=SCROLLBAR_GRAB_MIN_HEIGHT/2;style.content_margin_bottom=SCROLLBAR_GRAB_MIN_HEIGHT/2
 		bar.add_theme_stylebox_override(state,style)
 
 func _ready()->void:
@@ -77,7 +83,8 @@ func _ready()->void:
 	detail_header=OriginalSceneChrome.label(self,"装备详情",Rect2(28,269,264,18),11,GOLD)
 	detail_scroll=ScrollContainer.new();detail_scroll.name="DetailsScroll";detail_scroll.position=Vector2(28,291);detail_scroll.size=Vector2(264,76);detail_scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED;add_child(detail_scroll)
 	_skin_scrollbar(detail_scroll.get_v_scroll_bar())
-	details=OriginalSceneChrome.label(detail_scroll,"",Rect2(0,0,248,76),10,INK);details.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;details.custom_minimum_size.x=248;details.size_flags_horizontal=Control.SIZE_EXPAND_FILL
+	var text_width:=detail_scroll.size.x-SCROLLBAR_WIDTH-4
+	details=OriginalSceneChrome.label(detail_scroll,"",Rect2(0,0,text_width,76),10,INK);details.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;details.custom_minimum_size.x=text_width;details.size_flags_horizontal=Control.SIZE_EXPAND_FILL
 	equip=OriginalSceneChrome.button(self,"装备",Rect2(20,382,86,27),12);equip.name="Equip";equip.pressed.connect(_action.bind("toggle"))
 	claim=OriginalSceneChrome.button(self,"领取暂存",Rect2(112,382,94,27),12);claim.name="Claim";claim.pressed.connect(_action.bind("gear_claim"))
 	var back:=OriginalSceneChrome.button(self,"返回背包",Rect2(212,382,88,27),12);back.name="Back";back.pressed.connect(func()->void:back_requested.emit())

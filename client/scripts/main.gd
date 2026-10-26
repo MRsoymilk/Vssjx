@@ -1300,7 +1300,7 @@ func _battle_turn(command: String, skill_id:String="") -> void:
 		if int(result.damage) > 0 and not battle.skills.get("last_missed",false) and battle_enemy.sprite_frames.has_animation("hurt"):
 			battle_enemy.play("hurt")
 		if battle.skills.get("last_missed",false):battle_effects.dodge(battle_enemy,battle_hero)
-		if command=="skill" or not battle.skills.get("last_missed",false):battle_effects.play_action(command,int(Game.player.job),skill_id,battle_hero,battle_enemy)
+		if command=="skill" or not battle.skills.get("last_missed",false):battle_effects.play_action(command,int(Game.player.job),skill_id,battle_hero,battle_enemy,int(battle.skills.get("last_skill_level",1)))
 		battle_effects.number(battle_enemy,int(battle.skills.last_damage),battle.skills.get("last_critical",false))
 		battle_effects.number(battle_hero,int(battle.skills.last_healed),false,true)
 	_refresh_battle()

@@ -7,6 +7,9 @@ from import_assets import ROOT, DEST, bake, parse_ani, readable_json
 # Each entry was chosen after visually inspecting native ANI composites.
 # These are design decisions, never recovered original server effect IDs.
 MAPPINGS = {
+    'user_shipo_tianjing': ('用户新增侠客群攻，基础沿用第一阶段岩柱', [('t80','enemy')]),
+    'user_hengsao_qianjun': ('用户新增力士群攻，基础沿用第一阶段斩击', [('t35','enemy')]),
+    'user_qingfeng_rongxin': ('用户新增隐者回复，基础沿用第一阶段回春', [('t18','hero')]),
     'sheet_003': ('青色飞剑直落，表现指路剑击', [('t88','enemy')]),
     'sheet_004': ('多道月牙剑气，表现沧海明月', [('t87','enemy')]),
     'sheet_005': ('银白飞剑连续掠过，表现剑飞惊天', [('t85','enemy')]),
@@ -45,6 +48,9 @@ MAPPINGS = {
 # Explicit resource corrections supplied by the user. The old mapping remains
 # the base visual through skill level 5; numbers below are ANI resource stems.
 STAGES = {
+    'user_shipo_tianjing': (80,81,79),
+    'user_hengsao_qianjun': (35,69,70),
+    'user_qingfeng_rongxin': (18,21,96),
     'sheet_015': (127,128,129), 'sheet_008': (141,142,143),
     'sheet_010': (172,173,174), 'sheet_013': (46,179,180),
     'sheet_019': (47,48,54), 'sheet_021': (56,57,59),

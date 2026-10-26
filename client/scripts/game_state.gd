@@ -234,6 +234,7 @@ func new_player(nickname: String, job: int, school: int, gender: int = 0) -> voi
 		"version": SAVE_VERSION, "name": nickname.strip_edges().left(24), "gender": clampi(gender, 0, 1),
 		"job": clampi(job, 0, 2), "school": clampi(school, 0, SchoolRules.UNJOINED), "school_membership_version": 1,
 		"level": 1, "xp": 0, "gold": 30, "potions": 6,
+		"skill_proficiency":{},
 		"hp": 0, "mp": 0, "quest": 0, "kills": 0,
 		"equipped": false, "zone": 0, "cell": [START_CELL.x, START_CELL.y],
 		"defeated": [], "enemy_respawns": {}, "signature": "", "title": "",
@@ -714,6 +715,7 @@ func _invalid_save() -> PlatformResult:
 	return PlatformResult.new(PlatformResult.Status.INVALID_DATA, "INVALID_SAVE", "存档格式不正确，原文件已保留")
 
 func valid_save(data: Variant) -> bool:
+	if data is Dictionary and not SkillProficiency.valid(data.get("skill_proficiency",{}),int(data.get("job",-1)),int(data.get("level",1))):return false
 	if not data is Dictionary:
 		return false
 	if not ShopRules._integer(data.get("balance_revision",0),0,1) or not data.get("balance_respec_available",true) is bool:return false

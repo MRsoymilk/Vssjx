@@ -40,6 +40,8 @@ pub struct Enemy {
 }
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Event {
+    #[serde(default,skip_serializing_if="level_is_zero")]
+    pub skill_level:i32,
     /// One round-end damage batch, independent of status name or source count.
     #[serde(default, skip_serializing_if="std::ops::Not::not")]
     pub periodic: bool,
@@ -54,6 +56,7 @@ pub struct Event {
     pub damage: i32,
     pub healed: i32,
 }
+fn level_is_zero(level:&i32)->bool{*level==0}
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Battle {
     #[serde(default,skip_serializing_if="Option::is_none")] pub loot_pool:Option<crate::team_loot::Pool>,
@@ -171,7 +174,7 @@ impl Battle {
                     elite.revives_left-=1;
                     e.hp=(e.definition.hp*crate::monster_combat::elite_n(elite.party_size,"revive_bp")/10000).max(1);
                     e.effects=skills::State {enemy_mp:30+e.definition.level*2,..Default::default()};e.dots.clear();
-                    self.events.push(Event {periodic:false,missed:false,actor:e.slot.clone(),target:e.slot.clone(),action:"revive".into(),skill:"monster_rebirth".into(),damage:0,healed:e.hp,critical:false});
+                    self.events.push(Event {skill_level:0,periodic:false,missed:false,actor:e.slot.clone(),target:e.slot.clone(),action:"revive".into(),skill:"monster_rebirth".into(),damage:0,healed:e.hp,critical:false});
                     self.lines.push(format!("精英·{}妖躯复生，剩余{}次复活。",e.definition.name,elite.revives_left));
                 }
             }
@@ -408,6 +411,8 @@ impl Battle {
         if let Some(b)=self.fighters[i].effects.balance.as_mut(){b.targets=self.enemies.iter().filter(|e|e.hp>0).count() as i32;}
         self.fighters[i].guarding = false;
         if let Some(s) = selected {
+            self.fighters[i].effects.practice(&s.id);
+            let cast_level=self.fighters[i].effects.last_skill_level;
             let targets: Vec<usize> = if mode == "all_enemies" {
                 self.enemies
                     .iter()
@@ -429,7 +434,7 @@ impl Battle {
                     ally.effects
                         .cast(s, cast_stats, &mut ally.hp, &mut temporary_mp, 0, roll);
                     if ally.id!=who{if let Some(b)=ally.effects.balance.as_mut(){b.cooldowns=cooldowns.unwrap_or_default();}}
-                    self.events.push(Event {periodic:false,missed:false,
+                    self.events.push(Event {skill_level:cast_level,periodic:false,missed:false,
                         actor: who.to_string(),
                         target: ally.id.to_string(),
                         action: "skill".into(),
@@ -475,7 +480,7 @@ impl Battle {
                         let amount=if s.effect=="bleed"{enemy.effects.bleed_damage}else{enemy.effects.poison_damage};
                         enemy.dots.insert(format!("{who}/{}",s.effect),(ticks,amount));
                     }
-                    self.events.push(Event {periodic:false,missed,
+                    self.events.push(Event {skill_level:cast_level,periodic:false,missed,
                         actor: who.to_string(),
                         target: if mode == "self" {
                             who.to_string()
@@ -510,7 +515,7 @@ impl Battle {
             .min(e.hp);
             e.hp -= damage;
             if !missed{e.effects.enemy_sleep = 0;}
-            self.events.push(Event {periodic:false,missed,
+            self.events.push(Event {skill_level:0,periodic:false,missed,
                 actor: who.to_string(),
                 target: e.slot.clone(),
                 action: action.into(),
@@ -523,7 +528,7 @@ impl Battle {
             self.fighters[i].guarding = true;
             let a = &mut self.fighters[i];
             a.mp = (a.mp + crate::skill_balance::recovery(a.stats,"guard_restore_bp",5)).min(a.stats.mp);
-            self.events.push(Event {periodic:false,missed:false,
+            self.events.push(Event {skill_level:0,periodic:false,missed:false,
                 actor: who.to_string(),
                 target: who.to_string(),
                 action: "guard".into(),
@@ -537,7 +542,7 @@ impl Battle {
             a.potions -= 1;
             let healed = crate::skill_balance::potion(a.stats).min(a.stats.hp - a.hp);
             a.hp += healed;
-            self.events.push(Event {periodic:false,missed:false,
+            self.events.push(Event {skill_level:0,periodic:false,missed:false,
                 actor: who.to_string(),
                 target: who.to_string(),
                 action: action.into(),
@@ -585,7 +590,7 @@ impl Battle {
             }
             if e.effects.consume_stun() {
                 self.lines.push(format!("{}处于眩晕，跳过本次行动。",e.definition.name));
-                self.events.push(Event{periodic:false,missed:false,critical:false,actor:e.slot.clone(),target:e.slot.clone(),action:"stun".into(),skill:String::new(),damage:0,healed:0});
+                self.events.push(Event{skill_level:0,periodic:false,missed:false,critical:false,actor:e.slot.clone(),target:e.slot.clone(),action:"stun".into(),skill:String::new(),damage:0,healed:0});
                 continue;
             }
             if e.effects.enemy_sleep > 0 {
@@ -622,8 +627,8 @@ impl Battle {
                     let reflected=(reflected+if landed&&a.job==0&&a.guarding{6}else{0}).min(e.hp);
                     let damage=incoming.min(a.hp);
                     a.hp=(a.hp-incoming).max(0);e.hp-=reflected;
-                    self.events.push(Event{periodic:false,missed:!landed,actor:e.slot.clone(),target:a.id.to_string(),action:if plan.skill.is_empty(){"attack"}else{"skill"}.into(),skill:plan.skill.clone(),damage,healed:0,critical});
-                    if reflected>0{self.events.push(Event{periodic:false,missed:false,actor:a.id.to_string(),target:e.slot.clone(),action:"dot".into(),skill:String::new(),damage:reflected,healed:0,critical:false});}
+                    self.events.push(Event{skill_level:0,periodic:false,missed:!landed,actor:e.slot.clone(),target:a.id.to_string(),action:if plan.skill.is_empty(){"attack"}else{"skill"}.into(),skill:plan.skill.clone(),damage,healed:0,critical});
+                    if reflected>0{self.events.push(Event{skill_level:0,periodic:false,missed:false,actor:a.id.to_string(),target:e.slot.clone(),action:"dot".into(),skill:String::new(),damage:reflected,healed:0,critical:false});}
                     if plan.bleed&&damage>0&&a.hp>0{
                         let amount=(incoming*crate::monster_combat::n("bleed_bp")/10000).max(1);
                         let wound=self.wounds.entry(a.id.to_string()).or_insert((0,0));
@@ -638,11 +643,11 @@ impl Battle {
         let mut periodic=Vec::new();
         for ally in &mut self.fighters {
             if ally.hp>0{let before=ally.hp;ally.effects.end_balance_round(&mut ally.hp,ally.stats.hp);
-                if ally.hp>before{self.events.push(Event{periodic:false,missed:false,actor:ally.id.to_string(),target:ally.id.to_string(),action:"regen".into(),skill:String::new(),damage:0,healed:ally.hp-before,critical:false});}
+                if ally.hp>before{self.events.push(Event{skill_level:0,periodic:false,missed:false,actor:ally.id.to_string(),target:ally.id.to_string(),action:"regen".into(),skill:String::new(),damage:0,healed:ally.hp-before,critical:false});}
             }
             if let Some((ticks,amount))=self.wounds.get_mut(&ally.id.to_string()){
                 if *ticks>0&&ally.hp>0{let damage=(*amount).min(ally.hp);ally.hp-=damage;*ticks-=1;
-                    periodic.push(Event{periodic:true,missed:false,actor:ally.id.to_string(),target:ally.id.to_string(),action:"dot".into(),skill:"monster_bleed".into(),damage,healed:0,critical:false});
+                    periodic.push(Event{skill_level:0,periodic:true,missed:false,actor:ally.id.to_string(),target:ally.id.to_string(),action:"dot".into(),skill:"monster_bleed".into(),damage,healed:0,critical:false});
                 }
             }
             ally.effects.end_turn();
@@ -650,7 +655,7 @@ impl Battle {
         self.wounds.retain(|_,(ticks,_)|*ticks>0);
         for e in &mut self.enemies{
             if !e.dots.is_empty(){let mut total=0;for (ticks,amount) in e.dots.values_mut(){if *ticks>0{total+=*amount;*ticks-=1;}}let dealt=total.min(e.hp);e.hp=(e.hp-total).max(0);e.dots.retain(|_,(ticks,_)|*ticks>0);
-                if dealt>0{periodic.push(Event{periodic:true,missed:false,actor:e.slot.clone(),target:e.slot.clone(),action:"dot".into(),skill:String::new(),damage:dealt,healed:0,critical:false});}
+                if dealt>0{periodic.push(Event{skill_level:0,periodic:true,missed:false,actor:e.slot.clone(),target:e.slot.clone(),action:"dot".into(),skill:String::new(),damage:dealt,healed:0,critical:false});}
             }
             e.effects.tick_balance();
             e.effects.enemy_silence=(e.effects.enemy_silence-1).max(0);

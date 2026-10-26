@@ -176,7 +176,7 @@ func _hero_impact() -> void:
 	if _hero_motion == null or _hero_motion.cancelled: return
 	var status:Dictionary=model.state.battle.get("skills",{})
 	if status.get("last_missed",false):effects.dodge(enemy,hero)
-	if model.last_action=="skill" or not status.get("last_missed",false):effects.play_action(model.last_action,int(model.state.character.job),String(status.get("last_skill","")),hero,enemy)
+	if model.last_action=="skill" or not status.get("last_missed",false):effects.play_action(model.last_action,int(model.state.character.job),String(status.get("last_skill","")),hero,enemy,int(status.get("last_skill_level",1)))
 	var next_hp:=int(model.state.battle.enemy_hp)+int(status.get("last_reflected",0))
 	effects.number(enemy,int(status.get("last_damage",maxi(0,_shown_enemy_hp-next_hp))),status.get("last_critical",false))
 	effects.number(hero,int(status.get("last_healed",0)),false,true)

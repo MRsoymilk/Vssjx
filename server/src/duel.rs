@@ -1,4 +1,4 @@
-//! Consensual sparring. Combat is ephemeral; permanent resources are never written.
+//! Consensual sparring. HP, MP and items are ephemeral; accepted skill training persists.
 use crate::{pve_rules::Stats, skills};
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
@@ -140,7 +140,7 @@ impl Fighter {
             appearance,
             hp: stats.hp,
             mp: stats.mp,
-            effects,
+            effects:effects.with_proficiency(serde_json::from_value(c.get("skill_proficiency").cloned().unwrap_or(json!({}))).map_err(|_|"DUEL_PROFILE_UNAVAILABLE")?),
             guarding: false,
         })
     }
@@ -366,6 +366,7 @@ impl Battle {
                     }
                     "skill" => {
                         let s = skill.unwrap();
+                        actor.effects.practice(&s.id);
                         used = s.id.clone();
                         actor.effects.enemy_mp = enemy.mp;
                         let directed = matches!(s.target.as_str(), "enemy" | "all_enemies");
@@ -545,6 +546,7 @@ impl Battle {
 
 #[derive(Default)]
 pub struct Arena {
+    training_saved:HashMap<Uuid,[crate::skill_proficiency::Progress;2]>,
     pub offers: HashMap<Uuid, Offer>,
     pub battles: HashMap<Uuid, Battle>,
     pub slots: HashMap<Uuid, Uuid>,
@@ -554,6 +556,18 @@ pub struct Arena {
     last_request: HashMap<Uuid, Instant>,
 }
 impl Arena {
+    pub(crate) fn pending_training(&self,who:Uuid)->Option<(Uuid,Vec<(Uuid,crate::skill_proficiency::Progress)>)>{
+        let b=self.battles.get(self.slots.get(&who)?)?;
+        let progress=[b.fighters[0].effects.proficiency.clone(),b.fighters[1].effects.proficiency.clone()];
+        if self.training_saved.get(&b.id)==Some(&progress){return None;}
+        Some((b.id,b.fighters.iter().map(|f|(f.id,f.effects.proficiency.clone())).collect()))
+    }
+    pub(crate) fn training_saved(&mut self,id:Uuid,progress:&[(Uuid,crate::skill_proficiency::Progress)]){
+        if let Some(b)=self.battles.get(&id){
+            let values=b.fighters.each_ref().map(|f|progress.iter().find(|(id,_)|*id==f.id).expect("duel progress owner").1.clone());
+            self.training_saved.insert(id,values);
+        }
+    }
     pub fn touch(&mut self, ids: &[Uuid], notice: &str) {
         for id in ids {
             *self.revisions.entry(*id).or_default() += 1;
@@ -646,6 +660,7 @@ impl Arena {
         let ids = [o.from, o.to];
         let id = Uuid::new_v4();
         self.offers.remove(&offer);
+        self.training_saved.insert(id,[fighters[0].effects.proficiency.clone(),fighters[1].effects.proficiency.clone()]);
         self.battles.insert(
             id,
             Battle {
@@ -672,6 +687,7 @@ impl Arena {
         for previous in old {
             if !self.slots.values().any(|battle| *battle == previous) {
                 self.battles.remove(&previous);
+                self.training_saved.remove(&previous);
             }
         }
         self.touch(&ids, "双方已确认，决斗开始。");
@@ -757,6 +773,7 @@ impl Arena {
             .collect();
         for id in old {
             self.battles.remove(&id);
+            self.training_saved.remove(&id);
             let ids: Vec<_> = self
                 .slots
                 .iter()

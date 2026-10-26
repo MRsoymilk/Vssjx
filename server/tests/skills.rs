@@ -24,7 +24,7 @@ fn all_school_identities_share_job_skills_but_not_level_or_class_permissions() {
         }
     }
     let emei_knight = skills::view(1, 0, 50);
-    assert_eq!(emei_knight["available"].as_array().unwrap().len(), 8);
+    assert_eq!(emei_knight["available"].as_array().unwrap().len(), 9);
     assert!(emei_knight["available"].as_array().unwrap().contains(&json!("sheet_051")));
     assert!(!emei_knight["available"].as_array().unwrap().contains(&json!("sheet_008")));
     assert_eq!(skills::check("sheet_008", 1, 0, 50).err(), Some("SKILL_LEVEL_REQUIRED"));
@@ -52,7 +52,7 @@ fn saved_encounter_refreshes_cross_school_passives_without_clearing_active_effec
 }
 #[test]
 fn catalog_restrictions_and_typed_effects() {
-    assert_eq!(skills::ITEMS.len(), 33);
+    assert_eq!(skills::ITEMS.len(), 36);
     for s in skills::ITEMS.iter() {
         assert!(skills::check(&s.id, (s.job + 1) % 3, s.school.max(0), 60).is_err());
         for school in 0..=3 {

@@ -1,0 +1,7 @@
+{
+  "version": "skill-proficiency-v1",
+  "max_level": 15,
+  "casts_per_level": 20,
+  "stage_levels": [6, 10, 15],
+  "basis": "用户指定每20次有效施放升1级；1～5级基础特效，6/10/15级切换三级资源，仅改变熟练度和视觉，不叠加新数值增益"
+}

@@ -46,6 +46,8 @@ static func valid_view(view:Variant,character:Dictionary)->bool:
 	return true
 
 static func valid_state(state:Variant)->bool:
+	if state is Dictionary and state.has("proficiency") and not SkillProficiency.valid(state.proficiency):return false
+	if state is Dictionary and state.has("last_skill_level") and not OnlinePve.integer(state.last_skill_level,0,15):return false
 	if state is Dictionary and state.has("builds") and not BuildRules.valid_progress(state.builds):return false
 	if not state is Dictionary or not state.get("last_skill") is String or not state.get("last_enemy_acted") is bool:return false
 	if state.has("enemy_stun") and not OnlinePve.integer(state.enemy_stun,0,1):return false
@@ -60,7 +62,7 @@ static func valid_state(state:Variant)->bool:
 		if not OnlinePve.integer(value,0,1000000):return false
 	if state.has("balance"):
 		var b:Variant=state.balance
-		if not b is Dictionary or not b.get("cooldowns") is Dictionary or b.cooldowns.size()>33 or not OnlinePve.integer(b.get("targets"),0,5) or not OnlinePve.integer(b.get("control_protection"),0,3) or not b.get("last_enemy_magical") is bool:return false
+		if not b is Dictionary or not b.get("cooldowns") is Dictionary or b.cooldowns.size()>catalog.items.size() or not OnlinePve.integer(b.get("targets"),0,5) or not OnlinePve.integer(b.get("control_protection"),0,3) or not b.get("last_enemy_magical") is bool:return false
 		if b.has("stun_revision") and not OnlinePve.integer(b.stun_revision,0,1):return false
 		for id in b.cooldowns:
 			if not id is String or item(id).is_empty() or not OnlinePve.integer(b.cooldowns[id],0,4):return false
@@ -77,6 +79,7 @@ static func new_state(job:int,school:int,level:int,enemy_level:int=1)->Dictionar
 	return state
 
 static func reset_turn(state:Dictionary)->void:
+	state.erase("last_skill_level")
 	if state.has("builds"):state.builds.used=false;state.builds.bonus_bp=0;state.builds.dot_bp=0
 	if state.has("balance"):state.balance.last_enemy_magical=false
 	state.erase("last_missed");state.erase("last_enemy_missed")

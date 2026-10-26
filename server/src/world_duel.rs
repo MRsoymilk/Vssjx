@@ -4,6 +4,14 @@ use crate::duel::{Command, Fighter, REJECT_SECONDS};
 use rand::Rng;
 
 impl WorldHub {
+    pub(super) async fn flush_duel_training(&self,auth:&AuthService,who:Uuid)->Result<(),AuthError>{
+        let pending=self.data.lock().expect("world state").duels.pending_training(who);
+        if let Some((battle,progress))=pending{
+            crate::skill_proficiency::save_duel(auth.pool(),progress.clone()).await.map_err(db_error)?;
+            self.data.lock().expect("world state").duels.training_saved(battle,&progress);
+        }
+        Ok(())
+    }
     pub(super) fn duel_enable(&self, owner: &Ownership, enabled: bool) {
         if let Some(actor) = self
             .data
@@ -73,6 +81,8 @@ impl WorldHub {
             gates.sort_by_key(|(id,_)|*id);
             let mut guards=Vec::new();for (_,gate) in gates{guards.push(gate.lock_owned().await);}
             if !self.current(owner){return Err(("SESSION_REPLACED",0));}
+            self.flush_duel_training(auth,owner.id).await.map_err(|e|(e.1,0))?;
+            self.flush_duel_training(auth,peer).await.map_err(|e|(e.1,0))?;
             if matches!(c.action.as_str(),"invite"|"accept"){
                 let state=self.data.lock().expect("world state");
                  let a=state.actors.get(&owner.id).unwrap();let b=state.actors.get(&peer).ok_or(("DUEL_PLAYER_OFFLINE",0))?;
@@ -112,7 +122,10 @@ impl WorldHub {
                     state.duels.start(c.invite_id.unwrap(),owner.id,fighters,Instant::now()).map_err(|e|(e,0))?;
                     for who in [owner.id,peer]{state.actors.get_mut(&who).unwrap().motion.stop();}state.revision+=1;
                 },
-                _=>self.data.lock().expect("world state").duels.act(owner.id,c,Instant::now(),[rand::thread_rng().gen_range(0..100),rand::thread_rng().gen_range(0..100),rand::thread_rng().gen_range(0..100)]).map_err(|e|(e,0))?,
+                _=>{
+                    self.data.lock().expect("world state").duels.act(owner.id,c,Instant::now(),[rand::thread_rng().gen_range(0..100),rand::thread_rng().gen_range(0..100),rand::thread_rng().gen_range(0..100)]).map_err(|e|(e,0))?;
+                    self.flush_duel_training(auth,owner.id).await.map_err(|e|(e.1,0))?;
+                },
             }
             Ok(())
         }.await;

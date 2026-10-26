@@ -127,7 +127,8 @@ def main():
             a.move([11,16]); check(a.until('error')['code'] == 'BATTLE_ACTIVE', 'Movement is blocked by the server during PK')
             value, _ = a.command('restore', 'qingwei', ok=False); check(value['code'] == 'DUEL_ACTIVE', 'PvE and inventory mutations cannot overlap a duel')
             baseline=[f['hp'] for f in state['fighters']]
-            _, attack=a.duel('attack',battle_id=state['id'],expected_revision=state['decision_revision'])
+            practice_skill='sheet_010'
+            _, attack=a.duel('skill',skill=practice_skill,battle_id=state['id'],expected_revision=state['decision_revision'])
             locked=a.synced(lambda s:s['battle']['submitted'][0])['battle']
             check([f['hp'] for f in locked['fighters']]==baseline and locked['events']==[],'One commitment cannot spend resources or deal damage')
             value,_=a.duel('guard',ok=False,battle_id=state['id'],expected_revision=state['decision_revision']);check(value['code']=='DUEL_ALREADY_SUBMITTED','A locked decision cannot be changed or submitted twice')
@@ -137,8 +138,10 @@ def main():
             next_state=a.synced(lambda s:s['battle']['resolved_round']==1)['battle']
             b.synced(lambda s:s['battle']['resolved_round']==1)
             check(next_state['events'][0]['actor']==ib and next_state['fighters'][1]['speed']==120,'Allocated agility determines initiative, irrespective of arrival order')
+            check(db.query(f"SELECT skill_proficiency->>'sheet_010' FROM characters WHERE id='{ia}'")=='1','An actually resolved duel skill persists one training use')
             actor=a
             actor.duel('',request=attack)
+            check(db.query(f"SELECT skill_proficiency->>'sheet_010' FROM characters WHERE id='{ia}'")=='1','Duel command replay does not train twice')
             next_state=a.synced(lambda s:s['battle']['phase']=='planning' or s['battle']['status']=='finished')['battle']
             value,_=actor.duel('attack',ok=False,battle_id=state['id'],expected_revision=state['decision_revision']);check(value['code']=='DUEL_STALE_REVISION','A prior round token cannot deal damage again')
             for _ in range(50):

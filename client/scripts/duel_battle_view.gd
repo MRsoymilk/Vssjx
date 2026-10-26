@@ -159,7 +159,7 @@ func _hero_impact()->void:
 	if _playing.get("missed",false):effects.dodge(enemy,hero)
 	effects.number(enemy,int(_playing.get("damage",0)),_playing.get("critical",false))
 	effects.number(hero,int(_playing.get("reflected",0)))
-	if model.last_action=="skill" or not _playing.get("missed",false):effects.play_action(model.last_action,int(model.state.character.job),_playing.get("skill",""),hero,enemy)
+	if model.last_action=="skill" or not _playing.get("missed",false):effects.play_action(model.last_action,int(model.state.character.job),_playing.get("skill",""),hero,enemy,int(model.state.battle.skills.get("last_skill_level",1)))
 	if _enemy_took_damage and not _playing.get("missed",false) and enemy.sprite_frames.has_animation("hurt"):enemy.play("hurt")
 	_shown_hero_hp=int(model.state.battle.hp);_shown_enemy_hp=int(model.state.battle.enemy_hp)
 	effects.play_reflection(int(opponent.job),int(opponent.school),int(opponent.level),opponent.effects,model.last_action=="skill" and int(model.state.character.job)==2,enemy,hero)
@@ -178,7 +178,7 @@ func _start_enemy_motion()->void:
 		if event.get("missed",false):effects.dodge(hero,enemy)
 		effects.number(hero,int(event.get("damage",0)),event.get("critical",false))
 		effects.number(enemy,int(event.get("reflected",0)))
-		if event.action=="skill" or not event.get("missed",false):effects.play_action(event.action,int(opponent.job),event.skill,enemy,hero)
+		if event.action=="skill" or not event.get("missed",false):effects.play_action(event.action,int(opponent.job),event.skill,enemy,hero,int(opponent.effects.get("last_skill_level",1)))
 		if int(model.state.battle.hp)<_shown_hero_hp and not event.get("missed",false) and hero.sprite_frames.has_animation("hurt"):hero.play("hurt")
 		_shown_hero_hp=int(model.state.battle.hp);_shown_enemy_hp=int(model.state.battle.enemy_hp)
 		var me:Dictionary=event.fighters[0] if event.fighters[0].id==channel.character_id else event.fighters[1]

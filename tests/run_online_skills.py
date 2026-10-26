@@ -45,8 +45,12 @@ def main():
                 a.close(); time.sleep(.15)
                 b = copy.deepcopy(template)
                 b.update(hp=100,mp=mp,enemy_hp=10000,round=0,revision=0,outcome='active',skills={},skill_rules_version=0)
-                b['enemy'].update(hp=10000,attack=150)
-                db.query(f"UPDATE characters SET job={job},school={school},level={level},hp=100,mp={mp},state_revision=state_revision+1 WHERE id='{char}'; UPDATE pve_battles SET state=$owned${json.dumps(b)}$owned$::jsonb WHERE id='{battle_id}'")
+                # This fixture verifies the original fixed-cost branch. Keep its
+                # frozen stats explicit after later balance revisions introduced
+                # percent costs; the revised branch has independent integration checks.
+                b['frozen_stats']=dict(hp=1000,mp=400,attack=100,defense=20,attributes=[0]*5,balance=None)
+                b['enemy'].update(hp=10000,attack=1)
+                db.query(f"UPDATE characters SET corpse=NULL,skill_proficiency='{{}}'::jsonb,job={job},school={school},level={level},hp=100,mp={mp},state_revision=state_revision+1 WHERE id='{char}'; UPDATE pve_battles SET state=$owned${json.dumps(b)}$owned$::jsonb WHERE id='{battle_id}'")
                 a=Player(base,session,char); clients.append(a)
 
             def request(id):
@@ -67,7 +71,7 @@ def main():
 
             count=0
             for skill in catalog['items']:
-                if not skill['source_row']: continue
+                if not skill['source_row'] and not skill['id'].startswith('user_'): continue
                 # Every source skill must work for an unjoined character of its job.
                 seed(skill['job'],3)
                 assert skill['id'] in a.state['skills']['available']
@@ -87,8 +91,9 @@ def main():
                 assert b['skills']['last_skill']==skill['id'] and b['round']==1
                 assert any(skill['name'] in line for line in value['lines'])
                 assert 0<=b['mp']<=value['state']['stats']['mp'] and b['enemy_hp']<=10000,(skill['id'],b)
-                expected=400-skill['mp_cost']+(min(20,32) if skill['effect']=='mana_steal' else 0)
+                expected=min(400,400-skill['mp_cost']+(min(20,32) if skill['effect']=='mana_steal' else 0))
                 assert b['mp']==expected,(skill,b)
+                assert value['state']['character']['skill_proficiency'][skill['id']]==1
                 replay,_=a.command('',request=command);assert replay['replayed'] and replay['state']==value['state']
                 stale=dict(command,operation_id=str(uuid4()))
                 rejected,_=a.command('',request=stale,ok=False);assert rejected['code']=='STALE_BATTLE'
@@ -107,8 +112,8 @@ def main():
             command=dict(operation_id=str(uuid4()),action='allocate',attributes=[300,0,0,0,0],expected_revision=a.state['character']['state_revision'])
             value,_=a.command('',request=command)
             assert value['state']['attributes']['available']==0 and value['state']['attributes']['allocated']==[300,0,0,0,0]
-            assert count==30
-            print('ONLINE SKILLS: PASS (30 named skills without school gating, job/level/MP/passive guards, atomic rollback, replay, stale turns, restart, DOT expiry, level-60 allocation)')
+            assert count==33
+            print('ONLINE SKILLS: PASS (30 reference and 3 user-added skills; job/level/MP/passive guards, training, atomic rollback, replay, stale turns, restart, DOT expiry, allocation)')
         finally:
             for c in clients:
                 try:c.close()

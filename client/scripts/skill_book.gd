@@ -5,11 +5,13 @@ var items:Array=[]
 var level:=1
 var balanced:=false
 var selected_index:=0
+var proficiency:Dictionary={}
 @onready var rows:VBoxContainer=$SkillCatalog/Rows
 @onready var detail:Label=$Description
 
 func present(player:Dictionary,martial:bool)->void:
 	level=int(player.level)
+	proficiency=player.get("skill_proficiency",{}).duplicate(true)
 	balanced=player.get("balance_revision",0)==1
 	items=SkillRules.list_for(int(player.job),int(player.school),level,true).filter(func(s:Dictionary)->bool:return bool(s.active)==martial)
 	var unlocked:=items.filter(func(skill:Dictionary)->bool:return level>=int(skill.unlock_level)).size()
@@ -21,7 +23,7 @@ func present(player:Dictionary,martial:bool)->void:
 		var row:=Button.new();row.custom_minimum_size=Vector2(0,28);row.alignment=HORIZONTAL_ALIGNMENT_LEFT;row.clip_text=true
 		for state in ["normal","hover","pressed","focus"]:row.add_theme_stylebox_override(state,StyleBoxEmpty.new())
 		var name_label:=Label.new();name_label.name="Name";name_label.text=skill.name;name_label.position=Vector2(6,3);name_label.size=Vector2(190,22);name_label.add_theme_font_size_override("font_size",14);name_label.mouse_filter=Control.MOUSE_FILTER_IGNORE;row.add_child(name_label)
-		var rank:=Label.new();rank.name="Rank";rank.text="—/—";rank.position=Vector2(211,3);rank.size=Vector2(61,22);rank.horizontal_alignment=HORIZONTAL_ALIGNMENT_RIGHT;rank.add_theme_font_size_override("font_size",13);rank.mouse_filter=Control.MOUSE_FILTER_IGNORE;row.add_child(rank)
+		var rank:=Label.new();rank.name="Rank";rank.text=("%d/15"%SkillProficiency.level(proficiency,skill.id)) if skill.active and level>=int(skill.unlock_level) else "—/—";rank.position=Vector2(211,3);rank.size=Vector2(61,22);rank.horizontal_alignment=HORIZONTAL_ALIGNMENT_RIGHT;rank.add_theme_font_size_override("font_size",13);rank.mouse_filter=Control.MOUSE_FILTER_IGNORE;row.add_child(rank)
 		rows.add_child(row);row.pressed.connect(select_skill.bind(index))
 	$Label0.visible=items.is_empty()
 	if not items.is_empty():
@@ -35,6 +37,10 @@ func select_skill(index:int)->void:
 	var skill:Dictionary=items[selected_index]
 	$SkillName.text=skill.name
 	detail.text=SkillRules.description(skill,balanced)
+	if skill.active and level>=int(skill.unlock_level):
+		var rank:=SkillProficiency.level(proficiency,skill.id)
+		detail.text+=" · 技能%d级 · %s"%[rank,"基础特效" if rank<6 or not BattleEffects.binding(skill.id).has("stages") else "%d阶段特效"%SkillProficiency.stage(rank)]
+		detail.text+="\n熟练度已满" if rank==15 else "\n熟练度%d/20 · 施放升级"%(int(proficiency.get(skill.id,0))%20)
 	if balanced and skill.active:
 		if SkillBalance.kind(skill)=="dot":detail.text+=" · 首击80%＋每轮30%，共3次"
 		elif skill.target=="all_enemies":detail.text+=" · 群攻总倍率最多240%"

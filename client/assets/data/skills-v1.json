@@ -6,7 +6,7 @@
   "school_aliases": {
     "花间": "花涧"
   },
-  "unlock_basis": "资料中的等级列暂按角色解锁等级使用；自动解锁，无技能阶数或技能点消耗",
+  "unlock_basis": "按角色等级自动解锁；技能熟练度另按每20次有效施放升1级，最高15级",
   "group_target_basis": "当前遭遇战为单人单怪，群体技能作用于现有唯一目标，不虚构额外队友或敌人",
   "items": [
     {
@@ -325,7 +325,10 @@
       "source_level": "5",
       "original_skill_id": null,
       "source": "analysis/references/player-sheet/source.csv",
-      "rules_basis": "名称、归属与效果文字来自用户资料；等级暂按角色解锁等级；消耗、公式、部分持续时间及武功/心法划分为重建规则"
+      "rules_basis": "名称、归属与效果文字来自用户资料；等级暂按角色解锁等级；消耗、公式、部分持续时间及武功/心法划分为重建规则",
+      "aliases": [
+        "连天绝避"
+      ]
     },
     {
       "id": "sheet_018",
@@ -373,7 +376,10 @@
       "source_level": "25",
       "original_skill_id": null,
       "source": "analysis/references/player-sheet/source.csv",
-      "rules_basis": "名称、归属与效果文字来自用户资料；等级暂按角色解锁等级；消耗、公式、部分持续时间及武功/心法划分为重建规则"
+      "rules_basis": "名称、归属与效果文字来自用户资料；等级暂按角色解锁等级；消耗、公式、部分持续时间及武功/心法划分为重建规则",
+      "aliases": [
+        "焚天极火"
+      ]
     },
     {
       "id": "sheet_021",
@@ -517,7 +523,10 @@
       "source_level": "35",
       "original_skill_id": null,
       "source": "analysis/references/player-sheet/source.csv",
-      "rules_basis": "名称、归属与效果文字来自用户资料；等级暂按角色解锁等级；消耗、公式、部分持续时间及武功/心法划分为重建规则"
+      "rules_basis": "名称、归属与效果文字来自用户资料；等级暂按角色解锁等级；消耗、公式、部分持续时间及武功/心法划分为重建规则",
+      "aliases": [
+        "狂风巨电"
+      ]
     },
     {
       "id": "sheet_036",
@@ -800,6 +809,78 @@
       "original_skill_id": null,
       "source": "client/scripts/battle.gd",
       "rules_basis": "沿用旧版重建规则，并非原版技能"
+    },
+    {
+      "id": "user_shipo_tianjing",
+      "name": "石破天惊",
+      "job": 1,
+      "school": -1,
+      "unlock_level": 25,
+      "category": "武功",
+      "active": true,
+      "mp_cost": 15,
+      "damage_percent": 200,
+      "effect": "damage",
+      "value": 0,
+      "duration": 0,
+      "chance": 100,
+      "legacy_heal": 0,
+      "target": "all_enemies",
+      "description": "群体攻击",
+      "source_row": null,
+      "source_role": "侠客",
+      "source_level": null,
+      "original_skill_id": null,
+      "source": "user_skill_resource_corrections_20261026",
+      "rules_basis": "用户明确新增；25级解锁，伤害、消耗及持续回复沿用当前重建规则；三级资源按用户编号"
+    },
+    {
+      "id": "user_hengsao_qianjun",
+      "name": "横扫千军",
+      "job": 0,
+      "school": -1,
+      "unlock_level": 25,
+      "category": "武功",
+      "active": true,
+      "mp_cost": 15,
+      "damage_percent": 200,
+      "effect": "damage",
+      "value": 0,
+      "duration": 0,
+      "chance": 100,
+      "legacy_heal": 0,
+      "target": "all_enemies",
+      "description": "群体攻击",
+      "source_row": null,
+      "source_role": "力士",
+      "source_level": null,
+      "original_skill_id": null,
+      "source": "user_skill_resource_corrections_20261026",
+      "rules_basis": "用户明确新增；25级解锁，伤害、消耗及持续回复沿用当前重建规则；三级资源按用户编号"
+    },
+    {
+      "id": "user_qingfeng_rongxin",
+      "name": "清风荣新",
+      "job": 2,
+      "school": -1,
+      "unlock_level": 25,
+      "category": "武功",
+      "active": true,
+      "mp_cost": 15,
+      "damage_percent": 0,
+      "effect": "regen",
+      "value": 15,
+      "duration": 2,
+      "chance": 100,
+      "legacy_heal": 0,
+      "target": "self",
+      "description": "持续回复生命",
+      "source_row": null,
+      "source_role": "隐者",
+      "source_level": null,
+      "original_skill_id": null,
+      "source": "user_skill_resource_corrections_20261026",
+      "rules_basis": "用户明确新增；25级解锁，伤害、消耗及持续回复沿用当前重建规则；三级资源按用户编号"
     }
   ]
 }

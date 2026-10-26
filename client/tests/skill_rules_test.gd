@@ -7,7 +7,7 @@ func check(ok:bool,message:String)->void:
 	if not ok:failures+=1;push_error("SKILLS: "+message)
 func _ready()->void:
 	var vectors:Array=JSON.parse_string(FileAccess.get_file_as_string("res://tests/fixtures/skills_golden.json"))
-	check(vectors.size()==33,"All 30 reference skills plus three legacy skills")
+	check(vectors.size()==36,"All reference, user-added and compatibility skills")
 	for vector in vectors:
 		var skill:Dictionary=RULES.item(vector.id)
 		var state:Dictionary=RULES.new_state(int(skill.job),maxi(0,int(skill.school)),60,10)

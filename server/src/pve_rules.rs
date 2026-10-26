@@ -238,7 +238,8 @@ impl Battle {
             return Err("HP_FULL");
         }
         if self.skill_rules_version == 0 {
-            self.skills = crate::skills::State::new(job, school, level, self.enemy.level);
+            let progress=self.skills.proficiency.clone();
+            self.skills = crate::skills::State::new(job, school, level, self.enemy.level).with_proficiency(progress);
             self.skill_rules_version = 1;
         } else {
             // Refresh eligibility-derived passives in saved encounters without resetting buffs.
@@ -264,6 +265,7 @@ impl Battle {
             }
             Action::Skill => {
                 let skill = selected.expect("selected skill");
+                self.skills.practice(&skill.id);
                 lines.push(format!("你施展{}。", skill.name));
                 if crate::skill_balance::revised(stats)&&skill.damage_percent>0&&matches!(skill.target.as_str(),"enemy"|"all_enemies")&&!crate::attributes::lands(Some(stats),None,job==2){self.skills.miss(skill,stats,&mut self.mp);lines.push("法招未能命中，未施加目标状态。".into());0}else{
                 let damage = self.skills.cast(

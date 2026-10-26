@@ -2,7 +2,7 @@ use super::*;
 
 fn player(job:i16,level:i32,revision:i16)->(Loaded,Context){
     let id=Uuid::new_v4();
-    let character=Character{id,display_name:"恢复验证".into(),name_rules_version:crate::characters::NAME_RULES_VERSION.into(),
+    let character=Character{skill_proficiency:Json(Default::default()),id,display_name:"恢复验证".into(),name_rules_version:crate::characters::NAME_RULES_VERSION.into(),
         rules_version:crate::characters::RULES_VERSION.into(),job,gender:0,school:3,level,xp:0,gold:1000,hp:1,mp:0,
         quest_stage:0,map_id:"qingyun_trail".into(),cell_x:4,cell_y:4,state_revision:"0".into(),corpse:None,
         balance_revision:revision,balance_respec_available:false};

@@ -58,10 +58,24 @@ def build():
     thunder['legacy_description']=thunder['description']
     thunder['description']='单体攻击；命中后35%概率眩晕，跳过目标下一次行动，受击不解除。'
     thunder['rules_basis']+='；眩晕为2026-10-23新增玩法，非原版恢复；原伤害与灵力消耗保留'
-    assert len(items)==33
+    for id,name,job,effect,target in [
+        ('user_shipo_tianjing','石破天惊',1,'damage','all_enemies'),
+        ('user_hengsao_qianjun','横扫千军',0,'damage','all_enemies'),
+        ('user_qingfeng_rongxin','清风荣新',2,'regen','self'),
+    ]:
+        items.append(dict(id=id,name=name,job=job,school=-1,unlock_level=25,category='武功',active=True,
+            mp_cost=15,damage_percent=0 if effect=='regen' else 200,effect=effect,
+            value=15 if effect=='regen' else 0,duration=2 if effect=='regen' else 0,chance=100,
+            legacy_heal=0,target=target,description='持续回复生命' if effect=='regen' else '群体攻击',
+            source_row=None,source_role=['力士','侠客','隐者'][job],source_level=None,
+            original_skill_id=None,source='user_skill_resource_corrections_20261026',
+            rules_basis='用户明确新增；25级解锁，伤害、消耗及持续回复沿用当前重建规则；三级资源按用户编号'))
+    assert len(items)==36
+    for id,alias in [('sheet_019','焚天极火'),('sheet_035','狂风巨电'),('sheet_017','连天绝避')]:
+        next(s for s in items if s['id']==id)['aliases']=[alias]
     return {'version':'skills-v1','named_reference_count':30,'unnamed_rows_excluded':18,
         'rules_basis':'表中具名技能及效果文字接入；未知消耗与战斗参数使用显式重建规则',
-        'school_aliases':{'花间':'花涧'},'unlock_basis':'资料中的等级列暂按角色解锁等级使用；自动解锁，无技能阶数或技能点消耗',
+        'school_aliases':{'花间':'花涧'},'unlock_basis':'按角色等级自动解锁；技能熟练度另按每20次有效施放升1级，最高15级',
         'group_target_basis':'当前遭遇战为单人单怪，群体技能作用于现有唯一目标，不虚构额外队友或敌人',
         'items':items}
 
@@ -70,4 +84,4 @@ if __name__=='__main__':
     path=ROOT/'client/assets/data/skills-v1.json'
     path.write_text(json.dumps(build(),ensure_ascii=False,indent=2)+'\n','utf8')
     (path.parent/'skill-reference-coverage.json').write_text(json.dumps(build_coverage(),ensure_ascii=False,indent=2)+'\n','utf8')
-    print('Published 30 named skills and 3 legacy skills; 18 unnamed rows remain analysis-only.')
+    print('Published 30 reference, 3 user-added and 3 legacy skills; 18 unnamed reference rows remain analysis-only.')

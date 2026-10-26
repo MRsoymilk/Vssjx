@@ -182,6 +182,7 @@ static func valid_battle(b:Variant,character_id:String,ids:Dictionary)->bool:
 		enemies[e.slot]=true
 	if int(b.get("monster_revision",0))==2 and not b.enemies[0].has("elite"):return false
 	for event in b.events:
+		if event is Dictionary and event.has("skill_level") and not OnlinePve.integer(event.skill_level,0,15):return false
 		if event is Dictionary and event.has("missed") and (not event.missed is bool or (event.missed and (event.get("damage")!=0 or event.get("critical",false) or event.get("action") not in ["attack","skill"]))):return false
 		if event is Dictionary and event.has("critical") and not event.critical is bool:return false
 		if not event is Dictionary or not (fighters.has(event.get("actor")) or enemies.has(event.get("actor"))) or not (fighters.has(event.get("target")) or enemies.has(event.get("target"))) or event.get("action") not in ["attack","skill","potion","guard","dot","regen","revive","stun"] or not event.get("skill") is String or not OnlinePve.integer(event.get("damage"),0,100000) or not OnlinePve.integer(event.get("healed"),0,100000):return false

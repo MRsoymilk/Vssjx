@@ -1075,6 +1075,7 @@ async fn connection(socket: WebSocket, auth: AuthService, hub: Arc<WorldHub>, an
                 if !hub.current(&owner){fail(&mut socket,"SESSION_REPLACED").await;break;}
                 if matches!(input,ClientMessage::Leave {}){leave=true;break;}
                 match auth.live_session(owner.session).await {Ok(true)=>{},Ok(false)=>{fail(&mut socket,"SESSION_REVOKED").await;leave=true;break},Err(_)=>{fail(&mut socket,"DATABASE_UNAVAILABLE").await;break}}
+                if hub.flush_duel_training(&auth,owner.id).await.is_err(){fail(&mut socket,"DATABASE_UNAVAILABLE").await;break;}
                 if matches!(input,ClientMessage::Ping {}){if send(&mut socket,with_server_time(json!({"type":"pong"}))).await.is_err(){break;}}
                 else if let ClientMessage::Duel{command}=&input {
                     if duel_version!=2 {fail(&mut socket,"DUEL_UNSUPPORTED").await;continue;}
@@ -1142,6 +1143,7 @@ async fn connection(socket: WebSocket, auth: AuthService, hub: Arc<WorldHub>, an
                     match value{Ok(value)=>{hub.pve_applied(&owner,&value);if send(&mut socket,crate::shop::client_packet(value,shop_version)).await.is_err(){break;}},Err(_)=>{hub.data.lock().expect("world state").team_dirty.insert(owner.id);}}
                 }
                 if duel_version==2 {
+                    if hub.flush_duel_training(&auth,owner.id).await.is_err(){fail(&mut socket,"DATABASE_UNAVAILABLE").await;break;}
                     let packet=hub.data.lock().expect("world state").duels.packet(owner.id,duel_revision,Instant::now());
                     if let Some((revision,packet))=packet {if send(&mut socket,packet).await.is_err(){break;}duel_revision=Some(revision);}
                 }

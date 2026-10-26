@@ -82,6 +82,7 @@ async fn load_character(tx:&mut Transaction<'_,Postgres>,character_id:Uuid,accou
         return Err(AuthError(StatusCode::CONFLICT, "SESSION_REPLACED"));
     }
     let character = Character::from_row(&row).map_err(database)?;
+    if !character.skill_proficiency.0.valid(character.job,character.level){return Err(unavailable());}
     if character.corpse.as_ref().is_some_and(|corpse|!corpse.0.valid()||corpse.0.map_id!=character.map_id||character.hp!=0) {
         return Err(unavailable());
     }
@@ -295,7 +296,7 @@ impl Loaded {
             if context.moving{return Err("ENDLESS_NOT_READY");}
             if !self.loot.can_fight(){return Err("LOOT_STORAGE_FULL");}
             let run=self.endless.begin(self.character.level)?;let source=run.monster()?;let stats=self.stats();let c=&self.character;
-            let fighter=crate::team_rules::Fighter{id:c.id,name:c.display_name.clone(),job:c.job,gender:c.gender,school:c.school,level:c.level,appearance:self.loot.look(crate::shop::appearance(&self.gear)),stats,hp:c.hp,mp:c.mp,potions:self.potions,effects:crate::skills::State::new(c.job,c.school,c.level,run.level),guarding:false};
+            let fighter=crate::team_rules::Fighter{id:c.id,name:c.display_name.clone(),job:c.job,gender:c.gender,school:c.school,level:c.level,appearance:self.loot.look(crate::shop::appearance(&self.gear)),stats,hp:c.hp,mp:c.mp,potions:self.potions,effects:crate::skills::State::new(c.job,c.school,c.level,run.level).with_proficiency(c.skill_proficiency.0.clone()),guarding:false};
             let mut b=Battle::new_formation(context.map_id.clone(),fighter,vec![source],unix_ms());b.endless=Some(run);
             let line=format!("无尽试炼第{}层开始！每次胜利后的下一层更强，最高纪录永久保留。",run.stage);
             b.formation.as_mut().unwrap().lines.push(line.clone());self.battle=Some(b);return Ok(vec![line]);
@@ -566,7 +567,7 @@ impl Loaded {
                     if definition.kind!="boss"{pool.push(definition);}
                     while sources.len()<count&&!pool.is_empty(){sources.push(pool.choose(&mut rand::thread_rng()).unwrap().clone());}
                     let c=&self.character;
-                    let fighter=crate::team_rules::Fighter{id:c.id,name:c.display_name.clone(),job:c.job,gender:c.gender,school:c.school,level:c.level,appearance:self.loot.look(crate::shop::appearance(&self.gear)),stats:frozen,hp:c.hp,mp:c.mp,potions:self.potions,effects:crate::skills::State::new(c.job,c.school,c.level,c.level),guarding:false};
+                    let fighter=crate::team_rules::Fighter{id:c.id,name:c.display_name.clone(),job:c.job,gender:c.gender,school:c.school,level:c.level,appearance:self.loot.look(crate::shop::appearance(&self.gear)),stats:frozen,hp:c.hp,mp:c.mp,potions:self.potions,effects:crate::skills::State::new(c.job,c.school,c.level,c.level).with_proficiency(c.skill_proficiency.0.clone()),guarding:false};
                     let mut battle=Battle::new_formation(context.map_id.clone(),fighter,sources,unix_ms());
                     if elite {
                         let arena=battle.formation.as_mut().unwrap();arena.empower_hunt();
@@ -624,6 +625,8 @@ impl Loaded {
                     return Err("STALE_BATTLE");
                 }
                 let mut rng = rand::thread_rng();
+                battle.skills.proficiency=self.character.skill_proficiency.0.clone();
+                if let Some(arena)=battle.formation.as_mut(){arena.fighters[0].effects.proficiency=self.character.skill_proficiency.0.clone();}
                 let mut lines = if battle.formation.is_some(){battle.turn_formation(action,command.target.as_deref(),command.enemy_slot.as_deref(),unix_ms(),rng.gen_range(0..100))?}else{
                     battle.turn_selected(
                     action,
@@ -638,6 +641,7 @@ impl Loaded {
                 )?
                 };
                 self.character.hp = battle.hp.max(1);
+                self.character.skill_proficiency.0=battle.skills.proficiency.clone();
                 self.character.mp = battle.mp;
                 self.potions = battle.potions;
                 let endless_run=battle.endless;let outcome=battle.outcome.clone();
@@ -810,6 +814,7 @@ pub async fn execute(
         }
         let character_id = loaded.character.id;
         let c = &loaded.character;
+        sqlx::query("UPDATE characters SET skill_proficiency=$2 WHERE id=$1").bind(c.id).bind(&c.skill_proficiency).execute(&mut *tx).await.map_err(database)?;
         let revision:i64=sqlx::query_scalar("UPDATE characters SET level=$2,xp=$3,gold=$4,hp=$5,mp=$6,quest_stage=$7,defeated_mask=$8,active_battle_id=$9,allocated_attributes=$10,monster_respawns=$11,ai_progress=$12,school=$13,corpse=$14,balance_respec_available=$15,hunt_pressure=$16,endless_state=$17,state_revision=state_revision+1 WHERE id=$1 RETURNING state_revision")
             .bind(c.id).bind(c.level).bind(c.xp).bind(c.gold).bind(c.hp).bind(c.mp).bind(c.quest_stage).bind(loaded.defeated).bind(active).bind(loaded.allocated.to_vec()).bind(Json(&loaded.respawns))
             .bind(Json(&loaded.ai)).bind(c.school).bind(&c.corpse).bind(c.balance_respec_available).bind(Json(&loaded.hunt_pressure)).bind(Json(&loaded.endless)).fetch_one(&mut *tx).await.map_err(database)?;
@@ -855,11 +860,14 @@ pub(crate) async fn team_fighter(tx:&mut Transaction<'_,Postgres>,context:&Conte
     if crate::ai_world::map(&context.map_id).is_none()&&a.character.quest_stage==0{return Err(AuthError(StatusCode::CONFLICT,"QUEST_REQUIRED"));}
     let c=&a.character;
     let unavailable=a.respawns.iter().chain(a.ai.respawns.iter()).filter(|(_,t)|**t>unix_ms()).map(|(id,_)|id.clone()).collect();
-    Ok((crate::team_rules::Fighter{id:c.id,name:c.display_name.clone(),job:c.job,gender:c.gender,school:c.school,level:c.level,stats:a.stats(),appearance:a.loot.look(crate::shop::appearance(&a.gear)),hp:c.hp,mp:c.mp,potions:a.potions,effects:crate::skills::State::new(c.job,c.school,c.level,c.level),guarding:false},unavailable))
+    Ok((crate::team_rules::Fighter{id:c.id,name:c.display_name.clone(),job:c.job,gender:c.gender,school:c.school,level:c.level,stats:a.stats(),appearance:a.loot.look(crate::shop::appearance(&a.gear)),hp:c.hp,mp:c.mp,potions:a.potions,effects:crate::skills::State::new(c.job,c.school,c.level,c.level).with_proficiency(c.skill_proficiency.0.clone()),guarding:false},unavailable))
 }
 pub(crate) async fn team_save(tx:&mut Transaction<'_,Postgres>,f:&crate::team_rules::Fighter,b:&crate::team_rules::Battle,settle:bool)->Result<(),AuthError>{
     let account=sqlx::query_scalar("SELECT account_id FROM characters WHERE id=$1").bind(f.id).fetch_one(&mut **tx).await.map_err(database)?;
     let mut a=load_character(tx,f.id,account,None).await?;
+    if !f.effects.proficiency.valid(f.job,f.level){return Err(unavailable());}
+    a.character.skill_proficiency.0=f.effects.proficiency.clone();
+    sqlx::query("UPDATE characters SET skill_proficiency=$2 WHERE id=$1").bind(f.id).bind(&a.character.skill_proficiency).execute(&mut **tx).await.map_err(database)?;
     a.character.hp=f.hp.max(1).min(a.stats().hp);a.character.mp=f.mp.min(a.stats().mp);a.potions=f.potions;
     if settle&&b.outcome=="victory"{
         if b.elite_hunt(){a.hunt_pressure.cleared(&b.map_id,&b.enemies[0].definition.art);}

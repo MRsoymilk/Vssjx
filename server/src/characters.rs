@@ -63,6 +63,7 @@ fn operation_id<'de, D: Deserializer<'de>>(deserializer: D) -> Result<Uuid, D::E
 
 #[derive(Clone, Serialize, FromRow)]
 pub(crate) struct Character {
+    pub(crate) skill_proficiency: DbJson<crate::skill_proficiency::Progress>,
     pub(crate) id: Uuid,
     pub(crate) display_name: String,
     pub(crate) name_rules_version: String,
@@ -84,7 +85,7 @@ pub(crate) struct Character {
     pub(crate) balance_revision:i16,
     pub(crate) balance_respec_available:bool,
 }
-pub(crate) const CHARACTER_COLUMNS: &str = "id, display_name, name_rules_version, rules_version, job, gender, school, level, xp, gold, hp, mp, quest_stage, map_id, cell_x, cell_y, state_revision::text, corpse, balance_revision, balance_respec_available";
+pub(crate) const CHARACTER_COLUMNS: &str = "id, display_name, name_rules_version, rules_version, job, gender, school, level, xp, gold, hp, mp, quest_stage, map_id, cell_x, cell_y, state_revision::text, corpse, balance_revision, balance_respec_available, skill_proficiency";
 
 fn database_error(error: sqlx::Error) -> AuthError {
     crate::observability::database_error(&error, "characters");

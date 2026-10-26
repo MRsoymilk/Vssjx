@@ -38,6 +38,7 @@ func _init(opponent: Dictionary) -> void:
 	potions = int(Game.player.potions)
 	frozen_stats=Game.stats().duplicate(true)
 	skills=SkillRules.new_state(int(Game.player.job),int(Game.player.school),int(Game.player.level),int(enemy.get("level",1)))
+	skills.proficiency=Game.player.get("skill_proficiency",{}).duplicate(true)
 	SkillRules.activate(skills,frozen_stats)
 	SkillRules.enable_stun(skills,frozen_stats)
 	selected_skill=SkillRules.default_id(int(Game.player.job),int(Game.player.school),int(Game.player.level))
@@ -88,6 +89,8 @@ func resolve_player() -> Dictionary:
 			lines.append("你%s出击，造成 %d 点伤害。" % [["挥锤", "挥剑", "挥杖"][int(Game.player.job)], damage])
 		"skill":
 			var skill:=SkillRules.item(pending_skill)
+			skills.last_skill_level=SkillProficiency.record(skills.proficiency,pending_skill)
+			Game.player.skill_proficiency=skills.proficiency.duplicate(true)
 			if SkillBalance.revised(values) and int(skill.damage_percent)>0 and skill.target in ["enemy","all_enemies"] and rng.randi_range(0,9999)>=CharacterAttributeRules.hit_chance(values,{},int(Game.player.job)==2):
 				mp=SkillRules.miss(skill,skills,values,mp);lines.append("法招未能命中，未施加目标状态。")
 			else:

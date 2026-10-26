@@ -14,6 +14,7 @@ pub mod social;
 pub mod team_rules;
 pub mod teams;
 pub mod skills;
+pub mod skill_proficiency;
 pub mod auth;
 pub mod attributes;
 pub mod announcements;

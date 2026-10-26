@@ -76,6 +76,10 @@ pub fn view(job: i16, school: i16, level: i32) -> Value {
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
 #[serde(default)]
 pub struct State {
+    #[serde(default,skip_serializing_if="crate::skill_proficiency::Progress::is_empty")]
+    pub proficiency:crate::skill_proficiency::Progress,
+    #[serde(default,skip_serializing_if="stun_is_zero")]
+    pub last_skill_level:i32,
     #[serde(default,skip_serializing_if="stun_is_zero")]
     pub enemy_stun:i32,
     #[serde(default,skip_serializing_if="Option::is_none")]
@@ -119,6 +123,8 @@ fn not_critical(value: &bool) -> bool {
 }
 fn stun_is_zero(value:&i32)->bool{*value==0}
 impl State {
+    pub fn with_proficiency(mut self,progress:crate::skill_proficiency::Progress)->Self{self.proficiency=progress;self}
+    pub fn practice(&mut self,id:&str){self.last_skill_level=i32::from(self.proficiency.record(id));}
     // Enable only at encounter creation. Deserializing an in-flight battle must
     // not opt it into new mechanics or a new cooldown halfway through combat.
     pub fn enable_stun(&mut self,stats:Stats){self.activate(stats);if let Some(b)=self.balance.as_mut(){b.stun_revision=1;}}
@@ -155,6 +161,7 @@ impl State {
         state
     }
     pub fn reset_turn(&mut self) {
+        self.last_skill_level=0;
         if let Some(p)=self.builds.as_mut(){p.used=false;p.bonus_bp=0;p.dot_bp=0;}
         if let Some(b)=self.balance.as_mut(){b.last_enemy_magical=false;}
         self.last_critical = false;

@@ -34,7 +34,7 @@ func _verify() -> void:
 		for resident in map.residents:
 			check(manifest.scenes.has(resident.art), "Packed resident actor: " + resident.id)
 	var skill_rules = load("res://scripts/skill_rules.gd")
-	check(skill_rules.list_for(1, 0, 50).size() == 8 and skill_rules.list_for(1, 3, 50) == skill_rules.list_for(1, 0, 50), "Packed skills unlock by job and level for all schools")
+	check(skill_rules.list_for(1, 0, 50).size() == 9 and skill_rules.list_for(1, 3, 50) == skill_rules.list_for(1, 0, 50), "Packed skills unlock by job and level for all schools")
 	var shop_rules = load("res://scripts/shop_rules.gd")
 	check(shop_rules.catalog.items.size()==459,"All original goods, approved collections, ceremonial outfits and supply gourds are in the packed catalog")
 	check(shop_rules.item("restored/shenxing_scroll").get("effect")=="teleport","Packed travel talisman retains destination selection semantics")

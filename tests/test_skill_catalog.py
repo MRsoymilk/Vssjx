@@ -31,7 +31,10 @@ class SkillCatalogTests(unittest.TestCase):
         items=build()['items']
         indexed={s['source_row']:s for s in items if s['source_row']}
         self.assertEqual(len(indexed),30)
-        self.assertEqual(len(items),33)
+        self.assertEqual(len(items),36)
+        added=[s for s in items if s['id'].startswith('user_')]
+        self.assertEqual({s['name'] for s in added},{'石破天惊','横扫千军','清风荣新'})
+        self.assertTrue(all(s['unlock_level']==25 and s['active'] for s in added))
         for row in original:
             if not row['name']:
                 self.assertNotIn(row['source_row'],indexed)

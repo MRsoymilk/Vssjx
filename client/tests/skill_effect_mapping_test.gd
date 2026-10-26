@@ -7,7 +7,7 @@ func _run()->void:
 	var hero:=OriginalArt.battle_actor("hero/mck");hero.position=Vector2(250,280);add_child(hero)
 	var enemy:=OriginalArt.battle_actor("monster/langw");enemy.position=Vector2(65,280);enemy.scale.x=-1;add_child(enemy)
 	var effects:=BattleEffects.new();add_child(effects)
-	check(BattleEffects.catalog.bindings.size()==33,"All 30 named and three compatibility skills have a binding")
+	check(BattleEffects.catalog.bindings.size()==36,"All reference, user-added and compatibility skills have a binding")
 	for skill in SkillRules.catalog.items:
 		hero.position=Vector2(250,280);enemy.position=Vector2(65,280)
 		caption.text=skill.name

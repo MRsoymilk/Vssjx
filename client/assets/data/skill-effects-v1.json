@@ -1644,6 +1644,216 @@
           "source_sha256": "fcf085a85349bbd091ff71f752c263cdf2b7aa9140563e36d35b999a3af527b6"
         }
       ]
+    },
+    "user_shipo_tianjing": {
+      "name": "石破天惊",
+      "basis": "authored_semantic_mapping",
+      "trigger": "cast_impact",
+      "reason": "用户新增侠客群攻，基础沿用第一阶段岩柱",
+      "layers": [
+        {
+          "art": "effect/t80",
+          "anchor": "enemy",
+          "sequence": 0,
+          "canvas_offset": [
+            0,
+            0
+          ],
+          "source_member": "ssjx/effect.mrp/t80.ani",
+          "source_sha256": "333bf32836498d5b0840217066c83ce60d9c94f9db29d5bb1a28485892fa2c3f"
+        }
+      ],
+      "stages": [
+        {
+          "level": 6,
+          "layers": [
+            {
+              "art": "effect/t80",
+              "anchor": "enemy",
+              "sequence": 0,
+              "canvas_offset": [
+                0,
+                0
+              ],
+              "source_member": "ssjx/effect.mrp/t80.ani",
+              "source_sha256": "333bf32836498d5b0840217066c83ce60d9c94f9db29d5bb1a28485892fa2c3f"
+            }
+          ]
+        },
+        {
+          "level": 10,
+          "layers": [
+            {
+              "art": "effect/t81",
+              "anchor": "enemy",
+              "sequence": 0,
+              "canvas_offset": [
+                0,
+                0
+              ],
+              "source_member": "ssjx/effect.mrp/t81.ani",
+              "source_sha256": "f9cca222298d47f5c47dcfc5b572c35c0ba33d645cc00d96dac44d38348ad0fa"
+            }
+          ]
+        },
+        {
+          "level": 15,
+          "layers": [
+            {
+              "art": "effect/t79",
+              "anchor": "enemy",
+              "sequence": 0,
+              "canvas_offset": [
+                0,
+                0
+              ],
+              "source_member": "ssjx/effect.mrp/t79.ani",
+              "source_sha256": "fa1ee80d4f84df65cc4f4fcb46c6475e44020c7eea4873ee92176564d7a0022a"
+            }
+          ]
+        }
+      ],
+      "stage_basis": "user_supplied_resource_order"
+    },
+    "user_hengsao_qianjun": {
+      "name": "横扫千军",
+      "basis": "authored_semantic_mapping",
+      "trigger": "cast_impact",
+      "reason": "用户新增力士群攻，基础沿用第一阶段斩击",
+      "layers": [
+        {
+          "art": "effect/t35",
+          "anchor": "enemy",
+          "sequence": 0,
+          "canvas_offset": [
+            0,
+            0
+          ],
+          "source_member": "ssjx/effect.mrp/t35.ani",
+          "source_sha256": "293bce0bfe00a0bb88eb9f73ffd10ea2ebcc97de233557db060e043b31ba90e9"
+        }
+      ],
+      "stages": [
+        {
+          "level": 6,
+          "layers": [
+            {
+              "art": "effect/t35",
+              "anchor": "enemy",
+              "sequence": 0,
+              "canvas_offset": [
+                0,
+                0
+              ],
+              "source_member": "ssjx/effect.mrp/t35.ani",
+              "source_sha256": "293bce0bfe00a0bb88eb9f73ffd10ea2ebcc97de233557db060e043b31ba90e9"
+            }
+          ]
+        },
+        {
+          "level": 10,
+          "layers": [
+            {
+              "art": "effect/t69",
+              "anchor": "enemy",
+              "sequence": 0,
+              "canvas_offset": [
+                0,
+                0
+              ],
+              "source_member": "ssjx/effect.mrp/t69.ani",
+              "source_sha256": "2d289d72adfe1a2f54e834f63f189272cc1e5f5ca80bf37088b13fbaf372c16e"
+            }
+          ]
+        },
+        {
+          "level": 15,
+          "layers": [
+            {
+              "art": "effect/t70",
+              "anchor": "enemy",
+              "sequence": 0,
+              "canvas_offset": [
+                0,
+                0
+              ],
+              "source_member": "ssjx/effect.mrp/t70.ani",
+              "source_sha256": "1adfbe5f2eb7d67781a5b23f3687b11d5067022bc852d1e01771505c517f57c1"
+            }
+          ]
+        }
+      ],
+      "stage_basis": "user_supplied_resource_order"
+    },
+    "user_qingfeng_rongxin": {
+      "name": "清风荣新",
+      "basis": "authored_semantic_mapping",
+      "trigger": "cast_impact",
+      "reason": "用户新增隐者回复，基础沿用第一阶段回春",
+      "layers": [
+        {
+          "art": "effect/t18",
+          "anchor": "hero",
+          "sequence": 0,
+          "canvas_offset": [
+            0,
+            0
+          ],
+          "source_member": "ssjx/effect.mrp/t18.ani",
+          "source_sha256": "32d84a88186470bf5ae998b3e31d41cc60b6623684d1213e0d54387a27de922f"
+        }
+      ],
+      "stages": [
+        {
+          "level": 6,
+          "layers": [
+            {
+              "art": "effect/t18",
+              "anchor": "hero",
+              "sequence": 0,
+              "canvas_offset": [
+                0,
+                0
+              ],
+              "source_member": "ssjx/effect.mrp/t18.ani",
+              "source_sha256": "32d84a88186470bf5ae998b3e31d41cc60b6623684d1213e0d54387a27de922f"
+            }
+          ]
+        },
+        {
+          "level": 10,
+          "layers": [
+            {
+              "art": "effect/t21",
+              "anchor": "hero",
+              "sequence": 0,
+              "canvas_offset": [
+                0,
+                0
+              ],
+              "source_member": "ssjx/effect.mrp/t21.ani",
+              "source_sha256": "d98e802c00ff1f2463973b5779bc8259b10b899139b4c3e52fed1894662cd904"
+            }
+          ]
+        },
+        {
+          "level": 15,
+          "layers": [
+            {
+              "art": "effect/t96",
+              "anchor": "hero",
+              "sequence": 0,
+              "canvas_offset": [
+                0,
+                0
+              ],
+              "source_member": "ssjx/effect.mrp/t96.ani",
+              "source_sha256": "51570ed6e148be7090dc90277520de316e28d89c9f11747cf8fb43d1e2f215f9"
+            }
+          ]
+        }
+      ],
+      "stage_basis": "user_supplied_resource_order"
     }
   }
 }

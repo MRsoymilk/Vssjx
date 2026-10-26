@@ -7,7 +7,7 @@ import unittest
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'tools'))
-from build_skill_effects import build
+from build_skill_effects import build,all_layers,STAGES
 from import_assets import bake,parse_ani,build_actor_catalog
 from unittest.mock import patch
 
@@ -32,7 +32,7 @@ class SkillEffectMappingTests(unittest.TestCase):
         seen=set()
         index=json.loads((ROOT/'client/assets/data/actors.json').read_text('utf8'))['actors']
         for binding in build()['bindings'].values():
-            for layer in binding['layers']:
+            for layer in all_layers(binding):
                 self.assertIn(layer['anchor'],['hero','enemy'])
                 key=layer['art'];stem=key.split('/')[1]
                 source=ROOT/'analysis/unpacked/ssjx/effect'/f'{stem}.ani'
@@ -43,20 +43,30 @@ class SkillEffectMappingTests(unittest.TestCase):
                     expected=bake(key,parse_ani(source),write_texture=False)
                     self.assertEqual(info,json.loads(json.dumps(expected)))
                     seen.add(key)
-        self.assertEqual(len(seen),37)
+        self.assertGreaterEqual(len(seen),77)
+
+    def test_user_stages_use_exact_resource_order_and_boundaries(self):
+        catalog=build()
+        self.assertEqual(STAGES['sheet_010'],(172,173,174))
+        self.assertEqual(STAGES['sheet_017'],(81,80,79))
+        self.assertEqual(STAGES['sheet_013'],(46,179,180))
+        for skill,resources in STAGES.items():
+            stages=catalog['bindings'][skill]['stages']
+            self.assertEqual([s['level'] for s in stages],[6,10,15])
+            self.assertEqual([s['layers'][0]['art'] for s in stages],['effect/t'+str(n) for n in resources])
 
     def test_full_metadata_import_retains_mapped_effects(self):
         import import_assets
         # Real mapping and native hero structure; only atlas baking is replaced.
         parsed={key:{} for key in import_assets.SELECTED}
         for binding in build()['bindings'].values():
-            for layer in binding['layers']:parsed[layer['art']]={}
+            for layer in all_layers(binding):parsed[layer['art']]={}
         for stem in ['mzs','wzs','mck','wck','mfs','wfs']:
             parsed['hero/'+stem]={'sources':[],'frames':[]}
         with patch.object(import_assets,'bake',side_effect=lambda *a,**k:{}):
             imported=build_actor_catalog(parsed,False)
         for binding in build()['bindings'].values():
-            for layer in binding['layers']:self.assertIn(layer['art'],imported)
+            for layer in all_layers(binding):self.assertIn(layer['art'],imported)
 
     def test_representative_texture_exports_are_reproducible(self):
         with tempfile.TemporaryDirectory(prefix='skill-fx-') as folder:

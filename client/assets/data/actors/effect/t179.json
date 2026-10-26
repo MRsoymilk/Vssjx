@@ -1,0 +1,20 @@
+{
+  "texture": "res://assets/actors/effect_t179.png",
+  "width": 88,
+  "height": 84,
+  "columns": 6,
+  "origin": [-38, -76],
+  "anchor_x": 0,
+  "playback": {},
+  "count": 6,
+  "sequences": [
+    [
+      [0, 1],
+      [1, 1],
+      [2, 1],
+      [3, 1],
+      [4, 1],
+      [5, 1]
+    ]
+  ]
+}

@@ -14,32 +14,38 @@ func _init()->void:
 	# BattleActionPlayback advances in its owning view first.
 	process_priority=10
 
-func play_action(command:String,job:int,skill_id:String,hero:AnimatedSprite2D,enemy:AnimatedSprite2D)->AnimatedSprite2D:
+func play_action(command:String,job:int,skill_id:String,hero:AnimatedSprite2D,enemy:AnimatedSprite2D,skill_level:int=1)->AnimatedSprite2D:
 	if command not in ["attack","skill"]:return null
 	if command=="attack":return attach("effect/flash",enemy)
 	# Old servers omit the selected ID; resolve their known legacy skill explicitly.
 	var id:=skill_id if not skill_id.is_empty() else "legacy_%d"%clampi(job,0,2)
-	return play_binding(id,"cast_impact",hero,enemy)
+	return play_binding(id,"cast_impact",hero,enemy,true,skill_level)
 
-static func binding(id:String)->Dictionary:
-	return catalog.bindings.get(id,{})
+static func binding(id:String,skill_level:int=1)->Dictionary:
+	var selected:Dictionary=catalog.bindings.get(id,{}).duplicate(true)
+	for stage in selected.get("stages",[]):
+		if clampi(skill_level,1,15)>=int(stage.level):selected.layers=stage.layers
+	return selected
 
 static func preload_keys(job:int,school:int,level:int,legacy_only:bool=false)->Array[String]:
 	var keys:Array[String]=[]
 	for skill in SkillRules.list_for(job,school,level):
 		if legacy_only and not String(skill.id).begins_with("legacy_"):continue
-		for layer in binding(skill.id).get("layers",[]):
+		var selected:=binding(skill.id)
+		var layers:Array=selected.get("layers",[]).duplicate()
+		for stage in selected.get("stages",[]):layers.append_array(stage.layers)
+		for layer in layers:
 			if not keys.has(layer.art):keys.append(layer.art)
 	return keys
 
-func play_binding(id:String,trigger:String,hero:AnimatedSprite2D,enemy:AnimatedSprite2D,with_audio:bool=true)->AnimatedSprite2D:
-	var selected:=binding(id)
+func play_binding(id:String,trigger:String,hero:AnimatedSprite2D,enemy:AnimatedSprite2D,with_audio:bool=true,skill_level:int=1)->AnimatedSprite2D:
+	var selected:=binding(id,skill_level)
 	if selected.is_empty() or selected.trigger!=trigger:return null
 	var primary:AnimatedSprite2D
 	for layer in selected.layers:
 		var sprite:=attach(layer.art,hero if layer.anchor=="hero" else enemy,int(layer.sequence),Vector2(layer.canvas_offset[0],layer.canvas_offset[1]))
 		if sprite!=null:
-			sprite.set_meta("skill_id",id);sprite.set_meta("trigger",trigger)
+			sprite.set_meta("skill_id",id);sprite.set_meta("trigger",trigger);sprite.set_meta("skill_level",clampi(skill_level,1,15))
 			if primary==null:primary=sprite
 	if primary!=null and with_audio and selected.has("audio_id"):
 		var sound:=GameAudio.player(selected.audio_id)

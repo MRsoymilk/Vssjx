@@ -191,8 +191,9 @@ def build_actor_catalog(parsed, write_textures=True):
     mapping_path = DEST / 'data/skill-effects-v1.json'
     if mapping_path.exists():
         mapping = json.loads(mapping_path.read_text('utf8'))
+        from build_skill_effects import all_layers
         for binding in mapping['bindings'].values():
-            for layer in binding['layers']:
+            for layer in all_layers(binding):
                 key = layer['art']
                 if not re.fullmatch(r'effect/[A-Za-z0-9_]+', key) or key not in parsed:
                     raise ValueError('Invalid mapped effect: ' + key)

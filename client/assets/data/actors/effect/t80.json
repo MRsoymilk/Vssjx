@@ -1,0 +1,21 @@
+{
+  "texture": "res://assets/actors/effect_t80.png",
+  "width": 80,
+  "height": 65,
+  "columns": 6,
+  "origin": [-46, -61],
+  "anchor_x": 0,
+  "playback": {},
+  "count": 6,
+  "sequences": [
+    [
+      [0, 1],
+      [1, 1],
+      [2, 1],
+      [1, 1],
+      [3, 1],
+      [4, 1],
+      [5, 1]
+    ]
+  ]
+}

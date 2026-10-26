@@ -1,6 +1,6 @@
 {
   "version": "skill-effects-v1",
-  "basis": "用户要求按技能含义人工设计；原版ANI素材，非已恢复的原服技能对应表",
+  "basis": "1～5级保留基础设计；6/10/15级使用用户指定的三级原包ANI资源",
   "original_binding_recovered": false,
   "bindings": {
     "sheet_003": {
@@ -20,7 +20,58 @@
           "source_member": "ssjx/effect.mrp/t88.ani",
           "source_sha256": "b839b2e02c7617dce95ef599e844a4f12e2fca5b2ec9a03a6b21a3e1ecc9d8f2"
         }
-      ]
+      ],
+      "stages": [
+        {
+          "level": 6,
+          "layers": [
+            {
+              "art": "effect/t76",
+              "anchor": "enemy",
+              "sequence": 0,
+              "canvas_offset": [
+                0,
+                0
+              ],
+              "source_member": "ssjx/effect.mrp/t76.ani",
+              "source_sha256": "6e81377400fb233e21b15067a9319596cdc35a0aed8cddb4335d389b5b6f3354"
+            }
+          ]
+        },
+        {
+          "level": 10,
+          "layers": [
+            {
+              "art": "effect/t77",
+              "anchor": "enemy",
+              "sequence": 0,
+              "canvas_offset": [
+                0,
+                0
+              ],
+              "source_member": "ssjx/effect.mrp/t77.ani",
+              "source_sha256": "db153fccfdd7c603ca7c90d72555ebfd260e0ac96575b35b7c93c7e1330129e4"
+            }
+          ]
+        },
+        {
+          "level": 15,
+          "layers": [
+            {
+              "art": "effect/t78",
+              "anchor": "enemy",
+              "sequence": 0,
+              "canvas_offset": [
+                0,
+                0
+              ],
+              "source_member": "ssjx/effect.mrp/t78.ani",
+              "source_sha256": "9e81bfa84a354a696b44125d9b073723526ad5a61d3bfd9abf3bd6559722a7e1"
+            }
+          ]
+        }
+      ],
+      "stage_basis": "user_supplied_resource_order"
     },
     "sheet_004": {
       "name": "沧海明月",
@@ -39,7 +90,58 @@
           "source_member": "ssjx/effect.mrp/t87.ani",
           "source_sha256": "dc58697ef1edef07ea95c75b96f4386bc61895888768bbd108dcac87e2bf36fc"
         }
-      ]
+      ],
+      "stages": [
+        {
+          "level": 6,
+          "layers": [
+            {
+              "art": "effect/t85",
+              "anchor": "enemy",
+              "sequence": 0,
+              "canvas_offset": [
+                0,
+                0
+              ],
+              "source_member": "ssjx/effect.mrp/t85.ani",
+              "source_sha256": "de03f437e5c8fa05054cd7b3a516c74d91ed055d02f6907d66a45995c64b5181"
+            }
+          ]
+        },
+        {
+          "level": 10,
+          "layers": [
+            {
+              "art": "effect/t88",
+              "anchor": "enemy",
+              "sequence": 0,
+              "canvas_offset": [
+                0,
+                0
+              ],
+              "source_member": "ssjx/effect.mrp/t88.ani",
+              "source_sha256": "b839b2e02c7617dce95ef599e844a4f12e2fca5b2ec9a03a6b21a3e1ecc9d8f2"
+            }
+          ]
+        },
+        {
+          "level": 15,
+          "layers": [
+            {
+              "art": "effect/t89",
+              "anchor": "enemy",
+              "sequence": 0,
+              "canvas_offset": [
+                0,
+                0
+              ],
+              "source_member": "ssjx/effect.mrp/t89.ani",
+              "source_sha256": "b7dc2540c8e954fafcee15ae6db246909f0f5edee7ffa0cca69bf3baa1ccd9db"
+            }
+          ]
+        }
+      ],
+      "stage_basis": "user_supplied_resource_order"
     },
     "sheet_005": {
       "name": "剑飞惊天",
@@ -58,7 +160,58 @@
           "source_member": "ssjx/effect.mrp/t85.ani",
           "source_sha256": "de03f437e5c8fa05054cd7b3a516c74d91ed055d02f6907d66a45995c64b5181"
         }
-      ]
+      ],
+      "stages": [
+        {
+          "level": 6,
+          "layers": [
+            {
+              "art": "effect/t151",
+              "anchor": "enemy",
+              "sequence": 0,
+              "canvas_offset": [
+                0,
+                0
+              ],
+              "source_member": "ssjx/effect.mrp/t151.ani",
+              "source_sha256": "970cd1346214a7b04983f9988c20cde861aab2168fda73c28bbd3232fd3e753b"
+            }
+          ]
+        },
+        {
+          "level": 10,
+          "layers": [
+            {
+              "art": "effect/t40",
+              "anchor": "enemy",
+              "sequence": 0,
+              "canvas_offset": [
+                0,
+                0
+              ],
+              "source_member": "ssjx/effect.mrp/t40.ani",
+              "source_sha256": "f2c6e6dd6c094801ea94a73cde490d6a3c42f654f47e85e1b52dd36c5c54af9a"
+            }
+          ]
+        },
+        {
+          "level": 15,
+          "layers": [
+            {
+              "art": "effect/t140",
+              "anchor": "enemy",
+              "sequence": 0,
+              "canvas_offset": [
+                0,
+                0
+              ],
+              "source_member": "ssjx/effect.mrp/t140.ani",
+              "source_sha256": "c4236a934e0905da70b9f08f2b75c7bbf82892e7af7bb52e8d7b42ac5dae6897"
+            }
+          ]
+        }
+      ],
+      "stage_basis": "user_supplied_resource_order"
     },
     "sheet_006": {
       "name": "三环套月",
@@ -77,7 +230,58 @@
           "source_member": "ssjx/effect.mrp/t94.ani",
           "source_sha256": "e411ed0e2e65ed1bdf30f06e1df74b42070828db9e8bc2a5e793cdee7bed9931"
         }
-      ]
+      ],
+      "stages": [
+        {
+          "level": 6,
+          "layers": [
+            {
+              "art": "effect/t87",
+              "anchor": "enemy",
+              "sequence": 0,
+              "canvas_offset": [
+                0,
+                0
+              ],
+              "source_member": "ssjx/effect.mrp/t87.ani",
+              "source_sha256": "dc58697ef1edef07ea95c75b96f4386bc61895888768bbd108dcac87e2bf36fc"
+            }
+          ]
+        },
+        {
+          "level": 10,
+          "layers": [
+            {
+              "art": "effect/t67",
+              "anchor": "enemy",
+              "sequence": 0,
+              "canvas_offset": [
+                0,
+                0
+              ],
+              "source_member": "ssjx/effect.mrp/t67.ani",
+              "source_sha256": "b7724e99d771c44f1cdd44478d03be149857a056391b593ea5ab45a872cc30db"
+            }
+          ]
+        },
+        {
+          "level": 15,
+          "layers": [
+            {
+              "art": "effect/t68",
+              "anchor": "enemy",
+              "sequence": 0,
+              "canvas_offset": [
+                0,
+                0
+              ],
+              "source_member": "ssjx/effect.mrp/t68.ani",
+              "source_sha256": "919755ccc63a07199b67c20411dadd1482ed3423ce169c3c500683d7acd08b21"
+            }
+          ]
+        }
+      ],
+      "stage_basis": "user_supplied_resource_order"
     },
     "sheet_007": {
       "name": "天罡战甲",
@@ -126,11 +330,61 @@
           "source_member": "ssjx/effect.mrp/t78.ani",
           "source_sha256": "9e81bfa84a354a696b44125d9b073723526ad5a61d3bfd9abf3bd6559722a7e1"
         }
-      ]
+      ],
+      "stages": [
+        {
+          "level": 6,
+          "layers": [
+            {
+              "art": "effect/t141",
+              "anchor": "enemy",
+              "sequence": 0,
+              "canvas_offset": [
+                0,
+                0
+              ],
+              "source_member": "ssjx/effect.mrp/t141.ani",
+              "source_sha256": "c91b84597d4d8f463d21d1c0dd2d807051066f316fe7d3524f94a12cf69f4f64"
+            }
+          ]
+        },
+        {
+          "level": 10,
+          "layers": [
+            {
+              "art": "effect/t142",
+              "anchor": "enemy",
+              "sequence": 0,
+              "canvas_offset": [
+                0,
+                0
+              ],
+              "source_member": "ssjx/effect.mrp/t142.ani",
+              "source_sha256": "482b0c8653444be635fe4880a9bba630811ee5366725dc121d2589c3da294a01"
+            }
+          ]
+        },
+        {
+          "level": 15,
+          "layers": [
+            {
+              "art": "effect/t143",
+              "anchor": "enemy",
+              "sequence": 0,
+              "canvas_offset": [
+                0,
+                0
+              ],
+              "source_member": "ssjx/effect.mrp/t143.ani",
+              "source_sha256": "3ad159869c7606749cfbee493db9d683bdfb95a3f47edf0619d8805be42d2748"
+            }
+          ]
+        }
+      ],
+      "stage_basis": "user_supplied_resource_order"
     },
     "sheet_010": {
       "name": "雷霆一击",
-      "audio_id": "thunder",
       "basis": "authored_semantic_mapping",
       "trigger": "cast_impact",
       "reason": "青蓝雷电裂纹，表现雷霆重击",
@@ -146,7 +400,59 @@
           "source_member": "ssjx/effect.mrp/t92.ani",
           "source_sha256": "cbf5113f72f436b29fe7f26de03b621ad7066082d26db93886749a29e7f9fbd8"
         }
-      ]
+      ],
+      "audio_id": "thunder",
+      "stages": [
+        {
+          "level": 6,
+          "layers": [
+            {
+              "art": "effect/t172",
+              "anchor": "enemy",
+              "sequence": 0,
+              "canvas_offset": [
+                0,
+                0
+              ],
+              "source_member": "ssjx/effect.mrp/t172.ani",
+              "source_sha256": "a0bb7f33642e860aa540b96aa52b6f5e2d5d0a1f138bb126d193f78c85819811"
+            }
+          ]
+        },
+        {
+          "level": 10,
+          "layers": [
+            {
+              "art": "effect/t173",
+              "anchor": "enemy",
+              "sequence": 0,
+              "canvas_offset": [
+                0,
+                0
+              ],
+              "source_member": "ssjx/effect.mrp/t173.ani",
+              "source_sha256": "7bf58746180b2ba36b8b09acb168c6fccc889a9fd4fdd0c4a3a2628197da638d"
+            }
+          ]
+        },
+        {
+          "level": 15,
+          "layers": [
+            {
+              "art": "effect/t174",
+              "anchor": "enemy",
+              "sequence": 0,
+              "canvas_offset": [
+                0,
+                0
+              ],
+              "source_member": "ssjx/effect.mrp/t174.ani",
+              "source_sha256": "80bf0273e05aa2a61ba17b1a66bdd407796329b89a6b28f8824abfd2d2f549b7"
+            }
+          ]
+        }
+      ],
+      "stage_basis": "user_supplied_resource_order"
     },
     "sheet_011": {
       "name": "破釜沉舟",
@@ -165,7 +471,58 @@
           "source_member": "ssjx/effect.mrp/t93.ani",
           "source_sha256": "5e909df4490438c35d1e15d3dedff47f4b8e9066e6de040fa920b9759c1bceb2"
         }
-      ]
+      ],
+      "stages": [
+        {
+          "level": 6,
+          "layers": [
+            {
+              "art": "effect/t12",
+              "anchor": "hero",
+              "sequence": 0,
+              "canvas_offset": [
+                0,
+                -60
+              ],
+              "source_member": "ssjx/effect.mrp/t12.ani",
+              "source_sha256": "786b1199230fd1a72d39df04a517971c693ed8ba40064f8288015da1601b31df"
+            }
+          ]
+        },
+        {
+          "level": 10,
+          "layers": [
+            {
+              "art": "effect/t93",
+              "anchor": "hero",
+              "sequence": 0,
+              "canvas_offset": [
+                0,
+                0
+              ],
+              "source_member": "ssjx/effect.mrp/t93.ani",
+              "source_sha256": "5e909df4490438c35d1e15d3dedff47f4b8e9066e6de040fa920b9759c1bceb2"
+            }
+          ]
+        },
+        {
+          "level": 15,
+          "layers": [
+            {
+              "art": "effect/t94",
+              "anchor": "hero",
+              "sequence": 0,
+              "canvas_offset": [
+                0,
+                0
+              ],
+              "source_member": "ssjx/effect.mrp/t94.ani",
+              "source_sha256": "e411ed0e2e65ed1bdf30f06e1df74b42070828db9e8bc2a5e793cdee7bed9931"
+            }
+          ]
+        }
+      ],
+      "stage_basis": "user_supplied_resource_order"
     },
     "sheet_012": {
       "name": "固若金汤",
@@ -203,7 +560,58 @@
           "source_member": "ssjx/effect.mrp/t126.ani",
           "source_sha256": "85f772c4e20bcafd2497278985301aa5c578020a6c5a760aaba47631d9fde0d5"
         }
-      ]
+      ],
+      "stages": [
+        {
+          "level": 6,
+          "layers": [
+            {
+              "art": "effect/t46",
+              "anchor": "enemy",
+              "sequence": 0,
+              "canvas_offset": [
+                0,
+                0
+              ],
+              "source_member": "ssjx/effect.mrp/t46.ani",
+              "source_sha256": "2753e1ac8974453e5e1747537549ba53f34b27d80bd3d7f8c6756c7e96c27525"
+            }
+          ]
+        },
+        {
+          "level": 10,
+          "layers": [
+            {
+              "art": "effect/t179",
+              "anchor": "enemy",
+              "sequence": 0,
+              "canvas_offset": [
+                0,
+                0
+              ],
+              "source_member": "ssjx/effect.mrp/t179.ani",
+              "source_sha256": "4acc6355cbb16b4af9016193eb0b3b3c438e9f09e462974292adc0ef177b722f"
+            }
+          ]
+        },
+        {
+          "level": 15,
+          "layers": [
+            {
+              "art": "effect/t180",
+              "anchor": "enemy",
+              "sequence": 0,
+              "canvas_offset": [
+                0,
+                0
+              ],
+              "source_member": "ssjx/effect.mrp/t180.ani",
+              "source_sha256": "c08ab1c0556cb1f758bcae73bfd5a5b331ef2344c58bbedec49ed0b4ede37339"
+            }
+          ]
+        }
+      ],
+      "stage_basis": "user_supplied_resource_order"
     },
     "sheet_014": {
       "name": "霸王卸甲",
@@ -241,7 +649,58 @@
           "source_member": "ssjx/effect.mrp/t99.ani",
           "source_sha256": "2ce4c1dd0d481aa39d4af91efcefcc484e3da70745721cd57e11dd09275ee0ef"
         }
-      ]
+      ],
+      "stages": [
+        {
+          "level": 6,
+          "layers": [
+            {
+              "art": "effect/t127",
+              "anchor": "enemy",
+              "sequence": 0,
+              "canvas_offset": [
+                0,
+                0
+              ],
+              "source_member": "ssjx/effect.mrp/t127.ani",
+              "source_sha256": "d7ecf0c0346c36c6eeb0e0ef21b7705207fd58426ffada9b7338ca1e6194fab3"
+            }
+          ]
+        },
+        {
+          "level": 10,
+          "layers": [
+            {
+              "art": "effect/t128",
+              "anchor": "enemy",
+              "sequence": 0,
+              "canvas_offset": [
+                0,
+                0
+              ],
+              "source_member": "ssjx/effect.mrp/t128.ani",
+              "source_sha256": "ffb89c027040a35f16c424e13c717c75fa913987be1776977dffe4d7f0abe20f"
+            }
+          ]
+        },
+        {
+          "level": 15,
+          "layers": [
+            {
+              "art": "effect/t129",
+              "anchor": "enemy",
+              "sequence": 0,
+              "canvas_offset": [
+                0,
+                0
+              ],
+              "source_member": "ssjx/effect.mrp/t129.ani",
+              "source_sha256": "ce77e49620ee52055a0297a066968bb6254c11afe3df44bde1a7163a59c858d4"
+            }
+          ]
+        }
+      ],
+      "stage_basis": "user_supplied_resource_order"
     },
     "sheet_017": {
       "name": "连天绝壁",
@@ -260,11 +719,61 @@
           "source_member": "ssjx/effect.mrp/t81.ani",
           "source_sha256": "f9cca222298d47f5c47dcfc5b572c35c0ba33d645cc00d96dac44d38348ad0fa"
         }
-      ]
+      ],
+      "stages": [
+        {
+          "level": 6,
+          "layers": [
+            {
+              "art": "effect/t81",
+              "anchor": "enemy",
+              "sequence": 0,
+              "canvas_offset": [
+                0,
+                0
+              ],
+              "source_member": "ssjx/effect.mrp/t81.ani",
+              "source_sha256": "f9cca222298d47f5c47dcfc5b572c35c0ba33d645cc00d96dac44d38348ad0fa"
+            }
+          ]
+        },
+        {
+          "level": 10,
+          "layers": [
+            {
+              "art": "effect/t80",
+              "anchor": "enemy",
+              "sequence": 0,
+              "canvas_offset": [
+                0,
+                0
+              ],
+              "source_member": "ssjx/effect.mrp/t80.ani",
+              "source_sha256": "333bf32836498d5b0840217066c83ce60d9c94f9db29d5bb1a28485892fa2c3f"
+            }
+          ]
+        },
+        {
+          "level": 15,
+          "layers": [
+            {
+              "art": "effect/t79",
+              "anchor": "enemy",
+              "sequence": 0,
+              "canvas_offset": [
+                0,
+                0
+              ],
+              "source_member": "ssjx/effect.mrp/t79.ani",
+              "source_sha256": "fa1ee80d4f84df65cc4f4fcb46c6475e44020c7eea4873ee92176564d7a0022a"
+            }
+          ]
+        }
+      ],
+      "stage_basis": "user_supplied_resource_order"
     },
     "sheet_018": {
       "name": "星火燎原",
-      "audio_id": "fire",
       "basis": "authored_semantic_mapping",
       "trigger": "cast_impact",
       "reason": "星火坠落并燃起火柱",
@@ -280,7 +789,8 @@
           "source_member": "ssjx/effect.mrp/t47.ani",
           "source_sha256": "73ff3e4739cefebc34c52bc9dc468c3d0fa417d108579713b22e080b1ceae87c"
         }
-      ]
+      ],
+      "audio_id": "fire"
     },
     "sheet_019": {
       "name": "焚天疾火",
@@ -299,7 +809,58 @@
           "source_member": "ssjx/effect.mrp/t60.ani",
           "source_sha256": "9572b466d5fc80629c67bf1f5a6e464d35f723360d3d432d4e99a0570335ad88"
         }
-      ]
+      ],
+      "stages": [
+        {
+          "level": 6,
+          "layers": [
+            {
+              "art": "effect/t47",
+              "anchor": "enemy",
+              "sequence": 0,
+              "canvas_offset": [
+                0,
+                0
+              ],
+              "source_member": "ssjx/effect.mrp/t47.ani",
+              "source_sha256": "73ff3e4739cefebc34c52bc9dc468c3d0fa417d108579713b22e080b1ceae87c"
+            }
+          ]
+        },
+        {
+          "level": 10,
+          "layers": [
+            {
+              "art": "effect/t48",
+              "anchor": "enemy",
+              "sequence": 0,
+              "canvas_offset": [
+                0,
+                0
+              ],
+              "source_member": "ssjx/effect.mrp/t48.ani",
+              "source_sha256": "7219d7d96cb15da9ad94d32e4d1673970ebb4531f15fbbcb235967ffbf317a48"
+            }
+          ]
+        },
+        {
+          "level": 15,
+          "layers": [
+            {
+              "art": "effect/t54",
+              "anchor": "enemy",
+              "sequence": 0,
+              "canvas_offset": [
+                0,
+                0
+              ],
+              "source_member": "ssjx/effect.mrp/t54.ani",
+              "source_sha256": "1b94435486e31a9e39b13deffa5b524ee89b767066f6d69c9b46be82d5a3eea7"
+            }
+          ]
+        }
+      ],
+      "stage_basis": "user_supplied_resource_order"
     },
     "sheet_021": {
       "name": "劫焰燎原",
@@ -318,7 +879,58 @@
           "source_member": "ssjx/effect.mrp/t62.ani",
           "source_sha256": "135ed680424daefbcb51b3bc61ace8cb433f122f93ba2eb2bc0db7b962b5568e"
         }
-      ]
+      ],
+      "stages": [
+        {
+          "level": 6,
+          "layers": [
+            {
+              "art": "effect/t56",
+              "anchor": "enemy",
+              "sequence": 0,
+              "canvas_offset": [
+                0,
+                0
+              ],
+              "source_member": "ssjx/effect.mrp/t56.ani",
+              "source_sha256": "c4619ba3e89c0d3e833dc20df921ff54958caba4c644d5665d8f921441de618e"
+            }
+          ]
+        },
+        {
+          "level": 10,
+          "layers": [
+            {
+              "art": "effect/t57",
+              "anchor": "enemy",
+              "sequence": 0,
+              "canvas_offset": [
+                0,
+                0
+              ],
+              "source_member": "ssjx/effect.mrp/t57.ani",
+              "source_sha256": "f599082cf39d480ea7aa41b1f90239d59c9f471f0f8006122dc213dbbe936fa4"
+            }
+          ]
+        },
+        {
+          "level": 15,
+          "layers": [
+            {
+              "art": "effect/t59",
+              "anchor": "enemy",
+              "sequence": 0,
+              "canvas_offset": [
+                0,
+                0
+              ],
+              "source_member": "ssjx/effect.mrp/t59.ani",
+              "source_sha256": "2148f8287a2db9680c2c7e61b454ef266da5013276b5bc7f488b6b00663da2b3"
+            }
+          ]
+        }
+      ],
+      "stage_basis": "user_supplied_resource_order"
     },
     "sheet_025": {
       "name": "推窗望月",
@@ -356,7 +968,58 @@
           "source_member": "ssjx/effect.mrp/t37.ani",
           "source_sha256": "e2e0a139e29be9f50d2a64a579e847cebab20d430ea1f0e443502d9d0a38976b"
         }
-      ]
+      ],
+      "stages": [
+        {
+          "level": 6,
+          "layers": [
+            {
+              "art": "effect/t37",
+              "anchor": "enemy",
+              "sequence": 0,
+              "canvas_offset": [
+                0,
+                0
+              ],
+              "source_member": "ssjx/effect.mrp/t37.ani",
+              "source_sha256": "e2e0a139e29be9f50d2a64a579e847cebab20d430ea1f0e443502d9d0a38976b"
+            }
+          ]
+        },
+        {
+          "level": 10,
+          "layers": [
+            {
+              "art": "effect/t91",
+              "anchor": "enemy",
+              "sequence": 0,
+              "canvas_offset": [
+                0,
+                0
+              ],
+              "source_member": "ssjx/effect.mrp/t91.ani",
+              "source_sha256": "87e5a488753ee2f3f447baa18403db49d358fcae9f755e62575b36b6316ab0b2"
+            }
+          ]
+        },
+        {
+          "level": 15,
+          "layers": [
+            {
+              "art": "effect/t38",
+              "anchor": "enemy",
+              "sequence": 0,
+              "canvas_offset": [
+                0,
+                0
+              ],
+              "source_member": "ssjx/effect.mrp/t38.ani",
+              "source_sha256": "309ad3d7b1ba20e0f443728ad6636def085db4046135b3202cc1344b864b9ffb"
+            }
+          ]
+        }
+      ],
+      "stage_basis": "user_supplied_resource_order"
     },
     "sheet_033": {
       "name": "移花接木",
@@ -424,7 +1087,58 @@
           "source_member": "ssjx/effect.mrp/t173.ani",
           "source_sha256": "7bf58746180b2ba36b8b09acb168c6fccc889a9fd4fdd0c4a3a2628197da638d"
         }
-      ]
+      ],
+      "stages": [
+        {
+          "level": 6,
+          "layers": [
+            {
+              "art": "effect/t98",
+              "anchor": "enemy",
+              "sequence": 0,
+              "canvas_offset": [
+                0,
+                0
+              ],
+              "source_member": "ssjx/effect.mrp/t98.ani",
+              "source_sha256": "d2fb3264a2e1af366600b53ba8b3ff36a1693674d42b9b351c0564b70e3a8b1c"
+            }
+          ]
+        },
+        {
+          "level": 10,
+          "layers": [
+            {
+              "art": "effect/t99",
+              "anchor": "enemy",
+              "sequence": 0,
+              "canvas_offset": [
+                0,
+                0
+              ],
+              "source_member": "ssjx/effect.mrp/t99.ani",
+              "source_sha256": "2ce4c1dd0d481aa39d4af91efcefcc484e3da70745721cd57e11dd09275ee0ef"
+            }
+          ]
+        },
+        {
+          "level": 15,
+          "layers": [
+            {
+              "art": "effect/t72",
+              "anchor": "enemy",
+              "sequence": 0,
+              "canvas_offset": [
+                0,
+                0
+              ],
+              "source_member": "ssjx/effect.mrp/t72.ani",
+              "source_sha256": "41723e1af5a0eee5faa38a954974025966903c05ddbc21799a6dd4a66bdc6821"
+            }
+          ]
+        }
+      ],
+      "stage_basis": "user_supplied_resource_order"
     },
     "sheet_036": {
       "name": "穿衣破甲",
@@ -462,7 +1176,58 @@
           "source_member": "ssjx/effect.mrp/t75.ani",
           "source_sha256": "0ef6413f4de0cd6fd31177e2e07a81db482b9d8f72f7e55d7a8285bc75b9c630"
         }
-      ]
+      ],
+      "stages": [
+        {
+          "level": 6,
+          "layers": [
+            {
+              "art": "effect/t73",
+              "anchor": "enemy",
+              "sequence": 0,
+              "canvas_offset": [
+                0,
+                0
+              ],
+              "source_member": "ssjx/effect.mrp/t73.ani",
+              "source_sha256": "7c3598bbc82a1f2a12cfa4a8cc1e962e03f1e94f717a491547e3596f995b268c"
+            }
+          ]
+        },
+        {
+          "level": 10,
+          "layers": [
+            {
+              "art": "effect/t74",
+              "anchor": "enemy",
+              "sequence": 0,
+              "canvas_offset": [
+                0,
+                0
+              ],
+              "source_member": "ssjx/effect.mrp/t74.ani",
+              "source_sha256": "9fac73c05df3814872fba21b034eeb6fa599acc946217152b300b5a9128e4172"
+            }
+          ]
+        },
+        {
+          "level": 15,
+          "layers": [
+            {
+              "art": "effect/t75",
+              "anchor": "enemy",
+              "sequence": 0,
+              "canvas_offset": [
+                0,
+                0
+              ],
+              "source_member": "ssjx/effect.mrp/t75.ani",
+              "source_sha256": "0ef6413f4de0cd6fd31177e2e07a81db482b9d8f72f7e55d7a8285bc75b9c630"
+            }
+          ]
+        }
+      ],
+      "stage_basis": "user_supplied_resource_order"
     },
     "sheet_039": {
       "name": "起死回生",
@@ -538,7 +1303,58 @@
           "source_member": "ssjx/effect.mrp/t140.ani",
           "source_sha256": "c4236a934e0905da70b9f08f2b75c7bbf82892e7af7bb52e8d7b42ac5dae6897"
         }
-      ]
+      ],
+      "stages": [
+        {
+          "level": 6,
+          "layers": [
+            {
+              "art": "effect/t29",
+              "anchor": "enemy",
+              "sequence": 0,
+              "canvas_offset": [
+                0,
+                0
+              ],
+              "source_member": "ssjx/effect.mrp/t29.ani",
+              "source_sha256": "90e1b37e0e19a17351ca106c1c39b625db16d1bf6ba4c344994461ba41f903a0"
+            }
+          ]
+        },
+        {
+          "level": 10,
+          "layers": [
+            {
+              "art": "effect/t144",
+              "anchor": "enemy",
+              "sequence": 0,
+              "canvas_offset": [
+                0,
+                0
+              ],
+              "source_member": "ssjx/effect.mrp/t144.ani",
+              "source_sha256": "488bc9f2099222e72068f562b6ab0ec3e031aa59aedc05f1b9b7735ce5824881"
+            }
+          ]
+        },
+        {
+          "level": 15,
+          "layers": [
+            {
+              "art": "effect/t145",
+              "anchor": "enemy",
+              "sequence": 0,
+              "canvas_offset": [
+                0,
+                0
+              ],
+              "source_member": "ssjx/effect.mrp/t145.ani",
+              "source_sha256": "c9f00011bdead2fc8a25b78b8807d40ed6feea827030a74217114e47dd78efa1"
+            }
+          ]
+        }
+      ],
+      "stage_basis": "user_supplied_resource_order"
     },
     "sheet_047": {
       "name": "偷天换日",
@@ -568,7 +1384,58 @@
           "source_member": "ssjx/effect.mrp/t09.ani",
           "source_sha256": "30a2e1aaa797760395cfabbbd23acdd5e189aa3a8a26709613cfe331d7293522"
         }
-      ]
+      ],
+      "stages": [
+        {
+          "level": 6,
+          "layers": [
+            {
+              "art": "effect/t138",
+              "anchor": "enemy",
+              "sequence": 0,
+              "canvas_offset": [
+                0,
+                0
+              ],
+              "source_member": "ssjx/effect.mrp/t138.ani",
+              "source_sha256": "48252d1462e7cb034f0f28a25b09a7c33263bfb2cad41a981dd8271dd88b4892"
+            }
+          ]
+        },
+        {
+          "level": 10,
+          "layers": [
+            {
+              "art": "effect/t136",
+              "anchor": "enemy",
+              "sequence": 0,
+              "canvas_offset": [
+                0,
+                0
+              ],
+              "source_member": "ssjx/effect.mrp/t136.ani",
+              "source_sha256": "0309bc8f3550bc7e35aba216d029d8b881584713eb6fe289a23293fec9be4e7b"
+            }
+          ]
+        },
+        {
+          "level": 15,
+          "layers": [
+            {
+              "art": "effect/t137",
+              "anchor": "enemy",
+              "sequence": 0,
+              "canvas_offset": [
+                0,
+                0
+              ],
+              "source_member": "ssjx/effect.mrp/t137.ani",
+              "source_sha256": "5cc490b3d26569bd342a1c265aff644d186d18235728b166a2da2eee25b55354"
+            }
+          ]
+        }
+      ],
+      "stage_basis": "user_supplied_resource_order"
     },
     "sheet_051": {
       "name": "醉生梦死",
@@ -587,7 +1454,58 @@
           "source_member": "ssjx/effect.mrp/t16.ani",
           "source_sha256": "3e716d54817b74f3b2deee8d109a614c4445854ad0d0f5bccc81afc6c1861c01"
         }
-      ]
+      ],
+      "stages": [
+        {
+          "level": 6,
+          "layers": [
+            {
+              "art": "effect/t114",
+              "anchor": "enemy",
+              "sequence": 0,
+              "canvas_offset": [
+                0,
+                0
+              ],
+              "source_member": "ssjx/effect.mrp/t114.ani",
+              "source_sha256": "af54d43e528c632b5228c1acf44805aa26d639a0de84a08bc498525e2b63229d"
+            }
+          ]
+        },
+        {
+          "level": 10,
+          "layers": [
+            {
+              "art": "effect/t115",
+              "anchor": "enemy",
+              "sequence": 0,
+              "canvas_offset": [
+                0,
+                0
+              ],
+              "source_member": "ssjx/effect.mrp/t115.ani",
+              "source_sha256": "f3eebcc5295699b926d98c561a981ff69df59300593089fcd13267c532cf0e13"
+            }
+          ]
+        },
+        {
+          "level": 15,
+          "layers": [
+            {
+              "art": "effect/t116",
+              "anchor": "enemy",
+              "sequence": 0,
+              "canvas_offset": [
+                0,
+                0
+              ],
+              "source_member": "ssjx/effect.mrp/t116.ani",
+              "source_sha256": "1d74a72c6b1f1be349e6c0a24a2e932b5437d41f2c5a4370692c37874617f088"
+            }
+          ]
+        }
+      ],
+      "stage_basis": "user_supplied_resource_order"
     },
     "sheet_052": {
       "name": "混元入蛊",
@@ -606,7 +1524,58 @@
           "source_member": "ssjx/effect.mrp/t25.ani",
           "source_sha256": "453798e6a15e42b5467d85552c8d6a8f87c1ecc204ac1bf8ed81655c4831d278"
         }
-      ]
+      ],
+      "stages": [
+        {
+          "level": 6,
+          "layers": [
+            {
+              "art": "effect/t107",
+              "anchor": "enemy",
+              "sequence": 0,
+              "canvas_offset": [
+                0,
+                0
+              ],
+              "source_member": "ssjx/effect.mrp/t107.ani",
+              "source_sha256": "395cec6ec681321d048889c538a6e1f0a2159fae7e6fd6aa2bbda0ccb24499ac"
+            }
+          ]
+        },
+        {
+          "level": 10,
+          "layers": [
+            {
+              "art": "effect/t108",
+              "anchor": "enemy",
+              "sequence": 0,
+              "canvas_offset": [
+                0,
+                0
+              ],
+              "source_member": "ssjx/effect.mrp/t108.ani",
+              "source_sha256": "5e9ecbe19f9c8e75533efaf0896e4639debee85a243a3e8ad773b5ace3ece765"
+            }
+          ]
+        },
+        {
+          "level": 15,
+          "layers": [
+            {
+              "art": "effect/t110",
+              "anchor": "enemy",
+              "sequence": 0,
+              "canvas_offset": [
+                0,
+                0
+              ],
+              "source_member": "ssjx/effect.mrp/t110.ani",
+              "source_sha256": "adb9825c92e30877e90c2c0e32964a5f32b24a6a78ba7e276f7860462b0efcd9"
+            }
+          ]
+        }
+      ],
+      "stage_basis": "user_supplied_resource_order"
     },
     "legacy_0": {
       "name": "破山诀",

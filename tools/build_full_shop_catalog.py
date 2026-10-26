@@ -43,7 +43,7 @@ MEDICINES = {
     15:('小玉药瓶',30,0),16:('白瓷药瓶',60,0),17:('方口药瓶',0,25),18:('竹筒药液',45,20),
     19:('紫晶灵液',0,35),20:('四方灵液',0,45),21:('圆肚灵液',0,55),
     22:('赤玉葫芦',70,0),23:('铜口葫芦',100,25),24:('烧饼',20,0),25:('灵果',25,10),
-    26:('莲蓬',0,20),27:('朱果',35,15),28:('回春药罐',45,0),70:('白玉药囊',75,0),71:('赤陶药罐',100,0),72:('青纹药罐',60,40),
+    26:('荷叶烧鸡',6000,0),27:('朱果',35,15),28:('回春药罐',45,0),70:('白玉药囊',75,0),71:('赤陶药罐',100,0),72:('青纹药罐',60,40),
 }
 # Material resource names confirmed by the user; keep recovered evidence intact.
 MATERIAL_NAMES = {42: '当归', 43: '茯苓'}
@@ -81,11 +81,14 @@ def build():
         elif n in MEDICINES:
             name,hp,mp=MEDICINES[n]
             row.update(name=name,slot='consumable',category='药品',price=max(4,(hp+mp*2)//6),restore_hp=hp,restore_mp=mp,sections=['hot','elixir'])
-            if n in (10,14):
+            if n in (10,14,26):
                 resource,amount,field=('气血',hp,'restore_hp') if hp else ('灵力',mp,'restore_mp')
-                row.update(price=10,usage_note=f'战斗外使用，不超过{resource}上限',
+                price=6 if n==26 else 10
+                row.update(price=price,usage_note=f'战斗外使用，不超过{resource}上限',
                     original_confirmation={'name':name,field:amount,'source':f'用户于2026-10-26提供ix{n}截图并确认原版名称与恢复量'},
-                    rules_basis=f'原包图标；名称及固定恢复{amount}{resource}由用户确认；售价沿用10铜钱，分类与战斗外使用沿用当前重建规则')
+                    rules_basis=f'原包图标；名称及固定恢复{amount}{resource}由用户确认；售价沿用{price}铜钱，分类与战斗外使用沿用当前重建规则')
+                if n==26:
+                    row['original_confirmation']['level']=1
         else:
             if n in [29,31,32,33,34,35,67]: category='宝石';name='灵石';row['price']=35
             elif n in [6,51,52,53,54,68]: category='配方';name='纹印卷轴';row['price']=24

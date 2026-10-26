@@ -43,6 +43,8 @@ func _ready() -> void:
 			check(entry.data["原版名称"]=="生骨融血草" and entry.data["原版属性"]=={"恢复气血":8000},"User-confirmed herb name and recovery are explicit")
 		elif entry.id=="original/ix14":
 			check(entry.data["原版名称"]=="极品人参" and entry.data["原版属性"]=={"恢复灵力":4000},"User-confirmed ginseng name and mana recovery are explicit")
+		elif entry.id=="original/ix26":
+			check(entry.data["原版名称"]=="荷叶烧鸡" and entry.data["原版等级"]==1 and entry.data["原版属性"]=={"恢复气血":6000},"Screenshot-confirmed chicken name, level and healing are explicit")
 		else:
 			check(entry.data["原版名称"] == null and entry.data["原版属性"] == null, "Unknown original names and stats remain unknown: " + entry.id)
 		var product:=ShopRules.item(entry.id)

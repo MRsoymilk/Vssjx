@@ -7,7 +7,7 @@ from run_online_maps import MapPlayer
 ID = 'original/ix10'
 
 
-def main(item_id=ID, restore_hp=8000, restore_mp=0):
+def main(item_id=ID, restore_hp=8000, restore_mp=0, price=10):
     item = item_id
     checks = []
 
@@ -32,8 +32,8 @@ def main(item_id=ID, restore_hp=8000, restore_mp=0):
         player = connect()
         check(player.state['shop']['quantities'][item] == 2, 'Existing material inventory retains its ID and quantity')
         result, _ = command('buy')
-        check(result['state']['character']['gold'] == 90 and result['state']['shop']['quantities'][item] == 3,
-              'Shop sells the same item for 10 copper')
+        check(result['state']['character']['gold'] == 100-price and result['state']['shop']['quantities'][item] == 3,
+              'Shop sells the same item for its preserved price')
         result, receipt = command('use')
         check(result['state']['character']['hp'] == min(1+restore_hp, result['state']['stats']['hp']) and result['state']['character']['mp'] == min(7+restore_mp,result['state']['stats']['mp']),
               'Authoritative consumer restores the fixed amount to the correct resource')
@@ -55,5 +55,7 @@ def main(item_id=ID, restore_hp=8000, restore_mp=0):
 if __name__ == '__main__':
     if sys.argv[1:]==['--ginseng']:
         main('original/ix14',0,4000)
+    elif sys.argv[1:]==['--chicken']:
+        main('original/ix26',6000,0,6)
     else:
         main()

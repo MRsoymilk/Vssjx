@@ -336,6 +336,9 @@ func _load_original_items() -> void:
 			data["原版属性"] = recovery
 			data["确认依据"] = confirmation.source
 			data["说明"] = "名称与恢复量由用户确认；原版等级、业务物品ID及其余属性未知"
+			if confirmation.has("level"):
+				data["原版等级"] = int(confirmation.level)
+				data["说明"] = "名称、等级与恢复量由用户截图确认；原版业务物品ID及其余属性未知"
 			summary = "%d × %d 像素 · 用户确认原版名称与%s" % [int(item.width), int(item.height), " / ".join(parts)]
 		data["商城接入"] = "未接入" if product.is_empty() else "已接入"
 		if not product.is_empty():

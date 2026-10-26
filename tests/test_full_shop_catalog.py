@@ -8,6 +8,14 @@ ROOT=Path(__file__).resolve().parents[1]
 
 
 class FullShopTests(unittest.TestCase):
+    def test_chicken_preserves_icon_and_level_while_restoring_health(self):
+        catalog=json.loads((ROOT/'client/assets/data/shop-v2.json').read_text('utf8'))
+        item=next(i for i in catalog['items'] if i['id']=='original/ix26')
+        self.assertEqual((item['name'],item['slot'],item['restore_hp'],item['restore_mp']),('荷叶烧鸡','consumable',6000,0))
+        self.assertEqual((item['level'],item['price'],item['original_confirmation']['level']),(1,6,1))
+        self.assertEqual(item['icon'],'res://assets/items/original/ix26.png')
+        self.assertEqual(item['sections'],['hot','elixir'])
+
     def test_confirmed_ginseng_reuses_original_id_and_fixed_mana(self):
         catalog=json.loads((ROOT/'client/assets/data/shop-v2.json').read_text('utf8'))
         item=next(i for i in catalog['items'] if i['id']=='original/ix14')

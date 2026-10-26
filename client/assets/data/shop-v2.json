@@ -3990,7 +3990,7 @@
     },
     {
       "id": "original/ix26",
-      "name": "莲蓬",
+      "name": "荷叶烧鸡",
       "slot": "consumable",
       "price": 6,
       "attack": 0,
@@ -4000,16 +4000,23 @@
       "level": 1,
       "job": -1,
       "icon": "res://assets/items/original/ix26.png",
-      "restore_hp": 0,
-      "restore_mp": 20,
+      "restore_hp": 6000,
+      "restore_mp": 0,
       "source_member": "ssjx/item/ix26.img",
       "source_sha256": "defb7189d2cebe18ee113c3313a83f9413acd38eb2bcb892824f3ccfb7541eb8",
-      "rules_basis": "图形特征命名、分类、售价和属性为重建规则；并非原服务器物品表",
+      "rules_basis": "原包图标；名称及固定恢复6000气血由用户确认；售价沿用6铜钱，分类与战斗外使用沿用当前重建规则",
       "category": "药品",
       "sections": [
         "hot",
         "elixir"
-      ]
+      ],
+      "usage_note": "战斗外使用，不超过气血上限",
+      "original_confirmation": {
+        "name": "荷叶烧鸡",
+        "restore_hp": 6000,
+        "source": "用户于2026-10-26提供ix26截图并确认原版名称与恢复量",
+        "level": 1
+      }
     },
     {
       "id": "original/ix27",

@@ -318,7 +318,7 @@ pub(crate) async fn delete(
             .bind(payload.character_id).fetch_one(&mut *tx).await.map_err(database_error)?;
         if present { return Err(AuthError(StatusCode::CONFLICT, code)); }
     }
-    let escrow:bool=sqlx::query_scalar("SELECT EXISTS(SELECT 1 FROM auction_listings WHERE (seller=$1 OR bidder=$1) AND status='open') OR EXISTS(SELECT 1 FROM economy_deliveries WHERE character_id=$1 AND NOT claimed)").bind(payload.character_id).fetch_one(&mut *tx).await.map_err(database_error)?;
+    let escrow:bool=sqlx::query_scalar("SELECT EXISTS(SELECT 1 FROM auction_listings WHERE (seller=$1 OR bidder=$1) AND status='open') OR EXISTS(SELECT 1 FROM economy_deliveries WHERE character_id=$1 AND NOT claimed) OR EXISTS(SELECT 1 FROM equipment_trades WHERE (sender=$1 OR recipient=$1) AND status IN ('pending','active'))").bind(payload.character_id).fetch_one(&mut *tx).await.map_err(database_error)?;
     if escrow{return Err(AuthError(StatusCode::CONFLICT,"CHARACTER_HAS_ESCROW"));}
     sqlx::query("UPDATE characters SET deleted_at=clock_timestamp() WHERE id=$1").bind(payload.character_id).execute(&mut *tx).await.map_err(database_error)?;
     sqlx::query("DELETE FROM friendships WHERE low_id=$1 OR high_id=$1").bind(payload.character_id).execute(&mut *tx).await.map_err(database_error)?;

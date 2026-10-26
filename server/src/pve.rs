@@ -41,6 +41,7 @@ pub struct Context {
 }
 #[derive(Clone)]
 struct Loaded {
+    incoming_trade:Option<Uuid>,
     rules:std::sync::Arc<crate::map_rules::Snapshot>,
     gathering:Value,
     endless:crate::endless::Progress,
@@ -117,6 +118,7 @@ async fn load_character(tx:&mut Transaction<'_,Postgres>,character_id:Uuid,accou
     let ai:crate::ai_world::Progress=serde_json::from_value(row.get::<Json<Value>,_>("ai_progress").0).map_err(|_|unavailable())?;
     if !ai.valid(){return Err(unavailable());}
     let mut loaded = Loaded {
+        incoming_trade:sqlx::query_scalar("SELECT id FROM equipment_trades WHERE recipient=$1 AND status='pending' AND expires_at>clock_timestamp() LIMIT 1").bind(character_id).fetch_optional(&mut **tx).await.map_err(database)?,
         rules:crate::map_rules::load_tx(tx).await.map_err(database)?,
         gathering:crate::gathering::view(tx,character_id,&character.map_id).await.map_err(database)?,
         endless:serde_json::from_value(row.get::<Json<Value>,_>("endless_state").0).map_err(|_|unavailable())?,
@@ -199,7 +201,7 @@ impl Loaded {
         for key in ["physical_attack","magic_attack"] { profile["combat"][key] = json!(profile["combat"][key].as_i64().unwrap() + i64::from(attack - if self.equipped {5} else {0})); }
         for key in ["physical_defense","magic_defense"] { profile["combat"][key] = json!(self.stats().defense); }
         if self.stats().balance.is_some(){profile=crate::attributes::profile_for(self.stats(),self.character.job,self.character.level,self.allocated);}
-        json!({"rules_version":pve_rules::RULES,"character":self.character,"potions":self.potions,"gathering":self.gathering,"gourds":self.gourds,
+        json!({"rules_version":pve_rules::RULES,"character":self.character,"potions":self.potions,"gathering":self.gathering,"gourds":self.gourds,"economy":{"incoming_trade":self.incoming_trade},
             "endless":self.endless.view(),
             "equipment":{"version":"equipment-v1","weapon_owned":self.weapon_owned,"weapon":if self.equipped {Some("sword")} else {None}},
             "stats":self.stats(),"hunt_pressure":self.hunt_pressure,
@@ -911,7 +913,7 @@ pub(crate) async fn team_loot_pool(tx:&mut Transaction<'_,Postgres>,b:&crate::te
 pub(crate) async fn team_loot_award(tx:&mut Transaction<'_,Postgres>,id:Uuid,item:&crate::loot::Item)->Result<(),AuthError>{
     let account=sqlx::query_scalar("SELECT account_id FROM characters WHERE id=$1").bind(id).fetch_one(&mut **tx).await.map_err(database)?;
     let mut a=load_character(tx,id,account,None).await?;
-    if !item.valid(a.character.job,a.character.gender)||item.level>a.character.level{return Err(unavailable());}
+    if !item.valid(a.character.job,a.character.gender){return Err(unavailable());}
     if a.loot.items.iter().chain(a.loot.pending.iter()).any(|i|i.id==item.id){return Err(unavailable());}
     a.loot.skins.insert(item.template.clone());
     if a.bag_count()<60{a.loot.items.push(item.clone());}else if a.loot.pending.len()<20{a.loot.pending.push(item.clone());}else{return Err(AuthError(StatusCode::CONFLICT,"LOOT_STORAGE_FULL"));}

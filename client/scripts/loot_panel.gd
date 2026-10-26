@@ -156,7 +156,9 @@ func _describe()->void:
 	var pending:bool=_state().get("pending",[]).has(selection)
 	claim.disabled=locked or not pending
 	equip.text="卸下" if selection.equipped else "装备"
-	equip.disabled=locked or pending or (not selection.equipped and int(selection.level)>int(c.get("level",1)))
+	var restriction:=LootRules.equip_error(selection,int(c.get("job",0)),int(c.get("gender",0)))
+	equip.disabled=locked or pending or (not selection.equipped and (int(selection.level)>int(c.get("level",1)) or not restriction.is_empty()))
+	if not selection.equipped and not restriction.is_empty():status.text=OnlinePve.error_text(restriction)+"；未绑定装备可交易。"
 	var worn:=LootRules.equipped(_state(),ShopRules.item(selection.template).slot)
 	if not worn.is_empty() and worn.id!=selection.id:
 		details.text+="\n当前：%s · %s"%[ShopRules.item(worn.template).name,String(worn.id).right(6)]

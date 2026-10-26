@@ -59,6 +59,7 @@ def main():
         result,_=choose(a,'loot_roll',request=first);check(result['replayed'] and result['state']['team']['battle']['loot_pool']['drops'][0]['choices'][a[1]]==score,'Retry cannot reroll a committed score')
         players[0].close();players[0].fixture_closed=True;time.sleep(.2)
         choose(b,'loot_pass')
+        f.db.query(f"UPDATE characters SET level=1,hp=30,mp=20,allocated_attributes=ARRAY[0,0,0,0,0] WHERE id='{a[1]}'")
         before=f.db.query('SELECT id,loot_state,state_revision FROM characters ORDER BY id')
         f.db.query("CREATE FUNCTION reject_roll_award() RETURNS trigger LANGUAGE plpgsql AS $$BEGIN IF NEW.loot_state IS DISTINCT FROM OLD.loot_state THEN RAISE EXCEPTION 'owned roll rollback'; END IF; RETURN NEW; END$$; CREATE TRIGGER reject_roll_award BEFORE UPDATE ON characters FOR EACH ROW EXECUTE FUNCTION reject_roll_award();")
         current=battle();request=dict(character_id=c[1],action='loot_pass',operation_id=str(uuid4()),target=item_id,battle_id=current['id'],expected_revision=current['loot_pool']['revision'])
@@ -68,13 +69,14 @@ def main():
         result,_=choose(c,'loot_pass',request=request);fixtures.append(result)
         lifecycle['resolved']=send(c,'snapshot')[0]
         loot=json.loads(f.db.query(f"SELECT loot_state FROM characters WHERE id='{a[1]}'"));check(loot['pending'][0]['id']==item_id and battle()['loot_pool']['drops'][0]['winner']==a[1],'An offline roller still wins the original UUID into pending storage when their backpack is full')
+        check(loot['pending'][0]['level']>1 and not loot['pending'][0]['bound'],'A low-level winner receives higher-level random gear unbound; only wearing it is restricted')
         before=f.db.query('SELECT id,loot_state,state_revision FROM characters ORDER BY id');choose(c,'loot_pass',request=request)
         check(f.db.query('SELECT id,loot_state,state_revision FROM characters ORDER BY id')==before,'Award replay cannot duplicate an item or consume capacity twice')
         # Move the owned fixture to an actual original boss for two shared drops.
         boss=next(r for r in json.loads((ROOT/'shared/data/ruins-population-v1.json').read_text()) if r['id']=='boss')
         for p in players:p.close()
         f.restart() # Drain old room ownership before moving only the disposable characters.
-        for who in identities:f.db.query(f"UPDATE characters SET map_id='ancient_ruins',cell_x={boss['cell'][0]},cell_y={boss['cell'][1]-1},monster_respawns='{{}}'::jsonb,hunt_pressure='{{}}'::jsonb WHERE id='{who[1]}'")
+        for who in identities:f.db.query(f"UPDATE characters SET level=60,hp=1000,mp=480,allocated_attributes=ARRAY[60,0,180,60,0],map_id='ancient_ruins',cell_x={boss['cell'][0]},cell_y={boss['cell'][1]-1},monster_respawns='{{}}'::jsonb,hunt_pressure='{{}}'::jsonb WHERE id='{who[1]}'")
         time.sleep(.2);connect_all();result=finish('boss');check(len(battle()['loot_pool']['drops'])==2,'Boss victory creates two separately decidable common drops')
         lifecycle['next_active']=starts[1];lifecycle['next_pending']=send(c,'snapshot')[0]
         check(lifecycle['next_active']['state']['team']['battle']['id']!=lifecycle['resolved']['state']['team']['battle']['id'] and 'loot_pool' not in lifecycle['next_active']['state']['team']['battle'],'The next authoritative battle has a new ID and contains no previous loot pool')

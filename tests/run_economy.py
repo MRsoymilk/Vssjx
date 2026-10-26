@@ -1,6 +1,7 @@
 """Escrow/auction integration against an owned PostgreSQL and real HTTP/WS service."""
 import copy
 import json
+import os
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from uuid import uuid4
@@ -17,7 +18,7 @@ def main():
         assert ok, label
         checks.append(label)
 
-    prototype = copy.deepcopy(json.loads(Path('/tmp/opencode/loot-vectors.json').read_text())[0]['item'])
+    prototype = copy.deepcopy(json.loads(Path(os.environ.get('SSJX_LOOT_VECTORS', '/tmp/opencode/loot-vectors.json')).read_text())[0]['item'])
     prototype.update(template='original/if2', equipped=False, bound=False, legacy=False, level=1, quality='white', affixes=[])
 
     with BalanceFixture() as f:

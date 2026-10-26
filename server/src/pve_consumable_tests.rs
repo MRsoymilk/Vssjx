@@ -6,7 +6,7 @@ fn player(job:i16,level:i32,revision:i16)->(Loaded,Context){
         rules_version:crate::characters::RULES_VERSION.into(),job,gender:0,school:3,level,xp:0,gold:1000,hp:1,mp:0,
         quest_stage:0,map_id:"qingyun_trail".into(),cell_x:4,cell_y:4,state_revision:"0".into(),corpse:None,
         balance_revision:revision,balance_respec_available:false};
-    let loaded=Loaded{character,rules:Default::default(),gathering:json!({}),endless:Default::default(),
+    let loaded=Loaded{character,incoming_trade:None,rules:Default::default(),gathering:json!({}),endless:Default::default(),
         hunt_pressure:Default::default(),ai:Default::default(),defeated:0,respawns:Default::default(),battle:None,
         potions:6,equipped:false,weapon_owned:false,allocated:[0;5],gear:Default::default(),quantities:Default::default(),loot:Default::default(),gourds:Default::default()};
     let context=Context{character:id,session:Uuid::new_v4(),owner:0,connection_epoch:0,cell:[4,4],target_cell:None,

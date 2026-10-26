@@ -68,7 +68,7 @@ static func equip_error(i:Dictionary,job:int,gender:int)->String:
 	for key in ["legendary","set_id"]:
 		if i.get(key)!=null:
 			var index:=BuildRules.index(i[key])
-			if index<0 or int(BuildRules.rules.items[index].job)!=job:return "EQUIPMENT_JOB_REQUIRED"
+			if index<0 or int(BuildRules.rules.items[index].job)!=job:return "WRONG_JOB"
 	if i.get("skin")!=null:return ShopRules.equipment_error(ShopRules.item(i.skin),job,gender)
 	return ""
 static func valid(s:Variant,job:int,gender:int)->bool:
@@ -227,6 +227,10 @@ static func describe(i:Dictionary)->String:
 	var parts:Array[String]=["%s · %s · 物等%d"%[d.name,{"legacy":"原有固定装备","white":"普通","blue":"魔法","yellow":"稀有","orange":"传奇","green":"套装"}.get(i.quality,i.quality),int(i.level)]]
 	parts.append("主攻+%d  双防+%d  气血+%d  灵力+%d"%v)
 	parts.append("已绑定 · 不可交易" if i.get("bound",true) else "未绑定 · 可交易 · 穿戴后绑定")
+	var job:=int(d.job)
+	var build_id:Variant=i.get("legendary") if i.get("legendary")!=null else i.get("set_id")
+	if build_id!=null:job=int(BuildRules.rules.items[BuildRules.index(build_id)].job)
+	parts.append("穿戴需求：%s · %s · %d级"%["不限职业" if job<0 else Game.JOBS[job],"不限性别" if int(d.get("gender",-1))<0 else ("男" if int(d.gender)==0 else "女"),int(i.level)])
 	for a in i.affixes:
 		parts.append(affix_text(a))
 	parts.append("编号 "+String(i.id).right(8))

@@ -39,9 +39,11 @@ func _completed(action:String,result:Dictionary)->void:
 			request={};OnlineAccount.pending_economy={}
 		message.emit("交易结果待确认，将按原编号重试。" if pending() else OnlinePve.error_text(code));changed.emit();return
 	state=result.market.duplicate(true);request={};OnlineAccount.pending_economy={}
-	message.emit("操作已保存；货款、退款和装备在“领取”页。" if result.ok else ERRORS.get(result.code,OnlinePve.error_text(result.code)));changed.emit()
+	var trade_errors:={"TRADE_TOO_FAR":"双方需在同图2格内停下后交易。","TRADE_BUSY":"你或对方已有未结束的交易。","TRADE_CLOSED":"交易已结束或到期，请刷新。","STALE_TRADE":"对方已更新交易，请重新核对双方报价。","TRADE_NOT_LOCKED":"双方需先锁定报价，才能最终确认。","TRADE_NOT_ACTIVE":"请先接受交易邀请。","TRADE_EMPTY":"双方都未提供装备或铜钱。","TRADE_UNCHANGED":"你已确认，请等待对方或修改报价。","TEAM_PLAYER_OFFLINE":"对方已离线；可取消交易退回物资。","TEAM_BUSY":"对方正在战斗，暂不能交易。"}
+	message.emit("操作已保存；货款、退款和装备在“领取”页。" if result.ok else trade_errors.get(result.code,ERRORS.get(result.code,OnlinePve.error_text(result.code))));changed.emit()
 func valid(v:Dictionary)->bool:
 	if v.get("character_id")!=character_id or v.get("operation_id")!=request.get("operation_id") or not v.get("ok") is bool or not v.get("code") is String or not v.get("replayed") is bool:return false
+	if v.ok!=(v.code=="OK"):return false
 	var s:Variant=v.get("market")
 	if not s is Dictionary or s.get("version")!=1 or not s.get("listings") is Array or s.listings.size()>20 or not s.get("deliveries") is Array or s.deliveries.size()>50 or not s.get("more") is bool or not OnlinePve.integer(s.get("page"),0,10000):return false
 	for listing in s.listings:
@@ -54,4 +56,15 @@ func valid(v:Dictionary)->bool:
 		if not delivery is Dictionary or not OnlineWorldClient._uuid(delivery.get("id")) or not OnlinePve.integer(delivery.get("gold"),0,1000000000) or not delivery.get("reason") is String:return false
 		if delivery.get("item")!=null and not LootRules.valid_item(delivery.item,0,0):return false
 		if (delivery.get("item")!=null)==(int(delivery.gold)>0):return false
+	var trade:Variant=s.get("trade")
+	if trade!=null:
+		if not trade is Dictionary or not OnlineWorldClient._uuid(trade.get("id")) or not OnlineWorldClient._uuid(trade.get("sender")) or not OnlineWorldClient._uuid(trade.get("recipient")) or character_id not in [trade.sender,trade.recipient] or trade.sender==trade.recipient:return false
+		if trade.get("status") not in ["pending","active","completed","cancelled","expired"] or not trade.get("revision") is String or not trade.revision.is_valid_int() or int(trade.revision)<1 or not trade.get("sender_name") is String or not trade.get("recipient_name") is String:return false
+		if not trade.get("offers") is Array or trade.offers.size()!=2:return false
+		var ids:={}
+		for offer in trade.offers:
+			if not offer is Dictionary or not offer.get("items") is Array or offer.items.size()>6 or not OnlinePve.integer(offer.get("gold"),0,1000000000) or not offer.get("locked") is bool or not offer.get("confirmed") is bool or (offer.confirmed and not offer.locked):return false
+			for item in offer.items:
+				if not LootRules.valid_item(item,0,0) or not LootRules.tradable(item) or ids.has(item.id):return false
+				ids[item.id]=true
 	return true

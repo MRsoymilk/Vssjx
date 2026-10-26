@@ -169,6 +169,7 @@ struct SavedPosition {
     map_id: String,
 }
 impl WorldHub {
+    pub(crate) fn economy_sync(&self,ids:&[Uuid]){let mut s=self.data.lock().expect("world state");for id in ids{s.team_dirty.insert(*id);}}
     pub(crate) async fn team_guards(&self,ids:&[Uuid])->Vec<tokio::sync::OwnedMutexGuard<()>>{
         let mut gates={let s=self.data.lock().expect("world state");ids.iter().filter_map(|id|s.actors.get(id).map(|a|(*id,a.business.clone()))).collect::<Vec<_>>()};
         gates.sort_by_key(|(id,_)|*id);gates.dedup_by_key(|(id,_)|*id);

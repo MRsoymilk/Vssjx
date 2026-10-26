@@ -83,6 +83,7 @@ var solo_model:=SoloEncounter.new()
 var solo_battle:Control
 var help_panel:ControlHelp
 var economy_panel:EconomyPanel
+var _last_trade_invite:=""
 var team_battle:Control
 var team_notice:Panel
 var team_notice_text:Label
@@ -326,7 +327,9 @@ func _scene_action(action: String) -> void:
 	if action=="trade":
 		if network.pve.active() or network.team.active() or network.duel.active():chat_status.text=OnlinePve.error_text("BATTLE_ACTIVE");return
 		if is_instance_valid(economy_panel):return
-		economy_panel=EconomyPanel.new();economy_panel.online_model=network.pve;add_child(economy_panel);economy_panel.dismissed.connect(_close_economy);return
+		economy_panel=EconomyPanel.new();economy_panel.online_model=network.pve
+		if network.pve.state.get("economy",{}).get("incoming_trade")!=null:economy_panel.section="direct"
+		add_child(economy_panel);economy_panel.dismissed.connect(_close_economy);return
 	var titles := {"system": "系统", "properties": "人物属性", "quest": "任务", "bag": "背包", "map": "地图", "mail": "邮件", "reward": "奖励", "shop": "商城", "craft": "炼制", "team": "队伍", "guild": "帮会", "trade": "交易"}
 	$Menu/Panel/Title.text = titles.get(action, "提示")
 	var body := "同图%d人 · 点击地图移动 / WASD\n公共消息在底部直接发送。\n线上进度由服务器保存。" % actors.size()
@@ -420,6 +423,7 @@ func _team_changed()->void:
 		team_notice_text.text="%s 邀请组队"%team.state.incoming[0].name
 		team_confirm.disabled=team.pending() or team.inflight;team_reject.disabled=team_confirm.disabled
 	if team.active():
+		_close_economy()
 		if not team.presentation_ready() and _team_loading!=team.battle().id:_prepare_team_battle(team.battle())
 		network._pending_motion.clear();move_target.clear();_was_keyboard=false;_cancel_approach()
 		_close_inventory();_close_world_map();_close_attributes();menu.hide();details.hide();npc_dialog.hide()
@@ -529,6 +533,7 @@ func _duel_changed() -> void:
 		_closed_duel = data.id
 		return
 	if data.status == "active":
+		_close_economy()
 		if social_panel.visible:social_panel.dismiss()
 		_cancel_approach();move_target.clear();_was_keyboard=false
 		_close_inventory();_close_world_map();_close_attributes()
@@ -993,6 +998,7 @@ func _pve_changed() -> void:
 	if not model.ready or model.active(): move_target.clear()
 	if model.active():
 		if social_panel.visible:social_panel.dismiss()
+		_close_economy()
 		_close_world_map()
 		_close_inventory()
 	if model.active(): npc_dialog.hide()
@@ -1025,6 +1031,9 @@ func _pve_changed() -> void:
 	npc_dialog.refresh()
 	battle_view.refresh()
 	_update_soul_visuals()
+	var invitation:Variant=model.state.get("economy",{}).get("incoming_trade")
+	if invitation!=null and invitation!=_last_trade_invite:
+		_last_trade_invite=invitation;chat_status.text="收到当面交易邀请：菜单 → 交易 → 当面，可接受或拒绝。"
 
 func _update_soul_visuals() -> void:
 	if network==null or soul_overlay==null:return

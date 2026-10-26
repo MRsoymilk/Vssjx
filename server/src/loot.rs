@@ -75,7 +75,7 @@ impl Item{
         let d=shop::item(&self.template)?;
         if let Some(error)=d.equip_error(job,gender){return Some(error);}
         for id in [self.legendary.as_deref(),self.set_id.as_deref()].into_iter().flatten(){
-            if crate::builds::index(id).is_none_or(|index|crate::builds::DATA["items"][index]["job"]!=job){return Some("EQUIPMENT_JOB_REQUIRED");}
+            if crate::builds::index(id).is_none_or(|index|crate::builds::DATA["items"][index]["job"]!=job){return Some("WRONG_JOB");}
         }
         if let Some(skin)=self.skin.as_deref().and_then(shop::item){return skin.equip_error(job,gender);}
         None

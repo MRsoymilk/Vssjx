@@ -16,15 +16,18 @@ var sell_item:OptionButton
 var starting:SpinBox
 var buyout:SpinBox
 var hours:OptionButton
+var draft_trade:=""
+var draft_items:Dictionary={}
+var draft_gold:=-1
 const INK:=Color("654518")
 func _ready()->void:
 	size=Vector2(320,480);mouse_filter=Control.MOUSE_FILTER_STOP;z_index=20
 	theme=preload("res://scenes/ui/shop_category_theme.tres").duplicate(true)
 	var shade:=ColorRect.new();shade.color=Color(0,0,0,0.6);shade.size=size;add_child(shade)
 	preload("res://scripts/equipment_paper.gd").frame(self,Rect2(8,27,304,426),"拍卖行 · 铜钱交易")
-	for i in 4:
-		var key:String=["browse","sell","mine","deliveries"][i]
-		var tab:=button(["拍卖","上架","我的","领取"][i],self);tab.position=Vector2(17+i*72,67);tab.size=Vector2(70,30);tab.pressed.connect(_tab.bind(key))
+	for i in 5:
+		var key:String=["browse","sell","mine","deliveries","direct"][i]
+		var tab:=button(["拍卖","上架","我的","领取","当面"][i],self);tab.position=Vector2(17+i*58,67);tab.size=Vector2(56,30);tab.pressed.connect(_tab.bind(key))
 	scroll=ScrollContainer.new();scroll.position=Vector2(18,104);scroll.size=Vector2(284,270);scroll.horizontal_scroll_mode=ScrollContainer.SCROLL_MODE_DISABLED;add_child(scroll)
 	scroll.get_v_scroll_bar().custom_minimum_size.x=24
 	for state in ["scroll","grabber","grabber_highlight","grabber_pressed"]:
@@ -59,15 +62,18 @@ func button(text:String,parent:Node)->Button:
 func label(text:String)->Label:
 	var l:=Label.new();l.text=text;l.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART;l.custom_minimum_size.x=250;l.add_theme_color_override("font_color",INK);l.add_theme_font_size_override("font_size",11);rows.add_child(l);return l
 func spinner(value:int)->SpinBox:
-	var s:=SpinBox.new();s.min_value=1;s.max_value=1000000000;s.step=1;s.value=value;s.custom_minimum_size=Vector2(250,32);s.add_theme_font_size_override("font_size",11);rows.add_child(s);s.get_line_edit().add_theme_font_size_override("font_size",11);s.get_line_edit().focus_entered.connect(func()->void:Platform.context.text_input.request_focus(s.get_line_edit()));return s
+	var s:=SpinBox.new();s.min_value=1;s.max_value=1000000000;s.step=1;s.value=value;s.update_on_text_changed=true;s.custom_minimum_size=Vector2(250,32);s.add_theme_font_size_override("font_size",11);rows.add_child(s);s.get_line_edit().add_theme_font_size_override("font_size",11);s.get_line_edit().focus_entered.connect(func()->void:Platform.context.text_input.request_focus(s.get_line_edit()));return s
 func _tab(key:String)->void:
 	section=key;model.filters.scope="mine" if key=="mine" else "browse";model.filters.page=0;model.fetch();render()
 func confirm(action:String,values:Dictionary,text:String)->void:
 	if model.pending():notice.text="前一笔操作待确认，请稍候。";return
+	var focus:=get_viewport().gui_get_focus_owner()
+	if focus is LineEdit and is_ancestor_of(focus):Platform.context.text_input.release_focus(focus)
 	confirm_action=action;confirm_values=values.duplicate(true);confirm_text.text=text;confirmation.show()
 func render()->void:
 	if not is_node_ready():return
 	for child in rows.get_children():rows.remove_child(child);child.queue_free()
+	if section=="direct":_trade();return
 	if section=="sell":_sell();return
 	if section=="deliveries":
 		label("成交、退款和退回的装备在此领取；满包可入暂存，空间全满时保留在此。")
@@ -102,6 +108,7 @@ func _sell()->void:
 	var items:Array=online_model.state.get("loot",{}).get("state",{}).get("items",[]).filter(func(item:Dictionary)->bool:return LootRules.tradable(item))
 	for item in items:sell_item.add_item("%s · Lv.%d · %s"%[ShopRules.item(item.template).name,int(item.level),item.id.right(8)])
 	if items.is_empty():label("背包没有可上架的未绑定装备。");return
+	var description:=label(LootRules.describe(items[0]));sell_item.item_selected.connect(func(index:int)->void:description.text=LootRules.describe(items[index]))
 	label("起拍价（铜钱）");starting=spinner(1);label("一口价（铜钱）");buyout=spinner(100)
 	hours=OptionButton.new();hours.custom_minimum_size=Vector2(250,32);rows.add_child(hours)
 	for h in [6,12,24]:hours.add_item("上架%d小时"%h)
@@ -109,3 +116,42 @@ func _sell()->void:
 		var item:Dictionary=items[sell_item.selected]
 		confirm("list",{"target":item.id,"amount":int(starting.value),"buyout":int(buyout.value),"hours":[6,12,24][hours.selected]},"上架%s？\n编号%s\n起拍%d铜 · 一口价%d铜\n装备将离开背包并由拍卖行托管。"%[ShopRules.item(item.template).name,item.id.right(8),int(starting.value),int(buyout.value)])
 	)
+func _trade()->void:
+	var trade:Variant=model.state.get("trade")
+	if trade==null or trade.status not in ["pending","active"]:
+		if trade!=null:label({"completed":"交易已完成，请到“领取”页取回收到的物资。","cancelled":"交易已取消，托管物资已退回“领取”页。","expired":"交易已到期，托管物资已退回“领取”页。"}.get(trade.status,""))
+		label("当面交易：双方须在线、同图2格内停下。\n只可交易未绑定装备与铜钱；10分钟未完成自动退回。")
+		var name:=LineEdit.new();name.placeholder_text="对方完整角色名";name.max_length=12;name.custom_minimum_size=Vector2(250,32);name.add_theme_font_size_override("font_size",11);rows.add_child(name);name.focus_entered.connect(func()->void:Platform.context.text_input.request_focus(name))
+		button("邀请交易",rows).pressed.connect(func()->void:Platform.context.text_input.release_focus(name);confirm("trade_invite",{"name":name.text},"邀请%s进行当面交易？"%name.text));return
+	var own:=0 if trade.sender==model.character_id else 1
+	label("%s ↔ %s\n剩余%d分钟"%[trade.sender_name,trade.recipient_name,maxi(0,int(trade.expires_ms)-int(model.state.server_time_ms))/60000])
+	var reference:Dictionary={"target":trade.id,"revision":int(trade.revision)}
+	if trade.status=="pending":
+		label("等待对方接受邀请。" if own==0 else "对方邀请你交易。接受后可放入装备或铜钱。")
+		if own==1:button("接受交易",rows).pressed.connect(func()->void:confirm("trade_accept",reference,"确认与%s开始交易？"%trade.sender_name))
+	else:
+		for side in 2:
+			var offer:Dictionary=trade.offers[side]
+			label(("你的报价" if side==own else "对方报价")+" · %d铜 · "%int(offer.gold)+("已最终确认" if offer.confirmed else ("已锁定" if offer.locked else "可修改")))
+			for item in offer.items:label(LootRules.describe(item))
+		var mine:Dictionary=trade.offers[own]
+		if draft_trade!=trade.id:draft_trade=trade.id;draft_items={};draft_gold=-1
+		label("修改你的报价（最多6件，修改会清除双方锁定和确认）：")
+		var items:Array=online_model.state.get("loot",{}).get("state",{}).get("items",[]).filter(func(item:Dictionary)->bool:return LootRules.tradable(item))+mine.items
+		for item in items:
+			var select:=CheckBox.new();select.text="%s · %s"%[ShopRules.item(item.template).name,item.id.right(8)];select.custom_minimum_size=Vector2(250,30);select.add_theme_font_size_override("font_size",11);select.button_pressed=draft_items.get(item.id,mine.items.any(func(old:Dictionary)->bool:return old.id==item.id));rows.add_child(select)
+			select.add_theme_color_override("font_color",INK);select.add_theme_color_override("font_pressed_color",INK);select.tooltip_text=LootRules.describe(item)
+			select.toggled.connect(func(on:bool)->void:draft_items[item.id]=on)
+		label("提供铜钱（0表示不提供）：")
+		var gold:=spinner(1);gold.min_value=0;gold.value=int(mine.gold) if draft_gold<0 else draft_gold;gold.value_changed.connect(func(value:float)->void:draft_gold=int(value))
+		button("保存新报价",rows).pressed.connect(func()->void:
+			var chosen:Array=[]
+			for item in items:
+				if draft_items.get(item.id,mine.items.any(func(old:Dictionary)->bool:return old.id==item.id)):chosen.append(item.id)
+			var values:=reference.duplicate(true);values.items=chosen;values.amount=int(gold.value)
+			confirm("trade_offer",values,"托管%d件装备及%d铜？\n这会取消双方先前的锁定和确认。"%[chosen.size(),int(gold.value)]);draft_gold=-1;draft_items={}
+		)
+		var lock_button:=button("锁定当前报价",rows);lock_button.disabled=mine.locked;lock_button.pressed.connect(func()->void:confirm("trade_lock",reference,"确认锁定当前报价？\n最终交换前仍需双方再次确认。"))
+		var final:=button("最终确认交换",rows);final.disabled=not trade.offers.all(func(offer:Dictionary)->bool:return offer.locked) or mine.confirmed
+		final.pressed.connect(func()->void:confirm("trade_confirm",reference,"已核对双方装备编号、词条和铜钱？\n你出%d铜，对方出%d铜。\n双方最终确认后交换不可撤回，物资进入“领取”页。"%[int(mine.gold),int(trade.offers[1-own].gold)]))
+	button("取消交易／退回物资",rows).pressed.connect(func()->void:confirm("trade_cancel",reference,"确认取消？双方托管物资将原样退回各自“领取”页。"))

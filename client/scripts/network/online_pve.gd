@@ -54,6 +54,7 @@ static func decimal(value: Variant) -> bool:
 func valid(value: Variant) -> bool:
 	validation_error = ""
 	if not value is Dictionary or value.get("rules_version") != "qingyun-pve-v1": return false
+	if value.has("economy") and (not value.economy is Dictionary or (value.economy.get("incoming_trade")!=null and not OnlineWorldClient._uuid(value.economy.incoming_trade))):return false
 	if not OnlineAccount._valid_character(value.get("character")) or value.character.id != character_id or value.character.quest_stage > 4: return false
 	if not integer(value.get("potions"), 0, 99): return false
 	if not value.get("stats") is Dictionary: return false

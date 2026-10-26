@@ -3,6 +3,7 @@ extends RefCounted
 ## Read-only validation and presentation; never rolls a die on the client.
 static func pending(pool:Dictionary)->bool:return pool.get("drops",[]).any(func(d:Dictionary)->bool:return not d.delivered)
 static func valid(pool:Variant,fighters:Array)->bool:
+	if pool is Dictionary and pool.has("unrestricted") and not pool.unrestricted is bool:return false
 	if not pool is Dictionary or not OnlinePve.integer(pool.get("deadline_ms"),1,253402300799999) or not OnlinePve.integer(pool.get("revision"),0,1000) or not pool.get("members") is Array or not pool.get("drops") is Array or pool.drops.size()>2 or pool.members.size()!=fighters.size():return false
 	var members:={};var ids:={}
 	for f in fighters:members[f.id]=f

@@ -254,7 +254,7 @@ func _equip_error() -> String:
 	if not locked.is_empty():return locked
 	if item.is_empty():return "该装备已不在背包中。"
 	if _worn(item):return "此件装备已穿戴。"
-	var restriction:=ShopRules.equipment_error(item,int(_character().get("job",0)),int(_character().get("gender",0)))
+	var restriction:=LootRules.equip_error(item.instance,int(_character().get("job",0)),int(_character().get("gender",0))) if item.has("instance") else ShopRules.equipment_error(item,int(_character().get("job",0)),int(_character().get("gender",0)))
 	if not restriction.is_empty():return OnlinePve.error_text(restriction)
 	if item.has("instance_id") and int(item.level)>int(_character().get("level",1)):return OnlinePve.error_text("EQUIPMENT_LEVEL_REQUIRED")
 	return ""

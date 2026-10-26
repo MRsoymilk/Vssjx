@@ -79,6 +79,7 @@ func _result(action: String, result: Dictionary) -> void:
 				"CHARACTER_BUSY": "角色仍在游戏中，请退出并稍后重试",
 				"CHARACTER_IN_GUILD": "请先退出公会，或转让会长并退出",
 				"CHARACTER_IN_TEAM": "请先退出队伍后再删除角色",
+				"CHARACTER_HAS_ESCROW": "请先结束拍卖／交易，并领取全部装备、货款及退款",
 				"CHARACTER_NOT_FOUND": "角色已更新，请从菜单刷新",
 				"CHARACTER_CHANGED": "角色已更新，请从菜单刷新",
 				"DELETE_RETRY_REQUIRED": "请先重试上次删除，或刷新角色列表",

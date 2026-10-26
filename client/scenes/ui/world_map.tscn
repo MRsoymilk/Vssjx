@@ -188,6 +188,42 @@ theme_override_font_sizes/font_size = 13
 theme_override_colors/font_color = Color(1, 0.97, 0.2, 1)
 text = "0键切换主城"
 
+[node name="ZoomControls" type="Panel" parent="."]
+offset_left = 4.0
+offset_top = 46.0
+offset_right = 146.0
+offset_bottom = 73.0
+tooltip_text = "滚轮或双指缩放，拖动浏览；点击比例重置为100%"
+theme_override_styles/panel = SubResource("Orange")
+
+[node name="ZoomOut" type="Button" parent="ZoomControls"]
+offset_left = 1.0
+offset_top = 1.0
+offset_right = 31.0
+offset_bottom = 26.0
+focus_mode = 0
+tooltip_text = "缩小地图（-）"
+text = "-"
+
+[node name="Reset" type="Button" parent="ZoomControls"]
+offset_left = 32.0
+offset_top = 1.0
+offset_right = 109.0
+offset_bottom = 26.0
+focus_mode = 0
+theme_override_font_sizes/font_size = 13
+tooltip_text = "重置缩放为100%（Home）"
+text = "100%"
+
+[node name="ZoomIn" type="Button" parent="ZoomControls"]
+offset_left = 110.0
+offset_top = 1.0
+offset_right = 141.0
+offset_bottom = 26.0
+focus_mode = 0
+tooltip_text = "放大地图（+）"
+text = "+"
+
 [node name="Footer" type="Panel" parent="."]
 offset_left = 2.0
 offset_top = 444.0

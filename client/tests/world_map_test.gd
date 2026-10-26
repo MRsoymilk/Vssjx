@@ -42,6 +42,15 @@ func _run() -> void:
 	check(not page.find_children("*","Button",true,false).any(func(b:Button)->bool:return b.text.contains("目录")),"Map has no station directory entry")
 	output = OS.get_environment("SSJX_WORLD_MAP_CAPTURE_PATH") if DisplayServer.get_name() != "headless" else ""
 	await capture("local_world_map")
+	if not output.is_empty():
+		page.select_location(7,true)
+		await capture("named_world_map")
+		page.set_zoom(2)
+		await capture("named_world_map_200")
+		page.set_zoom(.5)
+		await capture("named_world_map_50")
+		page.set_zoom(1)
+	page.select_location(14,true) # Bring the clicked destination into the visible viewport.
 	var point := page.graph.position+page.location_point(15)
 	page._map_input(mouse_event(point,true))
 	page._map_input(mouse_event(point,false))

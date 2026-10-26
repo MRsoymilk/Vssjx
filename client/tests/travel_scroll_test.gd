@@ -7,7 +7,7 @@ class ActiveBattle extends RefCounted:
 
 func click_location(page:OriginalWorldMap,id:int,touch:bool=false)->void:
 	page.select_location(id,true)
-	var point:=page.graph.position+page.location_point(id)
+	var point:=page.graph.position+page.location_point(id)*page.zoom_level
 	for down in [true,false]:
 		if touch:
 			var event:=InputEventScreenTouch.new();event.index=0;event.position=point;event.pressed=down
@@ -42,12 +42,14 @@ func _run()->void:
 	app._scene_action("map")
 	var page:OriginalWorldMap=app.modal
 	check(page.get_node("Footer/TravelCount").text=="3" and not app.world.enabled,"Map shows purchased talisman stock and pauses local movement")
+	page.set_zoom(1.5)
 	click_location(page,4)
 	check(page.travel_confirmation.visible and page.travel_destination=="ai_004" and not page.travel_confirm.disabled and Game.player==purchased,"Map click opens destination confirmation without consuming")
 	output=OS.get_environment("SSJX_SCROLL_CAPTURE") if DisplayServer.get_name()!="headless" else ""
 	await capture("scroll-map-confirmation")
 	page.get_node("TravelConfirmation/Panel/Cancel").pressed.emit()
 	check(Game.player==purchased and not page.travel_confirmation.visible and app.modal==page,"Cancel keeps the map open and consumes nothing")
+	page.set_zoom(.75)
 	click_location(page,4,true)
 	check(page.travel_confirmation.visible and page.travel_destination=="ai_004","Touching a destination uses the same confirmation")
 	Platform.context._storage=RejectWrites.new()

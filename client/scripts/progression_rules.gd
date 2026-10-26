@@ -56,7 +56,7 @@ static func craft(player:Dictionary,id:String,action:String,index:int=-1,seed:in
 	player.gold=int(player.gold)-int(cost[0]);state.scrap=int(state.scrap)-int(cost[1]);state.essence=int(state.essence)-int(cost[2]);return ""
 static func reward(player:Dictionary,level:int,boss:bool,seed:int)->Array:
 	LootRules.sync_legacy(player)
-	var state:Dictionary=player.loot_state;var dice:=[seed];var job:=int(player.job);var gender:=int(player.get("gender",0))
+	var state:Dictionary=player.loot_state;var dice:=[seed]
 	assert(can_fight(state),"Loot storage must be reserved before combat")
 	state.kills=mini(1000000000,int(state.kills)+1)
 	if boss:state.bosses=mini(1000000000,int(state.bosses)+1)
@@ -66,8 +66,8 @@ static func reward(player:Dictionary,level:int,boss:bool,seed:int)->Array:
 	var used:=ShopRules.bag_slots(ShopRules.local_state(player),int(player.potions))+LootRules.extra_bag(state);var ids:Array=[]
 	for drop in (int(rules.boss_drops) if boss else 1):
 		var pity:bool=boss and drop==0 and int(state.bosses)%int(rules.boss_pity)==0 and level>=int(rules.min_special_level)
-		var focus:String=state.get("focus","")
-		var slot:String=focus if not focus.is_empty() and LootRules._draw(dice,100)<int(rules.focus_percent) else ShopRules.SLOTS[LootRules._draw(dice,ShopRules.SLOTS.size())]
+		var job:=LootRules._draw(dice,3)
+		var slot:String=ShopRules.SLOTS[LootRules._draw(dice,ShopRules.SLOTS.size())]
 		var roll:=LootRules._draw(dice,100);var total:=0;var quality:="yellow"
 		for q in ["white","blue","yellow","orange","green"]:
 			total+=int((rules.boss_weights if boss else rules.normal_weights).get(q,0))
@@ -82,9 +82,10 @@ static func reward(player:Dictionary,level:int,boss:bool,seed:int)->Array:
 			else:quality="green" if quality=="orange" else "orange"
 			special=BuildRules.rules.items.filter(func(b:Dictionary)->bool:return BuildRules.compatible(b.id,job,slot,quality=="orange"))
 			if special.is_empty():quality="yellow"
-		var exact:=LootRules._draw(dice,100)<80
-		var candidates:Array=ShopRules.catalog.items.filter(func(d:Dictionary)->bool:return ShopRules.is_equipment(d) and d.slot==slot and ShopRules.equipment_error(d,job,gender).is_empty() and (int(d.job)==job if exact else int(d.job)<0))
-		if candidates.is_empty():candidates=ShopRules.catalog.items.filter(func(d:Dictionary)->bool:return ShopRules.is_equipment(d) and d.slot==slot and ShopRules.equipment_error(d,job,gender).is_empty())
+		# Separate art pools without filtering by the recipient's job or gender.
+		var source:="original/" if LootRules._draw(dice,100)<int(rules.original_appearance_percent) else "ai/"
+		var candidates:Array=ShopRules.catalog.items.filter(func(d:Dictionary)->bool:return ShopRules.is_equipment(d) and d.slot==slot and (int(d.job)<0 or int(d.job)==job) and d.id.begins_with(source))
+		if candidates.is_empty():candidates=ShopRules.catalog.items.filter(func(d:Dictionary)->bool:return ShopRules.is_equipment(d) and d.slot==slot and (int(d.job)<0 or int(d.job)==job))
 		var d:Dictionary=candidates[LootRules._draw(dice,candidates.size())];var item_seed:=LootRules._draw(dice,0xffffffff)
 		var item:=LootRules.roll_special(d.id,clampi(level,1,60),quality,special[LootRules._draw(dice,special.size())].id,item_seed) if quality in ["orange","green"] else LootRules.roll(d.id,clampi(level,1,60),quality,item_seed)
 		if not state.skins.has(d.id):state.skins.append(d.id)

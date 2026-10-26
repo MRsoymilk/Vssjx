@@ -303,9 +303,7 @@ impl Loaded {
             if command.expected_revision.as_deref()!=Some(&self.character.state_revision){return Err("STALE_EQUIPMENT");}
             if (command.quantity.is_some()&&command.action!=Action::GearReroll)||command.battle_id.is_some()||command.attributes.is_some()||command.enemy_slot.is_some()||command.encounter_version.is_some(){return Err("INVALID_LOOT_COMMAND");}
             if command.action==Action::GearFocus{
-                let target=command.target.as_deref().ok_or("INVALID_LOOT_COMMAND")?;
-                if target!="any"&&!crate::shop::SLOTS.contains(&target){return Err("INVALID_LOOT_COMMAND");}
-                self.loot.focus=if target=="any"{String::new()}else{target.into()};return Ok(vec!["掉落定向已保存；保底流派装备可能跨部位。".into()]);
+                return Err("RANDOM_DROPS_ONLY");
             }
             let id=Uuid::parse_str(command.target.as_deref().ok_or("INVALID_LOOT_COMMAND")?).map_err(|_|"INVALID_LOOT_COMMAND")?;
             if matches!(command.action,Action::GearSalvage|Action::GearReroll|Action::GearUpgrade){
@@ -317,7 +315,7 @@ impl Loaded {
             }
             let action=match command.action{Action::GearEquip=>"gear_equip",Action::GearUnequip=>"gear_unequip",_=>"gear_claim"};
             let bag=self.bag_count();
-            self.loot.apply(action,id,&mut self.gear,self.character.level,bag)?;
+            self.loot.apply(action,id,&mut self.gear,self.character.level,bag,self.character.job,self.character.gender)?;
             self.equipped=self.gear.get("sword")==Some(&true);
             let stats=self.stats();self.character.hp=self.character.hp.min(stats.hp);self.character.mp=self.character.mp.min(stats.mp);
             return Ok(vec!["装备实例已保存。".into()]);
@@ -648,7 +646,7 @@ impl Loaded {
                     let defeated=battle.defeated_enemies();
                     let loot_enabled=battle.loot_revision>=1;
                     let boss_loot=defeated.iter().any(|d|d.kind=="boss"||d.id=="boss")||battle.formation.as_ref().is_some_and(|a|a.elite_hunt());
-                    let loot_level=defeated.iter().map(|d|d.level).max().unwrap_or(1).min(self.character.level);
+                    let loot_level=defeated.iter().map(|d|d.level).max().unwrap_or(1);
                     let gold=defeated.iter().map(|d|d.gold).sum();let xp=defeated.iter().map(|d|d.xp).sum();
                     let killed_boss=defeated.iter().any(|d|d.id=="boss");
                     let mut recorded=std::collections::HashSet::new();
@@ -697,6 +695,7 @@ impl Loaded {
     }
     fn bag_count(&self)->usize{self.gear.values().filter(|on|!**on).count()+(self.potions.max(0) as usize).div_ceil(99)+self.loot.extra_bag()}
 }
+pub(crate) async fn economy_snapshot(tx:&mut Transaction<'_,Postgres>,id:Uuid,account:Uuid)->Result<Value,AuthError>{Ok(load_character(tx,id,account,None).await?.state())}
 pub async fn snapshot(auth: &AuthService, context: &Context) -> Result<Value, AuthError> {
     let mut tx = auth.pool().begin().await.map_err(database)?;
     let mut loaded = load(&mut tx, context).await?;
@@ -905,7 +904,7 @@ pub(crate) async fn team_loot_pool(tx:&mut Transaction<'_,Postgres>,b:&crate::te
     scratch.bosses=if states.values().any(|s|(s.bosses+1)%crate::progression::n("boss_pity")==0){crate::progression::n("boss_pity")-1}else{states.values().map(|s|s.bosses).max().unwrap_or(0)};
     scratch.focus=states.get(&b.fighters[0].id).ok_or_else(unavailable)?.focus.clone();
     let f=&b.fighters[rand::thread_rng().gen_range(0..b.fighters.len())];
-    let level=b.enemies.iter().map(|e|e.definition.level).max().unwrap_or(1).min(f.level);
+    let level=b.enemies.iter().map(|e|e.definition.level).max().unwrap_or(1);
     scratch.reward(f.job,f.gender,level,boss,0,rand::random());
     Ok(crate::team_loot::Pool::new(scratch.items,&b.fighters,now))
 }

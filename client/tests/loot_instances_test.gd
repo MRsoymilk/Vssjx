@@ -20,7 +20,7 @@ func _run()->void:
 	if not vectors.is_empty():
 		for row in JSON.parse_string(FileAccess.get_file_as_string(vectors)):
 			var expected:Dictionary=row.item
-			var item:=LootRules.roll(expected.template,int(expected.level),expected.quality,int(row.seed),expected.id);item.equipped=true
+			var item:=LootRules.roll(expected.template,int(expected.level),expected.quality,int(row.seed),expected.id);item.equipped=true;item.bound=true
 			check(same(item,expected),"Actual Rust/Godot seeded roll parity")
 			var state:=LootRules.empty();state.items=[item];state.skins=[item.template]
 			check(LootRules.valid(state,int(row.job),int(row.gender)),"Legal slot, class, level, quality and affix bounds")

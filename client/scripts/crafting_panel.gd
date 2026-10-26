@@ -88,7 +88,7 @@ func _ready()->void:
 	reroll_cost=OriginalSceneChrome.label(self,"",Rect2(22,328,134,15),9,INK);reroll_cost.name="RerollCost"
 	upgrade_cost=OriginalSceneChrome.label(self,"",Rect2(164,328,134,15),9,INK);upgrade_cost.name="UpgradeCost"
 	salvage=OriginalSceneChrome.button(self,"分解装备",Rect2(22,349,134,25),11);salvage.name="Salvage";salvage.pressed.connect(_action.bind("gear_salvage"))
-	focus=_picker("Focus",Rect2(164,349,134,25));focus.add_item("掉落：随缘")
+	focus=_picker("Focus",Rect2(164,349,134,25));focus.add_item("掉落：全池随机")
 	for slot in ShopRules.SLOTS:focus.add_item("掉落："+SLOTS[slot])
 	focus.item_selected.connect(_focus_selected)
 	status=OriginalSceneChrome.label(self,"强化不损毁装备，洗炼仅更改所选词条。",Rect2(22,379,276,23),10,INK);status.autowrap_mode=TextServer.AUTOWRAP_WORD_SMART
@@ -117,13 +117,13 @@ func refresh()->void:
 	materials.tooltip_text="铜钱%d · 炼材%d · 精华%d"%amounts
 	for i in 3:
 		resource_counts[i].text=str(amounts[i]);resource_counts[i].tooltip_text=["铜钱","炼材","精华"][i]+"："+str(amounts[i])
-	focus.select(ShopRules.SLOTS.find(state.get("focus",""))+1);focus.disabled=locked or state.is_empty()
+	focus.select(0);focus.disabled=true;focus.tooltip_text="全装备池随机掉落，不按角色或部位定向筛选。"
 	affix.clear();affix.disabled=true;upgrade.disabled=true;reroll.disabled=true;salvage.disabled=true
 	upgrade.text="强化+1";reroll.text="洗炼";reroll_cost.text="—";upgrade_cost.text="—"
 	upgrade.tooltip_text="每级增加原始基础属性的2%，每项非零属性每级至少+1；词条不变。"
 	if item.is_empty():
 		item_icon.texture=null;item_name.text="未选择装备";item_meta.text="请先从装备列表中选择";affix.add_item("暂无可洗炼词条")
-		details.text="请在装备列表选中一件，再打开养成。\n暂存装备需领取后才能养成。\n定向掉落：80%优先选定部位。";refreshing=false;return
+		details.text="请在装备列表选中一件，再打开养成。\n暂存装备需领取后才能养成。\n全池随机掉落，首次穿戴后永久绑定。";refreshing=false;return
 	var definition:=ShopRules.item(item.template);var entry:=LootRules.bag_item(item)
 	item_icon.texture=load(entry.icon);item_name.text=entry.name;item_name.tooltip_text=entry.name
 	item_meta.text="%s · %s · 物等%d · +%d/6"%[{"legacy":"固定","white":"普通","blue":"魔法","yellow":"稀有","orange":"传奇","green":"套装"}[item.quality],SLOTS[definition.slot],int(item.level),int(item.upgrade)]

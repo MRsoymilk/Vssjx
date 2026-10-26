@@ -3,7 +3,7 @@ use uuid::Uuid;
 fn template(job:i16,slot:&str)->String{shop::ITEMS.iter().find(|d|d.equipment()&&d.slot==slot&&d.equip_error(job,0).is_none()).unwrap().id.clone()}
 fn gear(index:usize,legend:bool,count:usize)->loot::State{
     let d=&builds::DATA["items"][index];let id=d["id"].as_str().unwrap();let job=d["job"].as_i64().unwrap() as i16;let mut state=loot::State::default();
-    let mut add=|slot:&str,q:&str|{let mut item=loot::roll_special(&template(job,slot),60,q,id,17,Uuid::new_v4()).unwrap();item.equipped=true;state.items.push(item);};
+    let mut add=|slot:&str,q:&str|{let mut item=loot::roll_special(&template(job,slot),60,q,id,17,Uuid::new_v4()).unwrap();item.equipped=true;item.bound=true;state.items.push(item);};
     if legend{add(d["legend_slot"].as_str().unwrap(),"orange");}
     for slot in builds::DATA["set_slots"].as_array().unwrap().iter().take(count){add(slot.as_str().unwrap(),"green");}
     state

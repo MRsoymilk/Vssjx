@@ -16,7 +16,7 @@ static func valid(pool:Variant,fighters:Array)->bool:
 		for f in fighters:
 			if LootRules.valid_item(d.item,int(f.job),int(f.gender)):
 				valid_for_any=true
-				if int(d.item.level)<=int(f.level):eligible[f.id]=true
+				if pool.get("unrestricted",false) or (int(d.item.level)<=int(f.level) and LootRules.equip_error(d.item,int(f.job),int(f.gender)).is_empty()):eligible[f.id]=true
 		if not valid_for_any or d.item.legacy or d.item.equipped or ids.has(d.item.id):return false
 		ids[d.item.id]=true
 		if d.eligible.size()!=eligible.size():return false

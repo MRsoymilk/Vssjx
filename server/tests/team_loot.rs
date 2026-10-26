@@ -26,11 +26,31 @@ fn tied_highest_rolls_get_a_fair_finite_tiebreak_and_lower_rolls_cannot_win(){
     let winner=p.drops[0].tie_scores.iter().max_by_key(|(_,n)|**n).unwrap().0;assert_eq!(p.drops[0].winner,Some(*winner));
 }
 #[test]
-fn class_gender_and_level_eligibility_are_frozen_and_each_item_is_independent(){
+fn all_participants_can_roll_cross_class_gender_and_level_equipment(){
     let mut f=fighters();f[1].job=2;f[2].level=1;
     let item=loot::roll("ai/eva01/mfs/weapon",30,"yellow",17,Uuid::new_v4()).unwrap();let id=item.id;
     let mut p=Pool::new(vec![item,loot::roll("sword",1,"blue",29,Uuid::new_v4()).unwrap()],&f,1000);
-    assert_eq!(p.drops[0].eligible,vec![f[1].id]);assert_eq!(p.drops[0].choices[&f[0].id],None);
-    assert_eq!(p.choose(f[0].id,id,Some(100),1001),Err("TEAM_LOOT_INELIGIBLE"));
-    p.choose(f[1].id,id,Some(41),1002).unwrap();assert!(p.drops[0].resolved);assert!(!p.drops[1].resolved);
+    assert_eq!(p.drops[0].eligible,f.iter().map(|fighter|fighter.id).collect::<Vec<_>>());
+    p.choose(f[0].id,id,Some(100),1001).unwrap();p.choose(f[1].id,id,Some(41),1002).unwrap();p.choose(f[2].id,id,None,1003).unwrap();
+    assert!(p.drops[0].resolved);assert_eq!(p.drops[0].winner,Some(f[0].id));assert!(!p.drops[1].resolved);
+}
+#[test]
+fn original_reward_instances_enter_party_pools_with_normal_eligibility_and_identity(){
+    let mut f=fighters();f[1].job=0;f[2].gender=1;
+    let mut seen=std::collections::BTreeSet::new();
+    for slot in ["weapon","armor","hat"]{for seed in 0..64{
+        let mut state=loot::State::default();state.focus=slot.into();state.reward(1,0,60,true,0,seed*7919);
+        let original=state.items.clone();let mut p=Pool::new(state.items,&f,1000);
+        for (index,item) in original.iter().enumerate(){
+            assert_eq!(&p.drops[index].item,item);
+            assert_eq!(p.drops[index].eligible,f.iter().map(|fighter|fighter.id).collect::<Vec<_>>());
+            if item.template.starts_with("original/"){
+                seen.insert(item.slot().to_owned());
+                p.choose(f[0].id,item.id,Some(100),1001).unwrap();
+            }
+        }
+        p.resolve(61000);
+        for (index,item) in original.iter().enumerate(){if item.template.starts_with("original/"){assert_eq!(p.drops[index].winner,Some(f[0].id));assert_eq!(&p.drops[index].item,item);}}
+    }}
+    for slot in ["weapon","armor","hat"]{assert!(seen.contains(slot));}
 }

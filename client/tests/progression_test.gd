@@ -51,7 +51,7 @@ func _run()->void:
 		RenderingServer.force_draw();check(get_viewport().get_texture().get_image().save_png(output)==OK,"Actual upgrade/reroll/salvage/focus controls render")
 	panel.reroll.pressed.emit();panel.reroll.pressed.emit();await get_tree().process_frame
 	check(panel._item().reroll_index!=null and panel._item().rerolls==1 and panel.affix.disabled,"Production UI locks exactly one reroll slot after confirmed payment")
-	panel.focus.select(1);panel.focus.item_selected.emit(1);await get_tree().process_frame;check(Game.player.loot_state.focus=="weapon","Actual directed-drop setting persists through the equipment UI")
+	check(panel.focus.disabled and LootRules.apply_local(Game.player.duplicate(true),"gear_focus","weapon")=="RANDOM_DROPS_ONLY","Historical directed-drop control cannot filter the random pool")
 	inventory.queue_free();await get_tree().process_frame
 	var app:Control=load("res://scenes/main.tscn").instantiate();add_child(app);app.set_process(false);app._enter_world();app._scene_action("craft")
 	check(is_instance_valid(app.backpack) and is_instance_valid(app.backpack.loot_panel),"The original local HUD craft entry opens the actual equipment manager instead of an unopened-feature message")

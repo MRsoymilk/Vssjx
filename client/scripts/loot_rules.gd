@@ -22,7 +22,7 @@ static func roll(template:String,level:int,quality:String,seed:int,id:String="")
 	if not ShopRules.is_equipment(d) or level<1 or level>60 or quality not in ["white","blue","yellow"] or seed<0 or seed>0xffffffff:return {}
 	if id.is_empty():id=uuid()
 	if _uuid_pattern.search(id)==null:return {}
-	var result:Dictionary={"id":id,"template":template,"level":level,"quality":quality,"equipped":false,"legacy":false,"affixes":[],"upgrade":0,"reroll_index":null,"legendary":null,"set_id":null,"skin":null,"legacy_attack":0,"legacy_defense":0}
+	var result:Dictionary={"id":id,"template":template,"level":level,"quality":quality,"equipped":false,"legacy":false,"bound":false,"affixes":[],"upgrade":0,"reroll_index":null,"legendary":null,"set_id":null,"skin":null,"legacy_attack":0,"legacy_defense":0}
 	var dice:=[seed];var pool:Array=rules.pools[d.slot].duplicate()
 	for i in int(rules.quality_affixes[quality]):
 		var kind:String=pool.pop_at(_draw(dice,pool.size()));var r:=bounds(kind,level)
@@ -31,22 +31,29 @@ static func roll(template:String,level:int,quality:String,seed:int,id:String="")
 static func valid_item(i:Variant,job:int,gender:int)->bool:
 	if not i is Dictionary:return false
 	var d:=ShopRules.item(str(i.get("template","")))
-	if not ShopRules.is_equipment(d) or not ShopRules.equipment_error(d,job,gender).is_empty():return false
+	if not ShopRules.is_equipment(d):return false
 	if not i.get("id") is String or _uuid_pattern.search(i.id)==null:return false
 	if not ShopRules._integer(i.get("level"),1,60) or not ShopRules._integer(i.get("upgrade",0),0,6) or not i.get("quality") in rules.quality_affixes:return false
 	if not i.get("equipped") is bool or not i.get("legacy") is bool or i.legacy!=(i.quality=="legacy"):return false
+	if not i.get("bound",true) is bool or ((i.equipped or i.legacy) and not i.get("bound",true)):return false
+	if i.equipped and not equip_error(i,job,gender).is_empty():return false
 	if not i.get("affixes") is Array or i.affixes.size()!=int(rules.quality_affixes[i.quality]):return false
 	if i.legacy and (i.level!=1 or i.upgrade!=0 or i.get("legacy_attack")!=d.attack or i.get("legacy_defense")!=d.defense):return false
 	if not i.legacy and (i.get("legacy_attack",0)!=0 or i.get("legacy_defense",0)!=0):return false
 	if (i.quality=="orange")!=(i.get("legendary")!=null) or (i.quality=="green")!=(i.get("set_id")!=null):return false
 	for key in ["legendary","set_id"]:
-		if i.get(key)!=null and (not i[key] is String or not BuildRules.compatible(i[key],job,d.slot,key=="legendary")):return false
+		if i.get(key)!=null:
+			if not i[key] is String:return false
+			var index:=BuildRules.index(i[key])
+			if index<0:return false
+			var build_job:=int(BuildRules.rules.items[index].job)
+			if not BuildRules.compatible(i[key],build_job,d.slot,key=="legendary") or (int(d.job)>=0 and int(d.job)!=build_job):return false
 	if i.get("reroll_index")!=null and not ShopRules._integer(i.reroll_index,0,i.affixes.size()-1):return false
 	if not ShopRules._integer(i.get("rerolls",0),0,int(ProgressionRules.rules.max_rerolls)) or (i.legacy and (int(i.get("rerolls",0))!=0 or i.get("reroll_index")!=null)):return false
 	if int(i.get("rerolls",0))>0 and i.get("reroll_index")==null:return false
 	if i.get("skin")!=null:
 		var skin:=ShopRules.item(str(i.skin))
-		if skin.get("slot")!=d.slot or not ShopRules.equipment_error(skin,job,gender).is_empty():return false
+		if skin.get("slot")!=d.slot or (i.equipped and not ShopRules.equipment_error(skin,job,gender).is_empty()):return false
 	var seen:={}
 	for a in i.affixes:
 		if not a is Dictionary or not a.get("kind") in rules.pools[d.slot] or seen.has(a.kind):return false
@@ -54,6 +61,16 @@ static func valid_item(i:Variant,job:int,gender:int)->bool:
 		if not ShopRules._integer(a.get("value"),r.x,r.y):return false
 		seen[a.kind]=true
 	return true
+static func tradable(i:Dictionary)->bool:return not i.get("bound",true) and not i.legacy and not i.equipped
+static func equip_error(i:Dictionary,job:int,gender:int)->String:
+	var error:=ShopRules.equipment_error(ShopRules.item(i.template),job,gender)
+	if not error.is_empty():return error
+	for key in ["legendary","set_id"]:
+		if i.get(key)!=null:
+			var index:=BuildRules.index(i[key])
+			if index<0 or int(BuildRules.rules.items[index].job)!=job:return "EQUIPMENT_JOB_REQUIRED"
+	if i.get("skin")!=null:return ShopRules.equipment_error(ShopRules.item(i.skin),job,gender)
+	return ""
 static func valid(s:Variant,job:int,gender:int)->bool:
 	if not s is Dictionary or s.get("version")!=1 or not s.get("items") is Array or not s.get("pending") is Array or s.items.size()>90 or s.pending.size()>20:return false
 	for key in ["scrap","essence","kills","bosses"]:
@@ -76,12 +93,14 @@ static func valid(s:Variant,job:int,gender:int)->bool:
 	for id in s.skins:
 		if not id is String or skins.has(id):return false
 		var d:=ShopRules.item(id)
-		if not ShopRules.is_equipment(d) or not ShopRules.equipment_error(d,job,gender).is_empty():return false
+		if not ShopRules.is_equipment(d):return false
 		skins[id]=true
 	return true
 static func sync_legacy(player:Dictionary)->void:
 	if not player.has("loot_state"):player.loot_state=empty()
 	var s:Dictionary=player.loot_state;var gear:=ShopRules.local_state(player)
+	for item in s.items+s.pending:
+		if not item.has("bound"):item.bound=true
 	s.items=s.items.filter(func(i:Dictionary)->bool:return not i.legacy or gear.owned.has(i.template))
 	for id in gear.owned:
 		var d:=ShopRules.item(id)
@@ -91,7 +110,7 @@ static func sync_legacy(player:Dictionary)->void:
 		for i in s.items:
 			if i.legacy and i.template==id:found=i;break
 		if found.is_empty():
-			found={"id":uuid(),"template":id,"level":1,"quality":"legacy","legacy":true,"affixes":[],"upgrade":0,"reroll_index":null,"legendary":null,"set_id":null,"skin":null,"legacy_attack":int(d.attack),"legacy_defense":int(d.defense)};s.items.append(found)
+			found={"id":uuid(),"template":id,"level":1,"quality":"legacy","legacy":true,"bound":true,"affixes":[],"upgrade":0,"reroll_index":null,"legendary":null,"set_id":null,"skin":null,"legacy_attack":int(d.attack),"legacy_defense":int(d.defense)};s.items.append(found)
 		found.equipped=ShopRules.equipped_id(gear,d.slot)==id
 static func extra_bag(s:Dictionary)->int:return s.get("items",[]).filter(func(i:Dictionary)->bool:return not i.legacy and not i.equipped).size()
 static func base(i:Dictionary)->Array:
@@ -136,8 +155,7 @@ static func apply_local(player:Dictionary,action:String,id:String,count:int=1)->
 	if count<1 or count>4 or (action!="gear_reroll" and count!=1):return "INVALID_LOOT_COMMAND"
 	sync_legacy(player)
 	if action=="gear_focus":
-		if id!="any" and id not in ShopRules.SLOTS:return "INVALID_LOOT_COMMAND"
-		player.loot_state.focus="" if id=="any" else id;return ""
+		return "RANDOM_DROPS_ONLY"
 	if action in ["gear_salvage","gear_upgrade","gear_reroll"]:return ProgressionRules.craft(player,id,action,count-1 if action=="gear_reroll" else -1,randi())
 	var s:Dictionary=player.loot_state;var gear:=ShopRules.local_state(player);var bag:=ShopRules.bag_slots(gear,int(player.potions))+extra_bag(s)
 	if action=="gear_claim":
@@ -151,11 +169,13 @@ static func apply_local(player:Dictionary,action:String,id:String,count:int=1)->
 	if item.is_empty():return "INSTANCE_NOT_OWNED"
 	var slot:String=ShopRules.item(item.template).slot
 	if action=="gear_equip":
+		var error:=equip_error(item,int(player.job),int(player.get("gender",0)))
+		if not error.is_empty():return error
 		if int(item.level)>int(player.level):return "EQUIPMENT_LEVEL_REQUIRED"
 		if item.equipped:return "EQUIPMENT_UNCHANGED"
 		for i in s.items:
 			if ShopRules.item(i.template).slot==slot:i.equipped=false
-		gear.slots[slot]=item.template if item.legacy else null;item.equipped=true
+		gear.slots[slot]=item.template if item.legacy else null;item.equipped=true;item.bound=true
 	elif action=="gear_unequip":
 		if not item.equipped:return "NOT_EQUIPPED"
 		if bag>=60:return "BAG_FULL"
@@ -206,6 +226,7 @@ static func describe(i:Dictionary)->String:
 	var d:=ShopRules.item(i.template);var v:=base(i)
 	var parts:Array[String]=["%s · %s · 物等%d"%[d.name,{"legacy":"原有固定装备","white":"普通","blue":"魔法","yellow":"稀有","orange":"传奇","green":"套装"}.get(i.quality,i.quality),int(i.level)]]
 	parts.append("主攻+%d  双防+%d  气血+%d  灵力+%d"%v)
+	parts.append("已绑定 · 不可交易" if i.get("bound",true) else "未绑定 · 可交易 · 穿戴后绑定")
 	for a in i.affixes:
 		parts.append(affix_text(a))
 	parts.append("编号 "+String(i.id).right(8))

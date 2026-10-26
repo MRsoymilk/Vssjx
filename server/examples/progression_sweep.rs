@@ -9,7 +9,7 @@ fn gear(job:i16,index:usize,level:i32,stage:i32)->loot::State{
         let special=stage>=2;let quality=if special&&builds::compatible(build,job,slot,true){"orange"}else if special&&builds::compatible(build,job,slot,false){"green"}else{"yellow"};
         let seed=17+n as u32*7919;
         let mut item=if matches!(quality,"orange"|"green"){loot::roll_special(&template.id,level,quality,build,seed,Uuid::new_v4()).unwrap()}else{loot::roll(&template.id,level,quality,seed,Uuid::new_v4()).unwrap()};
-        item.equipped=true;if stage==3{item.upgrade=6;}gear.items.push(item);
+        item.equipped=true;item.bound=true;if stage==3{item.upgrade=6;}gear.items.push(item);
     }gear
 }
 fn rotation(b:&Battle,i:usize,style:usize)->(&'static str,Option<&'static str>){

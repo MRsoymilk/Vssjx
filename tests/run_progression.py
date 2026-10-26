@@ -30,7 +30,7 @@ def main():
             request=request or dict(operation_id=str(uuid4()),action=action,target=target,expected_revision=p.state['character']['state_revision'])
             if quantity is not None:request['quantity']=quantity
             return p.command('',request=request,ok=ok)
-        p=connect();command('gear_focus','weapon');check(p.state['loot']['state']['focus']=='weapon','Directed-drop selection is owned, revised and persisted')
+        p=connect();result,_=command('gear_focus','weapon',ok=False);check(result['code']=='RANDOM_DROPS_ONLY','Historical directed-drop requests cannot filter the random pool')
         p.command('',request=dict(operation_id=str(uuid4()),action='challenge',target=boss['id'],encounter_version=2))
         for _ in range(16):
             b=p.state['battle']
@@ -61,9 +61,17 @@ def main():
         result,_=p.command('',request=request);check(not result['replayed'] and item()['rerolls']==2,'Retry of a failed operation pays once and rolls only a newly committed result')
         replay,_=p.command('',request=request);check(replay['replayed'] and item()['rerolls']==2,'Committed reroll replay returns the same affix, never a new draw')
         saved=copy.deepcopy(p.state['loot']['state']);f.restart();p=connect();check(p.state['loot']['state']==saved,'Restart preserves focus, upgrades, affix lock, material balances and pending reward UUIDs')
-        fixtures.append(copy.deepcopy(p.state));command('gear_salvage',filler);command('gear_equip',item_id)
-        value,_=command('gear_salvage',item_id,ok=False);check(value['code']=='UNEQUIP_BEFORE_SALVAGE','Equipped equipment cannot be destroyed')
-        command('gear_unequip',item_id);state=copy.deepcopy(p.state['loot']['state']);quality=item()['quality'];template=item()['template']
+        fixtures.append(copy.deepcopy(p.state));command('gear_salvage',filler)
+        definition=next(d for d in json.loads((ROOT/'client/assets/data/shop-v2.json').read_text())['items'] if d['id']==item()['template'])
+        build=next((b for b in json.loads((ROOT/'shared/data/builds-v1.json').read_text())['items'] if b['id'] in [item().get('legendary'),item().get('set_id')]),None)
+        compatible=definition['job'] in [-1,1] and definition.get('gender',-1) in [-1,0] and (build is None or build['job']==1)
+        value,_=command('gear_equip',item_id,ok=compatible)
+        if compatible:
+            check(item()['bound'],'First authoritative equip permanently binds the random drop')
+            value,_=command('gear_salvage',item_id,ok=False);check(value['code']=='UNEQUIP_BEFORE_SALVAGE','Equipped equipment cannot be destroyed')
+            command('gear_unequip',item_id)
+        else:check(not item()['bound'],'Rejected cross-class or gender equip does not bind the item')
+        state=copy.deepcopy(p.state['loot']['state']);quality=item()['quality'];template=item()['template']
         result,request=command('gear_salvage',item_id)
         check(not any(i['id']==item_id for i in p.state['loot']['state']['items']) and template in p.state['loot']['state']['skins'],'Explicit salvage removes only the selected UUID and retains the appearance unlock')
         amount=json.loads((ROOT/'shared/data/progression-v1.json').read_text())['salvage_scrap'][quality]

@@ -60,7 +60,7 @@ fn equipped_percentage_hp_is_recomputed_before_respec_ratios(){
         for slot in ["armor","hat"]{
             let template=crate::shop::ITEMS.iter().find(|d|d.slot==slot&&d.equip_error(job,0).is_none()).unwrap();
             let mut item=crate::loot::roll(&template.id,60,"yellow",17,Uuid::new_v4()).unwrap();
-            item.equipped=true;item.upgrade=6;
+            item.equipped=true;item.bound=true;item.upgrade=6;
             item.affixes=vec![("hp_percent",400),("hp",120),("mana",80),("defense",40)].into_iter().map(|(kind,value)|crate::loot::Affix{kind:kind.into(),value}).collect();
             loaded.loot.items.push(item);
         }

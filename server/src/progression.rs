@@ -43,7 +43,7 @@ pub fn craft(state:&mut State,id:Uuid,action:&str,index:Option<usize>,gold:&mut 
     }
     *gold-=cost[0];state.scrap-=cost[1];state.essence-=cost[2];Ok(())
 }
-pub fn reward(state:&mut State,job:i16,gender:i16,level:i32,boss:bool,bag_count:usize,seed:u32)->Vec<Uuid>{
+pub fn reward(state:&mut State,_job:i16,_gender:i16,level:i32,boss:bool,bag_count:usize,seed:u32)->Vec<Uuid>{
     // Challenge admission reserves room for the entire encounter, not each kill.
     assert!(state.can_fight(),"loot storage must be reserved before combat");
     let mut dice=Dice(seed);credit(state,boss);
@@ -51,7 +51,9 @@ pub fn reward(state:&mut State,job:i16,gender:i16,level:i32,boss:bool,bag_count:
     let mut used=bag_count;let mut ids=vec![];
     for drop in 0..if boss{n("boss_drops")}else{1}{
         let pity=boss&&drop==0&&state.bosses%n("boss_pity")==0&&level>=n("min_special_level");
-        let mut slot=if !state.focus.is_empty()&&dice.next(100)<n("focus_percent") as usize{state.focus.as_str()}else{shop::SLOTS[dice.next(shop::SLOTS.len())]};
+        // Drop class is random, never the recipient's class or gender. Old focus is ignored.
+        let job=dice.next(3) as i16;
+        let mut slot=shop::SLOTS[dice.next(shop::SLOTS.len())];
         let roll=dice.next(100);let mut total=0;let mut quality="yellow";
         for q in ["white","blue","yellow","orange","green"]{total+=DATA[if boss{"boss_weights"}else{"normal_weights"}][q].as_u64().unwrap_or(0) as usize;if roll<total{quality=q;break;}}
         if pity{quality=if dice.next(2)==0{"orange"}else{"green"};}
@@ -65,9 +67,10 @@ pub fn reward(state:&mut State,job:i16,gender:i16,level:i32,boss:bool,bag_count:
             specials=builds::DATA["items"].as_array().unwrap().iter().filter(|b|builds::compatible(b["id"].as_str().unwrap(),job,slot,quality=="orange")).collect();
             if specials.is_empty(){quality="yellow";}
         }
-        let exact=dice.next(100)<80;
-        let candidates:Vec<_>=shop::ITEMS.iter().filter(|d|d.equipment()&&d.slot==slot&&d.equip_error(job,gender).is_none()&&if exact{d.job==job}else{d.job<0}).collect();
-        let candidates=if candidates.is_empty(){shop::ITEMS.iter().filter(|d|d.equipment()&&d.slot==slot&&d.equip_error(job,gender).is_none()).collect()}else{candidates};
+        // Choose art independently of the recipient and catalog family sizes.
+        let source=if dice.next(100)<n("original_appearance_percent") as usize{"original/"}else{"ai/"};
+        let candidates:Vec<_>=shop::ITEMS.iter().filter(|d|d.equipment()&&d.slot==slot&&(d.job<0||d.job==job)&&d.id.starts_with(source)).collect();
+        let candidates=if candidates.is_empty(){shop::ITEMS.iter().filter(|d|d.equipment()&&d.slot==slot&&(d.job<0||d.job==job)).collect()}else{candidates};
         let d=candidates[dice.next(candidates.len())];let seed=dice.next(u32::MAX as usize) as u32;
         let item=if matches!(quality,"orange"|"green"){let build=specials[dice.next(specials.len())]["id"].as_str().unwrap();loot::roll_special(&d.id,level.clamp(1,60),quality,build,seed,Uuid::new_v4()).unwrap()}else{loot::roll(&d.id,level.clamp(1,60),quality,seed,Uuid::new_v4()).unwrap()};
         state.skins.insert(d.id.clone());ids.push(item.id);

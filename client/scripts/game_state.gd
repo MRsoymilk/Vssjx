@@ -358,7 +358,7 @@ func award_loot(enemies:Array,seed:int)->String:
 	var boss:=false;var item_level:=1
 	for enemy in enemies:
 		boss=boss or enemy.get("kind")=="boss" or enemy.get("id")=="boss";item_level=maxi(item_level,int(enemy.get("level",1)))
-	var gained:=ProgressionRules.reward(player,mini(int(player.level),item_level),boss,seed)
+	var gained:=ProgressionRules.reward(player,item_level,boss,seed)
 	return "获得%d件装备与%d炼材%s；满包自动暂存。"%[gained.size(),int(ProgressionRules.rules.boss_scrap if boss else ProgressionRules.rules.victory_scrap),"、1精华" if boss else ""]
 
 func start_endless()->PlatformResult:

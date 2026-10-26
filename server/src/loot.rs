@@ -14,6 +14,7 @@ pub struct Affix{pub kind:String,pub value:i32}
 pub struct Item{
     pub id:Uuid,pub template:String,pub level:i32,pub quality:String,pub equipped:bool,
     pub legacy:bool,pub affixes:Vec<Affix>,
+    #[serde(default="previously_bound")] pub bound:bool,
     #[serde(default)] pub upgrade:i32,
     #[serde(default)] pub reroll_index:Option<usize>,
     #[serde(default,skip_serializing_if="is_zero")] pub rerolls:i32,
@@ -31,6 +32,7 @@ pub struct State{
     pub kills:i32,pub bosses:i32,pub difficulty:i32,pub skins:BTreeSet<String>,
 }
 fn is_zero(n:&i32)->bool{*n==0}
+fn previously_bound()->bool{true}
 impl Default for State{fn default()->Self{Self{version:1,items:vec![],pending:vec![],scrap:0,essence:0,kills:0,bosses:0,difficulty:1,skins:BTreeSet::new(),focus:String::new()}}}
 #[derive(Clone)]
 pub struct Dice(pub u32);
@@ -49,20 +51,34 @@ impl Item{
     pub fn slot(&self)->&str{&self.definition().slot}
     pub fn valid(&self,job:i16,gender:i16)->bool{
         let Some(d)=shop::item(&self.template)else{return false;};
-        if !d.equipment()||d.equip_error(job,gender).is_some()||self.id.get_version_num()!=4||self.id.get_variant()!=uuid::Variant::RFC4122||!(1..=60).contains(&self.level)||!(0..=6).contains(&self.upgrade){return false;}
+        if !d.equipment()||self.id.get_version_num()!=4||self.id.get_variant()!=uuid::Variant::RFC4122||!(1..=60).contains(&self.level)||!(0..=6).contains(&self.upgrade){return false;}
+        if (self.equipped||self.legacy)&&!self.bound||self.equipped&&self.equip_error(job,gender).is_some(){return false;}
         if !matches!(self.quality.as_str(),"legacy"|"white"|"blue"|"yellow"|"orange"|"green"){return false;}
         let Some(count)=DATA["quality_affixes"].get(&self.quality).and_then(Value::as_u64)else{return false;};
         if self.legacy!=(self.quality=="legacy")||self.affixes.len()!=count as usize{return false;}
         if self.legacy&&(self.level!=1||self.upgrade!=0||self.legacy_attack!=d.attack||self.legacy_defense!=d.defense){return false;}
         if !self.legacy&&(self.legacy_attack!=0||self.legacy_defense!=0){return false;}
         if (self.quality=="orange")!=self.legendary.is_some()||(self.quality=="green")!=self.set_id.is_some(){return false;}
-        if self.legendary.as_deref().is_some_and(|id|!crate::builds::compatible(id,job,&d.slot,true))||self.set_id.as_deref().is_some_and(|id|!crate::builds::compatible(id,job,&d.slot,false)){return false;}
+        for (build,legendary) in [(self.legendary.as_deref(),true),(self.set_id.as_deref(),false)]{
+            if let Some(id)=build{let Some(index)=crate::builds::index(id)else{return false;};let build_job=crate::builds::DATA["items"][index]["job"].as_i64().unwrap() as i16;
+                if !crate::builds::compatible(id,build_job,&d.slot,legendary)||(d.job>=0&&d.job!=build_job){return false;}}
+        }
         if self.reroll_index.is_some_and(|i|i>=self.affixes.len()){return false;}
         if !(0..=crate::progression::n("max_rerolls")).contains(&self.rerolls)||self.legacy&&(self.rerolls!=0||self.reroll_index.is_some()){return false;}
         if self.rerolls>0&&self.reroll_index.is_none(){return false;}
-        if let Some(skin)=&self.skin{if shop::item(skin).is_none_or(|s|s.slot!=d.slot||s.equip_error(job,gender).is_some()){return false;}}
+        if let Some(skin)=&self.skin{if shop::item(skin).is_none_or(|s|s.slot!=d.slot||self.equipped&&s.equip_error(job,gender).is_some()){return false;}}
         let mut seen=BTreeSet::new();
         self.affixes.iter().all(|a|seen.insert(&a.kind)&&DATA["pools"][&d.slot].as_array().unwrap().iter().any(|v|v.as_str()==Some(&a.kind))&&range(&a.kind,self.level).is_some_and(|(lo,hi)|a.value>=lo&&a.value<=hi))
+    }
+    pub fn tradable(&self)->bool{!self.bound&&!self.legacy&&!self.equipped}
+    pub fn equip_error(&self,job:i16,gender:i16)->Option<&'static str>{
+        let d=shop::item(&self.template)?;
+        if let Some(error)=d.equip_error(job,gender){return Some(error);}
+        for id in [self.legendary.as_deref(),self.set_id.as_deref()].into_iter().flatten(){
+            if crate::builds::index(id).is_none_or(|index|crate::builds::DATA["items"][index]["job"]!=job){return Some("EQUIPMENT_JOB_REQUIRED");}
+        }
+        if let Some(skin)=self.skin.as_deref().and_then(shop::item){return skin.equip_error(job,gender);}
+        None
     }
     pub fn base(&self)->(i32,i32,i32,i32){
         if self.legacy{return (self.legacy_attack,self.legacy_defense,0,0);}
@@ -79,7 +95,7 @@ pub fn roll(template:&str,level:i32,quality:&str,seed:u32,id:Uuid)->Result<Item,
     let count=DATA["quality_affixes"][quality].as_u64().unwrap() as usize;
     let mut dice=Dice(seed);let mut pool:Vec<String>=DATA["pools"][&d.slot].as_array().unwrap().iter().map(|v|v.as_str().unwrap().into()).collect();let mut affixes=vec![];
     for _ in 0..count{let kind=pool.remove(dice.next(pool.len()));let (lo,hi)=range(&kind,level).unwrap();let value=lo+dice.next((hi-lo+1) as usize) as i32;affixes.push(Affix{kind,value});}
-    Ok(Item{id,template:template.into(),level,quality:quality.into(),equipped:false,legacy:false,affixes,upgrade:0,reroll_index:None,rerolls:0,legendary:None,set_id:None,skin:None,legacy_attack:0,legacy_defense:0})
+    Ok(Item{id,template:template.into(),level,quality:quality.into(),equipped:false,legacy:false,bound:false,affixes,upgrade:0,reroll_index:None,rerolls:0,legendary:None,set_id:None,skin:None,legacy_attack:0,legacy_defense:0})
 }
 impl State{
     pub fn valid(&self,job:i16,gender:i16)->bool{
@@ -91,7 +107,7 @@ impl State{
             if !i.valid(job,gender)||!ids.insert(i.id)||i.legacy&&!legacy.insert(&i.template){return false;}
             if i.equipped&&(!slots.insert(i.slot())||self.pending.iter().any(|p|p.id==i.id)){return false;}
         }
-        self.skins.len()<=shop::ITEMS.len()&&self.skins.iter().all(|id|shop::item(id).is_some_and(|d|d.equipment()&&d.equip_error(job,gender).is_none()))
+        self.skins.len()<=shop::ITEMS.len()&&self.skins.iter().all(|id|shop::item(id).is_some_and(|d|d.equipment()))
     }
     pub fn sync_legacy(&mut self,gear:&BTreeMap<String,bool>,job:i16,gender:i16){
         self.items.retain(|i|!i.legacy||gear.contains_key(&i.template));
@@ -99,13 +115,13 @@ impl State{
             let Some(d)=shop::item(id).filter(|d|d.equipment()&&d.equip_error(job,gender).is_none())else{continue;};
             self.skins.insert(id.clone());
             if let Some(i)=self.items.iter_mut().find(|i|i.legacy&&i.template==*id){i.equipped=*on;}
-            else{self.items.push(Item{id:Uuid::new_v4(),template:id.clone(),level:1,quality:"legacy".into(),equipped:*on,legacy:true,affixes:vec![],upgrade:0,reroll_index:None,rerolls:0,legendary:None,set_id:None,skin:None,legacy_attack:d.attack,legacy_defense:d.defense});}
+            else{self.items.push(Item{id:Uuid::new_v4(),template:id.clone(),level:1,quality:"legacy".into(),equipped:*on,legacy:true,bound:true,affixes:vec![],upgrade:0,reroll_index:None,rerolls:0,legendary:None,set_id:None,skin:None,legacy_attack:d.attack,legacy_defense:d.defense});}
         }
     }
     pub fn extra_bag(&self)->usize{self.items.iter().filter(|i|!i.legacy&&!i.equipped).count()}
     pub fn can_fight(&self)->bool{self.pending.len()+3<=n("pending_limit") as usize}
     pub fn empty_slot(&mut self,slot:&str){for i in &mut self.items{if i.slot()==slot{i.equipped=false;}}}
-    pub fn apply(&mut self,action:&str,id:Uuid,gear:&mut BTreeMap<String,bool>,level:i32,bag_count:usize)->Result<(),&'static str>{
+    pub fn apply(&mut self,action:&str,id:Uuid,gear:&mut BTreeMap<String,bool>,level:i32,bag_count:usize,job:i16,gender:i16)->Result<(),&'static str>{
         if action=="gear_claim"{
             if bag_count>=60{return Err("BAG_FULL");}
             let index=self.pending.iter().position(|i|i.id==id).ok_or("INSTANCE_NOT_OWNED")?;
@@ -114,10 +130,11 @@ impl State{
         let item=self.items.iter().find(|i|i.id==id).cloned().ok_or("INSTANCE_NOT_OWNED")?;
         if item.level>level&&action=="gear_equip"{return Err("EQUIPMENT_LEVEL_REQUIRED");}
         if action=="gear_equip"{
+            if let Some(error)=item.equip_error(job,gender){return Err(error);}
             if item.equipped{return Err("EQUIPMENT_UNCHANGED");}
             self.empty_slot(item.slot());
             for (key,on) in gear.iter_mut(){if shop::item(key).is_some_and(|d|d.slot==item.slot()){*on=false;}}
-            self.items.iter_mut().find(|i|i.id==id).unwrap().equipped=true;
+            let equipped=self.items.iter_mut().find(|i|i.id==id).unwrap();equipped.equipped=true;equipped.bound=true;
             if item.legacy{gear.insert(item.template,true);}
         }else if action=="gear_unequip"{
             if !item.equipped{return Err("NOT_EQUIPPED");}

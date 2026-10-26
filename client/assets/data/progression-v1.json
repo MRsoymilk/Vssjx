@@ -1,6 +1,6 @@
 {
   "version":"progression-v1","boss_hp_budget_bp":13000,"min_special_level":15,"normal_pity":8,"boss_pity":8,
-  "normal_drop_percent":25,"boss_drops":2,"focus_percent":80,
+  "normal_drop_percent":25,"boss_drops":2,"focus_percent":80,"original_appearance_percent":50,
   "normal_weights":{"white":25,"blue":45,"yellow":25,"orange":3,"green":2},
   "boss_weights":{"blue":50,"yellow":30,"orange":10,"green":10},
   "salvage_scrap":{"white":2,"blue":4,"yellow":8,"orange":12,"green":12},

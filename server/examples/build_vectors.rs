@@ -6,7 +6,7 @@ fn main(){
     for i in 0..6{for gender in 0..2{for (legend,count) in [(false,0),(false,2),(false,4),(true,0),(true,4)]{
         let d=&builds::DATA["items"][i];let job=d["job"].as_i64().unwrap() as i16;let build=d["id"].as_str().unwrap();
         let mut loot=loot::State::default();
-        let mut add=|slot:&str,quality:&str|{let template=shop::ITEMS.iter().find(|d|d.equipment()&&d.slot==slot&&d.equip_error(job,gender).is_none()).unwrap();let id=Uuid::parse_str(&format!("22222222-2222-4222-8222-{serial:012}")).unwrap();serial+=1;let mut item=loot::roll_special(&template.id,60,quality,build,17,id).unwrap();item.equipped=true;loot.items.push(item);};
+        let mut add=|slot:&str,quality:&str|{let template=shop::ITEMS.iter().find(|d|d.equipment()&&d.slot==slot&&d.equip_error(job,gender).is_none()).unwrap();let id=Uuid::parse_str(&format!("22222222-2222-4222-8222-{serial:012}")).unwrap();serial+=1;let mut item=loot::roll_special(&template.id,60,quality,build,17,id).unwrap();item.equipped=true;item.bound=true;loot.items.push(item);};
         if legend{add(d["legend_slot"].as_str().unwrap(),"orange");}
         for slot in builds::DATA["set_slots"].as_array().unwrap().iter().take(count){add(slot.as_str().unwrap(),"green");}
         assert!(loot.valid(job,gender));let mut stats=attributes::balanced_stats(job,60,false,[0;5]);loot.apply_stats(&mut stats,job);

@@ -1,17 +1,44 @@
 use vssjx_server::{loot,progression,shop};
 use uuid::Uuid;
 #[test]
-fn drops_obey_class_focus_item_level_and_both_pity_guarantees(){
+fn original_and_ai_art_drop_equally_across_classes_genders_slots_and_encounters(){
+    let mut originals=std::collections::BTreeSet::new();let mut qualities=std::collections::BTreeSet::new();
+    assert_eq!(progression::n("original_appearance_percent"),50);
+    for job in 0..3{for gender in 0..2{for boss in [false,true]{
+        let mut state=loot::State::default();state.focus="weapon".into();let mut counts=std::collections::BTreeMap::new();
+        for seed in 0..2048{
+            let full=seed%2==0;
+            state.reward(job,gender,60,boss,if full{60}else{0},seed*7919);
+            assert!(state.valid(job,gender));
+            assert!(if full{state.items.is_empty()}else{state.pending.is_empty()});
+            for item in state.items.drain(..).chain(state.pending.drain(..)){
+                assert!(!item.legacy&&!item.bound);assert_eq!(item.level,60);
+                let native=item.template.starts_with("original/");
+                assert!(native||item.template.starts_with("ai/"));
+                assert!(state.skins.contains(&item.template));
+                counts.entry(item.slot().to_owned()).or_insert([0_usize;2])[usize::from(!native)]+=1;
+                qualities.insert((native,item.quality.clone()));
+                if native{originals.insert(item.template);}
+            }
+        }
+        for slot in shop::SLOTS{let values=counts[slot];let total=values.iter().sum::<usize>();for count in values{assert!(count*100>=total*25&&count*100<=total*75,"job {job} gender {gender} {slot} boss {boss}: {values:?}");}}
+    }}}
+    let catalog:std::collections::BTreeSet<_>=shop::ITEMS.iter().filter(|d|d.equipment()&&d.id.starts_with("original/")).map(|d|d.id.clone()).collect();
+    assert_eq!(originals,catalog,"Every original equipment template is reachable through actual rewards");
+    for native in [false,true]{for quality in ["white","blue","yellow","orange","green"]{assert!(qualities.contains(&(native,quality.into())));}}
+}
+#[test]
+fn drops_ignore_class_focus_and_retain_item_level_and_both_pity_guarantees(){
     let mut seen=std::collections::BTreeSet::new();
     for job in 0..3{for gender in 0..2{for slot in shop::SLOTS{
         let mut s=loot::State::default();s.focus=slot.into();let mut focused=0;let mut drops=0;let mut drought=0;
         for seed in 0..512{
-            s.reward(job,gender,60,false,0,seed*7919);
+            s.reward(job,gender,60,false,0,seed*7919+job as u32*104729+gender as u32*1717);
             assert!(s.valid(job,gender));
             if s.items.is_empty(){drought+=1;assert!(drought<8);}else{drought=0;}
             for i in s.items.drain(..){drops+=1;focused+=usize::from(i.slot()==slot);assert_eq!(i.level,60);if let Some(id)=i.legendary.or(i.set_id){seen.insert(id);}}
         }
-        assert!(focused*100>=drops*65,"Directing loot must visibly favor the selected slot");
+        assert!(focused*100<drops*30,"Historical focus must not filter random drops");
         for seed in 0..16{s.reward(job,gender,60,true,60,seed*1717);assert!(s.pending.len()==2);assert!(s.pending.iter().all(|i|i.quality!="white"));if s.bosses%8==0{assert!(s.pending[0].legendary.is_some()||s.pending[0].set_id.is_some());}s.pending.clear();}
         s.reward(job,gender,1,true,0,17);assert!(s.items.iter().all(|i|i.level==1&&i.legendary.is_none()&&i.set_id.is_none()));
     }}}
@@ -48,7 +75,7 @@ fn old_battles_do_not_silently_gain_new_reward_rules(){
 fn unfocused_nonpity_first_drops_cover_every_set_slot_for_every_build(){
     for job in 0..3{
         let mut counts=std::collections::BTreeMap::new();
-        for seed in 0..4096{
+        for seed in 0..12288{
             let mut state=loot::State::default();
             state.reward(job,0,60,true,0,seed);
             let item=&state.items[0];

@@ -2,6 +2,17 @@ use std::collections::BTreeMap;
 use uuid::Uuid;
 use vssjx_server::{attributes,loot,shop};
 #[test]
+fn cross_class_inventory_is_legal_but_equip_checks_requirements_and_binds_permanently(){
+    let item=loot::roll("ai/eva01/wfs/weapon",30,"yellow",17,Uuid::new_v4()).unwrap();assert!(item.tradable());assert!(item.valid(0,0));
+    let id=item.id;let mut state=loot::State::default();state.items.push(item);let mut gear=BTreeMap::new();
+    let before=state.clone();assert!(state.apply("gear_equip",id,&mut gear,60,1,0,0).is_err());assert_eq!(before,state);
+    assert!(state.apply("gear_equip",id,&mut gear,60,1,2,0).is_err());assert_eq!(before,state);
+    state.apply("gear_equip",id,&mut gear,60,1,2,1).unwrap();assert!(state.items[0].bound);assert!(!state.items[0].tradable());
+    state.apply("gear_unequip",id,&mut gear,60,0,2,1).unwrap();assert!(state.items[0].bound);assert!(!state.items[0].tradable());
+    let mut old=serde_json::to_value(&before.items[0]).unwrap();old.as_object_mut().unwrap().remove("bound");
+    let restored:loot::Item=serde_json::from_value(old).unwrap();assert!(restored.bound);assert!(!restored.tradable());
+}
+#[test]
 fn rolls_are_unique_slot_legal_level_bounded_and_immutable_after_serialization(){
     for job in 0..3{for gender in 0..2{for slot in shop::SLOTS{
         let d=shop::ITEMS.iter().find(|d|d.slot==slot&&d.equip_error(job,gender).is_none()).unwrap();
@@ -31,16 +42,16 @@ fn legacy_migration_preserves_fixed_stats_ids_and_all_appearances(){
 fn instance_equips_replace_legacy_slots_enforce_capacity_and_preserve_other_copies(){
     let mut gear=BTreeMap::from([("sword".into(),true)]);let mut s=loot::State::default();s.sync_legacy(&gear,1,0);
     let a=loot::roll("sword",30,"yellow",1,Uuid::new_v4()).unwrap();let b=loot::roll("sword",30,"yellow",2,Uuid::new_v4()).unwrap();s.items.extend([a.clone(),b.clone()]);
-    assert_eq!(s.apply("gear_equip",a.id,&mut gear,29,59),Err("EQUIPMENT_LEVEL_REQUIRED"));
-    s.apply("gear_equip",a.id,&mut gear,30,59).unwrap();assert_eq!(gear["sword"],false);assert!(s.valid(1,0));
-    assert_eq!(s.apply("gear_equip",a.id,&mut gear,30,59),Err("EQUIPMENT_UNCHANGED"));
-    assert_eq!(s.apply("gear_unequip",a.id,&mut gear,30,60),Err("BAG_FULL"));
+    assert_eq!(s.apply("gear_equip",a.id,&mut gear,29,59,1,0),Err("EQUIPMENT_LEVEL_REQUIRED"));
+    s.apply("gear_equip",a.id,&mut gear,30,59,1,0).unwrap();assert_eq!(gear["sword"],false);assert!(s.valid(1,0));assert!(s.items.iter().find(|i|i.id==a.id).unwrap().bound);
+    assert_eq!(s.apply("gear_equip",a.id,&mut gear,30,59,1,0),Err("EQUIPMENT_UNCHANGED"));
+    assert_eq!(s.apply("gear_unequip",a.id,&mut gear,30,60,1,0),Err("BAG_FULL"));
     assert!(s.items.iter().any(|i|i.id==a.id&&i.equipped));assert!(s.items.contains(&b));
-    s.apply("gear_unequip",a.id,&mut gear,30,59).unwrap();
+    s.apply("gear_unequip",a.id,&mut gear,30,59,1,0).unwrap();assert!(s.items.iter().find(|i|i.id==a.id).unwrap().bound);
     s.pending.push(loot::roll("sword",1,"blue",3,Uuid::new_v4()).unwrap());let id=s.pending[0].id;
-    assert_eq!(s.apply("gear_claim",id,&mut gear,30,60),Err("BAG_FULL"));
-    s.apply("gear_claim",id,&mut gear,30,59).unwrap();assert!(s.pending.is_empty());assert!(s.valid(1,0));
-    assert_eq!(s.apply("gear_claim",id,&mut gear,30,59),Err("INSTANCE_NOT_OWNED"));
+    assert_eq!(s.apply("gear_claim",id,&mut gear,30,60,1,0),Err("BAG_FULL"));
+    s.apply("gear_claim",id,&mut gear,30,59,1,0).unwrap();assert!(s.pending.is_empty());assert!(s.valid(1,0));
+    assert_eq!(s.apply("gear_claim",id,&mut gear,30,59,1,0),Err("INSTANCE_NOT_OWNED"));
 }
 #[test]
 fn affix_channels_have_actual_combat_effects_and_retain_caps(){

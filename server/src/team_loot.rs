@@ -9,16 +9,16 @@ pub struct Drop{
     pub tie_scores:BTreeMap<Uuid,u8>,pub winner:Option<Uuid>,pub resolved:bool,pub delivered:bool,
 }
 #[derive(Clone,Debug,Serialize,Deserialize)]
-pub struct Pool{pub deadline_ms:i64,pub revision:u64,pub members:Vec<Uuid>,pub drops:Vec<Drop>}
+pub struct Pool{pub deadline_ms:i64,pub revision:u64,pub members:Vec<Uuid>,pub drops:Vec<Drop>,#[serde(default)] pub unrestricted:bool}
 impl Pool{
     pub fn new(items:Vec<Item>,fighters:&[Fighter],now:i64)->Self{
         let members:Vec<_>=fighters.iter().map(|f|f.id).collect();
         let drops=items.into_iter().map(|item|{
-            let eligible:Vec<_>=fighters.iter().filter(|f|item.valid(f.job,f.gender)&&item.level<=f.level).map(|f|f.id).collect();
+            let eligible:Vec<_>=fighters.iter().map(|f|f.id).collect();
             let choices=members.iter().filter(|id|!eligible.contains(id)).map(|id|(*id,None)).collect();
             Drop{item,eligible,choices,tie_scores:BTreeMap::new(),winner:None,resolved:false,delivered:false}
         }).collect();
-        let mut pool=Self{deadline_ms:now+ROLL_MS,revision:0,members,drops};pool.resolve(now);pool
+        let mut pool=Self{deadline_ms:now+ROLL_MS,revision:0,members,drops,unrestricted:true};pool.resolve(now);pool
     }
     pub fn pending(&self)->bool{self.drops.iter().any(|d|!d.delivered)}
     pub fn choose(&mut self,who:Uuid,id:Uuid,roll:Option<u8>,now:i64)->Result<(),&'static str>{

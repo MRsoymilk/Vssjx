@@ -1,0 +1,4 @@
+[gd_scene format=3]
+[ext_resource type="Script" path="res://tests/skill_picker_layout_test.gd" id="1"]
+[node name="SkillPickerLayoutTest" type="Node"]
+script = ExtResource("1")

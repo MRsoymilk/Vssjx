@@ -1,6 +1,6 @@
 class_name SkillPicker
 extends Control
-## Battle 31a4..3200, 3ff8, 4158, 41ac: compact rows, cost column and separate description.
+## Native rows and cost column, expanded vertically to show the current skill pool.
 signal chosen(id: String)
 signal dismissed
 var rows: VBoxContainer
@@ -13,29 +13,36 @@ var submitted := false
 var locked := false
 var combat_stats:Dictionary={}
 var combat_effects:Dictionary={}
+var paper:Panel
+var heading:ColorRect
+var name_heading:Label
+var mana_heading:Label
+var strip:Panel
+var back:Button
 const INK := Color("643019")
 const ROW_HEIGHT := 19
+const MAX_VISIBLE_ROWS := 13
 
 func _init() -> void:
-	size = Vector2(320, 396)
+	size = Vector2(320, 424)
 	mouse_filter = Control.MOUSE_FILTER_STOP
-	var paper := Panel.new()
+	paper = Panel.new()
 	paper.position = Vector2(90, 165); paper.size = Vector2(140, 150)
 	paper.add_theme_stylebox_override("panel", _paper(Color("fff6bc"), true))
 	add_child(paper)
-	var heading := ColorRect.new()
+	heading = ColorRect.new()
 	heading.position = Vector2(92, 167); heading.size = Vector2(136, 20)
 	heading.color = Color("ff684a"); heading.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(heading)
-	_caption("技能", Vector2(105, 168), Vector2(60, 17), Color("fff6bc"))
-	_caption("灵力", Vector2(189, 168), Vector2(32, 17), Color("fff6bc"))
+	name_heading=_caption("技能", Vector2(105, 168), Vector2(60, 17), Color("fff6bc"))
+	mana_heading=_caption("灵力", Vector2(189, 168), Vector2(32, 17), Color("fff6bc"))
 	scroll = ScrollContainer.new(); scroll.name = "Skills"
 	scroll.position = Vector2(94, 194); scroll.size = Vector2(132, 114)
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	add_child(scroll)
 	rows = VBoxContainer.new(); rows.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	rows.add_theme_constant_override("separation", 0); scroll.add_child(rows)
-	var strip := Panel.new()
+	strip = Panel.new()
 	strip.position = Vector2(0, 134); strip.size = Vector2(320, 30)
 	strip.add_theme_stylebox_override("panel", _paper(Color("fff6bc"), true))
 	add_child(strip)
@@ -43,10 +50,25 @@ func _init() -> void:
 	description.add_theme_font_size_override("font_size", 10)
 	description.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	description.clip_text = true
-	var back := Button.new(); back.name = "Back"; back.text = "返回"
+	back = Button.new(); back.name = "Back"; back.text = "返回"
 	back.position = Vector2(134, 316); back.size = Vector2(52, 22)
 	_style_button(back); add_child(back)
 	back.pressed.connect(func() -> void: dismissed.emit())
+	_layout_choices()
+
+func _layout_choices()->void:
+	# Thirteen rows fit between the countdown and bottom chat at the native size.
+	# Retain scrolling as a fallback if a future catalog adds more skills.
+	var list_height:=float(ROW_HEIGHT*clampi(choices.size(),6,MAX_VISIBLE_ROWS))
+	var paper_height:=maxf(150.0,list_height+30.0)
+	var top:=240.0-paper_height*0.5
+	paper.position=Vector2(90,top);paper.size=Vector2(140,paper_height)
+	heading.position=Vector2(92,top+2)
+	name_heading.position=Vector2(105,top+3);mana_heading.position=Vector2(189,top+3)
+	scroll.position=Vector2(94,top+26);scroll.size=Vector2(132,list_height)
+	strip.position=Vector2(0,top-31);description.position=Vector2(4,top-28)
+	back.position=Vector2(134,top+paper_height+1)
+	back.size=Vector2(52,22)
 
 static func usable_choices(job: int, school: int, level: int, available: Array = [], legacy_only: bool = false) -> Array:
 	return SkillRules.list_for(job,school,level).filter(func(skill: Dictionary) -> bool:
@@ -59,6 +81,8 @@ func present(job: int, school: int, level: int, mp: int, available: Array = [], 
 	current_mp = mp; selected_id = ""; submitted = false; locked = false
 	combat_stats=stats;combat_effects=effects
 	choices = usable_choices(job,school,level,available,legacy_only).duplicate(true)
+	_layout_choices()
+	scroll.scroll_vertical=0
 	for skill in choices:
 		skill.mp_cost=SkillBalance.cost(skill,stats)
 		skill.description=SkillRules.description(skill,SkillRules.stun_enabled(effects))

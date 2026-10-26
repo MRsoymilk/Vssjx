@@ -37,6 +37,7 @@ WEAPONS = {
 WEAPON_NAMES = ['冰魄龙锤','紫焰龙锤','赤鳞龙锤','白骨锤','金骨锤','玄骨锤','日轮锤','骨纹轮锤','冰花锤','玄铁斧','赤珠锤','赤纹锤','双刃斧','金钺','骨刃斧','玄刃战斧','紫月战镰','木槌','赤爪刃','冰焰刃','焰牙刃','寒锋剑','苍星剑','赤星剑','流霞剑','碧纹剑','赤纹剑','青锋长剑','苍刃剑','赤锋剑','银锋剑','绯翼剑','紫翼剑','白刃剑','赤刃剑','苍月刀','弧锋刃','紫月刀','木纹杖','檀木杖','冰灵杖','碧灵杖','紫晶杖','朱纹杖','紫纹杖','青纹杖','金焰杖','玄星杖','赤星杖','绯星杖','金铃杖','白玉杖','日华杖','月华杖','灵骨杖','冰晶杖']
 MEDICINES = {
     10:('生骨融血草',8000,0),
+    14:('极品人参',0,4000),
     0:('青露药剂',30,0),1:('白玉药剂',45,0),2:('青瓷灵液',0,20),
     3:('赤玉药剂',60,0),4:('碧水灵液',0,30),5:('琥珀药剂',40,15),
     15:('小玉药瓶',30,0),16:('白瓷药瓶',60,0),17:('方口药瓶',0,25),18:('竹筒药液',45,20),
@@ -80,10 +81,11 @@ def build():
         elif n in MEDICINES:
             name,hp,mp=MEDICINES[n]
             row.update(name=name,slot='consumable',category='药品',price=max(4,(hp+mp*2)//6),restore_hp=hp,restore_mp=mp,sections=['hot','elixir'])
-            if n==10:
-                row.update(price=10,usage_note='战斗外使用，不超过气血上限',
-                    original_confirmation={'name':name,'restore_hp':hp,'source':'用户于2026-10-26提供ix10截图并确认原版名称与恢复量'},
-                    rules_basis='原包图标；名称及固定恢复8000气血由用户确认；售价沿用10铜钱，分类与战斗外使用沿用当前重建规则')
+            if n in (10,14):
+                resource,amount,field=('气血',hp,'restore_hp') if hp else ('灵力',mp,'restore_mp')
+                row.update(price=10,usage_note=f'战斗外使用，不超过{resource}上限',
+                    original_confirmation={'name':name,field:amount,'source':f'用户于2026-10-26提供ix{n}截图并确认原版名称与恢复量'},
+                    rules_basis=f'原包图标；名称及固定恢复{amount}{resource}由用户确认；售价沿用10铜钱，分类与战斗外使用沿用当前重建规则')
         else:
             if n in [29,31,32,33,34,35,67]: category='宝石';name='灵石';row['price']=35
             elif n in [6,51,52,53,54,68]: category='配方';name='纹印卷轴';row['price']=24

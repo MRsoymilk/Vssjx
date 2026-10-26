@@ -3708,8 +3708,8 @@
     },
     {
       "id": "original/ix14",
-      "name": "灵草·14",
-      "slot": "material",
+      "name": "极品人参",
+      "slot": "consumable",
       "price": 10,
       "attack": 0,
       "defense": 0,
@@ -3719,15 +3719,21 @@
       "job": -1,
       "icon": "res://assets/items/original/ix14.png",
       "restore_hp": 0,
-      "restore_mp": 0,
+      "restore_mp": 4000,
       "source_member": "ssjx/item/ix14.img",
       "source_sha256": "3aaf1e5b5a532a115839874242e9bcbc12b3cd0b57385da4d51e76063b262daa",
-      "rules_basis": "图形特征命名、分类、售价和属性为重建规则；并非原服务器物品表",
-      "category": "药材",
+      "rules_basis": "原包图标；名称及固定恢复4000灵力由用户确认；售价沿用10铜钱，分类与战斗外使用沿用当前重建规则",
+      "category": "药品",
       "sections": [
         "hot",
-        "craft"
-      ]
+        "elixir"
+      ],
+      "usage_note": "战斗外使用，不超过灵力上限",
+      "original_confirmation": {
+        "name": "极品人参",
+        "restore_mp": 4000,
+        "source": "用户于2026-10-26提供ix14截图并确认原版名称与恢复量"
+      }
     },
     {
       "id": "original/ix15",

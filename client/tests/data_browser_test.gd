@@ -41,6 +41,8 @@ func _ready() -> void:
 	for entry in catalog.find("items", "", "原包资源"):
 		if entry.id=="original/ix10":
 			check(entry.data["原版名称"]=="生骨融血草" and entry.data["原版属性"]=={"恢复气血":8000},"User-confirmed herb name and recovery are explicit")
+		elif entry.id=="original/ix14":
+			check(entry.data["原版名称"]=="极品人参" and entry.data["原版属性"]=={"恢复灵力":4000},"User-confirmed ginseng name and mana recovery are explicit")
 		else:
 			check(entry.data["原版名称"] == null and entry.data["原版属性"] == null, "Unknown original names and stats remain unknown: " + entry.id)
 		var product:=ShopRules.item(entry.id)

@@ -367,7 +367,7 @@ static func error_text(code: String) -> String:
 	if code == "MONSTER_RESPAWNING": return "怪物正在刷新，请稍候再来。"
 	var attributes := {"STALE_ATTRIBUTES":"属性已更新，请重新加点。", "ATTRIBUTE_RESPEC_FORBIDDEN":"已保存的属性点不能减少。", "ATTRIBUTE_POINTS_EXCEEDED":"剩余属性点不足。", "NO_ATTRIBUTE_CHANGE":"请先分配属性点。", "INVALID_ATTRIBUTES":"属性点格式无效。"}
 	if attributes.has(code): return attributes[code]
-	return {"PLAYER_MOVING":"请停稳后再交互。", "RESIDENT_TOO_FAR":"距离过远，请靠近后再试。", "QUEST_REQUIRED":"请先向清微道人接取山林试炼。", "QUEST_NOT_READY":"试炼尚未完成或奖励已经领取。", "QUEST_ALREADY_ACCEPTED":"已经领受过此试炼。", "MONSTER_DEFEATED":"你已经击败过这只怪物。", "STALE_BATTLE":"回合已经更新，请重新选择行动。", "MP_INSUFFICIENT":"灵力不足，可凝神防御恢复灵力。", "NO_POTION":"回春散已经用完。", "HP_FULL":"当前生命已满。", "BATTLE_ACTIVE":"请先完成当前战斗。"}.get(code,"操作未完成：" + code)
+	return {"PLAYER_MOVING":"请停稳后再交互。", "RESIDENT_TOO_FAR":"距离过远，请靠近后再试。", "QUEST_REQUIRED":"请先向清微道人接取山林试炼。", "QUEST_NOT_READY":"试炼尚未完成或奖励已经领取。", "QUEST_ALREADY_ACCEPTED":"已经领受过此试炼。", "MONSTER_DEFEATED":"你已经击败过这只怪物。", "STALE_BATTLE":"回合已经更新，请重新选择行动。", "MP_INSUFFICIENT":"灵力不足，可凝神防御恢复灵力。", "NO_POTION":"回春散已经用完。", "HP_FULL":"气血或灵力已满，无需使用该道具。", "BATTLE_ACTIVE":"请先完成当前战斗。"}.get(code,"操作未完成：" + code)
 
 static func valid_points(value: Variant) -> bool:
 	if not value is Array or value.size() != 5: return false

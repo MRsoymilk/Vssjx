@@ -19,6 +19,22 @@ fn use_item(id:&str)->Command{
 }
 
 #[test]
+fn confirmed_ginseng_restores_4000_mana_without_healing_hp_or_wasting_items(){
+    const ID:&str="original/ix14";
+    let item=crate::shop::item(ID).unwrap();
+    assert_eq!((item.name.as_str(),item.slot.as_str(),item.restore_hp,item.restore_mp,item.price),("极品人参","consumable",0,4000,10));
+    for revision in [0,1]{for job in 0..3{
+        let (mut loaded,context)=player(job,60,revision);
+        loaded.gear.insert(ID.into(),false);loaded.quantities.insert(ID.into(),2);
+        let max_mp=loaded.stats().mp;
+        loaded.apply(&use_item(ID),&context).unwrap();
+        assert_eq!(loaded.character.mp,4000.min(max_mp));assert_eq!(loaded.character.hp,1);
+        assert_eq!(loaded.quantities[ID],1);
+        assert_eq!(loaded.apply(&use_item(ID),&context),Err("HP_FULL"));assert_eq!(loaded.quantities[ID],1);
+    }}
+}
+
+#[test]
 fn confirmed_boneblood_herb_restores_fixed_8000_without_waste_or_changing_mana(){
     const ID:&str="original/ix10";
     let item=crate::shop::item(ID).unwrap();

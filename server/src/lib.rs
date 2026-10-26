@@ -6,6 +6,7 @@ pub mod monster_combat;
 pub mod loot;
 pub mod builds;
 pub mod progression;
+mod economy;
 pub mod team_loot;
 pub mod endless;
 pub mod soul;
@@ -119,6 +120,7 @@ pub fn apps(
         operator_token: uuid::Uuid::new_v4(),
     });
     monitor::sample_database(&state);
+    economy::start(&state);
     let router = Router::new()
         .route("/healthz", get(health))
         .route("/readyz", get(ready))
@@ -132,6 +134,7 @@ pub fn apps(
         .route("/api/v1/world/ws", get(world::upgrade))
         .route("/api/v1/social", post(social::command))
         .route("/api/v1/teams", post(teams::command))
+        .route("/api/v1/economy", post(economy::command))
         .route(
             "/api/v1/characters",
             get(characters::list).post(characters::create),

@@ -23,6 +23,7 @@ var pending_deletion: Dictionary = {}
 var pending_pve: Dictionary = {}
 var pending_social: Dictionary = {}
 var pending_team: Dictionary = {}
+var pending_economy:Dictionary={}
 var _after_refresh: Dictionary = {}
 var _generation := 0
 
@@ -67,6 +68,7 @@ func clear() -> void:
 	pending_pve = {}
 	pending_social = {}
 	pending_team = {}
+	pending_economy={}
 	_after_refresh = {}
 
 func list_characters() -> void:
@@ -98,6 +100,8 @@ func target_profile_request(payload: Dictionary) -> void:
 
 func team_request(payload: Dictionary) -> void:
 	_send("teams", server_address, payload, true)
+func economy_request(payload:Dictionary)->void:
+	_send("economy",server_address,payload,true)
 
 func request_world_ticket(character_id: String, config_hash: String) -> void:
 	_send("world_ticket", server_address, {"character_id": character_id, "protocol_version": 1, "config_hash": config_hash}, true)
@@ -177,7 +181,7 @@ func _send(action: String, address: String, payload: Dictionary, bearer: bool = 
 	busy = true
 	_request = HTTPRequest.new()
 	_request.timeout = REQUEST_TIMEOUT
-	_request.body_size_limit = 262144 if action in ["social","teams","target_profile"] else 32768
+	_request.body_size_limit = 262144 if action in ["social","teams","target_profile","economy"] else 32768
 	_request.max_redirects = 0
 	add_child(_request)
 	_request.request_completed.connect(_on_response.bind(_generation))
@@ -189,6 +193,7 @@ func _send(action: String, address: String, payload: Dictionary, bearer: bool = 
 	if action == "world_ticket": route = "/api/v1/world/ticket"
 	if action in ["social","target_profile"]: route = "/api/v1/social"
 	if action == "teams": route = "/api/v1/teams"
+	if action == "economy":route="/api/v1/economy"
 	var error := _request.request(_target + route, headers, method, body)
 	if error != OK: _finish({"ok": false, "code": "NETWORK_ERROR", "request_error": int(error)})
 
@@ -241,7 +246,7 @@ func _on_response(result: int, code: int, _headers: PackedStringArray, body: Pac
 		pending_deletion = {}
 		_finish({"ok": true})
 		return
-	if _action in ["social","teams","target_profile"]:
+	if _action in ["social","teams","target_profile","economy"]:
 		_finish(data)
 		return
 	if _action in ["characters", "character_create"]:

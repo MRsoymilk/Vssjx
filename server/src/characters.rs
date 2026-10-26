@@ -289,7 +289,7 @@ pub(crate) async fn delete(
     let mut tx = auth.pool().begin().await.map_err(database_error)?;
     sqlx::query("SET LOCAL lock_timeout='3s'").execute(&mut *tx).await.map_err(database_error)?;
     // Social/team handlers acquire these gates before authorizing the account.
-    for lock in [773913018_i64, 773913019_i64] {
+    for lock in [773913018_i64, 773913019_i64, 773913020_i64] {
         sqlx::query("SELECT pg_advisory_xact_lock($1)").bind(lock).execute(&mut *tx).await.map_err(database_error)?;
     }
     sqlx::query("SELECT id FROM accounts WHERE id=$1 FOR UPDATE").bind(account.id).fetch_one(&mut *tx).await.map_err(database_error)?;
@@ -318,6 +318,8 @@ pub(crate) async fn delete(
             .bind(payload.character_id).fetch_one(&mut *tx).await.map_err(database_error)?;
         if present { return Err(AuthError(StatusCode::CONFLICT, code)); }
     }
+    let escrow:bool=sqlx::query_scalar("SELECT EXISTS(SELECT 1 FROM auction_listings WHERE (seller=$1 OR bidder=$1) AND status='open') OR EXISTS(SELECT 1 FROM economy_deliveries WHERE character_id=$1 AND NOT claimed)").bind(payload.character_id).fetch_one(&mut *tx).await.map_err(database_error)?;
+    if escrow{return Err(AuthError(StatusCode::CONFLICT,"CHARACTER_HAS_ESCROW"));}
     sqlx::query("UPDATE characters SET deleted_at=clock_timestamp() WHERE id=$1").bind(payload.character_id).execute(&mut *tx).await.map_err(database_error)?;
     sqlx::query("DELETE FROM friendships WHERE low_id=$1 OR high_id=$1").bind(payload.character_id).execute(&mut *tx).await.map_err(database_error)?;
     sqlx::query("DELETE FROM guild_applications WHERE character_id=$1").bind(payload.character_id).execute(&mut *tx).await.map_err(database_error)?;

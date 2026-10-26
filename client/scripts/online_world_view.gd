@@ -82,6 +82,7 @@ var team_panel:Control
 var solo_model:=SoloEncounter.new()
 var solo_battle:Control
 var help_panel:ControlHelp
+var economy_panel:EconomyPanel
 var team_battle:Control
 var team_notice:Panel
 var team_notice_text:Label
@@ -263,6 +264,7 @@ func _scene_action(action: String) -> void:
 	if network.duel.active() or duel_battle.visible or team.active() or team_battle.visible: return
 	if gathering_panel.visible:_cancel_gathering()
 	_close_help()
+	_close_economy()
 	if team_panel.visible:team_panel.dismiss()
 	if social_panel.visible: social_panel.dismiss()
 	_close_inventory()
@@ -321,6 +323,10 @@ func _scene_action(action: String) -> void:
 		_open_inventory()
 		if backpack!=null:backpack.open_loot();backpack.loot_panel.status.text="选择一件装备，再点“养成”。"
 		return
+	if action=="trade":
+		if network.pve.active() or network.team.active() or network.duel.active():chat_status.text=OnlinePve.error_text("BATTLE_ACTIVE");return
+		if is_instance_valid(economy_panel):return
+		economy_panel=EconomyPanel.new();economy_panel.online_model=network.pve;add_child(economy_panel);economy_panel.dismissed.connect(_close_economy);return
 	var titles := {"system": "系统", "properties": "人物属性", "quest": "任务", "bag": "背包", "map": "地图", "mail": "邮件", "reward": "奖励", "shop": "商城", "craft": "炼制", "team": "队伍", "guild": "帮会", "trade": "交易"}
 	$Menu/Panel/Title.text = titles.get(action, "提示")
 	var body := "同图%d人 · 点击地图移动 / WASD\n公共消息在底部直接发送。\n线上进度由服务器保存。" % actors.size()
@@ -334,6 +340,9 @@ func _scene_action(action: String) -> void:
 func _close_help()->void:
 	if is_instance_valid(help_panel):remove_child(help_panel);help_panel.queue_free()
 	help_panel=null
+func _close_economy()->void:
+	if is_instance_valid(economy_panel):economy_panel.queue_free()
+	economy_panel=null
 
 func _status_changed(text_value: String) -> void:
 	status.text = text_value
@@ -359,7 +368,7 @@ func _refresh_target()->void:
 	if not network.world_ready or not network.entities.has(target.selected) or map_transition.blocking or network.pve.active() or team.active() or network.duel.active():
 		target.clear();return
 	target_view.display(target.selected,network.entities[target.selected],target.profile,target.last_code)
-	target_view.visible=not (gathering_panel.visible or is_instance_valid(help_panel) or team_panel.visible or social_panel.visible or bag_overlay!=null or menu.visible or details.visible or npc_dialog.visible or encounter.visible or battle_view.visible or solo_battle.visible or duel_battle.visible or team_battle.visible or expanded_chat.visible or attributes.visible or world_map.visible)
+	target_view.visible=not (is_instance_valid(economy_panel) or gathering_panel.visible or is_instance_valid(help_panel) or team_panel.visible or social_panel.visible or bag_overlay!=null or menu.visible or details.visible or npc_dialog.visible or encounter.visible or battle_view.visible or solo_battle.visible or duel_battle.visible or team_battle.visible or expanded_chat.visible or attributes.visible or world_map.visible)
 	if not target_view.visible:target_view.close_actions()
 	target_view.buttons.duel.disabled=not network.duel.enabled or network.duel.pending()
 	var friends:bool=social.state.get("friends",[]).any(func(p:Dictionary)->bool:return p.id==target.selected)
@@ -816,7 +825,7 @@ func _process(delta: float) -> void:
 	if _follow_transfer():return
 	_advance_approach()
 	if gathering_panel.visible and GatheringPanel.movement_pressed():_cancel_gathering()
-	if gathering_panel.visible or target_view.actions.visible or is_instance_valid(help_panel) or team_panel.visible or social_panel.visible or bag_overlay != null or chat_input.has_focus() or menu.visible or details.visible or npc_dialog.visible or emote_picker.visible or encounter.visible or (battle_view.visible or solo_battle.visible) or expanded_chat.visible or attributes.visible or world_map.visible or network.pve.pending() or network.pve.active():
+	if is_instance_valid(economy_panel) or gathering_panel.visible or target_view.actions.visible or is_instance_valid(help_panel) or team_panel.visible or social_panel.visible or bag_overlay != null or chat_input.has_focus() or menu.visible or details.visible or npc_dialog.visible or emote_picker.visible or encounter.visible or (battle_view.visible or solo_battle.visible) or expanded_chat.visible or attributes.visible or world_map.visible or network.pve.pending() or network.pve.active():
 		_was_keyboard = false
 		return
 	if network.team_following: return
@@ -844,7 +853,7 @@ func _map_input(event: InputEvent) -> void:
 	if _battle_load_failed:
 		if (event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed) or (event is InputEventScreenTouch and event.pressed): _pve_changed()
 		return
-	if is_instance_valid(help_panel) or social_panel.visible or bag_overlay != null or not network.world_ready or menu.visible or details.visible or npc_dialog.visible or encounter.visible or (battle_view.visible or solo_battle.visible) or expanded_chat.visible or attributes.visible or world_map.visible or network.pve.pending() or network.pve.active(): return
+	if is_instance_valid(economy_panel) or is_instance_valid(help_panel) or social_panel.visible or bag_overlay != null or not network.world_ready or menu.visible or details.visible or npc_dialog.visible or encounter.visible or (battle_view.visible or solo_battle.visible) or expanded_chat.visible or attributes.visible or world_map.visible or network.pve.pending() or network.pve.active(): return
 	var point := Vector2.ZERO
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed: point = event.position
 	elif event is InputEventScreenTouch and event.pressed: point = event.position
@@ -904,6 +913,12 @@ func _map_input(event: InputEvent) -> void:
 		chat_status.text = "目标不可达，已停止原路线。"
 
 func _unhandled_key_input(event: InputEvent) -> void:
+	if is_instance_valid(economy_panel):
+		if event is InputEventKey and event.pressed and event.keycode==KEY_ESCAPE:
+			if economy_panel.confirmation.visible:economy_panel.confirmation.hide()
+			else:_close_economy()
+			get_viewport().set_input_as_handled()
+		return
 	if is_instance_valid(help_panel):
 		if event is InputEventKey and event.pressed and event.keycode==KEY_ESCAPE:_close_help();get_viewport().set_input_as_handled()
 		return

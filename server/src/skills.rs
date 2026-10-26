@@ -32,6 +32,14 @@ pub struct Skill {
     pub mp_cost: i32,
     pub damage_percent: i32,
     #[serde(default)]
+    pub damage_override_percent:i32,
+    #[serde(default)]
+    pub critical_chance:i32,
+    #[serde(default)]
+    pub dot_attack_percent:i32,
+    #[serde(default)]
+    pub unreflectable:bool,
+    #[serde(default)]
     pub flat_reduction: i32,
     pub effect: String,
     pub value: i32,
@@ -104,6 +112,8 @@ pub struct State {
     pub bleed_damage: i32,
     pub enemy_poison: i32,
     pub poison_damage: i32,
+    #[serde(default,skip_serializing_if="not_critical")]
+    pub poison_fixed:bool,
     pub enemy_sleep: i32,
     pub enemy_silence: i32,
     pub regen: i32,
@@ -139,8 +149,8 @@ impl State {
     pub fn consume_stun(&mut self)->bool{if self.enemy_stun<=0{return false;}self.enemy_stun-=1;true}
     pub fn miss(&mut self,s:&Skill,stats:Stats,mp:&mut i32){self.activate(stats);self.last_skill=s.id.clone();self.last_missed=true;*mp-=crate::skill_balance::cost(s,stats);self.mark(s);self.last_critical=false;}
     pub fn activate(&mut self,stats:Stats){if crate::skill_balance::revised(stats)&&self.balance.is_none(){self.balance=Some(BalanceState{targets:1,..Default::default()});}}
-    pub fn remaining(&self,id:&str)->i32{self.balance.as_ref().and_then(|b|b.cooldowns.get(id)).copied().unwrap_or(0)}
-    pub fn mark(&mut self,s:&Skill){let cooldown=crate::skill_balance::cooldown_for(s,self.stun_enabled());if let Some(b)=self.balance.as_mut(){b.cooldowns.insert(s.id.clone(),cooldown+1);}}
+    pub fn remaining(&self,id:&str)->i32{if item(id).is_some_and(|s|crate::skill_balance::cooldown_for(s,self.stun_enabled())==0){return 0;}self.balance.as_ref().and_then(|b|b.cooldowns.get(id)).copied().unwrap_or(0)}
+    pub fn mark(&mut self,s:&Skill){let cooldown=crate::skill_balance::cooldown_for(s,self.stun_enabled());if let Some(b)=self.balance.as_mut(){if cooldown>0{b.cooldowns.insert(s.id.clone(),cooldown+1);}else{b.cooldowns.remove(&s.id);}}}
     pub fn tick_balance(&mut self){if let Some(b)=self.balance.as_mut(){for v in b.cooldowns.values_mut(){*v=(*v-1).max(0);}b.cooldowns.retain(|_,v|*v>0);b.control_protection=(b.control_protection-1).max(0);}}
     pub fn end_balance_round(&mut self,hp:&mut i32,max_hp:i32)->i32{
         if self.balance.is_none(){return 0;}
@@ -181,7 +191,8 @@ impl State {
         self.last_healed = 0;
     }
     pub fn critical(&mut self, damage: i32, roll: i32) -> i32 {
-        self.last_critical = damage > 0 && self.crit > 0 && roll < self.crit_chance;
+        let specific=item(&self.last_skill).map_or(0,|s|s.critical_chance);
+        self.last_critical = damage > 0 && if specific>0{roll<specific}else{self.crit > 0 && roll < self.crit_chance};
         if self.last_critical {
             damage * 3 / 2
         } else {
@@ -216,13 +227,18 @@ impl State {
         let mut stolen_amount=0;
         let mut control_applied=false;
         match s.effect.as_str() {
+            "heal"=>{
+                let amount=(i64::from(stats.attack.max(0))*i64::from(s.value)/100).min(i64::from((stats.hp-*hp).max(0))) as i32;
+                *hp+=amount;self.last_healed+=amount;
+            }
             "bleed" => {
                 self.enemy_bleed = if revised{crate::skill_balance::n("dot_ticks")}else{s.duration};
                 self.bleed_damage = if revised{crate::attributes::dot_damage(stats,enemy_defense,crate::skill_balance::n("dot_tick_bp"))}else{(stats.attack * s.value / 100).max(1)};
             }
             "poison" => {
                 self.enemy_poison = if revised{crate::skill_balance::n("dot_ticks")}else{s.duration};
-                self.poison_damage = if revised{crate::attributes::dot_damage(stats,enemy_defense,crate::skill_balance::n("dot_tick_bp"))}else{(stats.attack * s.value / 100).max(1)};
+                self.poison_fixed=s.dot_attack_percent>0;
+                self.poison_damage = if self.poison_fixed{stats.attack.max(0)*s.dot_attack_percent/100}else if revised{crate::attributes::dot_damage(stats,enemy_defense,crate::skill_balance::n("dot_tick_bp"))}else{(stats.attack * s.value / 100).max(1)};
             }
             "sleep" => {
                 if roll < if revised{crate::skill_balance::n("control_chance")}else{s.chance} && self.balance.as_ref().is_none_or(|b|b.control_protection==0) {

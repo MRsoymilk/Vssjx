@@ -62,7 +62,7 @@ static func valid_state(state:Variant)->bool:
 	if state is Dictionary and state.has("builds") and not BuildRules.valid_progress(state.builds):return false
 	if not state is Dictionary or not state.get("last_skill") is String or not state.get("last_enemy_acted") is bool:return false
 	if state.has("enemy_stun") and not OnlinePve.integer(state.enemy_stun,0,1):return false
-	for key in ["last_missed","last_enemy_missed"]:
+	for key in ["last_missed","last_enemy_missed","poison_fixed"]:
 		if state.has(key) and not state[key] is bool:return false
 	if state.has("last_critical") and not state.last_critical is bool:return false
 	if not state.last_skill.is_empty() and (item(state.last_skill).is_empty() or not item(state.last_skill).active):return false
@@ -108,9 +108,16 @@ static func consume_stun(state:Dictionary)->bool:
 	if int(state.get("enemy_stun",0))<=0:return false
 	state.erase("enemy_stun")
 	return true
-static func remaining(state:Dictionary,id:String)->int:return int(state.get("balance",{}).get("cooldowns",{}).get(id,0))
+static func remaining(state:Dictionary,id:String)->int:
+	if not item(id).is_empty() and SkillBalance.cooldown(item(id),stun_enabled(state))==0:return 0
+	return int(state.get("balance",{}).get("cooldowns",{}).get(id,0))
+static func mark(skill:Dictionary,state:Dictionary)->void:
+	if not state.has("balance"):return
+	var cooldown:=SkillBalance.cooldown(skill,stun_enabled(state))
+	if cooldown>0:state.balance.cooldowns[skill.id]=cooldown+1
+	else:state.balance.cooldowns.erase(skill.id)
 static func miss(skill:Dictionary,state:Dictionary,stats:Dictionary,mp:int)->int:
-	activate(state,stats);state.erase("last_critical");state.last_missed=true;state.last_skill=skill.id;state.balance.cooldowns[skill.id]=SkillBalance.cooldown(skill,stun_enabled(state))+1
+	activate(state,stats);state.erase("last_critical");state.last_missed=true;state.last_skill=skill.id;mark(skill,state)
 	return mp-SkillBalance.cost(skill,stats)
 static func end_balance_round(state:Dictionary,hp:int,max_hp:int)->Dictionary:
 	if not state.has("balance"):return {"damage":0,"hp":hp}
@@ -122,7 +129,8 @@ static func end_balance_round(state:Dictionary,hp:int,max_hp:int)->Dictionary:
 	return {"damage":damage,"hp":hp}
 
 static func critical(state:Dictionary,damage:int,roll:int)->int:
-	state.last_critical=damage>0 and int(state.crit)>0 and roll<int(state.crit_chance)
+	var specific:=int(item(state.last_skill).get("critical_chance",0))
+	state.last_critical=damage>0 and (roll<specific if specific>0 else int(state.crit)>0 and roll<int(state.crit_chance))
 	return damage*3/2 if state.last_critical else damage
 
 static func cast(skill:Dictionary,state:Dictionary,stats:Dictionary,hp:int,mp:int,enemy_defense:int,roll:int)->Dictionary:
@@ -130,7 +138,7 @@ static func cast(skill:Dictionary,state:Dictionary,stats:Dictionary,hp:int,mp:in
 	var revised:=SkillBalance.revised(stats)
 	activate(state,stats)
 	mp-=SkillBalance.cost(skill,stats)
-	if revised:state.balance.cooldowns[skill.id]=SkillBalance.cooldown(skill,stun_enabled(state))+1
+	if revised:mark(skill,state)
 	var coefficient:=SkillBalance.coefficient(skill,int(state.balance.targets)) if revised else int(skill.damage_percent)*100
 	var damage:=CharacterAttributeRules.direct_damage(stats,enemy_defense,coefficient) if int(skill.damage_percent)>0 else 0
 	var healed:=mini(int(skill.legacy_heal),int(stats.hp)-hp)
@@ -141,9 +149,16 @@ static func cast(skill:Dictionary,state:Dictionary,stats:Dictionary,hp:int,mp:in
 	var stolen_amount:=0
 	var control_applied:=false
 	match String(skill.effect):
+		"heal":
+			var amount:=mini(maxi(0,int(stats.attack))*value/100,maxi(0,int(stats.hp)-hp))
+			hp+=amount;healed+=amount
 		"bleed","poison":
 			state["enemy_"+skill.effect]=int(SkillBalance.rules.dot_ticks) if revised else duration
-			state[skill.effect+"_damage"]=CharacterAttributeRules.dot_damage(stats,enemy_defense,int(SkillBalance.rules.dot_tick_bp)) if revised else maxi(1,int(stats.attack)*value/100)
+			if skill.effect=="poison" and int(skill.get("dot_attack_percent",0))>0:
+				state.poison_fixed=true;state.poison_damage=maxi(0,int(stats.attack))*int(skill.dot_attack_percent)/100
+			else:
+				if skill.effect=="poison":state.erase("poison_fixed")
+				state[skill.effect+"_damage"]=CharacterAttributeRules.dot_damage(stats,enemy_defense,int(SkillBalance.rules.dot_tick_bp)) if revised else maxi(1,int(stats.attack)*value/100)
 		"sleep","silence":
 			if roll<(int(SkillBalance.rules.control_chance) if revised else int(skill.chance)) and int(state.get("balance",{}).get("control_protection",0))==0:
 				state["enemy_"+skill.effect]=int(SkillBalance.rules.control_duration) if revised else duration

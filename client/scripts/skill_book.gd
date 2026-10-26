@@ -49,15 +49,17 @@ func select_skill(index:int)->void:
 	if String(skill.id).begins_with("legacy_"):
 		detail.text="单体攻击"+("，恢复%d点气血"%int(skill.legacy_heal) if int(skill.legacy_heal)>0 else "")
 	if not skill.active and skill.effect in ["reflect_physical","reflect_magic"]:
-		detail.text="%s反伤：自动反弹自身攻击力的%d%%伤害。"%["物理" if skill.effect=="reflect_physical" else "法术",int(skill.value)]
+		detail.text="%s反伤：自动反弹自身物理攻击力的%d%%伤害。"%["物理" if skill.effect=="reflect_physical" else "法术",int(skill.value)]
 	if balanced and skill.active:
-		if SkillBalance.kind(skill)=="dot":detail.text+=" · 首击80%＋每轮30%，共3次"
+		if int(skill.get("damage_override_percent",0))>0:pass
+		elif SkillBalance.kind(skill)=="dot" and int(skill.get("dot_attack_percent",0))==0:detail.text+=" · 首击80%＋每轮30%，共3次"
+		elif SkillBalance.kind(skill)=="dot":pass
 		elif skill.target=="all_enemies":
 			var limit:=int(skill.get("max_targets",0))
 			detail.text+=" · 群攻总倍率最多240%" if limit==0 else " · 每个目标威力%d%%"%(SkillBalance.coefficient(skill,limit)/100)
 		elif SkillBalance.kind(skill)=="control":detail.text+=" · 65%概率控制1轮，之后保护2轮"
 		elif int(skill.damage_percent)>0:detail.text+=" · 威力160%"
-	$CombatMeta.text=("消耗灵力%d点 · 冷却%d轮"%[SkillBalance.cost(skill,{}),SkillBalance.cooldown(skill)] if balanced else "消耗灵力%d点"%SkillBalance.cost(skill,{})) if skill.active else "自动生效 · 不消耗灵力"
+	$CombatMeta.text=("消耗灵力%d点 · 无冷却"%SkillBalance.cost(skill,{})) if skill.active else "自动生效 · 不消耗灵力"
 	$TrainingProgress.visible=skill.active and unlocked
 	if not unlocked:
 		$Training.text="解锁后施放技能可提升熟练度" if skill.active else "达到等级后自动生效"

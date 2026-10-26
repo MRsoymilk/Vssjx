@@ -44,7 +44,7 @@ func _ready()->void:
 	var stats:=CharacterAttributeRules.balanced_stats(0,60,false,[0,0,0,0,0])
 	var effects:=SkillRules.new_state(0,3,60);SkillRules.activate(effects,stats);effects.balance.cooldowns.sheet_010=2
 	picker.present(0,3,60,1000,[],false,stats,effects);await settle();await click(picker.rows.get_child(0))
-	check(chosen.size()==count and picker.description.text.contains("尚余2轮"),"Expanded list preserves cooldown refusal")
+	check(chosen.size()==count+1 and picker.description.text.contains("无冷却"),"Saved old cooldown cannot block the expanded picker")
 	field.queue_free();await settle()
 	var output:=OS.get_environment("SSJX_SKILL_LAYOUT_CAPTURE")
 	if not output.is_empty() and DisplayServer.get_name()!="headless":

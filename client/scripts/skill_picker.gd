@@ -89,7 +89,7 @@ func present(job: int, school: int, level: int, mp: int, available: Array = [], 
 		skill.full_description=skill.description
 		if skill.has("stun") and SkillRules.stun_enabled(effects):skill.description="%d%%眩晕：跳过下次行动，受击不解除"%int(skill.stun.chance)
 		if SkillBalance.revised(stats):
-			var cooldown_text:=" · 冷却%d轮"%SkillBalance.cooldown(skill,SkillRules.stun_enabled(effects))
+			var cooldown_text:=" · 无冷却" if SkillBalance.cooldown(skill,SkillRules.stun_enabled(effects))==0 else " · 冷却%d轮"%SkillBalance.cooldown(skill,SkillRules.stun_enabled(effects))
 			skill.description+=cooldown_text;skill.full_description+=cooldown_text
 	for child in rows.get_children(): rows.remove_child(child); child.queue_free()
 	for skill in choices:

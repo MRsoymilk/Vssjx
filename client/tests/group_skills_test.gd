@@ -37,7 +37,7 @@ func _run()->void:
 	check(local.submit("skill","m4",skill),"Valid primary still casts with a dead enemy present")
 	var targets:Array=local.state.events.filter(func(e:Dictionary)->bool:return e.skill==skill).map(func(e:Dictionary)->String:return e.target)
 	check(targets==["m4","m1"],"Dead enemies never consume a target slot")
-	check(not local.submit("skill","m4",skill),"Cooldown remains enforced")
+	check(local.submit("skill","m4",skill),"Same skill remains available in the next round")
 	check(SkillRules.check(skill,2,3,24)=="SKILL_LEVEL_REQUIRED","New skill unlocks at character level 25")
 	for spec in [["user_hengsao_qianjun",0],["sheet_004",1]]:
 		local=encounter(spec[1],spec[0],5)

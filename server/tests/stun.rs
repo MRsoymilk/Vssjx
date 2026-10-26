@@ -9,7 +9,7 @@ fn fighter(job:i16)->team_rules::Fighter{
     team_rules::Fighter{id:Uuid::new_v4(),name:"眩晕验证".into(),job,gender:0,school:3,level:60,appearance:[1,0,0],stats:s,hp:s.hp,mp:s.mp,potions:6,effects:skills::State::new(job,3,60,1),guarding:false}
 }
 #[test]
-fn thunder_keeps_damage_cost_and_exact_chance_with_three_turn_cooldown(){
+fn thunder_keeps_damage_cost_and_exact_chance_without_cooldown(){
     let s=skills::item("sheet_010").unwrap();let stats=stats(0);
     assert_eq!(s.stun.as_ref().unwrap().chance,35);
     assert_eq!(s.stun.as_ref().unwrap().actions,1);
@@ -23,8 +23,8 @@ fn thunder_keeps_damage_cost_and_exact_chance_with_three_turn_cooldown(){
         let damage=state.cast(s,stats,&mut hp,&mut mp,20,roll);
         assert!(damage>0);assert_eq!(state.enemy_stun,if roll<35{1}else{0});
         successes+=state.enemy_stun;
-        assert_eq!(state.remaining(&s.id),4);
-        state.end_turn();assert_eq!(state.remaining(&s.id),3);
+        assert_eq!(state.remaining(&s.id),0);
+        state.end_turn();assert_eq!(state.remaining(&s.id),0);
         // Stun is an action token, not a round-end timer.
         assert_eq!(state.enemy_stun,if roll<35{1}else{0});
     }
@@ -56,9 +56,9 @@ fn misses_old_saves_and_roundtrips_do_not_invent_or_reroll_control(){
     let encoded=serde_json::to_value(&old).unwrap();assert!(encoded.get("enemy_stun").is_none());assert!(encoded["balance"].get("stun_revision").is_none());
     let mut old:skills::State=serde_json::from_value(encoded).unwrap();let(mut hp,mut mp)=(stats.hp,stats.mp);
     old.cast(skill,stats,&mut hp,&mut mp,20,0);
-    assert_eq!(old.enemy_stun,0);assert_eq!(old.remaining(&skill.id),1,"An existing fight retains the old zero cooldown");
+    assert_eq!(old.enemy_stun,0);assert_eq!(old.remaining(&skill.id),0,"An existing fight retains the old zero cooldown");
     let mut new=skills::State::new(0,3,60,1);new.enable_stun(stats);
-    new.miss(skill,stats,&mut mp);assert_eq!(new.enemy_stun,0);assert_eq!(new.balance.as_ref().unwrap().control_protection,0);assert_eq!(new.remaining(&skill.id),4);
+    new.miss(skill,stats,&mut mp);assert_eq!(new.enemy_stun,0);assert_eq!(new.balance.as_ref().unwrap().control_protection,0);assert_eq!(new.remaining(&skill.id),0);
     new.cast(skill,stats,&mut hp,&mut mp,20,0);
     let wire=serde_json::to_value(&new).unwrap();let mut restored:skills::State=serde_json::from_value(wire.clone()).unwrap();
     assert_eq!(serde_json::to_value(&restored).unwrap(),wire);assert_eq!(restored.enemy_stun,1);assert!(restored.consume_stun());
@@ -74,7 +74,7 @@ fn party_target_skips_entire_monster_action_and_survives_followup_damage(){
         assert_eq!(b.events.iter().filter(|e|e.action=="stun").count(),1);
         assert!(!b.events.iter().any(|e|e.actor=="m0"&&matches!(e.action.as_str(),"attack"|"skill")));
         assert_eq!(b.enemies[0].effects.enemy_stun,0);
-        assert_eq!(b.fighters[0].effects.remaining("sheet_010"),3);
+        assert_eq!(b.fighters[0].effects.remaining("sheet_010"),0);
         assert!(b.enemies[0].effects.balance.as_ref().unwrap().control_protection>0);
         let wire=serde_json::to_value(&b).unwrap();let restored:team_rules::Battle=serde_json::from_value(wire.clone()).unwrap();assert_eq!(serde_json::to_value(restored).unwrap(),wire);
         return;

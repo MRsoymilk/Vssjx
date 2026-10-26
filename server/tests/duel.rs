@@ -120,7 +120,7 @@ fn concurrent_choices_are_hidden_and_settle_only_after_both_commit() {
     a.act(x, &c, now, [99; 3]).unwrap();
     assert_eq!(a.battles[&id].events.len(), 2);
     assert_eq!(a.battles[&id].fighters[0].hp, 205);
-    assert_eq!(a.battles[&id].fighters[1].hp, 185); // 95 direct + defender's 100 × 20% reflection
+    assert_eq!(a.battles[&id].fighters[1].hp, 105); // 95 direct + defender's 100 physical attack
     assert_eq!(a.act(x, &c, now, [99; 3]), Err("DUEL_RESOLVING"));
     a.tick(
         now + Duration::from_secs(4),
@@ -242,7 +242,7 @@ fn physical_and_magical_reflection_use_defenders_attack_in_duels() {
             if magical{hit.skill=Some("legacy_2".into());}
             a.act(y,&hit,now,[99;3]).unwrap();
             let event=a.battles[&id].events.iter().find(|e|e.actor==y).unwrap();
-            assert_eq!(event.reflected,if active{72}else{24},"defender 120 × own reflection ratio, independent of attacker {attack}");
+            assert_eq!(event.reflected,120,"defender 120 × own reflection ratio, independent of attacker {attack}");
         }
     }
 }
@@ -297,7 +297,7 @@ fn agility_determines_initiative_instead_of_arrival_order_and_ko_cancels_the_slo
         assert_eq!(b.events[0].actor, y);
         assert_eq!(b.winner, Some(y));
         assert_eq!(
-            b.fighters[1].hp, 280,
+            b.fighters[1].hp, 200,
             "Passive reflection still applies to the faster attacker"
         );
     }
@@ -432,6 +432,48 @@ fn paired_actions(arena: &mut Arena, id: Uuid, now: Instant, choices: [(&str, Op
     }
 }
 #[test]
+fn poison_is_unreflectable_and_ticks_full_caster_attack_even_against_guard_and_reduction(){
+    for _ in 0..40{
+        let(mut arena,x,_,id,now)=revised_arena([1,0],0);
+        let b=arena.battles.get_mut(&id).unwrap();
+        b.fighters[1].stats.balance.as_mut().unwrap().reduction_bp=2500;
+        let before=[b.fighters[0].hp,b.fighters[1].hp];let attack=b.fighters[0].stats.attack;
+        paired_actions(&mut arena,id,now,[("skill",Some("sheet_052")),("guard",None)]);
+        let b=&arena.battles[&id];let event=b.events.iter().find(|e|e.actor==x).unwrap();
+        if event.missed{continue;}
+        assert_eq!(event.reflected,0);assert_eq!(b.fighters[0].hp,before[0]);
+        assert_eq!(b.fighters[1].hp,before[1]-event.damage-attack);
+        assert_eq!(b.fighters[0].effects.poison_damage,attack);assert!(b.fighters[0].effects.poison_fixed);
+        return;
+    }
+    panic!("Expected an ordinary landed poison cast");
+}
+#[test]
+fn attack_based_heals_keep_the_full_attack_amount_in_duels(){
+    for skill in ["sheet_039","sheet_041"]{
+        let(mut arena,_,_,id,now)=revised_arena([2,1],0);
+        let b=arena.battles.get_mut(&id).unwrap();b.fighters[0].hp=1;
+        let attack=b.fighters[0].stats.balance.unwrap().magic_attack;
+        paired_actions(&mut arena,id,now,[("skill",Some(skill)),("guard",None)]);
+        let b=&arena.battles[&id];assert_eq!(b.fighters[0].hp,1+attack);
+        assert_eq!(b.fighters[0].effects.regen,0);
+    }
+}
+#[test]
+fn lishi_reflection_stays_full_own_physical_attack_in_revised_duels(){
+    for _ in 0..40{
+        let(mut arena,_,y,id,now)=revised_arena([0,1],0);
+        let b=arena.battles.get_mut(&id).unwrap();let attack=b.fighters[0].stats.balance.unwrap().physical_attack;
+        b.fighters[1].stats.balance.as_mut().unwrap().reduction_bp=2500;
+        paired_actions(&mut arena,id,now,[("guard",None),("attack",None)]);
+        let b=&arena.battles[&id];let event=b.events.iter().find(|e|e.actor==y).unwrap();
+        if event.missed{continue;}
+        assert_eq!(event.reflected,attack);assert_eq!(b.fighters[0].effects.passive_physical,100);
+        return;
+    }
+    panic!("Expected an ordinary landed attack");
+}
+#[test]
 fn solid_guard_in_duels_spends_fixed_mana_and_blocks_the_opponents_hit(){
     for magical in [false,true]{
         let (mut arena,x,y,id,now)=arena();
@@ -483,7 +525,7 @@ fn revised_sleep_and_silence_each_block_one_action_for_fast_and_slow_casters() {
                     } else { assert_eq!(target_event.action, "skill"); }
                     if round == 0 {
                         assert_eq!(b.fighters[0].mp, initial_mp - cost);
-                        assert_eq!(b.fighters[0].effects.remaining(&skill.id), 3);
+                        assert_eq!(b.fighters[0].effects.remaining(&skill.id), 0);
                         assert_eq!(b.fighters[0].effects.balance.as_ref().unwrap().control_protection, 2);
                         let remaining = if effect == "sleep" { b.fighters[0].effects.enemy_sleep } else { b.fighters[0].effects.enemy_silence };
                         assert_eq!(remaining, i32::from(first == 1));
@@ -519,7 +561,7 @@ fn landed_damage_still_wakes_sleep_and_silence_expires_after_a_basic_or_guard_ac
     }
 }
 #[test]
-fn revised_reflection_uses_pvp_scale_matching_defense_reduction_and_no_reflect_loop() {
+fn revised_reflection_uses_own_attack_ratio_without_mitigation_or_reflect_loops() {
     for (job, action, skill, magical) in [(0,"attack",None,false),(2,"attack",None,true),(2,"skill",Some("legacy_2"),true)] {
         for active in [false, true] {
             for mitigated in [false, true] {
@@ -545,13 +587,9 @@ fn revised_reflection_uses_pvp_scale_matching_defense_reduction_and_no_reflect_l
                     paired_actions(&mut a, id, now, [(action, skill), ("guard", None)]);
                     let b = &a.battles[&id];let event = b.events.iter().find(|e| e.actor == x).unwrap();
                     if event.missed { assert_eq!(event.reflected,0);continue; }
-                    // 500×20/60%; armor is 50% physical / capped 60% magical;
-                    // then 20% gear reduction, 35% PvP scale and 25% defense buff.
-                    let expected = match (active, mitigated, magical) {
-                        (false,false,_)=>35,(true,false,_)=>105,
-                        (false,true,false)=>10,(false,true,true)=>8,
-                        (true,true,false)=>31,(true,true,true)=>24,
-                    };
+                    // Reflection is own physical attack; armor, guard and PvP
+                    // damage scale cannot reduce it, and it cannot reflect again.
+                    let expected = if active{300}else{100};
                     assert_eq!(event.reflected,expected);
                     assert_eq!(event.fighters[0].hp,hp[0]-expected);
                     assert_eq!(event.fighters[1].hp,hp[1]-event.damage,"Reflection never reflects recursively");

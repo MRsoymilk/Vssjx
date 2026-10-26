@@ -12,7 +12,7 @@ class SkillCatalogTests(unittest.TestCase):
     def test_thunder_stun_is_authored_and_keeps_its_original_damage_budget(self):
         skills=build()['items']
         thunder=next(s for s in skills if s['id']=='sheet_010')
-        self.assertEqual(thunder['stun'],{'chance':35,'actions':1,'cooldown':3})
+        self.assertEqual(thunder['stun'],{'chance':35,'actions':1,'cooldown':0})
         self.assertEqual((thunder['effect'],thunder['damage_percent'],thunder['mp_cost'],thunder['unlock_level']),('damage',180,9,5))
         self.assertIn('非原版恢复',thunder['rules_basis'])
         self.assertEqual([s['id'] for s in skills if 'stun' in s],['sheet_010'])
@@ -61,12 +61,22 @@ class SkillCatalogTests(unittest.TestCase):
         self.assertTrue(all(s['mp_cost']==0 and s['damage_percent']==0 for s in passive))
         self.assertTrue(all(s['unlock_level']<=60 and s['mp_cost']>=0 for s in items))
 
-    def test_active_reflection_is_sixty_percent_for_two_turns(self):
+    def test_all_lishi_reflection_is_own_physical_attack_at_one_hundred_percent(self):
         reflection=[s for s in build()['items'] if s['effect'] in ('reflect_physical','reflect_magic')]
         self.assertEqual({s['id'] for s in reflection},{'sheet_011','sheet_014','sheet_033','sheet_036'})
         for skill in reflection:
-            self.assertEqual(skill['value'],60 if skill['active'] else 20)
+            self.assertEqual(skill['value'],100)
             self.assertEqual(skill['duration'],2 if skill['active'] else 0)
+
+    def test_user_rebalance_overrides_generic_budgets_and_preserves_mana(self):
+        items={s['id']:s for s in build()['items']}
+        for id in ['sheet_015','sheet_037','sheet_006','sheet_042','sheet_008']:
+            self.assertEqual((items[id]['damage_percent'],items[id]['damage_override_percent']),(300,300))
+        self.assertEqual(items['sheet_008']['critical_chance'],70)
+        for id in ['sheet_039','sheet_041']:
+            self.assertEqual((items[id]['effect'],items[id]['value'],items[id]['duration']),('heal',100,0))
+        self.assertEqual(items['sheet_045']['target'],'all_enemies')
+        self.assertEqual((items['sheet_052']['dot_attack_percent'],items['sheet_052']['unreflectable']),(100,True))
 
 
 if __name__=='__main__':unittest.main()

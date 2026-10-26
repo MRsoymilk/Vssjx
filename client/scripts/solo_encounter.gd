@@ -75,6 +75,8 @@ func _sync()->void:
 	server_time=int(Time.get_unix_time_from_system()*1000);received_at=Time.get_ticks_msec();state.deadline_ms=server_time+30000
 func _copy_enemy(from:Dictionary,to:Dictionary)->void:
 	for key in ENEMY_FIELDS:to[key]=from[key]
+	if from.get("poison_fixed",false):to.poison_fixed=true
+	else:to.erase("poison_fixed")
 	if int(from.get("enemy_stun",0))>0:to.enemy_stun=int(from.enemy_stun)
 	else:to.erase("enemy_stun")
 	if from.has("balance") and to.has("balance"):to.balance.control_protection=from.balance.control_protection
@@ -139,7 +141,7 @@ func _enemy_round()->void:
 			var crit:=MonsterCombat.elite_critical(e,raw,rng.randi_range(0,99));var damage:=int(crit.damage)
 			if engine.guarding and landed:damage=maxi(1,damage/2)
 			var taken:=SkillRules.enemy_hit(engine.skills,maxi(1,damage),int(engine.frozen_stats.attack),plan.magical) if landed else Vector2i.ZERO
-			var reflected:=mini(int(e.hp),taken.y+(6 if landed and int(Game.player.job)==0 and engine.guarding else 0))
+			var reflected:=mini(int(e.hp),taken.y)
 			damage=mini(engine.hp,taken.x);engine.hp-=damage;e.hp=int(e.hp)-reflected
 			_event(e.slot,character_id,"skill" if not plan.skill.is_empty() else "attack",plan.skill,damage,0,crit.critical,not landed)
 			if reflected>0:_event(character_id,e.slot,"dot","",reflected)

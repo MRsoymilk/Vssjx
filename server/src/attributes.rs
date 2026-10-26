@@ -137,7 +137,8 @@ pub fn critical_at(
     } else {
         0
     };
-    let chance = if let Some(b)=s.balance{crate::combat_balance::critical_chance(b.level as i64,(b.ratings[usize::from(magical)]+b.crit_bonus[usize::from(magical)]) as i64,buff as i64).unwrap() as i32}else{(rating * 10 + buff).clamp(0, 7_500)};
+    let specific=crate::skills::item(&effects.last_skill).map_or(0,|s|s.critical_chance);
+    let chance = if specific>0{specific*100}else if let Some(b)=s.balance{crate::combat_balance::critical_chance(b.level as i64,(b.ratings[usize::from(magical)]+b.crit_bonus[usize::from(magical)]) as i64,buff as i64).unwrap() as i32}else{(rating * 10 + buff).clamp(0, 7_500)};
     effects.last_critical = damage > 0 && roll < chance;
     if effects.last_critical {
         if let Some(b)=s.balance{(i64::from(damage)*i64::from((15000+b.crit_damage_bp).min(22500))/10000) as i32}else{damage * 3 / 2}

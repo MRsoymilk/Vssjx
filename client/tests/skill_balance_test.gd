@@ -31,10 +31,10 @@ func _run()->void:
 	check(battle.begin_action("skill",aoe.id).ok,"Revised battle accepts its first area skill")
 	battle.resolve_player();battle.resolve_enemy();battle.finish_round()
 	var before_mp:=battle.mp;var before_round:=battle.round_number
-	check(not battle.begin_action("skill",aoe.id).ok and battle.mp==before_mp and battle.round_number==before_round,"Cooling skill refusal never advances or spends resources")
+	check(battle.begin_action("skill",aoe.id).ok and battle.mp==before_mp and battle.round_number==before_round+1,"Same skill can start again without a cooldown; cost is paid at resolution")
 	var picker:=SkillPicker.new();add_child(picker);picker.present(1,3,60,battle.mp,[],false,battle.frozen_stats,battle.skills)
 	var chosen:Array=[];picker.chosen.connect(func(id:String)->void:chosen.append(id));picker.activate(aoe.id)
-	check(chosen.is_empty() and picker.description.text.contains("冷却"),"Production skill picker explains and blocks cooldown")
+	check(chosen==[aoe.id] and picker.description.text.contains("无冷却"),"Production skill picker permits consecutive casts")
 	var output:=OS.get_environment("SSJX_BALANCE_CAPTURE")
 	var server_fixtures:=OS.get_environment("SSJX_BALANCE_SKILL_FIXTURES")
 	if not server_fixtures.is_empty():

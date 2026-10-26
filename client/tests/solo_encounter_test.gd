@@ -29,7 +29,7 @@ func _run()->void:
 	check(local.engine.mp==mp-SkillBalance.cost(area,local.engine.frozen_stats),"Area skill pays MP once for all monsters")
 	check(local.state.events.filter(func(e:Dictionary)->bool:return e.skill==area.id).size()==3,"Area skill emits one hit per living target")
 	var revision:int=local.state.revision
-	check(not local.submit("skill","m0",area.id) and int(local.state.revision)==revision,"Cooldown rejection does not advance the round")
+	check(local.submit("skill","m0",area.id) and int(local.state.revision)==revision+1,"Area skill can be cast in consecutive rounds")
 	local.state.enemies[0].hp=0
 	check(not local.submit("attack","m0"),"A dead target cannot be attacked")
 	var boss:Dictionary=SharedWorldMap.population("ancient_ruins").filter(func(d:Dictionary)->bool:return d.id=="boss")[0].duplicate(true);boss.hp=10000

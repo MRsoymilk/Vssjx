@@ -386,7 +386,7 @@ impl Battle {
                                 crate::attributes::defense(enemy.stats,magical),
                                 roll,
                             );
-                            if balanced{
+                            if balanced&&s.effect!="heal"{
                                 let actual=(actor.hp-before_hp)*crate::skill_balance::n("pvp_heal_bp")/10000;
                                 actor.hp=before_hp+actual;actor.effects.last_healed=before_healed+actual;
                             }
@@ -412,13 +412,7 @@ impl Battle {
                 } else {
                     (0, 0)
                 };
-                if reflected > 0 && crate::skill_balance::revised(enemy.stats) {
-                    reflected = crate::attributes::incoming(reflected,enemy.level,actor.stats,magical,0)
-                        * crate::skill_balance::n("pvp_damage_bp") / 10000;
-                    if actor.guarding { reflected /= 2; }
-                    // Apply defensive buffs once, without generating another reflection.
-                    reflected = actor.effects.enemy_hit(reflected,0,magical).0;
-                }
+                if choice.action=="skill"&&skill.is_some_and(|s|s.unreflectable){reflected=0;}
                 enemy.hp = (enemy.hp - damage).max(0);
                 actor.hp = (actor.hp - reflected).max(0);
                 enemy.effects.last_incoming = damage;
@@ -461,12 +455,12 @@ impl Battle {
             }
         }
         if self.ended.is_none() {
-            let mut dots=[0;2];
+            let mut dots=[0;2];let mut fixed_dots=[0;2];
             for (i,f) in self.fighters.iter_mut().enumerate(){
-                if crate::skill_balance::revised(f.stats){let before=f.hp;dots[i]=f.effects.end_balance_round(&mut f.hp,f.stats.hp)*crate::skill_balance::n("pvp_damage_bp")/10000;f.hp=before+(f.hp-before)*crate::skill_balance::n("pvp_heal_bp")/10000;f.effects.tick_balance();}
+                if crate::skill_balance::revised(f.stats){let before=f.hp;fixed_dots[i]=if f.effects.poison_fixed&&f.effects.enemy_poison>0{f.effects.poison_damage}else{0};let raw=f.effects.end_balance_round(&mut f.hp,f.stats.hp);dots[i]=(raw-fixed_dots[i])*crate::skill_balance::n("pvp_damage_bp")/10000;f.hp=before+(f.hp-before)*crate::skill_balance::n("pvp_heal_bp")/10000;f.effects.tick_balance();}
             }
-            self.fighters[0].hp=(self.fighters[0].hp-crate::attributes::extra_reduction(dots[1],self.fighters[0].stats)).max(0);
-            self.fighters[1].hp=(self.fighters[1].hp-crate::attributes::extra_reduction(dots[0],self.fighters[1].stats)).max(0);
+            self.fighters[0].hp=(self.fighters[0].hp-crate::attributes::extra_reduction(dots[1],self.fighters[0].stats)-fixed_dots[1]).max(0);
+            self.fighters[1].hp=(self.fighters[1].hp-crate::attributes::extra_reduction(dots[0],self.fighters[1].stats)-fixed_dots[0]).max(0);
             for f in &mut self.fighters {
                 if f.effects.balance.is_none()&&f.effects.regen > 0 {
                     let heal = f.effects.regen_amount.min(f.stats.hp - f.hp);

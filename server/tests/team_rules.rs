@@ -170,7 +170,7 @@ fn killed_monsters_never_take_a_turn() {
     assert!(b.events.iter().all(|e| !e.actor.starts_with('m')));
 }
 #[test]
-fn group_support_buffs_living_allies_and_charges_only_caster() {
+fn group_support_heals_living_allies_immediately_and_charges_only_caster() {
     let mut b = encounter();
     b.fighters = vec![fighter(2, 35), fighter(1, 35)];
     for f in &mut b.fighters {
@@ -180,7 +180,9 @@ fn group_support_buffs_living_allies_and_charges_only_caster() {
     b.act(b.fighters[0].id, "skill", None, Some("sheet_041"), 2000, 99)
         .unwrap();
     complete(&mut b, 3000);
-    assert!(b.fighters.iter().all(|f| f.effects.regen > 0));
+    assert!(b.fighters.iter().all(|f| f.effects.regen == 0));
+    let healing=b.fighters[0].stats.attack.min(100);
+    assert!(b.events.iter().filter(|e|e.skill=="sheet_041").all(|e|e.healed==healing));
     assert_eq!(
         b.fighters[0].mp,
         before[0] - skills::item("sheet_041").unwrap().mp_cost

@@ -14,6 +14,7 @@ static func cooldown(skill:Dictionary,stun_enabled:bool=true)->int:
 	return int(skill.stun.cooldown) if stun_enabled and skill.has("stun") else int(rules.cooldowns[kind(skill)])
 static func coefficient(skill:Dictionary,targets:int=1)->int:
 	if int(skill.damage_percent)==0:return 0
+	if int(skill.get("damage_override_percent",0))>0:return int(skill.damage_override_percent)*100
 	var raw:int=rules.get({"dot":"dot_direct_bp","aoe":"aoe_bp","control":"control_direct_bp"}.get(kind(skill),"single_bp"))
 	return int(CombatBalance.aoe_coefficient(raw,clampi(targets,1,5)).value) if skill.target=="all_enemies" else raw
 static func recovery(stats:Dictionary,key:String,legacy:int=0)->int:

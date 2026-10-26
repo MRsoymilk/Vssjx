@@ -9,24 +9,24 @@ func _run()->void:
 	await Game.when_ready()
 	var thunder:=SkillRules.item("sheet_010")
 	var stats:=CharacterAttributeRules.balanced_stats(0,60,false,[60,60,60,60,60])
-	check(int(thunder.stun.chance)==35 and int(thunder.stun.actions)==1 and int(thunder.stun.cooldown)==3 and int(thunder.unlock_level)==5,"Only the existing level-five thunder skill gains the explicit authored effect")
-	check(SkillBalance.kind(thunder)=="single" and SkillBalance.coefficient(thunder)==16000 and SkillBalance.cost(thunder,stats)==(int(stats.mp)*900+9999)/10000,"Original damage coefficient and mana budget stay unchanged")
+	check(int(thunder.stun.chance)==35 and int(thunder.stun.actions)==1 and int(thunder.stun.cooldown)==0 and int(thunder.unlock_level)==5,"Only the existing level-five thunder skill gains the explicit authored effect")
+	check(SkillBalance.kind(thunder)=="single" and SkillBalance.coefficient(thunder)==16000 and SkillBalance.cost(thunder,stats)==9,"Original damage coefficient and mana budget stay unchanged")
 	var successful:=0
 	for roll in 100:
 		var effects:=SkillRules.new_state(0,3,60,1);SkillRules.enable_stun(effects,stats)
 		var cast:=SkillRules.cast(thunder,effects,stats,int(stats.hp),int(stats.mp),20,roll)
 		var count:=int(effects.get("enemy_stun",0));successful+=count
 		check(count==(1 if roll<35 else 0) and cast.damage>0,"Exactly the first 35 of 100 effect rolls stun without changing damage")
-		check(SkillRules.remaining(effects,thunder.id)==4,"Casting reserves three following rounds of cooldown")
+		check(SkillRules.remaining(effects,thunder.id)==0,"Casting creates no cooldown")
 		SkillRules.end_turn(effects)
-		check(SkillRules.remaining(effects,thunder.id)==3 and int(effects.get("enemy_stun",0))==count,"Round end decreases cooldown but cannot prematurely erase stun")
+		check(SkillRules.remaining(effects,thunder.id)==0 and int(effects.get("enemy_stun",0))==count,"Round end keeps cooldown zero and preserves the pending stun")
 	check(successful==35,"Effect probability is exactly 35 percent")
 	var effects:=SkillRules.new_state(0,3,60,1);SkillRules.activate(effects,stats)
 	SkillRules.cast(thunder,effects,stats,int(stats.hp),int(stats.mp),20,0)
-	check(not effects.has("enemy_stun") and SkillRules.remaining(effects,thunder.id)==1,"Old frozen battle lacks the new revision and retains old thunder behavior")
+	check(not effects.has("enemy_stun") and SkillRules.remaining(effects,thunder.id)==0,"Old frozen battle remains readable without granting stun or cooldown")
 	SkillRules.enable_stun(effects,stats);effects.balance.control_protection=0
 	SkillRules.miss(thunder,effects,stats,int(stats.mp))
-	check(not effects.has("enemy_stun") and effects.balance.control_protection==0,"Miss consumes mana and cooldown without granting control or protection")
+	check(not effects.has("enemy_stun") and effects.balance.control_protection==0,"Miss consumes mana without granting control or a cooldown")
 	SkillRules.cast(thunder,effects,stats,int(stats.hp),int(stats.mp),20,0)
 	SkillRules.cast(SkillRules.item("legacy_0"),effects,stats,int(stats.hp),int(stats.mp),20,0)
 	check(effects.enemy_stun==1,"Follow-up direct damage does not wake a stunned target")
@@ -50,7 +50,7 @@ func _run()->void:
 		check(solo.submit("skill","m0","sheet_010"),"Actual local encounter accepts thunder")
 		if solo.state.events.any(func(e:Dictionary)->bool:return e.action=="stun"):
 			check(not solo.state.events.any(func(e:Dictionary)->bool:return e.actor=="m0" and e.action in ["attack","skill"]),"Actual solo target skips its whole action")
-			check(int(solo.state.enemies[0].effects.get("enemy_stun",0))==0 and SkillRules.remaining(solo.engine.skills,"sheet_010")==3,"Local engine consumes target stun once and retains caster cooldown")
+			check(int(solo.state.enemies[0].effects.get("enemy_stun",0))==0 and SkillRules.remaining(solo.engine.skills,"sheet_010")==0,"Local engine consumes target stun once without a cooldown")
 			observed=true;break
 	check(observed,"Observe an actual landed local stun through production combat")
 	Game.player=old_player;Game.save_path=old_path

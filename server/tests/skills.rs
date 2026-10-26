@@ -43,8 +43,8 @@ fn saved_encounter_refreshes_cross_school_passives_without_clearing_active_effec
     battle.skills.defense_percent = 25;
     // Old saved encounters may have neither passive from the newly shared job pool.
     battle.turn_selected(Action::Guard, 0, 3, 60, stats(), 0, 0, None, 99).unwrap();
-    assert_eq!(battle.skills.passive_physical, 20);
-    assert_eq!(battle.skills.passive_magic, 20);
+    assert_eq!(battle.skills.passive_physical, 100);
+    assert_eq!(battle.skills.passive_magic, 100);
     assert_eq!(battle.skills.enemy_sleep, 1);
     assert_eq!(battle.skills.defense, 1);
     assert_eq!(battle.skills.defense_percent, 25);
@@ -68,20 +68,20 @@ fn catalog_restrictions_and_typed_effects() {
         );
     }
     let mut state = State::new(0, 2, 45, 1);
-    assert_eq!(state.passive_physical, 20);
-    assert_eq!(state.enemy_hit(50, 100, false), (50, 20));
-    assert_eq!(state.enemy_hit(50, 100, true), (50, 20));
+    assert_eq!(state.passive_physical, 100);
+    assert_eq!(state.enemy_hit(50, 100, false), (50, 100));
+    assert_eq!(state.enemy_hit(50, 100, true), (50, 100));
     let mut hp = 10;
     let mut mp = 100;
     let heal = skills::ITEMS.iter().find(|s| s.name == "起死回生").unwrap();
     state.cast(heal, stats(), &mut hp, &mut mp, 5, 0);
     state.after_player(&mut hp, 1000);
-    assert_eq!(hp, 160);
+    assert_eq!(hp, 110);
     state.end_turn();
     state.after_player(&mut hp, 1000);
-    assert_eq!(hp, 310);
+    assert_eq!(hp, 110);
     state.after_player(&mut hp, 1000);
-    assert_eq!(hp, 310);
+    assert_eq!(hp, 110);
     let dot = skills::ITEMS.iter().find(|s| s.name == "推窗望月").unwrap();
     state.cast(dot, stats(), &mut hp, &mut mp, 5, 0);
     assert_eq!(state.after_player(&mut hp, 1000), 20);
@@ -108,17 +108,17 @@ fn reflection_scales_with_own_attack_not_received_damage_or_mitigation() {
     let mut state=State::new(0,3,60,1);
     for magical in [false,true] {
         for incoming in [1,50,5000] {
-            assert_eq!(state.enemy_hit(incoming,120,magical),(incoming,24));
-            assert_eq!(state.enemy_hit(incoming,240,magical),(incoming,48));
+            assert_eq!(state.enemy_hit(incoming,120,magical),(incoming,120));
+            assert_eq!(state.enemy_hit(incoming,240,magical),(incoming,240));
         }
     }
-    state.reflect_physical=2;state.physical_percent=60;
-    state.reflect_magic=2;state.magic_percent=60;
+    state.reflect_physical=2;state.physical_percent=100;
+    state.reflect_magic=2;state.magic_percent=100;
     state.defense=2;state.defense_percent=50;
     for magical in [false,true] {
-        assert_eq!(state.enemy_hit(50,120,magical),(25,72));
-        assert_eq!(state.enemy_hit(5000,120,magical),(2500,72));
-        assert_eq!(state.enemy_hit(50,119,magical),(25,71));
+        assert_eq!(state.enemy_hit(50,120,magical),(25,120));
+        assert_eq!(state.enemy_hit(5000,120,magical),(2500,120));
+        assert_eq!(state.enemy_hit(50,119,magical),(25,119));
         assert_eq!(state.enemy_hit(0,120,magical),(0,0));
         assert_eq!(state.enemy_hit(50,0,magical),(25,0));
     }
@@ -127,18 +127,18 @@ fn reflection_scales_with_own_attack_not_received_damage_or_mitigation() {
 #[test]
 fn active_reflection_casts_last_two_turns_without_stacking_with_passives() {
     for (id,magical) in [("sheet_011",false),("sheet_033",true)] {
-        let skill=skills::item(id).unwrap();assert_eq!(skill.value,60);assert_eq!(skill.duration,2);
+        let skill=skills::item(id).unwrap();assert_eq!(skill.value,100);assert_eq!(skill.duration,2);
         let mut state=State::new(0,3,60,1);let mut hp=100;let mut mp=200;
         let mut own=stats();own.attack=120;
         assert_eq!(state.cast(skill,own,&mut hp,&mut mp,0,99),0);
-        assert_eq!(state.enemy_hit(500,own.attack,magical),(500,72));
-        assert_eq!(state.enemy_hit(500,own.attack,!magical),(500,24));
+        assert_eq!(state.enemy_hit(500,own.attack,magical),(500,120));
+        assert_eq!(state.enemy_hit(500,own.attack,!magical),(500,120));
         state.end_turn();
         let mut state:State=serde_json::from_value(serde_json::to_value(state).unwrap()).unwrap();
-        assert_eq!(state.enemy_hit(500,own.attack,magical),(500,72));
+        assert_eq!(state.enemy_hit(500,own.attack,magical),(500,120));
         state.end_turn();
-        assert_eq!(state.enemy_hit(500,own.attack,magical),(500,24));
-        assert_eq!(state.passive_physical,20);assert_eq!(state.passive_magic,20);
+        assert_eq!(state.enemy_hit(500,own.attack,magical),(500,120));
+        assert_eq!(state.passive_physical,100);assert_eq!(state.passive_magic,100);
     }
 }
 
@@ -150,7 +150,7 @@ fn active_reflection_applies_once_per_hit_in_multi_enemy_rounds_then_expires() {
     let f=team_rules::Fighter{id,name:"多怪反弹".into(),job:0,gender:0,school:3,level:60,appearance:[0;3],stats:own,hp:own.hp,mp:own.mp,potions:6,effects:State::new(0,3,60,1),guarding:false};
     let mut enemy=population::definitions().into_iter().find(|e|e.id=="wolf_a").unwrap();enemy.attack=50;enemy.hp=10000;
     let mut b=team_rules::Battle::new("qingyun_trail".into(),vec![f],vec![enemy.clone(),enemy.clone(),enemy],1000);
-    for (action,skill,expected,timer) in [("skill",Some("sheet_011"),72,1),("guard",None,78,0),("guard",None,30,0)] {
+    for (action,skill,expected,timer) in [("skill",Some("sheet_011"),120,1),("guard",None,120,0),("guard",None,120,0)] {
         b.act(id,action,None,skill,b.selection_starts_ms+1,99).unwrap();
         let reflected:Vec<_>=b.events.iter().filter(|e|e.actor==id.to_string()&&e.action=="dot").collect();
         assert_eq!(reflected.len(),3);assert!(reflected.iter().all(|e|e.damage==expected));
@@ -166,13 +166,13 @@ fn solo_and_formation_use_the_reflecting_fighters_stats() {
         let mut enemy=population::definitions().into_iter().find(|e|e.id=="wolf_a").unwrap();enemy.attack=attack;enemy.hp=10000;
         let mut solo=Battle::new(enemy.clone(),own.hp,own.mp,6);
         solo.turn_selected(Action::Guard,0,3,60,own,0,0,None,99).unwrap();
-        assert_eq!(solo.skills.last_reflected,30,"own 120 × 20% plus unchanged guard bonus 6");
+        assert_eq!(solo.skills.last_reflected,120,"own physical attack at 100%");
         let id=uuid::Uuid::new_v4();
         let f=team_rules::Fighter{id,name:"反弹验证".into(),job:0,gender:0,school:3,level:60,appearance:[0;3],stats:own,hp:own.hp,mp:own.mp,potions:6,effects:State::new(0,3,60,1),guarding:false};
         let mut formation=team_rules::Battle::new("qingyun_trail".into(),vec![f],vec![enemy],1000);
         formation.act(id,"guard",None,None,formation.selection_starts_ms+1,99).unwrap();
         let reflection=formation.events.iter().find(|e|e.actor==id.to_string()&&e.action=="dot").unwrap();
-        assert_eq!(reflection.damage,30,"formation must use its defender's own attack");
+        assert_eq!(reflection.damage,120,"formation must use its defender's own attack");
     }
 }
 

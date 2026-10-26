@@ -50,10 +50,10 @@ fn dragons_skips_dead_enemies_and_rejections_leave_the_battle_unchanged() {
     b.act(id, "skill", Some("m4"), Some(skill), 2000, 99).unwrap();
     let targets: Vec<_> = b.events.iter().filter(|e| e.skill == skill).map(|e| e.target.as_str()).collect();
     assert_eq!(targets, ["m4", "m1"]);
-    assert_eq!(b.fighters[0].effects.remaining(skill), 2);
-    let before = serde_json::to_value(&b).unwrap();
-    assert_eq!(b.act(id, "skill", Some("m4"), Some(skill), b.selection_starts_ms + 1, 99), Err("SKILL_COOLDOWN"));
-    assert_eq!(serde_json::to_value(&b).unwrap(), before);
+    assert_eq!(b.fighters[0].effects.remaining(skill), 0);
+    let mp=b.fighters[0].mp;
+    b.act(id, "skill", Some("m4"), Some(skill), b.selection_starts_ms + 1, 99).unwrap();
+    assert_eq!(b.fighters[0].mp,mp-15);
     assert_eq!(skills::check(skill, 2, 3, 24).err(), Some("SKILL_LEVEL_REQUIRED"));
     assert_eq!(skills::check(skill, 0, 3, 60).err(), Some("SKILL_ROLE_MISMATCH"));
 }

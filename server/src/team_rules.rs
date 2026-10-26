@@ -434,11 +434,13 @@ impl Battle {
             }
             if mode == "all_allies" {
                 self.fighters[i].mp -= cost;
+                let healing_power=crate::attributes::for_attack(self.fighters[i].stats,self.fighters[i].job,self.fighters[i].job==2).attack;
                 for ally in self.fighters.iter_mut().filter(|a| a.hp > 0) {
                     let mut temporary_mp = crate::skill_balance::cost(s,ally.stats);
                     let cooldowns=ally.effects.balance.as_ref().map(|b|b.cooldowns.clone());
                     let old = ally.hp;
                     let mut cast_stats=ally.stats;
+                    if s.effect=="heal"{cast_stats.attack=healing_power;}
                     if ally.id!=who{if let Some(b)=cast_stats.balance.as_mut(){b.builds=Default::default();}}
                     ally.effects
                         .cast(s, cast_stats, &mut ally.hp, &mut temporary_mp, 0, roll);
@@ -572,6 +574,7 @@ impl Battle {
         to.bleed_damage = from.bleed_damage;
         to.enemy_poison = from.enemy_poison;
         to.poison_damage = from.poison_damage;
+        to.poison_fixed = from.poison_fixed;
         to.enemy_sleep = from.enemy_sleep;
         to.enemy_stun = from.enemy_stun;
         to.enemy_silence = from.enemy_silence;
@@ -633,7 +636,7 @@ impl Battle {
                     let (incoming,critical)=if self.monster_revision>0{crate::monster_combat::elite_critical(e.elite.as_ref(),&e.definition,raw,(roll*37+n as i32*19+hit as i32*43+i as i32*11).rem_euclid(100))}else{(raw,false)};
                     let incoming=if landed&&a.guarding{(incoming/2).max(1)}else{incoming};
                     let (incoming,reflected)=if landed{a.effects.enemy_hit(incoming.max(1),a.stats.attack,plan.magical)}else{(0,0)};
-                    let reflected=(reflected+if landed&&a.job==0&&a.guarding{6}else{0}).min(e.hp);
+                    let reflected=reflected.min(e.hp);
                     let damage=incoming.min(a.hp);
                     a.hp=(a.hp-incoming).max(0);e.hp-=reflected;
                     self.events.push(Event{skill_level:0,periodic:false,missed:!landed,actor:e.slot.clone(),target:a.id.to_string(),action:if plan.skill.is_empty(){"attack"}else{"skill"}.into(),skill:plan.skill.clone(),damage,healed:0,critical});

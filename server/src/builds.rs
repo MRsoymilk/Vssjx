@@ -43,7 +43,7 @@ pub fn cast(skill:&Skill,stats:Stats,state:&mut State,hp:&mut i32,mp:&mut i32,mu
             else{p.charges[2]=(p.charges[2]+1).min(2);}
         }
         if snapshot.tier(4)>0{
-            if skill.effect=="regen"{p.charges[4]=1;}
+            if matches!(skill.effect.as_str(),"regen"|"heal"){p.charges[4]=1;}
             else if damage>0&&p.charges[4]>0{p.charges[4]=0;p.bonus_bp+=param(4,"bonus");refund=stats.mp*param(4,"refund")/10000;}
         }
         if snapshot.tier(5)>0{

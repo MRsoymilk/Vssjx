@@ -15,12 +15,13 @@ def main():
         print('PASS: ' + label, flush=True)
 
     with BalanceFixture() as fixture:
-        for skill, job, cases in [
+        for index, (skill, job, cases) in enumerate([
             ('user_hengsao_qianjun', 0, [(5, False)]),
             ('sheet_004', 1, [(5, False)]),
             ('user_shuanglong_xizhu', 2, [(1, False), (2, False), (5, False), (5, True)]),
-        ]:
-            identity = fixture.create('grp_probe' + str(job), job)
+            ('sheet_045', 2, [(5, False)]),
+        ]):
+            identity = fixture.create('grp_probe' + str(index), job)
             cid = identity[1]
             fixture.db.query(f"UPDATE characters SET level=60,quest_stage=1 WHERE id='{cid}'")
             player = fixture.connect(identity)
@@ -52,12 +53,12 @@ def main():
                 state = result['state']
                 formation = state['battle']['formation']
                 hits = [e for e in formation['events'] if e['skill'] == skill and e['actor'] == cid]
-                expected = ['m' + str(count - 1)] + (['m1' if dead_first else 'm0'] if count > 1 else []) if job == 2 else ['m' + str(i) for i in range(count)]
+                expected = ['m' + str(count - 1)] + (['m1' if dead_first else 'm0'] if count > 1 else []) if skill == 'user_shuanglong_xizhu' else ['m' + str(i) for i in range(count)]
                 check([e['target'] for e in hits] == expected, f'{skill}: exact living targets {expected}')
-                cost = 12 if job == 1 else 15
+                cost = 12 if skill in ('sheet_004','sheet_045') else 15
                 check(state['battle']['mp'] == battle['mp'] - cost, 'One fixed MP charge per cast')
                 check(state['character']['skill_proficiency'][skill] == 100 and all(e['skill_level'] == 6 for e in hits), 'One durable proficiency increase and a shared effect rank')
-                if job == 2:
+                if skill == 'user_shuanglong_xizhu':
                     check(all(e['hp'] == old['hp'] for e, old in zip(formation['enemies'], battle['formation']['enemies']) if e['slot'] not in expected), 'Unselected enemies receive no damage')
                 replay, _ = player.command('', request=operation)
                 check(replay['replayed'] and replay['state'] == state, 'Receipt replay preserves the resolved cast')

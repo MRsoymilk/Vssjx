@@ -152,8 +152,6 @@ func resolve_enemy() -> Dictionary:
 	hp = maxi(0, hp - incoming)
 	lines.append("%s行动，你受到 %d 点伤害。" % [enemy.name, incoming])
 	var reflected := hit.y
-	if landed and int(Game.player.job) == 0 and guarding:
-		reflected+=6
 	reflected=mini(enemy_hp,reflected);enemy_hp=maxi(0,enemy_hp-reflected)
 	skills.last_incoming=incoming;skills.last_reflected=reflected
 	if reflected>0:lines.append("反伤造成 %d 点伤害。"%reflected)

@@ -41,7 +41,7 @@ func _run()->void:
 	var book:SkillBook=attributes.content.get_node("SkillBook")
 	check(book.rows.get_child_count()==13 and book.rows.get_child(0).get_node("Rank").text=="1/15","Native skill list shows actual proficiency ranks")
 	book.select_skill(1)
-	var expected_cost:="消耗灵力12点 · 冷却2轮" if book.balanced else "消耗灵力12点"
+	var expected_cost:="消耗灵力12点 · 无冷却" if book.balanced else "消耗灵力12点"
 	check(book.detail.text.contains("反伤") and book.get_node("CombatMeta").text.contains(expected_cost),"Selecting a row shows its effect alongside separate cost and cooldown")
 	check(attributes.get_node("Label5").text=="人物技能" and not attributes.signature.visible,"Skill page uses original title and replaces signature footer")
 	check(not book.get_node("Upgrade").visible and not book.get_node("NextInfo").visible and book.get_node("GrowthHint").text.contains("自动升1级"),"Automatic training replaces inactive manual growth actions")

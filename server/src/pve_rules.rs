@@ -339,9 +339,6 @@ impl Battle {
             self.skills.last_incoming = incoming;
             self.hp = (self.hp - incoming).max(0);
             lines.push(format!("{}出击，你受到{incoming}点伤害。", self.enemy.name));
-            if landed && job == 0 && action == Action::Guard {
-                reflected += 6;
-            }
             reflected = reflected.min(self.enemy_hp);
             self.enemy_hp = (self.enemy_hp - reflected).max(0);
             self.skills.last_reflected = reflected;

@@ -140,6 +140,8 @@ static func critical_at(values:Dictionary,magical:bool,state:Dictionary,damage:i
 	var rating:=int(values.get("attributes",[0,0,0,0,0])[4 if magical else 3])
 	var buff:=int(state.crit_chance)*100 if int(state.crit)>0 else 0
 	var chance:=int(CombatBalance.critical_chance(int(values.balance.level),int(values.balance.ratings[1 if magical else 0])+int(values.balance.get("crit_bonus",[0,0])[1 if magical else 0]),buff).value) if values.has("balance") else clampi(rating*10+buff,0,7500)
+	var specific:=int(SkillRules.item(state.last_skill).get("critical_chance",0))
+	if specific>0:chance=specific*100
 	state.last_critical=damage>0 and roll<chance
 	return damage*mini(22500,15000+int(values.get("balance",{}).get("crit_damage_bp",0)))/10000 if state.last_critical else damage
 

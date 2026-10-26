@@ -1,4 +1,4 @@
-"""Cooldown/AI/persistence checks against real Rust sockets in an owned fixture."""
+"""Consecutive skills, old cooldowns, AI and persistence in an owned fixture."""
 import json
 from uuid import uuid4
 from balance_fixture import BalanceFixture,ROOT
@@ -8,7 +8,7 @@ def main():
     def check(value,label):
         assert value,label
         checks.append(label)
-    skills=json.loads((ROOT/'client/assets/data/skills-v1.json').read_text())['items']
+    skills=json.loads((ROOT/'client/assets/data/skills-v1.json').read_text('utf8'))['items']
     area=next(s for s in skills if s['job']==1 and s['active'] and s['target']=='all_enemies')
     with BalanceFixture() as f:
         identity=f.create('skill_budget',1);cid=identity[1]
@@ -21,18 +21,22 @@ def main():
         value,request=cast();s=value['state'];fixtures.append(s)
         cost=area['mp_cost']
         check(s['battle']['mp']==500-cost,'Actual action spends the same fixed MP shown by the picker')
-        check(s['battle']['skills']['balance']['cooldowns'][area['id']]==2,'Fresh area cast starts two full intervening cooldown rounds')
-        before=dict(round=s['battle']['round'],mp=s['battle']['mp'],enemy_hp=s['battle']['enemy_hp'])
-        failed,_=cast(False);fixtures.append(failed['state'])
-        check(failed['code']=='SKILL_COOLDOWN','Server rejects cooling skill even when bypassing the UI')
-        check(all(failed['state']['battle'][key]==val for key,val in before.items()),'Cooling refusal consumes no MP and does not advance the clock')
-        f.restart();p=f.connect(identity)
-        check(p.state['battle']['skills']['balance']['cooldowns'][area['id']]==2,'Cooldown survives actual server restart')
+        check(not s['battle']['skills']['balance']['cooldowns'],'Fresh cast creates no cooldown')
         replay,_=p.command('',request=request)
-        check(replay['replayed'],'A repeated successful cast is only a receipt replay')
-        p.command('guard');value,_=p.command('guard');fixtures.append(value['state'])
+        check(replay['replayed'] and replay['state']==s,'A repeated successful cast is only a receipt replay')
+        value,_=cast();fixtures.append(value['state'])
+        check(value['state']['battle']['mp']==500-cost*2 and value['state']['battle']['round']==2,'Same skill works on the following round')
+        f.restart();p=f.connect(identity)
+        check(not p.state['battle']['skills']['balance']['cooldowns'],'No cooldown appears after server restart')
+        p.close()
+        import time
+        time.sleep(.15)
+        f.db.query(f"UPDATE pve_battles SET state=jsonb_set(state,'{{skills,balance,cooldowns}}',$owned${json.dumps({area['id']:3})}$owned$::jsonb) WHERE id='{bid}'")
+        p=f.connect(identity)
+        value,_=cast();fixtures.append(value['state'])
+        check(value['state']['battle']['mp']==500-cost*3,'Old saved cooldown cannot block a valid cast')
         check(value['state']['battle']['skills']['balance']['last_enemy_magical'],'Caster monster really uses magic on its announced third round')
-        check(area['id'] not in value['state']['battle']['skills']['balance']['cooldowns'],'Two complete intervening rounds expire the cooldown')
+        check(not value['state']['battle']['skills']['balance']['cooldowns'],'Casting clears the old saved cooldown')
         value,_=cast();check(value['ok'],'Skill is usable again without reconnecting or resetting battle')
         check(value['state']['skills']['balance_sha256'],'Snapshot announces the versioned skill-budget contract')
         output=ROOT/'work/combat-balance-v1/skill-server-fixtures.json';output.write_text(json.dumps(fixtures,ensure_ascii=False,indent=2))

@@ -13,6 +13,7 @@ pub fn kind(s:&Skill)->&'static str{
 }
 pub fn coefficient(s:&Skill,targets:i32)->i32{
     if s.damage_percent==0{return 0;}
+    if s.damage_override_percent>0{return s.damage_override_percent*100;}
     let raw=match kind(s){"dot"=>n("dot_direct_bp"),"aoe"=>n("aoe_bp"),"control"=>n("control_direct_bp"),_=>n("single_bp")};
     if s.target=="all_enemies"{crate::combat_balance::aoe_coefficient(raw as i64,targets.clamp(1,5) as i64).unwrap() as i32}else{raw}
 }

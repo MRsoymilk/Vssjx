@@ -7,7 +7,7 @@
   "dot_ticks":3,
   "control_direct_bp":6000,
   "cost_basis":"fixed_skill_mp_cost",
-  "cooldowns":{"single":0,"aoe":2,"dot":1,"control":3,"support":2},
+  "cooldowns":{"single":0,"aoe":0,"dot":0,"control":0,"support":0},
   "basic_restore_bp":300,
   "guard_restore_bp":500,
   "potion_restore_bp":2000,

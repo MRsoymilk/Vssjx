@@ -9,7 +9,7 @@ fn mana_and_cooldowns_cover_all_named_skills_without_touching_legacy(){
     for s in skills::ITEMS.iter(){
         let stats=attributes::balanced_stats(s.job,60,false,[0;5]);
         assert_eq!(b::cost(s,stats),s.mp_cost);
-        assert!(b::coefficient(s,5)*5<=24000||s.target!="all_enemies");
+        assert!(b::coefficient(s,5)*5<=24000||s.target!="all_enemies"||s.damage_override_percent>0);
         let legacy=vssjx_server::pve_rules::stats(s.job,60,false);
         assert_eq!(b::cost(s,legacy),s.mp_cost);
     }
@@ -20,9 +20,9 @@ fn mana_and_cooldowns_cover_all_named_skills_without_touching_legacy(){
     let stats=attributes::balanced_stats(s.job,60,false,[0;5]);let mut state=skills::State::default();
     let mut hp=stats.hp;let mut mp=stats.mp;
     state.cast(s,stats,&mut hp,&mut mp,240,99);
-    assert_eq!(state.remaining(&s.id),3);state.end_turn();assert_eq!(state.remaining(&s.id),2);
+    assert_eq!(state.remaining(&s.id),0);state.end_turn();assert_eq!(state.remaining(&s.id),0);
     let encoded=serde_json::to_value(&state).unwrap();let mut state:skills::State=serde_json::from_value(encoded).unwrap();
-    state.end_turn();assert_eq!(state.remaining(&s.id),1);state.end_turn();assert_eq!(state.remaining(&s.id),0);
+    state.end_turn();assert_eq!(state.remaining(&s.id),0);state.end_turn();assert_eq!(state.remaining(&s.id),0);
 }
 
 #[test]
@@ -84,14 +84,14 @@ fn actual_solo_and_formation_solid_guard_reduces_the_same_monster_hit(){
     assert_eq!(team.fighters[0].mp,385);assert_eq!((team.fighters[0].effects.defense,team.fighters[0].effects.defense_flat),(1,25));
 }
 #[test]
-fn cast_validation_rejects_cooling_skill_without_spending_or_advancing(){
+fn cast_validation_accepts_the_same_skill_in_consecutive_rounds(){
     let s=skills::ITEMS.iter().find(|s|s.active&&s.target=="all_enemies").unwrap();let stats=attributes::balanced_stats(s.job,60,false,[0;5]);
     let mut enemy=population::definitions().into_iter().find(|r|r.id=="spirit").unwrap();enemy.hp=10000;
     let mut battle=Battle::new(enemy,stats.hp,stats.mp,6);battle.frozen_stats=Some(stats);
     battle.turn_selected(Action::Skill,s.job,3,60,stats,0,0,Some(&s.id),99).unwrap();
-    let before=serde_json::to_value(&battle).unwrap();
-    assert_eq!(battle.turn_selected(Action::Skill,s.job,3,60,stats,0,0,Some(&s.id),99),Err("SKILL_COOLDOWN"));
-    assert_eq!(serde_json::to_value(&battle).unwrap(),before);
+    battle.turn_selected(Action::Skill,s.job,3,60,stats,0,0,Some(&s.id),99).unwrap();
+    assert_eq!(battle.mp,stats.mp-s.mp_cost*2);
+    assert_eq!(battle.skills.proficiency.0[&s.id],2);
 }
 #[test]
 fn dot_ticks_once_per_complete_round_and_independent_teammates_keep_their_sources(){

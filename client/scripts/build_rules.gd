@@ -63,7 +63,7 @@ static func cast(skill:Dictionary,stats:Dictionary,state:Dictionary,hp:int,mp:in
 			if skill.target=="all_enemies":p.bonus_bp+=int(p.charges[2])*param(s,2,"bonus");p.charges[2]=0
 			else:p.charges[2]=mini(2,int(p.charges[2])+1)
 		if tier(s,4)>0:
-			if skill.effect=="regen":p.charges[4]=1
+			if skill.effect in ["regen","heal"]:p.charges[4]=1
 			elif damage>0 and int(p.charges[4])>0:p.charges[4]=0;p.bonus_bp+=param(s,4,"bonus");refund=int(stats.mp)*param(s,4,"refund")/10000
 		if tier(s,5)>0:
 			if skill.effect=="mana_steal" and stolen>0:p.charges[5]=1;heal+=mini(stolen*2,int(stats.hp)*param(s,5,"heal_cap")/10000)

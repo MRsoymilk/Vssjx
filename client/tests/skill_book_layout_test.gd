@@ -36,7 +36,7 @@ func _ready()->void:
 	check(book.get_node("Training").text.contains("0/20") and book.get_node("TrainingProgress").value==0,"Fresh skill displays actual training")
 	await capture("skill-book-basic")
 	book.select_skill(book.items.find_custom(func(s:Dictionary)->bool:return s.id=="sheet_010"));await settle();layout(book)
-	check(book.detail.text.contains("35%") and book.get_node("CombatMeta").text.contains("冷却3轮"),"Long control effect retains its chance and separate cooldown")
+	check(book.detail.text.contains("35%") and book.get_node("CombatMeta").text.contains("无冷却"),"Long control effect retains its chance and separate cooldown")
 	var description_scroll:ScrollContainer=book.get_node("DescriptionScroll")
 	if description_scroll.get_v_scroll_bar().visible:
 		description_scroll.scroll_vertical=999;await settle()

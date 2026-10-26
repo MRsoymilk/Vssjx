@@ -77,7 +77,7 @@ fn old_team_request_receipts_keep_the_same_serialized_command() {
 fn reflection_death_stops_combo_and_uses_one_finite_life() {
     let mut observed=false;
     for _ in 0..30 {
-        let mut b=arena(1);b.fighters[0].job=0;b.enemies[0].hp=1;
+        let mut b=arena(1);b.fighters[0].job=0;b.fighters[0].effects=skills::State::new(0,3,60,1);b.enemies[0].hp=1;
         turn(&mut b,"guard",0);
         if !b.events.iter().any(|e|e.action=="revive"){continue;}
         assert_eq!(b.events.iter().filter(|e|e.skill=="monster_combo").count(),1);

@@ -54,7 +54,7 @@ def build():
             legacy_heal=16 if job==2 else 0,target='enemy',description='旧版入门技能，保留兼容。',
             source_row=None,original_skill_id=None,source='client/scripts/battle.gd',rules_basis='沿用旧版重建规则，并非原版技能'))
     thunder=next(s for s in items if s['id']=='sheet_010')
-    thunder['stun']={'chance':35,'actions':1,'cooldown':3}
+    thunder['stun']={'chance':35,'actions':1,'cooldown':0}
     thunder['legacy_description']=thunder['description']
     thunder['description']='单体攻击；命中后35%概率眩晕，跳过目标下一次行动，受击不解除。'
     thunder['rules_basis']+='；眩晕为2026-10-23新增玩法，非原版恢复；原伤害与灵力消耗保留'
@@ -78,6 +78,28 @@ def build():
     dragons=next(s for s in items if s['id']=='user_shuanglong_xizhu')
     dragons.update(max_targets=2,description='群体攻击，优先攻击选中目标，最多命中2个敌人。',
         rules_basis='用户新增隐者技能；最多攻击两个敌人；25级解锁，固定消耗15点灵力，伤害与冷却沿用当前群攻规则；复用排山倒海全部阶段特效')
+    indexed={s['id']:s for s in items}
+    for id in ['sheet_011','sheet_014','sheet_033','sheet_036']:
+        skill=indexed[id];skill['value']=100
+        damage_type='法术' if skill['effect']=='reflect_magic' else '物理'
+        skill['description']=f'{damage_type}反伤：{"自动" if not skill["active"] else "2回合内"}反弹自身物理攻击力100%的伤害。'
+        skill['rules_basis']+='；用户修正反弹为自身物攻100%，主动和被动取最高值、不叠加'
+    for id in ['sheet_015','sheet_037','sheet_006','sheet_042','sheet_008']:
+        skill=indexed[id];skill.update(damage_percent=300,damage_override_percent=300)
+        skill['description']='群体攻击，每个敌人承受300%威力，技能暴击率70%。' if id=='sheet_008' else '单体攻击，威力300%。'
+        skill['rules_basis']+='；用户调整最高档单体直伤／万剑归宗为300%，不套用通用群攻倍率上限'
+    indexed['sheet_008']['critical_chance']=70
+    for id in ['sheet_039','sheet_041']:
+        skill=indexed[id];skill.update(effect='heal',value=100,duration=0)
+        skill['description']=('为全部存活队友' if id=='sheet_041' else '为自身')+'立即恢复施法者攻击力100%的气血，不超过各自气血上限。'
+        skill['rules_basis']+='；用户修正为施法者攻击力等量的即时回血，非最大气血百分比'
+    indexed['sheet_045']['target']='all_enemies'
+    indexed['sheet_045']['description']='群体攻击，作用于全部存活敌人。'
+    indexed['sheet_045']['rules_basis']+='；用户修正排山倒海为全体群攻'
+    poison=indexed['sheet_052']
+    poison.update(dot_attack_percent=100,unreflectable=True,value=100,
+        description='单体攻击；中毒每轮扣除施法者攻击力100%的气血，整个技能不可反弹。')
+    poison['rules_basis']+='；用户修正每轮毒伤为施法者攻击力100%，不受防御、暴击或反伤影响'
     assert len(items)==37
     for id,alias in [('sheet_019','焚天极火'),('sheet_035','狂风巨电'),('sheet_017','连天绝避')]:
         next(s for s in items if s['id']==id)['aliases']=[alias]

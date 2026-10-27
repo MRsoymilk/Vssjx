@@ -1,6 +1,6 @@
 # 气血葫芦与灵力葫芦
 
-规则见[商城设计](../design/shop_catalog.md#可补充储量的气血灵力葫芦)。本轮于2026-10-23使用隔离 PostgreSQL、真实 Rust HTTP／WebSocket 和 Godot 4.7.2 完成验证。
+规则见[商城设计](../design/shop_catalog.md#可补充储量的气血灵力葫芦)。2026-10-27两种容量均提高至999999，见本文末尾新增验收。以下2026-10-23结果为初次接入的历史记录，使用隔离 PostgreSQL、真实 Rust HTTP／WebSocket 和 Godot 4.7.2 验证。
 
 ## 验证结果
 
@@ -55,3 +55,41 @@ SSJX_GOURD_FIXTURES="$PWD/work/gourds/server-fixtures.json" \
 - `godot --headless --path client res://tests/gourd_icons_test.tscn` 与实际OpenGL各13项通过：检查原图像素直接复用、红蓝映射、商城／背包实际纹理路径、购买后储量及目录摘要。
 - 完整商城Godot回归1,641项、Python目录回归5项通过。已查看商城和背包截图：`/tmp/opencode/vssjx-gourds-original-captures/`。本轮未重跑依赖隔离PostgreSQL的葫芦服务端专项。
 - 仅替换显示，不推送、打包或部署。
+
+## 储量上限调整（2026-10-27）
+
+- 气血葫芦和灵力葫芦的容量均提高至 **999999**；价格仍为200铜钱，每种限持一个、仅战斗外自动补给及NPC免费补充等规则不变。
+- 只修改 `tools/build_gourds.py` 的两项容量并重建 `client/assets/data/shop-v2.json`。客户端和Rust共用该目录，购买／NPC补充使用新上限；已有存档／库存保留当前余量和开关，不自动补满。旧10000／5000余量继续有效，无需新增数据库迁移或重写历史迁移。
+- 两端继续拒绝负数、1000000及更大的储量；新增999999边界、旧余量保存重读／重连和满储量六位数UI宽度回归。
+- 服务端内嵌商城目录，需重新编译并与客户端配套更新；目录摘要已变化，联机夹具必须用新服务端生成，不复用此前快照。
+
+新增检查入口：
+
+```sh
+python tests/test_full_shop_catalog.py
+cargo build --offline --manifest-path server/Cargo.toml
+cargo test --offline --manifest-path server/Cargo.toml --lib gourd
+SSJX_TEST_SERVER_BIN="$PWD/server/target/debug/vssjx-server" python tests/run_gourds.py
+SSJX_GOURD_FIXTURES="$PWD/work/gourds/server-fixtures.json" \
+  godot --headless --path client res://tests/gourds_test.tscn
+SSJX_GOURD_FIXTURES="$PWD/work/gourds/server-fixtures.json" \
+SSJX_SHOP_CAPTURE=/tmp/opencode/gourds-capacity-ui \
+SSJX_OFFSCREEN_SCREEN=1600x1200x24 LIBGL_ALWAYS_SOFTWARE=1 \
+  python tests/run_offscreen.py --path client --rendering-driver opengl3_es res://tests/gourds_test.tscn
+```
+
+本轮只在隔离环境验收，未操作正式数据库，未推送、打包或部署。实际界面使用Xvfb与Mesa；本机另设置 `XVFB_BIN=/tmp/opencode/ui-test-xvfb/usr/bin/Xvfb` 和 `LD_LIBRARY_PATH=/tmp/opencode/ui-test-xvfb/usr/lib/x86_64-linux-gnu`。
+
+本轮结果：
+
+| 检查 | 结果 |
+| --- | --- |
+| Python全商城目录与两种容量／价格 | 10项通过，确认目录仅两项capacity字段变化 |
+| Rust葫芦边界、购买扣量、战斗与NPC限制 | 3项通过，离线构建成功 |
+| 隔离PostgreSQL + Rust实际联机／重启／旧余量重连 | 61项通过 |
+| Godot本地存档、真实快照解析、容量边界和UI布局 | headless及实际OpenGL ES各402项通过 |
+| 红蓝原图复用与购买／背包显示 | headless及实际OpenGL ES各13项通过 |
+| 完整商城实际渲染回归 | 1964项通过 |
+| 文档链接、索引及当前目录数量 | Python 9项通过 |
+
+已审阅两种满容量背包、商城容量及NPC补充后截图；六位数余量／上限不溢出，容量说明不与价格重叠。日志为 `/tmp/opencode/gourds-capacity-*.log`，界面截图位于 `/tmp/opencode/gourds-capacity-ui/` 和 `/tmp/opencode/gourds-capacity-icons/`；生成的测试快照不入库。

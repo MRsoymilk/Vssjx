@@ -59,7 +59,7 @@
       "restore_hp": 0,
       "restore_mp": 0,
       "resource": "hp",
-      "capacity": 10000,
+      "capacity": 999999,
       "category": "药品",
       "sections": [
         "hot",
@@ -82,7 +82,7 @@
       "restore_hp": 0,
       "restore_mp": 0,
       "resource": "mp",
-      "capacity": 5000,
+      "capacity": 999999,
       "category": "药品",
       "sections": [
         "hot",

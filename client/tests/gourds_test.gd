@@ -9,15 +9,19 @@ func _run()->void:
 	Game.player.hp=3;Game.player.mp=2
 	var maxima:=Game.stats()
 	check((await Game.shop_command("buy",GourdRules.HP)).ok,"Buy health container through durable local command")
-	check(Game.player.hp==maxima.hp and Game.player.mp==2 and Game.player.gourds[GourdRules.HP].remaining==10000-int(maxima.hp)+3,"Purchase supplies only missing health and debits exact amount")
+	check(Game.player.hp==maxima.hp and Game.player.mp==2 and Game.player.gourds[GourdRules.HP].remaining==999999-int(maxima.hp)+3,"Purchase supplies only missing health and debits exact amount")
 	check((await Game.shop_command("buy",GourdRules.MP)).ok,"Buy mana container")
-	check(Game.player.mp==maxima.mp and Game.player.gourds[GourdRules.MP].remaining==5000-int(maxima.mp)+2,"Mana container cannot charge for already restored health")
+	check(Game.player.mp==maxima.mp and Game.player.gourds[GourdRules.MP].remaining==999999-int(maxima.mp)+2,"Mana container cannot charge for already restored health")
 	var stable:=Game.player.duplicate(true)
 	check((await Game.shop_command("buy",GourdRules.HP)).code=="ITEM_ALREADY_OWNED" and Game.player==stable,"Duplicate containers cannot refill by stacking")
 	check((await Game.shop_command("buy",GourdRules.HP,2)).code=="INVALID_QUANTITY","Bulk container purchases rejected")
 	check((await Game.shop_command("use",GourdRules.HP)).code=="ITEM_NOT_USABLE","Container cannot be consumed as medicine")
 	await Game.save_game();await Game.load_game()
 	check(Game.player.hp==stable.hp and Game.player.mp==stable.mp and same_reserves(Game.player.gourds,stable.gourds),"Full resource save and reload never consume again")
+	Game.player.gourds[GourdRules.HP]={"remaining":10000,"enabled":false}
+	Game.player.gourds[GourdRules.MP]={"remaining":5000,"enabled":false}
+	check((await Game.save_game()).ok and (await Game.load_game()).ok and same_reserves(Game.player.gourds,{GourdRules.HP:{"remaining":10000,"enabled":false},GourdRules.MP:{"remaining":5000,"enabled":false}}),"Old reserves and switches survive save/reload without a free top-up")
+	Game.player=stable.duplicate(true)
 	await Game.shop_command("gourd_disable",GourdRules.HP)
 	Game.player.hp=1;Game.player.gourds[GourdRules.HP].remaining=7
 	await Game.save_game();await Game.load_game()
@@ -35,7 +39,7 @@ func _run()->void:
 	check((await Game.shop_command("gourd_refill_hp","qingwei")).ok and Game.player.hp==maxima.hp and Game.player.gold==gold,"Nearby provider refills for free then enabled supply heals missing health")
 	await Game.shop_command("gourd_disable",GourdRules.HP)
 	await Game.shop_command("gourd_refill_hp","qingwei")
-	check(Game.player.gourds[GourdRules.HP].remaining==10000 and not Game.player.gourds[GourdRules.HP].enabled,"Refill preserves the off switch")
+	check(Game.player.gourds[GourdRules.HP].remaining==999999 and not Game.player.gourds[GourdRules.HP].enabled,"Refill preserves the off switch")
 	check((await Game.shop_command("gourd_refill_hp","qingwei")).code=="GOURD_FULL","Full reserve cannot be refilled again")
 	await Game.shop_command("gourd_enable",GourdRules.HP)
 	Game.player.hp=1;stable=Game.player.duplicate(true);Game.save_path="invalid://gourd-failure"
@@ -48,8 +52,13 @@ func _run()->void:
 	check(Game.player==stable,"Second load cannot repeat consumption")
 	var invalid:=Game.player.duplicate(true);invalid.gourds[GourdRules.HP].remaining=-1
 	check(not Game.valid_save(invalid),"Negative reserve invalidates a save")
-	invalid=Game.player.duplicate(true);invalid.gourds[GourdRules.HP].remaining=10001
+	invalid=Game.player.duplicate(true);invalid.gourds[GourdRules.HP].remaining=1000000
 	check(not Game.valid_save(invalid),"Over-capacity reserve invalidates a save")
+	for id in GourdRules.IDS:
+		invalid=Game.player.duplicate(true);invalid.gourds[id].remaining=999999
+		check(Game.valid_save(invalid),"New maximum reserve is valid for "+id)
+		invalid.gourds[id].remaining=1000000
+		check(not Game.valid_save(invalid),"One above the new maximum is rejected for "+id)
 	invalid=Game.player.duplicate(true);invalid.gourds.erase(GourdRules.HP)
 	check(not Game.valid_save(invalid),"Owned bottle cannot silently regain missing reserve")
 	var engine:=ShushanBattle.new(ShushanWorld.ENEMIES[0]);Game.local_combat=weakref(engine)
@@ -90,14 +99,22 @@ func _ui()->void:
 	var shop:ShopPanel=load("res://scenes/ui/shop_panel.tscn").instantiate();add_child(shop)
 	shop.selected=GourdRules.HP;shop.refresh()
 	check(shop.goods[0].id==GourdRules.HP and shop.goods[1].id==GourdRules.MP,"Both supplies are visible first in the mall")
-	check(shop.quantity_box.max_value==1 and shop.buy_button.disabled and shop.summary.text.contains("10000"),"Shop shows capacity and prevents duplicate purchase")
+	check(shop.quantity_box.max_value==1 and shop.buy_button.disabled and shop.summary.text.contains("999999"),"Shop shows capacity and prevents duplicate purchase")
 	await get_tree().process_frame
 	check(shop.summary.get_line_count()<=2 and shop.summary.position.y+shop.summary.size.y<=shop.total.position.y,"Gourd summary fits above the price without overlap")
 	await capture("gourds-shop");shop.queue_free();await get_tree().process_frame
 	var bag:OriginalInventory=load("res://scenes/ui/inventory.tscn").instantiate();add_child(bag)
 	bag.select_item(bag.items.find_custom(func(i:Dictionary)->bool:return i.id==GourdRules.HP))
-	check(bag.description.text.contains("0/10000") and bag.description.text.contains("自动开"),"Backpack displays empty reserve, capacity and switch")
+	check(bag.description.text.contains("0/999999") and bag.description.text.contains("自动开"),"Backpack displays empty reserve, capacity and switch")
 	check(bag.description.get_theme_font("font").get_string_size(bag.description.text,HORIZONTAL_ALIGNMENT_LEFT,-1,bag.description.get_theme_font_size("font_size")).x<=bag.description.size.x,"Reserve and switch fit the inventory footer")
+	for id in GourdRules.IDS:
+		var remaining:int=Game.player.gourds[id].remaining
+		Game.player.gourds[id].remaining=999999
+		bag.select_item(bag.items.find_custom(func(i:Dictionary)->bool:return i.id==id))
+		check(bag.description.text.contains("999999/999999") and bag.description.get_theme_font("font").get_string_size(bag.description.text,HORIZONTAL_ALIGNMENT_LEFT,-1,bag.description.get_theme_font_size("font_size")).x<=bag.description.size.x,"Full six-digit reserve and capacity fit the footer for "+id)
+		await capture("gourds-full-"+ShopRules.item(id).resource)
+		Game.player.gourds[id].remaining=remaining
+	bag.select_item(bag.items.find_custom(func(i:Dictionary)->bool:return i.id==GourdRules.HP))
 	await capture("gourds-bag-reserve");bag.show_item()
 	check(bag.tooltip_label.text.contains("清微道人") and bag.tooltip_label.position.y+bag.tooltip_label.get_minimum_size().y<=bag.tooltip.size.y,"Container detail names providers and fits the tooltip")
 	await capture("gourds-bag-details");bag.open_menu()
@@ -119,7 +136,7 @@ func _ui()->void:
 	var app:Control=load("res://scenes/main.tscn").instantiate();add_child(app);app.set_process(false);app._enter_world()
 	app._open_ai_npc("ai_001_guide");app.modal.get_node("Paper/RefillMp").pressed.emit()
 	await get_tree().process_frame
-	check(Game.player.gourds[GourdRules.MP].remaining==5000 and app.modal.get_node("Paper/RefillMp").disabled,"Actual local NPC button routes through distance validation and durable refill")
+	check(Game.player.gourds[GourdRules.MP].remaining==999999 and app.modal.get_node("Paper/RefillMp").disabled,"Actual local NPC button routes through distance validation and durable refill")
 	await capture("gourds-world-refill");app.queue_free();await get_tree().process_frame
 
 func _online(records:Array)->void:

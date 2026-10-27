@@ -5,4 +5,4 @@ def catalog_items():
                  icon=f'res://assets/items/original/ix{icon}.png',restore_hp=0,restore_mp=0,
                  resource=resource,capacity=capacity,category='药品',sections=['hot','elixir'],
                  rules_basis='重建规则；仅战斗外自动补给，按实际恢复扣储量；NPC免费补充，每种限持一个')
-            for resource,name,capacity,icon in [('hp','气血葫芦',10000,22),('mp','灵力葫芦',5000,23)]]
+            for resource,name,capacity,icon in [('hp','气血葫芦',999999,22),('mp','灵力葫芦',999999,23)]]

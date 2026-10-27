@@ -10,6 +10,35 @@ pub struct Supply {pub remaining:i32,pub enabled:bool}
 impl Supply {
     pub fn full(id:&str)->Self{Self{remaining:crate::shop::item(id).expect("gourd catalog").capacity,enabled:true}}
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn enlarged_capacity_accepts_legacy_and_full_reserves_but_rejects_overflow(){
+        let gear=BTreeMap::from([(HP.into(),false),(MP.into(),false)]);
+        let quantities=BTreeMap::from([(HP.into(),1),(MP.into(),1)]);
+        let mut state=State(BTreeMap::from([
+            (HP.into(),Supply{remaining:10000,enabled:false}),
+            (MP.into(),Supply{remaining:5000,enabled:true}),
+        ]));
+        assert!(state.valid(&gear,&quantities));
+        let restored:State=serde_json::from_str(&serde_json::to_string(&state).unwrap()).unwrap();
+        assert_eq!(restored,state);
+        for id in [HP,MP] {
+            let full=Supply::full(id);
+            assert_eq!(full.remaining,999999);assert!(full.enabled);
+            state.0.insert(id.into(),full);
+            assert!(state.valid(&gear,&quantities));
+            for invalid in [-1,1000000] {
+                state.0.get_mut(id).unwrap().remaining=invalid;
+                assert!(!state.valid(&gear,&quantities));
+            }
+            state.0.get_mut(id).unwrap().remaining=999999;
+        }
+    }
+}
 #[derive(Clone,Default,Debug,Deserialize,Serialize,PartialEq,Eq)]
 #[serde(transparent)]
 pub struct State(pub BTreeMap<String,Supply>);

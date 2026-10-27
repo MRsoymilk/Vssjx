@@ -26,7 +26,7 @@ func _run()->void:
 		bag.select_item(index)
 		var icon:TextureRect=bag.grid.get_child(index-bag.offset).get_node("Panel/Icon")
 		check(icon.texture.resource_path==mapping[id],"Backpack shows the same original gourd: "+id)
-	check(Game.player.gourds[GourdRules.HP].remaining==10000 and Game.player.gourds[GourdRules.MP].remaining==5000,"Art changes leave capacities and reserves intact")
+	check(Game.player.gourds[GourdRules.HP].remaining==999999 and Game.player.gourds[GourdRules.MP].remaining==999999,"Art changes leave capacities and reserves intact")
 	await capture("gourds-original-inventory");bag.queue_free();await get_tree().process_frame
 	DirAccess.remove_absolute(Game.save_path);Game.player=old;Game.save_path=path
 	print("GOURD ICONS: %d checks, %d failures"%[checks,failures]);get_tree().quit(1 if failures else 0)

@@ -170,7 +170,7 @@ fn gourd_purchase_supply_switches_and_empty_containers_are_conservative(){
     let mut buy=use_item(crate::gourds::HP);buy.action=Action::Buy;
     a.apply(&buy,&c).unwrap();assert_eq!(a.character.gold,800);
     assert!(a.auto_supply());assert_eq!(a.character.hp,maxima.hp);assert_eq!(a.character.mp,0);
-    assert_eq!(a.gourds.0[crate::gourds::HP].remaining,10000-maxima.hp+1);
+    assert_eq!(a.gourds.0[crate::gourds::HP].remaining,999999-maxima.hp+1);
     let stable=a.gourds.clone();assert!(!a.auto_supply());assert_eq!(a.gourds,stable);
     assert_eq!(a.apply(&buy,&c),Err("ITEM_ALREADY_OWNED"));
     let mut toggle=buy.clone();toggle.action=Action::GourdDisable;toggle.quantity=None;
@@ -197,7 +197,7 @@ fn gourd_supply_cannot_touch_active_battles_or_resurrect_and_refills_require_npc
     a.character.corpse=None;a.character.hp=1;
     command.action=Action::GourdRefillMp;command.target=Some("qingwei".into());c.target_cell=Some([10,13]);
     assert_eq!(a.apply(&command,&c),Err("RESIDENT_TOO_FAR"));c.cell=[10,14];
-    a.apply(&command,&c).unwrap();assert_eq!(a.gourds.0[crate::gourds::MP].remaining,5000);
+    a.apply(&command,&c).unwrap();assert_eq!(a.gourds.0[crate::gourds::MP].remaining,999999);
     assert_eq!(a.apply(&command,&c),Err("GOURD_FULL"));
     command.target=Some("wolf_a".into());assert_eq!(a.apply(&command,&c),Err("GOURD_NPC_REQUIRED"));
 }

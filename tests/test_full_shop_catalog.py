@@ -8,6 +8,15 @@ ROOT=Path(__file__).resolve().parents[1]
 
 
 class FullShopTests(unittest.TestCase):
+    def test_refillable_gourds_share_enlarged_capacity_without_changing_price(self):
+        catalog=json.loads((ROOT/'client/assets/data/shop-v2.json').read_text('utf8'))
+        gourds={i['id']:i for i in catalog['items'] if i['slot']=='gourd'}
+        self.assertEqual(set(gourds),{'supply/hp_gourd','supply/mp_gourd'})
+        for resource in ['hp','mp']:
+            item=gourds[f'supply/{resource}_gourd']
+            self.assertEqual((item['capacity'],item['price'],item['resource']),(999999,200,resource))
+            self.assertEqual((item['restore_hp'],item['restore_mp']),(0,0))
+
     def test_confirmed_medicines_and_stones_reuse_ids_and_preserve_other_items(self):
         catalog=json.loads((ROOT/'client/assets/data/shop-v2.json').read_text('utf8'))
         indexed={i['id']:i for i in catalog['items']}

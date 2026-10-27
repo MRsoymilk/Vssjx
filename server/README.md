@@ -2,7 +2,7 @@
 
 [项目首页](../README.md) · [设计索引](../design/README.md) · [部署导航](../deploy/README.md)
 
-Rust／Tokio／Axum 联机服务，使用 PostgreSQL 保存账号、角色和玩法状态。当前源码已接入任务／PVE、商城装备、技能、AI 世界、社交、组队和邀请决斗；运行中的旧版本不自动获得新功能。
+Rust／Tokio／Axum 联机服务，使用 PostgreSQL 保存账号、角色和玩法状态。当前源码已接入任务／PVE、商城与随机装备、绑定／拍卖／当面交易、技能熟练度、AI 世界、采集、无尽排行榜、社交、组队和邀请决斗；运行中的旧版本不自动获得新功能。
 
 **部署边界：一个世界只支持一个游戏写进程。** 多进程连接同库不是世界集群，人数配置不是容量保证。完整混合负载、长稳及设备兼容须分别验收，当前设计与限制见 [路线图](../design/roadmap.md)。
 
@@ -69,6 +69,8 @@ ssh -N -L 9090:127.0.0.1:9090 user@server
 
 页面每5秒刷新，显示在线/移动/保留角色数量、WebSocket连接及下行应用字节、世界tick间隔/工作耗时、聊天队列长度、HTTP路由耗时/错误、进程RSS、数据库健康/连接池、日志丢弃/写盘失败和最近100条异常。数据库独立每5秒探测一次，页面不等待数据库查询；数据库失败、采样过期或世界tick停滞会提示关注。内存趋势只保留在当前页面，计数重启清零并更换`boot_id`，不是历史监控平台。
 
+HTTP表是启动以来的累计计时，止于生成响应头，p95为固定桶上界，不包含公网往返、响应体传输或WebSocket消息时延；不同业务动作和成功／失败尚未分开。2026-10-26的只读观测、部署版本限制及尚未实施的调优顺序见[HTTP延迟分析](../tests/http_latency_optimization.md)。9091可以是本机SSH转发端口，不应据此改变监控默认值或公开管理监听。
+
 控制台仍输出可读日志，文件为`logs/server.jsonl`及`server.jsonl.1`等（`.1`较新）。两种输出各有4096条有界非阻塞队列，避免慢磁盘/控制台阻塞游戏；队列满时丢弃日志并在监控计数，写盘故障另计数。默认文件总预算约70MiB，普通新建文件在Unix下权限为`0600`；目录应只给服务用户写入，每个进程使用独立日志目录。修改更小的保留数量并重启时会清理本日志器的超限编号文件；无关文件不处理。由systemd/Docker接管的控制台日志还需由部署层单独配置留存上限。
 
 HTTP响应带服务端生成的`X-Request-Id`，调用方传入的同名值不会被采信。WebSocket另有`connection_id`，与升级请求ID同时记录在连接span中；最近异常中的关联ID可直接用于搜索：
@@ -95,6 +97,24 @@ cargo run --manifest-path server/Cargo.toml
 Cargo会按改动重新编译，服务继续读取原 `.env` 和数据库；不需要清空账号、角色或存档。本机编辑器／Windows客户端连接 `http://127.0.0.1:8080`。网页／Android另需使用与服务端相同数据版本的客户端包。
 
 地图目录指纹不一致时，客户端显示“客户端与服务器的地图数据版本不一致，请同步更新后重试”，内部错误为 `PVE_CATALOG_MISMATCH`；其他无效PVE数据仍严格拒绝，不通过跳过校验解决版本问题。
+
+## 近期功能与迁移兼容
+
+下表仅列近期增量供核对，不替代完整迁移历史；当前仓库迁移至0043，配置数据库后启动由SQLx按序执行。这里只整理文档，不对现有数据库执行迁移。
+
+| 迁移 | 相关功能与升级注意事项 |
+|---|---|
+| [0035](migrations/0035_gathering.sql) | 采集点、个人冷却、凭证及材料余额；材料加工另用共享配方 |
+| [0036](migrations/0036_map_management.sql) | 地图草稿、校验／发布／历史和当前版本；不是修改静态地形或任意SQL入口 |
+| [0037](migrations/0037_supply_gourds.sql)／[0038](migrations/0038_vow_equipment.sql) | 补给葫芦储量及誓约礼装库存兼容 |
+| [0039](migrations/0039_equipment_binding.sql) | 缺绑定历史的装备保守补为已绑定，旧UUID和词条不重抽 |
+| [0040](migrations/0040_auction_house.sql)／[0041](migrations/0041_direct_trades.sql) | 拍卖、领取、经济回执及当面托管；有未结束／未领取物资时不能删角 |
+| [0042](migrations/0042_skill_proficiency.sql) | 技能熟练度，旧角色缺失记录按1级；客户端与服务端目录同步 |
+| [0043](migrations/0043_endless_leaderboard.sql) | 无尽纪录与里程碑事件；旧纪录无真实达成时间，按迁移时间导入，不补发历史通告 |
+
+更新前先确认实际部署提交、构建摘要、共享目录与迁移状态，在隔离环境演练备份恢复和旧在途数据兼容。经济写入与资产转移不能仅靠切回旧镜像撤销；不改写已应用迁移、不清空玩家库或历史回执，也不让多个游戏写进程同时连接同库处理世界。
+
+当前规则及入口见[装备与经济](../design/equipment-economy.md)、[技能](../design/skills.md)、[采集](../tests/gathering.md)、[地图管理](../tests/map_management.md)、[无尽排行榜](../tests/endless.md)。自动更新客户端尚属[待实施方案](../design/client-updates.md)，门户APK管理不等于已完成应用内更新。
 
 ## 启用账号数据库
 
@@ -144,11 +164,14 @@ SSJX_SERVER_NAME="蜀山剑侠服务器"
 | `POST /api/v1/auth/logout` | 撤销该Bearer会话，重复注销可安全重试 |
 | `GET /api/v1/characters` | 当前账号的角色基本行，最多五个，不读取离线存档 |
 | `POST /api/v1/characters` | 账号级幂等创建，昵称全服唯一，初始资产同事务提交 |
+| `POST /api/v1/characters/delete` | 本人角色删除；在线／战斗、队伍／帮派及托管／待领取等限制仍校验 |
 | `GET /api/v1/character-operations/{operation_id}` | 读取当前账号的原创建回执，成功与明确拒绝均持久化 |
 | `POST /api/v1/world/ticket` | 账号角色归属校验后签发短时单次票据 |
 | `GET /api/v1/world/ws` | WebSocket升级后交换票据、进入世界、移动与公共聊天 |
 | `POST /api/v1/social` | 公开资料、好友与帮派的闭集动作 |
 | `POST /api/v1/teams` | 队伍邀请、准备、成员管理与组队战斗动作 |
+| `POST /api/v1/economy` | 经济快照、拍卖、竞价／买断／领取与当面双向确认；写入使用原操作UUID重试 |
+| `POST /api/v1/endless/leaderboard` | 只读认证榜单及本人名次，不允许借本人查询读取私人资产 |
 
 未配置数据库时 `stage=connection_only` 且能力列表为空；配置后 `stage=account_auth`，当前列表为 `account_auth`、`character_creation`、`shared_world`、`public_chat`、`social_v1`。它不是全部玩法清单，PVE、地图与决斗扩展还通过票据／握手协商。
 

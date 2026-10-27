@@ -7,6 +7,7 @@
 | 范围 | 说明 |
 |---|---|
 | 开源文档与链接 | [文档检查](documentation.md) |
+| HTTP延迟口径、采样与优化候选 | [只读历史分析](http_latency_optimization.md)，优化尚未实施，不是压测报告 |
 | 导航与游戏子路径 | [页面、浏览器与隔离 Nginx 验证](portal_navigation.md) |
 | 私有统计后台与 APK 管理 | [采集、文件管理、HTTP 安全与浏览器验证](portal_stats.md) |
 | 茶馆社区调整与旧论坛清理 | [腾讯频道链接、专用组件移除及服务器核验](community_channel_20261023.md) |
@@ -15,7 +16,17 @@
 | 任务、战斗与地图 | [线上 PVE](online_pve.md)、[第二张地图](online_maps.md)、[技能](../design/skills.md#验证) |
 | 雷霆一击眩晕 | [概率、行动跳过、持久化与原生状态图标](stun.md) |
 | 回合末持续伤害同步 | [五人五怪、混合状态、死亡／复活顺序及跨端回执](periodic_damage.md) |
-| 新数值候选内核 | [共享参数、Rust/Godot一致性与实际离屏预览](combat_balance.md) |
+| 数值内核与阶段基线 | [共享参数、Rust/Godot一致性与实际离屏预览](combat_balance.md)、[当前规则及历史阶段区分](../design/combat-balance.md) |
+| 原生／AI随机掉落、绑定与养成 | [掉落养成](progression.md)、[装备实例](loot_instances.md)、[当前规则](../design/equipment-economy.md) |
+| 拍卖行与当面交易 | [托管、二次确认、并发、回滚、领取和重启](economy.md) |
+| 组队公共ROLL与高物等奖励领取 | [公共分配、旧池兼容和界面生命周期](team_loot.md) |
+| 装备详情、对比与评分 | [原版界面、派生评分与真实需求](equipment_details.md) |
+| 技能熟练度与固定费用 | [资源阶段／计数](skill_proficiency.md)、[固定耗蓝](fixed_skill_costs.md)、[无冷却及效果调整](skill_rebalance.md) |
+| 原地施法与逐目标飞行特效 | [动作、阶段、取消及多模式表现](battle_casting.md) |
+| 无尽试炼、榜单与里程碑 | [规则、迁移0043、跨图公屏与回执](endless.md) |
+| 采矿采药和有限材料加工 | [个人刷新、材料袋与原子配方](gathering.md) |
+| 地图点位管理 | [草稿／校验／发布／恢复及来源安全](map_management.md) |
+| 总图文字、缩放与点击传送 | [世界地图](world_map.md)、[神行符](travel_scroll.md) |
 | 社交与多人战斗 | [社交](social.md)、[组队](teams.md)、[决斗](player_duels.md) |
 | 平台与网页 | [平台基础](platform_interface.md)、[主游戏 Web](web_game.md)、[浏览器存储](web_storage.md) |
 | 一小时昼夜切换 | [场景时间、边界、洞穴固定光照与实际渲染](day_night.md) |
@@ -25,6 +36,32 @@
 | 公网历史发布 | [发布基线](release_20261018.md)、[后续聊天管理](chat_moderation.md)、[仅门户发布](portal_release_20261019.md) |
 
 文档变更可只运行相关静态检查，不要求启动数据库、导出产物或部署服务。以下保留各阶段的具体入口，选择与修改范围对应的回归。
+
+## 装备与经济专项的复现准备
+
+以下是复现命令，不表示本次文档整理已经执行。集成脚本仅使用自建临时PostgreSQL与账号；先准备现有Docker测试镜像或按 `pg_fixture.py` 配置独立测试数据库工具，不读取玩家库或私有部署配置。
+
+```sh
+mkdir -p work/economy-review
+cargo build --locked --manifest-path server/Cargo.toml
+cargo run --locked --manifest-path server/Cargo.toml --example loot_vectors \
+  > work/economy-review/loot-vectors.json
+cargo run --locked --manifest-path server/Cargo.toml --example progression_vectors \
+  > work/economy-review/progression-vectors.json
+SSJX_LOOT_VECTORS="$PWD/work/economy-review/loot-vectors.json" python tests/run_economy.py
+SSJX_LOOT_VECTORS="$PWD/work/economy-review/loot-vectors.json" python tests/run_direct_trade.py
+SSJX_PROGRESSION_VECTORS="$PWD/work/economy-review/progression-vectors.json" python tests/run_progression.py
+SSJX_PROGRESSION_VECTORS="$PWD/work/economy-review/progression-vectors.json" python tests/run_team_loot.py
+SSJX_ECONOMY_FIXTURES="$PWD/work/economy/server-fixtures.json" \
+  godot --headless --path client res://tests/economy_test.tscn
+SSJX_DIRECT_TRADE_FIXTURES="$PWD/work/direct-trade/server-fixtures.json" \
+  godot --headless --path client res://tests/direct_trade_test.tscn
+godot --headless --path client res://tests/random_binding_test.tscn
+```
+
+`SSJX_TEST_SERVER_BIN`可指定当前源码构建的隔离测试二进制；更多向量、真实OpenGL和截图变量分别见[经济](economy.md)、[养成](progression.md)及[ROLL](team_loot.md)。无头通过不等于渲染或手机真机通过；历史随机测试失败和已知旧断言仍按对应验收记录保留，不能只引用成功总数。
+
+## 其他已有入口
 
 Rust基础服务、登录服务器地址、重启保存与真实网络联调见[server_connection.md](server_connection.md)。
 

@@ -1,5 +1,6 @@
 """Check the public documentation's local links without network access."""
 from pathlib import Path
+import json
 import re
 import unittest
 from urllib.parse import unquote, urlsplit
@@ -15,6 +16,8 @@ DOCUMENTS = [
     *sorted((ROOT / 'deploy').glob('*.md')),
     *(ROOT / 'tests' / name for name in (
         'documentation.md', 'player_duels.md', 'social.md', 'teams.md', 'testing.md', 'portal_navigation.md', 'portal_release_20261019.md', 'portal_stats.md', 'community_channel_20261023.md', 'eva01_equipment.md',
+        'economy.md', 'progression.md', 'team_loot.md', 'observability.md',
+        'http_latency_optimization.md',
     )),
 ]
 
@@ -99,6 +102,38 @@ class DocumentationTests(unittest.TestCase):
             with self.subTest(topic=topic.name):
                 self.assertIn('[返回设计索引](README.md)', text)
                 self.assertRegex(text, r'性质：|状态核对：')
+
+    def test_docs_index_covers_every_guide(self):
+        index = ROOT / 'docs/README.md'
+        destinations = {
+            (index.parent / unquote(urlsplit(link).path)).resolve()
+            for link in links(index.read_text('utf-8'))
+            if not urlsplit(link).scheme
+        }
+        for topic in (ROOT / 'docs').glob('*.md'):
+            if topic != index:
+                with self.subTest(topic=topic.name):
+                    self.assertIn(topic.resolve(), destinations)
+
+    def test_equipment_document_counts_match_current_catalog(self):
+        catalog = json.loads((ROOT / 'client/assets/data/shop-v2.json').read_text('utf-8'))
+        items = catalog['items']
+        equipment = [item for item in items if item['slot'] in catalog['slots']]
+        text = (ROOT / 'design/equipment-economy.md').read_text('utf-8')
+        self.assertIn(f'目录{len(items)}项', text)
+        self.assertIn(f'装备模板{len(equipment)}种', text)
+        for prefix in ('original', 'ai'):
+            count = sum(item['id'].startswith(prefix + '/') for item in equipment)
+            self.assertIn(f'`{prefix}/` {count}种', text)
+        for migration in ('0039_equipment_binding.sql', '0040_auction_house.sql',
+                          '0041_direct_trades.sql'):
+            self.assertIn(migration, text)
+
+    def test_optimization_proposals_declare_pending_status(self):
+        for relative in ('design/client-updates.md', 'tests/http_latency_optimization.md'):
+            with self.subTest(document=relative):
+                text = (ROOT / relative).read_text('utf-8')
+                self.assertRegex(text, r'未实施|未实现|待实施')
 
 
 if __name__ == '__main__':

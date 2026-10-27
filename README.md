@@ -12,6 +12,7 @@
   <a href="https://47.93.114.190/downloads/vssjx-arm64.apk">Android 预览版</a> ·
   <a href="https://pd.qq.com/s/a6q695iaf?b=9">剑侠茶馆</a> ·
   <a href="#快速开始">快速开始</a> ·
+  <a href="docs/README.md">文档导航</a> ·
   <a href="design/README.md">设计文档</a> ·
   <a href="CONTRIBUTING.md">参与贡献</a>
 </p>
@@ -27,8 +28,9 @@
 - **像素剑侠**：320×480 逻辑画布、原包组合动画，力士／侠客／隐者三职业及男女形象。
 - **回合战斗**：攻击、职业技能、道具、自动战斗与状态效果，支持联机组队多目标战斗和邀请制切磋。
 - **双模式体验**：本地游玩无需服务端；联机支持账号、每账号最多五个角色、共享地图与公共聊天，线上线下资产隔离。
-- **角色与社交**：十个装备槽、商城与换装、NPC 入派、公开资料、好友和基础帮派管理。
-- **世界扩展**：原有试炼地图之外，提供明确标注来源的 AI 生成地图、NPC 和一次性支线任务；另有三系列主题装备，含[初号机参考套装](design/eva01-equipment.md)，不作为原版地图或装备恢复成果。
+- **装备与经济**：十槽装备、原生／AI外观随机掉落、穿戴绑定、强化／洗炼、属性评分；联机提供铜钱拍卖行和双方确认的当面交易，见[当前规则](design/equipment-economy.md)。
+- **角色与社交**：NPC 入派、公开资料、好友、基础帮派管理、技能熟练度与资源阶段；主城无尽试炼支持排行榜和里程碑通告。
+- **世界扩展**：原有试炼地图之外，提供明确标注来源的 AI 生成地图、NPC 和一次性支线任务；骨甲幽光、冥林异装、[初号机参考套装](design/eva01-equipment.md)及誓约礼装等新装备不作为原版恢复成果。另有采矿／采药、材料加工和本机地图管理。
 - **开发工具**：独立桌面数据浏览器、世界总图和可重复执行的素材转换工具。
 
 以上为当前源码能力，不保证体验服已部署所有最新功能。网页与 ARM64 APK 的发布基线见 [2026-10-18 发布说明](tests/release_20261018.md)，后续网页聊天更新见 [聊天管理发布记录](tests/chat_moderation.md)。手机真机兼容、完整混合负载与公网长稳仍需分别验证，不将短时连接测试表述为千人完整玩法验收。
@@ -66,12 +68,16 @@ cargo run --locked --manifest-path server/Cargo.toml
 
 | 想了解什么 | 从这里开始 |
 |---|---|
+| 按主题查找当前规则、历史验收和待实施方案 | [项目文档导航](docs/README.md) |
 | 操作、试玩流程与存档 | [游玩指南](docs/getting-started.md) |
+| 随机掉落、绑定、拍卖与当面交易 | [装备与经济规则](design/equipment-economy.md) |
 | 架构、协议与玩法规则 | [设计文档索引](design/README.md) |
 | 浏览项目定义、动画与世界总图 | [数据工具](docs/data-tools.md) |
 | 恢复范围、导入与资源重建 | [资源恢复与重建](docs/resource-recovery.md) |
 | 素材来源、AI 标识与许可边界 | [资源来源说明](docs/asset-provenance.md) |
 | 本机联机服务与配置 | [服务端说明](server/README.md) |
+| HTTP延迟解读与优化候选 | [只读分析与待实施计划](tests/http_latency_optimization.md) |
+| 客户端版本检查、应用内下载与资源热更 | [升级方案](design/client-updates.md)，尚未实现 |
 | 自行部署网页或公网服务 | [部署导航](deploy/README.md) |
 | 私有门户统计与 APK 上传／版本管理 | [管理工具说明](portal_stats/README.md)，当前仅本地实现 |
 | 开发与提交贡献 | [贡献指南](CONTRIBUTING.md) |
@@ -84,7 +90,7 @@ client/    Godot 客户端、游戏素材与独立桌面工具
 server/    Rust 联机服务、数据库迁移与规则测试
 shared/    版本化协议、共享配置与固定样例
 design/    架构、玩法、平台与美术设计
-docs/      使用指南与资源说明
+docs/      文档导航、使用指南与资源说明
 deploy/    Docker Compose、代理与部署说明
 tools/     资源转换、内容生成与导出工具
 portal_stats/ 独立门户统计与 APK 管理，不连接游戏数据库

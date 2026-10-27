@@ -1,0 +1,1016 @@
+[
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/mzs/parts/mzst1.png",
+    "sha256": "300a72edb5d037e27e5620c916c9d1eda9ca332d3e20bd4846d80eaedc9a8a74",
+    "native_frames": [
+      [
+        0,
+        0,
+        42,
+        43
+      ],
+      [
+        42,
+        0,
+        20,
+        16
+      ]
+    ]
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/mzs/parts/mzs1.png",
+    "sha256": "b4e3177dbb490f1738784260264587181aec4ff26226faca9f0e84d8bcd7ccb9",
+    "native_frames": [
+      [
+        0,
+        0,
+        19,
+        13
+      ],
+      [
+        26,
+        0,
+        26,
+        13
+      ],
+      [
+        52,
+        0,
+        6,
+        7
+      ]
+    ]
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/mzs/parts/mzs1q.png",
+    "sha256": "40aec3326b16cad64f6de562126cf46ced193b96a4ea79c79dc6662337d27d2f",
+    "native_frames": [
+      [
+        0,
+        0,
+        11,
+        14
+      ],
+      [
+        25,
+        0,
+        9,
+        10
+      ],
+      [
+        50,
+        0,
+        25,
+        23
+      ]
+    ]
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/mzs/parts/mzs1x.png",
+    "sha256": "7c21433146daaf044bd35ffe615a3c56447f6143515a152773bbe90af34d4cfa",
+    "native_frames": [
+      [
+        0,
+        0,
+        25,
+        15
+      ],
+      [
+        26,
+        0,
+        26,
+        14
+      ],
+      [
+        52,
+        0,
+        22,
+        13
+      ],
+      [
+        78,
+        0,
+        20,
+        15
+      ],
+      [
+        104,
+        0,
+        19,
+        14
+      ],
+      [
+        130,
+        0,
+        22,
+        13
+      ]
+    ]
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/mzs/parts/ezs1.png",
+    "sha256": "9caf8135d6f17ad7fb4d5e45f98eaa1f4628527218fb4da74f7a83de7e0e7c2c",
+    "native_frames": [
+      [
+        0,
+        0,
+        74,
+        38
+      ],
+      [
+        74,
+        0,
+        74,
+        47
+      ]
+    ]
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/mzs/icons/weapon.png",
+    "sha256": "f64a8a67610d4db2a831d3937509b44b01b0166beddeb26cdf034af00c127fd1"
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/mzs/icons/pendant.png",
+    "sha256": "7e7aeb8c6421e3b0257d6d88aeaaf3ca3f69d9b7ffb07388a4314d06e99a4305"
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/mzs/icons/armor.png",
+    "sha256": "c8282876e769442fdce9bd2fe0ea737c9ef4ffa93f6882215c7520a5f4e1587f"
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/mzs/icons/wrist.png",
+    "sha256": "a313c1c400b601353b447de4fa670f417d5ebb71327023c3fa80d9b1d680a0fc"
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/mzs/icons/belt.png",
+    "sha256": "dcbf951315b496d7314889e476c221bac397b101366ead00130d2ffb64a335c6"
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/mzs/icons/pants.png",
+    "sha256": "be5a8f373557e346de15a91b1830fb7cfc9b9c29b5a6d983862842c80ab67a52"
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/mzs/icons/boots.png",
+    "sha256": "afad65d557315295c919ecf97ec8ee8c4e46f0e004dc8fadd086ee2df6a8fd7a"
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/mzs/icons/ring.png",
+    "sha256": "d7b9f244a0805565f29786fd84f0d72e2d478a1c705c6b9bf4032de9a82ba4b6"
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/mzs/icons/necklace.png",
+    "sha256": "94264d0374cff0c126e39fe41b661e17ac751030be6dfbd204548578bf5316d6"
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/mzs/icons/hat.png",
+    "sha256": "4d04b546272746f5699c80e43f6ffbf0357bd0088bb73b207a377fd0365375eb"
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/wzs/parts/wzst1.png",
+    "sha256": "ee032f3fc81316ac7d6ed82eb9ad6e5fc1c0d6565ba3ef914973ac87777c19b0",
+    "native_frames": [
+      [
+        0,
+        0,
+        42,
+        43
+      ],
+      [
+        42,
+        0,
+        20,
+        16
+      ]
+    ]
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/wzs/parts/wzs1.png",
+    "sha256": "a646b0dd57f820eb18a5ad77e423fd076db19b754e8f642429ebc99b4b1a072e",
+    "native_frames": [
+      [
+        0,
+        0,
+        13,
+        11
+      ],
+      [
+        24,
+        0,
+        24,
+        12
+      ],
+      [
+        48,
+        0,
+        7,
+        9
+      ]
+    ]
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/wzs/parts/wzs1q.png",
+    "sha256": "72cabeb3f7f59b175ab63dc77be39903b6132a7121e3e19d90df4771e4a89a37",
+    "native_frames": [
+      [
+        0,
+        0,
+        10,
+        7
+      ],
+      [
+        25,
+        0,
+        8,
+        7
+      ],
+      [
+        50,
+        0,
+        25,
+        21
+      ]
+    ]
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/wzs/parts/wzs1x.png",
+    "sha256": "d18ed1c0ff728be6dcc25ee74a3fcdb788afa4bc4e82337fd00c6d548f510967",
+    "native_frames": [
+      [
+        0,
+        0,
+        24,
+        14
+      ],
+      [
+        24,
+        0,
+        13,
+        12
+      ],
+      [
+        48,
+        0,
+        19,
+        12
+      ],
+      [
+        72,
+        0,
+        22,
+        13
+      ],
+      [
+        96,
+        0,
+        16,
+        14
+      ],
+      [
+        120,
+        0,
+        17,
+        11
+      ]
+    ]
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/wzs/parts/ezs1.png",
+    "sha256": "9caf8135d6f17ad7fb4d5e45f98eaa1f4628527218fb4da74f7a83de7e0e7c2c",
+    "native_frames": [
+      [
+        0,
+        0,
+        74,
+        38
+      ],
+      [
+        74,
+        0,
+        74,
+        47
+      ]
+    ]
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/wzs/icons/weapon.png",
+    "sha256": "f64a8a67610d4db2a831d3937509b44b01b0166beddeb26cdf034af00c127fd1"
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/wzs/icons/pendant.png",
+    "sha256": "7e7aeb8c6421e3b0257d6d88aeaaf3ca3f69d9b7ffb07388a4314d06e99a4305"
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/wzs/icons/armor.png",
+    "sha256": "483bb95d6351b7253bc8fa1db23efd2c3d67268a62bf1a2e3441d35099385e03"
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/wzs/icons/wrist.png",
+    "sha256": "a313c1c400b601353b447de4fa670f417d5ebb71327023c3fa80d9b1d680a0fc"
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/wzs/icons/belt.png",
+    "sha256": "dcbf951315b496d7314889e476c221bac397b101366ead00130d2ffb64a335c6"
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/wzs/icons/pants.png",
+    "sha256": "be5a8f373557e346de15a91b1830fb7cfc9b9c29b5a6d983862842c80ab67a52"
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/wzs/icons/boots.png",
+    "sha256": "afad65d557315295c919ecf97ec8ee8c4e46f0e004dc8fadd086ee2df6a8fd7a"
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/wzs/icons/ring.png",
+    "sha256": "d7b9f244a0805565f29786fd84f0d72e2d478a1c705c6b9bf4032de9a82ba4b6"
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/wzs/icons/necklace.png",
+    "sha256": "94264d0374cff0c126e39fe41b661e17ac751030be6dfbd204548578bf5316d6"
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/wzs/icons/hat.png",
+    "sha256": "de98364fc52f663f19c631fb3bbe319a4f25a9b786292a78048c7a2802d3e3aa"
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/mck/parts/mckt1.png",
+    "sha256": "507b5fc5ecc97a3f374c241f20a145a753c5155fee2572239c85562d3c252bfb",
+    "native_frames": [
+      [
+        0,
+        0,
+        42,
+        43
+      ],
+      [
+        42,
+        0,
+        20,
+        16
+      ]
+    ]
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/mck/parts/mck1.png",
+    "sha256": "b892754d1c8036d134686c312221b931b6bb278b8075ed456a45480fbef5fe49",
+    "native_frames": [
+      [
+        0,
+        0,
+        21,
+        19
+      ],
+      [
+        21,
+        0,
+        15,
+        13
+      ]
+    ]
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/mck/parts/mck1q.png",
+    "sha256": "ea7211787f637c139697c62d6ee545dc6c03e4cc4977f2b2c9bbf7fa6598e8ec",
+    "native_frames": [
+      [
+        0,
+        0,
+        22,
+        20
+      ],
+      [
+        24,
+        0,
+        11,
+        8
+      ],
+      [
+        48,
+        0,
+        20,
+        8
+      ],
+      [
+        72,
+        0,
+        14,
+        5
+      ],
+      [
+        96,
+        0,
+        12,
+        5
+      ],
+      [
+        120,
+        0,
+        21,
+        17
+      ],
+      [
+        144,
+        0,
+        24,
+        16
+      ]
+    ]
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/mck/parts/mck1x.png",
+    "sha256": "27aa1d241eecde78c5a469554e450a707c1db67f72ee11f98bb3e119948ec25a",
+    "native_frames": [
+      [
+        0,
+        0,
+        15,
+        13
+      ],
+      [
+        16,
+        0,
+        16,
+        13
+      ],
+      [
+        32,
+        0,
+        14,
+        13
+      ],
+      [
+        48,
+        0,
+        13,
+        13
+      ],
+      [
+        64,
+        0,
+        13,
+        13
+      ],
+      [
+        80,
+        0,
+        14,
+        13
+      ]
+    ]
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/mck/parts/eck1.png",
+    "sha256": "11656ffda195229e9edd0a8fa2a65071943673e4d3eeed658245d423efd839c1",
+    "native_frames": [
+      [
+        0,
+        0,
+        41,
+        14
+      ],
+      [
+        41,
+        0,
+        30,
+        30
+      ]
+    ]
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/mck/icons/weapon.png",
+    "sha256": "0b6d8c4b71d14eff246059b9defc4bdd1332158cb4a1352348e00338e9c9ca6e"
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/mck/icons/pendant.png",
+    "sha256": "7e7aeb8c6421e3b0257d6d88aeaaf3ca3f69d9b7ffb07388a4314d06e99a4305"
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/mck/icons/armor.png",
+    "sha256": "412a2af2b3d3e6fb88c3d22d8cce948d2d520b298c3fc977af03dfcfc08cbd53"
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/mck/icons/wrist.png",
+    "sha256": "a313c1c400b601353b447de4fa670f417d5ebb71327023c3fa80d9b1d680a0fc"
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/mck/icons/belt.png",
+    "sha256": "dcbf951315b496d7314889e476c221bac397b101366ead00130d2ffb64a335c6"
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/mck/icons/pants.png",
+    "sha256": "be5a8f373557e346de15a91b1830fb7cfc9b9c29b5a6d983862842c80ab67a52"
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/mck/icons/boots.png",
+    "sha256": "afad65d557315295c919ecf97ec8ee8c4e46f0e004dc8fadd086ee2df6a8fd7a"
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/mck/icons/ring.png",
+    "sha256": "d7b9f244a0805565f29786fd84f0d72e2d478a1c705c6b9bf4032de9a82ba4b6"
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/mck/icons/necklace.png",
+    "sha256": "94264d0374cff0c126e39fe41b661e17ac751030be6dfbd204548578bf5316d6"
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/mck/icons/hat.png",
+    "sha256": "e4081259a75351964aab6eb8dac78f74f3a1a8e02c90df1dd7aa673182e6d546"
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/wck/parts/wckt1.png",
+    "sha256": "3651dc8d2ddcc97bbb213f47085ba74082ccd7833abe1e3fe68e3b43faf01927",
+    "native_frames": [
+      [
+        0,
+        0,
+        42,
+        43
+      ],
+      [
+        42,
+        0,
+        20,
+        16
+      ]
+    ]
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/wck/parts/wck1.png",
+    "sha256": "6cfb52fe24a9f673d91054ec41f232a2a72006997799c3aa2ed46fbba7f7d979",
+    "native_frames": [
+      [
+        0,
+        0,
+        15,
+        12
+      ],
+      [
+        15,
+        0,
+        11,
+        13
+      ]
+    ]
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/wck/parts/wck1q.png",
+    "sha256": "0638d773243bef84630c54d0f6cefe7bdb55a7e02b007a3746fb5f473b2b794f",
+    "native_frames": [
+      [
+        0,
+        0,
+        17,
+        21
+      ],
+      [
+        27,
+        0,
+        25,
+        22
+      ],
+      [
+        54,
+        0,
+        27,
+        26
+      ]
+    ]
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/wck/parts/wck1x.png",
+    "sha256": "b5bd7e65ffa2dbad53fd2c5c2d78abedc8b7b50ad1082b7df588deb72c8b86f3",
+    "native_frames": [
+      [
+        0,
+        0,
+        16,
+        12
+      ],
+      [
+        16,
+        0,
+        12,
+        13
+      ],
+      [
+        32,
+        0,
+        12,
+        13
+      ],
+      [
+        48,
+        0,
+        13,
+        11
+      ],
+      [
+        64,
+        0,
+        15,
+        13
+      ],
+      [
+        80,
+        0,
+        12,
+        13
+      ]
+    ]
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/wck/parts/eck1.png",
+    "sha256": "11656ffda195229e9edd0a8fa2a65071943673e4d3eeed658245d423efd839c1",
+    "native_frames": [
+      [
+        0,
+        0,
+        41,
+        14
+      ],
+      [
+        41,
+        0,
+        30,
+        30
+      ]
+    ]
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/wck/icons/weapon.png",
+    "sha256": "0b6d8c4b71d14eff246059b9defc4bdd1332158cb4a1352348e00338e9c9ca6e"
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/wck/icons/pendant.png",
+    "sha256": "7e7aeb8c6421e3b0257d6d88aeaaf3ca3f69d9b7ffb07388a4314d06e99a4305"
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/wck/icons/armor.png",
+    "sha256": "add86827836c4979898a01b5c4fc36542481aa24d7ffcbf5ffab0699b6e04b68"
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/wck/icons/wrist.png",
+    "sha256": "a313c1c400b601353b447de4fa670f417d5ebb71327023c3fa80d9b1d680a0fc"
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/wck/icons/belt.png",
+    "sha256": "dcbf951315b496d7314889e476c221bac397b101366ead00130d2ffb64a335c6"
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/wck/icons/pants.png",
+    "sha256": "be5a8f373557e346de15a91b1830fb7cfc9b9c29b5a6d983862842c80ab67a52"
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/wck/icons/boots.png",
+    "sha256": "afad65d557315295c919ecf97ec8ee8c4e46f0e004dc8fadd086ee2df6a8fd7a"
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/wck/icons/ring.png",
+    "sha256": "d7b9f244a0805565f29786fd84f0d72e2d478a1c705c6b9bf4032de9a82ba4b6"
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/wck/icons/necklace.png",
+    "sha256": "94264d0374cff0c126e39fe41b661e17ac751030be6dfbd204548578bf5316d6"
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/wck/icons/hat.png",
+    "sha256": "0b9f42a98c915cab7af23eb0de4bff06cf99af371f633a6d77209d710ef0b4fc"
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/mfs/parts/mfst2.png",
+    "sha256": "350c9c3b8010afd80b51fee68297d5e691f2b1cea118a4d61f933c7e4cc30655",
+    "native_frames": [
+      [
+        0,
+        0,
+        42,
+        43
+      ],
+      [
+        42,
+        0,
+        20,
+        16
+      ]
+    ]
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/mfs/parts/mfs2.png",
+    "sha256": "0f98e05688ab68149168ce7e79cef9d30ad569f1959a583589b67b12401b5796",
+    "native_frames": [
+      [
+        0,
+        0,
+        28,
+        17
+      ],
+      [
+        28,
+        0,
+        23,
+        10
+      ],
+      [
+        56,
+        0,
+        5,
+        9
+      ]
+    ]
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/mfs/parts/mfs2q.png",
+    "sha256": "ce13d750af6ae5367ec3d5d81798cefacb20e99f323db2c95769d4b43b7cf0b1",
+    "native_frames": [
+      [
+        0,
+        0,
+        11,
+        5
+      ],
+      [
+        31,
+        0,
+        3,
+        4
+      ],
+      [
+        62,
+        0,
+        31,
+        23
+      ]
+    ]
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/mfs/parts/mfs2x.png",
+    "sha256": "a16ef94286f56589d32630fac4e67a33bd43f95fbb1d33bb9dd7da04c68ba6dd",
+    "native_frames": [
+      [
+        0,
+        0,
+        18,
+        14
+      ],
+      [
+        18,
+        0,
+        16,
+        13
+      ],
+      [
+        36,
+        0,
+        18,
+        12
+      ],
+      [
+        54,
+        0,
+        16,
+        12
+      ],
+      [
+        72,
+        0,
+        15,
+        12
+      ],
+      [
+        90,
+        0,
+        16,
+        14
+      ]
+    ]
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/mfs/parts/efs1.png",
+    "sha256": "049d9b277d1399333b1df63c351f422f56efcb9c2e4932d268ce1fcb23e65eb0",
+    "native_frames": [
+      [
+        0,
+        0,
+        40,
+        40
+      ],
+      [
+        49,
+        0,
+        49,
+        32
+      ]
+    ]
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/mfs/icons/weapon.png",
+    "sha256": "b839558a6c4ec6f089153b9a748f2f1f6494acde11acad12ac92eb92adf58f0d"
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/mfs/icons/pendant.png",
+    "sha256": "7e7aeb8c6421e3b0257d6d88aeaaf3ca3f69d9b7ffb07388a4314d06e99a4305"
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/mfs/icons/armor.png",
+    "sha256": "0b831f649bcfe7767998c5f31115ad2afe7c93dee8a018d2756ebc94c89e2651"
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/mfs/icons/wrist.png",
+    "sha256": "a313c1c400b601353b447de4fa670f417d5ebb71327023c3fa80d9b1d680a0fc"
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/mfs/icons/belt.png",
+    "sha256": "dcbf951315b496d7314889e476c221bac397b101366ead00130d2ffb64a335c6"
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/mfs/icons/pants.png",
+    "sha256": "be5a8f373557e346de15a91b1830fb7cfc9b9c29b5a6d983862842c80ab67a52"
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/mfs/icons/boots.png",
+    "sha256": "afad65d557315295c919ecf97ec8ee8c4e46f0e004dc8fadd086ee2df6a8fd7a"
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/mfs/icons/ring.png",
+    "sha256": "d7b9f244a0805565f29786fd84f0d72e2d478a1c705c6b9bf4032de9a82ba4b6"
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/mfs/icons/necklace.png",
+    "sha256": "94264d0374cff0c126e39fe41b661e17ac751030be6dfbd204548578bf5316d6"
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/mfs/icons/hat.png",
+    "sha256": "e12310ef49f340e8d1da3879e0a9a48c8aa654b04196c90c44b2c2775857d115"
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/wfs/parts/wfst2.png",
+    "sha256": "18589a30f052db89240980974530d14d89c81e0efd250affac9e39863640725a",
+    "native_frames": [
+      [
+        0,
+        0,
+        42,
+        43
+      ],
+      [
+        42,
+        0,
+        20,
+        16
+      ]
+    ]
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/wfs/parts/wfs2.png",
+    "sha256": "bcc265ef78eb7773aaf08de9023a8fe291a25200f31ff31a40eb33043c550db6",
+    "native_frames": [
+      [
+        0,
+        0,
+        22,
+        14
+      ],
+      [
+        22,
+        0,
+        12,
+        13
+      ],
+      [
+        44,
+        0,
+        11,
+        15
+      ]
+    ]
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/wfs/parts/wfs2q.png",
+    "sha256": "a086c642b5f6893455a9d81ce8f3edb58827f43087cd08b1cd5c5bb97f4e6f74",
+    "native_frames": [
+      [
+        0,
+        0,
+        19,
+        22
+      ],
+      [
+        21,
+        0,
+        4,
+        6
+      ],
+      [
+        42,
+        0,
+        21,
+        21
+      ],
+      [
+        63,
+        0,
+        10,
+        8
+      ]
+    ]
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/wfs/parts/wfs2x.png",
+    "sha256": "0c2f59a5dd5041519a92dfd45f494baebe959dab662469acbaf266c5781736b8",
+    "native_frames": [
+      [
+        0,
+        0,
+        13,
+        14
+      ],
+      [
+        15,
+        0,
+        15,
+        13
+      ],
+      [
+        30,
+        0,
+        12,
+        12
+      ],
+      [
+        45,
+        0,
+        12,
+        14
+      ],
+      [
+        60,
+        0,
+        13,
+        13
+      ],
+      [
+        75,
+        0,
+        12,
+        12
+      ]
+    ]
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/wfs/parts/efs1.png",
+    "sha256": "dfc6cb58c6570b5fc4fa2de265967e64e674368b59a423e0521e51f1c709d474",
+    "native_frames": [
+      [
+        0,
+        0,
+        40,
+        40
+      ],
+      [
+        49,
+        0,
+        49,
+        32
+      ]
+    ]
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/wfs/icons/weapon.png",
+    "sha256": "03b5fa226aac4d4e9f10b3e1b727253f206911fe396a769f9aa23b4ca18a95fd"
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/wfs/icons/pendant.png",
+    "sha256": "7e7aeb8c6421e3b0257d6d88aeaaf3ca3f69d9b7ffb07388a4314d06e99a4305"
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/wfs/icons/armor.png",
+    "sha256": "78878876217c003d7a6fcd402f09ee7c77b949e157d73c9889fcbc2fa8e15cc3"
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/wfs/icons/wrist.png",
+    "sha256": "a313c1c400b601353b447de4fa670f417d5ebb71327023c3fa80d9b1d680a0fc"
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/wfs/icons/belt.png",
+    "sha256": "dcbf951315b496d7314889e476c221bac397b101366ead00130d2ffb64a335c6"
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/wfs/icons/pants.png",
+    "sha256": "be5a8f373557e346de15a91b1830fb7cfc9b9c29b5a6d983862842c80ab67a52"
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/wfs/icons/boots.png",
+    "sha256": "afad65d557315295c919ecf97ec8ee8c4e46f0e004dc8fadd086ee2df6a8fd7a"
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/wfs/icons/ring.png",
+    "sha256": "d7b9f244a0805565f29786fd84f0d72e2d478a1c705c6b9bf4032de9a82ba4b6"
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/wfs/icons/necklace.png",
+    "sha256": "94264d0374cff0c126e39fe41b661e17ac751030be6dfbd204548578bf5316d6"
+  },
+  {
+    "path": "res://assets/generated/equipment/xuanfeng/wfs/icons/hat.png",
+    "sha256": "6d879c96e008b84d1cf266ad764e99b736d9ca44c9c48c067130d9bd9b6b0312"
+  }
+]

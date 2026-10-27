@@ -1,0 +1,860 @@
+{
+  "format_version": 1,
+  "source": "用户确认的像素母版；原生分层、关节与动作适配",
+  "sets": [
+    {
+      "id": "xuanfeng/mzs",
+      "name": "玄锋·破阵",
+      "stem": "mzs",
+      "job": 0,
+      "gender": 0,
+      "weapon_code": 53,
+      "clothing_code": 36,
+      "head_code": 34,
+      "head": "xuanfeng/mzs/mzst1",
+      "body": [
+        "xuanfeng/mzs/mzs1",
+        "xuanfeng/mzs/mzs1q",
+        "xuanfeng/mzs/mzs1x"
+      ],
+      "weapon": "xuanfeng/mzs/ezs1",
+      "weapon_name": "玄锋阔刃"
+    },
+    {
+      "id": "xuanfeng/wzs",
+      "name": "玄锋·斩月",
+      "stem": "wzs",
+      "job": 0,
+      "gender": 1,
+      "weapon_code": 54,
+      "clothing_code": 37,
+      "head_code": 35,
+      "head": "xuanfeng/wzs/wzst1",
+      "body": [
+        "xuanfeng/wzs/wzs1",
+        "xuanfeng/wzs/wzs1q",
+        "xuanfeng/wzs/wzs1x"
+      ],
+      "weapon": "xuanfeng/wzs/ezs1",
+      "weapon_name": "玄锋钩刃"
+    },
+    {
+      "id": "xuanfeng/mck",
+      "name": "玄锋·逐影",
+      "stem": "mck",
+      "job": 1,
+      "gender": 0,
+      "weapon_code": 55,
+      "clothing_code": 38,
+      "head_code": 36,
+      "head": "xuanfeng/mck/mckt1",
+      "body": [
+        "xuanfeng/mck/mck1",
+        "xuanfeng/mck/mck1q",
+        "xuanfeng/mck/mck1x"
+      ],
+      "weapon": "xuanfeng/mck/eck1",
+      "weapon_name": "玄锋双刃"
+    },
+    {
+      "id": "xuanfeng/wck",
+      "name": "玄锋·流萤",
+      "stem": "wck",
+      "job": 1,
+      "gender": 1,
+      "weapon_code": 56,
+      "clothing_code": 39,
+      "head_code": 37,
+      "head": "xuanfeng/wck/wckt1",
+      "body": [
+        "xuanfeng/wck/wck1",
+        "xuanfeng/wck/wck1q",
+        "xuanfeng/wck/wck1x"
+      ],
+      "weapon": "xuanfeng/wck/eck1",
+      "weapon_name": "玄锋反握刃"
+    },
+    {
+      "id": "xuanfeng/mfs",
+      "name": "玄锋·观星",
+      "stem": "mfs",
+      "job": 2,
+      "gender": 0,
+      "weapon_code": 57,
+      "clothing_code": 40,
+      "head_code": 38,
+      "head": "xuanfeng/mfs/mfst2",
+      "body": [
+        "xuanfeng/mfs/mfs2",
+        "xuanfeng/mfs/mfs2q",
+        "xuanfeng/mfs/mfs2x"
+      ],
+      "weapon": "xuanfeng/mfs/efs1",
+      "weapon_name": "玄晶灵杖"
+    },
+    {
+      "id": "xuanfeng/wfs",
+      "name": "玄锋·照夜",
+      "stem": "wfs",
+      "job": 2,
+      "gender": 1,
+      "weapon_code": 58,
+      "clothing_code": 41,
+      "head_code": 39,
+      "head": "xuanfeng/wfs/wfst2",
+      "body": [
+        "xuanfeng/wfs/wfs2",
+        "xuanfeng/wfs/wfs2q",
+        "xuanfeng/wfs/wfs2x"
+      ],
+      "weapon": "xuanfeng/wfs/efs1",
+      "weapon_name": "照夜晶杖"
+    }
+  ],
+  "parts": {
+    "xuanfeng/mzs/mzst1": {
+      "texture": "res://assets/generated/equipment/xuanfeng/mzs/parts/mzst1.png",
+      "frames": [
+        [
+          0,
+          0,
+          42,
+          43
+        ],
+        [
+          42,
+          0,
+          20,
+          16
+        ]
+      ]
+    },
+    "xuanfeng/mzs/mzs1": {
+      "texture": "res://assets/generated/equipment/xuanfeng/mzs/parts/mzs1.png",
+      "frames": [
+        [
+          0,
+          0,
+          19,
+          13
+        ],
+        [
+          26,
+          0,
+          26,
+          13
+        ],
+        [
+          52,
+          0,
+          6,
+          7
+        ]
+      ]
+    },
+    "xuanfeng/mzs/mzs1q": {
+      "texture": "res://assets/generated/equipment/xuanfeng/mzs/parts/mzs1q.png",
+      "frames": [
+        [
+          0,
+          0,
+          11,
+          14
+        ],
+        [
+          25,
+          0,
+          9,
+          10
+        ],
+        [
+          50,
+          0,
+          25,
+          23
+        ]
+      ]
+    },
+    "xuanfeng/mzs/mzs1x": {
+      "texture": "res://assets/generated/equipment/xuanfeng/mzs/parts/mzs1x.png",
+      "frames": [
+        [
+          0,
+          0,
+          25,
+          15
+        ],
+        [
+          26,
+          0,
+          26,
+          14
+        ],
+        [
+          52,
+          0,
+          22,
+          13
+        ],
+        [
+          78,
+          0,
+          20,
+          15
+        ],
+        [
+          104,
+          0,
+          19,
+          14
+        ],
+        [
+          130,
+          0,
+          22,
+          13
+        ]
+      ]
+    },
+    "xuanfeng/mzs/ezs1": {
+      "texture": "res://assets/generated/equipment/xuanfeng/mzs/parts/ezs1.png",
+      "frames": [
+        [
+          0,
+          0,
+          74,
+          38
+        ],
+        [
+          74,
+          0,
+          74,
+          47
+        ]
+      ]
+    },
+    "xuanfeng/wzs/wzst1": {
+      "texture": "res://assets/generated/equipment/xuanfeng/wzs/parts/wzst1.png",
+      "frames": [
+        [
+          0,
+          0,
+          42,
+          43
+        ],
+        [
+          42,
+          0,
+          20,
+          16
+        ]
+      ]
+    },
+    "xuanfeng/wzs/wzs1": {
+      "texture": "res://assets/generated/equipment/xuanfeng/wzs/parts/wzs1.png",
+      "frames": [
+        [
+          0,
+          0,
+          13,
+          11
+        ],
+        [
+          24,
+          0,
+          24,
+          12
+        ],
+        [
+          48,
+          0,
+          7,
+          9
+        ]
+      ]
+    },
+    "xuanfeng/wzs/wzs1q": {
+      "texture": "res://assets/generated/equipment/xuanfeng/wzs/parts/wzs1q.png",
+      "frames": [
+        [
+          0,
+          0,
+          10,
+          7
+        ],
+        [
+          25,
+          0,
+          8,
+          7
+        ],
+        [
+          50,
+          0,
+          25,
+          21
+        ]
+      ]
+    },
+    "xuanfeng/wzs/wzs1x": {
+      "texture": "res://assets/generated/equipment/xuanfeng/wzs/parts/wzs1x.png",
+      "frames": [
+        [
+          0,
+          0,
+          24,
+          14
+        ],
+        [
+          24,
+          0,
+          13,
+          12
+        ],
+        [
+          48,
+          0,
+          19,
+          12
+        ],
+        [
+          72,
+          0,
+          22,
+          13
+        ],
+        [
+          96,
+          0,
+          16,
+          14
+        ],
+        [
+          120,
+          0,
+          17,
+          11
+        ]
+      ]
+    },
+    "xuanfeng/wzs/ezs1": {
+      "texture": "res://assets/generated/equipment/xuanfeng/wzs/parts/ezs1.png",
+      "frames": [
+        [
+          0,
+          0,
+          74,
+          38
+        ],
+        [
+          74,
+          0,
+          74,
+          47
+        ]
+      ]
+    },
+    "xuanfeng/mck/mckt1": {
+      "texture": "res://assets/generated/equipment/xuanfeng/mck/parts/mckt1.png",
+      "frames": [
+        [
+          0,
+          0,
+          42,
+          43
+        ],
+        [
+          42,
+          0,
+          20,
+          16
+        ]
+      ]
+    },
+    "xuanfeng/mck/mck1": {
+      "texture": "res://assets/generated/equipment/xuanfeng/mck/parts/mck1.png",
+      "frames": [
+        [
+          0,
+          0,
+          21,
+          19
+        ],
+        [
+          21,
+          0,
+          15,
+          13
+        ]
+      ]
+    },
+    "xuanfeng/mck/mck1q": {
+      "texture": "res://assets/generated/equipment/xuanfeng/mck/parts/mck1q.png",
+      "frames": [
+        [
+          0,
+          0,
+          22,
+          20
+        ],
+        [
+          24,
+          0,
+          11,
+          8
+        ],
+        [
+          48,
+          0,
+          20,
+          8
+        ],
+        [
+          72,
+          0,
+          14,
+          5
+        ],
+        [
+          96,
+          0,
+          12,
+          5
+        ],
+        [
+          120,
+          0,
+          21,
+          17
+        ],
+        [
+          144,
+          0,
+          24,
+          16
+        ]
+      ]
+    },
+    "xuanfeng/mck/mck1x": {
+      "texture": "res://assets/generated/equipment/xuanfeng/mck/parts/mck1x.png",
+      "frames": [
+        [
+          0,
+          0,
+          15,
+          13
+        ],
+        [
+          16,
+          0,
+          16,
+          13
+        ],
+        [
+          32,
+          0,
+          14,
+          13
+        ],
+        [
+          48,
+          0,
+          13,
+          13
+        ],
+        [
+          64,
+          0,
+          13,
+          13
+        ],
+        [
+          80,
+          0,
+          14,
+          13
+        ]
+      ]
+    },
+    "xuanfeng/mck/eck1": {
+      "texture": "res://assets/generated/equipment/xuanfeng/mck/parts/eck1.png",
+      "frames": [
+        [
+          0,
+          0,
+          41,
+          14
+        ],
+        [
+          41,
+          0,
+          30,
+          30
+        ]
+      ]
+    },
+    "xuanfeng/wck/wckt1": {
+      "texture": "res://assets/generated/equipment/xuanfeng/wck/parts/wckt1.png",
+      "frames": [
+        [
+          0,
+          0,
+          42,
+          43
+        ],
+        [
+          42,
+          0,
+          20,
+          16
+        ]
+      ]
+    },
+    "xuanfeng/wck/wck1": {
+      "texture": "res://assets/generated/equipment/xuanfeng/wck/parts/wck1.png",
+      "frames": [
+        [
+          0,
+          0,
+          15,
+          12
+        ],
+        [
+          15,
+          0,
+          11,
+          13
+        ]
+      ]
+    },
+    "xuanfeng/wck/wck1q": {
+      "texture": "res://assets/generated/equipment/xuanfeng/wck/parts/wck1q.png",
+      "frames": [
+        [
+          0,
+          0,
+          17,
+          21
+        ],
+        [
+          27,
+          0,
+          25,
+          22
+        ],
+        [
+          54,
+          0,
+          27,
+          26
+        ]
+      ]
+    },
+    "xuanfeng/wck/wck1x": {
+      "texture": "res://assets/generated/equipment/xuanfeng/wck/parts/wck1x.png",
+      "frames": [
+        [
+          0,
+          0,
+          16,
+          12
+        ],
+        [
+          16,
+          0,
+          12,
+          13
+        ],
+        [
+          32,
+          0,
+          12,
+          13
+        ],
+        [
+          48,
+          0,
+          13,
+          11
+        ],
+        [
+          64,
+          0,
+          15,
+          13
+        ],
+        [
+          80,
+          0,
+          12,
+          13
+        ]
+      ]
+    },
+    "xuanfeng/wck/eck1": {
+      "texture": "res://assets/generated/equipment/xuanfeng/wck/parts/eck1.png",
+      "frames": [
+        [
+          0,
+          0,
+          41,
+          14
+        ],
+        [
+          41,
+          0,
+          30,
+          30
+        ]
+      ]
+    },
+    "xuanfeng/mfs/mfst2": {
+      "texture": "res://assets/generated/equipment/xuanfeng/mfs/parts/mfst2.png",
+      "frames": [
+        [
+          0,
+          0,
+          42,
+          43
+        ],
+        [
+          42,
+          0,
+          20,
+          16
+        ]
+      ]
+    },
+    "xuanfeng/mfs/mfs2": {
+      "texture": "res://assets/generated/equipment/xuanfeng/mfs/parts/mfs2.png",
+      "frames": [
+        [
+          0,
+          0,
+          28,
+          17
+        ],
+        [
+          28,
+          0,
+          23,
+          10
+        ],
+        [
+          56,
+          0,
+          5,
+          9
+        ]
+      ]
+    },
+    "xuanfeng/mfs/mfs2q": {
+      "texture": "res://assets/generated/equipment/xuanfeng/mfs/parts/mfs2q.png",
+      "frames": [
+        [
+          0,
+          0,
+          11,
+          5
+        ],
+        [
+          31,
+          0,
+          3,
+          4
+        ],
+        [
+          62,
+          0,
+          31,
+          23
+        ]
+      ]
+    },
+    "xuanfeng/mfs/mfs2x": {
+      "texture": "res://assets/generated/equipment/xuanfeng/mfs/parts/mfs2x.png",
+      "frames": [
+        [
+          0,
+          0,
+          18,
+          14
+        ],
+        [
+          18,
+          0,
+          16,
+          13
+        ],
+        [
+          36,
+          0,
+          18,
+          12
+        ],
+        [
+          54,
+          0,
+          16,
+          12
+        ],
+        [
+          72,
+          0,
+          15,
+          12
+        ],
+        [
+          90,
+          0,
+          16,
+          14
+        ]
+      ]
+    },
+    "xuanfeng/mfs/efs1": {
+      "texture": "res://assets/generated/equipment/xuanfeng/mfs/parts/efs1.png",
+      "frames": [
+        [
+          0,
+          0,
+          40,
+          40
+        ],
+        [
+          49,
+          0,
+          49,
+          32
+        ]
+      ]
+    },
+    "xuanfeng/wfs/wfst2": {
+      "texture": "res://assets/generated/equipment/xuanfeng/wfs/parts/wfst2.png",
+      "frames": [
+        [
+          0,
+          0,
+          42,
+          43
+        ],
+        [
+          42,
+          0,
+          20,
+          16
+        ]
+      ]
+    },
+    "xuanfeng/wfs/wfs2": {
+      "texture": "res://assets/generated/equipment/xuanfeng/wfs/parts/wfs2.png",
+      "frames": [
+        [
+          0,
+          0,
+          22,
+          14
+        ],
+        [
+          22,
+          0,
+          12,
+          13
+        ],
+        [
+          44,
+          0,
+          11,
+          15
+        ]
+      ]
+    },
+    "xuanfeng/wfs/wfs2q": {
+      "texture": "res://assets/generated/equipment/xuanfeng/wfs/parts/wfs2q.png",
+      "frames": [
+        [
+          0,
+          0,
+          19,
+          22
+        ],
+        [
+          21,
+          0,
+          4,
+          6
+        ],
+        [
+          42,
+          0,
+          21,
+          21
+        ],
+        [
+          63,
+          0,
+          10,
+          8
+        ]
+      ]
+    },
+    "xuanfeng/wfs/wfs2x": {
+      "texture": "res://assets/generated/equipment/xuanfeng/wfs/parts/wfs2x.png",
+      "frames": [
+        [
+          0,
+          0,
+          13,
+          14
+        ],
+        [
+          15,
+          0,
+          15,
+          13
+        ],
+        [
+          30,
+          0,
+          12,
+          12
+        ],
+        [
+          45,
+          0,
+          12,
+          14
+        ],
+        [
+          60,
+          0,
+          13,
+          13
+        ],
+        [
+          75,
+          0,
+          12,
+          12
+        ]
+      ]
+    },
+    "xuanfeng/wfs/efs1": {
+      "texture": "res://assets/generated/equipment/xuanfeng/wfs/parts/efs1.png",
+      "frames": [
+        [
+          0,
+          0,
+          40,
+          40
+        ],
+        [
+          49,
+          0,
+          49,
+          32
+        ]
+      ]
+    }
+  }
+}

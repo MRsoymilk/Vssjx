@@ -1,0 +1,78 @@
+{
+  "method": "Pillow像素部件生产；按可见原生部件回投成品母版，复用完整原生动作；不是整张立绘缩放",
+  "generator": "tools/build_xuanfeng_equipment.py",
+  "generator_sha256": "a1c8b654c2185e0cefffe9ec5f8058af153f0ce5abd7a957ab3fed3c55c25c55",
+  "style_module": "tools/xuanfeng_native_style.py",
+  "style_sha256": "da54d4801317a625dfb50b0161c1adb0c9d2d33fbdad558c5ffc9b63ad074668",
+  "native_inputs": {
+    "client/assets/data/actors/hero/mzs.json": "a30d9d7e89db9e13be2d44ef1926754ee3af6bc5acf9a5ec6bb0d959972e77c4",
+    "analysis/ai-generated/equipment/xuanfeng/reference/mzs.png": "e8819a5690075dd71e07de55e6ee1cb460686875f07ffcf949d10d9b18c60828",
+    "client/assets/hero_parts/ezs1.png": "0e12a61a11270c9337b9a9fdb4383ec2bf01e1505c6e75165bc595e0c69b2020",
+    "client/assets/hero_parts/mzs1.png": "08c7b97c1b14ea3f81c08e1b8420bf17f560ab6ad7ff549e14df49d5267182d6",
+    "client/assets/hero_parts/mzst1.png": "3ab7c2d2829ec4166e9ef30694bfb779a8ba4b9ae55ec598609b31c09cfc9578",
+    "client/assets/hero_parts/mzs1q.png": "d370dd16a4e0f86c41b37ef7dec7043b43800ef66b130d9f53fca7544a6f4f67",
+    "client/assets/hero_parts/mzs1x.png": "11e35db4c6cd9b2cc5881e99cd6f927745c625771125de4924cf12ab35718fbb",
+    "client/assets/data/actors/hero/wzs.json": "4dbfd6ad820bf577c823eb928a65f8f5299f81912a3ad6f59956b3dcaf9beacb",
+    "analysis/ai-generated/equipment/xuanfeng/reference/wzs.png": "bee82f491da628d547f1745bc132288206e818701ca0d56f212656768f3d4095",
+    "client/assets/hero_parts/wzst1.png": "f364212fb63a2107c9030a37d5576b1f3b4bdb21c3885ec766ffc56a75d3780f",
+    "client/assets/hero_parts/wzs1.png": "1d0c4de8477f90c11b1a7998d61ae5df7d2b12f687d041596aeb651dd3259bce",
+    "client/assets/hero_parts/wzs1q.png": "b1bee100f0076f79240f0f06c646d10b30796767ef1e38bf3a96231fca8f0459",
+    "client/assets/hero_parts/wzs1x.png": "0ae63e2fe0c1b3624a361473bc63e3cb84178d4580ef7357e0b467e146993b14",
+    "client/assets/data/actors/hero/mck.json": "56e0a2e37aa98719d8982406c8bead8a32f5ffd8e3c9fc1a1c9f81cff1235216",
+    "analysis/ai-generated/equipment/xuanfeng/reference/mck.png": "530e606d4deb82adc83d67e76c6ef48d85cc3330b66f57070e7fa475ddecff8f",
+    "client/assets/hero_parts/eck1.png": "80eb77e9512f0b794ffb25339a7e08713b506dede063721839cbc9b969a07792",
+    "client/assets/hero_parts/mckt1.png": "49622433a63e8114d765bcb8a3d41c67969abd185bdfd54d4ce2d1e9b3efaa08",
+    "client/assets/hero_parts/mck1.png": "38210ab71ba90141fbd03d364944e148244421604a8453ae15b5add8a110cc0e",
+    "client/assets/hero_parts/mck1q.png": "77dbcbc57fb11f8f6286d5ee3d1e2c94adbca686db382813b6d8ba5bed61ca10",
+    "client/assets/hero_parts/mck1x.png": "40e337682875db0529ec050ed7797850f3c775a89d5cbaaa0dfca5aa7e658573",
+    "client/assets/data/actors/hero/wck.json": "14e2a120b17362937f557a2fdc7f79f2adbb1aff4f1fbda47b11f904c4747257",
+    "analysis/ai-generated/equipment/xuanfeng/reference/wck.png": "bfc1772fdb3306c06de090829872479864cca42e1a71b9165137f3f25c776887",
+    "client/assets/hero_parts/wckt1.png": "fc5b4eb0aa897d7a06ef8d1b8dc61df313e247fa7a1a1bb8226bc0d3215430be",
+    "client/assets/hero_parts/wck1.png": "785299be00ca499bb9fd07201660fb2e96c701d60fd13187cad8770153e9d871",
+    "client/assets/hero_parts/wck1q.png": "f6196a51e413b50de8da4c27fd4bfd4efe05098c8ac712420c5f3415caebea35",
+    "client/assets/hero_parts/wck1x.png": "0c9c87bff4c6caeac97c6b9630b0f419ecd380f046507f2216f1d29851db10ef",
+    "client/assets/data/actors/hero/mfs.json": "5ae58f4fc6e34a82891c55b04f40b407fd8a6468247deab4dd8320f6e14f9a7a",
+    "analysis/ai-generated/equipment/xuanfeng/reference/mfs.png": "4041c9c99503adb4fc4d976b0ccb5bd3ef1dc618900d085e81a0967e20e552b0",
+    "client/assets/hero_parts/efs1.png": "e3177975f92d3d8e9f4d4a66ff23db863e3e1bfafb6414dff6aa2c6e6e6b42f9",
+    "client/assets/hero_parts/mfst2.png": "d73d297054bc51181585598fae893fea6638d868d046f0793d12b250e777cb1f",
+    "client/assets/hero_parts/mfs2.png": "2b8e1559c94959d8b6878e74d1096c61f92109a9298ba14f3d9c98d4335f7c31",
+    "client/assets/hero_parts/mfs2q.png": "8f43b026ffcd0fec78b6371c8af3b226d0b5e5ec1b117c0439e5de87fa4955d3",
+    "client/assets/hero_parts/mfs2x.png": "61af360f53af387c71eee69bcee42fe1952556748b439c644e8825e2475443b7",
+    "client/assets/data/actors/hero/wfs.json": "6cb23cedff693dc9a8d4097fe31bd093dbce7a14dd8c8119c0fd01856cb0f038",
+    "analysis/ai-generated/equipment/xuanfeng/reference/wfs.png": "9efa310c3d1a3f2d8f26358fe9933d840bd5812fb080948204f3ce54fc45b7d4",
+    "client/assets/hero_parts/wfst2.png": "80561a1862a6896af3ef68dc56b57d0a5d84a8e7ae92c315b566ca890136401d",
+    "client/assets/hero_parts/wfs2.png": "8e298eb193dfd420ca481f5d1d2d75185fc895c4d34515ebe95a36dcfb3e081b",
+    "client/assets/hero_parts/wfs2q.png": "dcbd4f05f9cb66e70db25bc3b2fd491410dd8142a499e193333949b10922b7ca",
+    "client/assets/hero_parts/wfs2x.png": "6a5299a8ed58a7099efb9c975d729001c873ab62c9f140c634bafa9a69466f4e",
+    "client/assets/data/hero-parts.json": "79037c093c4f04f6ad36e53ad8bf592ed6eb6bbc6528ec65329733502fa89a5f"
+  },
+  "palette": {
+    "ink": "#28212e",
+    "shadow": "#373643",
+    "cloth": "#515262",
+    "fold": "#727586",
+    "steel": "#9caab2",
+    "silver": "#cbd6d3",
+    "ivory": "#f1eee1",
+    "garnet": "#753847",
+    "red": "#aa5260",
+    "gem": "#dd8790",
+    "leather": "#4e3938",
+    "leather_light": "#826354"
+  },
+  "codes": {
+    "weapon": [
+      53,
+      58
+    ],
+    "clothing": [
+      36,
+      41
+    ],
+    "head": [
+      34,
+      39
+    ]
+  },
+  "limitations": "成品母版用于登记服装与头盔设计；动画由原生部件制作。只有武器、衣服、头部三项独立改变外观。"
+}

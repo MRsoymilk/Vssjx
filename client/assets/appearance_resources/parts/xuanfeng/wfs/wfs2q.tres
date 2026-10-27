@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="NativeAppearancePart" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/appearance_part.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+source_id = "xuanfeng/wfs/wfs2q"
+texture_path = "res://assets/generated/equipment/xuanfeng/wfs/parts/wfs2q.png"
+regions = Array[Rect2i]([Rect2i(0, 0, 19, 22), Rect2i(21, 0, 4, 6), Rect2i(42, 0, 21, 21), Rect2i(63, 0, 10, 8)])

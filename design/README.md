@@ -83,6 +83,7 @@
 | [冥林异装](gravebloom-equipment.md) | 六套正式资源、多样武器与头部 |
 | [初号机参考套装](eva01-equipment.md) | 六角色紫黑／荧绿装甲、独角盔、十槽与实际离屏渲染；未部署 |
 | [誓约礼装](../tests/vow_equipment.md) | 六套婚纱／西装、花束武器及原动作兼容 |
+| [玄锋行装](xuanfeng-equipment.md) | 六角色开面硬盔、黑银衣装、十槽装备及独立换装 |
 | [图集采样](atlas-sampling.md) | 像素对齐、边缘串帧及原动画保留边界 |
 | [游戏音频](audio.md) | 音效、背景音乐、来源清单及独立资源试听 |
 

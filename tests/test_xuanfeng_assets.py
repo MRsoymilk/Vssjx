@@ -100,5 +100,21 @@ class XuanfengAssets(unittest.TestCase):
 
     def test_rebuild_is_byte_identical(self):builder.build(check=True)
 
+    def test_catalog_registry_and_forward_only_migration(self):
+        import re
+        from build_xuanfeng_migration import sql
+        catalog=json.loads((ROOT/'client/assets/data/shop-v2.json').read_text())['items']
+        self.assertEqual([i for i in catalog if i['id'].startswith('ai/xuanfeng/')],builder.equipment_items())
+        text=(ROOT/'server/migrations/0044_xuanfeng_equipment.sql').read_text()
+        self.assertEqual(text,sql())
+        whitelist=set(re.findall("'([^']+)'",re.search(r'definition_id IN \((.*?)\)\)',text)[1]))
+        self.assertEqual(whitelist,{i['id']for i in catalog})
+        for ids,slot in re.findall(r"WHEN definition_id IN \((.*?)\) THEN '([^']+)'",text):
+            self.assertEqual(set(re.findall("'([^']+)'",ids)),{i['id']for i in catalog if i['slot']==slot})
+        self.assertIn('CREATE UNIQUE INDEX one_equipped_per_slot',text)
+        self.assertNotIn('DELETE FROM',text.upper());self.assertNotIn('UPDATE CHARACTERS',text.upper())
+        registry=(ROOT/'client/scripts/generated_equipment.gd').read_text()
+        self.assertIn('"id":"xuanfeng","name":"玄锋行装"',registry)
+
 
 if __name__=='__main__':unittest.main()

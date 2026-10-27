@@ -118,7 +118,7 @@ def appearance_files(client=CLIENT):
     source=json.loads((client/'assets/data/hero-parts.json').read_text())
     parts=dict(source['parts'])
     families={}
-    for family in ['boneglow','gravebloom','eva01','legendary','vow']:
+    for family in ['boneglow','gravebloom','eva01','legendary','vow','xuanfeng']:
         data=json.loads((client/f'assets/data/{family}-equipment.json').read_text())
         parts.update(data['parts'])
         families[family]=data

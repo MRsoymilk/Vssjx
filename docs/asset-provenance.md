@@ -19,6 +19,7 @@
 | 新编写的客户端与联机规则 | Godot／Rust 源码、`shared/` 配置及 [设计文档](../design/README.md) | 不宣称恢复原服务端、原公式或获得原作官方背书 |
 | AI 世界与主题装备 | `analysis/ai-generated/`、[世界设计](../design/ai-world.md)、[装备美术流程](../design/ai-equipment-art.md) | 标明 AI 生成、人工配置及复用素材；AI 标识不能消除底层原包素材或参考图的权利要求 |
 | EVA 初号机参考装备 | [设计与生成说明](../design/eva01-equipment.md)；用户文字参考，AI 脚本在原生帧上重配色与补绘 | 非官方授权，不复制官方标志或插画；作品形象参考及原包底层素材仍需分别核验权利 |
+| 玄锋行装 | [成品设计](../design/xuanfeng-equipment.md)及[生产记录](../analysis/ai-generated/equipment/xuanfeng/README.md)；六张确认后的像素母版，Pillow原生分层适配与独立图标绘制 | 新增游戏装备，非原包恢复；母版不是动画图集，原包关节、配方及底层素材的权利仍需单独核验，生成记录不构成授权证明 |
 | 项目图标 | `client/assets/ui/app_icon.png`，见 [生成记录与提示词](../analysis/ai-generated/app-icon.md) | 依据参考图生成的女性 Q 版剑侠与金色“蜀”字，是本项目新增图标，不声称为原版恢复图或官方标识 |
 | 外部依赖与引擎 | Cargo 依赖、Godot 及导出模板等各自的许可声明 | 分发时按依赖许可保留相应声明，不由本仓库许可证统一替代 |
 

@@ -53,7 +53,7 @@ func _run() -> void:
 	check(source_count==208,"All recovered items are functional")
 	var page:ShopPanel=load("res://scenes/ui/shop_panel.tscn").instantiate()
 	add_child(page)
-	check(page.rows.size()==459 and page.grid.columns==2,"Complete two-column catalog including ceremonial outfits and supply gourds")
+	check(page.rows.size()==519 and page.grid.columns==2,"Complete two-column catalog including Xuanfeng outfits and supply gourds")
 	for row in page.rows:
 		check(row.get_node("Icon").texture!=null,"Actual product icon "+String(row.get_meta("item_id")))
 	for section_index in [3,2]:
@@ -61,9 +61,9 @@ func _run() -> void:
 		check(not page.goods.is_empty() and page.category=="全部" and page.category_box.get_item_text(page.category_box.selected)=="全部","Tab changes clear an incompatible category")
 		choose_category(page,"帽子")
 		check(page.section=="hot" and page.category=="帽子" and page.category_box.get_item_text(page.category_box.selected)=="帽子","Hats remain accessible after medicine and crafting tabs")
-	check(page.goods.size()==33 and page.goods.all(func(i:Dictionary)->bool:return i.slot=="hat"),"Nine original and twenty-four generated hats in their own category")
+	check(page.goods.size()==39 and page.goods.all(func(i:Dictionary)->bool:return i.slot=="hat"),"Nine original and thirty generated hats in their own category")
 	page.tabs[1].pressed.emit()
-	check(page.category=="帽子" and page.goods.size()==33,"A compatible tab retains the hat category")
+	check(page.category=="帽子" and page.goods.size()==39,"A compatible tab retains the hat category")
 	await capture("shop_hats")
 	for number in [1,10,20,29,39,48,57,66,75]:
 		var id:="original/if%d"%number

@@ -17,7 +17,7 @@ DOCUMENTS = [
     *(ROOT / 'tests' / name for name in (
         'documentation.md', 'player_duels.md', 'social.md', 'teams.md', 'testing.md', 'portal_navigation.md', 'portal_release_20261019.md', 'portal_stats.md', 'community_channel_20261023.md', 'eva01_equipment.md',
         'economy.md', 'progression.md', 'team_loot.md', 'observability.md',
-        'http_latency_optimization.md',
+        'http_latency_optimization.md', 'xuanfeng_equipment.md',
     )),
 ]
 

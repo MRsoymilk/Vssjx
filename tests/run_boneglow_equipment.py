@@ -107,6 +107,7 @@ def main(family='boneglow'):
                 check(status==200 and roster['characters'][0]['appearance_v2']==look,'roster persistence')
                 fixtures.append(dict(character=roster['characters'][0], state=restored.state))
             output = ROOT/f'work/{family}-production/live-fixtures.json'
+            output.parent.mkdir(parents=True,exist_ok=True)
             output.write_text(json.dumps(fixtures,ensure_ascii=False,indent=2),encoding='utf8')
             print(f'{family.upper()} SERVER: {checks} checks, 0 failures',flush=True)
         finally:

@@ -94,6 +94,7 @@ func _ready() -> void:
 		set_process(false)
 		set_process_unhandled_key_input(false)
 		return
+	GameAudio.initialize_settings()
 	$BackgroundMusic.begin()
 	Game.storage_changed.connect(_storage_changed)
 	if OS.has_feature("web"): Platform.context.lifecycle.changed.connect(_web_lifecycle)

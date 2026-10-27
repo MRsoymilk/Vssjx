@@ -14,3 +14,10 @@ func check_network_target(_address: String) -> PlatformResult:
 
 func allows_remembered_login() -> bool:
 	return false
+
+## Non-secret device preference, independent of player saves and network targets.
+func load_sound_enabled() -> PlatformResult:
+	return PlatformResult.unsupported()
+
+func save_sound_enabled(_enabled: bool) -> PlatformResult:
+	return PlatformResult.unsupported()

@@ -1,5 +1,6 @@
 [gd_scene format=3]
 [ext_resource type="Theme" path="res://scenes/ui/login_theme.tres" id="Theme"]
+[ext_resource type="PackedScene" path="res://scenes/ui/sound_settings.tscn" id="Sound"]
 [sub_resource type="StyleBoxFlat" id="Paper"]
 bg_color = Color(1, 0.968627, 0.721569, 1)
 border_color = Color(0.298039, 0.501961, 0.72549, 1)
@@ -58,3 +59,9 @@ offset_right = 266.0
 offset_bottom = 220.0
 theme_override_font_sizes/font_size = 12
 text = "公共聊天"
+[node name="SoundSettings" parent="Panel" instance=ExtResource("Sound")]
+visible = false
+offset_left = 18.0
+offset_top = 90.0
+offset_right = 266.0
+offset_bottom = 154.0

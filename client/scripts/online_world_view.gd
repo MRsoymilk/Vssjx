@@ -333,7 +333,9 @@ func _scene_action(action: String) -> void:
 	var titles := {"system": "系统", "properties": "人物属性", "quest": "任务", "bag": "背包", "map": "地图", "mail": "邮件", "reward": "奖励", "shop": "商城", "craft": "炼制", "team": "队伍", "guild": "帮会", "trade": "交易"}
 	$Menu/Panel/Title.text = titles.get(action, "提示")
 	var body := "同图%d人 · 点击地图移动 / WASD\n公共消息在底部直接发送。\n线上进度由服务器保存。" % actors.size()
-	if action == "quest": body = network.pve.quest_text()
+	$Menu/Panel/SoundSettings.visible = action == "system"
+	if action == "system": body = "线上进度由服务器自动保存。\n声音设置仅影响当前设备。"
+	elif action == "quest": body = network.pve.quest_text()
 	elif action == "bag" and not network.pve.state.is_empty(): body = "回春散 ×%d\n战斗中可恢复45点生命。\n铜钱：%d" % [int(network.pve.state.potions), int(_character.get("gold", 0))]
 	elif action in ["bag", "reward", "shop", "craft", "team", "guild", "trade"]: body = "线上%s尚未开放。\n可在当前地图移动，与同图玩家聊天。" % titles[action]
 	elif action == "mail": body = "暂无邮件。"

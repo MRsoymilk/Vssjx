@@ -1,0 +1,22 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/sound_settings.gd" id="Script"]
+
+[node name="SoundSettings" type="Control"]
+offset_right = 248.0
+offset_bottom = 64.0
+script = ExtResource("Script")
+
+[node name="Toggle" type="Button" parent="."]
+offset_right = 248.0
+offset_bottom = 30.0
+theme_override_font_sizes/font_size = 12
+text = "声音：开启（点击关闭）"
+
+[node name="Status" type="Label" parent="."]
+offset_top = 34.0
+offset_right = 248.0
+offset_bottom = 64.0
+theme_override_font_sizes/font_size = 11
+autowrap_mode = 3
+text = "背景音乐与音效同时开关。"

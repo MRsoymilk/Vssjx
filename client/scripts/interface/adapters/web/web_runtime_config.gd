@@ -2,6 +2,13 @@ extends PlatformRuntimeConfigInterface
 ## Same-origin network configuration controlled by the exported build.
 ## Page path, query, fragment, JS config globals and saved preferences are ignored.
 var _profile: Resource = preload("res://scripts/interface/profiles/web_runtime.tres")
+const SOUND_PREFERENCES := preload("res://scripts/interface/adapters/web/web_sound_preferences.gd")
+
+func load_sound_enabled() -> PlatformResult:
+	return SOUND_PREFERENCES.new().load_enabled()
+
+func save_sound_enabled(enabled: bool) -> PlatformResult:
+	return SOUND_PREFERENCES.new().save_enabled(enabled)
 
 func local_path(kind: String, explicit_path: String = "") -> PlatformResult:
 	if kind == "save" and explicit_path.is_empty(): return PlatformResult.success("offline://save-v1")

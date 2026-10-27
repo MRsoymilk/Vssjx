@@ -3,7 +3,7 @@ extends Control
 ## Authored, unnumbered game menu shared by local and online play.
 signal chosen(action: String)
 signal dismissed
-const ACTIONS := ["shop", "properties", "craft", "social", "quest", "team", "guild", "trade", "system", "help"]
+const ACTIONS := ["shop", "properties", "craft", "social", "quest", "team", "guild", "trade", "system", "find", "help"]
 var rows: Array[Button] = []
 var selected_index := 0
 

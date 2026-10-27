@@ -1,9 +1,9 @@
 extends "res://tests/shared_interface_test.gd"
 ## Menu routing in both real game UI instances, with isolated local state.
-const LABELS := ["商城", "人物", "炼制", "社交", "任务", "队伍", "帮会", "交易", "系统", "帮助"]
+const LABELS := ["商城", "人物", "炼制", "社交", "任务", "队伍", "帮会", "交易", "系统", "寻找", "帮助"]
 
 func check_rows(popup: OriginalGameMenu) -> void:
-	check(popup.scene_file_path == "res://scenes/ui/game_menu.tscn" and popup.rows.size() == 10, "Both modes use the authored menu with help last")
+	check(popup.scene_file_path == "res://scenes/ui/game_menu.tscn" and popup.rows.size() == 11, "Both modes use the authored menu with Finding and help last")
 	for index in LABELS.size():
 		check(popup.rows[index].text == LABELS[index], "Unnumbered menu row matches the requested order: " + LABELS[index])
 	check(not popup.has_node("Panel/Rows/Recharge"), "Recharge entry is removed")
@@ -26,7 +26,7 @@ func _run() -> void:
 	check_rows(popup)
 	check(popup.visible and not app.world.enabled, "Local toolbar opens compact menu and pauses movement")
 	await get_tree().process_frame
-	check(popup.get_node("Panel").get_rect() == Rect2(2, 154, 64, 304), "Ten-row menu stays narrow at the bottom-left above the toolbar")
+	check(popup.get_node("Panel").get_rect() == Rect2(2, 124, 64, 334), "Eleven-row menu stays narrow at the bottom-left above the toolbar")
 	check(popup.rows[0].button_pressed, "Opening menu highlights the first entry")
 	await capture("01_local_menu")
 	popup.rows[3].mouse_entered.emit()
@@ -68,8 +68,14 @@ func _run() -> void:
 		app._menu()
 		popup = app.modal
 		popup.rows[index].pressed.emit()
-		check(app.modal.find_child("Title", true, false).text == ("帮派" if index==6 else LABELS[index]) and Game.player == before, "Local entry reports its current state without changing assets: " + LABELS[index])
+		if index == 2:
+			check(app.backpack != null and app.backpack.loot_panel.visible and Game.player == before, "Craft entry opens the implemented equipment page without changing assets")
+		else:
+			check(app.modal.find_child("Title", true, false).text == ("帮派" if index==6 else LABELS[index]) and Game.player == before, "Local entry reports its current state without changing assets: " + LABELS[index])
 		app._close_modal()
+	app._menu(); app.modal.get_node("Panel/Rows/Find").pressed.emit()
+	check(app.modal is WorldTargetList and not app.world.enabled, "Finding opens current-map NPC list and pauses movement")
+	app._close_modal()
 	app._menu();app.modal.get_node("Panel/Rows/Help").pressed.emit()
 	check(app.modal is ControlHelp and not app.world.enabled,"Last local menu row opens a themed help page and pauses movement")
 	for command in ["/control help","/control lv","/control hp","/control money"]:
@@ -122,6 +128,10 @@ func _run() -> void:
 			check(view.team_panel.visible,"Online Team entry opens its implemented team panel");view.team_panel.dismiss()
 		elif index==6:
 			check(view.social_panel.visible and view.social_panel.section=="guild","Online Guild entry opens its implemented guild panel");view.social_panel.dismiss()
+		elif index == 2:
+			check(view.backpack == null and view.chat_status.text.contains("同步"), "Craft waits for authoritative character data instead of a placeholder page")
+		elif index == 7:
+			check(is_instance_valid(view.economy_panel), "Trade opens the implemented economy panel"); view._close_economy()
 		else:
 			check(view.details.visible and view.details.get_node("Panel/Title").text == LABELS[index], "Online menu entry routes to its current feature state: " + LABELS[index])
 			view.get_node("Menu/Panel/Continue").pressed.emit()

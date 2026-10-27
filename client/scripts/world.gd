@@ -49,6 +49,7 @@ var quest_marker: NpcQuestMarker
 var soul_markers: SoulMarkers
 var day_night: WorldDayNight
 var gathering_nodes:Dictionary={}
+var npc_search := false
 
 func _ready() -> void:
 	zone = int(Game.player.zone)
@@ -256,8 +257,38 @@ func approach_ai_target(id: String) -> void:
 	var r := AIWorld.resident(id)
 	if not r.is_empty(): _walk_to({"kind": "ai_npc" if r.kind == "npc" else "enemy", "cell": Vector2i(r.cell[0], r.cell[1]), "data": r})
 
+func npc_targets() -> Array[Dictionary]:
+	var targets: Array[Dictionary] = []
+	for id in ai_npcs:
+		if not is_instance_valid(ai_npcs[id]) or not ai_npcs[id].visible: continue
+		var resident := AIWorld.resident(id).duplicate(true)
+		if resident.is_empty(): continue
+		var point := Vector2i(floori(ai_npcs[id].position.x/CELL), floori(ai_npcs[id].position.y/CELL))
+		resident.cell = [point.x, point.y]
+		targets.append({"kind":"ai_npc", "cell":point, "data":resident})
+	if map_id == "qingyun_trail" and is_instance_valid(quest_marker):
+		var resident: Dictionary = SharedWorldMap.population(map_id)[0].duplicate(true)
+		targets.append({"kind":"npc", "cell":Vector2i(resident.cell[0], resident.cell[1]), "data":resident})
+	return targets
+
+func find_npc(id: String) -> bool:
+	if not enabled or Game.is_soul(): return false
+	for target in npc_targets():
+		if target.data.id != id: continue
+		var origin := next_cell if next_cell.x >= 0 else cell
+		var route := NpcFinder.route(astar, origin, target.cell, SharedWorldMap.exits(map_id))
+		if route.is_empty(): return false
+		pending = target; npc_search = true
+		path = route; path.pop_front()
+		if next_cell.x < 0 and absi(cell.x-target.cell.x)+absi(cell.y-target.cell.y) <= 2:
+			_interact_pending()
+		elif not path.is_empty(): move_target.set_destination(path[-1])
+		return true
+	return false
+
 func click(local: Vector2) -> void:
 	if not enabled: return
+	npc_search = false
 	var world_point := camera.get_screen_center_position() + local - get_viewport_rect().size / 2.0
 	var target := Vector2i(floor(world_point.x / CELL), floor(world_point.y / CELL))
 	if not astar.region.has_point(target): return
@@ -321,6 +352,7 @@ func target_at(target: Vector2i) -> Dictionary:
 	return {}
 
 func _walk_to(target: Dictionary) -> void:
+	npc_search = false
 	if Game.is_soul() and target.get("kind")!="corpse":return
 	if target.kind == "enemy" and enemy_nodes.has(target.data.id):
 		target = target.duplicate()
@@ -377,6 +409,7 @@ func interact_nearest() -> void:
 		interaction.emit("hint", {"text": "靠近人物、怪物或灵门，再按交互。"})
 
 func _interact_pending() -> void:
+	npc_search = false
 	move_target.clear()
 	var target := pending
 	pending = {}
@@ -393,6 +426,7 @@ func _process(delta: float) -> void:
 	if OS.has_feature("web") and (not Platform.context.lifecycle.focused or Platform.context.lifecycle.suspended): return
 	_sync_enemies()
 	if _keyboard_direction() != Vector2i.ZERO:
+		npc_search = false
 		move_target.clear()
 		path.clear()
 		pending = {}
@@ -413,7 +447,7 @@ func _process(delta: float) -> void:
 			next_cell = Vector2i(-1, -1)
 			_save_position()
 			var exit := SharedWorldMap.exit_at(map_id,cell)
-			if not exit.is_empty() and not Game.is_soul():
+			if not exit.is_empty() and not Game.is_soul() and not npc_search:
 				_idle_hero();_enter_exit(exit);return
 			if path.is_empty() and not pending.is_empty():
 				_idle_hero()
@@ -537,6 +571,7 @@ func stop_moving() -> void:
 	hero.position = cell_center(cell)
 
 func pause_moving() -> void:
+	npc_search = false
 	# UI pauses keep the rendered position and unfinished segment. Resuming may
 	# finish that one segment, but must not restore an old click/interaction path.
 	path.clear()

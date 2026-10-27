@@ -34,6 +34,7 @@
 | 无尽试炼、个人纪录、排行榜与公屏里程碑 | [无尽试炼](../tests/endless.md) |
 | 采矿采药、独立材料袋与材料加工 | [采集验证](../tests/gathering.md) |
 | 地图管理草稿／校验／发布／恢复 | [地图管理](../tests/map_management.md)；不是任意SQL或数值修改入口 |
+| 人群显示、重叠目标及同图寻找NPC | [人群遮挡](../tests/crowd_display.md)、[寻找NPC与到达对白](../tests/npc_finder.md) |
 | 总图地点文字、缩放、拖动与神行符确认 | [世界地图](../tests/world_map.md)、[神行符](../tests/travel_scroll.md) |
 | 本机管理、每日在线与HTTP监控口径 | [服务端说明](../server/README.md)、[每日在线](../tests/monitor_online.md)、[监控验证](../tests/observability.md) |
 

@@ -238,7 +238,9 @@ func _ready() -> void:
 	)
 	network.map_changed.connect(_map_changed)
 	network.map_rules.changed.connect(func()->void:
-		if network.map_rules.map_id==String(map_data.map_id):_build_portals()
+		if network.map_rules.map_id==String(map_data.map_id):
+			_build_portals()
+			_refresh_npc_finder()
 	)
 	network.map_transfer_started.connect(_begin_map_transition)
 	network.connection_failed.connect(map_transition.cancel)
@@ -267,6 +269,8 @@ func _scene_action(action: String) -> void:
 	if map_transition.blocking: return
 	if network.duel.active() or duel_battle.visible or team.active() or team_battle.visible: return
 	_close_target_list()
+	$Menu/Panel/SoundSettings.hide()
+	$Menu/Panel/CrowdSettings.hide()
 	if gathering_panel.visible:_cancel_gathering()
 	_close_help()
 	_close_economy()
@@ -296,6 +300,9 @@ func _scene_action(action: String) -> void:
 		help_panel=preload("res://scenes/ui/control_help.tscn").instantiate();help_panel.online_mode=true;add_child(help_panel)
 		help_panel.dismissed.connect(_close_help)
 		return
+	if action == "find":
+		_open_npc_finder()
+		return
 	if action == "social":
 		_toggle_chat()
 		return
@@ -324,12 +331,12 @@ func _scene_action(action: String) -> void:
 		_open_inventory()
 		return
 	if action=="craft":
-		if network.team.active() or network.duel.active():chat_status.text=OnlinePve.error_text("BATTLE_ACTIVE");return
+		if team.active() or network.duel.active():chat_status.text=OnlinePve.error_text("BATTLE_ACTIVE");return
 		_open_inventory()
 		if backpack!=null:backpack.open_loot();backpack.loot_panel.status.text="选择一件装备，再点“养成”。"
 		return
 	if action=="trade":
-		if network.pve.active() or network.team.active() or network.duel.active():chat_status.text=OnlinePve.error_text("BATTLE_ACTIVE");return
+		if network.pve.active() or team.active() or network.duel.active():chat_status.text=OnlinePve.error_text("BATTLE_ACTIVE");return
 		if is_instance_valid(economy_panel):return
 		economy_panel=EconomyPanel.new();economy_panel.online_model=network.pve
 		if network.pve.state.get("economy",{}).get("incoming_trade")!=null:economy_panel.section="direct"
@@ -360,6 +367,7 @@ func _status_changed(text_value: String) -> void:
 	expanded_chat.add_system(text_value)
 	if not network.world_ready:
 		_close_target_list()
+		_cancel_approach()
 		target.clear()
 		move_target.clear()
 		for actor in actors.values():
@@ -671,6 +679,7 @@ func _population(values: Dictionary) -> void:
 			var marker := AIWorld.npc_marker(id,network.pve.state.get("ai_world",{}),int(_character.get("level",1))) if network.pve.ready else {"stage":-1,"hint":""}
 			residents[id].set_quest_stage(marker.stage,marker.hint)
 	screen.hud.get_node("Minimap").set_shared_population(visible_values)
+	_refresh_npc_finder()
 
 func _apply_player_display(id: String) -> void:
 	var actor: Dictionary = actors[id]
@@ -966,8 +975,14 @@ func _open_target_list(entries: Array[Dictionary], caption: String = "重叠目�
 	target_list = WorldTargetList.new()
 	target_list.entries = entries; target_list.caption = caption
 	add_child(target_list)
-	target_list.dismissed.connect(_close_target_list)
-	target_list.chosen.connect(_choose_world_target)
+	var picker := target_list
+	target_list.dismissed.connect(func() -> void:
+		if target_list == picker: _close_target_list()
+	)
+	var source_map: String = map_data.map_id
+	target_list.chosen.connect(func(kind: String, id: String) -> void:
+		if target_list == picker and String(map_data.map_id) == source_map: _choose_world_target(kind, id)
+	)
 
 func _close_target_list() -> void:
 	if is_instance_valid(target_list): remove_child(target_list); target_list.queue_free()
@@ -978,10 +993,57 @@ func _choose_world_target(kind: String, id: String) -> void:
 	if map_transition.blocking or not network.world_ready or network.pve.active() or network.pve.pending() or team.active() or network.duel.active() or network.pve.is_soul(): return
 	if kind == "player":
 		_select_player(id)
+	elif kind == "npc_find":
+		_start_npc_find(id)
 	elif kind == "resident" and not network.team_following and residents.has(id) and not residents[id].is_queued_for_deletion() and id not in network.pve.unavailable_monsters():
 		resident_selected.emit(id)
 	else:
 		chat_status.text = "目标已离开或当前不能交互，请重新选择。"
+
+func _npc_find_available(id: String) -> bool:
+	var resident: Dictionary = network.population.entities.get(id, {})
+	if resident.get("kind") != "npc" or not residents.has(id) or residents[id].is_queued_for_deletion(): return false
+	if network.map_rules.map_id == String(map_data.map_id):
+		for rule in network.map_rules.rules.get("residents", []):
+			if rule.id == id: return rule.enabled
+	return true
+
+func _npc_finder_entries() -> Array[Dictionary]:
+	var entries: Array[Dictionary] = []
+	if not network.entities.has(character_id): return entries
+	var own: Dictionary = network.entities[character_id]
+	var origin := Vector2i(own.cell[0], own.cell[1])
+	for id in network.population.entities:
+		if not _npc_find_available(id): continue
+		var resident: Dictionary = network.population.entities[id]
+		var marker: NpcQuestMarker = residents[id].get_node("QuestMarker")
+		entries.append(NpcFinder.row(resident, origin, marker.quest_stage, marker.tooltip_text if marker.visible else ""))
+	return entries
+
+func _refresh_npc_finder() -> void:
+	if not is_instance_valid(target_list) or not target_list.get_meta("npc_finder", false): return
+	target_list.entries = _npc_finder_entries()
+	target_list._refresh()
+
+func _open_npc_finder() -> void:
+	if not network.world_ready or not network.pve.ready or network.pve.pending() or network.pve.active():
+		chat_status.text = "正在同步或战斗中，暂时不能寻找NPC。"; return
+	if network.pve.is_soul(): chat_status.text = OnlinePve.error_text("SOUL_STATE"); return
+	if network.team_following: chat_status.text = "跟随中请先在队伍界面暂离，再寻找NPC。"; return
+	if not network.entities.has(character_id): return
+	_open_target_list(_npc_finder_entries(), "寻找NPC · 当前地图")
+	target_list.set_meta("npc_finder", true)
+
+func _start_npc_find(id: String) -> void:
+	if not network.pve.ready or network.team_following or not _npc_find_available(id):
+		chat_status.text = "目标已离开、禁用或当前处于跟随中，请重新选择。"; return
+	target.clear()
+	_select_resident(id)
+	if not _approach.is_empty():
+		_approach.npc_find = true; _approach.map_id = String(map_data.map_id)
+		# The full-map route may need longer than the legacy 30-second click approach.
+		_approach.deadline = Time.get_unix_time_from_system() + 240.0
+		chat_status.text = "正在寻找%s，手动移动或按Esc取消。" % String(network.population.entities[id].name)
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	if is_instance_valid(target_list):
@@ -1132,6 +1194,7 @@ func _select_resident(id: String) -> void:
 	_resident_action("ai_npc" if not AIWorld.resident(id).is_empty() and AIWorld.resident(id).kind=="npc" else ("npc" if id=="qingwei" else "challenge"),id)
 
 func _cancel_approach() -> void:
+	if _approach.get("npc_find", false): chat_status.text = "已取消寻找NPC。"
 	if not _approach.is_empty() and network.world_ready: network.stop_moving()
 	_approach = {}
 	if npc_dialog != null:
@@ -1156,6 +1219,7 @@ func _follow_transfer()->bool:
 	return true
 
 func _auto_transfer() -> bool:
+	if _approach.get("npc_find", false): return false
 	if network.pve.is_soul():return false
 	if not network.pve.ready or not network.entities.has(character_id): return false
 	var own: Dictionary=network.entities[character_id]
@@ -1249,6 +1313,11 @@ func _gather_tick()->void:
 
 func _advance_approach() -> void:
 	if _approach.is_empty(): return
+	var finding: bool = _approach.get("npc_find", false)
+	if finding and GatheringPanel.movement_pressed():
+		_cancel_approach(); return
+	if finding and (network.team_following or String(map_data.map_id) != _approach.map_id or not _npc_find_available(_approach.target)):
+		_cancel_approach(); chat_status.text = "寻路已取消：目标离开、禁用或角色状态改变。"; return
 	if network.pve.active() or network.pve.pending():
 		_cancel_approach()
 		return
@@ -1275,12 +1344,14 @@ func _advance_approach() -> void:
 	# Moving wolves can cross a cell while the challenge is in flight.
 	var reach := 1 if gathering or resident.get("kind") == "wolf" else 2
 	if absi(cell.x - target.x) + absi(cell.y - target.y) <= reach:
+		if finding and actors.has(character_id) and actors[character_id].motion.has_motion(): return
 		if not _approach.stopped:
 			_approach.stopped = true
 			network.stop_moving()
 			return
 		var request := _approach
 		_approach = {}
+		if finding: chat_status.text = "已抵达%s。" % String(resident.get("name", "NPC"))
 		var action: String = request.action
 		if action=="gather":
 			_gather_cancel_requested=false;_gather_auto_token="";gathering_panel.present(resident);_gather_confirm();return
@@ -1297,13 +1368,17 @@ func _advance_approach() -> void:
 		return
 	var best := Vector2i(-1, -1)
 	var shortest := 9999
-	for offset in [Vector2i.UP, Vector2i.DOWN, Vector2i.LEFT, Vector2i.RIGHT]:
-		var goal: Vector2i = target + offset
-		if not _motion_grid.region.has_point(goal) or _motion_grid.is_point_solid(goal): continue
-		var path := _motion_grid.get_id_path(cell, goal)
-		if not path.is_empty() and path.size() < shortest:
-			best = goal
-			shortest = path.size()
+	if finding:
+		var path := NpcFinder.route(_motion_grid, cell, target, network.map_rules.exits(String(map_data.map_id)))
+		if not path.is_empty(): best = NpcFinder.waypoint(path)
+	else:
+		for offset in [Vector2i.UP, Vector2i.DOWN, Vector2i.LEFT, Vector2i.RIGHT]:
+			var goal: Vector2i = target + offset
+			if not _motion_grid.region.has_point(goal) or _motion_grid.is_point_solid(goal): continue
+			var path := _motion_grid.get_id_path(cell, goal)
+			if not path.is_empty() and path.size() < shortest:
+				best = goal
+				shortest = path.size()
 	if best.x < 0:
 		_cancel_approach()
 		chat_status.text = "目标不可达，请更换路线。"

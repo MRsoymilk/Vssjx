@@ -605,6 +605,7 @@ func _scene_action(action: String) -> void:
 		"guild": _message("帮派", "帮派在联机模式开放。\n进入联机后，可创建帮派、申请入帮，并查看成员与公告。")
 		"team": _message("队伍", "组队在联机模式开放。\n点击玩家资料邀请组队，全员准备后由队长发起共同战斗。")
 		"system": _system_menu()
+		"find": _open_npc_finder()
 		"help":
 			_close_modal()
 			if is_instance_valid(world):world.pause_moving();world.enabled=false
@@ -970,6 +971,26 @@ func _menu() -> void:
 		_scene_action(action)
 	)
 	popup.open()
+
+func _open_npc_finder() -> void:
+	if mode != "world" or not is_instance_valid(world): return
+	if Game.is_soul(): _message("寻找NPC", OnlinePve.error_text("SOUL_STATE")); return
+	_close_modal(); world.pause_moving(); world.enabled = false
+	var finder := WorldTargetList.new()
+	finder.caption = "寻找NPC · 当前地图"
+	for target in world.npc_targets():
+		var marker := AIWorld.npc_marker(target.data.id, AIWorld.progress(), int(Game.player.level)) if target.kind == "ai_npc" else {"stage":int(Game.player.quest), "hint":""}
+		finder.entries.append(NpcFinder.row(target.data, world.cell, marker.stage, marker.hint))
+	modal = finder; ui.add_child(finder)
+	var source_map: String = world.map_id
+	finder.dismissed.connect(func() -> void:
+		if modal == finder: _close_modal()
+	)
+	finder.chosen.connect(func(_kind: String, id: String) -> void:
+		if modal != finder or mode != "world" or not is_instance_valid(world) or world.map_id != source_map or Game.storage_busy or _closing: return
+		_close_modal()
+		if not world.find_npc(id): _message("寻找NPC", "目标已离开或不可达，请重新选择。")
+	)
 
 func _system_menu() -> void:
 	_close_modal()

@@ -109,15 +109,21 @@ func check_npc_crowding(view: OnlineWorldView, selected: Array) -> void:
 	for touch in [false,true]:
 		selected.clear();view.target.clear()
 		online_click(view,point,touch)
-		check(selected==["qingwei"] and view.target.selected.is_empty(),"Crowded NPC body wins over overlapping players: "+("touch" if touch else "mouse"))
+		check(is_instance_valid(view.target_list) and selected.is_empty(),"Crowded NPC body opens explicit choices without misclicks: "+("touch" if touch else "mouse"))
+		view._choose_world_target("resident", "qingwei")
+		check(selected==["qingwei"] and view.target.selected.is_empty(),"Choosing NPC preserves the original interaction flow")
 	selected.clear();view.target.clear()
 	var player_point:=npc.position+Vector2(0,16)
 	check(not npc.hit(player_point),"Exposed player feet are outside the NPC body")
 	online_click(view,player_point)
+	if is_instance_valid(view.target_list):
+		var choice: Dictionary = view.target_list.entries.filter(func(entry:Dictionary)->bool:return entry.kind=="player")[0]
+		view._choose_world_target("player", choice.id)
 	check(selected.is_empty() and not view.target.selected.is_empty(),"Exposed player area still selects a player")
 	view.target.clear();view.network.team_following=true
 	var input_before:=view.network._input_seq
 	online_click(view,point)
+	if is_instance_valid(view.target_list): view._choose_world_target("player", view.target_list.entries[0].id)
 	check(selected.is_empty() and not view.target.selected.is_empty() and view.network._input_seq==input_before,"Following still allows player selection without starting NPC movement")
 	view.network.team_following=false;view.target.clear()
 	names._process(0.0)

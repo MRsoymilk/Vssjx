@@ -1,6 +1,7 @@
 [gd_scene format=3]
 [ext_resource type="Theme" path="res://scenes/ui/login_theme.tres" id="Theme"]
 [ext_resource type="PackedScene" path="res://scenes/ui/sound_settings.tscn" id="Sound"]
+[ext_resource type="PackedScene" path="res://scenes/ui/crowd_settings.tscn" id="Crowd"]
 [sub_resource type="StyleBoxFlat" id="Paper"]
 bg_color = Color(1, 0.956863, 0.756863, 1)
 border_color = Color(0.458824, 0.286275, 0.129412, 1)
@@ -18,9 +19,9 @@ offset_bottom = 480.0
 color = Color(0.03, 0.05, 0.04, 0.3)
 [node name="Panel" type="Panel" parent="."]
 offset_left = 18.0
-offset_top = 74.0
+offset_top = 42.0
 offset_right = 302.0
-offset_bottom = 406.0
+offset_bottom = 438.0
 theme_override_styles/panel = SubResource("Paper")
 [node name="Title" type="Label" parent="Panel"]
 offset_left = 18.0
@@ -71,3 +72,8 @@ offset_left = 18.0
 offset_top = 260.0
 offset_right = 266.0
 offset_bottom = 324.0
+[node name="CrowdSettings" parent="Panel" instance=ExtResource("Crowd")]
+offset_left = 18.0
+offset_top = 324.0
+offset_right = 266.0
+offset_bottom = 388.0

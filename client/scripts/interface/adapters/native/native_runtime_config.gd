@@ -1,6 +1,7 @@
 extends PlatformRuntimeConfigInterface
 
 var audio_settings_path := "user://audio.cfg"
+var display_settings_path := "user://display.cfg"
 const PREFERENCE_STORAGE := preload("res://scripts/interface/adapters/native/native_storage.gd")
 
 const PATHS := {
@@ -43,3 +44,20 @@ func save_sound_enabled(enabled: bool) -> PlatformResult:
 	var config := ConfigFile.new()
 	config.set_value("audio", "enabled", enabled)
 	return PREFERENCE_STORAGE.new().write_text_atomic(audio_settings_path, config.encode_to_text())
+
+func load_player_display() -> PlatformResult:
+	var read := PREFERENCE_STORAGE.new().read_text(display_settings_path, 4096)
+	if read.code == "NOT_FOUND": return PlatformResult.success("normal")
+	if not read.ok: return read
+	var config := ConfigFile.new()
+	if config.parse(read.value) == OK and config.has_section_key("display", "players"):
+		var mode: Variant = config.get_value("display", "players", "normal")
+		if mode is String and mode in ["normal", "faded", "hidden"]: return PlatformResult.success(mode)
+	return PlatformResult.new(PlatformResult.Status.INVALID_DATA, "INVALID_DISPLAY_SETTINGS", "人群显示设置无效，已使用正常显示。")
+
+func save_player_display(mode: String) -> PlatformResult:
+	if mode not in ["normal", "faded", "hidden"]:
+		return PlatformResult.new(PlatformResult.Status.INVALID_DATA, "INVALID_DISPLAY_SETTINGS", "未知的人群显示方式。")
+	var config := ConfigFile.new()
+	config.set_value("display", "players", mode)
+	return PREFERENCE_STORAGE.new().write_text_atomic(display_settings_path, config.encode_to_text())

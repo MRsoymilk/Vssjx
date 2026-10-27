@@ -7,6 +7,7 @@
 | 范围 | 说明 |
 |---|---|
 | 开源文档与链接 | [文档检查](documentation.md) |
+| 人群遮挡、显示设置与重叠点击 | [保留队友、隐藏同步和显式选择](crowd_display.md) |
 | HTTP延迟口径、采样与优化候选 | [只读历史分析](http_latency_optimization.md)，优化尚未实施，不是压测报告 |
 | 导航与游戏子路径 | [页面、浏览器与隔离 Nginx 验证](portal_navigation.md) |
 | 私有统计后台与 APK 管理 | [采集、文件管理、HTTP 安全与浏览器验证](portal_stats.md) |

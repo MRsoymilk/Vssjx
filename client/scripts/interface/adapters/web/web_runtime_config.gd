@@ -3,6 +3,13 @@ extends PlatformRuntimeConfigInterface
 ## Page path, query, fragment, JS config globals and saved preferences are ignored.
 var _profile: Resource = preload("res://scripts/interface/profiles/web_runtime.tres")
 const SOUND_PREFERENCES := preload("res://scripts/interface/adapters/web/web_sound_preferences.gd")
+const DISPLAY_PREFERENCES := preload("res://scripts/interface/adapters/web/web_display_preferences.gd")
+
+func load_player_display() -> PlatformResult:
+	return DISPLAY_PREFERENCES.new().load_mode()
+
+func save_player_display(mode: String) -> PlatformResult:
+	return DISPLAY_PREFERENCES.new().save_mode(mode)
 
 func load_sound_enabled() -> PlatformResult:
 	return SOUND_PREFERENCES.new().load_enabled()

@@ -21,3 +21,9 @@ func load_sound_enabled() -> PlatformResult:
 
 func save_sound_enabled(_enabled: bool) -> PlatformResult:
 	return PlatformResult.unsupported()
+
+func load_player_display() -> PlatformResult:
+	return PlatformResult.unsupported()
+
+func save_player_display(_mode: String) -> PlatformResult:
+	return PlatformResult.unsupported()

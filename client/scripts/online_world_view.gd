@@ -95,8 +95,11 @@ var soul_markers: SoulMarkers
 var _soul_transition_id := ""
 var _soul_snap_pending := false
 var day_night: WorldDayNight
+var target_list: WorldTargetList
+var _display_mode := ""
 
 func _ready() -> void:
+	WorldDisplaySettings.initialize()
 	solo_model.attach(network.pve)
 	solo_battle=preload("res://scenes/ui/team_battle_view.tscn").instantiate();solo_battle.model=solo_model;add_child(solo_battle)
 	solo_battle.dismissed.connect(func()->void:
@@ -263,6 +266,7 @@ func _leave_world() -> void:
 func _scene_action(action: String) -> void:
 	if map_transition.blocking: return
 	if network.duel.active() or duel_battle.visible or team.active() or team_battle.visible: return
+	_close_target_list()
 	if gathering_panel.visible:_cancel_gathering()
 	_close_help()
 	_close_economy()
@@ -334,6 +338,7 @@ func _scene_action(action: String) -> void:
 	$Menu/Panel/Title.text = titles.get(action, "提示")
 	var body := "同图%d人 · 点击地图移动 / WASD\n公共消息在底部直接发送。\n线上进度由服务器保存。" % actors.size()
 	$Menu/Panel/SoundSettings.visible = action == "system"
+	$Menu/Panel/CrowdSettings.visible = action == "system"
 	if action == "system": body = "线上进度由服务器自动保存。\n声音设置仅影响当前设备。"
 	elif action == "quest": body = network.pve.quest_text()
 	elif action == "bag" and not network.pve.state.is_empty(): body = "回春散 ×%d\n战斗中可恢复45点生命。\n铜钱：%d" % [int(network.pve.state.potions), int(_character.get("gold", 0))]
@@ -354,9 +359,12 @@ func _status_changed(text_value: String) -> void:
 	_system_text = text_value
 	expanded_chat.add_system(text_value)
 	if not network.world_ready:
+		_close_target_list()
 		target.clear()
 		move_target.clear()
-		for actor in actors.values(): actor.sprite.play("idle")
+		for actor in actors.values():
+			if actor.root.visible: actor.sprite.play("idle")
+			else: actor.sprite.pause()
 	_chat_changed()
 
 func _map_command_sent(packet: Dictionary) -> void:
@@ -365,6 +373,7 @@ func _map_command_sent(packet: Dictionary) -> void:
 
 func _select_player(id: String) -> void:
 	if id == character_id or not network.entities.has(id) or not network.world_ready or network.pve.active() or network.pve.pending() or team.active() or network.duel.active() or map_transition.blocking:return
+	if not actors.has(id) or not actors[id].root.visible: return
 	_cancel_approach();target.select(id);target_view.close_actions();_refresh_target()
 
 func _refresh_target()->void:
@@ -373,7 +382,7 @@ func _refresh_target()->void:
 	if not network.world_ready or not network.entities.has(target.selected) or map_transition.blocking or network.pve.active() or team.active() or network.duel.active():
 		target.clear();return
 	target_view.display(target.selected,network.entities[target.selected],target.profile,target.last_code)
-	target_view.visible=not (is_instance_valid(economy_panel) or gathering_panel.visible or is_instance_valid(help_panel) or team_panel.visible or social_panel.visible or bag_overlay!=null or menu.visible or details.visible or npc_dialog.visible or encounter.visible or battle_view.visible or solo_battle.visible or duel_battle.visible or team_battle.visible or expanded_chat.visible or attributes.visible or world_map.visible)
+	target_view.visible=not (is_instance_valid(target_list) or is_instance_valid(economy_panel) or gathering_panel.visible or is_instance_valid(help_panel) or team_panel.visible or social_panel.visible or bag_overlay!=null or menu.visible or details.visible or npc_dialog.visible or encounter.visible or battle_view.visible or solo_battle.visible or duel_battle.visible or team_battle.visible or expanded_chat.visible or attributes.visible or world_map.visible)
 	if not target_view.visible:target_view.close_actions()
 	target_view.buttons.duel.disabled=not network.duel.enabled or network.duel.pending()
 	var friends:bool=social.state.get("friends",[]).any(func(p:Dictionary)->bool:return p.id==target.selected)
@@ -418,6 +427,7 @@ func _open_team()->void:
 	network.stop_moving();_was_keyboard=false;team_panel.open()
 
 func _team_changed()->void:
+	_refresh_player_display()
 	network.team_active=team.active()
 	menu.rows[5].text="队伍（%d）"%team.party().get("members",[]).size() if not team.party().is_empty() else "队伍"
 	team_notice.visible=not team.state.incoming.is_empty() and not team.active() and not network.pve.active() and not network.duel.active()
@@ -425,6 +435,7 @@ func _team_changed()->void:
 		team_notice_text.text="%s 邀请组队"%team.state.incoming[0].name
 		team_confirm.disabled=team.pending() or team.inflight;team_reject.disabled=team_confirm.disabled
 	if team.active():
+		_close_target_list()
 		_close_economy()
 		if not team.presentation_ready() and _team_loading!=team.battle().id:_prepare_team_battle(team.battle())
 		network._pending_motion.clear();move_target.clear();_was_keyboard=false;_cancel_approach()
@@ -553,6 +564,7 @@ func _duel_changed() -> void:
 		_duel_lines = lines;_system_text = lines;_pve_log = lines;expanded_chat.add_system(lines);_chat_changed()
 
 func _begin_map_transition() -> void:
+	_close_target_list()
 	if map_transition.blocking: return
 	target.clear()
 	_cancel_gathering()
@@ -611,6 +623,7 @@ func _build_portals()->void:
 		label.add_theme_font_size_override("font_size",10);preload("res://scripts/world_nameplate.gd").apply(label,Color("c2f7f4"));node.add_child(label)
 
 func _map_changed(id: String) -> void:
+	_close_target_list()
 	target.clear()
 	gathering_panel.hide();gathering_nodes.clear();_gather_auto_token=""
 	if social_panel.visible:social_panel.dismiss()
@@ -659,6 +672,23 @@ func _population(values: Dictionary) -> void:
 			residents[id].set_quest_stage(marker.stage,marker.hint)
 	screen.hud.get_node("Minimap").set_shared_population(visible_values)
 
+func _apply_player_display(id: String) -> void:
+	var actor: Dictionary = actors[id]
+	var protected: bool = id == character_id or team.party().get("members", []).any(func(member: Dictionary) -> bool: return member.id == id)
+	actor.root.visible = protected or WorldDisplaySettings.mode != "hidden"
+	actor.root.modulate.a = 1.0 if protected or WorldDisplaySettings.mode != "faded" else 0.25
+	if not actor.root.visible:
+		actor.sprite.pause()
+		if target.selected == id: target.clear()
+	else:
+		var entity: Dictionary = network.entities.get(id, {})
+		if not entity.is_empty():
+			OriginalArt.apply_appearance(actor.sprite, ShopRules.actor_key(int(entity.job), int(entity.gender), network.appearances.get(id, [1, 0])))
+
+func _refresh_player_display() -> void:
+	_display_mode = WorldDisplaySettings.mode
+	for id in actors: _apply_player_display(id)
+
 func _snapshot(values: Dictionary) -> void:
 	for id in actors.keys():
 		if not values.has(id):
@@ -684,8 +714,7 @@ func _snapshot(values: Dictionary) -> void:
 			flag.position=Vector2(-ceilf(label.get_theme_font("font").get_string_size(label.text,HORIZONTAL_ALIGNMENT_LEFT,-1,label.get_theme_font_size("font_size")).x/2.0)-10,-63)
 			actors[id] = {"flag":flag,"root": root, "sprite": sprite, "target": point, "distance": 0.0, "motion": OnlineActorMotion.new()}
 		actors[id].flag.update_state(network.team_marks.get(id,{}))
-		var look: Array = network.appearances.get(id,[1,0])
-		OriginalArt.apply_appearance(actors[id].sprite,ShopRules.actor_key(int(entity.job),int(entity.gender),look))
+		_apply_player_display(id)
 		actors[id].target = point
 		if id==character_id and _soul_snap_pending and network.pve.is_soul():
 			var character:Dictionary=network.pve.state.character
@@ -787,6 +816,8 @@ func _update_chat_controls() -> void:
 		if emote_button.disabled: emote_picker.hide()
 
 func _process(delta: float) -> void:
+	if _display_mode != WorldDisplaySettings.mode: _refresh_player_display()
+	if is_instance_valid(target_list) and (network.pve.active() or network.pve.pending() or team.active() or network.duel.active() or network.pve.is_soul()): _close_target_list()
 	_update_soul_visuals()
 	var social_available:=network.world_ready and OnlineAccount.is_logged_in() and not OnlineAccount.busy and not OnlineAccount.network_suspended
 	if Platform.context.lifecycle.suspended:social_available=false
@@ -809,6 +840,7 @@ func _process(delta: float) -> void:
 		var motion: OnlineActorMotion = actor.motion
 		motion.advance(delta)
 		actor.root.position = motion.position
+		if not actor.root.visible: continue
 		var distance := motion.travelled
 		if distance > 0.001:
 			actor.distance += distance
@@ -832,7 +864,7 @@ func _process(delta: float) -> void:
 	if _follow_transfer():return
 	_advance_approach()
 	if gathering_panel.visible and GatheringPanel.movement_pressed():_cancel_gathering()
-	if is_instance_valid(economy_panel) or gathering_panel.visible or target_view.actions.visible or is_instance_valid(help_panel) or team_panel.visible or social_panel.visible or bag_overlay != null or chat_input.has_focus() or menu.visible or details.visible or npc_dialog.visible or emote_picker.visible or encounter.visible or (battle_view.visible or solo_battle.visible) or expanded_chat.visible or attributes.visible or world_map.visible or network.pve.pending() or network.pve.active():
+	if is_instance_valid(target_list) or is_instance_valid(economy_panel) or gathering_panel.visible or target_view.actions.visible or is_instance_valid(help_panel) or team_panel.visible or social_panel.visible or bag_overlay != null or chat_input.has_focus() or menu.visible or details.visible or npc_dialog.visible or emote_picker.visible or encounter.visible or (battle_view.visible or solo_battle.visible) or expanded_chat.visible or attributes.visible or world_map.visible or network.pve.pending() or network.pve.active():
 		_was_keyboard = false
 		return
 	if network.team_following: return
@@ -860,7 +892,7 @@ func _map_input(event: InputEvent) -> void:
 	if _battle_load_failed:
 		if (event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed) or (event is InputEventScreenTouch and event.pressed): _pve_changed()
 		return
-	if is_instance_valid(economy_panel) or is_instance_valid(help_panel) or social_panel.visible or bag_overlay != null or not network.world_ready or menu.visible or details.visible or npc_dialog.visible or encounter.visible or (battle_view.visible or solo_battle.visible) or expanded_chat.visible or attributes.visible or world_map.visible or network.pve.pending() or network.pve.active(): return
+	if is_instance_valid(target_list) or is_instance_valid(economy_panel) or is_instance_valid(help_panel) or social_panel.visible or bag_overlay != null or not network.world_ready or menu.visible or details.visible or npc_dialog.visible or encounter.visible or (battle_view.visible or solo_battle.visible) or expanded_chat.visible or attributes.visible or world_map.visible or network.pve.pending() or network.pve.active(): return
 	var point := Vector2.ZERO
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed: point = event.position
 	elif event is InputEventScreenTouch and event.pressed: point = event.position
@@ -883,19 +915,13 @@ func _map_input(event: InputEvent) -> void:
 		var destination:=Vector2i(floori(world_point.x/16.0),floori(world_point.y/16.0))
 		if _motion_grid.region.has_point(destination) and not _motion_grid.is_point_solid(destination):network.move_to(destination);_mark_destination(destination)
 		return
-	for id in actors:
-		if id == character_id: continue
-		var actor: Dictionary = actors[id]
-		if Rect2(actor.root.position - Vector2(20,60),Vector2(40,64)).has_point(world_point):
-			# Match the raised NPC artwork only when a player would steal its click.
-			if not network.team_following:
-				for resident_id in residents:
-					var resident: OnlineResident = residents[resident_id]
-					if resident.data.kind == "npc" and resident.hit(world_point):
-						resident_selected.emit(resident_id)
-						return
-			_select_player(id)
-			return
+	var hits := _targets_at(world_point)
+	if hits.size() > 1:
+		_open_target_list(hits)
+		return
+	if hits.size() == 1:
+		_choose_world_target(hits[0].kind, hits[0].id)
+		return
 	if network.team_following:
 		chat_status.text="跟随中由队长控制移动，可在队伍界面暂离。"
 		return
@@ -919,7 +945,49 @@ func _map_input(event: InputEvent) -> void:
 		network.stop_moving()
 		chat_status.text = "目标不可达，已停止原路线。"
 
+func _targets_at(point: Vector2) -> Array[Dictionary]:
+	var hits: Array[Dictionary] = []
+	if not network.team_following:
+		for id in residents:
+			var resident: OnlineResident = residents[id]
+			if resident.is_queued_for_deletion() or not resident.is_visible_in_tree() or not resident.hit(point): continue
+			hits.append({"kind":"resident", "id":id, "name":resident.data.name, "detail":"NPC · 对话" if resident.data.kind == "npc" else "怪物 · 前往挑战"})
+	for id in actors:
+		if id == character_id or not actors[id].root.visible: continue
+		if Rect2(actors[id].root.position - Vector2(20, 60), Vector2(40, 64)).has_point(point):
+			hits.append({"kind":"player", "id":id, "name":network.entities[id].display_name, "detail":"玩家 · 查看目标"})
+	return hits
+
+func _open_target_list(entries: Array[Dictionary], caption: String = "重叠目标，请选择") -> void:
+	_close_target_list()
+	_cancel_approach()
+	if network.world_ready and not network.team_following: network.stop_moving()
+	move_target.clear(); _was_keyboard = false
+	target_list = WorldTargetList.new()
+	target_list.entries = entries; target_list.caption = caption
+	add_child(target_list)
+	target_list.dismissed.connect(_close_target_list)
+	target_list.chosen.connect(_choose_world_target)
+
+func _close_target_list() -> void:
+	if is_instance_valid(target_list): remove_child(target_list); target_list.queue_free()
+	target_list = null
+
+func _choose_world_target(kind: String, id: String) -> void:
+	_close_target_list()
+	if map_transition.blocking or not network.world_ready or network.pve.active() or network.pve.pending() or team.active() or network.duel.active() or network.pve.is_soul(): return
+	if kind == "player":
+		_select_player(id)
+	elif kind == "resident" and not network.team_following and residents.has(id) and not residents[id].is_queued_for_deletion() and id not in network.pve.unavailable_monsters():
+		resident_selected.emit(id)
+	else:
+		chat_status.text = "目标已离开或当前不能交互，请重新选择。"
+
 func _unhandled_key_input(event: InputEvent) -> void:
+	if is_instance_valid(target_list):
+		if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
+			_close_target_list(); get_viewport().set_input_as_handled()
+		return
 	if is_instance_valid(economy_panel):
 		if event is InputEventKey and event.pressed and event.keycode==KEY_ESCAPE:
 			if economy_panel.confirmation.visible:economy_panel.confirmation.hide()
@@ -999,6 +1067,7 @@ func _pve_changed() -> void:
 	elif not model.is_soul():_soul_transition_id="";_soul_snap_pending=false
 	if not model.ready or model.active(): move_target.clear()
 	if model.active():
+		_close_target_list()
 		if social_panel.visible:social_panel.dismiss()
 		_close_economy()
 		_close_world_map()

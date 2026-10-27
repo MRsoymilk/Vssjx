@@ -21,7 +21,7 @@ func _process(_delta: float) -> void:
 	if not is_instance_valid(source_viewport):return
 	var ratio:=size/Vector2(source_viewport.size)
 	var seen := {}
-	var raised: Array[Label] = []
+	var raised: Array[Dictionary] = []
 	for source in get_tree().get_nodes_in_group(STYLE.GROUP):
 		if not source is Label or source.is_queued_for_deletion() or source.get_viewport()!=source_viewport:continue
 		var id: int=source.get_instance_id()
@@ -36,7 +36,8 @@ func _process(_delta: float) -> void:
 			source.self_modulate=Color(1,1,1,0)
 		var proxy: Label=entries[id].proxy
 		var actor := source.get_parent() as CanvasItem
-		if actor!=null and actor.z_index>0:raised.append(proxy)
+		if actor!=null and actor.z_index>0:raised.append({"label":proxy,"rank":actor.z_index})
+		proxy.modulate.a = actor.modulate.a if actor != null else 1.0
 		proxy.text=source.text
 		proxy.size=source.size
 		proxy.position=source.get_global_transform_with_canvas().origin*ratio
@@ -49,10 +50,11 @@ func _process(_delta: float) -> void:
 			var entry: Dictionary=entries[id]
 			if is_instance_valid(entry.source):entry.source.self_modulate=entry.modulate
 			entry.proxy.queue_free();entries.erase(id)
-	# Raise NPC names within this overlay, without raising them above the HUD.
+	# Monsters and NPC names stay above player names, but never above the HUD.
+	raised.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return a.rank < b.rank)
 	for i in range(raised.size()-1,-1,-1):
 		var index:=get_child_count()-raised.size()+i
-		if raised[i].get_index()!=index:move_child(raised[i],index)
+		if raised[i].label.get_index()!=index:move_child(raised[i].label,index)
 
 func _exit_tree() -> void:
 	for entry in entries.values():

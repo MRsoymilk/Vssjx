@@ -1,6 +1,7 @@
 [gd_scene format=3]
 [ext_resource type="Theme" path="res://scenes/ui/login_theme.tres" id="Theme"]
 [ext_resource type="PackedScene" path="res://scenes/ui/sound_settings.tscn" id="Sound"]
+[ext_resource type="PackedScene" path="res://scenes/ui/crowd_settings.tscn" id="Crowd"]
 [sub_resource type="StyleBoxFlat" id="Paper"]
 bg_color = Color(1, 0.968627, 0.721569, 1)
 border_color = Color(0.298039, 0.501961, 0.72549, 1)
@@ -20,9 +21,9 @@ offset_bottom = 480.0
 color = Color(0.03, 0.05, 0.04, 0.3)
 [node name="Panel" type="Panel" parent="."]
 offset_left = 18.0
-offset_top = 125.0
+offset_top = 90.0
 offset_right = 302.0
-offset_bottom = 355.0
+offset_bottom = 390.0
 theme_override_styles/panel = SubResource("Paper")
 [node name="Title" type="Label" parent="Panel"]
 offset_left = 18.0
@@ -40,23 +41,23 @@ theme_override_font_sizes/font_size = 12
 autowrap_mode = 3
 [node name="Continue" type="Button" parent="Panel"]
 offset_left = 18.0
-offset_top = 156.0
+offset_top = 224.0
 offset_right = 138.0
-offset_bottom = 184.0
+offset_bottom = 252.0
 theme_override_font_sizes/font_size = 12
 text = "返回游戏"
 [node name="Leave" type="Button" parent="Panel"]
 offset_left = 146.0
-offset_top = 156.0
+offset_top = 224.0
 offset_right = 266.0
-offset_bottom = 184.0
+offset_bottom = 252.0
 theme_override_font_sizes/font_size = 12
 text = "返回登陆"
 [node name="Chat" type="Button" parent="Panel"]
 offset_left = 18.0
-offset_top = 192.0
+offset_top = 260.0
 offset_right = 266.0
-offset_bottom = 220.0
+offset_bottom = 288.0
 theme_override_font_sizes/font_size = 12
 text = "公共聊天"
 [node name="SoundSettings" parent="Panel" instance=ExtResource("Sound")]
@@ -65,3 +66,9 @@ offset_left = 18.0
 offset_top = 90.0
 offset_right = 266.0
 offset_bottom = 154.0
+[node name="CrowdSettings" parent="Panel" instance=ExtResource("Crowd")]
+visible = false
+offset_left = 18.0
+offset_top = 156.0
+offset_right = 266.0
+offset_bottom = 220.0

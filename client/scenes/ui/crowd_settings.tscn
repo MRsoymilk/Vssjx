@@ -1,0 +1,17 @@
+[gd_scene format=3]
+[ext_resource type="Script" path="res://scripts/crowd_settings.gd" id="Script"]
+[node name="CrowdSettings" type="Control"]
+offset_right = 248.0
+offset_bottom = 64.0
+script = ExtResource("Script")
+[node name="Toggle" type="Button" parent="."]
+offset_right = 248.0
+offset_bottom = 30.0
+theme_override_font_sizes/font_size = 12
+text = "其他玩家：正常（点击切换）"
+[node name="Status" type="Label" parent="."]
+offset_top = 34.0
+offset_right = 248.0
+offset_bottom = 64.0
+theme_override_font_sizes/font_size = 11
+autowrap_mode = 3

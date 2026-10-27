@@ -11,7 +11,7 @@ func set_quest_stage(stage: int, description: String = "") -> void:
 
 func receive(value: Dictionary, grid: AStarGrid2D) -> void:
 	# NPCs remain above player sprites and their team flags (z=5).
-	z_index = 10 if value.kind == "npc" else 0
+	z_index = 10 if value.kind == "npc" else 8
 	if sprite == null:
 		sprite = OriginalArt.actor(value.art)
 		$Sprite.add_child(sprite)
